@@ -1,0 +1,240 @@
+/** @file
+  EDKII Device Security library for SPDM device.
+  It follows the SPDM Specification.
+
+Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "SpdmRequesterLibInternal.h"
+
+#pragma pack(1)
+typedef struct {
+  SPDM_MESSAGE_HEADER  Header;
+  UINT8                NumberOfBlocks;
+  UINT8                MeasurementRecordLength[3];
+  UINT8                MeasurementRecord[(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MAX_HASH_SIZE) * MAX_SPDM_MEASUREMENT_BLOCK_COUNT];
+  UINT8                Nonce[SPDM_NONCE_SIZE];
+  UINT16               OpaqueLength;
+  UINT8                OpaqueData[MAX_SPDM_OPAQUE_DATA_SIZE];
+  UINT8                Signature[MAX_ASYM_KEY_SIZE];
+} SPDM_MEASUREMENTS_RESPONSE_MAX;
+#pragma pack()
+
+RETURN_STATUS
+VerifyMeasurementSignature (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *SignData,
+  UINTN                           SignDataSize
+  )
+{
+  HASH_ALL                                  HashAll;
+  UINTN                                     HashSize;
+  UINT8                                     HashData[MAX_HASH_SIZE];
+  BOOLEAN                                   Result;
+  UINT8                                     *CertBuffer;
+  UINTN                                     CertBufferSize;
+  VOID                                      *RsaContext;
+
+  HashAll = GetSpdmHashFunc (SpdmContext);
+  ASSERT(HashAll != NULL);
+  HashSize = GetSpdmHashSize (SpdmContext);
+  
+  DEBUG((DEBUG_INFO, "L1L2 Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
+
+  HashAll (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
+  DEBUG((DEBUG_INFO, "L1L2 Hash - "));
+  InternalDumpData (HashData, HashSize);
+  DEBUG((DEBUG_INFO, "\n"));
+  
+  if ((SpdmContext->LocalContext.SpdmCertChainVarBuffer == NULL) || (SpdmContext->LocalContext.SpdmCertChainVarBufferSize == 0)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
+  CertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    
+  Result = RsaGetPublicKeyFromX509 (CertBuffer, CertBufferSize, &RsaContext);
+  if (!Result) {
+    return RETURN_SECURITY_VIOLATION;
+  }
+  
+  Result = RsaPkcs1Verify (
+             RsaContext,
+             HashData,
+             HashSize,
+             SignData,
+             SignDataSize
+             );
+  RsaFree (RsaContext);
+  if (!Result) {
+    DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - FAIL !!!\n"));
+    return RETURN_SECURITY_VIOLATION;
+  }
+  
+  DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - PASS !!!\n"));
+  return RETURN_SUCCESS;
+}
+
+
+/*
+  Get measurement
+*/
+RETURN_STATUS
+EFIAPI
+SpdmGetMeasurement (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                RequestAttribute,
+  IN     UINT8                MeasurementOperation,
+     OUT UINT8                *NumberOfBlocks,
+  IN OUT UINT32               *MeasurementRecordLength,
+     OUT VOID                 *MeasurementRecord
+  )
+{
+  RETURN_STATUS                             Status;
+  SPDM_GET_MEASUREMENTS_REQUEST             SpdmRequest;
+  UINTN                                     SpdmRequestSize;
+  SPDM_MEASUREMENTS_RESPONSE_MAX            SpdmResponse;
+  UINTN                                     SpdmResponseSize;
+  UINT32                                    MeasurementRecordDataLength;
+  UINT8                                     *MeasurementRecordData;
+  UINT8                                     *Ptr;
+  VOID                                      *ServerNonce;
+  UINT16                                    OpaqueLength;
+  VOID                                      *Opaque;
+  VOID                                      *Signature;
+  UINTN                                     SignatureSize;
+
+  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
+
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP) == SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG) {
+    RequestAttribute = 0;
+  }
+
+  if (RequestAttribute == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {
+    SignatureSize = GetSpdmAsymSize (SpdmContext);
+  } else {
+    SignatureSize = 0;
+  }
+
+  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  SpdmRequest.Header.RequestResponseCode = SPDM_GET_MEASUREMENTS;
+  SpdmRequest.Header.Param1 = RequestAttribute;
+  SpdmRequest.Header.Param2 = MeasurementOperation;
+  if (RequestAttribute == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {
+    SpdmRequestSize = sizeof(SpdmRequest);
+
+    GetRandomNumber (SPDM_NONCE_SIZE, SpdmRequest.Nonce);
+    DEBUG((DEBUG_INFO, "ClientNonce - "));
+    InternalDumpData (SpdmRequest.Nonce, SPDM_NONCE_SIZE);
+    DEBUG((DEBUG_INFO, "\n"));
+  } else {
+    SpdmRequestSize = sizeof(SpdmRequest.Header);
+  }
+  Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_DEVICE_ERROR;
+  }
+
+  SpdmResponseSize = sizeof(SpdmResponse);
+  ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+  Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE)) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponseSize > sizeof(SpdmResponse)) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponse.Header.RequestResponseCode != SPDM_MEASUREMENTS) {
+    return RETURN_DEVICE_ERROR;
+  }
+
+  if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+    if (SpdmResponse.NumberOfBlocks != 0) {
+      return RETURN_DEVICE_ERROR;
+    }
+  } else if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS) {
+    if (SpdmResponse.NumberOfBlocks == 0) {
+      return RETURN_DEVICE_ERROR;
+    }
+  } else {
+    if (SpdmResponse.NumberOfBlocks != 1) {
+      return RETURN_DEVICE_ERROR;
+    }
+  }
+
+  MeasurementRecordDataLength = (*(UINT32 *)SpdmResponse.MeasurementRecordLength) & 0xFFFFFF;
+  if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+    if (MeasurementRecordDataLength != 0) {
+      return RETURN_DEVICE_ERROR;
+    }
+  } else {
+    if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurementRecordDataLength) {
+      return RETURN_DEVICE_ERROR;
+    }
+    DEBUG((DEBUG_INFO, "MeasurementRecordLength - 0x%06x\n", MeasurementRecordDataLength));
+  }
+  MeasurementRecordData = SpdmResponse.MeasurementRecord;
+
+  if (RequestAttribute == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {
+    if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE) +
+                           MeasurementRecordDataLength +
+                           SPDM_NONCE_SIZE +
+                           sizeof(UINT16)) {
+      return RETURN_DEVICE_ERROR;
+    }
+    Ptr = MeasurementRecordData + MeasurementRecordDataLength;
+    ServerNonce = Ptr;
+    DEBUG((DEBUG_INFO, "ServerNonce (0x%x) - ", SPDM_NONCE_SIZE));
+    InternalDumpData (ServerNonce, SPDM_NONCE_SIZE);
+    DEBUG((DEBUG_INFO, "\n"));
+    Ptr += SPDM_NONCE_SIZE;
+        
+    OpaqueLength = *(UINT16 *)Ptr;
+    Ptr += sizeof(UINT16);
+        
+    if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE) +
+                           MeasurementRecordDataLength +
+                           SPDM_NONCE_SIZE +
+                           sizeof(UINT16) +
+                           OpaqueLength +
+                           SignatureSize) {
+      return RETURN_DEVICE_ERROR;
+    }
+
+    Opaque = Ptr;
+    Ptr += OpaqueLength;
+    DEBUG((DEBUG_INFO, "Opaque (0x%x):\n", OpaqueLength));
+    InternalDumpHex (Opaque, OpaqueLength);
+
+    Signature = Ptr;
+    DEBUG((DEBUG_INFO, "Signature (0x%x):\n", SignatureSize));
+    InternalDumpHex (Signature, SignatureSize);
+        
+    Status = VerifyMeasurementSignature (SpdmContext, Signature, SignatureSize);
+    if (RETURN_ERROR(Status)) {
+      SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE;
+      return Status;
+    }
+
+    ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
+  }
+  
+  if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+    *NumberOfBlocks = SpdmResponse.Header.Param1;
+  } else {
+    *NumberOfBlocks = SpdmResponse.NumberOfBlocks;
+    if (*MeasurementRecordLength < MeasurementRecordDataLength) {
+      return RETURN_BUFFER_TOO_SMALL;
+    }
+    *MeasurementRecordLength = MeasurementRecordDataLength;
+    CopyMem (MeasurementRecord, MeasurementRecordData, MeasurementRecordDataLength);
+  }
+
+  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_SUCCESS;
+  return RETURN_SUCCESS;
+}
