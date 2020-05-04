@@ -48,6 +48,9 @@ Build :
   Open Windows command prompt at openspdm root dir and type "nmake".
   The output is at openspdm\Build\X64.
 
+Run :
+  Open one windows command prompt at openspdm\Build\X64 to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
+
 NOTE:
   Current version only supports build with "Visual Studio 2015" and X64 version.
   Supporting for more compilers such as VS2019, GCC or LLVM, and architectures such as IA32 are in the progress.
