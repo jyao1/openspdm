@@ -37,7 +37,7 @@ GetRandomNoise64 (
   @param[out]  RandBuffer    Pointer to the buffer to store the random result.
 
   @retval RETURN_SUCCESS        Random bytes generation succeeded.
-  @retval EFI_NOT_READY      Failed to request random bytes.
+  @retval RETURN_NOT_READY      Failed to request random bytes.
 
 **/
 STATIC
@@ -107,7 +107,7 @@ RandGetSeed128 (
   @param[out]  Entropy       Pointer to the buffer to store the entropy data.
 
   @retval RETURN_SUCCESS        Entropy generation succeeded.
-  @retval EFI_NOT_READY      Failed to request random data.
+  @retval RETURN_NOT_READY      Failed to request random data.
 
 **/
 STATIC

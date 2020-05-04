@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -109,7 +109,7 @@ SpdmGetMeasurement (
 
   SpdmContext = Context;
 
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
+  SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP) == SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG) {
     RequestAttribute = 0;
@@ -220,7 +220,7 @@ SpdmGetMeasurement (
         
     Status = VerifyMeasurementSignature (SpdmContext, Signature, SignatureSize);
     if (RETURN_ERROR(Status)) {
-      SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE;
+      SpdmContext->ErrorState = SPDM_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE;
       return Status;
     }
 
@@ -238,6 +238,6 @@ SpdmGetMeasurement (
     CopyMem (MeasurementRecord, MeasurementRecordData, MeasurementRecordDataLength);
   }
 
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_SUCCESS;
+  SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   return RETURN_SUCCESS;
 }

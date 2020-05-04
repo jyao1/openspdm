@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -154,7 +154,7 @@ SpdmChallenge (
     return RETURN_DEVICE_ERROR;
   }
 
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
+  SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
  
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   SpdmRequest.Header.RequestResponseCode = SPDM_CHALLENGE;
@@ -207,7 +207,7 @@ SpdmChallenge (
   DEBUG((DEBUG_INFO, "\n"));
   Status = VerifyCertificateChainHash (SpdmContext, CertChainHash, HashSize);
   if (RETURN_ERROR(Status)) {
-    SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
     return Status;
   }
 
@@ -246,11 +246,11 @@ SpdmChallenge (
   InternalDumpHex (Signature, SignatureSize);
   Status = VerifyChallengeSignature (SpdmContext, Signature, SignatureSize);
   if (RETURN_ERROR(Status)) {
-    SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
     return Status;
   }
 
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_SUCCESS;
+  SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
 

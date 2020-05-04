@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SPDM_LIB_INTERNAL_H__
-#define __SPDM_LIB_INTERNAL_H__
+#ifndef __SPDM_COMMON_LIB_INTERNAL_H__
+#define __SPDM_COMMON_LIB_INTERNAL_H__
 
 #include <Library/SpdmCommonLib.h>
 
@@ -32,26 +32,26 @@ typedef enum {
   // Before send KEY_EXCHANGE/PSK_EXCHANGE
   // or after END_SESSION 
   //
-  EdkiiSpdmStateNotStarted,
+  SpdmStateNotStarted,
   //
   // After send KEY_EXHCNAGE, before send FINISH
   //
-  EdkiiSpdmStateHandshaking,
+  SpdmStateHandshaking,
   //
   // After send FINISH, before END_SESSION
   //
-  EdkiiSpdmStateEstablished,
+  SpdmStateEstablished,
   //
   // MAX
   //
-  EdkiiSpdmStateMax,
-} EDKII_SPDM_STATE;
+  SpdmStateMax,
+} SPDM_STATE;
 
 typedef struct {
   UINT8                SessionId;
   BOOLEAN              UsePsk;
   UINT8                Mut_Auth_Requested;
-  EDKII_SPDM_STATE     SessionState;
+  SPDM_STATE           SessionState;
   UINTN                DheKeySize;
   UINTN                HashSize;
   UINTN                AeadKeySize;
@@ -223,7 +223,7 @@ typedef struct {
 
 typedef struct {
   UINT32                          Version;
-  EDKII_SPDM_IO_PROTOCOL          *SpdmIo;
+  SPDM_IO_PROTOCOL                *SpdmIo;
   
   //
   // Command Status

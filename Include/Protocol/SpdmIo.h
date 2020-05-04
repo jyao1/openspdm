@@ -6,13 +6,13 @@
 
 **/
 
-#ifndef __EDKII_SPDM_IO_PROTOCOL_H__
-#define __EDKII_SPDM_IO_PROTOCOL_H__
+#ifndef __SPDM_IO_PROTOCOL_H__
+#define __SPDM_IO_PROTOCOL_H__
 
 #include <Base.h>
 #include <IndustryStandard/Spdm.h>
 
-typedef struct _EDKII_SPDM_IO_PROTOCOL EDKII_SPDM_IO_PROTOCOL;
+typedef struct _SPDM_IO_PROTOCOL SPDM_IO_PROTOCOL;
 
 /**
   Send a SPDM request command to a device.
@@ -38,8 +38,8 @@ typedef struct _EDKII_SPDM_IO_PROTOCOL EDKII_SPDM_IO_PROTOCOL;
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_IO_SEND_REQUEST) (
-  IN     EDKII_SPDM_IO_PROTOCOL  *This,
+(EFIAPI *SPDM_IO_SEND_REQUEST_FUNC) (
+  IN     SPDM_IO_PROTOCOL        *This,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
   IN     UINT64                  Timeout
@@ -70,18 +70,18 @@ RETURN_STATUS
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_IO_RECEIVE_RESPONSE) (
-  IN     EDKII_SPDM_IO_PROTOCOL  *This,
+(EFIAPI *SPDM_IO_RECEIVE_RESPONSE_FUNC) (
+  IN     SPDM_IO_PROTOCOL        *This,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,
   IN     UINT64                  Timeout
   );
 
 typedef enum {
-  EdkiiSpdmIoSecureMessagingTypeDmtfMtcp,
-  EdkiiSpdmIoSecureMessagingTypePciSigDoe,
-  EdkiiSpdmIoSecureMessagingTypeMax,
-} EDKII_SPDM_IO_SECURE_MESSAGING_TYPE;
+  SpdmIoSecureMessagingTypeDmtfMtcp,
+  SpdmIoSecureMessagingTypePciSigDoe,
+  SpdmIoSecureMessagingTypeMax,
+} SPDM_IO_SECURE_MESSAGING_TYPE;
 
 /**
   Return Secure Messaging type.
@@ -94,10 +94,10 @@ typedef enum {
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_IO_GET_SECURE_MESSAGING_TYPE) (
-  IN     EDKII_SPDM_IO_PROTOCOL              *This,
+(EFIAPI *SPDM_IO_GET_SECURE_MESSAGING_TYPE_FUNC) (
+  IN     SPDM_IO_PROTOCOL                    *This,
      OUT UINTN                               *SecureMessagingTypeCount,
-     OUT EDKII_SPDM_IO_SECURE_MESSAGING_TYPE **SecureMessagingType
+     OUT SPDM_IO_SECURE_MESSAGING_TYPE       **SecureMessagingType
   );
 
 /**
@@ -128,9 +128,9 @@ RETURN_STATUS
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_IO_SECURE_SEND_REQUEST) (
-  IN     EDKII_SPDM_IO_PROTOCOL                 *This,
-  IN     EDKII_SPDM_IO_SECURE_MESSAGING_TYPE    SecureMessagingType,
+(EFIAPI *SPDM_IO_SECURE_SEND_REQUEST_FUNC) (
+  IN     SPDM_IO_PROTOCOL                       *This,
+  IN     SPDM_IO_SECURE_MESSAGING_TYPE          SecureMessagingType,
   IN     UINT8                                  SessionId,
   IN     UINTN                                  RequestSize,
   IN     VOID                                   *Request,
@@ -166,21 +166,21 @@ RETURN_STATUS
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_IO_SECURE_RECEIVE_RESPONSE) (
-  IN     EDKII_SPDM_IO_PROTOCOL                 *This,
-  IN     EDKII_SPDM_IO_SECURE_MESSAGING_TYPE    SecureMessagingType,
+(EFIAPI *SPDM_IO_SECURE_RECEIVE_RESPONSE_FUNC) (
+  IN     SPDM_IO_PROTOCOL                       *This,
+  IN     SPDM_IO_SECURE_MESSAGING_TYPE          SecureMessagingType,
   IN     UINT8                                  SessionId,
   IN OUT UINTN                                  *ResponseSize,
   IN OUT VOID                                   *Response,
   IN     UINT64                                 Timeout
   );
 
-struct _EDKII_SPDM_IO_PROTOCOL {
-  EDKII_SPDM_IO_SEND_REQUEST               SendRequest;
-  EDKII_SPDM_IO_RECEIVE_RESPONSE           ReceiveResponse;
-  EDKII_SPDM_IO_GET_SECURE_MESSAGING_TYPE  GetSecureMessagingType;
-  EDKII_SPDM_IO_SECURE_SEND_REQUEST        SecureSendRequest;
-  EDKII_SPDM_IO_SECURE_RECEIVE_RESPONSE    SecureReceiveResponse;
+struct _SPDM_IO_PROTOCOL {
+  SPDM_IO_SEND_REQUEST_FUNC               SendRequest;
+  SPDM_IO_RECEIVE_RESPONSE_FUNC           ReceiveResponse;
+  SPDM_IO_GET_SECURE_MESSAGING_TYPE_FUNC  GetSecureMessagingType;
+  SPDM_IO_SECURE_SEND_REQUEST_FUNC        SecureSendRequest;
+  SPDM_IO_SECURE_RECEIVE_RESPONSE_FUNC    SecureReceiveResponse;
 };
 
 #endif

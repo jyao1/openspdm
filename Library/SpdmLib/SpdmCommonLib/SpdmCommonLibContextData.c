@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -65,27 +65,27 @@ SpdmAllocateSessionId (
 
 BOOLEAN
 NeedSessionInfoForData (
-  IN     EDKII_SPDM_DATA_TYPE      DataType
+  IN     SPDM_DATA_TYPE      DataType
   )
 {
   switch (DataType) {
-  case EdkiiSpdmDataDheSecret:
-  case EdkiiSpdmDataHandshakeSecret:
-  case EdkiiSpdmDataMasterSecret:
-  case EdkiiSpdmDataRequestHandshakeSecret:
-  case EdkiiSpdmDataResponseHandshakeSecret:
-  case EdkiiSpdmDataRequestDataSecret:
-  case EdkiiSpdmDataResponseDataSecret:
-  case EdkiiSpdmDataRequestHandshakeEncryptionKey:
-  case EdkiiSpdmDataRequestHandshakeSalt:
-  case EdkiiSpdmDataResponseHandshakeEncryptionKey:
-  case EdkiiSpdmDataResponseHandshakeSalt:
-  case EdkiiSpdmDataRequestDataEncryptionKey:
-  case EdkiiSpdmDataRequestDataSalt:
-  case EdkiiSpdmDataResponseDataEncryptionKey:
-  case EdkiiSpdmDataResponseDataSalt:
-  case EdkiiSpdmDataRequestFinishedKey:
-  case EdkiiSpdmDataResponseFinishedKey:
+  case SpdmDataDheSecret:
+  case SpdmDataHandshakeSecret:
+  case SpdmDataMasterSecret:
+  case SpdmDataRequestHandshakeSecret:
+  case SpdmDataResponseHandshakeSecret:
+  case SpdmDataRequestDataSecret:
+  case SpdmDataResponseDataSecret:
+  case SpdmDataRequestHandshakeEncryptionKey:
+  case SpdmDataRequestHandshakeSalt:
+  case SpdmDataResponseHandshakeEncryptionKey:
+  case SpdmDataResponseHandshakeSalt:
+  case SpdmDataRequestDataEncryptionKey:
+  case SpdmDataRequestDataSalt:
+  case SpdmDataResponseDataEncryptionKey:
+  case SpdmDataResponseDataSalt:
+  case SpdmDataRequestFinishedKey:
+  case SpdmDataResponseFinishedKey:
     return TRUE;
   }
   return FALSE;
@@ -109,8 +109,8 @@ RETURN_STATUS
 EFIAPI
 SpdmSetData (
   IN     VOID                      *Context,
-  IN     EDKII_SPDM_DATA_TYPE      DataType,
-  IN     EDKII_SPDM_DATA_PARAMETER *Parameter,
+  IN     SPDM_DATA_TYPE            DataType,
+  IN     SPDM_DATA_PARAMETER       *Parameter,
   IN     VOID                      *Data,
   IN     UINTN                     DataSize
   )
@@ -121,59 +121,59 @@ SpdmSetData (
   SpdmContext = Context;
 
   switch (DataType) {
-  case EdkiiSpdmDataCapabilityFlags:
+  case SpdmDataCapabilityFlags:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.Capability.Flags = *(UINT32 *)Data;
     break;
-  case EdkiiSpdmDataCapabilityCTExponent:
+  case SpdmDataCapabilityCTExponent:
     if (DataSize != sizeof(UINT8)) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.Capability.CTExponent = *(UINT8 *)Data;
     break;
-  case EdkiiSpdmDataMeasurementHashAlgo:
+  case SpdmDataMeasurementHashAlgo:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = *(UINT32 *)Data;
     break;
-  case EdkiiSpdmDataBaseAsymAlgo:
+  case SpdmDataBaseAsymAlgo:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = *(UINT32 *)Data;
     break;
-  case EdkiiSpdmDataBaseHashAlgo:
+  case SpdmDataBaseHashAlgo:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.Algorithm.BaseHashAlgo = *(UINT32 *)Data;
     break;
-  case EdkiiSpdmDataDHENamedGroup:
+  case SpdmDataDHENamedGroup:
     if (DataSize != sizeof(UINT16)) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.Algorithm.DHENamedGroup = *(UINT16 *)Data;
     break;
-  case EdkiiSpdmDataAEADCipherSuite:
+  case SpdmDataAEADCipherSuite:
     if (DataSize != sizeof(UINT16)) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.Algorithm.AEADCipherSuite = *(UINT16 *)Data;
     break;
-  case EdkiiSpdmDataKeySchedule:
+  case SpdmDataKeySchedule:
     if (DataSize != sizeof(UINT16)) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.Algorithm.KeySchedule = *(UINT16 *)Data;
     break;
-  case EdkiiSpdmPeerPublicCertChains:
+  case SpdmDataPeerPublicCertChains:
     SpdmContext->LocalContext.SpdmCertChainVarBufferSize = DataSize;
     SpdmContext->LocalContext.SpdmCertChainVarBuffer = Data;
     break;
-  case EdkiiSpdmSlotCount:
+  case SpdmDataSlotCount:
     if (DataSize != sizeof(UINT8)) {
       return RETURN_INVALID_PARAMETER;
     }
@@ -183,7 +183,7 @@ SpdmSetData (
     }
     SpdmContext->LocalContext.SlotCount = SlotNum;
     break;
-  case EdkiiSpdmPublicCertChains:
+  case SpdmDataPublicCertChains:
     SlotNum = Parameter->AdditionalData[0];
     if (SlotNum > SpdmContext->LocalContext.SlotCount) {
       return RETURN_INVALID_PARAMETER;
@@ -191,15 +191,15 @@ SpdmSetData (
     SpdmContext->LocalContext.CertificateChainSize[SlotNum] = DataSize;
     SpdmContext->LocalContext.CertificateChain[SlotNum] = Data;
     break;
-  case EdkiiSpdmPrivateCertificate:
+  case SpdmDataPrivateCertificate:
     SpdmContext->LocalContext.PrivatePemSize = DataSize;
     SpdmContext->LocalContext.PrivatePem = Data;
     break;
-  case EdkiiSpdmMeasurementRecord:
+  case SpdmDataMeasurementRecord:
     SpdmContext->LocalContext.DeviceMeasurementCount = Parameter->AdditionalData[0];
     SpdmContext->LocalContext.DeviceMeasurement = Data;
     break;
-  case EdkiiSpdmDataPsk:
+  case SpdmDataPsk:
     SpdmContext->LocalContext.PskSize = DataSize;
     SpdmContext->LocalContext.Psk = Data;
     break;
@@ -233,8 +233,8 @@ RETURN_STATUS
 EFIAPI
 SpdmGetData (
   IN     VOID                      *Context,
-  IN     EDKII_SPDM_DATA_TYPE      DataType,
-  IN     EDKII_SPDM_DATA_PARAMETER *Parameter,
+  IN     SPDM_DATA_TYPE            DataType,
+  IN     SPDM_DATA_PARAMETER       *Parameter,
   IN OUT VOID                      *Data,
   IN OUT UINTN                     *DataSize
   )
@@ -248,7 +248,7 @@ SpdmGetData (
   SpdmContext = Context;
 
   if (NeedSessionInfoForData (DataType)) {    
-    if (Parameter->Location != EdkiiSpdmDataLocationSession) {
+    if (Parameter->Location != SpdmDataLocationSession) {
       return RETURN_INVALID_PARAMETER;
     }
     SessionId = Parameter->AdditionalData[0];
@@ -259,83 +259,83 @@ SpdmGetData (
   }
 
   switch (DataType) {
-  case EdkiiSpdmDataCapabilityFlags:
+  case SpdmDataCapabilityFlags:
     TargetDataSize = sizeof(UINT32);
     TargetData = &SpdmContext->LocalContext.Capability.Flags;
     break;
-  case EdkiiSpdmDataCapabilityCTExponent:
+  case SpdmDataCapabilityCTExponent:
     TargetDataSize = sizeof(UINT8);
     TargetData = &SpdmContext->LocalContext.Capability.CTExponent;
     break;
-  case EdkiiSpdmDataMeasurementHashAlgo:
+  case SpdmDataMeasurementHashAlgo:
     TargetDataSize = sizeof(UINT32);
     TargetData = &SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo;
     break;
-  case EdkiiSpdmDataDheSecret:
+  case SpdmDataDheSecret:
     TargetDataSize = SessionInfo->DheKeySize;
     TargetData = SessionInfo->DheSecret;
     break;
-  case EdkiiSpdmDataHandshakeSecret:
+  case SpdmDataHandshakeSecret:
     TargetDataSize = SessionInfo->HashSize;
     TargetData = SessionInfo->HandshakeSecret;
     break;
-  case EdkiiSpdmDataMasterSecret:
+  case SpdmDataMasterSecret:
     TargetDataSize = SessionInfo->HashSize;
     TargetData = SessionInfo->MasterSecret;
     break;
-  case EdkiiSpdmDataRequestHandshakeSecret:
+  case SpdmDataRequestHandshakeSecret:
     TargetDataSize = SessionInfo->HashSize;
     TargetData = SessionInfo->RequestHandshakeSecret;
     break;
-  case EdkiiSpdmDataResponseHandshakeSecret:
+  case SpdmDataResponseHandshakeSecret:
     TargetDataSize = SessionInfo->HashSize;
     TargetData = SessionInfo->ResponseHandshakeSecret;
     break;
-  case EdkiiSpdmDataRequestDataSecret:
+  case SpdmDataRequestDataSecret:
     TargetDataSize = SessionInfo->HashSize;
     TargetData = SessionInfo->RequestDataSecret;
     break;
-  case EdkiiSpdmDataResponseDataSecret:
+  case SpdmDataResponseDataSecret:
     TargetDataSize = SessionInfo->HashSize;
     TargetData = SessionInfo->ResponseDataSecret;
     break;
-  case EdkiiSpdmDataRequestHandshakeEncryptionKey:
+  case SpdmDataRequestHandshakeEncryptionKey:
     TargetDataSize = SessionInfo->AeadKeySize;
     TargetData = SessionInfo->RequestHandshakeEncryptionKey;
     break;
-  case EdkiiSpdmDataRequestHandshakeSalt:
+  case SpdmDataRequestHandshakeSalt:
     TargetDataSize = SessionInfo->AeadIvSize;
     TargetData = SessionInfo->RequestHandshakeSalt;
     break;
-  case EdkiiSpdmDataResponseHandshakeEncryptionKey:
+  case SpdmDataResponseHandshakeEncryptionKey:
     TargetDataSize = SessionInfo->AeadKeySize;
     TargetData = SessionInfo->ResponseHandshakeEncryptionKey;
     break;
-  case EdkiiSpdmDataResponseHandshakeSalt:
+  case SpdmDataResponseHandshakeSalt:
     TargetDataSize = SessionInfo->AeadIvSize;
     TargetData = SessionInfo->ResponseHandshakeSalt;
     break;
-  case EdkiiSpdmDataRequestDataEncryptionKey:
+  case SpdmDataRequestDataEncryptionKey:
     TargetDataSize = SessionInfo->AeadKeySize;
     TargetData = SessionInfo->RequestDataEncryptionKey;
     break;
-  case EdkiiSpdmDataRequestDataSalt:
+  case SpdmDataRequestDataSalt:
     TargetDataSize = SessionInfo->AeadIvSize;
     TargetData = SessionInfo->RequestDataSalt;
     break;
-  case EdkiiSpdmDataResponseDataEncryptionKey:
+  case SpdmDataResponseDataEncryptionKey:
     TargetDataSize = SessionInfo->AeadKeySize;
     TargetData = SessionInfo->ResponseDataEncryptionKey;
     break;
-  case EdkiiSpdmDataResponseDataSalt:
+  case SpdmDataResponseDataSalt:
     TargetDataSize = SessionInfo->AeadIvSize;
     TargetData = SessionInfo->ResponseDataSalt;
     break;
-  case EdkiiSpdmDataRequestFinishedKey:
+  case SpdmDataRequestFinishedKey:
     TargetDataSize = SessionInfo->HashSize;
     TargetData = SessionInfo->RequestFinishedKey;
     break;
-  case EdkiiSpdmDataResponseFinishedKey:
+  case SpdmDataResponseFinishedKey:
     TargetDataSize = SessionInfo->AeadIvSize;
     TargetData = SessionInfo->ResponseFinishedKey;
     break;

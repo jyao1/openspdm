@@ -35,7 +35,7 @@ DoAuthenticationViaSpdm (
   SpdmContext = mSpdmContext;
 
   DataSize = sizeof(CapabilityFlags);
-  SpdmGetData (SpdmContext, EdkiiSpdmDataCapabilityFlags, NULL, &CapabilityFlags, &DataSize);
+  SpdmGetData (SpdmContext, SpdmDataCapabilityFlags, NULL, &CapabilityFlags, &DataSize);
 
   if ((CapabilityFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) != 0) {
     ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));

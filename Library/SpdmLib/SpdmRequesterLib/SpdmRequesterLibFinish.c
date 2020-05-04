@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -108,7 +108,7 @@ SpdmSendReceiveFinish (
     return RETURN_DEVICE_ERROR;
   }
 
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
+  SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
    
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmRequest.Header.RequestResponseCode = SPDM_FINISH;
@@ -141,12 +141,12 @@ SpdmSendReceiveFinish (
   
   Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId);
   if (RETURN_ERROR(Status)) {
-    SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;
   }
 
-  SessionInfo->SessionState = EdkiiSpdmStateEstablished;
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_SUCCESS;
+  SessionInfo->SessionState = SpdmStateEstablished;
+  SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   
   return RETURN_SUCCESS;
 }

@@ -142,7 +142,7 @@ SpdmServerInit (
   BOOLEAN                      Res;
   VOID                         *Data;
   UINTN                        DataSize;
-  EDKII_SPDM_DATA_PARAMETER    Parameter;
+  SPDM_DATA_PARAMETER          Parameter;
   UINT8                        Data8;
   UINT16                       Data16;
   UINT32                       Data32;
@@ -157,13 +157,13 @@ SpdmServerInit (
   if (Res) {
     HasPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = EdkiiSpdmDataLocationLocal;
+    Parameter.Location = SpdmDataLocationLocal;
     Data8 = SLOT_NUMBER;
-    SpdmSetData (SpdmContext, EdkiiSpdmSlotCount, &Parameter, &Data8, sizeof(Data8));
+    SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &Data8, sizeof(Data8));
 
     for (Index = 0; Index < SLOT_NUMBER; Index++) {
       Parameter.AdditionalData[0] = Index;
-      SpdmSetData (SpdmContext, EdkiiSpdmPublicCertChains, &Parameter, Data, DataSize);
+      SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, Data, DataSize);
     }
     // do not free it
   } else {
@@ -174,8 +174,8 @@ SpdmServerInit (
   if (Res) {
     HasPrivKey = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = EdkiiSpdmDataLocationLocal;
-    SpdmSetData (SpdmContext, EdkiiSpdmPrivateCertificate, &Parameter, Data, DataSize);
+    Parameter.Location = SpdmDataLocationLocal;
+    SpdmSetData (SpdmContext, SpdmDataPrivateCertificate, &Parameter, Data, DataSize);
     // do not free it
   } else{
     HasPrivKey = FALSE;
@@ -183,8 +183,8 @@ SpdmServerInit (
 
   Data8 = 0;
   ZeroMem (&Parameter, sizeof(Parameter));
-  Parameter.Location = EdkiiSpdmDataLocationLocal;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof(Data8));
+  Parameter.Location = SpdmDataLocationLocal;
+  SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof(Data8));
 
   Data32 = SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP |
@@ -208,34 +208,34 @@ SpdmServerInit (
     Data32 |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
     Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG;
   }
-  SpdmSetData (SpdmContext, EdkiiSpdmDataCapabilityFlags, &Parameter, &Data32, sizeof(Data32));
+  SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &Data32, sizeof(Data32));
 
   Data32 = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataMeasurementHashAlgo, &Parameter, &Data32, sizeof(Data32));
+  SpdmSetData (SpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &Data32, sizeof(Data32));
   Data32 = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataBaseAsymAlgo, &Parameter, &Data32, sizeof(Data32));
+  SpdmSetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, sizeof(Data32));
   Data32 = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataBaseHashAlgo, &Parameter, &Data32, sizeof(Data32));
+  SpdmSetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &Data32, sizeof(Data32));
   Data16 = SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataDHENamedGroup, &Parameter, &Data16, sizeof(Data16));
+  SpdmSetData (SpdmContext, SpdmDataDHENamedGroup, &Parameter, &Data16, sizeof(Data16));
   Data16 = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataAEADCipherSuite, &Parameter, &Data16, sizeof(Data16));
+  SpdmSetData (SpdmContext, SpdmDataAEADCipherSuite, &Parameter, &Data16, sizeof(Data16));
   Data16 = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
+  SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
 
   Res = RegisterMeasurement (&Data, &DataSize, &Data8);
   if (Res) {
     ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = EdkiiSpdmDataLocationLocal;
+    Parameter.Location = SpdmDataLocationLocal;
     Parameter.AdditionalData[0] = Data8;
-    SpdmSetData (SpdmContext, EdkiiSpdmMeasurementRecord, &Parameter, Data, DataSize);
+    SpdmSetData (SpdmContext, SpdmDataMeasurementRecord, &Parameter, Data, DataSize);
     // do not free it
   }
 
   Status = SpdmRegisterGetResponseSessionFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
 
 #if USE_PSK
-  Status = SpdmSetData (SpdmContext, EdkiiSpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
+  Status = SpdmSetData (SpdmContext, SpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);
     return ;

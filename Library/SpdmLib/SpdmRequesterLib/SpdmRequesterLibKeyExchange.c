@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -197,7 +197,7 @@ SpdmSendReceiveKeyExchange (
     return RETURN_DEVICE_ERROR;
   }
 
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
+  SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmRequest.Header.RequestResponseCode = SPDM_KEY_EXCHANGE;
@@ -235,7 +235,7 @@ SpdmSendReceiveKeyExchange (
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Mut_Auth_Requested != 0) {
-    SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_NO_MUTUAL_AUTH;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_NO_MUTUAL_AUTH;
     return RETURN_DEVICE_ERROR;
   }
   if (HeartbeatPeriod != NULL) {
@@ -280,7 +280,7 @@ SpdmSendReceiveKeyExchange (
   Ptr += SignatureSize;  
   Status = VerifyKeyExchangeSignature (SpdmContext, Signature, SignatureSize);
   if (RETURN_ERROR(Status)) {
-    SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;
   }
 
@@ -299,7 +299,7 @@ SpdmSendReceiveKeyExchange (
 
   Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId);
   if (RETURN_ERROR(Status)) {
-    SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;
   }
 
@@ -308,7 +308,7 @@ SpdmSendReceiveKeyExchange (
   InternalDumpHex (VerifyData, HmacSize);
   Status = VerifyKeyExchangeHmac (SpdmContext, *SessionId, VerifyData, HmacSize);
   if (RETURN_ERROR(Status)) {
-    SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;
   }
 
@@ -316,8 +316,8 @@ SpdmSendReceiveKeyExchange (
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);
   }
 
-  SessionInfo->SessionState = EdkiiSpdmStateHandshaking;
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_SUCCESS;
+  SessionInfo->SessionState = SpdmStateHandshaking;
+  SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   
   return RETURN_SUCCESS;
 }

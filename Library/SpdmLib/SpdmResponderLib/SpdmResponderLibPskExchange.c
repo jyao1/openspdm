@@ -1,5 +1,6 @@
 /** @file
-  EDKII SpdmIo Stub
+  SPDM common library.
+  It follows the SPDM Specification.
 
   Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -133,7 +134,7 @@ SpdmGetResponsePskExchange (
   }
   Ptr += HmacSize;
 
-  SessionInfo->SessionState = EdkiiSpdmStateHandshaking;
+  SessionInfo->SessionState = SpdmStateHandshaking;
 
   return RETURN_SUCCESS;
 }

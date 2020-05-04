@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -47,17 +47,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MAX_AEAD_KEY_SIZE   32
 #define MAX_AEAD_IV_SIZE    12
 
-#define EDKII_SPDM_ERROR_STATUS_SUCCESS                          0
-#define EDKII_SPDM_ERROR_STATUS_ERROR                            BIT31
-#define EDKII_SPDM_ERROR_STATUS_ERROR_DEVICE_NO_CAPABILITIES     (EDKII_SPDM_ERROR_STATUS_ERROR + 0x10)
-#define EDKII_SPDM_ERROR_STATUS_ERROR_DEVICE_ERROR               (EDKII_SPDM_ERROR_STATUS_ERROR + 0x11)
-#define EDKII_SPDM_ERROR_STATUS_ERROR_TCG_EXTEND_TPM_PCR         (EDKII_SPDM_ERROR_STATUS_ERROR + 0x20)
-#define EDKII_SPDM_ERROR_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE   (EDKII_SPDM_ERROR_STATUS_ERROR + 0x21)
-#define EDKII_SPDM_ERROR_STATUS_ERROR_CHALLENGE_FAILURE          (EDKII_SPDM_ERROR_STATUS_ERROR + 0x30)
-#define EDKII_SPDM_ERROR_STATUS_ERROR_CERTIFIACTE_FAILURE        (EDKII_SPDM_ERROR_STATUS_ERROR + 0x31)
-#define EDKII_SPDM_ERROR_STATUS_ERROR_NO_CERT_PROVISION          (EDKII_SPDM_ERROR_STATUS_ERROR + 0x32)
-#define EDKII_SPDM_ERROR_STATUS_ERROR_KEY_EXCHANGE_FAILURE       (EDKII_SPDM_ERROR_STATUS_ERROR + 0x40)
-#define EDKII_SPDM_ERROR_STATUS_ERROR_NO_MUTUAL_AUTH             (EDKII_SPDM_ERROR_STATUS_ERROR + 0x41)
+#define SPDM_STATUS_SUCCESS                          0
+#define SPDM_STATUS_ERROR                            BIT31
+#define SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES     (SPDM_STATUS_ERROR + 0x10)
+#define SPDM_STATUS_ERROR_DEVICE_ERROR               (SPDM_STATUS_ERROR + 0x11)
+#define SPDM_STATUS_ERROR_TCG_EXTEND_TPM_PCR         (SPDM_STATUS_ERROR + 0x20)
+#define SPDM_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE   (SPDM_STATUS_ERROR + 0x21)
+#define SPDM_STATUS_ERROR_CHALLENGE_FAILURE          (SPDM_STATUS_ERROR + 0x30)
+#define SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE        (SPDM_STATUS_ERROR + 0x31)
+#define SPDM_STATUS_ERROR_NO_CERT_PROVISION          (SPDM_STATUS_ERROR + 0x32)
+#define SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE       (SPDM_STATUS_ERROR + 0x40)
+#define SPDM_STATUS_ERROR_NO_MUTUAL_AUTH             (SPDM_STATUS_ERROR + 0x41)
 
 /**
   Set a SPDM Session Data.
@@ -76,9 +76,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 EFIAPI
 SpdmSetData (
-  IN     VOID                     *SpdmContext,
-  IN     EDKII_SPDM_DATA_TYPE      DataType,
-  IN     EDKII_SPDM_DATA_PARAMETER *Parameter,
+  IN     VOID                      *SpdmContext,
+  IN     SPDM_DATA_TYPE            DataType,
+  IN     SPDM_DATA_PARAMETER       *Parameter,
   IN     VOID                      *Data,
   IN     UINTN                     DataSize
   );
@@ -105,8 +105,8 @@ RETURN_STATUS
 EFIAPI
 SpdmGetData (
   IN     VOID                      *SpdmContext,
-  IN     EDKII_SPDM_DATA_TYPE      DataType,
-  IN     EDKII_SPDM_DATA_PARAMETER *Parameter,
+  IN     SPDM_DATA_TYPE            DataType,
+  IN     SPDM_DATA_PARAMETER       *Parameter,
   IN OUT VOID                      *Data,
   IN OUT UINTN                     *DataSize
   );

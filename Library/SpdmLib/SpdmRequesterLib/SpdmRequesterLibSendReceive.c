@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -44,13 +44,13 @@ SpdmEncSendRequest (
   }
 
   switch (SessionInfo->SessionState) {
-  case EdkiiSpdmStateHandshaking:
+  case SpdmStateHandshaking:
     Key = SessionInfo->RequestHandshakeEncryptionKey;
     CopyMem (Salt, SessionInfo->RequestHandshakeSalt, SessionInfo->AeadIvSize);
     *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->RequestHandshakeSequenceNumber;
     SessionInfo->RequestHandshakeSequenceNumber ++;
     break;
-  case EdkiiSpdmStateEstablished:
+  case SpdmStateEstablished:
     Key = SessionInfo->RequestDataEncryptionKey;
     CopyMem (Salt, SessionInfo->RequestDataSalt, SessionInfo->AeadIvSize);
     *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->RequestDataSequenceNumber;
@@ -129,15 +129,15 @@ SpdmSendRequestSession (
   }
 
   switch (SessionInfo->SessionState) {
-  case EdkiiSpdmStateHandshaking:
-  case EdkiiSpdmStateEstablished:
+  case SpdmStateHandshaking:
+  case SpdmStateEstablished:
     EncRequestSize = sizeof(EncRequest);
     ZeroMem (EncRequest, sizeof(EncRequest));
     Status = SpdmEncSendRequest (SpdmContext, SessionId, RequestSize, Request, &EncRequestSize, EncRequest);
     if (RETURN_ERROR(Status)) {
       return Status;
     }
-    Status = SpdmContext->SpdmIo->SecureSendRequest (SpdmContext->SpdmIo, EdkiiSpdmIoSecureMessagingTypeDmtfMtcp, SessionId, EncRequestSize, EncRequest, 0);
+    Status = SpdmContext->SpdmIo->SecureSendRequest (SpdmContext->SpdmIo, SpdmIoSecureMessagingTypeDmtfMtcp, SessionId, EncRequestSize, EncRequest, 0);
     break;
   default:
     ASSERT (FALSE);
@@ -283,13 +283,13 @@ SpdmDecReceiveResponse (
   }
 
   switch (SessionInfo->SessionState) {
-  case EdkiiSpdmStateHandshaking:
+  case SpdmStateHandshaking:
     Key = SessionInfo->ResponseHandshakeEncryptionKey;
     CopyMem (Salt, SessionInfo->ResponseHandshakeSalt, SessionInfo->AeadIvSize);
     *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ResponseHandshakeSequenceNumber;
     SessionInfo->ResponseHandshakeSequenceNumber ++;
     break;
-  case EdkiiSpdmStateEstablished:
+  case SpdmStateEstablished:
     Key = SessionInfo->ResponseDataEncryptionKey;
     CopyMem (Salt, SessionInfo->ResponseDataSalt, SessionInfo->AeadIvSize);
     *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ResponseDataSequenceNumber;
@@ -379,11 +379,11 @@ SpdmReceiveResponseSession (
   }
 
   switch (SessionInfo->SessionState) {
-  case EdkiiSpdmStateHandshaking:
-  case EdkiiSpdmStateEstablished:
+  case SpdmStateHandshaking:
+  case SpdmStateEstablished:
     MyResponseSize = sizeof(MyResponse);
     ZeroMem (MyResponse, sizeof(MyResponse));
-    Status = SpdmContext->SpdmIo->SecureReceiveResponse (SpdmContext->SpdmIo, EdkiiSpdmIoSecureMessagingTypeDmtfMtcp, SessionId, &MyResponseSize, MyResponse, 0);
+    Status = SpdmContext->SpdmIo->SecureReceiveResponse (SpdmContext->SpdmIo, SpdmIoSecureMessagingTypeDmtfMtcp, SessionId, &MyResponseSize, MyResponse, 0);
     if (RETURN_ERROR(Status)) {
       DEBUG((DEBUG_INFO, "Status - %p\n", Status));
       return Status;

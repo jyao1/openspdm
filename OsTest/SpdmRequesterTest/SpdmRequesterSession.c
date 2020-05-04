@@ -12,28 +12,28 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 extern VOID          *mSpdmContext;
 
 typedef struct {
-  EDKII_SPDM_DATA_TYPE  DataType;
-  CHAR8                 *String;
+  SPDM_DATA_TYPE  DataType;
+  CHAR8           *String;
 } DATA_TYPE_STRING;
 
 DATA_TYPE_STRING  mDataTypeString[] = {
-  {EdkiiSpdmDataDheSecret,        "DheSecret"},
-  {EdkiiSpdmDataHandshakeSecret,  "HandshakeSecret"},
-  {EdkiiSpdmDataMasterSecret,     "MasterSecret"},
-  {EdkiiSpdmDataRequestHandshakeSecret,   "RequestHandshakeSecret"},
-  {EdkiiSpdmDataResponseHandshakeSecret,  "ResponseHandshakeSecret"},
-  {EdkiiSpdmDataRequestDataSecret,        "RequestDataSecret"},
-  {EdkiiSpdmDataResponseDataSecret,       "ResponseDataSecret"},
-  {EdkiiSpdmDataRequestFinishedKey,       "RequestFinishedKey"},
-  {EdkiiSpdmDataResponseFinishedKey,      "ResponseFinishedKey"},
-  {EdkiiSpdmDataRequestHandshakeEncryptionKey,  "RequestHandshakeEncryptionKey"},
-  {EdkiiSpdmDataRequestHandshakeSalt,           "RequestHandshakeSalt"},
-  {EdkiiSpdmDataResponseHandshakeEncryptionKey, "ResponseHandshakeEncryptionKey"},
-  {EdkiiSpdmDataResponseHandshakeSalt,          "ResponseHandshakeSalt"},
-  {EdkiiSpdmDataRequestDataEncryptionKey,       "RequestDataEncryptionKey"},
-  {EdkiiSpdmDataRequestDataSalt,                "RequestDataSalt"},
-  {EdkiiSpdmDataResponseDataEncryptionKey,      "ResponseDataEncryptionKey"},
-  {EdkiiSpdmDataResponseDataSalt,               "ResponseDataSalt"},
+  {SpdmDataDheSecret,        "DheSecret"},
+  {SpdmDataHandshakeSecret,  "HandshakeSecret"},
+  {SpdmDataMasterSecret,     "MasterSecret"},
+  {SpdmDataRequestHandshakeSecret,   "RequestHandshakeSecret"},
+  {SpdmDataResponseHandshakeSecret,  "ResponseHandshakeSecret"},
+  {SpdmDataRequestDataSecret,        "RequestDataSecret"},
+  {SpdmDataResponseDataSecret,       "ResponseDataSecret"},
+  {SpdmDataRequestFinishedKey,       "RequestFinishedKey"},
+  {SpdmDataResponseFinishedKey,      "ResponseFinishedKey"},
+  {SpdmDataRequestHandshakeEncryptionKey,  "RequestHandshakeEncryptionKey"},
+  {SpdmDataRequestHandshakeSalt,           "RequestHandshakeSalt"},
+  {SpdmDataResponseHandshakeEncryptionKey, "ResponseHandshakeEncryptionKey"},
+  {SpdmDataResponseHandshakeSalt,          "ResponseHandshakeSalt"},
+  {SpdmDataRequestDataEncryptionKey,       "RequestDataEncryptionKey"},
+  {SpdmDataRequestDataSalt,                "RequestDataSalt"},
+  {SpdmDataResponseDataEncryptionKey,      "ResponseDataEncryptionKey"},
+  {SpdmDataResponseDataSalt,               "ResponseDataSalt"},
 };
 
 SPDM_VENDOR_DEFINED_REQUEST_MINE  mVendorDefinedRequest = {
@@ -94,14 +94,14 @@ DoSessionViaSpdm (
   UINT8                            Data[MAX_DHE_KEY_SIZE];
   UINTN                            Index;
   UINT8                            SessionId;
-  EDKII_SPDM_DATA_PARAMETER        Parameter;
+  SPDM_DATA_PARAMETER              Parameter;
   UINT8                            HeartbeatPeriod;
   UINT8                            MeasurementHash[MAX_HASH_SIZE];
 
   SpdmContext = mSpdmContext;
 
 #if USE_PSK
-  Status = SpdmSetData (SpdmContext, EdkiiSpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
+  Status = SpdmSetData (SpdmContext, SpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);
     return Status;
@@ -125,7 +125,7 @@ DoSessionViaSpdm (
   }
   
   ZeroMem (&Parameter, sizeof(Parameter));
-  Parameter.Location = EdkiiSpdmDataLocationSession;
+  Parameter.Location = SpdmDataLocationSession;
   Parameter.AdditionalData[0] = SessionId;
   for (Index = 0; Index < ARRAY_SIZE(mDataTypeString); Index++) {
     DataSize = sizeof(Data);

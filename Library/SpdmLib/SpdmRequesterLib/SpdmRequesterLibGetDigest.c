@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -81,7 +81,7 @@ SpdmGetDigest (
     return RETURN_DEVICE_ERROR;
   }
   
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
+  SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
  
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_DIGESTS;
@@ -126,11 +126,11 @@ SpdmGetDigest (
 
   Status = VerifyDigest (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
   if (RETURN_ERROR(Status)) {
-    SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
     return Status;
   }
 
-  SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_SUCCESS;
+  SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   
   if (SlotMask != NULL) {
     *SlotMask = SpdmResponse.Header.Param2;

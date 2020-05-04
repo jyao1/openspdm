@@ -6,13 +6,13 @@
 
 **/
 
-#ifndef __EDKII_SPDM_PROTOCOL_H__
-#define __EDKII_SPDM_PROTOCOL_H__
+#ifndef __SPDM_PROTOCOL_H__
+#define __SPDM_PROTOCOL_H__
 
 #include <Base.h>
 #include <IndustryStandard/Spdm.h>
 
-typedef struct _EDKII_SPDM_PROTOCOL EDKII_SPDM_PROTOCOL;
+typedef struct _SPDM_PROTOCOL SPDM_PROTOCOL;
 
 //
 // Connection: When a host sends messgages to a device, they create a connection.
@@ -31,41 +31,41 @@ typedef enum {
   //
   // SPDM parameter
   //
-  EdkiiSpdmVersion,
+  SpdmDataVersion,
   //
   // SPDM capability
   //
-  EdkiiSpdmDataCapabilityFlags,
-  EdkiiSpdmDataCapabilityCTExponent,  
+  SpdmDataCapabilityFlags,
+  SpdmDataCapabilityCTExponent,  
   //
   // SPDM Algorithm setting
   //
-  EdkiiSpdmDataMeasurementHashAlgo,
-  EdkiiSpdmDataBaseAsymAlgo,
-  EdkiiSpdmDataBaseHashAlgo,
-  EdkiiSpdmDataDHENamedGroup,
-  EdkiiSpdmDataAEADCipherSuite,
-  EdkiiSpdmDataKeySchedule,
+  SpdmDataMeasurementHashAlgo,
+  SpdmDataBaseAsymAlgo,
+  SpdmDataBaseHashAlgo,
+  SpdmDataDHENamedGroup,
+  SpdmDataAEADCipherSuite,
+  SpdmDataKeySchedule,
   //
   // Certificate info
   //
-  EdkiiSpdmPeerPublicCertChains,
-  EdkiiSpdmSlotCount,
-  EdkiiSpdmPublicCertChains,
-  EdkiiSpdmPrivateCertificate,
-  EdkiiSpdmMeasurementRecord,
+  SpdmDataPeerPublicCertChains,
+  SpdmDataSlotCount,
+  SpdmDataPublicCertChains,
+  SpdmDataPrivateCertificate,
+  SpdmDataMeasurementRecord,
   //
   // Pre-shared secret
   // If PSK is present, then PSK_EXCHANGE is used.
   // Otherwise, the KEY_EXCHANGE is used.
   //
-  EdkiiSpdmDataPsk,
+  SpdmDataPsk,
 
   //
   // MAX
   //
-  EdkiiSpdmDataMax,
-} EDKII_SPDM_DATA_TYPE;
+  SpdmDataMax,
+} SPDM_DATA_TYPE;
 
 typedef enum {
   //
@@ -78,49 +78,49 @@ typedef enum {
   //
   // Master Secret
   //
-  EdkiiSpdmDataDheSecret = 0x80000000, // No DHE secret if PSK is used.
-  EdkiiSpdmDataHandshakeSecret,
-  EdkiiSpdmDataMasterSecret,
+  SpdmDataDheSecret = 0x80000000, // No DHE secret if PSK is used.
+  SpdmDataHandshakeSecret,
+  SpdmDataMasterSecret,
   //
   // Major secret
   //
-  EdkiiSpdmDataRequestHandshakeSecret,
-  EdkiiSpdmDataResponseHandshakeSecret,
-  EdkiiSpdmDataRequestDataSecret,
-  EdkiiSpdmDataResponseDataSecret,
-  EdkiiSpdmDataRequestFinishedKey,
-  EdkiiSpdmDataResponseFinishedKey,
+  SpdmDataRequestHandshakeSecret,
+  SpdmDataResponseHandshakeSecret,
+  SpdmDataRequestDataSecret,
+  SpdmDataResponseDataSecret,
+  SpdmDataRequestFinishedKey,
+  SpdmDataResponseFinishedKey,
   //
   // Derived Key & Salt
   //
-  EdkiiSpdmDataRequestHandshakeEncryptionKey,
-  EdkiiSpdmDataRequestHandshakeSalt,
-  EdkiiSpdmDataResponseHandshakeEncryptionKey,
-  EdkiiSpdmDataResponseHandshakeSalt,
-  EdkiiSpdmDataRequestDataEncryptionKey,
-  EdkiiSpdmDataRequestDataSalt,
-  EdkiiSpdmDataResponseDataEncryptionKey,
-  EdkiiSpdmDataResponseDataSalt,
+  SpdmDataRequestHandshakeEncryptionKey,
+  SpdmDataRequestHandshakeSalt,
+  SpdmDataResponseHandshakeEncryptionKey,
+  SpdmDataResponseHandshakeSalt,
+  SpdmDataRequestDataEncryptionKey,
+  SpdmDataRequestDataSalt,
+  SpdmDataResponseDataEncryptionKey,
+  SpdmDataResponseDataSalt,
   //
   // MAX
   //
-  EdkiiSpdmDebugDataMax,
-} EDKII_SPDM_DEBUG_DATA_TYPE;
+  SpdmDataDebugDataMax,
+} SPDM_DEBUG_DATA_TYPE;
 
 typedef enum {
-  EdkiiSpdmDataLocationLocal,
-  EdkiiSpdmDataLocationConnection,
-  EdkiiSpdmDataLocationSession,
-  EdkiiSpdmDataLocationMax,
-} EDKII_SPDM_DATA_LOCATION;
+  SpdmDataLocationLocal,
+  SpdmDataLocationConnection,
+  SpdmDataLocationSession,
+  SpdmDataLocationMax,
+} SPDM_DATA_LOCATION;
 
 typedef struct {
-  EDKII_SPDM_DATA_LOCATION   Location;
+  SPDM_DATA_LOCATION   Location;
   // DataType specific:
   //   SessionId for the negoatiated key.
   //   SlotId for the certificate.
-  UINT8                      AdditionalData[4];
-} EDKII_SPDM_DATA_PARAMETER;
+  UINT8                AdditionalData[4];
+} SPDM_DATA_PARAMETER;
 
 /**
   Set a SPDM local Data.
@@ -138,10 +138,10 @@ typedef struct {
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_SET_DATA) (
-  IN     EDKII_SPDM_PROTOCOL       *This,
-  IN     EDKII_SPDM_DATA_TYPE      DataType,
-  IN     EDKII_SPDM_DATA_PARAMETER *Parameter,
+(EFIAPI *SPDM_SET_DATA_FUNC) (
+  IN     SPDM_PROTOCOL             *This,
+  IN     SPDM_DATA_TYPE            DataType,
+  IN     SPDM_DATA_PARAMETER       *Parameter,
   IN     VOID                      *Data,
   IN     UINTN                     DataSize
   );
@@ -168,10 +168,10 @@ RETURN_STATUS
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_GET_DATA) (
-  IN     EDKII_SPDM_PROTOCOL       *This,
-  IN     EDKII_SPDM_DATA_TYPE      DataType,
-  IN     EDKII_SPDM_DATA_PARAMETER *Parameter,
+(EFIAPI *SPDM_GET_DATA_FUNC) (
+  IN     SPDM_PROTOCOL             *This,
+  IN     SPDM_DATA_TYPE            DataType,
+  IN     SPDM_DATA_PARAMETER       *Parameter,
   IN OUT VOID                      *Data,
   IN OUT UINTN                     *DataSize
   );
@@ -185,8 +185,8 @@ RETURN_STATUS
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_START_SESSION) (
-  IN     EDKII_SPDM_PROTOCOL  *This,
+(EFIAPI *SPDM_START_SESSION_FUNC) (
+  IN     SPDM_PROTOCOL        *This,
   IN     BOOLEAN              UsePsk,
   IN     UINT8                MeasurementHashType,
   IN     UINT8                SlotNum,
@@ -204,8 +204,8 @@ RETURN_STATUS
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_STOP_SESSION) (
-  IN     EDKII_SPDM_PROTOCOL  *This,
+(EFIAPI *SPDM_STOP_SESSION_FUNC) (
+  IN     SPDM_PROTOCOL        *This,
   IN     UINT8                SessionId,
   IN     UINT8                EndSessionAttributes
   );
@@ -240,8 +240,8 @@ RETURN_STATUS
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_SEND_RECEIVE_SESSION_DATA) (
-  IN     EDKII_SPDM_PROTOCOL  *This,
+(EFIAPI *SPDM_SEND_RECEIVE_SESSION_DATA_FUNC) (
+  IN     SPDM_PROTOCOL        *This,
   IN     UINT8                SessionId,
   IN     VOID                 *Request,
   IN     UINTN                RequestSize,
@@ -256,8 +256,8 @@ RETURN_STATUS
 */
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_INIT_CONNECTION) (
-  IN     EDKII_SPDM_PROTOCOL  *This
+(EFIAPI *SPDM_INIT_CONNECTION_FUNC) (
+  IN     SPDM_PROTOCOL        *This
   );
 
 /*
@@ -267,8 +267,8 @@ RETURN_STATUS
 */
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_GET_DIGEST) (
-  IN     EDKII_SPDM_PROTOCOL  *This,
+(EFIAPI *SPDM_GET_DIGEST_FUNC) (
+  IN     SPDM_PROTOCOL        *This,
      OUT UINT8                *SlotMask,
      OUT VOID                 *TotalDigestBuffer
   );
@@ -278,8 +278,8 @@ RETURN_STATUS
 */
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_GET_CERTIFICATE) (
-  IN     EDKII_SPDM_PROTOCOL  *This,
+(EFIAPI *SPDM_GET_CERTIFICATE_FUNC) (
+  IN     SPDM_PROTOCOL        *This,
   IN     UINT8                SlotNum,
      OUT UINTN                *CertChainSize,
      OUT VOID                 *CertChain
@@ -290,8 +290,8 @@ RETURN_STATUS
 */
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_CHALLENGE) (
-  IN     EDKII_SPDM_PROTOCOL  *This,
+(EFIAPI *SPDM_CHALLENGE_FUNC) (
+  IN     SPDM_PROTOCOL        *This,
   IN     UINT8                SlotNum,
   IN     UINT8                MeasurementHashType,
      OUT VOID                 *MeasurementHash
@@ -302,8 +302,8 @@ RETURN_STATUS
 */
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_GET_MEASUREMENT) (
-  IN     EDKII_SPDM_PROTOCOL  *This,
+(EFIAPI *SPDM_GET_MEASUREMENT_FUNC) (
+  IN     SPDM_PROTOCOL        *This,
   IN     UINT8                RequestAttribute,
   IN     UINT8                MeasurementOperation,
      OUT UINT8                *NumberOfBlocks,
@@ -316,26 +316,26 @@ RETURN_STATUS
 */
 typedef
 RETURN_STATUS
-(EFIAPI *EDKII_SPDM_SEND_RECEIVE_DATA) (
-  IN     EDKII_SPDM_PROTOCOL  *This,
+(EFIAPI *SPDM_SEND_RECEIVE_DATA_FUNC) (
+  IN     SPDM_PROTOCOL        *This,
   IN     VOID                 *Request,
   IN     UINTN                RequestSize,
   IN OUT VOID                 *Response,
   IN OUT UINTN                *ResponseSize
   );
 
-struct _EDKII_SPDM_PROTOCOL {
-  EDKII_SPDM_SET_DATA                   SetData;
-  EDKII_SPDM_GET_DATA                   GetData;
-  EDKII_SPDM_INIT_CONNECTION            InitConnection;
-  EDKII_SPDM_GET_DIGEST                 GetDigest;
-  EDKII_SPDM_GET_CERTIFICATE            GetCertificate;
-  EDKII_SPDM_CHALLENGE                  Challenge;
-  EDKII_SPDM_GET_MEASUREMENT            GetMeasurement;
-  EDKII_SPDM_SEND_RECEIVE_DATA          SendReceiveData;
-  EDKII_SPDM_START_SESSION              StartSession;
-  EDKII_SPDM_STOP_SESSION               StopSession;
-  EDKII_SPDM_SEND_RECEIVE_SESSION_DATA  SendReceiveSessionData;
+struct _SPDM_PROTOCOL {
+  SPDM_SET_DATA_FUNC                   SetData;
+  SPDM_GET_DATA_FUNC                   GetData;
+  SPDM_INIT_CONNECTION_FUNC            InitConnection;
+  SPDM_GET_DIGEST_FUNC                 GetDigest;
+  SPDM_GET_CERTIFICATE_FUNC            GetCertificate;
+  SPDM_CHALLENGE_FUNC                  Challenge;
+  SPDM_GET_MEASUREMENT_FUNC            GetMeasurement;
+  SPDM_SEND_RECEIVE_DATA_FUNC          SendReceiveData;
+  SPDM_START_SESSION_FUNC              StartSession;
+  SPDM_STOP_SESSION_FUNC               StopSession;
+  SPDM_SEND_RECEIVE_SESSION_DATA_FUNC  SendReceiveSessionData;
 };
 
 #endif

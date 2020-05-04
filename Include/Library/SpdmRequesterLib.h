@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -157,7 +157,7 @@ RETURN_STATUS
 EFIAPI
 SpdmRegisterSpdmIo (
   IN     VOID                      *SpdmContext,
-  IN     EDKII_SPDM_IO_PROTOCOL    *SpdmIo
+  IN     SPDM_IO_PROTOCOL          *SpdmIo
   );
 
 #endif

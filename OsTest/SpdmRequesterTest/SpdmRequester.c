@@ -9,8 +9,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmRequesterTest.h"
 
-VOID                         *mSpdmContext;
-SOCKET                       mSocket;
+VOID                          *mSpdmContext;
+SOCKET                        mSocket;
+SPDM_IO_SECURE_MESSAGING_TYPE mSecureMessagingType = SpdmIoSecureMessagingTypeSocket;
 
 BOOLEAN
 CommunicatePlatformData (
@@ -64,7 +65,7 @@ CommunicatePlatformData (
 RETURN_STATUS
 EFIAPI
 SpdmClientSendRequest (
-  IN     EDKII_SPDM_IO_PROTOCOL  *This,
+  IN     SPDM_IO_PROTOCOL        *This,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
   IN     UINT64                  Timeout
@@ -106,7 +107,7 @@ SpdmClientSendRequest (
 RETURN_STATUS
 EFIAPI
 SpdmClientReceiveResponse (
-  IN     EDKII_SPDM_IO_PROTOCOL  *This,
+  IN     SPDM_IO_PROTOCOL        *This,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,
   IN     UINT64                  Timeout
@@ -139,14 +140,13 @@ SpdmClientReceiveResponse (
 RETURN_STATUS
 EFIAPI
 SpdmClientGetSecureMessagingType (
-  IN     EDKII_SPDM_IO_PROTOCOL              *This,
+  IN     SPDM_IO_PROTOCOL                    *This,
      OUT UINTN                               *SecureMessagingTypeCount,
-     OUT EDKII_SPDM_IO_SECURE_MESSAGING_TYPE **SecureMessagingType
+     OUT SPDM_IO_SECURE_MESSAGING_TYPE       **SecureMessagingType
   )
 {
   *SecureMessagingTypeCount = 1;
-  *SecureMessagingType = (VOID *)malloc (sizeof(EDKII_SPDM_IO_SECURE_MESSAGING_TYPE));
-  **SecureMessagingType = EdkiiSpdmIoSecureMessagingTypeSocket;
+  *SecureMessagingType = &mSecureMessagingType;
   return RETURN_UNSUPPORTED;
 }
 
@@ -179,8 +179,8 @@ SpdmClientGetSecureMessagingType (
 RETURN_STATUS
 EFIAPI
 SpdmClientSecureSendRequest (
-  IN     EDKII_SPDM_IO_PROTOCOL                 *This,
-  IN     EDKII_SPDM_IO_SECURE_MESSAGING_TYPE    SecureMessagingType,
+  IN     SPDM_IO_PROTOCOL                       *This,
+  IN     SPDM_IO_SECURE_MESSAGING_TYPE          SecureMessagingType,
   IN     UINT8                                  SessionId,
   IN     UINTN                                  RequestSize,
   IN     VOID                                   *Request,
@@ -227,8 +227,8 @@ SpdmClientSecureSendRequest (
 RETURN_STATUS
 EFIAPI
 SpdmClientSecureReceiveResponse (
-  IN     EDKII_SPDM_IO_PROTOCOL                 *This,
-  IN     EDKII_SPDM_IO_SECURE_MESSAGING_TYPE    SecureMessagingType,
+  IN     SPDM_IO_PROTOCOL                       *This,
+  IN     SPDM_IO_SECURE_MESSAGING_TYPE          SecureMessagingType,
   IN     UINT8                                  SessionId,
   IN OUT UINTN                                  *ResponseSize,
   IN OUT VOID                                   *Response,
@@ -255,7 +255,7 @@ SpdmClientSecureReceiveResponse (
   return RETURN_SUCCESS;
 }
 
-EDKII_SPDM_IO_PROTOCOL       mSpdmProtocol = {
+SPDM_IO_PROTOCOL       mSpdmProtocol = {
   SpdmClientSendRequest,
   SpdmClientReceiveResponse,
   SpdmClientGetSecureMessagingType,
@@ -273,7 +273,7 @@ SpdmClientInit (
   BOOLEAN                      Res;
   VOID                         *Data;
   UINTN                        DataSize;
-  EDKII_SPDM_DATA_PARAMETER    Parameter;
+  SPDM_DATA_PARAMETER          Parameter;
   UINT8                        Data8;
   UINT16                       Data16;
   UINT32                       Data32;
@@ -286,15 +286,15 @@ SpdmClientInit (
   Res = ReadPublicCertificateChain (&Data, &DataSize);
   if (Res) {
     ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = EdkiiSpdmDataLocationLocal;
-    SpdmSetData (SpdmContext, EdkiiSpdmPeerPublicCertChains, &Parameter, Data, DataSize);
+    Parameter.Location = SpdmDataLocationLocal;
+    SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
     // Do not free it.
   }
 
   Data8 = 0;
   ZeroMem (&Parameter, sizeof(Parameter));
-  Parameter.Location = EdkiiSpdmDataLocationLocal;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof(Data8));
+  Parameter.Location = SpdmDataLocationLocal;
+  SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof(Data8));
 
   Data32 = SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP |
@@ -303,18 +303,18 @@ SpdmClientInit (
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataCapabilityFlags, &Parameter, &Data32, sizeof(Data32));
+  SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &Data32, sizeof(Data32));
 
   Data32 = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataBaseAsymAlgo, &Parameter, &Data32, sizeof(Data32));
+  SpdmSetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, sizeof(Data32));
   Data32 = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataBaseHashAlgo, &Parameter, &Data32, sizeof(Data32));
+  SpdmSetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &Data32, sizeof(Data32));
   Data16 = SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataDHENamedGroup, &Parameter, &Data16, sizeof(Data16));
+  SpdmSetData (SpdmContext, SpdmDataDHENamedGroup, &Parameter, &Data16, sizeof(Data16));
   Data16 = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataAEADCipherSuite, &Parameter, &Data16, sizeof(Data16));
+  SpdmSetData (SpdmContext, SpdmDataAEADCipherSuite, &Parameter, &Data16, sizeof(Data16));
   Data16 = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
-  SpdmSetData (SpdmContext, EdkiiSpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
+  SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
 
   Status = SpdmInitConnection (SpdmContext);
   if (RETURN_ERROR(Status)) {

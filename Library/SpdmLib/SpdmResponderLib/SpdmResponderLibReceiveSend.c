@@ -1,5 +1,5 @@
 /** @file
-  EDKII Device Security library for SPDM device.
+  SPDM common library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -104,13 +104,13 @@ SpdmDecReceiveRequest (
   }
   
   switch (SessionInfo->SessionState) {
-  case EdkiiSpdmStateHandshaking:
+  case SpdmStateHandshaking:
     Key = SessionInfo->RequestHandshakeEncryptionKey;
     CopyMem (Salt, SessionInfo->RequestHandshakeSalt, SessionInfo->AeadIvSize);
     *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->RequestHandshakeSequenceNumber;
     SessionInfo->RequestHandshakeSequenceNumber ++;
     break;
-  case EdkiiSpdmStateEstablished:
+  case SpdmStateEstablished:
     Key = SessionInfo->RequestDataEncryptionKey;
     CopyMem (Salt, SessionInfo->RequestDataSalt, SessionInfo->AeadIvSize);
     *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->RequestDataSequenceNumber;
@@ -210,8 +210,8 @@ SpdmReceiveRequestSession (
   ZeroMem (SpdmContext->LastSpdmRequest, sizeof(SpdmContext->LastSpdmRequest));
 
   switch (SessionInfo->SessionState) {
-  case EdkiiSpdmStateHandshaking:
-  case EdkiiSpdmStateEstablished:
+  case SpdmStateHandshaking:
+  case SpdmStateEstablished:
     DecRequestSize = sizeof(DecRequest);
     ZeroMem (DecRequest, sizeof(DecRequest));
     Status = SpdmDecReceiveRequest (SpdmContext, SessionId, RequestSize, Request, &DecRequestSize, DecRequest);
@@ -353,13 +353,13 @@ SpdmEncSendResponse (
   }
   
   switch (SessionInfo->SessionState) {
-  case EdkiiSpdmStateHandshaking:
+  case SpdmStateHandshaking:
     Key = SessionInfo->ResponseHandshakeEncryptionKey;
     CopyMem (Salt, SessionInfo->ResponseHandshakeSalt, SessionInfo->AeadIvSize);
     *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ResponseHandshakeSequenceNumber;
     SessionInfo->ResponseHandshakeSequenceNumber ++;
     break;
-  case EdkiiSpdmStateEstablished:
+  case SpdmStateEstablished:
     Key = SessionInfo->ResponseDataEncryptionKey;
     CopyMem (Salt, SessionInfo->ResponseDataSalt, SessionInfo->AeadIvSize);
     *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ResponseDataSequenceNumber;
@@ -469,8 +469,8 @@ SpdmSendResponseSession (
   }
 
   switch (SessionInfo->SessionState) {
-  case EdkiiSpdmStateHandshaking:
-  case EdkiiSpdmStateEstablished:
+  case SpdmStateHandshaking:
+  case SpdmStateEstablished:
     EncResponseSize = sizeof(EncResponse);
     ZeroMem (EncResponse, sizeof(EncResponse));
     Status = SpdmEncSendResponse (SpdmContext, SessionId, MyResponseSize, MyResponse, &EncResponseSize, EncResponse);
@@ -496,14 +496,14 @@ SpdmSendResponseSession (
   switch (SpdmResponse->RequestResponseCode) {
   case SPDM_FINISH_RSP:
     AppendManagedBuffer (&SpdmContext->Transcript.MessageF, MyResponse, MyResponseSize);
-    SessionInfo->SessionState = EdkiiSpdmStateEstablished;
+    SessionInfo->SessionState = SpdmStateEstablished;
     break;
   case SPDM_PSK_FINISH_RSP:
     AppendManagedBuffer (&SpdmContext->Transcript.MessagePF, MyResponse, MyResponseSize);
-    SessionInfo->SessionState = EdkiiSpdmStateEstablished;
+    SessionInfo->SessionState = SpdmStateEstablished;
     break;
   case SPDM_END_SESSION_ACK:
-    SessionInfo->SessionState = EdkiiSpdmStateNotStarted;
+    SessionInfo->SessionState = SpdmStateNotStarted;
     break;
   case SPDM_VENDOR_DEFINED_RESPONSE:
     break;

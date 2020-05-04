@@ -29,7 +29,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define GET_COMMAND_SESSION_ID(c)    ((UINT8)(((c) & 0x00FF0000) >> 16))
 #define MAKE_COMMAND(c, s)           ((c) | ((s) << 16))
 
-#define EdkiiSpdmIoSecureMessagingTypeSocket  0x80000000 
+#define SpdmIoSecureMessagingTypeSocket  0x80000000 
 
 //
 // Vendor Hello
