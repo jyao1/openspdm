@@ -1,0 +1,41 @@
+## @file
+#  SPDM library.
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+#
+# Build Configuration Macro Definition
+#
+ARCH = X64
+TOOLCHAIN = GCC
+TARGET = DEBUG
+
+#
+# Shell Command Macro
+#
+CP = cp -f
+MD = mkdir -p
+MV = mv -f
+RD = rm -r -f
+RM = rm -f
+
+#
+# Tools definitions specific to this module
+#
+SLINK = gcc-ar
+
+CC_FLAGS = -c -g -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -m64 -fno-stack-protector "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Os -Wno-switch
+CC = gcc
+
+MAKE = make
+MAKEFILE = GNUmakefile
+
+DLINK_FLAGS = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x40 -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive -Wl,-melf_x86_64,--oformat=elf64-x86-64,-pie -flto -Os
+DLINK = gcc
+
+DLINK2_FLAGS = -Wl,--defsym=PECOFF_HEADER_SIZE=0x228 -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds -Wno-error
+

@@ -11,7 +11,7 @@
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseCapability (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -20,6 +20,9 @@ SpdmGetResponseCapability (
 {
   SPDM_GET_CAPABILITIES_REQUEST  *SpdmRequest;
   SPDM_CAPABILITIES_RESPONSE     *SpdmResponse;
+  SPDM_DEVICE_CONTEXT            *SpdmContext;
+
+  SpdmContext = Context;
 
   ASSERT (*ResponseSize >= sizeof(SPDM_CAPABILITIES_RESPONSE));
   *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);

@@ -101,7 +101,7 @@ CreateMeasurementSig (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseMeasurement (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -114,17 +114,18 @@ SpdmGetResponseMeasurement (
   UINTN                          SpdmResponseSize;
   RETURN_STATUS                  Status;
   UINT32                         HashSize;
-  HASH_ALL                       HashFunc;
   UINTN                          SignatureSize;
   UINTN                          MeasurmentSigSize;
   UINTN                          MeasurmentBlockSize;
   SPDM_MEASUREMENT_BLOCK_DMTF    *MeasurmentBlock;
   SPDM_MEASUREMENT_BLOCK_DMTF    *CachedMeasurmentBlock;
+  SPDM_DEVICE_CONTEXT            *SpdmContext;
+
+  SpdmContext = Context;
   
   SpdmRequest = Request;
 
   HashSize = GetSpdmMeasurementHashSize (SpdmContext);
-  HashFunc = GetSpdmMeasurementHashFunc (SpdmContext);
   SignatureSize = GetSpdmAsymSize (SpdmContext);
   MeasurmentSigSize = sizeof(SPDM_MEASUREMENT_SIG) + SignatureSize;
   MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize;

@@ -41,15 +41,22 @@ Crypto library :
   Please download [openssl-1.1.1b](https://www.openssl.org/source/openssl-1.1.1b.tar.gz) and unzip it.
   Rename openssl-1.1.1b to openssl and put openssl under [OpensslLib](https://github.com/jyao1/openspdm/tree/master/OsStub/OpensslLib)
 
-Build tool :
-  Please install "Visual Studio 2015".
+Windows Build tool :
+  Visual Studio 2015
 
-Build :
-  Open Windows command prompt at openspdm root dir and type "nmake".
-  The output is at openspdm\Build\X64.
+Windows Build :
+  Open command prompt at openspdm dir and type "nmake".
+  The output is at openspdm\Build\DEBUG_VS2015\X64.
+
+Linux Build tool :
+  GCC
+
+Linux Build:
+  Open command prompt at openspdm dir and type "make -f GNUmakefile  -e WORKSPACE=~/openspdm".
+  The output is at openspdm\Build\DEBUG_GCC\X64.
 
 Run :
-  Open one windows command prompt at openspdm\Build\X64 to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
+  Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
 
 NOTE:
   Current version only supports build with "Visual Studio 2015" and X64 version.

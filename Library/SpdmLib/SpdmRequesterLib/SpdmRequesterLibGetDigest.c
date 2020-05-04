@@ -61,7 +61,7 @@ VerifyDigest (
 RETURN_STATUS
 EFIAPI
 SpdmGetDigest (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
      OUT UINT8                *SlotMask,
      OUT VOID                 *TotalDigestBuffer
   )
@@ -73,6 +73,9 @@ SpdmGetDigest (
   UINTN                                     DigestSize;
   UINTN                                     DigestCount;
   UINTN                                     Index;
+  SPDM_DEVICE_CONTEXT                       *SpdmContext;
+
+  SpdmContext = Context;
   
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) == 0) {
     return RETURN_DEVICE_ERROR;

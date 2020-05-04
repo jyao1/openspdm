@@ -17,12 +17,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 EFIAPI
 SpdmInitConnection (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
+  IN     VOID                 *Context
   )
 {
   RETURN_STATUS        Status;
   UINT8                VersionNumberEntryCount;
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+
+  SpdmContext = Context;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
   ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
@@ -59,7 +62,7 @@ SpdmInitConnection (
 RETURN_STATUS
 EFIAPI
 SpdmStartSession (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     BOOLEAN              UsePsk,
   IN     UINT8                MeasurementHashType,
   IN     UINT8                SlotNum,
@@ -69,6 +72,9 @@ SpdmStartSession (
   )
 {
   RETURN_STATUS                 Status;
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
+
+  SpdmContext = Context;
 
   if (!UsePsk) {
     Status = SpdmSendReceiveKeyExchange (SpdmContext, MeasurementHashType, SlotNum, HeartbeatPeriod, SessionId, MeasurementHash);
@@ -110,12 +116,15 @@ SpdmStartSession (
 RETURN_STATUS
 EFIAPI
 SpdmStopSession (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT8                SessionId,
   IN     UINT8                EndSessionAttributes
   )
 {
   RETURN_STATUS                 Status;
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
+
+  SpdmContext = Context;
 
   Status = SpdmSendReceiveEndSession (SpdmContext, SessionId, EndSessionAttributes);
   DEBUG ((DEBUG_INFO, "SpdmStopSession - %p\n", Status));
@@ -157,7 +166,7 @@ SpdmStopSession (
 RETURN_STATUS
 EFIAPI
 SpdmSendReceiveSessionData (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT8                SessionId,
   IN     VOID                 *Request,
   IN     UINTN                RequestSize,
@@ -166,6 +175,9 @@ SpdmSendReceiveSessionData (
   )
 {
   RETURN_STATUS                 Status;
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
+
+  SpdmContext = Context;
 
   Status = SpdmSendRequestSession (SpdmContext, SessionId, RequestSize, Request);
   if (RETURN_ERROR(Status)) {
@@ -186,7 +198,7 @@ SpdmSendReceiveSessionData (
 RETURN_STATUS
 EFIAPI
 SpdmSendReceiveData (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     VOID                 *Request,
   IN     UINTN                RequestSize,
   IN OUT VOID                 *Response,
@@ -194,6 +206,9 @@ SpdmSendReceiveData (
   )
 {
   RETURN_STATUS                 Status;
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
+
+  SpdmContext = Context;
 
   Status = SpdmSendRequest (SpdmContext, RequestSize, Request);
   if (RETURN_ERROR(Status)) {
@@ -211,10 +226,13 @@ SpdmSendReceiveData (
 RETURN_STATUS
 EFIAPI
 SpdmRegisterSpdmIo (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     VOID                      *Context,
   IN     EDKII_SPDM_IO_PROTOCOL    *SpdmIo
   )
 {
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
+
+  SpdmContext = Context;
   SpdmContext->SpdmIo = SpdmIo;
   return RETURN_SUCCESS;
 }

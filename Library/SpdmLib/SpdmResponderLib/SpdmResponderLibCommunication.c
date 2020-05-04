@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 EFIAPI
 SpdmReceiveSendData (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     VOID                 *RequestBuffer,
   IN     UINTN                RequestBufferSize,
      OUT VOID                 *ResponseBuffer,
@@ -20,6 +20,9 @@ SpdmReceiveSendData (
   )
 {
   RETURN_STATUS            Status;
+  SPDM_DEVICE_CONTEXT      *SpdmContext;
+
+  SpdmContext = Context;
 
   Status = SpdmReceiveRequest (SpdmContext, RequestBufferSize, RequestBuffer);
   if (RETURN_ERROR(Status)) {
@@ -36,7 +39,7 @@ SpdmReceiveSendData (
 RETURN_STATUS
 EFIAPI
 SpdmReceiveSendSessionData (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT8                SessionId,
   IN     VOID                 *RequestBuffer,
   IN     UINTN                RequestBufferSize,
@@ -45,6 +48,9 @@ SpdmReceiveSendSessionData (
   )
 {
   RETURN_STATUS            Status;
+  SPDM_DEVICE_CONTEXT      *SpdmContext;
+
+  SpdmContext = Context;
 
   Status = SpdmReceiveRequestSession (SpdmContext, SessionId, RequestBufferSize, RequestBuffer);
   if (RETURN_ERROR(Status)) {

@@ -37,7 +37,6 @@ RETURN_STATUS
 EFIAPI
 SpdmRegisterGetResponseFunc (
   IN  VOID                    *SpdmContext,
-  IN  UINTN                   RequestResponseCode,
   IN  SPDM_GET_RESPONSE_FUNC  GetResponseFunc
   );
 
@@ -45,7 +44,6 @@ RETURN_STATUS
 EFIAPI
 SpdmRegisterGetResponseSessionFunc (
   IN  VOID                            *SpdmContext,
-  IN  UINTN                           RequestResponseCode,
   IN  SPDM_GET_RESPONSE_SESSION_FUNC  GetResponseFunc
   );
 

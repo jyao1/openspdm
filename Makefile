@@ -18,24 +18,24 @@ WORKSPACE = .
 # Build Directory Macro Definition
 #
 BUILD_DIR = $(WORKSPACE)\Build
-BIN_DIR = $(BUILD_DIR)\$(ARCH)
+BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
 
 #
 # Default target, which will build dependent libraries in addition to source files
 #
 
 all:
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmCommonLib\Makefile
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmRequesterLib\Makefile
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmResponderLib\Makefile
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseMemoryLib\Makefile
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\DebugLib\Makefile
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLib\Makefile
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\OpensslLib\Makefile
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLib\Makefile
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsTest\SpdmRequesterTest\Makefile
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsTest\SpdmResponderTest\Makefile
-	@$(CP) $(WORKSPACE)\OsTest\TestKey\* $(WORKSPACE)\Build\$(ARCH)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmCommonLib\$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmRequesterLib\$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmResponderLib\$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseMemoryLib\$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\DebugLib\$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLib\$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\OpensslLib\$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLib\$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsTest\SpdmRequesterTest\$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsTest\SpdmResponderTest\$(MAKEFILE)
+	@$(CP) $(WORKSPACE)\OsTest\TestKey\* $(BIN_DIR)
 
 #
 # clean all generated files

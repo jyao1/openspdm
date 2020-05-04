@@ -54,7 +54,7 @@ VerifyCertificateChain (
 RETURN_STATUS
 EFIAPI
 SpdmGetCertificate (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT8                SlotNum,
   IN OUT UINTN                *CertChainSize,
      OUT VOID                 *CertChain
@@ -65,6 +65,9 @@ SpdmGetCertificate (
   SPDM_CERTIFICATE_RESPONSE_MAX             SpdmResponse;
   UINTN                                     SpdmResponseSize;
   LARGE_MANAGED_BUFFER                      CertificateChainBuffer = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  SPDM_DEVICE_CONTEXT                       *SpdmContext;
+
+  SpdmContext = Context;
   
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) == 0) {
     return RETURN_DEVICE_ERROR;

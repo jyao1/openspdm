@@ -69,11 +69,15 @@ InternalDumpHex (
 **/
 RETURN_STATUS
 AppendManagedBuffer (
-  IN OUT MANAGED_BUFFER  *ManagedBuffer,
+  IN OUT VOID            *MBuffer,
   IN VOID                *Buffer,
   IN UINTN               BufferSize
   )
 {
+  MANAGED_BUFFER  *ManagedBuffer;
+
+  ManagedBuffer = MBuffer;
+
   if (BufferSize == 0) {
     return RETURN_SUCCESS;
   }
@@ -97,9 +101,13 @@ AppendManagedBuffer (
 **/
 RETURN_STATUS
 ResetManagedBuffer (
-  IN OUT MANAGED_BUFFER  *ManagedBuffer
+  IN OUT VOID            *MBuffer
   )
 {
+  MANAGED_BUFFER  *ManagedBuffer;
+
+  ManagedBuffer = MBuffer;
+
   ASSERT ((ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_BUFFER_SIZE) ||
           (ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
   ManagedBuffer->BufferSize = 0;
@@ -112,9 +120,13 @@ ResetManagedBuffer (
 **/
 UINTN
 GetManagedBufferSize (
-  IN MANAGED_BUFFER  *ManagedBuffer
+  IN OUT VOID            *MBuffer
   )
 {
+  MANAGED_BUFFER  *ManagedBuffer;
+
+  ManagedBuffer = MBuffer;
+
   ASSERT ((ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_BUFFER_SIZE) ||
           (ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
   return ManagedBuffer->BufferSize;
@@ -125,9 +137,13 @@ GetManagedBufferSize (
 **/
 VOID *
 GetManagedBuffer (
-  IN MANAGED_BUFFER  *ManagedBuffer
+  IN OUT VOID            *MBuffer
   )
 {
+  MANAGED_BUFFER  *ManagedBuffer;
+
+  ManagedBuffer = MBuffer;
+
   ASSERT ((ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_BUFFER_SIZE) ||
           (ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
   return (ManagedBuffer + 1);

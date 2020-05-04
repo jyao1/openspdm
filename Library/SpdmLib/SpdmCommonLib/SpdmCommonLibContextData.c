@@ -108,14 +108,17 @@ NeedSessionInfoForData (
 RETURN_STATUS
 EFIAPI
 SpdmSetData (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     VOID                      *Context,
   IN     EDKII_SPDM_DATA_TYPE      DataType,
   IN     EDKII_SPDM_DATA_PARAMETER *Parameter,
   IN     VOID                      *Data,
   IN     UINTN                     DataSize
   )
 {
-  UINT8  SlotNum;
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+  UINT8                     SlotNum;
+
+  SpdmContext = Context;
 
   switch (DataType) {
   case EdkiiSpdmDataCapabilityFlags:
@@ -229,17 +232,20 @@ SpdmSetData (
 RETURN_STATUS
 EFIAPI
 SpdmGetData (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     VOID                      *Context,
   IN     EDKII_SPDM_DATA_TYPE      DataType,
   IN     EDKII_SPDM_DATA_PARAMETER *Parameter,
   IN OUT VOID                      *Data,
   IN OUT UINTN                     *DataSize
   )
 {
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
   UINTN                      TargetDataSize;
   VOID                       *TargetData;
   UINT8                      SessionId;
   SPDM_SESSION_INFO          *SessionInfo;
+
+  SpdmContext = Context;
 
   if (NeedSessionInfoForData (DataType)) {    
     if (Parameter->Location != EdkiiSpdmDataLocationSession) {
@@ -351,18 +357,24 @@ SpdmGetData (
 UINT32
 EFIAPI
 SpdmGetLastError (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext
+  IN     VOID                      *Context
   )
 {
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+
+  SpdmContext = Context;
   return SpdmContext->ErrorState;
 }
 
 RETURN_STATUS
 EFIAPI
 SpdmInitContext (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext
+  IN     VOID                      *Context
   )
 {
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+
+  SpdmContext = Context;
   ZeroMem (SpdmContext, sizeof(SPDM_DEVICE_CONTEXT));
   SpdmContext->Version = SPDM_DEVICE_CONTEXT_VERSION;
   SpdmContext->Transcript.MessageA.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;

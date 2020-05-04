@@ -20,7 +20,7 @@ typedef struct {
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseVersion (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,

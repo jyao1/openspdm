@@ -11,7 +11,7 @@
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseEndSession (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT8                SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,

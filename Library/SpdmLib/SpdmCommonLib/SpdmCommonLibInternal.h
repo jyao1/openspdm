@@ -262,10 +262,10 @@ BOOLEAN
 typedef
 BOOLEAN
 (EFIAPI *HMAC_ALL) (
-  IN   CONST UINT8  *Key,
-  IN   UINTN        KeySize,
   IN   CONST VOID   *Data,
   IN   UINTN        DataSize,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
   OUT  UINT8        *HmacValue
   );
 

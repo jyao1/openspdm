@@ -11,6 +11,8 @@
 # Build Configuration Macro Definition
 #
 ARCH = X64
+TOOLCHAIN = VS2015
+TARGET = DEBUG
 
 #
 # Shell Command Macro
@@ -32,6 +34,7 @@ CC_FLAGS = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /EHs-c- /G
 CC = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\cl.exe
 
 MAKE = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\nmake.exe
+MAKEFILE = Makefile
 
 DLINK_FLAGS = /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb" /LIBPATH:"%VCINSTALLDIR%\Lib\AMD64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:AMD64 /LTCG Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib ws2_32.lib
 DLINK = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\link.exe

@@ -60,7 +60,7 @@ SpdmGeneratePskExchangeHmac (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponsePskExchange (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -77,6 +77,9 @@ SpdmGetResponsePskExchange (
   UINT8                         *Ptr;
   SPDM_SESSION_INFO             *SessionInfo;
   UINTN                         TotalSize;
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
+
+  SpdmContext = Context;
 
   SpdmRequest = Request;
   SlotNum = SpdmRequest->Header.Param2;

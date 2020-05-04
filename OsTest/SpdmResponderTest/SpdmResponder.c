@@ -232,7 +232,7 @@ SpdmServerInit (
     // do not free it
   }
 
-  Status = SpdmRegisterGetResponseSessionFunc (SpdmContext, SPDM_VENDOR_DEFINED_REQUEST, SpdmGetResponseVendorDefinedRequest);
+  Status = SpdmRegisterGetResponseSessionFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
 
 #if USE_PSK
   Status = SpdmSetData (SpdmContext, EdkiiSpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));

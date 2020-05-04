@@ -22,7 +22,7 @@ MODULE_NAME = BaseCryptLib
 # Build Directory Macro Definition
 #
 BUILD_DIR = $(WORKSPACE)\Build
-BIN_DIR = $(BUILD_DIR)\$(ARCH)
+BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
 OUTPUT_DIR = $(BIN_DIR)\OsStub\$(MODULE_NAME)
 
 SOURCE_DIR = $(WORKSPACE)\OsStub\$(MODULE_NAME)

@@ -274,6 +274,7 @@ HmacSha256Final (
 
 **/
 BOOLEAN
+EFIAPI
 HmacSha256All (
   IN   CONST VOID   *Data,
   IN   UINTN        DataSize,

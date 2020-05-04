@@ -11,7 +11,7 @@
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseDigest (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -23,6 +23,9 @@ SpdmGetResponseDigest (
   UINT32                        HashSize;
   HASH_ALL                      HashFunc;
   UINT8                         *Digest;
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
+
+  SpdmContext = Context;
 
   if (SpdmContext->LocalContext.CertificateChain == NULL) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);

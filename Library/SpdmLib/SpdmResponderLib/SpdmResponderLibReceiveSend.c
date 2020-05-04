@@ -617,11 +617,13 @@ SpdmSendResponse (
 RETURN_STATUS
 EFIAPI
 SpdmRegisterGetResponseFunc (
-  IN  SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN  UINTN                   RequestResponseCode,
+  IN  VOID                    *Context,
   IN  SPDM_GET_RESPONSE_FUNC  GetResponseFunc
   )
 {
+  SPDM_DEVICE_CONTEXT      *SpdmContext;
+
+  SpdmContext = Context;
   SpdmContext->GetResponseFunc = (UINTN)GetResponseFunc;
 
   return RETURN_SUCCESS;
@@ -630,11 +632,13 @@ SpdmRegisterGetResponseFunc (
 RETURN_STATUS
 EFIAPI
 SpdmRegisterGetResponseSessionFunc (
-  IN  SPDM_DEVICE_CONTEXT             *SpdmContext,
-  IN  UINTN                           RequestResponseCode,
+  IN  VOID                            *Context,
   IN  SPDM_GET_RESPONSE_SESSION_FUNC  GetResponseSessionFunc
   )
 {
+  SPDM_DEVICE_CONTEXT      *SpdmContext;
+
+  SpdmContext = Context;
   SpdmContext->GetResponseSessionFunc = (UINTN)GetResponseSessionFunc;
 
   return RETURN_SUCCESS;

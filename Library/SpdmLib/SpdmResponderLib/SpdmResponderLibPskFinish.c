@@ -58,7 +58,7 @@ SpdmVerifyPskFinishHmac (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponsePskFinish (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT8                SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
@@ -69,6 +69,9 @@ SpdmGetResponsePskFinish (
   BOOLEAN                      Result;
   UINT32                       HmacSize;
   SPDM_PSK_FINISH_RESPONSE     *SpdmResponse;
+  SPDM_DEVICE_CONTEXT          *SpdmContext;
+
+  SpdmContext = Context;
 
   ASSERT (*ResponseSize >= sizeof(SPDM_PSK_FINISH_RESPONSE));
   *ResponseSize = sizeof(SPDM_PSK_FINISH_RESPONSE);

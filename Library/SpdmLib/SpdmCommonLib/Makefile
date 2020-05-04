@@ -22,7 +22,7 @@ MODULE_NAME = SpdmCommonLib
 # Build Directory Macro Definition
 #
 BUILD_DIR = $(WORKSPACE)\Build
-BIN_DIR = $(BUILD_DIR)\$(ARCH)
+BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
 OUTPUT_DIR = $(BIN_DIR)\Library\SpdmLib\$(MODULE_NAME)
 
 SOURCE_DIR = $(WORKSPACE)\Library\SpdmLib\$(MODULE_NAME)
@@ -45,7 +45,7 @@ OBJECT_FILES =  \
 
 
 INC =  \
-    /I$(WORKSPACE)\Library\SpdmLib\SpdmCommonLib \
+    /I$(SOURCE_DIR) \
     /I$(WORKSPACE)\Include \
     /I$(WORKSPACE)\Include\Hal \
     /I$(WORKSPACE)\Include\Hal\$(ARCH)

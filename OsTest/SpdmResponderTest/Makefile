@@ -23,7 +23,7 @@ BASE_NAME = $(MODULE_NAME)
 # Build Directory Macro Definition
 #
 BUILD_DIR = $(WORKSPACE)\Build
-BIN_DIR = $(BUILD_DIR)\$(ARCH)
+BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
 OUTPUT_DIR = $(BIN_DIR)\OsTest\$(MODULE_NAME)
 
 SOURCE_DIR = $(WORKSPACE)\OsTest\$(MODULE_NAME)
@@ -61,7 +61,7 @@ STATIC_LIBRARY_FILES =  \
 
 
 INC =  \
-    /I$(WORKSPACE)\OsTest\SpdmResponderLib \
+    /I$(SOURCE_DIR) \
     /I$(WORKSPACE)\OsTest\SpdmTestCommon \
     /I$(WORKSPACE)\Include \
     /I$(WORKSPACE)\Include\Hal \

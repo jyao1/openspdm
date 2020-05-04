@@ -28,7 +28,7 @@ typedef struct {
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseAlgorithm (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -39,6 +39,9 @@ SpdmGetResponseAlgorithm (
   SPDM_ALGORITHMS_RESPONSE_MINE                  *SpdmResponse;
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  *StructTable;
   UINTN                                          Index;
+  SPDM_DEVICE_CONTEXT                            *SpdmContext;
+
+  SpdmContext = Context;
 
   ASSERT (*ResponseSize >= sizeof(SPDM_ALGORITHMS_RESPONSE_MINE));
   *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE_MINE);

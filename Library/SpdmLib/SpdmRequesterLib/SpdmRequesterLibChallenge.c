@@ -127,7 +127,7 @@ VerifyChallengeSignature (
 RETURN_STATUS
 EFIAPI
 SpdmChallenge (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT8                SlotNum,
   IN     UINT8                MeasurementHashType,
      OUT VOID                 *MeasurementHash
@@ -146,6 +146,9 @@ SpdmChallenge (
   VOID                                      *Opaque;
   VOID                                      *Signature;
   UINTN                                     SignatureSize;
+  SPDM_DEVICE_CONTEXT                       *SpdmContext;
+
+  SpdmContext = Context;
   
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP) == 0) {
     return RETURN_DEVICE_ERROR;

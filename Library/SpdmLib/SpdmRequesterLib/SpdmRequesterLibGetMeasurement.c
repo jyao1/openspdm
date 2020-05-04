@@ -84,7 +84,7 @@ VerifyMeasurementSignature (
 RETURN_STATUS
 EFIAPI
 SpdmGetMeasurement (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT8                RequestAttribute,
   IN     UINT8                MeasurementOperation,
      OUT UINT8                *NumberOfBlocks,
@@ -105,6 +105,9 @@ SpdmGetMeasurement (
   VOID                                      *Opaque;
   VOID                                      *Signature;
   UINTN                                     SignatureSize;
+  SPDM_DEVICE_CONTEXT                       *SpdmContext;
+
+  SpdmContext = Context;
 
   SpdmContext->ErrorState = EDKII_SPDM_ERROR_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 

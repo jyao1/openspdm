@@ -101,7 +101,6 @@ SpdmSendReceivePskExchange (
   SPDM_PSK_EXCHANGE_RESPONSE_MAX            SpdmResponse;
   UINTN                                     SpdmResponseSize;
   UINT32                                    HashSize;
-  UINT32                                    SignatureSize;
   UINT32                                    HmacSize;
   UINT8                                     *Ptr;
   VOID                                      *MeasurementSummaryHash;
@@ -156,7 +155,6 @@ SpdmSendReceivePskExchange (
   SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId);
   SessionInfo->UsePsk = TRUE;
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
   HmacSize = GetSpdmHashSize (SpdmContext);
 

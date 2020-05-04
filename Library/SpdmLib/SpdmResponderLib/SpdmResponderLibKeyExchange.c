@@ -140,7 +140,7 @@ SpdmGenerateKeyExchangeHmac (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseKeyExchange (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -162,6 +162,9 @@ SpdmGetResponseKeyExchange (
   UINTN                         FinalKeySize;
   SPDM_SESSION_INFO             *SessionInfo;
   UINTN                         TotalSize;
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
+
+  SpdmContext = Context;
 
   SpdmRequest = Request;
   SlotNum = SpdmRequest->Header.Param2;

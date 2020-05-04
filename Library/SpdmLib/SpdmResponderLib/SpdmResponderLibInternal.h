@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseVersion (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -26,7 +26,7 @@ SpdmGetResponseVersion (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseCapability (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -36,7 +36,7 @@ SpdmGetResponseCapability (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseAlgorithm (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -46,7 +46,7 @@ SpdmGetResponseAlgorithm (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseDigest (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -56,7 +56,7 @@ SpdmGetResponseDigest (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseCertificate (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -66,7 +66,7 @@ SpdmGetResponseCertificate (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseChallenge (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -76,7 +76,7 @@ SpdmGetResponseChallenge (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseMeasurement (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -86,7 +86,7 @@ SpdmGetResponseMeasurement (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseKeyExchange (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -96,7 +96,7 @@ SpdmGetResponseKeyExchange (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseFinish (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINT8                SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
@@ -107,7 +107,7 @@ SpdmGetResponseFinish (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponsePskExchange (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -117,7 +117,7 @@ SpdmGetResponsePskExchange (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponsePskFinish (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINT8                SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
@@ -128,7 +128,7 @@ SpdmGetResponsePskFinish (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseEndSession (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *SpdmContext,
   IN     UINT8                SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,

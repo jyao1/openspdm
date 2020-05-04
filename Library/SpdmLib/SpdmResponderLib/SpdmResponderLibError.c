@@ -20,7 +20,7 @@ SPDM_ERROR_RESPONSE mSpdmError = {
 RETURN_STATUS
 EFIAPI
 SpdmGenerateErrorResponse (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT8                ErrorCode,
   IN     UINT8                ErrorData,
   IN OUT UINTN                *ResponseSize,

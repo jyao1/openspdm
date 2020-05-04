@@ -15,10 +15,8 @@ SpdmCalculateCertChainHash (
   OUT UINT8                *CertChainHash
   )
 {
-  UINT32                        HashSize;
   HASH_ALL                      HashFunc;
-  
-  HashSize = GetSpdmHashSize (SpdmContext);
+
   HashFunc = GetSpdmHashFunc (SpdmContext);
 
   HashFunc (SpdmContext->LocalContext.CertificateChain[SlotNum], SpdmContext->LocalContext.CertificateChainSize[SlotNum], CertChainHash);
@@ -152,7 +150,7 @@ SpdmGenerateChallengeSignature (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseChallenge (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -167,6 +165,9 @@ SpdmGetResponseChallenge (
   UINT32                            HashSize;
   UINT8                             *Ptr;
   UINTN                             TotalSize;
+  SPDM_DEVICE_CONTEXT               *SpdmContext;
+
+  SpdmContext = Context;
   
   SpdmRequest = Request;
   SlotNum = SpdmRequest->Header.Param1;
