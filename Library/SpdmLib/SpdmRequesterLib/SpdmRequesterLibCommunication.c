@@ -73,26 +73,26 @@ SpdmStartSession (
   if (!UsePsk) {
     Status = SpdmSendReceiveKeyExchange (SpdmContext, MeasurementHashType, SlotNum, HeartbeatPeriod, SessionId, MeasurementHash);
     if (RETURN_ERROR(Status)) {
-      DEBUG ((DEBUG_INFO, "SpdmStartSession - %r\n", Status));
+      DEBUG ((DEBUG_INFO, "SpdmStartSession - %p\n", Status));
       ZeroMem (&SpdmContext->SessionInfo, sizeof(SpdmContext->SessionInfo));
       return Status;
     }
 
     Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, SlotNum);
-    DEBUG ((DEBUG_INFO, "SpdmStartSession - %r\n", Status));
+    DEBUG ((DEBUG_INFO, "SpdmStartSession - %p\n", Status));
     if (RETURN_ERROR(Status)) {
       ZeroMem (&SpdmContext->SessionInfo, sizeof(SpdmContext->SessionInfo));
     }
   } else {
     Status = SpdmSendReceivePskExchange (SpdmContext, MeasurementHashType, HeartbeatPeriod, SessionId, MeasurementHash);
     if (RETURN_ERROR(Status)) {
-      DEBUG ((DEBUG_INFO, "SpdmStartSession - %r\n", Status));
+      DEBUG ((DEBUG_INFO, "SpdmStartSession - %p\n", Status));
       ZeroMem (&SpdmContext->SessionInfo, sizeof(SpdmContext->SessionInfo));
       return Status;
     }
 
     Status = SpdmSendReceivePskFinish (SpdmContext, *SessionId);
-    DEBUG ((DEBUG_INFO, "SpdmStartSession - %r\n", Status));
+    DEBUG ((DEBUG_INFO, "SpdmStartSession - %p\n", Status));
     if (RETURN_ERROR(Status)) {
       ZeroMem (&SpdmContext->SessionInfo, sizeof(SpdmContext->SessionInfo));
     }
@@ -118,7 +118,7 @@ SpdmStopSession (
   RETURN_STATUS                 Status;
 
   Status = SpdmSendReceiveEndSession (SpdmContext, SessionId, EndSessionAttributes);
-  DEBUG ((DEBUG_INFO, "SpdmStopSession - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "SpdmStopSession - %p\n", Status));
   if (!RETURN_ERROR(Status)) {
     ZeroMem (&SpdmContext->SessionInfo, sizeof(SpdmContext->SessionInfo));
   }

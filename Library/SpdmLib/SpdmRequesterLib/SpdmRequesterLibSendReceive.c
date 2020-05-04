@@ -145,7 +145,7 @@ SpdmSendRequestSession (
   }
 
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "Status - %r\n", Status));
+    DEBUG((DEBUG_INFO, "Status - %p\n", Status));
   } else {
     SpdmRequest = Request;
     switch (SpdmRequest->RequestResponseCode) {
@@ -202,7 +202,7 @@ SpdmSendRequest (
 
   Status = SpdmContext->SpdmIo->SendRequest (SpdmContext->SpdmIo, RequestSize, Request, 0);
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "Status - %r\n", Status));
+    DEBUG((DEBUG_INFO, "Status - %p\n", Status));
   } else {
     SpdmRequest = Request;
     switch (SpdmRequest->RequestResponseCode) {
@@ -385,7 +385,7 @@ SpdmReceiveResponseSession (
     ZeroMem (MyResponse, sizeof(MyResponse));
     Status = SpdmContext->SpdmIo->SecureReceiveResponse (SpdmContext->SpdmIo, EdkiiSpdmIoSecureMessagingTypeDmtfMtcp, SessionId, &MyResponseSize, MyResponse, 0);
     if (RETURN_ERROR(Status)) {
-      DEBUG((DEBUG_INFO, "Status - %r\n", Status));
+      DEBUG((DEBUG_INFO, "Status - %p\n", Status));
       return Status;
     }
     DecResponseSize = sizeof(DecResponse);
@@ -409,7 +409,7 @@ SpdmReceiveResponseSession (
 
   DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] (0x%x): \n", SessionId, *ResponseSize));
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "Status - %r\n", Status));    
+    DEBUG((DEBUG_INFO, "Status - %p\n", Status));    
   } else {
     InternalDumpHex (Response, *ResponseSize);
 
@@ -465,7 +465,7 @@ SpdmReceiveResponse (
 
   DEBUG((DEBUG_INFO, "SpdmReceiveResponse (0x%x): \n", *ResponseSize));
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "Status - %r\n", Status));    
+    DEBUG((DEBUG_INFO, "Status - %p\n", Status));    
   } else {
     InternalDumpHex (Response, *ResponseSize);
 
