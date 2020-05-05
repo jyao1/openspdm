@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 ReadInputFile (
   IN CHAR8    *FileName,
-  OUT UINT8   **FileData,
+  OUT VOID    **FileData,
   OUT UINTN   *FileSize
   )
 {
@@ -27,7 +27,7 @@ ReadInputFile (
   fseek (FpIn, 0, SEEK_END);
   *FileSize = ftell (FpIn);
   
-  *FileData = (UINT8 *) malloc (*FileSize);
+  *FileData = (VOID *) malloc (*FileSize);
   if (NULL == *FileData) {
     printf ("No sufficient memory to allocate %s\n", FileName);
     fclose (FpIn);
@@ -51,7 +51,7 @@ ReadInputFile (
 BOOLEAN
 WriteOutputFile (
   IN CHAR8   *FileName,
-  IN UINT8   *FileData,
+  IN VOID    *FileData,
   IN UINTN   FileSize
   )
 {

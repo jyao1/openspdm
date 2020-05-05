@@ -199,14 +199,14 @@ EcGetPublicKey (
   IN OUT  UINTN  *PublicSize
   )
 {
-  EC_KEY     *EcKey;
-  EC_GROUP   *Group;
-  BOOLEAN    RetVal;
-  EC_POINT   *EcPoint;
-  BIGNUM     *BnX;
-  BIGNUM     *BnY;
-  INTN       XSize;
-  INTN       YSize;
+  EC_KEY         *EcKey;
+  CONST EC_GROUP *Group;
+  BOOLEAN        RetVal;
+  CONST EC_POINT *EcPoint;
+  BIGNUM         *BnX;
+  BIGNUM         *BnY;
+  INTN           XSize;
+  INTN           YSize;
 
   if (EcContext == NULL || PublicSize == NULL) {
     return FALSE;
@@ -301,13 +301,13 @@ EcComputeKey (
   IN OUT  UINTN        *KeySize
   )
 {
-  EC_KEY     *EcKey;
-  EC_GROUP   *Group;
-  BOOLEAN    RetVal;
-  BIGNUM     *BnX;
-  BIGNUM     *BnY;
-  EC_POINT   *Point;
-  INTN       Size;
+  EC_KEY         *EcKey;
+  CONST EC_GROUP *Group;
+  BOOLEAN        RetVal;
+  BIGNUM         *BnX;
+  BIGNUM         *BnY;
+  EC_POINT       *Point;
+  INTN           Size;
 
   if (EcContext == NULL || PeerPublic == NULL || KeySize == NULL || Key == NULL) {
     return FALSE;

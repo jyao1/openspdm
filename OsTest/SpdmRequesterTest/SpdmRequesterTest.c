@@ -11,7 +11,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define IP_ADDRESS "127.0.0.1"
 
+#ifdef _MSC_VER
 struct  in_addr mIpAddress = {127, 0, 0, 1};
+#else
+struct  in_addr mIpAddress = {0x0100007F};
+#endif
 UINT8  mReceiveBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
 extern SOCKET                       mSocket;
@@ -59,7 +63,13 @@ InitClient (
 
   ClientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (ClientSocket == INVALID_SOCKET) {
-    printf ("Create Socket Failed - %x\n", WSAGetLastError());
+    printf ("Create Socket Failed - %x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return FALSE;
   }
 
@@ -70,7 +80,13 @@ InitClient (
 
   Return = connect (ClientSocket, (struct sockaddr *)&ServerAddr, sizeof(ServerAddr));
   if (Return == SOCKET_ERROR) {
-    printf ("Connect Error - %x\n", WSAGetLastError());
+    printf ("Connect Error - %x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return FALSE;
   }
 
@@ -87,11 +103,11 @@ PlatformClientRoutine (
 {
   SOCKET  PlatformSocket;
   BOOLEAN Result;
-  WSADATA Ws;
   UINT32  Response;
   UINTN   ResponseSize;
   
 #ifdef _MSC_VER
+  WSADATA Ws;
   if (WSAStartup(MAKEWORD(2,2), &Ws) != 0) {
     printf ("Init Windows Socket Failed - %x\n", WSAGetLastError());
     return FALSE;
@@ -109,7 +125,7 @@ PlatformClientRoutine (
   Result = CommunicatePlatformData (
              PlatformSocket,
              SOCKET_SPDM_COMMAND_TEST,
-             "Client Hello!",
+             (UINT8 *)"Client Hello!",
              sizeof("Client Hello!"),
              &Response,
              &ResponseSize,

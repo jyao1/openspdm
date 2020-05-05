@@ -14,14 +14,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 EFIAPI
 Sha256HashAll (
-  IN VOID  *Data,
-  IN UINTN DataSize,
-  OUT VOID *Hash
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   );
 
 BOOLEAN
 ReadPrivateCertificate (
-  OUT UINT8   **Data,
+  OUT VOID    **Data,
   OUT UINTN   *Size
   )
 {
@@ -32,12 +32,12 @@ ReadPrivateCertificate (
 
 BOOLEAN
 ReadPublicCertificateChain (
-  OUT UINT8   **Data,
+  OUT VOID    **Data,
   OUT UINTN   *Size
   )
 {
   BOOLEAN             Res;
-  UINT8               *FileData;
+  VOID                *FileData;
   UINTN               FileSize;
   SPDM_CERT_CHAIN     *CertChain;
   UINTN               CertChainSize;
@@ -48,13 +48,13 @@ ReadPublicCertificateChain (
   }
 
   CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
-  CertChain = malloc (CertChainSize);
+  CertChain = (VOID *)malloc (CertChainSize);
   if (CertChain == NULL) {
     return FALSE;
   }
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
-  Sha256HashAll (FileData, FileSize, (VOID *)(CertChain + 1));
+  Sha256HashAll (FileData, FileSize, (UINT8 *)(CertChain + 1));
   CopyMem (
     (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE,
     FileData,

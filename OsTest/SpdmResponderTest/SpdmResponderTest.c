@@ -46,7 +46,13 @@ CreateSocket(
 
   *ListenSocket = socket(PF_INET, SOCK_STREAM, 0);
   if(INVALID_SOCKET == *ListenSocket) {
-    printf("Cannot create server listen socket.  Error is 0x%x\n", WSAGetLastError());
+    printf("Cannot create server listen socket.  Error is 0x%x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return FALSE;
   }
 
@@ -56,13 +62,25 @@ CreateSocket(
 
   Res = bind(*ListenSocket, (struct sockaddr*) &MyAddress, sizeof(MyAddress));
   if(Res == SOCKET_ERROR) {
-    printf("Bind error.  Error is 0x%x\n", WSAGetLastError());
+    printf("Bind error.  Error is 0x%x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return FALSE;
   }
 
   Res = listen(*ListenSocket, 3);
   if(Res == SOCKET_ERROR) {
-    printf("Listen error.  Error is 0x%x\n", WSAGetLastError());
+    printf("Listen error.  Error is 0x%x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return FALSE;
   }
   return TRUE;
@@ -82,14 +100,31 @@ PlatformServer(
     BytesReceived = sizeof(mReceiveBuffer);
     Result = ReceivePlatformData (Socket, &Command, mReceiveBuffer, &BytesReceived);
     if (!Result) {
-      printf ("ReceivePlatformData Error - %x\n", WSAGetLastError());
+      printf ("ReceivePlatformData Error - %x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
       return TRUE;
     }
     switch(GET_COMMAND_OPCODE(Command)) {
     case SOCKET_SPDM_COMMAND_TEST:
-      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_TEST, "Server Hello!", sizeof("Server Hello!"));
+      Result = SendPlatformData (
+                 Socket,
+                 SOCKET_SPDM_COMMAND_TEST,
+                 (UINT8 *)"Server Hello!",
+                 sizeof("Server Hello!")
+                 );
       if (!Result) {
-        printf ("SendPlatformData Error - %x\n", WSAGetLastError());
+        printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+          WSAGetLastError()
+#else
+          errno
+#endif
+          );
         return TRUE;
       }
       break;
@@ -104,20 +139,38 @@ PlatformServer(
                  &BytesToReceive
                  );
       if (!Result) {
-        printf ("SendPlatformData Error - %x\n", WSAGetLastError());
+        printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+          WSAGetLastError()
+#else
+          errno
+#endif
+          );
         return TRUE;
       }
                 
       Result = SendPlatformData (Socket, Command, mReceiveBuffer, BytesToReceive);
       if (!Result) {
-        printf ("SendPlatformData Error - %x\n", WSAGetLastError());
+        printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+          WSAGetLastError()
+#else
+          errno
+#endif
+          );
         return TRUE;
       }
       break;
     case SOCKET_SPDM_COMMAND_STOP:
       Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_STOP, NULL, 0);
       if (!Result) {
-        printf ("SendPlatformData Error - %x\n", WSAGetLastError());
+        printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+          WSAGetLastError()
+#else
+          errno
+#endif
+          );
         return TRUE;
       }
       return FALSE;
@@ -126,7 +179,13 @@ PlatformServer(
       printf ("Unrecognized platform interface command %x\n", Command);
       Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_UNKOWN, NULL, 0);
       if (!Result) {
-        printf ("SendPlatformData Error - %x\n", WSAGetLastError());
+        printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+          WSAGetLastError()
+#else
+          errno
+#endif
+          );
         return TRUE;
       }
       return TRUE;
@@ -143,7 +202,7 @@ PlatformServerRoutine (
   SOCKET               ServerSocket;
   struct               sockaddr_in PeerAddress;
   BOOLEAN              Result;
-  INT32                Length;
+  UINT32               Length;
   BOOLEAN              ContinueServing;
 
   Result = CreateSocket(PortNumber, &ListenSocket);
@@ -158,7 +217,13 @@ PlatformServerRoutine (
     Length = sizeof(PeerAddress);
     ServerSocket = accept(ListenSocket, (struct sockaddr*) &PeerAddress, &Length);
     if (ServerSocket == INVALID_SOCKET) {
-      printf ("Accept error.  Error is 0x%x\n", WSAGetLastError());
+      printf ("Accept error.  Error is 0x%x\n",
+#ifdef _MSC_VER
+        WSAGetLastError()
+#else
+        errno
+#endif
+        );
 #ifdef _MSC_VER
       WSACleanup();
 #endif

@@ -193,14 +193,14 @@ void           abort       (void);
 #endif
 int            inet_pton   (int, const char *, void *);
 
-void *memcpy(void *destin, void *source, unsigned n);
+void *memcpy(void *destin, const void *source, unsigned n);
 void *memset(void *s, int ch, size_t n);
 void *memchr(const void *buf, int ch, size_t count);
 int memcmp(const void *str1, const void *str2, size_t n);
 void *memmove( void* dest, const void* src, size_t count );
 size_t strlen(const char *string);
 char *strcpy(char* dest, const char *src);
-char *strncpy(char *destinin, char *source, int maxlen);
+char *strncpy(char *destinin, const char *source, int maxlen);
 char *strcat(char *dest, const char *src);
 int strncmp(const char *str1, const char *str2, size_t n);
 int strcasecmp (const char *s1, const char *s2);

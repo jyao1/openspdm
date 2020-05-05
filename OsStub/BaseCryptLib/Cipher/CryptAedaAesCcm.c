@@ -54,10 +54,10 @@ AeadAesCcmEncrypt (
   OUT  UINTN        *DataOutSize
   )
 {
-  EVP_CIPHER_CTX *Ctx;
-  EVP_CIPHER     *Cipher;
-  UINTN          TempOutSize;
-  BOOLEAN        RetValue;
+  EVP_CIPHER_CTX   *Ctx;
+  CONST EVP_CIPHER *Cipher;
+  UINTN            TempOutSize;
+  BOOLEAN          RetValue;
 
   if (DataInSize > INT_MAX) {
     return FALSE;
@@ -135,7 +135,7 @@ AeadAesCcmEncrypt (
     goto Done;
   }
 
-  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl(Ctx, EVP_CTRL_CCM_GET_TAG, (INT32)TagSize, TagOut);
+  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl(Ctx, EVP_CTRL_CCM_GET_TAG, (INT32)TagSize, (VOID *)TagOut);
 
 Done:
   EVP_CIPHER_CTX_free(Ctx);
@@ -185,9 +185,9 @@ AeadAesCcmDecrypt (
   OUT  UINTN        *DataOutSize
   )
 {
-  EVP_CIPHER_CTX *Ctx;
-  EVP_CIPHER     *Cipher;
-  BOOLEAN        RetValue;
+  EVP_CIPHER_CTX   *Ctx;
+  CONST EVP_CIPHER *Cipher;
+  BOOLEAN          RetValue;
 
   if (DataInSize > INT_MAX) {
     return FALSE;
@@ -234,7 +234,7 @@ AeadAesCcmDecrypt (
     goto Done;
   }
 
-  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl(Ctx, EVP_CTRL_CCM_SET_TAG, (INT32)TagSize, Tag);
+  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl(Ctx, EVP_CTRL_CCM_SET_TAG, (INT32)TagSize, (VOID *)Tag);
   if (!RetValue) {
     goto Done;
   }

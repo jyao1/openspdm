@@ -59,8 +59,8 @@ Run :
   Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
 
 NOTE:
-  Current version only supports build with "Visual Studio 2015" and X64 version.
-  Supporting for more compilers such as VS2019, GCC or LLVM, and architectures such as IA32 are in the progress.
+  Current version only supports build with Visual Studio 2015, GCC compilers and X64 version.
+  Supporting for more compilers such as VS2019 or LLVM, and architectures such as IA32 are in the progress.
 
 ## Feature not implemented yet
 

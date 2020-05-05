@@ -149,7 +149,7 @@ SpdmServerInit (
   BOOLEAN                      HasPubCert;
   BOOLEAN                      HasPrivKey;
 
-  mSpdmContext = malloc (SpdmGetContextSize());
+  mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
 
@@ -233,6 +233,8 @@ SpdmServerInit (
   }
 
   Status = SpdmRegisterGetResponseSessionFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
+  if (RETURN_ERROR(Status)) {
+  }
 
 #if USE_PSK
   Status = SpdmSetData (SpdmContext, SpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));

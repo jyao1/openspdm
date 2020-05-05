@@ -43,7 +43,13 @@ ReadBytes (
   while (NumberReceived < NumberOfBytes) {
     Result = recv (Socket, Buffer + NumberReceived, NumberOfBytes - NumberReceived, 0);
     if (Result == -1) {
-      printf ("Receive error - 0x%x\n", WSAGetLastError());
+      printf ("Receive error - 0x%x\n",
+#ifdef _MSC_VER
+        WSAGetLastError()
+#else
+        errno
+#endif
+        );
       return FALSE;
     }
     if (Result == 0) {
@@ -122,7 +128,7 @@ ReceivePlatformData (
   IN  SOCKET           Socket,
   OUT UINT32           *Command,
   OUT UINT8            *ReceiveBuffer,
-  IN OUT UINT32        *BytesToReceive
+  IN OUT UINTN         *BytesToReceive
   )
 {
   BOOLEAN  Result;
@@ -139,7 +145,7 @@ ReceivePlatformData (
   DumpData ((UINT8 *)&Response, sizeof(UINT32));
 
   BytesReceived = 0;
-  Result = ReadMultipleBytes (Socket, ReceiveBuffer, &BytesReceived, *BytesToReceive);
+  Result = ReadMultipleBytes (Socket, ReceiveBuffer, &BytesReceived, (UINT32)*BytesToReceive);
   if (!Result) {
     return Result;
   }
@@ -167,11 +173,21 @@ WriteBytes(
   while (NumberSent < NumberOfBytes) {
     Result = send (Socket, Buffer + NumberSent, NumberOfBytes - NumberSent, 0);
     if (Result == -1) {
+#ifdef _MSC_VER
       if (WSAGetLastError() == 0x2745) {
         printf ("Client disconnected\n");
       } else {
-        printf ("Send error - 0x%x\n", WSAGetLastError());
+#endif
+        printf ("Send error - 0x%x\n",
+#ifdef _MSC_VER
+          WSAGetLastError()
+#else
+          errno
+#endif
+          );
+#ifdef _MSC_VER
       }
+#endif
       return FALSE;
     }
     NumberSent += Result;
@@ -227,7 +243,7 @@ SendPlatformData (
   IN SOCKET           Socket,
   IN UINT32           Command,
   IN UINT8            *SendBuffer,
-  IN UINT32           BytesToSend
+  IN UINTN            BytesToSend
   )
 {
   BOOLEAN  Result;
@@ -240,7 +256,7 @@ SendPlatformData (
   Command = htonl(Command);
   DumpData ((UINT8 *)&Command, sizeof(UINT32));
 
-  Result = WriteMultipleBytes (Socket, SendBuffer, BytesToSend);
+  Result = WriteMultipleBytes (Socket, SendBuffer, (UINT32)BytesToSend);
   if (!Result) {
     return Result;
   }

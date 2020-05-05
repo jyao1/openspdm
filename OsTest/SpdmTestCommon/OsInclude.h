@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __WIN_NT_INCLUDE_H__
 #define __WIN_NT_INCLUDE_H__
 
+#ifdef _MSC_VER
+// MSVC
 //
 // Win32 include files do not compile clean with /W4, so we use the warning
 // pragma to suppress the warnings for Win32 only. This way our code can stil
@@ -67,6 +69,20 @@ typedef UINT32 size_t ;
 //
 #pragma warning(default : 4115)
 #pragma warning(default : 4201)
+
+#else
+// GCC
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+typedef int SOCKET;
+#define closesocket(x) close(x)
+#define INVALID_SOCKET (-1)
+#define SOCKET_ERROR (-1)
+#endif
 
 
 #endif

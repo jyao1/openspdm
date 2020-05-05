@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/SpdmCommonLib.h>
 
-#include "WinInclude.h"
+#include "OsInclude.h"
 #include "stdio.h"
 #include "SpdmTestCommand.h"
 
@@ -45,26 +45,26 @@ ReceivePlatformData (
 BOOLEAN
 ReadInputFile (
   IN CHAR8    *FileName,
-  OUT UINT8   **FileData,
+  OUT VOID    **FileData,
   OUT UINTN   *FileSize
   );
 
 BOOLEAN
 WriteOutputFile (
   IN CHAR8   *FileName,
-  IN UINT8   *FileData,
+  IN VOID    *FileData,
   IN UINTN   FileSize
   );
 
 BOOLEAN
 ReadPrivateCertificate (
-  OUT UINT8   **Data,
+  OUT VOID    **Data,
   OUT UINTN   *Size
   );
 
 BOOLEAN
 ReadPublicCertificateChain (
-  OUT UINT8   **Data,
+  OUT VOID    **Data,
   OUT UINTN   *Size
   );
 

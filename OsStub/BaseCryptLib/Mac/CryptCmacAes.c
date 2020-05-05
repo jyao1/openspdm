@@ -72,7 +72,7 @@ CmacAesInit (
   IN   UINTN        KeySize
   )
 {
-  EVP_CIPHER     *Cipher;
+  CONST EVP_CIPHER *Cipher;
 
   //
   // Check input parameters.
@@ -266,10 +266,10 @@ CmacAesAll (
   OUT  UINT8       *CmacValue
   )
 {
-  EVP_CIPHER     *Cipher;
-  UINTN     Length;
-  CMAC_CTX  *Ctx;
-  BOOLEAN   RetVal;
+  CONST EVP_CIPHER *Cipher;
+  UINTN            Length;
+  CMAC_CTX         *Ctx;
+  BOOLEAN          RetVal;
   
   switch (KeySize) {
   case 16:

@@ -16,9 +16,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 EFIAPI
 Sha256HashAll (
-  IN VOID  *Data,
-  IN UINTN DataSize,
-  OUT VOID *Hash
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   );
 
 typedef struct {
@@ -40,7 +40,7 @@ RegisterMeasurement (
 
   *DeviceMeasurementCount = BLOCK_NUMBER;
   *DeviceMeasurementSize = BLOCK_NUMBER * sizeof(MY_SPDM_MEASUREMENT_BLOCK);
-  *DeviceMeasurement = malloc (BLOCK_NUMBER * sizeof(MY_SPDM_MEASUREMENT_BLOCK));
+  *DeviceMeasurement = (VOID *)malloc (BLOCK_NUMBER * sizeof(MY_SPDM_MEASUREMENT_BLOCK));
   if (*DeviceMeasurement == NULL) {
     return FALSE;
   }

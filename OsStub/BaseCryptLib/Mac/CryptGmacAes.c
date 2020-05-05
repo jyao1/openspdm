@@ -19,8 +19,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 /* typedef EVP_MAC_IMPL */
 typedef struct {
-  EVP_CIPHER     *Cipher;
-  EVP_CIPHER_CTX *Ctx;
+  CONST EVP_CIPHER  *Cipher;
+  EVP_CIPHER_CTX    *Ctx;
 } EFI_GMAC_CONTEXT;
 
 /**
@@ -238,9 +238,9 @@ GmacAesUpdate (
   IN      UINTN       DataSize
   )
 {
-  UINT32 Length;
+  UINT32           Length;
   EFI_GMAC_CONTEXT *Gctx;
-  BOOLEAN        RetValue;
+  BOOLEAN          RetValue;
 
   //
   // Check input parameters.
@@ -260,7 +260,7 @@ GmacAesUpdate (
   //
   // OpenSSL GMAC-AES digest update
   //
-  RetValue = (BOOLEAN) EVP_EncryptUpdate (Gctx->Ctx, NULL, &Length, Data, (INT32)DataSize);
+  RetValue = (BOOLEAN) EVP_EncryptUpdate (Gctx->Ctx, NULL, (INT32*)&Length, Data, (INT32)DataSize);
   if (!RetValue) {
     return FALSE;
   }
@@ -298,9 +298,9 @@ GmacAesFinal (
   OUT     UINT8  *CmacValue
   )
 {
-  UINT32 Length;
+  UINT32           Length;
   EFI_GMAC_CONTEXT *Gctx;
-  BOOLEAN        RetValue;
+  BOOLEAN          RetValue;
 
   //
   // Check input parameters.
@@ -313,11 +313,11 @@ GmacAesFinal (
   //
   // OpenSSL GMAC-AES digest finalization
   //
-  RetValue = (BOOLEAN) EVP_EncryptFinal_ex (Gctx->Ctx, CmacValue, &Length);
+  RetValue = (BOOLEAN) EVP_EncryptFinal_ex (Gctx->Ctx, CmacValue, (INT32 *)&Length);
   if (!RetValue) {
     return FALSE;
   }
-  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl (Gctx->Ctx, EVP_CTRL_AEAD_GET_TAG, 16, CmacValue);
+  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl (Gctx->Ctx, EVP_CTRL_AEAD_GET_TAG, 16, (VOID *)CmacValue);
   if (!RetValue) {
     return FALSE;
   }
@@ -353,7 +353,7 @@ GmacAesAll (
   IN   UINTN        KeySize,
   IN   CONST UINT8  *Iv,
   IN   UINTN        IvSize,
-  OUT  UINT8       *CmacValue
+  OUT  UINT8        *CmacValue
   )
 {
   VOID      *Ctx;

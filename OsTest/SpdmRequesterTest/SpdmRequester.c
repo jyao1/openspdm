@@ -28,13 +28,25 @@ CommunicatePlatformData (
 
   Result = SendPlatformData (Socket, Command, SendBuffer, BytesToSend);
   if (!Result) {
-    printf ("SendPlatformData Error - %x\n", WSAGetLastError());
+    printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return Result;
   }
 
   Result = ReceivePlatformData (Socket, Response, ReceiveBuffer, BytesToReceive);
   if (!Result) {
-    printf ("ReceivePlatformData Error - %x\n", WSAGetLastError());
+    printf ("ReceivePlatformData Error - %x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return Result;
   }
   return Result;
@@ -75,7 +87,13 @@ SpdmClientSendRequest (
 
   Result = SendPlatformData (mSocket, SOCKET_SPDM_COMMAND_NORMAL, Request, (UINT32)RequestSize);
   if (!Result) {
-    printf ("SendPlatformData Error - %x\n", WSAGetLastError());
+    printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return RETURN_DEVICE_ERROR;
   }
   return RETURN_SUCCESS;
@@ -118,7 +136,13 @@ SpdmClientReceiveResponse (
 
   Result = ReceivePlatformData (mSocket, &Command, Response, ResponseSize);
   if (!Result) {
-    printf ("ReceivePlatformData Error - %x\n", WSAGetLastError());
+    printf ("ReceivePlatformData Error - %x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return RETURN_DEVICE_ERROR;
   }
   if (Command != SOCKET_SPDM_COMMAND_NORMAL) {
@@ -191,7 +215,13 @@ SpdmClientSecureSendRequest (
 
   Result = SendPlatformData (mSocket, MAKE_COMMAND(SOCKET_SPDM_COMMAND_SECURE, SessionId), Request, (UINT32)RequestSize);
   if (!Result) {
-    printf ("SendPlatformData Error - %x\n", WSAGetLastError());
+    printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return RETURN_DEVICE_ERROR;
   }
   return RETURN_SUCCESS;
@@ -241,7 +271,13 @@ SpdmClientSecureReceiveResponse (
   Command = MAKE_COMMAND(SOCKET_SPDM_COMMAND_SECURE, SessionId);
   Result = ReceivePlatformData (mSocket, &Command, Response, ResponseSize);
   if (!Result) {
-    printf ("ReceivePlatformData Error - %x\n", WSAGetLastError());
+    printf ("ReceivePlatformData Error - %x\n",
+#ifdef _MSC_VER
+      WSAGetLastError()
+#else
+      errno
+#endif
+      );
     return RETURN_DEVICE_ERROR;
   }
   if (GET_COMMAND_SESSION_ID(Command) != SessionId) {
@@ -278,7 +314,7 @@ SpdmClientInit (
   UINT16                       Data16;
   UINT32                       Data32;
 
-  mSpdmContext = malloc (SpdmGetContextSize());
+  mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
   SpdmRegisterSpdmIo (SpdmContext, &mSpdmProtocol);

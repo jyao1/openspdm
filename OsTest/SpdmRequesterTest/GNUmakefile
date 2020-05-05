@@ -1,0 +1,148 @@
+## @file
+#  SPDM library.
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+#
+# Platform Macro Definition
+#
+
+include $(WORKSPACE)/GNUmakefile.Flags
+
+#
+# Module Macro Definition
+#
+MODULE_NAME = SpdmRequesterTest
+BASE_NAME = $(MODULE_NAME)
+
+#
+# Build Directory Macro Definition
+#
+BUILD_DIR = $(WORKSPACE)/Build
+BIN_DIR = $(BUILD_DIR)/$(TARGET)_$(TOOLCHAIN)/$(ARCH)
+OUTPUT_DIR = $(BIN_DIR)/OsTest/$(MODULE_NAME)
+
+SOURCE_DIR = $(WORKSPACE)/OsTest/$(MODULE_NAME)
+
+#
+# Build Macro
+#
+
+OBJECT_FILES =  \
+    $(OUTPUT_DIR)/SpdmRequester.o \
+    $(OUTPUT_DIR)/SpdmRequesterAuthentication.o \
+    $(OUTPUT_DIR)/SpdmRequesterMeasurement.o \
+    $(OUTPUT_DIR)/SpdmRequesterSession.o \
+    $(OUTPUT_DIR)/SpdmRequesterTest.o \
+    $(OUTPUT_DIR)/SpdmTestCommand.o \
+    $(OUTPUT_DIR)/SpdmTestKey.o \
+    $(OUTPUT_DIR)/SpdmTestSupport.o \
+
+
+STATIC_LIBRARY_FILES =  \
+    $(BIN_DIR)/OsStub/BaseMemoryLib/BaseMemoryLib.a \
+    $(BIN_DIR)/OsStub/DebugLib/DebugLib.a \
+    $(BIN_DIR)/OsStub/BaseCryptLib/BaseCryptLib.a \
+    $(BIN_DIR)/OsStub/OpensslLib/OpensslLib.a \
+    $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a \
+    $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a \
+    $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/SpdmRequesterLib.a \
+    $(OUTPUT_DIR)/$(MODULE_NAME).a \
+
+
+INC =  \
+    -I$(SOURCE_DIR) \
+    -I$(WORKSPACE)/OsTest/SpdmTestCommon \
+    -I$(WORKSPACE)/Include \
+    -I$(WORKSPACE)/Include/Hal \
+    -I$(WORKSPACE)/Include/Hal/$(ARCH)
+
+#
+# Overridable Target Macro Definitions
+#
+INIT_TARGET = init
+CODA_TARGET = $(OUTPUT_DIR)/$(MODULE_NAME)
+
+#
+# Default target, which will build dependent libraries in addition to source files
+#
+
+all: mbuild
+
+#
+# ModuleTarget
+#
+
+mbuild: $(INIT_TARGET) gen_libs $(CODA_TARGET)
+
+#
+# Initialization target: print build information and create necessary directories
+#
+init:
+	-@$(MD) $(OUTPUT_DIR)
+
+#
+# GenLibsTarget
+#
+gen_libs:
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseMemoryLib/$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/DebugLib/$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseCryptLib/$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/OpensslLib/$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/MemoryAllocationLib/$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmCommonLib/$(MAKEFILE)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmRequesterLib/$(MAKEFILE)
+
+#
+# Individual Object Build Targets
+#
+$(OUTPUT_DIR)/SpdmRequester.o : $(SOURCE_DIR)/SpdmRequester.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterAuthentication.o : $(SOURCE_DIR)/SpdmRequesterAuthentication.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterMeasurement.o : $(SOURCE_DIR)/SpdmRequesterMeasurement.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterSession.o : $(SOURCE_DIR)/SpdmRequesterSession.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterTest.o : $(SOURCE_DIR)/SpdmRequesterTest.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmTestCommand.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestCommand.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestKey.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestSupport.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
+	$(RM) $(OUTPUT_DIR)/$(MODULE_NAME).a
+	"$(SLINK)" cr $@ $(SLINK_FLAGS) $^
+
+$(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
+	@echo $(BIN_DIR)/OsStub/BaseMemoryLib/BaseMemoryLib.a > $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsStub/DebugLib/DebugLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsStub/BaseCryptLib/BaseCryptLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsStub/OpensslLib/OpensslLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/SpdmRequesterLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
+	"$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group $(DLINK_FLAGS2)
+
+#
+# clean all intermediate files
+#
+clean:
+	$(RD) $(OUTPUT_DIR)
+
+

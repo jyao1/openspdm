@@ -40,18 +40,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 EFIAPI
 AeadChaCha20Poly1305Encrypt(
-  IN   CONST UINT8* Key,
+  IN   CONST UINT8  *Key,
   IN   UINTN        KeySize,
-  IN   CONST UINT8* Iv,
+  IN   CONST UINT8  *Iv,
   IN   UINTN        IvSize,
-  IN   CONST UINT8* AData,
+  IN   CONST UINT8  *AData,
   IN   UINTN        ADataSize,
-  IN   CONST UINT8* DataIn,
+  IN   CONST UINT8  *DataIn,
   IN   UINTN        DataInSize,
-  OUT  UINT8*       TagOut,
+  OUT  UINT8        *TagOut,
   IN   UINTN        TagSize,
-  OUT  UINT8*       DataOut,
-  OUT  UINTN*       DataOutSize
+  OUT  UINT8        *DataOut,
+  OUT  UINTN        *DataOutSize
   )
 {
   EVP_CIPHER_CTX* Ctx;
@@ -118,7 +118,7 @@ AeadChaCha20Poly1305Encrypt(
     goto Done;
   }
 
-  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl(Ctx, EVP_CTRL_AEAD_GET_TAG, (INT32)TagSize, TagOut);
+  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl(Ctx, EVP_CTRL_AEAD_GET_TAG, (INT32)TagSize, (VOID *)TagOut);
 
 Done:
   EVP_CIPHER_CTX_free(Ctx);
@@ -154,18 +154,18 @@ Done:
 BOOLEAN
 EFIAPI
 AeadChaCha20Poly1305Decrypt(
-  IN   CONST UINT8* Key,
+  IN   CONST UINT8  *Key,
   IN   UINTN        KeySize,
-  IN   CONST UINT8* Iv,
+  IN   CONST UINT8  *Iv,
   IN   UINTN        IvSize,
-  IN   CONST UINT8* AData,
+  IN   CONST UINT8  *AData,
   IN   UINTN        ADataSize,
-  IN   CONST UINT8* DataIn,
+  IN   CONST UINT8  *DataIn,
   IN   UINTN        DataInSize,
-  IN   CONST UINT8* Tag,
+  IN   CONST UINT8  *Tag,
   IN   UINTN        TagSize,
-  OUT  UINT8*       DataOut,
-  OUT  UINTN*       DataOutSize
+  OUT  UINT8        *DataOut,
+  OUT  UINTN        *DataOutSize
   )
 {
   EVP_CIPHER_CTX* Ctx;
@@ -205,7 +205,7 @@ AeadChaCha20Poly1305Decrypt(
     goto Done;
   }
 
-  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl(Ctx, EVP_CTRL_AEAD_SET_TAG, (INT32)TagSize, Tag);
+  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl(Ctx, EVP_CTRL_AEAD_SET_TAG, (INT32)TagSize, (VOID *)Tag);
   if (!RetValue) {
     goto Done;
   }

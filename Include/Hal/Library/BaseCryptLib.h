@@ -962,7 +962,7 @@ GmacAesAll (
   IN   UINTN        KeySize,
   IN   CONST UINT8  *Iv,
   IN   UINTN        IvSize,
-  OUT  UINT8       *CmacValue
+  OUT  UINT8        *CmacValue
   );
 
 //=====================================================================================
@@ -1285,18 +1285,18 @@ AeadAesGcmDecrypt (
 BOOLEAN
 EFIAPI
 AeadChaCha20Poly1305Encrypt(
-  IN   CONST UINT8* Key,
+  IN   CONST UINT8  *Key,
   IN   UINTN        KeySize,
-  IN   CONST UINT8* Iv,
+  IN   CONST UINT8  *Iv,
   IN   UINTN        IvSize,
-  IN   CONST UINT8* AData,
+  IN   CONST UINT8  *AData,
   IN   UINTN        ADataSize,
-  IN   CONST UINT8* DataIn,
+  IN   CONST UINT8  *DataIn,
   IN   UINTN        DataInSize,
-  OUT  UINT8*       TagOut,
+  OUT  UINT8        *TagOut,
   IN   UINTN        TagSize,
-  OUT  UINT8*       DataOut,
-  OUT  UINTN*       DataOutSize
+  OUT  UINT8        *DataOut,
+  OUT  UINTN        *DataOutSize
   );
 
 /**
@@ -1327,18 +1327,18 @@ AeadChaCha20Poly1305Encrypt(
 BOOLEAN
 EFIAPI
 AeadChaCha20Poly1305Decrypt(
-  IN   CONST UINT8* Key,
+  IN   CONST UINT8  *Key,
   IN   UINTN        KeySize,
-  IN   CONST UINT8* Iv,
+  IN   CONST UINT8  *Iv,
   IN   UINTN        IvSize,
-  IN   CONST UINT8* AData,
+  IN   CONST UINT8  *AData,
   IN   UINTN        ADataSize,
-  IN   CONST UINT8* DataIn,
+  IN   CONST UINT8  *DataIn,
   IN   UINTN        DataInSize,
-  IN   CONST UINT8* Tag,
+  IN   CONST UINT8  *Tag,
   IN   UINTN        TagSize,
-  OUT  UINT8*       DataOut,
-  OUT  UINTN*       DataOutSize
+  OUT  UINT8        *DataOut,
+  OUT  UINTN        *DataOutSize
   );
 
 //=====================================================================================
