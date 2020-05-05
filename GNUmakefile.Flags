@@ -14,6 +14,22 @@ ARCH = X64
 TOOLCHAIN = GCC
 TARGET = DEBUG
 
+ifeq ("$(ARCH)","X64")
+    $(info ARCH=X64)
+else ifeq ("$(ARCH)","Ia32")
+    $(echo ARCH=Ia32)
+else
+    $(error unknown ARCH)
+endif
+
+ifeq ("$(TARGET)","DEBUG")
+    $(info TARGET=DEBUG)
+else ifeq ("$(TARGET)","RELEASE")
+    $(info TARGET=RELEASE)
+else
+    $(error unknown TARGET)
+endif
+
 #
 # Shell Command Macro
 #
@@ -26,17 +42,40 @@ RM = rm -f
 #
 # Tools definitions specific to this module
 #
-SLINK = gcc-ar
-
-# -fno-builtin
-CC_FLAGS = -c -m64 -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -DNO_MSABI_VA_FUNCS -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Os -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare
-CC = gcc
-
 MAKE = make
 MAKEFILE = GNUmakefile
 
-DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -m64 -flto -Os -L/usr/X11R6/lib
-DLINK_FLAGS2 = -Wno-error -no-pie
+# -fno-builtin
+CC = gcc
+
+CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare
+ifeq ("$(ARCH)","X64")
+    CC_FLAGS += -m64 -DNO_MSABI_VA_FUNCS -mcmodel=small
+else ifeq ("$(ARCH)","Ia32")
+    CC_FLAGS += -m32
+endif
+ifeq ("$(TARGET)","DEBUG")
+    CC_FLAGS += -O0
+else ifeq ("$(TARGET)","RELEASE")
+    CC_FLAGS += -Os
+endif
+
+SLINK = gcc-ar
+
 DLINK = gcc
+
+DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
+DLINK_FLAGS2 = -Wno-error -no-pie
+ifeq ("$(ARCH)","X64")
+    DLINK_FLAGS += -m64
+else ifeq ("$(ARCH)","Ia32")
+    DLINK_FLAGS += -m32
+endif
+ifeq ("$(TARGET)","DEBUG")
+    DLINK_FLAGS += -O0
+else ifeq ("$(TARGET)","RELEASE")
+    DLINK_FLAGS += -Os
+endif
+
 
 

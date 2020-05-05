@@ -42,25 +42,24 @@ Crypto library :
   Rename openssl-1.1.1b to openssl and put openssl under [OpensslLib](https://github.com/jyao1/openspdm/tree/master/OsStub/OpensslLib)
 
 Windows Build tool :
-  Visual Studio 2015
+  Visual Studio 2015 (TOOLCHAIN=VS2015)
 
 Windows Build :
-  Open command prompt at openspdm dir and type "nmake".
-  The output is at openspdm\Build\DEBUG_VS2015\X64.
+  Open command prompt at openspdm dir and type "nmake ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE>".
+  The output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
 
 Linux Build tool :
-  GCC
+  GCC (TOOLCHAIN=GCC)
 
 Linux Build:
-  Open command prompt at openspdm dir and type "make -f GNUmakefile  -e WORKSPACE=~/openspdm".
-  The output is at openspdm\Build\DEBUG_GCC\X64.
+  Open command prompt at openspdm dir and type "make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> -e WORKSPACE=<openspdm_root_dir>".
+  The output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
 
 Run :
   Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
 
 NOTE:
-  Current version only supports build with Visual Studio 2015, GCC compilers and X64 version.
-  Supporting for more compilers such as VS2019 or LLVM, and architectures such as IA32 are in the progress.
+  Supporting for more compilers such as VS2019 or LLVM, and architectures are in the progress.
 
 ## Feature not implemented yet
 
