@@ -18,8 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
-#include <Protocol/SpdmIo.h>
-#include <Protocol/Spdm.h>
+#include "SpdmIo.h"
 
 //
 // Connection: When a host sends messgages to a device, they create a connection.
@@ -58,6 +57,101 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPDM_STATUS_ERROR_NO_CERT_PROVISION          (SPDM_STATUS_ERROR + 0x32)
 #define SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE       (SPDM_STATUS_ERROR + 0x40)
 #define SPDM_STATUS_ERROR_NO_MUTUAL_AUTH             (SPDM_STATUS_ERROR + 0x41)
+
+typedef enum {
+  //
+  // SPDM parameter
+  //
+  SpdmDataVersion,
+  //
+  // SPDM capability
+  //
+  SpdmDataCapabilityFlags,
+  SpdmDataCapabilityCTExponent,  
+  //
+  // SPDM Algorithm setting
+  //
+  SpdmDataMeasurementHashAlgo,
+  SpdmDataBaseAsymAlgo,
+  SpdmDataBaseHashAlgo,
+  SpdmDataDHENamedGroup,
+  SpdmDataAEADCipherSuite,
+  SpdmDataKeySchedule,
+  //
+  // Certificate info
+  //
+  SpdmDataPeerPublicCertChains,
+  SpdmDataSlotCount,
+  SpdmDataPublicCertChains,
+  SpdmDataPrivateCertificate,
+  SpdmDataMeasurementRecord,
+  //
+  // Pre-shared secret
+  // If PSK is present, then PSK_EXCHANGE is used.
+  // Otherwise, the KEY_EXCHANGE is used.
+  //
+  SpdmDataPsk,
+
+  //
+  // MAX
+  //
+  SpdmDataMax,
+} SPDM_DATA_TYPE;
+
+typedef enum {
+  //
+  // Below per session data is defined for debug purpose
+  // GET-only in debug mode.
+  //
+  // NOTE: This is persession data. Need input SessionId in the input buffer
+  //
+
+  //
+  // Master Secret
+  //
+  SpdmDataDheSecret = 0x80000000, // No DHE secret if PSK is used.
+  SpdmDataHandshakeSecret,
+  SpdmDataMasterSecret,
+  //
+  // Major secret
+  //
+  SpdmDataRequestHandshakeSecret,
+  SpdmDataResponseHandshakeSecret,
+  SpdmDataRequestDataSecret,
+  SpdmDataResponseDataSecret,
+  SpdmDataRequestFinishedKey,
+  SpdmDataResponseFinishedKey,
+  //
+  // Derived Key & Salt
+  //
+  SpdmDataRequestHandshakeEncryptionKey,
+  SpdmDataRequestHandshakeSalt,
+  SpdmDataResponseHandshakeEncryptionKey,
+  SpdmDataResponseHandshakeSalt,
+  SpdmDataRequestDataEncryptionKey,
+  SpdmDataRequestDataSalt,
+  SpdmDataResponseDataEncryptionKey,
+  SpdmDataResponseDataSalt,
+  //
+  // MAX
+  //
+  SpdmDataDebugDataMax,
+} SPDM_DEBUG_DATA_TYPE;
+
+typedef enum {
+  SpdmDataLocationLocal,
+  SpdmDataLocationConnection,
+  SpdmDataLocationSession,
+  SpdmDataLocationMax,
+} SPDM_DATA_LOCATION;
+
+typedef struct {
+  SPDM_DATA_LOCATION   Location;
+  // DataType specific:
+  //   SessionId for the negoatiated key.
+  //   SlotId for the certificate.
+  UINT8                AdditionalData[4];
+} SPDM_DATA_PARAMETER;
 
 /**
   Set a SPDM Session Data.
