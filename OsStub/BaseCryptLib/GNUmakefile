@@ -32,9 +32,9 @@ SOURCE_DIR = $(WORKSPACE)/OsStub/$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)/Cipher/CryptAedaAesCcm.o \
-    $(OUTPUT_DIR)/Cipher/CryptAedaAesGcm.o \
-    $(OUTPUT_DIR)/Cipher/CryptAedaChaCha20Poly1305.o \
+    $(OUTPUT_DIR)/Cipher/CryptAeadAesCcm.o \
+    $(OUTPUT_DIR)/Cipher/CryptAeadAesGcm.o \
+    $(OUTPUT_DIR)/Cipher/CryptAeadChaCha20Poly1305.o \
     $(OUTPUT_DIR)/Cipher/CryptAes.o \
     $(OUTPUT_DIR)/Hash/CryptSha256.o \
     $(OUTPUT_DIR)/Hash/CryptSha512.o \
@@ -102,13 +102,13 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)/Cipher/CryptAedaAesCcm.o : $(SOURCE_DIR)/Cipher/CryptAedaAesCcm.c
+$(OUTPUT_DIR)/Cipher/CryptAeadAesCcm.o : $(SOURCE_DIR)/Cipher/CryptAeadAesCcm.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/Cipher/CryptAedaAesGcm.o : $(SOURCE_DIR)/Cipher/CryptAedaAesGcm.c
+$(OUTPUT_DIR)/Cipher/CryptAeadAesGcm.o : $(SOURCE_DIR)/Cipher/CryptAeadAesGcm.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/Cipher/CryptAedaChaCha20Poly1305.o : $(SOURCE_DIR)/Cipher/CryptAedaChaCha20Poly1305.c
+$(OUTPUT_DIR)/Cipher/CryptAeadChaCha20Poly1305.o : $(SOURCE_DIR)/Cipher/CryptAeadChaCha20Poly1305.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/Cipher/CryptAes.o : $(SOURCE_DIR)/Cipher/CryptAes.c

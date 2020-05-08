@@ -33,9 +33,9 @@ CC_FLAGS = $(CC_FLAGS) /wd4090 /wd4018
 # Build Macro
 #
 SOURCE_FILES =  \
-	$(SOURCE_DIR)\Cipher\CryptAedaAesCcm.c \
-	$(SOURCE_DIR)\Cipher\CryptAedaAesGcm.c \
-	$(SOURCE_DIR)\Cipher\CryptAedaChaCha20Poly1305.c \
+	$(SOURCE_DIR)\Cipher\CryptAeadAesCcm.c \
+	$(SOURCE_DIR)\Cipher\CryptAeadAesGcm.c \
+	$(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c \
 	$(SOURCE_DIR)\Cipher\CryptAes.c \
 	$(SOURCE_DIR)\Hash\CryptSha256.c \
 	$(SOURCE_DIR)\Hash\CryptSha512.c \
@@ -59,9 +59,9 @@ SOURCE_FILES =  \
 
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\CryptAedaAesCcm.obj \
-    $(OUTPUT_DIR)\CryptAedaAesGcm.obj \
-    $(OUTPUT_DIR)\CryptAedaChaCha20Poly1305.obj \
+    $(OUTPUT_DIR)\CryptAeadAesCcm.obj \
+    $(OUTPUT_DIR)\CryptAeadAesGcm.obj \
+    $(OUTPUT_DIR)\CryptAeadChaCha20Poly1305.obj \
     $(OUTPUT_DIR)\CryptAes.obj \
     $(OUTPUT_DIR)\CryptSha256.obj \
     $(OUTPUT_DIR)\CryptSha512.obj \

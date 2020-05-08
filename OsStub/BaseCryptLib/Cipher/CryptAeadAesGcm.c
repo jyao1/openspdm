@@ -1,5 +1,5 @@
 /** @file
-  AEDA (AES-GCM) Wrapper Implementation over OpenSSL.
+  AEAD (AES-GCM) Wrapper Implementation over OpenSSL.
 
   RFC 5116 - An Interface and Algorithms for Authenticated Encryption
   NIST SP800-38d - Cipher Modes of Operation: Galois / Counter Mode(GCM) and GMAC
