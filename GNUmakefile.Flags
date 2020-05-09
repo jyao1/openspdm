@@ -13,6 +13,7 @@
 ARCH = X64
 TOOLCHAIN = GCC
 TARGET = DEBUG
+CRYPTO = MbedTls
 
 ifeq ("$(ARCH)","X64")
     $(info ARCH=X64)
@@ -28,6 +29,14 @@ else ifeq ("$(TARGET)","RELEASE")
     $(info TARGET=RELEASE)
 else
     $(error unknown TARGET)
+endif
+
+ifeq ("$(CRYPTO)","MbedTls")
+    $(info CRYPTO=MbedTls)
+else ifeq ("$(CRYPTO)","Openssl")
+    $(info CRYPTO=Openssl)
+else
+    $(error unknown CRYPTO)
 endif
 
 #

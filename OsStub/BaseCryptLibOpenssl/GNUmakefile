@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = BaseCryptLib
+MODULE_NAME = BaseCryptLibOpenssl
 
 #
 # Build Directory Macro Definition

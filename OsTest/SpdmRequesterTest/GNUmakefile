@@ -46,8 +46,8 @@ OBJECT_FILES =  \
 STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/OsStub/BaseMemoryLib/BaseMemoryLib.a \
     $(BIN_DIR)/OsStub/DebugLib/DebugLib.a \
-    $(BIN_DIR)/OsStub/BaseCryptLib/BaseCryptLib.a \
-    $(BIN_DIR)/OsStub/OpensslLib/OpensslLib.a \
+    $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a \
+    $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a \
     $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a \
     $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a \
     $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/SpdmRequesterLib.a \
@@ -91,8 +91,8 @@ init:
 gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseMemoryLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/DebugLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseCryptLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/OpensslLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseCryptLib$(CRYPTO)/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/$(CRYPTO)Lib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/MemoryAllocationLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmCommonLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmRequesterLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
@@ -131,8 +131,8 @@ $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
 $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/OsStub/BaseMemoryLib/BaseMemoryLib.a > $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/DebugLib/DebugLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/OsStub/BaseCryptLib/BaseCryptLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/OsStub/OpensslLib/OpensslLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/SpdmRequesterLib.a >> $(OUTPUT_DIR)/tmp.list

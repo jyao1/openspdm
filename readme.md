@@ -25,9 +25,9 @@
 
    The SPDM lib requires [cryptolib API](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h), including random number, symmetric crypto, asymmetric crypto, hash and message authentication code etc.
 
-   An [openssl](https://www.openssl.org/) wrapper is included in [BaseCryptLib](https://github.com/jyao1/openspdm/tree/master/OsStub/BaseCryptLib).
+   An [MbedTls](https://tls.mbed.org/) wrapper is included in [BaseCryptLibMbedTls](https://github.com/jyao1/openspdm/tree/master/OsStub/BaseCryptLibMbedTls).
 
-   NOTE: To support other cryptographic library is TBD.
+   An [Openssl](https://www.openssl.org/) wrapper is included in [BaseCryptLibOpenssl](https://github.com/jyao1/openspdm/tree/master/OsStub/BaseCryptLibOpenssl).
 
 6) Execution context:
 
@@ -37,29 +37,29 @@
 
 ## Build
 
-Crypto library :
-  Please download [openssl-1.1.1b](https://www.openssl.org/source/openssl-1.1.1b.tar.gz) and unzip it.
-  Rename openssl-1.1.1b to openssl and put openssl under [OpensslLib](https://github.com/jyao1/openspdm/tree/master/OsStub/OpensslLib)
+1) Download Crypto library :
 
-Windows Build tool :
-  Visual Studio 2015 (TOOLCHAIN=VS2015)
+   To use MbedTls as Crypto librarym, Please download [mbedtls-2.16.6](https://tls.mbed.org/download/start/mbedtls-2.16.6-apache.tgz) and unzip it.
+   Rename mbedtls-2.16.6 to mbedtls and put mbedtls under [MbedTlsLib](https://github.com/jyao1/openspdm/tree/master/OsStub/MbedTlsLib)
 
-Windows Build :
-  Open command prompt at openspdm dir and type "nmake ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE>".
-  The output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
+   To use Openssl as crypto library, please download [openssl-1.1.1b](https://www.openssl.org/source/openssl-1.1.1b.tar.gz) and unzip it.
+   Rename openssl-1.1.1b to openssl and put openssl under [OpensslLib](https://github.com/jyao1/openspdm/tree/master/OsStub/OpensslLib)
 
-Linux Build tool :
-  GCC (TOOLCHAIN=GCC)
+2) Windows Build:
 
-Linux Build:
-  Open command prompt at openspdm dir and type "make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> -e WORKSPACE=<openspdm_root_dir>".
-  The output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
+   Tool : Visual Studio 2015 (TOOLCHAIN=VS2015)
 
-Run :
-  Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
+   Open command prompt at openspdm dir and type "nmake ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>".
 
-NOTE:
-  Supporting for more compilers such as VS2019 or LLVM, and architectures are in the progress.
+3) Linux Build:
+
+   Tool : GCC (TOOLCHAIN=GCC)
+
+   Open command prompt at openspdm dir and type "make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>".
+
+4) Run :
+   The output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
+   Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
 
 ## Feature not implemented yet
 
@@ -76,6 +76,12 @@ NOTE:
    mutual authentication (ENCAPSULATED message)
 
    command and response: HEARTBEAT, KEY_UPDATE, GET_ENCAPSULATED
+
+4) Other architectures such as Arm, AArch64, RiscV64, or Arc.
+
+5) Other compilers such as VS2019 or LLVM.
+
+6) Other crypto library.
 
 ## Known limitation
 This package is only the sample code to show the concept.

@@ -27,8 +27,8 @@ OUTPUT_DIR = $(BIN_DIR)/OsStub/$(MODULE_NAME)
 
 SOURCE_DIR = $(WORKSPACE)/OsStub/$(MODULE_NAME)
 
-OPENSSL_FLAGS = -DL_ENDIAN -DOPENSSL_SMALL_FOOTPRINT -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DOPENSSL_SYS_UEFI=1
-CC_FLAGS += -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable -DNO_MSABI_VA_FUNCS
+OPENSSL_FLAGS = -DL_ENDIAN -DOPENSSL_SMALL_FOOTPRINT -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DOPENSSL_SYS_UEFI=1 -DNO_MSABI_VA_FUNCS
+CC_FLAGS += -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable
 
 
 #

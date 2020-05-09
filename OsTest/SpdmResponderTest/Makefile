@@ -52,8 +52,8 @@ OBJECT_FILES =  \
 STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\BaseMemoryLib\BaseMemoryLib.lib \
     $(BIN_DIR)\OsStub\DebugLib\DebugLib.lib \
-    $(BIN_DIR)\OsStub\BaseCryptLib\BaseCryptLib.lib \
-    $(BIN_DIR)\OsStub\OpensslLib\OpensslLib.lib \
+    $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\BaseCryptLib$(CRYPTO).lib \
+    $(BIN_DIR)\OsStub\$(CRYPTO)Lib\$(CRYPTO)Lib.lib \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\MemoryAllocationLib.lib \
     $(BIN_DIR)\Library\SpdmLib\SpdmCommonLib\SpdmCommonLib.lib \
     $(BIN_DIR)\Library\SpdmLib\SpdmResponderLib\SpdmResponderLib.lib \
@@ -97,8 +97,8 @@ init:
 gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseMemoryLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\DebugLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\OpensslLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLib$(CRYPTO)\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\$(CRYPTO)Lib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmCommonLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmResponderLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET)

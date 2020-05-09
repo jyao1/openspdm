@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = BaseCryptLib
+MODULE_NAME = BaseCryptLibMbedTls
 
 #
 # Build Directory Macro Definition
@@ -36,52 +36,40 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\Cipher\CryptAeadAesCcm.c \
 	$(SOURCE_DIR)\Cipher\CryptAeadAesGcm.c \
 	$(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c \
-	$(SOURCE_DIR)\Cipher\CryptAes.c \
 	$(SOURCE_DIR)\Hash\CryptSha256.c \
 	$(SOURCE_DIR)\Hash\CryptSha512.c \
 	$(SOURCE_DIR)\Hmac\CryptHmacSha256.c \
 	$(SOURCE_DIR)\Kdf\CryptHkdf.c \
-	$(SOURCE_DIR)\Mac\CryptCmacAes.c \
-	$(SOURCE_DIR)\Mac\CryptGmacAes.c \
 	$(SOURCE_DIR)\Pem\CryptPem.c \
 	$(SOURCE_DIR)\Pk\CryptEc.c \
 	$(SOURCE_DIR)\Pk\CryptDh.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs1Oaep.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs7Sign.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs7VerifyBase.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs7VerifyCommon.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs7VerifyEku.c \
 	$(SOURCE_DIR)\Pk\CryptRsaBasic.c \
 	$(SOURCE_DIR)\Pk\CryptRsaExt.c \
 	$(SOURCE_DIR)\Pk\CryptX509.c \
 	$(SOURCE_DIR)\Rand\CryptRand.c \
+	$(SOURCE_DIR)\SysCall\BaseMemAllocation.c \
 	$(SOURCE_DIR)\SysCall\CrtWrapperHost.c \
+	$(SOURCE_DIR)\SysCall\TimerWrapperHost.c \
 
 
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\CryptAeadAesCcm.obj \
     $(OUTPUT_DIR)\CryptAeadAesGcm.obj \
     $(OUTPUT_DIR)\CryptAeadChaCha20Poly1305.obj \
-    $(OUTPUT_DIR)\CryptAes.obj \
     $(OUTPUT_DIR)\CryptSha256.obj \
     $(OUTPUT_DIR)\CryptSha512.obj \
     $(OUTPUT_DIR)\CryptHmacSha256.obj \
     $(OUTPUT_DIR)\CryptHkdf.obj \
-    $(OUTPUT_DIR)\CryptCmacAes.obj \
-    $(OUTPUT_DIR)\CryptGmacAes.obj \
     $(OUTPUT_DIR)\CryptPem.obj \
     $(OUTPUT_DIR)\CryptDh.obj \
     $(OUTPUT_DIR)\CryptEc.obj \
-    $(OUTPUT_DIR)\CryptPkcs1Oaep.obj \
-    $(OUTPUT_DIR)\CryptPkcs7Sign.obj \
-    $(OUTPUT_DIR)\CryptPkcs7VerifyBase.obj \
-    $(OUTPUT_DIR)\CryptPkcs7VerifyCommon.obj \
-    $(OUTPUT_DIR)\CryptPkcs7VerifyEku.obj \
     $(OUTPUT_DIR)\CryptRsaBasic.obj \
     $(OUTPUT_DIR)\CryptRsaExt.obj \
     $(OUTPUT_DIR)\CryptX509.obj \
     $(OUTPUT_DIR)\CryptRand.obj \
+    $(OUTPUT_DIR)\BaseMemAllocation.obj \
     $(OUTPUT_DIR)\CrtWrapperHost.obj \
+    $(OUTPUT_DIR)\TimerWrapperHost.obj \
 
 INC =  \
     /I$(SOURCE_DIR)\
@@ -89,9 +77,7 @@ INC =  \
     /I$(WORKSPACE)\Include\Hal \
     /I$(WORKSPACE)\Include\Hal\$(ARCH) \
     /I$(WORKSPACE)\OsStub\Include \
-    /I$(WORKSPACE)\OsStub\OpensslLib\Include \
-    /I$(WORKSPACE)\OsStub\OpensslLib\openssl\include \
-    /I$(WORKSPACE)\OsStub\OpensslLib\openssl\crypto\include
+    /I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include
 
 #
 # Overridable Target Macro Definitions
