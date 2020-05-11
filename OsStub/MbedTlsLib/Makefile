@@ -27,7 +27,7 @@ OUTPUT_DIR = $(BIN_DIR)\OsStub\$(MODULE_NAME)
 
 SOURCE_DIR = $(WORKSPACE)\OsStub\$(MODULE_NAME)
 
-MBEDTLS_FLAGS = /DMBEDTLS_PLATFORM_NO_STD_FUNCTIONS /DMBEDTLS_PLATFORM_MEMORY /DMBEDTLS_PLATFORM_FPRINTF_ALT /DMBEDTLS_PLATFORM_PRINTF_ALT /DMBEDTLS_PLATFORM_SNPRINTF_ALT /UMBEDTLS_FS_IO
+MBEDTLS_FLAGS = 
 CC_FLAGS = $(CC_FLAGS) $(MBEDTLS_FLAGS) /wd4244 /wd4132 /wd4245 /wd4310 /wd4701 /wd4127
 
 !IF "$(ARCH)" == "X64"
@@ -201,7 +201,9 @@ INC =  \
     /I$(WORKSPACE)\Include\Hal \
     /I$(WORKSPACE)\Include\Hal\$(ARCH) \
     /I$(WORKSPACE)\OsStub\Include \
-    /I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include
+    /I$(WORKSPACE)\OsStub\MbedTlsLib\Include \
+    /I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include \
+    /I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include\mbedtls \
 
 #
 # Overridable Target Macro Definitions
