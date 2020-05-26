@@ -41,6 +41,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/CryptSha512.o \
     $(OUTPUT_DIR)/CryptHmacSha256.o \
     $(OUTPUT_DIR)/CryptHkdf.o \
+    $(OUTPUT_DIR)/CryptCmacAes.o \
+    $(OUTPUT_DIR)/CryptGmacAes.o \
     $(OUTPUT_DIR)/CryptPem.o \
     $(OUTPUT_DIR)/CryptDh.o \
     $(OUTPUT_DIR)/CryptEc.o \
@@ -106,6 +108,12 @@ $(OUTPUT_DIR)/CryptHmacSha256.o : $(SOURCE_DIR)/Hmac/CryptHmacSha256.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptHkdf.o : $(SOURCE_DIR)/Kdf/CryptHkdf.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/CryptCmacAes.o : $(SOURCE_DIR)/Mac/CryptCmacAes.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/CryptGmacAes.o : $(SOURCE_DIR)/Mac/CryptGmacAes.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptPem.o : $(SOURCE_DIR)/Pem/CryptPem.c

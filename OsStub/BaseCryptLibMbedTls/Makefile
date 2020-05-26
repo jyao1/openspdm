@@ -40,6 +40,8 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\Hash\CryptSha512.c \
 	$(SOURCE_DIR)\Hmac\CryptHmacSha256.c \
 	$(SOURCE_DIR)\Kdf\CryptHkdf.c \
+	$(SOURCE_DIR)\Mac\CryptCmacAes.c \
+	$(SOURCE_DIR)\Mac\CryptGmacAes.c \
 	$(SOURCE_DIR)\Pem\CryptPem.c \
 	$(SOURCE_DIR)\Pk\CryptEc.c \
 	$(SOURCE_DIR)\Pk\CryptDh.c \
@@ -60,6 +62,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\CryptSha512.obj \
     $(OUTPUT_DIR)\CryptHmacSha256.obj \
     $(OUTPUT_DIR)\CryptHkdf.obj \
+    $(OUTPUT_DIR)\CryptCmacAes.obj \
+    $(OUTPUT_DIR)\CryptGmacAes.obj \
     $(OUTPUT_DIR)\CryptPem.obj \
     $(OUTPUT_DIR)\CryptDh.obj \
     $(OUTPUT_DIR)\CryptEc.obj \

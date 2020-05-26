@@ -778,6 +778,7 @@ CmacAesFinal (
 
 **/
 BOOLEAN
+EFIAPI
 CmacAesAll (
   IN   CONST VOID   *Data,
   IN   UINTN        DataSize,
@@ -920,7 +921,7 @@ GmacAesUpdate (
   If CmacValue is NULL, then return FALSE.
 
   @param[in, out]  GmacAesContext     Pointer to the GMAC-AES context.
-  @param[out]      CmacValue          Pointer to a buffer that receives the GMAC-AES digest
+  @param[out]      GmacValue          Pointer to a buffer that receives the GMAC-AES digest
                                       value (16 bytes).
 
   @retval TRUE   GMAC-AES digest computation succeeded.
@@ -931,7 +932,7 @@ BOOLEAN
 EFIAPI
 GmacAesFinal (
   IN OUT  VOID   *GmacAesContext,
-  OUT     UINT8  *CmacValue
+  OUT     UINT8  *GmacValue
   );
 
 /**
@@ -955,6 +956,7 @@ GmacAesFinal (
 
 **/
 BOOLEAN
+EFIAPI
 GmacAesAll (
   IN   CONST VOID   *Data,
   IN   UINTN        DataSize,
@@ -962,7 +964,7 @@ GmacAesAll (
   IN   UINTN        KeySize,
   IN   CONST UINT8  *Iv,
   IN   UINTN        IvSize,
-  OUT  UINT8        *CmacValue
+  OUT  UINT8        *GmacValue
   );
 
 //=====================================================================================

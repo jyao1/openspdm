@@ -14,14 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalCryptLib.h"
-#include <openssl/aes.h>
-#include <openssl/evp.h>
-
-/* typedef EVP_MAC_IMPL */
-typedef struct {
-  CONST EVP_CIPHER  *Cipher;
-  EVP_CIPHER_CTX    *Ctx;
-} EFI_GMAC_CONTEXT;
+#include <mbedtls/gcm.h>
 
 /**
   Allocates and initializes one GMAC_CTX context for subsequent GMAC use.
@@ -36,19 +29,14 @@ GmacAesNew (
   VOID
   )
 {
-  EFI_GMAC_CONTEXT *Gctx;
+  mbedtls_gcm_context *ctx;
 
-  Gctx = AllocateZeroPool(sizeof(*Gctx));
-  if (Gctx == NULL) {
+  ctx = AllocateZeroPool(sizeof(mbedtls_gcm_context));
+  if (ctx == NULL) {
     return NULL;
   }
-  Gctx->Ctx = EVP_CIPHER_CTX_new();
-  if (Gctx == NULL) {
-    FreePool (Gctx);
-    return NULL;
-  }
-  
-  return Gctx;
+  mbedtls_gcm_init(ctx);
+  return ctx;
 }
 
 /**
@@ -63,13 +51,8 @@ GmacAesFree (
   IN  VOID  *GmacAesCtx
   )
 {
-  EFI_GMAC_CONTEXT *Gctx;
-
-  Gctx = GmacAesCtx;
-  if (Gctx->Ctx != NULL) {
-    EVP_CIPHER_CTX_free(Gctx->Ctx);
-  }
-  FreePool (Gctx);
+  mbedtls_gcm_free(GmacAesCtx);
+  FreePool(GmacAesCtx);
 }
 
 /**
@@ -96,38 +79,23 @@ GmacAesInit (
   IN   UINTN        KeySize
   )
 {
-  BOOLEAN        RetValue;
-  EFI_GMAC_CONTEXT *Gctx;
+  INT32               Ret;
 
-  //
-  // Check input parameters.
-  //
   if (GmacAesContext == NULL || KeySize > INT_MAX) {
     return FALSE;
   }
-  Gctx = GmacAesContext;
   
   switch (KeySize) {
   case 16:
-    Gctx->Cipher = EVP_aes_128_gcm();
-    break;
   case 24:
-    Gctx->Cipher = EVP_aes_192_gcm();
-    break;
   case 32:
-    Gctx->Cipher = EVP_aes_256_gcm();
     break;
   default:
     return FALSE;
   }
 
-  RetValue = (BOOLEAN) EVP_EncryptInit_ex(Gctx->Ctx, Gctx->Cipher, NULL, NULL, NULL);
-  if (!RetValue) {
-    return FALSE;
-  }
-  
-  RetValue = (BOOLEAN) EVP_EncryptInit_ex(Gctx->Ctx, NULL, NULL, Key, NULL);
-  if (!RetValue) {
+  Ret = mbedtls_gcm_setkey(GmacAesContext, MBEDTLS_CIPHER_ID_AES, Key, (UINT32)(KeySize * 8));
+  if (Ret != 0) {
     return FALSE;
   }
 
@@ -157,26 +125,9 @@ GmacAesSetIv (
   IN   UINTN        IvSize
   )
 {
-  BOOLEAN        RetValue;
-  EFI_GMAC_CONTEXT *Gctx;
+  ASSERT(FALSE);
 
-  Gctx = GmacAesContext;
-
-  if (IvSize != 12) {
-    return FALSE;
-  }
-
-  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl(Gctx->Ctx, EVP_CTRL_AEAD_SET_IVLEN, (INT32)IvSize, NULL);
-  if (!RetValue) {
-    return FALSE;
-  }
-  
-  RetValue = (BOOLEAN) EVP_EncryptInit_ex(Gctx->Ctx, NULL, NULL, NULL, Iv);
-  if (!RetValue) {
-    return FALSE;
-  }
-
-  return TRUE;
+  return FALSE;
 }
 
 /**
@@ -199,17 +150,9 @@ GmacAesDuplicate (
   OUT  VOID        *NewGmacAesContext
   )
 {
-  EFI_GMAC_CONTEXT *Gctx;
-  EFI_GMAC_CONTEXT *NewGctx;
+  ASSERT(FALSE);
 
-  if (GmacAesContext == NULL || NewGmacAesContext == NULL) {
-    return FALSE;
-  }
-  Gctx = (VOID *)GmacAesContext;
-  NewGctx = NewGmacAesContext;
-  
-  NewGctx->Cipher = Gctx->Cipher;
-  return (BOOLEAN) EVP_CIPHER_CTX_copy(NewGctx->Ctx, Gctx->Ctx);
+  return FALSE;
 }
 
 /**
@@ -238,34 +181,9 @@ GmacAesUpdate (
   IN      UINTN       DataSize
   )
 {
-  UINT32           Length;
-  EFI_GMAC_CONTEXT *Gctx;
-  BOOLEAN          RetValue;
+  ASSERT(FALSE);
 
-  //
-  // Check input parameters.
-  //
-  if (GmacAesContext == NULL) {
-    return FALSE;
-  }
-  Gctx = GmacAesContext;
-
-  //
-  // Check invalid parameters, in case that only DataLength was checked in OpenSSL
-  //
-  if (Data == NULL && DataSize != 0) {
-    return FALSE;
-  }
-
-  //
-  // OpenSSL GMAC-AES digest update
-  //
-  RetValue = (BOOLEAN) EVP_EncryptUpdate (Gctx->Ctx, NULL, (INT32*)&Length, Data, (INT32)DataSize);
-  if (!RetValue) {
-    return FALSE;
-  }
-
-  return TRUE;
+  return FALSE;
 }
 
 /**
@@ -298,27 +216,14 @@ GmacAesFinal (
   OUT     UINT8  *GmacValue
   )
 {
-  UINT32           Length;
-  EFI_GMAC_CONTEXT *Gctx;
-  BOOLEAN          RetValue;
+  INT32               Ret;
 
-  //
-  // Check input parameters.
-  //
   if (GmacAesContext == NULL || GmacValue == NULL) {
     return FALSE;
   }
-  Gctx = GmacAesContext;
 
-  //
-  // OpenSSL GMAC-AES digest finalization
-  //
-  RetValue = (BOOLEAN) EVP_EncryptFinal_ex (Gctx->Ctx, GmacValue, (INT32 *)&Length);
-  if (!RetValue) {
-    return FALSE;
-  }
-  RetValue = (BOOLEAN) EVP_CIPHER_CTX_ctrl (Gctx->Ctx, EVP_CTRL_AEAD_GET_TAG, 16, (VOID *)GmacValue);
-  if (!RetValue) {
+  Ret = mbedtls_gcm_finish(GmacAesContext, GmacValue, 16);
+  if (Ret != 0) {
     return FALSE;
   }
 
@@ -357,33 +262,28 @@ GmacAesAll (
   OUT  UINT8        *GmacValue
   )
 {
-  VOID      *Ctx;
-  BOOLEAN   RetVal;
+  mbedtls_gcm_context ctx;
+  INT32               Ret;
 
-  Ctx = GmacAesNew ();
-  if (Ctx == NULL) {
+  mbedtls_gcm_init(&ctx);
+
+  Ret = mbedtls_gcm_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, Key, (UINT32)(KeySize * 8));
+  if (Ret != 0) {
     return FALSE;
   }
-  
-  RetVal = (BOOLEAN) GmacAesInit (Ctx, Key, KeySize);
-  if (!RetVal) {
-    goto Done;
-  }
-  RetVal = (BOOLEAN) GmacAesSetIv (Ctx, Iv, IvSize);
-  if (!RetVal) {
-    goto Done;
-  }
-  RetVal = (BOOLEAN) GmacAesUpdate (Ctx, Data, DataSize);
-  if (!RetVal) {
-    goto Done;
-  }
-  RetVal = (BOOLEAN) GmacAesFinal (Ctx, GmacValue);
-  if (!RetVal) {
-    goto Done;
+
+  Ret = mbedtls_gcm_starts(&ctx, MBEDTLS_GCM_ENCRYPT,
+                          Iv, (UINT32)IvSize, Data, (UINT32)DataSize);
+  if (Ret != 0) {
+    mbedtls_gcm_free(&ctx);
+    return FALSE;
   }
 
-Done:
-  GmacAesFree (Ctx);
+  Ret = mbedtls_gcm_finish(&ctx, GmacValue, 16);
+  mbedtls_gcm_free(&ctx);
+  if (Ret != 0) {
+    return FALSE;
+  }
 
-  return RetVal;
+  return TRUE;
 }

@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalCryptLib.h"
-#include <openssl/cmac.h>
+#include <mbedtls/cmac.h>
 
 /**
   Allocates and initializes one CMAC_CTX context for subsequent CMAC-AES use.
@@ -25,10 +25,16 @@ CmacAesNew (
   VOID
   )
 {
-  //
-  // Allocates & Initializes CMAC_CTX Context by OpenSSL CMAC_CTX_new()
-  //
-  return (VOID *) CMAC_CTX_new ();
+  mbedtls_cipher_context_t *ctx;
+
+  ctx = AllocateZeroPool(sizeof(mbedtls_cipher_context_t));
+  if (ctx == NULL) {
+    return NULL;
+  }
+
+  mbedtls_cipher_init(ctx);
+
+  return ctx;
 }
 
 /**
@@ -43,10 +49,8 @@ CmacAesFree (
   IN  VOID  *CmacAesCtx
   )
 {
-  //
-  // Free OpenSSL CMAC_CTX Context
-  //
-  CMAC_CTX_free ((CMAC_CTX *)CmacAesCtx);
+  mbedtls_cipher_free (CmacAesCtx);
+  FreePool(CmacAesCtx);
 }
 
 /**
@@ -72,33 +76,33 @@ CmacAesInit (
   IN   UINTN        KeySize
   )
 {
-  CONST EVP_CIPHER *Cipher;
+  const mbedtls_cipher_info_t  *cipher_info;
+  INT32                        Ret;
 
-  //
-  // Check input parameters.
-  //
   if (CmacAesContext == NULL || KeySize > INT_MAX) {
     return FALSE;
   }
   
   switch (KeySize) {
   case 16:
-    Cipher = EVP_aes_128_cbc();
+    cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_AES_128_CBC);
     break;
   case 24:
-    Cipher = EVP_aes_192_cbc();
+    cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_AES_192_CBC);
     break;
   case 32:
-    Cipher = EVP_aes_256_cbc();
+    cipher_info = mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_AES_256_CBC);
     break;
   default:
     return FALSE;
   }
-
-  //
-  // OpenSSL CMAC-AES Context Initialization
-  //
-  if (CMAC_Init ((CMAC_CTX *)CmacAesContext, Key, (UINT32) KeySize, Cipher, NULL) != 1) {
+  
+  Ret = mbedtls_cipher_setup(CmacAesContext, cipher_info);
+  if (Ret != 0) {
+    return FALSE;
+  }
+  Ret = mbedtls_cipher_cmac_starts(CmacAesContext, Key, (UINT32)KeySize);
+  if (Ret != 0) {
     return FALSE;
   }
 
@@ -125,18 +129,9 @@ CmacAesDuplicate (
   OUT  VOID        *NewCmacAesContext
   )
 {
-  //
-  // Check input parameters.
-  //
-  if (CmacAesContext == NULL || NewCmacAesContext == NULL) {
-    return FALSE;
-  }
+  ASSERT(FALSE);
 
-  if (CMAC_CTX_copy ((CMAC_CTX *)NewCmacAesContext, (CMAC_CTX *)CmacAesContext) != 1) {
-    return FALSE;
-  }
-
-  return TRUE;
+  return FALSE;
 }
 
 /**
@@ -165,24 +160,18 @@ CmacAesUpdate (
   IN      UINTN       DataSize
   )
 {
-  //
-  // Check input parameters.
-  //
+  INT32  Ret;
+
   if (CmacAesContext == NULL) {
     return FALSE;
   }
 
-  //
-  // Check invalid parameters, in case that only DataLength was checked in OpenSSL
-  //
   if (Data == NULL && DataSize != 0) {
     return FALSE;
   }
 
-  //
-  // OpenSSL CMAC-AES digest update
-  //
-  if (CMAC_Update ((CMAC_CTX *)CmacAesContext, Data, DataSize) != 1) {
+  Ret = mbedtls_cipher_cmac_update(CmacAesContext, Data, (UINT32)DataSize);
+  if (Ret != 0) {
     return FALSE;
   }
 
@@ -216,19 +205,14 @@ CmacAesFinal (
   OUT     UINT8  *CmacValue
   )
 {
-  UINTN  Length;
+  INT32  Ret;
 
-  //
-  // Check input parameters.
-  //
   if (CmacAesContext == NULL || CmacValue == NULL) {
     return FALSE;
   }
 
-  //
-  // OpenSSL CMAC-AES digest finalization
-  //
-  if (CMAC_Final ((CMAC_CTX *)CmacAesContext, CmacValue, &Length) != 1) {
+  Ret = mbedtls_cipher_cmac_finish(CmacAesContext, CmacValue);
+  if (Ret != 0) {
     return FALSE;
   }
 
@@ -267,45 +251,27 @@ CmacAesAll (
   OUT  UINT8       *CmacValue
   )
 {
-  CONST EVP_CIPHER *Cipher;
-  UINTN            Length;
-  CMAC_CTX         *Ctx;
-  BOOLEAN          RetVal;
+  const mbedtls_cipher_info_t  *cipher_info;
+  INT32                        Ret;
   
   switch (KeySize) {
   case 16:
-    Cipher = EVP_aes_128_cbc();
+    cipher_info = mbedtls_cipher_info_from_type (MBEDTLS_CIPHER_AES_128_CBC);
     break;
   case 24:
-    Cipher = EVP_aes_192_cbc();
+    cipher_info = mbedtls_cipher_info_from_type (MBEDTLS_CIPHER_AES_192_CBC);
     break;
   case 32:
-    Cipher = EVP_aes_256_cbc();
+    cipher_info = mbedtls_cipher_info_from_type (MBEDTLS_CIPHER_AES_256_CBC);
     break;
   default:
     return FALSE;
   }
 
-  Ctx = CMAC_CTX_new ();
-  if (Ctx == NULL) {
+  Ret = mbedtls_cipher_cmac(cipher_info, Key, (UINT32) KeySize, Data, DataSize, CmacValue);
+  if (Ret != 0) {
     return FALSE;
   }
-  
-  RetVal = (BOOLEAN) CMAC_Init (Ctx, Key, (UINT32) KeySize, Cipher, NULL);
-  if (!RetVal) {
-    goto Done;
-  }
-  RetVal = (BOOLEAN) CMAC_Update (Ctx, Data, DataSize);
-  if (!RetVal) {
-    goto Done;
-  }
-  RetVal = (BOOLEAN) CMAC_Final (Ctx, CmacValue, &Length);
-  if (!RetVal) {
-    goto Done;
-  }
 
-Done:
-  CMAC_CTX_free (Ctx);
-
-  return RetVal;
+  return TRUE;
 }
