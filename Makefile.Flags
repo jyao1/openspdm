@@ -13,7 +13,7 @@
 ARCH = X64
 TOOLCHAIN = VS2015
 TARGET = DEBUG
-CRYPTO = MbedTls
+CRYPTO_DEF = MbedTls
 
 !IF "$(ARCH)" == "X64"
 !MESSAGE ARCH=X64
@@ -31,6 +31,9 @@ CRYPTO = MbedTls
 !ERROR Unknown TARGET!
 !ENDIF
 
+!IF "$(CRYPTO)" == ""
+CRYPTO = $(CRYPTO_DEF)
+!ENDIF
 !IF "$(CRYPTO)" == "MbedTls"
 !MESSAGE CRYPTO=MbedTls
 !ELSEIF "$(CRYPTO)" == "Openssl"
