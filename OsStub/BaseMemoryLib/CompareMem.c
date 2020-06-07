@@ -49,5 +49,5 @@ CompareMem (
     Delta = *(PointerDst++) - *(PointerSrc++);
   }
 
-  return 0;
+  return Delta;
 }
