@@ -56,15 +56,15 @@ GenerateFinishHmac(
   InternalDumpHex (CertBuffer, CertBufferSize);
 
   DEBUG((DEBUG_INFO, "MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   DEBUG((DEBUG_INFO, "MessageF Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageF), GetManagedBufferSize(&SpdmContext->Transcript.MessageF));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
   AppendManagedBuffer (&THCurr, CertBuffer, CertBufferSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageF), GetManagedBufferSize(&SpdmContext->Transcript.MessageF));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   ASSERT(SessionInfo->HashSize != 0);
   HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->RequestHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
@@ -118,7 +118,7 @@ SpdmSendReceiveFinish (
   HmacSize = GetSpdmHashSize (SpdmContext);
   SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + HmacSize;
   
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
   GenerateFinishHmac (SpdmContext, SessionId, SpdmRequest.VerifyData);
   
   Status = SpdmSendRequestSession (SpdmContext, SessionId, SpdmRequestSize, &SpdmRequest);
@@ -138,6 +138,8 @@ SpdmSendReceiveFinish (
   if (SpdmResponse.Header.RequestResponseCode != SPDM_FINISH_RSP) {
     return RETURN_DEVICE_ERROR;
   }
+
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, &SpdmResponse, SpdmResponseSize);
   
   Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId);
   if (RETURN_ERROR(Status)) {

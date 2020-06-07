@@ -188,7 +188,6 @@ SpdmReceiveRequestSession (
   RETURN_STATUS             Status;
   UINTN                     DecRequestSize;
   UINT8                     DecRequest[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-  UINTN                     HmacSize;
   SPDM_SESSION_INFO         *SessionInfo;
   SPDM_MESSAGE_HEADER       *SpdmRequest;
 
@@ -229,18 +228,8 @@ SpdmReceiveRequestSession (
   
   switch (SpdmRequest->RequestResponseCode) {
   case SPDM_FINISH:
-    // remove HMAC
-    HmacSize = GetSpdmHashSize (SpdmContext);
-    if (RequestSize > HmacSize) {
-      AppendManagedBuffer (&SpdmContext->Transcript.MessageF, SpdmRequest, DecRequestSize - HmacSize);
-    }
     break;
   case SPDM_PSK_FINISH:
-    // remove HMAC
-    HmacSize = GetSpdmHashSize (SpdmContext);
-    if (RequestSize > HmacSize) {
-      AppendManagedBuffer (&SpdmContext->Transcript.MessagePF, SpdmRequest, DecRequestSize - HmacSize);
-    }
     break;
   case SPDM_END_SESSION:
     break;
@@ -303,10 +292,10 @@ SpdmReceiveRequest (
     AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmRequest, RequestSize);
     break;
   case SPDM_KEY_EXCHANGE:
-    AppendManagedBuffer (&SpdmContext->Transcript.MessageK, SpdmRequest, RequestSize);
+    // will be done later, because SessionInfo is unknown.
     break;
   case SPDM_PSK_EXCHANGE:
-    AppendManagedBuffer (&SpdmContext->Transcript.MessagePK, SpdmRequest, RequestSize);
+    // will be done later, because SessionInfo is unknown.
     break;
   case SPDM_VENDOR_DEFINED_REQUEST:
     break;
@@ -495,15 +484,14 @@ SpdmSendResponseSession (
   SpdmResponse = (VOID *)MyResponse;
   switch (SpdmResponse->RequestResponseCode) {
   case SPDM_FINISH_RSP:
-    AppendManagedBuffer (&SpdmContext->Transcript.MessageF, MyResponse, MyResponseSize);
     SessionInfo->SessionState = SpdmStateEstablished;
     break;
   case SPDM_PSK_FINISH_RSP:
-    AppendManagedBuffer (&SpdmContext->Transcript.MessagePF, MyResponse, MyResponseSize);
     SessionInfo->SessionState = SpdmStateEstablished;
     break;
   case SPDM_END_SESSION_ACK:
     SessionInfo->SessionState = SpdmStateNotStarted;
+    SpdmFreeSessionId(SpdmContext, SessionId);
     break;
   case SPDM_VENDOR_DEFINED_RESPONSE:
     break;

@@ -19,7 +19,7 @@ CalculateMeasurementSummaryHash (
 BOOLEAN
 SpdmGeneratePskExchangeHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN  UINT8                     SessionId,
+  IN  SPDM_SESSION_INFO         *SessionInfo,
   OUT UINT8                     *Hmac
   )
 {
@@ -27,13 +27,6 @@ SpdmGeneratePskExchangeHmac (
   HMAC_ALL                      HmacFunc;
   UINT32                        HashSize;
   LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
-  SPDM_SESSION_INFO             *SessionInfo;
-
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return FALSE;
-  }
 
   HmacFunc = GetSpdmHmacFunc (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
@@ -41,11 +34,11 @@ SpdmGeneratePskExchangeHmac (
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
 
-  DEBUG((DEBUG_INFO, "Calc MessagePK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
+  DEBUG((DEBUG_INFO, "Calc MessageK Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
   HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->ResponseFinishedKey, SessionInfo->HashSize, HmacData);
@@ -109,6 +102,9 @@ SpdmGetResponsePskExchange (
 
   SessionInfo = SpdmAllocateSessionId (SpdmContext, &SessionId);
   SessionInfo->UsePsk = TRUE;
+
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
+
   SpdmResponse->Header.Param2 = SessionId;
 
   SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
@@ -119,16 +115,18 @@ SpdmGetResponsePskExchange (
   
   Result = CalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param1, Ptr);
   if (!Result) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   Ptr += HashSize;
 
-  AppendManagedBuffer (&SpdmContext->Transcript.MessagePK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId);
   
-  Result = SpdmGeneratePskExchangeHmac (SpdmContext, SessionId, Ptr);
+  Result = SpdmGeneratePskExchangeHmac (SpdmContext, SessionInfo, Ptr);
   if (!Result) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_PSK_EXCHANGE_RSP, ResponseSize, Response);
     return RETURN_SUCCESS;
   }

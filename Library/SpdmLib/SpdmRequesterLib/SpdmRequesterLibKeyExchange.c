@@ -35,6 +35,7 @@ typedef struct {
 RETURN_STATUS
 VerifyKeyExchangeSignature (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN SPDM_SESSION_INFO            *SessionInfo,
   IN VOID                         *SignData,
   IN INTN                         SignDataSize
   )
@@ -65,11 +66,11 @@ VerifyKeyExchangeSignature (
   InternalDumpHex (CertBuffer, CertBufferSize);
 
   DEBUG((DEBUG_INFO, "MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK) - SignDataSize);
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK) - SignDataSize);
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
   AppendManagedBuffer (&THCurr, CertBuffer, CertBufferSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK) - SignDataSize);
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK) - SignDataSize);
 
   HashAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
@@ -138,11 +139,11 @@ VerifyKeyExchangeHmac (
   InternalDumpHex (CertBuffer, CertBufferSize);
 
   DEBUG((DEBUG_INFO, "MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
   AppendManagedBuffer (&THCurr, CertBuffer, CertBufferSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
   HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->ResponseHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
@@ -245,6 +246,16 @@ SpdmSendReceiveKeyExchange (
   SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId);
   SessionInfo->UsePsk = FALSE;
 
+  //
+  // Cache session data
+  //
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
+  // Need remove HMAC.
+  HmacSize = GetSpdmHashSize (SpdmContext);
+  if (SpdmResponseSize > HmacSize) {
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - HmacSize);
+  }
+
   SignatureSize = GetSpdmAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
   HmacSize = GetSpdmHashSize (SpdmContext);
@@ -254,6 +265,7 @@ SpdmSendReceiveKeyExchange (
                           HashSize +
                           SignatureSize +
                           HmacSize) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -278,8 +290,9 @@ SpdmSendReceiveKeyExchange (
   DEBUG((DEBUG_INFO, "Signature (0x%x):\n", SignatureSize));
   InternalDumpHex (Signature, SignatureSize);
   Ptr += SignatureSize;  
-  Status = VerifyKeyExchangeSignature (SpdmContext, Signature, SignatureSize);
+  Status = VerifyKeyExchangeSignature (SpdmContext, SessionInfo, Signature, SignatureSize);
   if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;
   }
@@ -299,6 +312,7 @@ SpdmSendReceiveKeyExchange (
 
   Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId);
   if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;
   }
@@ -308,6 +322,7 @@ SpdmSendReceiveKeyExchange (
   InternalDumpHex (VerifyData, HmacSize);
   Status = VerifyKeyExchangeHmac (SpdmContext, *SessionId, VerifyData, HmacSize);
   if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;
   }

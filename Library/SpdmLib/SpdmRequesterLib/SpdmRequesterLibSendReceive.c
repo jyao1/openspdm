@@ -145,7 +145,7 @@ SpdmSendRequestSession (
   }
 
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "Status - %p\n", Status));
+    DEBUG((DEBUG_INFO, "SpdmSendRequestSession[%x] Status - %p\n", SessionId, Status));
   } else {
     SpdmRequest = Request;
     switch (SpdmRequest->RequestResponseCode) {
@@ -202,7 +202,7 @@ SpdmSendRequest (
 
   Status = SpdmContext->SpdmIo->SendRequest (SpdmContext->SpdmIo, RequestSize, Request, 0);
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "Status - %p\n", Status));
+    DEBUG((DEBUG_INFO, "SpdmSendRequest Status - %p\n", Status));
   } else {
     SpdmRequest = Request;
     switch (SpdmRequest->RequestResponseCode) {
@@ -234,10 +234,10 @@ SpdmSendRequest (
       AppendManagedBuffer (&SpdmContext->Transcript.L1L2, Request, RequestSize);
       break;
     case SPDM_KEY_EXCHANGE:
-      AppendManagedBuffer (&SpdmContext->Transcript.MessageK, Request, RequestSize);
+      // will be done in KeyExchange, because SessionInfo is unknown.
       break;
     case SPDM_PSK_EXCHANGE:
-      AppendManagedBuffer (&SpdmContext->Transcript.MessagePK, Request, RequestSize);
+      // will be done in KeyExchange, because SessionInfo is unknown.
       break;
     case SPDM_VENDOR_DEFINED_REQUEST:
       break;
@@ -385,7 +385,7 @@ SpdmReceiveResponseSession (
     ZeroMem (MyResponse, sizeof(MyResponse));
     Status = SpdmContext->SpdmIo->SecureReceiveResponse (SpdmContext->SpdmIo, SpdmIoSecureMessagingTypeDmtfMtcp, SessionId, &MyResponseSize, MyResponse, 0);
     if (RETURN_ERROR(Status)) {
-      DEBUG((DEBUG_INFO, "Status - %p\n", Status));
+      DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] Status - %p\n", SessionId, Status));
       return Status;
     }
     DecResponseSize = sizeof(DecResponse);
@@ -409,17 +409,17 @@ SpdmReceiveResponseSession (
 
   DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] (0x%x): \n", SessionId, *ResponseSize));
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "Status - %p\n", Status));    
+    DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] Status - %p\n", SessionId, Status));    
   } else {
     InternalDumpHex (Response, *ResponseSize);
 
     SpdmResponse = Response;
     switch (SpdmResponse->RequestResponseCode) {
     case SPDM_FINISH_RSP:
-      AppendManagedBuffer (&SpdmContext->Transcript.MessageF, Response, *ResponseSize);
+      // will be done in Finish().
       break;
     case SPDM_PSK_FINISH_RSP:
-      AppendManagedBuffer (&SpdmContext->Transcript.MessagePF, Response, *ResponseSize);
+      // will be done in Finish().
       break;
     case SPDM_END_SESSION_ACK:
       break;
@@ -458,14 +458,13 @@ SpdmReceiveResponse (
 {
   RETURN_STATUS             Status;
   UINTN                     SignatureSize;
-  UINTN                     HmacSize;
   SPDM_MESSAGE_HEADER       *SpdmResponse;
   
   Status = SpdmContext->SpdmIo->ReceiveResponse (SpdmContext->SpdmIo, ResponseSize, Response, 0);
 
   DEBUG((DEBUG_INFO, "SpdmReceiveResponse (0x%x): \n", *ResponseSize));
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "Status - %p\n", Status));    
+    DEBUG((DEBUG_INFO, "SpdmReceiveResponse Status - %p\n", Status));    
   } else {
     InternalDumpHex (Response, *ResponseSize);
 
@@ -502,18 +501,10 @@ SpdmReceiveResponse (
       }
       break;
     case SPDM_KEY_EXCHANGE_RSP:
-      // Need remove HMAC.
-      HmacSize = GetSpdmHashSize (SpdmContext);
-      if (*ResponseSize > HmacSize) {
-        AppendManagedBuffer (&SpdmContext->Transcript.MessageK, Response, *ResponseSize - HmacSize);
-      }
+      // will be done in KeyExchange, because SessionInfo is unknown.
       break;
     case SPDM_PSK_EXCHANGE_RSP:
-      // Need remove HMAC.
-      HmacSize = GetSpdmHashSize (SpdmContext);
-      if (*ResponseSize > HmacSize) {
-        AppendManagedBuffer (&SpdmContext->Transcript.MessagePK, Response, *ResponseSize - HmacSize);
-      }
+      // will be done in KeyExchange, because SessionInfo is unknown.
       break;
     case SPDM_VENDOR_DEFINED_RESPONSE:
       break;

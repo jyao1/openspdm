@@ -9,6 +9,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmCommonLibInternal.h"
 
+VOID
+SpdmSessionInfoInit (
+  IN     SPDM_SESSION_INFO       *SessionInfo,
+  IN     UINT8                   SessionId
+  )
+{
+  ZeroMem (SessionInfo, sizeof(*SessionInfo));
+  SessionInfo->SessionId = SessionId;
+  SessionInfo->SessionTranscript.MessageK.MaxBufferSize  = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SessionInfo->SessionTranscript.MessageF.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
+  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
+}
+
 SPDM_SESSION_INFO *
 SpdmGetSessionInfoViaSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
@@ -16,14 +30,24 @@ SpdmGetSessionInfoViaSessionId (
   )
 {
   SPDM_SESSION_INFO          *SessionInfo;
+  UINTN                      Index;
 
-  SessionInfo = &SpdmContext->SessionInfo;
-  if (SessionId != SessionInfo->SessionId) {
-    ASSERT (FALSE);
+  if (SessionId == INVALID_SESSION_ID) {
+    DEBUG ((DEBUG_ERROR, "SpdmGetSessionInfoViaSessionId - Invalid SessionId\n"));
+    ASSERT(FALSE);
     return NULL;
   }
 
-  return SessionInfo;
+  SessionInfo = SpdmContext->SessionInfo;
+  for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
+    if (SessionInfo[Index].SessionId == SessionId) {
+      return &SessionInfo[Index];
+    }
+  }
+
+  DEBUG ((DEBUG_ERROR, "SpdmGetSessionInfoViaSessionId - MAX SessionId\n"));
+  ASSERT(FALSE);
+  return NULL;
 }
 
 SPDM_SESSION_INFO *
@@ -33,15 +57,34 @@ SpdmAssignSessionId (
   )
 {
   SPDM_SESSION_INFO          *SessionInfo;
+  UINTN                      Index;
 
-  SessionInfo = &SpdmContext->SessionInfo;
-  if (SessionId == SessionInfo->SessionId) {
-    ASSERT (FALSE);
+  if (SessionId == INVALID_SESSION_ID) {
+    DEBUG ((DEBUG_ERROR, "SpdmAssignSessionId - Invalid SessionId\n"));
+    ASSERT(FALSE);
     return NULL;
   }
-  SessionInfo->SessionId = SessionId;
 
-  return SessionInfo;
+  SessionInfo = SpdmContext->SessionInfo;
+
+  for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
+    if (SessionInfo[Index].SessionId == SessionId) {
+      DEBUG ((DEBUG_ERROR, "SpdmAssignSessionId - Duplicated SessionId\n"));
+      ASSERT(FALSE);
+      return NULL;
+    }
+  }
+
+  for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
+    if (SessionInfo[Index].SessionId == INVALID_SESSION_ID) {
+      SpdmSessionInfoInit (&SessionInfo[Index], SessionId);
+      return &SessionInfo[Index];
+    }
+  }
+
+  DEBUG ((DEBUG_ERROR, "SpdmAssignSessionId - MAX SessionId\n"));
+  ASSERT(FALSE);
+  return NULL;
 }
 
 SPDM_SESSION_INFO *
@@ -51,16 +94,48 @@ SpdmAllocateSessionId (
   )
 {
   SPDM_SESSION_INFO          *SessionInfo;
+  UINTN                      Index;
 
-  SessionInfo = &SpdmContext->SessionInfo;
-  *SessionId = 0xFF;
-  if (0xFF == SessionInfo->SessionId) {
-    ASSERT (FALSE);
+  SessionInfo = SpdmContext->SessionInfo;
+  for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
+    if (SessionInfo[Index].SessionId == INVALID_SESSION_ID) {
+      *SessionId = (UINT8)(0xFF - Index);
+      SpdmSessionInfoInit (&SessionInfo[Index], *SessionId);
+      return &SessionInfo[Index];
+    }
+  }
+
+  DEBUG ((DEBUG_ERROR, "SpdmAllocateSessionId - MAX SessionId\n"));
+  ASSERT(FALSE);
+  return NULL;
+}
+
+SPDM_SESSION_INFO *
+SpdmFreeSessionId (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     UINT8                     SessionId
+  )
+{
+  SPDM_SESSION_INFO          *SessionInfo;
+  UINTN                      Index;
+
+  if (SessionId == INVALID_SESSION_ID) {
+    DEBUG ((DEBUG_ERROR, "SpdmFreeSessionId - Invalid SessionId\n"));
+    ASSERT(FALSE);
     return NULL;
   }
-  SessionInfo->SessionId = *SessionId;
 
-  return SessionInfo;
+  SessionInfo = SpdmContext->SessionInfo;
+  for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
+    if (SessionInfo[Index].SessionId == SessionId) {
+      SpdmSessionInfoInit (&SessionInfo[Index], INVALID_SESSION_ID);
+      return &SessionInfo[Index];
+    }
+  }
+
+  DEBUG ((DEBUG_ERROR, "SpdmFreeSessionId - MAX SessionId\n"));
+  ASSERT(FALSE);
+  return NULL;
 }
 
 BOOLEAN
@@ -382,10 +457,6 @@ SpdmInitContext (
   SpdmContext->Transcript.MessageC.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
   SpdmContext->Transcript.M1M2.MaxBufferSize      = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SpdmContext->Transcript.L1L2.MaxBufferSize      = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
-  SpdmContext->Transcript.MessageK.MaxBufferSize  = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SpdmContext->Transcript.MessageF.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
-  SpdmContext->Transcript.MessagePK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SpdmContext->Transcript.MessagePF.MaxBufferSize = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
 
   RandomSeed (NULL, 0);
   return RETURN_SUCCESS;

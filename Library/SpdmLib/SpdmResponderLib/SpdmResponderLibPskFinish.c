@@ -12,7 +12,7 @@
 BOOLEAN
 SpdmVerifyPskFinishHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN  UINT8                     SessionId,
+  IN  SPDM_SESSION_INFO         *SessionInfo,
   OUT UINT8                     *Hmac
   )
 {
@@ -20,29 +20,22 @@ SpdmVerifyPskFinishHmac (
   HMAC_ALL                      HmacFunc;
   UINT32                        HashSize;
   LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
-  SPDM_SESSION_INFO             *SessionInfo;
   
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return FALSE;
-  }
-
   HmacFunc = GetSpdmHmacFunc (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
 
-  DEBUG((DEBUG_INFO, "Calc MessagePK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
+  DEBUG((DEBUG_INFO, "Calc MessageK Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
-  DEBUG((DEBUG_INFO, "Calc MessagePF Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessagePF), GetManagedBufferSize(&SpdmContext->Transcript.MessagePF));
+  DEBUG((DEBUG_INFO, "Calc MessageF Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessagePF), GetManagedBufferSize(&SpdmContext->Transcript.MessagePF));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   ASSERT(SessionInfo->HashSize != 0);
   HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->RequestFinishedKey, SessionInfo->HashSize, HmacData);
@@ -71,8 +64,21 @@ SpdmGetResponsePskFinish (
   UINT32                       HmacSize;
   SPDM_PSK_FINISH_RESPONSE     *SpdmResponse;
   SPDM_DEVICE_CONTEXT          *SpdmContext;
+  SPDM_SESSION_INFO            *SessionInfo;
 
   SpdmContext = Context;
+
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  
+  // remove HMAC
+  HmacSize = GetSpdmHashSize (SpdmContext);
+  if (RequestSize > HmacSize) {
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Request, RequestSize - HmacSize);
+  }
 
   ASSERT (*ResponseSize >= sizeof(SPDM_PSK_FINISH_RESPONSE));
   *ResponseSize = sizeof(SPDM_PSK_FINISH_RESPONSE);
@@ -93,13 +99,13 @@ SpdmGetResponsePskFinish (
 
   // Need regenerate the finishedkey
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId);
-  Result = SpdmVerifyPskFinishHmac (SpdmContext, SessionId, (UINT8 *)Request + sizeof(SPDM_PSK_FINISH_REQUEST));
+  Result = SpdmVerifyPskFinishHmac (SpdmContext, SessionInfo, (UINT8 *)Request + sizeof(SPDM_PSK_FINISH_REQUEST));
   if (!Result) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   
-  AppendManagedBuffer (&SpdmContext->Transcript.MessagePF, SpdmResponse, *ResponseSize);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, *ResponseSize);
   SpdmGenerateSessionDataKey (SpdmContext, SessionId);
 
   return RETURN_SUCCESS;

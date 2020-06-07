@@ -59,11 +59,11 @@ VerifyPskExchangeHmac (
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
 
-  DEBUG((DEBUG_INFO, "MessagePK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
+  DEBUG((DEBUG_INFO, "MessageK Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
   HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->ResponseFinishedKey, SessionInfo->HashSize, CalcHmacData);
@@ -155,6 +155,16 @@ SpdmSendReceivePskExchange (
   SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId);
   SessionInfo->UsePsk = TRUE;
 
+  //
+  // Cache session data
+  //
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
+  // Need remove HMAC.
+  HmacSize = GetSpdmHashSize (SpdmContext);
+  if (SpdmResponseSize > HmacSize) {
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - HmacSize);
+  }
+
   HashSize = GetSpdmHashSize (SpdmContext);
   HmacSize = GetSpdmHashSize (SpdmContext);
 
@@ -162,6 +172,7 @@ SpdmSendReceivePskExchange (
                           SpdmResponse.ResponderContextLength +
                           HashSize +
                           HmacSize) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -181,6 +192,7 @@ SpdmSendReceivePskExchange (
 
   Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId);
   if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;
   }
@@ -190,6 +202,7 @@ SpdmSendReceivePskExchange (
   InternalDumpHex (VerifyData, HmacSize);
   Status = VerifyPskExchangeHmac (SpdmContext, *SessionId, VerifyData, HmacSize);
   if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;
   }

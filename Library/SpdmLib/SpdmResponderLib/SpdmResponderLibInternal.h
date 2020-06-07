@@ -172,4 +172,10 @@ SpdmAllocateSessionId (
      OUT UINT8                     *SessionId
   );
 
+SPDM_SESSION_INFO *
+SpdmFreeSessionId (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     UINT8                     SessionId
+  );
+
 #endif

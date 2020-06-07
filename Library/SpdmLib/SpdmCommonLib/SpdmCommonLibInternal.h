@@ -48,38 +48,6 @@ typedef enum {
 } SPDM_STATE;
 
 typedef struct {
-  UINT8                SessionId;
-  BOOLEAN              UsePsk;
-  UINT8                Mut_Auth_Requested;
-  SPDM_STATE           SessionState;
-  UINTN                DheKeySize;
-  UINTN                HashSize;
-  UINTN                AeadKeySize;
-  UINTN                AeadIvSize;
-  UINT8                DheSecret[MAX_DHE_KEY_SIZE];
-  UINT8                HandshakeSecret[MAX_HASH_SIZE];
-  UINT8                RequestHandshakeSecret[MAX_HASH_SIZE];
-  UINT8                ResponseHandshakeSecret[MAX_HASH_SIZE];
-  UINT8                MasterSecret[MAX_HASH_SIZE];
-  UINT8                RequestDataSecret[MAX_HASH_SIZE];
-  UINT8                ResponseDataSecret[MAX_HASH_SIZE];
-  UINT8                RequestFinishedKey[MAX_HASH_SIZE];
-  UINT8                ResponseFinishedKey[MAX_HASH_SIZE];  
-  UINT8                RequestHandshakeEncryptionKey[MAX_AEAD_KEY_SIZE];
-  UINT8                RequestHandshakeSalt[MAX_AEAD_IV_SIZE];
-  UINT64               RequestHandshakeSequenceNumber;
-  UINT8                ResponseHandshakeEncryptionKey[MAX_AEAD_KEY_SIZE];
-  UINT8                ResponseHandshakeSalt[MAX_AEAD_IV_SIZE];
-  UINT64               ResponseHandshakeSequenceNumber;
-  UINT8                RequestDataEncryptionKey[MAX_AEAD_KEY_SIZE];
-  UINT8                RequestDataSalt[MAX_AEAD_IV_SIZE];
-  UINT64               RequestDataSequenceNumber;
-  UINT8                ResponseDataEncryptionKey[MAX_AEAD_KEY_SIZE];
-  UINT8                ResponseDataSalt[MAX_AEAD_IV_SIZE];
-  UINT64               ResponseDataSequenceNumber;
-} SPDM_SESSION_INFO;
-
-typedef struct {
   //
   // Local device info
   //
@@ -163,6 +131,9 @@ typedef struct {
   //
   BOOLEAN                         GetMeasurementWithSign;
   SMALL_MANAGED_BUFFER            L1L2;
+} SPDM_TRANSCRIPT;
+
+typedef struct {
   //
   // TH for KEY_EXCHANGE response signature: Concatenate (A, Ct, K)
   // Ct = certificate chain
@@ -197,27 +168,60 @@ typedef struct {
   LARGE_MANAGED_BUFFER            MessageK;
   SMALL_MANAGED_BUFFER            MessageF;
   //
-  // TH for PSK_EXCHANGE response HMAC: Concatenate (A, PK)
-  // PK = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response\VerifyData)
+  // TH for PSK_EXCHANGE response HMAC: Concatenate (A, K)
+  // K  = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response\VerifyData)
   //
-  // TH for PSK_FINISH response HMAC: Concatenate (A, PK, PF)
-  // PK = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response)
-  // PF = Concatenate (PSK_FINISH request\VerifyData)
+  // TH for PSK_FINISH response HMAC: Concatenate (A, K, PF)
+  // K  = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response)
+  // F  = Concatenate (PSK_FINISH request\VerifyData)
   //
-  // TH1_PSK1: Concatenate (A, PK)
-  // PK = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response\VerifyData)
+  // TH1_PSK1: Concatenate (A, K)
+  // K  = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response\VerifyData)
   //
-  // TH1_PSK2: Concatenate (A, PK, PF)
-  // PK = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response)
-  // PF = Concatenate (PSK_FINISH request\VerifyData)
+  // TH1_PSK2: Concatenate (A, K, F)
+  // K  = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response)
+  // F  = Concatenate (PSK_FINISH request\VerifyData)
   //
-  // TH2_PSK: Concatenate (A, PK, PF)
-  // PK = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response)
-  // PF = Concatenate (PSK_FINISH request, PSK_FINISH response)
+  // TH2_PSK: Concatenate (A, K, F)
+  // K  = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response)
+  // F  = Concatenate (PSK_FINISH request, PSK_FINISH response)
   //
-  LARGE_MANAGED_BUFFER            MessagePK;
-  SMALL_MANAGED_BUFFER            MessagePF;
-} SPDM_TRANSCRIPT;
+} SPDM_SESSION_TRANSCRIPT;
+
+#define INVALID_SESSION_ID  0
+
+typedef struct {
+  UINT8                SessionId;
+  BOOLEAN              UsePsk;
+  UINT8                Mut_Auth_Requested;
+  SPDM_STATE           SessionState;
+  UINTN                DheKeySize;
+  UINTN                HashSize;
+  UINTN                AeadKeySize;
+  UINTN                AeadIvSize;
+  UINT8                DheSecret[MAX_DHE_KEY_SIZE];
+  UINT8                HandshakeSecret[MAX_HASH_SIZE];
+  UINT8                RequestHandshakeSecret[MAX_HASH_SIZE];
+  UINT8                ResponseHandshakeSecret[MAX_HASH_SIZE];
+  UINT8                MasterSecret[MAX_HASH_SIZE];
+  UINT8                RequestDataSecret[MAX_HASH_SIZE];
+  UINT8                ResponseDataSecret[MAX_HASH_SIZE];
+  UINT8                RequestFinishedKey[MAX_HASH_SIZE];
+  UINT8                ResponseFinishedKey[MAX_HASH_SIZE];  
+  UINT8                RequestHandshakeEncryptionKey[MAX_AEAD_KEY_SIZE];
+  UINT8                RequestHandshakeSalt[MAX_AEAD_IV_SIZE];
+  UINT64               RequestHandshakeSequenceNumber;
+  UINT8                ResponseHandshakeEncryptionKey[MAX_AEAD_KEY_SIZE];
+  UINT8                ResponseHandshakeSalt[MAX_AEAD_IV_SIZE];
+  UINT64               ResponseHandshakeSequenceNumber;
+  UINT8                RequestDataEncryptionKey[MAX_AEAD_KEY_SIZE];
+  UINT8                RequestDataSalt[MAX_AEAD_IV_SIZE];
+  UINT64               RequestDataSequenceNumber;
+  UINT8                ResponseDataEncryptionKey[MAX_AEAD_KEY_SIZE];
+  UINT8                ResponseDataSalt[MAX_AEAD_IV_SIZE];
+  UINT64               ResponseDataSequenceNumber;
+  SPDM_SESSION_TRANSCRIPT  SessionTranscript;
+} SPDM_SESSION_INFO;
 
 #define SPDM_DEVICE_CONTEXT_VERSION 0x1
 
@@ -248,7 +252,7 @@ typedef struct {
   SPDM_TRANSCRIPT                 Transcript;
 
   // TBD: Need support multiple session
-  SPDM_SESSION_INFO               SessionInfo;
+  SPDM_SESSION_INFO               SessionInfo[MAX_SPDM_SESSION_COUNT];
 } SPDM_DEVICE_CONTEXT;
 
 typedef

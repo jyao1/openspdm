@@ -12,7 +12,7 @@
 BOOLEAN
 SpdmVerifyFinishHmac (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN  UINT8                SessionId,
+  IN  SPDM_SESSION_INFO    *SessionInfo,
   IN  UINT8                SlotNum,
   OUT UINT8                *Hmac
   )
@@ -23,13 +23,6 @@ SpdmVerifyFinishHmac (
   HMAC_ALL                      HmacFunc;
   UINTN                         HashSize;
   LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
-  SPDM_SESSION_INFO             *SessionInfo;
-  
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return FALSE;
-  }
 
   if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
     return FALSE;
@@ -48,15 +41,15 @@ SpdmVerifyFinishHmac (
   InternalDumpHex (CertBuffer, CertBufferSize);
 
   DEBUG((DEBUG_INFO, "Calc MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   DEBUG((DEBUG_INFO, "Calc MessageF Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageF), GetManagedBufferSize(&SpdmContext->Transcript.MessageF));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
   AppendManagedBuffer (&THCurr, CertBuffer, CertBufferSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageF), GetManagedBufferSize(&SpdmContext->Transcript.MessageF));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   ASSERT(SessionInfo->HashSize != 0);
   HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->RequestHandshakeSecret, SessionInfo->HashSize, HmacData);
@@ -86,8 +79,21 @@ SpdmGetResponseFinish (
   UINT8                    SlotNum;
   SPDM_FINISH_RESPONSE     *SpdmResponse;
   SPDM_DEVICE_CONTEXT      *SpdmContext;
-
+  SPDM_SESSION_INFO        *SessionInfo;
+  
   SpdmContext = Context;
+
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
+  // remove HMAC
+  HmacSize = GetSpdmHashSize (SpdmContext);
+  if (RequestSize > HmacSize) {
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Request, RequestSize - HmacSize);
+  }
 
   ASSERT (*ResponseSize >= sizeof(SPDM_FINISH_RESPONSE));
   *ResponseSize = sizeof(SPDM_FINISH_RESPONSE);
@@ -107,13 +113,13 @@ SpdmGetResponseFinish (
   }
 
   SlotNum = 0;
-  Result = SpdmVerifyFinishHmac (SpdmContext, SessionId, SlotNum, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST));
+  Result = SpdmVerifyFinishHmac (SpdmContext, SessionInfo, SlotNum, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST));
   if (!Result) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageF, SpdmResponse, *ResponseSize);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, *ResponseSize);
   SpdmGenerateSessionDataKey (SpdmContext, SessionId);
 
   return RETURN_SUCCESS;

@@ -167,7 +167,9 @@ SpdmGenerateSessionHandshakeKey (
   LARGE_MANAGED_BUFFER           TH1 = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
   UINT8                          SlotNum;
   SPDM_SESSION_INFO              *SessionInfo;
-  
+
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", SessionId));
+
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     ASSERT (FALSE);
@@ -206,11 +208,11 @@ SpdmGenerateSessionHandshakeKey (
 
   if (SessionInfo->UsePsk) {
     AppendManagedBuffer (&TH1, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-    AppendManagedBuffer (&TH1, GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
+    AppendManagedBuffer (&TH1, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
   } else {
     AppendManagedBuffer (&TH1, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
     AppendManagedBuffer (&TH1, CertBuffer, CertBufferSize);
-    AppendManagedBuffer (&TH1, GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
+    AppendManagedBuffer (&TH1, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
   }
   
   HashFunc (GetManagedBuffer(&TH1), GetManagedBufferSize(&TH1), TH1HashData);
@@ -326,7 +328,9 @@ SpdmGenerateSessionDataKey (
   LARGE_MANAGED_BUFFER           TH2 = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
   UINT8                          SlotNum;
   SPDM_SESSION_INFO              *SessionInfo;
-  
+
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
+
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     ASSERT (FALSE);
@@ -362,13 +366,13 @@ SpdmGenerateSessionDataKey (
 
   if (SessionInfo->UsePsk) {
     AppendManagedBuffer (&TH2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-    AppendManagedBuffer (&TH2, GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
-    AppendManagedBuffer (&TH2, GetManagedBuffer(&SpdmContext->Transcript.MessagePF), GetManagedBufferSize(&SpdmContext->Transcript.MessagePF));
+    AppendManagedBuffer (&TH2, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+    AppendManagedBuffer (&TH2, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
   } else {
     AppendManagedBuffer (&TH2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
     AppendManagedBuffer (&TH2, CertBuffer, CertBufferSize);
-    AppendManagedBuffer (&TH2, GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
-    AppendManagedBuffer (&TH2, GetManagedBuffer(&SpdmContext->Transcript.MessageF), GetManagedBufferSize(&SpdmContext->Transcript.MessageF));
+    AppendManagedBuffer (&TH2, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+    AppendManagedBuffer (&TH2, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
   }
   HashFunc (GetManagedBuffer(&TH2), GetManagedBufferSize(&TH2), TH2HashData);
   DEBUG((DEBUG_INFO, "TH2 Hash - "));

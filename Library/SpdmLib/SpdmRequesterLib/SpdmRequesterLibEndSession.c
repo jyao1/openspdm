@@ -64,7 +64,9 @@ SpdmSendReceiveEndSession (
   if (SpdmResponse.Header.RequestResponseCode != SPDM_END_SESSION_ACK) {
     return RETURN_DEVICE_ERROR;
   }
-  
+
+  SpdmFreeSessionId (SpdmContext, SessionId);
+ 
   SessionInfo->SessionState = SpdmStateNotStarted;
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   

@@ -94,6 +94,7 @@ DoSessionViaSpdm (
   UINT8                            Data[MAX_DHE_KEY_SIZE];
   UINTN                            Index;
   UINT8                            SessionId;
+  UINT8                            SessionId2;
   SPDM_DATA_PARAMETER              Parameter;
   UINT8                            HeartbeatPeriod;
   UINT8                            MeasurementHash[MAX_HASH_SIZE];
@@ -124,6 +125,22 @@ DoSessionViaSpdm (
     return Status;
   }
   
+  HeartbeatPeriod = 0;
+  ZeroMem(MeasurementHash, sizeof(MeasurementHash));
+  Status = SpdmStartSession (
+             SpdmContext,
+             USE_PSK,
+             SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH,
+             0,
+             &HeartbeatPeriod,
+             &SessionId2,
+             MeasurementHash
+             );
+  if (RETURN_ERROR(Status)) {
+    printf ("SpdmStartSession - %x\n", (UINT32)Status);
+    return Status;
+  }
+
   ZeroMem (&Parameter, sizeof(Parameter));
   Parameter.Location = SpdmDataLocationSession;
   Parameter.AdditionalData[0] = SessionId;
@@ -141,7 +158,15 @@ DoSessionViaSpdm (
 
   DoAppSessionViaSpdm (SessionId);
 
+  DoAppSessionViaSpdm (SessionId2);
+
   Status = SpdmStopSession (SpdmContext, SessionId, 0);
+  if (RETURN_ERROR(Status)) {
+    printf ("SpdmStopSession - %x\n", (UINT32)Status);
+    return Status;
+  }
+
+  Status = SpdmStopSession (SpdmContext, SessionId2, 0);
   if (RETURN_ERROR(Status)) {
     printf ("SpdmStopSession - %x\n", (UINT32)Status);
     return Status;

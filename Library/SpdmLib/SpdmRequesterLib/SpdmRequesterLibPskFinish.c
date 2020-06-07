@@ -44,15 +44,15 @@ GeneratePskFinishHmac(
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
 
-  DEBUG((DEBUG_INFO, "MessagePK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
+  DEBUG((DEBUG_INFO, "MessageK Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
-  DEBUG((DEBUG_INFO, "MessagePF Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessagePF), GetManagedBufferSize(&SpdmContext->Transcript.MessagePF));
+  DEBUG((DEBUG_INFO, "MessageF Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessagePK), GetManagedBufferSize(&SpdmContext->Transcript.MessagePK));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessagePF), GetManagedBufferSize(&SpdmContext->Transcript.MessagePF));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   ASSERT(SessionInfo->HashSize != 0);
   HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->RequestFinishedKey, SessionInfo->HashSize, CalcHmacData);
@@ -105,7 +105,7 @@ SpdmSendReceivePskFinish (
   HmacSize = GetSpdmHashSize (SpdmContext);
   SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + HmacSize;
   
-  AppendManagedBuffer (&SpdmContext->Transcript.MessagePF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
   
   // Need regenerate the finishedkey
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId);
@@ -129,6 +129,8 @@ SpdmSendReceivePskFinish (
     return RETURN_DEVICE_ERROR;
   }
   
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, &SpdmResponse, SpdmResponseSize);
+
   Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId);
   if (RETURN_ERROR(Status)) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;

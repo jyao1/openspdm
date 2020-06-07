@@ -19,6 +19,7 @@ CalculateMeasurementSummaryHash (
 BOOLEAN
 SpdmGenerateKeyExchangeSignature (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN  SPDM_SESSION_INFO         *SessionInfo,
   IN  UINT8                     SlotNum,
   OUT UINT8                     *Signature
   )
@@ -59,11 +60,11 @@ SpdmGenerateKeyExchangeSignature (
   InternalDumpHex (CertBuffer, CertBufferSize);
 
   DEBUG((DEBUG_INFO, "Calc MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
   AppendManagedBuffer (&THCurr, CertBuffer, CertBufferSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   HashFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
   DEBUG((DEBUG_INFO, "Calc THCurr Hash - "));
@@ -85,7 +86,7 @@ SpdmGenerateKeyExchangeSignature (
 BOOLEAN
 SpdmGenerateKeyExchangeHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN  UINT8                     SessionId,
+  IN  SPDM_SESSION_INFO         *SessionInfo,
   IN  UINT8                     SlotNum,
   OUT UINT8                     *Hmac
   )
@@ -96,13 +97,6 @@ SpdmGenerateKeyExchangeHmac (
   HMAC_ALL                      HmacFunc;
   UINT32                        HashSize;
   LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
-  SPDM_SESSION_INFO             *SessionInfo;
-
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return FALSE;
-  }
 
   if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
     return FALSE;
@@ -121,11 +115,11 @@ SpdmGenerateKeyExchangeHmac (
   InternalDumpHex (CertBuffer, CertBufferSize);
 
   DEBUG((DEBUG_INFO, "Calc MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
   AppendManagedBuffer (&THCurr, CertBuffer, CertBufferSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageK), GetManagedBufferSize(&SpdmContext->Transcript.MessageK));
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
   HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->ResponseHandshakeSecret, SessionInfo->HashSize, HmacData);
@@ -202,6 +196,9 @@ SpdmGetResponseKeyExchange (
 
   SessionInfo = SpdmAllocateSessionId (SpdmContext, &SessionId);
   SessionInfo->UsePsk = FALSE;
+
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
+
   SpdmResponse->Header.Param2 = SessionId;
 
   SpdmResponse->Length = (UINT16)*ResponseSize;
@@ -230,24 +227,27 @@ SpdmGetResponseKeyExchange (
 
   Result = CalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param1, Ptr);
   if (!Result) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   Ptr += HashSize;
 
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
-  Result = SpdmGenerateKeyExchangeSignature (SpdmContext, SlotNum, Ptr);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
+  Result = SpdmGenerateKeyExchangeSignature (SpdmContext, SessionInfo, SlotNum, Ptr);
   if (!Result) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE_RSP, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageK, Ptr, SignatureSize);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, SignatureSize);
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId);
   Ptr += SignatureSize;
   
-  Result = SpdmGenerateKeyExchangeHmac (SpdmContext, SessionId, SlotNum, Ptr);
+  Result = SpdmGenerateKeyExchangeHmac (SpdmContext, SessionInfo, SlotNum, Ptr);
   if (!Result) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE_RSP, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
