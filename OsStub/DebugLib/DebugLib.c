@@ -18,6 +18,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
 
+#define DEBUG_ASSERT_NATIVE      0
+#define DEBUG_ASSERT_DEADLOOP    1
+#define DEBUG_ASSERT_BREAKPOINT  2
+
+#define DEBUG_ASSERT_CHOICE      DEBUG_ASSERT_DEADLOOP
+
 VOID
 EFIAPI
 DebugAssert (
@@ -27,6 +33,18 @@ DebugAssert (
   )
 {
   printf ("ASSERT: %s(%d): %s\n", FileName, (INT32)(UINT32)LineNumber, Description);
+
+#if (DEBUG_ASSERT_CHOICE == DEBUG_ASSERT_DEADLOOP)
+  {volatile INTN ___i = 1; while (___i);}
+#elif (DEBUG_ASSERT_CHOICE == DEBUG_ASSERT_BREAKPOINT)
+#if defined(_MSC_EXTENSIONS)
+  __debugbreak();
+#endif
+#if defined(__GNUC__)
+  __asm__ __volatile__("int $3");
+#endif
+#endif
+
   assert (FALSE);
 }
 
