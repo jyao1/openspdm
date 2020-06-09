@@ -23,6 +23,14 @@ else
     $(error unknown ARCH)
 endif
 
+ifeq ("$(TOOLCHAIN)","GCC")
+    $(info TOOLCHAIN=GCC)
+else ifeq ("$(TOOLCHAIN)","CLANG")
+    $(info TOOLCHAIN=CLANG)
+else
+    $(error unknown TOOLCHAIN)
+endif
+
 ifeq ("$(TARGET)","DEBUG")
     $(info TARGET=DEBUG)
 else ifeq ("$(TARGET)","RELEASE")
@@ -54,10 +62,23 @@ RM = rm -f
 MAKE = make
 MAKEFILE = GNUmakefile
 
-# -fno-builtin
-CC = gcc
+ifeq ("$(TOOLCHAIN)","GCC")
+    CC = gcc
+    CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare
+    SLINK = gcc-ar
+    DLINK = gcc
+    DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
+    DLINK_FLAGS2 = -Wno-error -no-pie
 
-CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare
+else ifeq ("$(TOOLCHAIN)","CLANG")
+    CC = clang
+    CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall  -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector  -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch 
+    SLINK = llvm-ar
+    DLINK = clang
+    DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
+    DLINK_FLAGS2 = -Wno-error -no-pie
+endif
+
 ifeq ("$(ARCH)","X64")
     CC_FLAGS += -m64 -DNO_MSABI_VA_FUNCS -mcmodel=small
 else ifeq ("$(ARCH)","Ia32")
@@ -69,12 +90,8 @@ else ifeq ("$(TARGET)","RELEASE")
     CC_FLAGS += -Os
 endif
 
-SLINK = gcc-ar
 
-DLINK = gcc
 
-DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
-DLINK_FLAGS2 = -Wno-error -no-pie
 ifeq ("$(ARCH)","X64")
     DLINK_FLAGS += -m64
 else ifeq ("$(ARCH)","Ia32")
