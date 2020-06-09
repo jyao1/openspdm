@@ -59,6 +59,10 @@
 
    Open command prompt at openspdm dir and type "make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>".
 
+   Tool : CLANG (TOOLCHAIN=CLANG)
+
+   Open command prompt at openspdm dir and type "make -f GNUmakefile ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>".
+
 4) Run :
    The output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
    Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
