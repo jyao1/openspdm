@@ -159,6 +159,7 @@ SpdmGetResponseChallenge (
   )
 {
   SPDM_CHALLENGE_REQUEST            *SpdmRequest;
+  UINTN                             SpdmRequestSize;
   SPDM_CHALLENGE_AUTH_RESPONSE      *SpdmResponse;
   BOOLEAN                           Result;
   UINTN                             SignatureSize;
@@ -169,8 +170,17 @@ SpdmGetResponseChallenge (
   SPDM_DEVICE_CONTEXT               *SpdmContext;
 
   SpdmContext = Context;
-  
   SpdmRequest = Request;
+  if (RequestSize != sizeof(SPDM_CHALLENGE_REQUEST)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SpdmRequestSize = RequestSize;
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, SpdmRequest, SpdmRequestSize);
+
   SlotNum = SpdmRequest->Header.Param1;
 
   if (SlotNum > SpdmContext->LocalContext.SlotCount) {
@@ -227,6 +237,11 @@ SpdmGetResponseChallenge (
     return RETURN_SUCCESS;
   }
   Ptr += SignatureSize;
+  
+  //
+  // Reset
+  //
+  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
 
   return RETURN_SUCCESS;
 }

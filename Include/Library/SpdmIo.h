@@ -77,29 +77,6 @@ RETURN_STATUS
   IN     UINT64                  Timeout
   );
 
-typedef enum {
-  SpdmIoSecureMessagingTypeDmtfMtcp,
-  SpdmIoSecureMessagingTypePciSigDoe,
-  SpdmIoSecureMessagingTypeMax,
-} SPDM_IO_SECURE_MESSAGING_TYPE;
-
-/**
-  Return Secure Messaging type.
-
-  @param  This                         Indicates a pointer to the calling context.
-  @param  SecureMessagingType          Secure messaging type.
-                                       
-  @retval RETURN_SUCCESS                  The secure messaging type is returned successfully.
-  @retval RETURN_INVALID_PARAMETER        The SecureMessagingType is NULL.
-**/
-typedef
-RETURN_STATUS
-(EFIAPI *SPDM_IO_GET_SECURE_MESSAGING_TYPE_FUNC) (
-  IN     SPDM_IO_PROTOCOL                    *This,
-     OUT UINTN                               *SecureMessagingTypeCount,
-     OUT SPDM_IO_SECURE_MESSAGING_TYPE       **SecureMessagingType
-  );
-
 /**
   Send a SPDM request command to a device.
 
@@ -130,7 +107,6 @@ typedef
 RETURN_STATUS
 (EFIAPI *SPDM_IO_SECURE_SEND_REQUEST_FUNC) (
   IN     SPDM_IO_PROTOCOL                       *This,
-  IN     SPDM_IO_SECURE_MESSAGING_TYPE          SecureMessagingType,
   IN     UINT8                                  SessionId,
   IN     UINTN                                  RequestSize,
   IN     VOID                                   *Request,
@@ -168,19 +144,25 @@ typedef
 RETURN_STATUS
 (EFIAPI *SPDM_IO_SECURE_RECEIVE_RESPONSE_FUNC) (
   IN     SPDM_IO_PROTOCOL                       *This,
-  IN     SPDM_IO_SECURE_MESSAGING_TYPE          SecureMessagingType,
   IN     UINT8                                  SessionId,
   IN OUT UINTN                                  *ResponseSize,
   IN OUT VOID                                   *Response,
   IN     UINT64                                 Timeout
   );
 
+typedef enum {
+  SpdmIoSecureMessagingTypeDmtfMtcp,
+  SpdmIoSecureMessagingTypePciSigDoe,
+  SpdmIoSecureMessagingTypeMax,
+} SPDM_IO_SECURE_MESSAGING_TYPE;
+
 struct _SPDM_IO_PROTOCOL {
   SPDM_IO_SEND_REQUEST_FUNC               SendRequest;
   SPDM_IO_RECEIVE_RESPONSE_FUNC           ReceiveResponse;
-  SPDM_IO_GET_SECURE_MESSAGING_TYPE_FUNC  GetSecureMessagingType;
   SPDM_IO_SECURE_SEND_REQUEST_FUNC        SecureSendRequest;
   SPDM_IO_SECURE_RECEIVE_RESPONSE_FUNC    SecureReceiveResponse;
+  SPDM_IO_SECURE_MESSAGING_TYPE           SecureMessageType;
+  UINT32                                  Alignment;
 };
 
 #endif

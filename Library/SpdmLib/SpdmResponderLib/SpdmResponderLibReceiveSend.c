@@ -211,6 +211,9 @@ SpdmReceiveRequestSession (
   switch (SessionInfo->SessionState) {
   case SpdmStateHandshaking:
   case SpdmStateEstablished:
+  
+    ASSERT (SpdmContext->SecureMessageType == SpdmIoSecureMessagingTypeDmtfMtcp);
+
     DecRequestSize = sizeof(DecRequest);
     ZeroMem (DecRequest, sizeof(DecRequest));
     Status = SpdmDecReceiveRequest (SpdmContext, SessionId, RequestSize, Request, &DecRequestSize, DecRequest);
@@ -223,20 +226,6 @@ SpdmReceiveRequestSession (
   default:
     ASSERT (FALSE);
     return RETURN_OUT_OF_RESOURCES;
-    break;
-  }
-  
-  switch (SpdmRequest->RequestResponseCode) {
-  case SPDM_FINISH:
-    break;
-  case SPDM_PSK_FINISH:
-    break;
-  case SPDM_END_SESSION:
-    break;
-  case SPDM_VENDOR_DEFINED_REQUEST:
-    break;
-  default:
-    ASSERT(FALSE);
     break;
   }
 
@@ -259,50 +248,13 @@ SpdmReceiveRequest (
     return RETURN_INVALID_PARAMETER;
   }
 
+  if (SpdmContext->Alignment > 1) {
+    ASSERT ((RequestSize & (SpdmContext->Alignment - 1)) == 0);
+  }
+
   SpdmRequest = (VOID *)SpdmContext->LastSpdmRequest;
   SpdmContext->LastSpdmRequestSize = RequestSize;
   CopyMem (SpdmRequest, Request, RequestSize);
-  
-  switch (SpdmRequest->RequestResponseCode) {
-  case SPDM_GET_VERSION:
-    ResetManagedBuffer (&SpdmContext->Transcript.MessageA);
-    ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
-    ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
-    ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-    // passthru
-  case SPDM_GET_CAPABILITIES:
-  case SPDM_NEGOTIATE_ALGORITHMS:
-    AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmRequest, RequestSize);
-    break;
-  case SPDM_GET_DIGESTS:
-  case SPDM_GET_CERTIFICATE:
-    AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, RequestSize);
-    break;
-  case SPDM_CHALLENGE:
-    AppendManagedBuffer (&SpdmContext->Transcript.MessageC, SpdmRequest, RequestSize);
-    break;
-  case SPDM_GET_MEASUREMENTS:
-    ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-
-    if ((SpdmRequest->Param1 & BIT0) != 0) {
-      SpdmContext->Transcript.GetMeasurementWithSign = TRUE;
-    } else {
-      SpdmContext->Transcript.GetMeasurementWithSign = FALSE;
-    }
-    AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmRequest, RequestSize);
-    break;
-  case SPDM_KEY_EXCHANGE:
-    // will be done later, because SessionInfo is unknown.
-    break;
-  case SPDM_PSK_EXCHANGE:
-    // will be done later, because SessionInfo is unknown.
-    break;
-  case SPDM_VENDOR_DEFINED_REQUEST:
-    break;
-  default:
-    ASSERT(FALSE);
-    break;
-  }
 
   return RETURN_SUCCESS;
 }
@@ -460,6 +412,9 @@ SpdmSendResponseSession (
   switch (SessionInfo->SessionState) {
   case SpdmStateHandshaking:
   case SpdmStateEstablished:
+  
+    ASSERT (SpdmContext->SecureMessageType == SpdmIoSecureMessagingTypeDmtfMtcp);
+
     EncResponseSize = sizeof(EncResponse);
     ZeroMem (EncResponse, sizeof(EncResponse));
     Status = SpdmEncSendResponse (SpdmContext, SessionId, MyResponseSize, MyResponse, &EncResponseSize, EncResponse);
@@ -493,11 +448,6 @@ SpdmSendResponseSession (
     SessionInfo->SessionState = SpdmStateNotStarted;
     SpdmFreeSessionId(SpdmContext, SessionId);
     break;
-  case SPDM_VENDOR_DEFINED_RESPONSE:
-    break;
-  default:
-    ASSERT(FALSE);
-    break;
   }
   
   return RETURN_SUCCESS;
@@ -515,7 +465,6 @@ SpdmSendResponse (
   RETURN_STATUS             Status;
   SPDM_GET_RESPONSE_FUNC    GetResponseFunc;
   SPDM_MESSAGE_HEADER       *SpdmRequest;
-  SPDM_MESSAGE_HEADER       *SpdmResponse;
 
   if (Response == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -547,6 +496,10 @@ SpdmSendResponse (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SpdmRequest->RequestResponseCode, &MyResponseSize, MyResponse);
   }
 
+  if (SpdmContext->Alignment > 1) {
+    MyResponseSize = (MyResponseSize + (SpdmContext->Alignment - 1)) & ~(SpdmContext->Alignment - 1);
+  }
+
   if (*ResponseSize < MyResponseSize) {
     CopyMem (Response, MyResponse, *ResponseSize);
     *ResponseSize = MyResponseSize;
@@ -554,50 +507,6 @@ SpdmSendResponse (
   }  
   CopyMem (Response, MyResponse, MyResponseSize);
   *ResponseSize = MyResponseSize;
-
-  SpdmResponse = (VOID *)MyResponse;
-  switch (SpdmResponse->RequestResponseCode) {
-  case SPDM_VERSION:
-  case SPDM_CAPABILITIES:
-  case SPDM_ALGORITHMS:
-    AppendManagedBuffer (&SpdmContext->Transcript.MessageA, MyResponse, MyResponseSize);
-    break;
-  case SPDM_DIGESTS:
-  case SPDM_CERTIFICATE:
-    AppendManagedBuffer (&SpdmContext->Transcript.MessageB, MyResponse, MyResponseSize);
-    break;
-  case SPDM_CHALLENGE_AUTH:
-    //
-    // The signature is generated in the reponse.
-    //
-    ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-    break;
-  case SPDM_MEASUREMENTS:
-    if (SpdmContext->Transcript.GetMeasurementWithSign) {
-      //
-      // The signature is generated in the reponse.
-      //
-      ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
-    } else {
-      AppendManagedBuffer (&SpdmContext->Transcript.L1L2, MyResponse, MyResponseSize);
-    }
-    break;
-  case SPDM_KEY_EXCHANGE_RSP:
-    //
-    // The signature and HMAC are generated in the reponse.
-    //
-    break;
-  case SPDM_PSK_EXCHANGE_RSP:
-    //
-    // The signature and HMAC are generated in the reponse.
-    //
-    break;
-  case SPDM_VENDOR_DEFINED_RESPONSE:
-    break;
-  default:
-    ASSERT(FALSE);
-    break;
-  }
 
   return RETURN_SUCCESS;
 }

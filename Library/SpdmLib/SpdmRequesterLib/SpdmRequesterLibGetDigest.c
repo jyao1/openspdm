@@ -93,6 +93,11 @@ SpdmGetDigest (
     return RETURN_DEVICE_ERROR;
   }
 
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmRequest, sizeof(SpdmRequest));
+
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
@@ -114,9 +119,14 @@ SpdmGetDigest (
   if (DigestCount == 0) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponseSize != sizeof(SPDM_DIGESTS_RESPONSE) + DigestCount * DigestSize) {
+  if (SpdmResponseSize < sizeof(SPDM_DIGESTS_RESPONSE) + DigestCount * DigestSize) {
     return RETURN_DEVICE_ERROR;
   }
+  SpdmResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + DigestCount * DigestSize;
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmResponse, SpdmResponseSize);
 
   for (Index = 0; Index < DigestCount; Index++) {
     DEBUG((DEBUG_INFO, "Digest (0x%x) - ", Index));

@@ -19,6 +19,8 @@ SpdmGetResponseDigest (
      OUT VOID                 *Response
   )
 {
+  SPDM_GET_DIGESTS_REQUEST      *SpdmRequest;
+  UINTN                         SpdmRequestSize;
   SPDM_DIGESTS_RESPONSE         *SpdmResponse;
   UINTN                         Index;
   UINT32                        HashSize;
@@ -27,6 +29,16 @@ SpdmGetResponseDigest (
   SPDM_DEVICE_CONTEXT           *SpdmContext;
 
   SpdmContext = Context;
+  SpdmRequest = Request;
+  if (RequestSize != sizeof(SPDM_GET_DIGESTS_REQUEST)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SpdmRequestSize = RequestSize;
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, SpdmRequestSize);
 
   if (SpdmContext->LocalContext.CertificateChain == NULL) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);
@@ -51,6 +63,10 @@ SpdmGetResponseDigest (
     SpdmResponse->Header.Param2 |= (1 << Index);
     HashFunc (SpdmContext->LocalContext.CertificateChain[Index], SpdmContext->LocalContext.CertificateChainSize[Index], &Digest[HashSize * Index]);
   }
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmResponse, *ResponseSize);
 
   return RETURN_SUCCESS;
 }

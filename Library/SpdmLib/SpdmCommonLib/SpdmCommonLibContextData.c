@@ -196,6 +196,18 @@ SpdmSetData (
   SpdmContext = Context;
 
   switch (DataType) {
+  case SpdmDataIoSizeAlignment:
+    if (DataSize != sizeof(UINT32)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->Alignment = *(UINT32 *)Data;
+    break;
+  case SpdmDataIoSecureMessageType:
+    if (DataSize != sizeof(SPDM_IO_SECURE_MESSAGING_TYPE)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->SecureMessageType = *(SPDM_IO_SECURE_MESSAGING_TYPE *)Data;
+    break;
   case SpdmDataCapabilityFlags:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;

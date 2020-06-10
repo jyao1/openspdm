@@ -117,7 +117,6 @@ SpdmSendRequestSession (
   UINT8                              EncRequest[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                              EncRequestSize;
   SPDM_SESSION_INFO                  *SessionInfo;
-  SPDM_MESSAGE_HEADER                *SpdmRequest;
 
   DEBUG((DEBUG_INFO, "SpdmSendRequestSession[%x] (0x%x): \n", SessionId, RequestSize));
   InternalDumpHex (Request, RequestSize);
@@ -131,13 +130,16 @@ SpdmSendRequestSession (
   switch (SessionInfo->SessionState) {
   case SpdmStateHandshaking:
   case SpdmStateEstablished:
+
+    ASSERT (SpdmContext->SecureMessageType == SpdmIoSecureMessagingTypeDmtfMtcp);
+
     EncRequestSize = sizeof(EncRequest);
     ZeroMem (EncRequest, sizeof(EncRequest));
     Status = SpdmEncSendRequest (SpdmContext, SessionId, RequestSize, Request, &EncRequestSize, EncRequest);
     if (RETURN_ERROR(Status)) {
       return Status;
     }
-    Status = SpdmContext->SpdmIo->SecureSendRequest (SpdmContext->SpdmIo, SpdmIoSecureMessagingTypeDmtfMtcp, SessionId, EncRequestSize, EncRequest, 0);
+    Status = SpdmContext->SpdmIo->SecureSendRequest (SpdmContext->SpdmIo, SessionId, EncRequestSize, EncRequest, 0);
     break;
   default:
     ASSERT (FALSE);
@@ -146,27 +148,6 @@ SpdmSendRequestSession (
 
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmSendRequestSession[%x] Status - %p\n", SessionId, Status));
-  } else {
-    SpdmRequest = Request;
-    switch (SpdmRequest->RequestResponseCode) {
-    case SPDM_FINISH:
-      //
-      // Message is appended for MAC calculation
-      //
-      break;
-    case SPDM_PSK_FINISH:
-      //
-      // Message is appended for MAC calculation
-      //
-      break;
-    case SPDM_END_SESSION:
-      break;
-    case SPDM_VENDOR_DEFINED_REQUEST:
-      break;
-    default:
-      ASSERT(FALSE);
-      break;
-    }
   }
 
   return Status;
@@ -195,56 +176,26 @@ SpdmSendRequest (
   )
 {
   RETURN_STATUS                      Status;
-  SPDM_MESSAGE_HEADER                *SpdmRequest;
+  UINT8                              AlignedRequest[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINTN                              AlignedRequestSize;
 
   DEBUG((DEBUG_INFO, "SpdmSendRequest (0x%x): \n", RequestSize));
   InternalDumpHex (Request, RequestSize);
 
-  Status = SpdmContext->SpdmIo->SendRequest (SpdmContext->SpdmIo, RequestSize, Request, 0);
+  ASSERT (RequestSize <= MAX_SPDM_MESSAGE_BUFFER_SIZE);
+  if ((SpdmContext->Alignment > 1) && 
+      ((RequestSize & (SpdmContext->Alignment - 1)) != 0)) {
+    AlignedRequestSize = (RequestSize + (SpdmContext->Alignment - 1)) & ~(SpdmContext->Alignment - 1);
+    CopyMem (AlignedRequest, Request, RequestSize);
+    ZeroMem (&AlignedRequest[RequestSize], AlignedRequestSize - RequestSize);
+
+    Status = SpdmContext->SpdmIo->SendRequest (SpdmContext->SpdmIo, AlignedRequestSize, AlignedRequest, 0);
+  } else {
+    Status = SpdmContext->SpdmIo->SendRequest (SpdmContext->SpdmIo, RequestSize, Request, 0);
+  }
+
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmSendRequest Status - %p\n", Status));
-  } else {
-    SpdmRequest = Request;
-    switch (SpdmRequest->RequestResponseCode) {
-    case SPDM_GET_VERSION:
-      ResetManagedBuffer (&SpdmContext->Transcript.MessageA);
-      ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
-      ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
-      ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-      // passthru
-    case SPDM_GET_CAPABILITIES:
-    case SPDM_NEGOTIATE_ALGORITHMS:
-      AppendManagedBuffer (&SpdmContext->Transcript.MessageA, Request, RequestSize);
-      break;
-    case SPDM_GET_DIGESTS:
-    case SPDM_GET_CERTIFICATE:
-      AppendManagedBuffer (&SpdmContext->Transcript.MessageB, Request, RequestSize);
-      break;
-    case SPDM_CHALLENGE:
-      AppendManagedBuffer (&SpdmContext->Transcript.MessageC, Request, RequestSize);
-      break;
-    case SPDM_GET_MEASUREMENTS:
-      ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-      
-      if ((((SPDM_MESSAGE_HEADER *)Request)->Param1 & BIT0) != 0) {
-        SpdmContext->Transcript.GetMeasurementWithSign = TRUE;
-      } else {
-        SpdmContext->Transcript.GetMeasurementWithSign = FALSE;
-      }
-      AppendManagedBuffer (&SpdmContext->Transcript.L1L2, Request, RequestSize);
-      break;
-    case SPDM_KEY_EXCHANGE:
-      // will be done in KeyExchange, because SessionInfo is unknown.
-      break;
-    case SPDM_PSK_EXCHANGE:
-      // will be done in KeyExchange, because SessionInfo is unknown.
-      break;
-    case SPDM_VENDOR_DEFINED_REQUEST:
-      break;
-    default:
-      ASSERT(FALSE);
-      break;
-    }
   }
 
   return Status;
@@ -370,7 +321,6 @@ SpdmReceiveResponseSession (
   UINTN                          DecResponseSize;
   UINT8                          DecResponse[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_SESSION_INFO              *SessionInfo;
-  SPDM_MESSAGE_HEADER            *SpdmResponse;
   
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
@@ -381,9 +331,12 @@ SpdmReceiveResponseSession (
   switch (SessionInfo->SessionState) {
   case SpdmStateHandshaking:
   case SpdmStateEstablished:
+  
+    ASSERT (SpdmContext->SecureMessageType == SpdmIoSecureMessagingTypeDmtfMtcp);
+
     MyResponseSize = sizeof(MyResponse);
     ZeroMem (MyResponse, sizeof(MyResponse));
-    Status = SpdmContext->SpdmIo->SecureReceiveResponse (SpdmContext->SpdmIo, SpdmIoSecureMessagingTypeDmtfMtcp, SessionId, &MyResponseSize, MyResponse, 0);
+    Status = SpdmContext->SpdmIo->SecureReceiveResponse (SpdmContext->SpdmIo, SessionId, &MyResponseSize, MyResponse, 0);
     if (RETURN_ERROR(Status)) {
       DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] Status - %p\n", SessionId, Status));
       return Status;
@@ -412,23 +365,6 @@ SpdmReceiveResponseSession (
     DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] Status - %p\n", SessionId, Status));    
   } else {
     InternalDumpHex (Response, *ResponseSize);
-
-    SpdmResponse = Response;
-    switch (SpdmResponse->RequestResponseCode) {
-    case SPDM_FINISH_RSP:
-      // will be done in Finish().
-      break;
-    case SPDM_PSK_FINISH_RSP:
-      // will be done in Finish().
-      break;
-    case SPDM_END_SESSION_ACK:
-      break;
-    case SPDM_VENDOR_DEFINED_RESPONSE:
-      break;
-    default:
-      ASSERT(FALSE);
-      break;
-    }
   }
   return Status;
 }
@@ -457,61 +393,32 @@ SpdmReceiveResponse (
   )
 {
   RETURN_STATUS             Status;
-  UINTN                     SignatureSize;
-  SPDM_MESSAGE_HEADER       *SpdmResponse;
-  
-  Status = SpdmContext->SpdmIo->ReceiveResponse (SpdmContext->SpdmIo, ResponseSize, Response, 0);
+  UINT8                     AlignedResponse[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINTN                     AlignedResponseSize;
+
+  ASSERT (*ResponseSize <= MAX_SPDM_MESSAGE_BUFFER_SIZE);
+
+  if ((SpdmContext->Alignment > 1) && 
+      (((*ResponseSize) & (SpdmContext->Alignment - 1)) != 0)) {
+    AlignedResponseSize = (*ResponseSize + (SpdmContext->Alignment - 1)) & ~(SpdmContext->Alignment - 1);
+
+    Status = SpdmContext->SpdmIo->ReceiveResponse (SpdmContext->SpdmIo, &AlignedResponseSize, AlignedResponse, 0);
+    if (!RETURN_ERROR(Status)) {
+      ASSERT ((AlignedResponseSize & (SpdmContext->Alignment - 1)) == 0);
+      if (*ResponseSize > AlignedResponseSize) {
+        *ResponseSize = AlignedResponseSize;
+      }
+      CopyMem (Response, AlignedResponse, *ResponseSize);
+    }
+  } else {
+    Status = SpdmContext->SpdmIo->ReceiveResponse (SpdmContext->SpdmIo, ResponseSize, Response, 0);
+  }
 
   DEBUG((DEBUG_INFO, "SpdmReceiveResponse (0x%x): \n", *ResponseSize));
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmReceiveResponse Status - %p\n", Status));    
   } else {
     InternalDumpHex (Response, *ResponseSize);
-
-    SpdmResponse = Response;
-    switch (SpdmResponse->RequestResponseCode) {
-    case SPDM_VERSION:
-    case SPDM_CAPABILITIES:
-    case SPDM_ALGORITHMS:
-      AppendManagedBuffer (&SpdmContext->Transcript.MessageA, Response, *ResponseSize);
-      break;
-    case SPDM_DIGESTS:
-    case SPDM_CERTIFICATE:
-      AppendManagedBuffer (&SpdmContext->Transcript.MessageB, Response, *ResponseSize);
-      break;
-    case SPDM_CHALLENGE_AUTH:
-      // Need remove signature.
-      SignatureSize = GetSpdmAsymSize (SpdmContext);
-      if (*ResponseSize > SignatureSize) {
-        AppendManagedBuffer (&SpdmContext->Transcript.MessageC, Response, *ResponseSize - SignatureSize);
-        AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-        AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageB), GetManagedBufferSize(&SpdmContext->Transcript.MessageB));
-        AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
-      }
-      break;
-    case SPDM_MEASUREMENTS:
-      if (SpdmContext->Transcript.GetMeasurementWithSign) {
-        // Need remove signature.
-        SignatureSize = GetSpdmAsymSize (SpdmContext);
-        if (*ResponseSize > SignatureSize) {
-          AppendManagedBuffer (&SpdmContext->Transcript.L1L2, Response, *ResponseSize - SignatureSize);
-        }
-      } else {
-        AppendManagedBuffer (&SpdmContext->Transcript.L1L2, Response, *ResponseSize);
-      }
-      break;
-    case SPDM_KEY_EXCHANGE_RSP:
-      // will be done in KeyExchange, because SessionInfo is unknown.
-      break;
-    case SPDM_PSK_EXCHANGE_RSP:
-      // will be done in KeyExchange, because SessionInfo is unknown.
-      break;
-    case SPDM_VENDOR_DEFINED_RESPONSE:
-      break;
-    default:
-      ASSERT(FALSE);
-      break;
-    }
   }
   return Status;
 }

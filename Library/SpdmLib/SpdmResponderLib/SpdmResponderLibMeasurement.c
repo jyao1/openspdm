@@ -111,6 +111,7 @@ SpdmGetResponseMeasurement (
 {
   UINT8                          Index;
   SPDM_GET_MEASUREMENTS_REQUEST  *SpdmRequest;
+  UINTN                          SpdmRequestSize;
   SPDM_MEASUREMENTS_RESPONSE     *SpdmResponse;
   UINTN                          SpdmResponseSize;
   RETURN_STATUS                  Status;
@@ -123,8 +124,24 @@ SpdmGetResponseMeasurement (
   SPDM_DEVICE_CONTEXT            *SpdmContext;
 
   SpdmContext = Context;
-  
   SpdmRequest = Request;
+  if (SpdmRequest->Header.Param1 == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {
+    if (RequestSize != sizeof(SPDM_GET_MEASUREMENTS_REQUEST)) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+  } else {
+    if (RequestSize != sizeof(SPDM_MESSAGE_HEADER)) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+  }
+  SpdmRequestSize = RequestSize;
+  //
+  // Cache
+  //
+  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
+  AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmRequest, RequestSize);
 
   HashSize = GetSpdmMeasurementHashSize (SpdmContext);
   SignatureSize = GetSpdmAsymSize (SpdmContext);
@@ -229,8 +246,17 @@ SpdmGetResponseMeasurement (
       }
     } else {
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
     }
     break;
+  }
+  if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
+    //
+    // Reset
+    //
+    ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
+  } else {
+    AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmResponse, *ResponseSize);
   }
   return RETURN_SUCCESS;
 }

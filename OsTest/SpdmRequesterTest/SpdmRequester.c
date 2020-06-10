@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 VOID                          *mSpdmContext;
 SOCKET                        mSocket;
-SPDM_IO_SECURE_MESSAGING_TYPE mSecureMessagingType = SpdmIoSecureMessagingTypeSocket;
 
 BOOLEAN
 CommunicatePlatformData (
@@ -153,28 +152,6 @@ SpdmClientReceiveResponse (
 }
 
 /**
-  Return Secure Messaging type.
-
-  @param  This                         Indicates a pointer to the calling context.
-  @param  SecureMessagingType          Secure messaging type.
-                                       
-  @retval RETURN_SUCCESS                  The secure messaging type is returned successfully.
-  @retval RETURN_INVALID_PARAMETER        The SecureMessagingType is NULL.
-**/
-RETURN_STATUS
-EFIAPI
-SpdmClientGetSecureMessagingType (
-  IN     SPDM_IO_PROTOCOL                    *This,
-     OUT UINTN                               *SecureMessagingTypeCount,
-     OUT SPDM_IO_SECURE_MESSAGING_TYPE       **SecureMessagingType
-  )
-{
-  *SecureMessagingTypeCount = 1;
-  *SecureMessagingType = &mSecureMessagingType;
-  return RETURN_UNSUPPORTED;
-}
-
-/**
   Send a SPDM request command to a device.
 
   The request is a data blob to send to the messaging device directly,
@@ -204,7 +181,6 @@ RETURN_STATUS
 EFIAPI
 SpdmClientSecureSendRequest (
   IN     SPDM_IO_PROTOCOL                       *This,
-  IN     SPDM_IO_SECURE_MESSAGING_TYPE          SecureMessagingType,
   IN     UINT8                                  SessionId,
   IN     UINTN                                  RequestSize,
   IN     VOID                                   *Request,
@@ -258,7 +234,6 @@ RETURN_STATUS
 EFIAPI
 SpdmClientSecureReceiveResponse (
   IN     SPDM_IO_PROTOCOL                       *This,
-  IN     SPDM_IO_SECURE_MESSAGING_TYPE          SecureMessagingType,
   IN     UINT8                                  SessionId,
   IN OUT UINTN                                  *ResponseSize,
   IN OUT VOID                                   *Response,
@@ -294,9 +269,10 @@ SpdmClientSecureReceiveResponse (
 SPDM_IO_PROTOCOL       mSpdmProtocol = {
   SpdmClientSendRequest,
   SpdmClientReceiveResponse,
-  SpdmClientGetSecureMessagingType,
   SpdmClientSecureSendRequest,
   SpdmClientSecureReceiveResponse,
+  SpdmIoSecureMessagingTypeDmtfMtcp,
+  sizeof(UINT32)
 };
 
 VOID

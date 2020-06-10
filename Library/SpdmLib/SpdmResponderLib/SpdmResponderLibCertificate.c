@@ -20,6 +20,7 @@ SpdmGetResponseCertificate (
   )
 {
   SPDM_GET_CERTIFICATE_REQUEST  *SpdmRequest;
+  UINTN                         SpdmRequestSize;
   SPDM_CERTIFICATE_RESPONSE     *SpdmResponse;
   UINT16                        Offset;
   UINT16                        Length;
@@ -28,13 +29,22 @@ SpdmGetResponseCertificate (
   SPDM_DEVICE_CONTEXT           *SpdmContext;
 
   SpdmContext = Context;
+  SpdmRequest = Request;
+  if (RequestSize != sizeof(SPDM_GET_CERTIFICATE_REQUEST)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SpdmRequestSize = RequestSize;
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, SpdmRequestSize);
 
   if (SpdmContext->LocalContext.CertificateChain == NULL) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_CERTIFICATE, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  SpdmRequest = Request;
   SlotNum = SpdmRequest->Header.Param1;
 
   if (SlotNum > SpdmContext->LocalContext.SlotCount) {
@@ -73,6 +83,10 @@ SpdmGetResponseCertificate (
   SpdmResponse->PortionLength = Length;
   SpdmResponse->RemainderLength = (UINT16)RemainderLength;
   CopyMem (SpdmResponse + 1, (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + Offset, Length);
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmResponse, *ResponseSize);
 
   return RETURN_SUCCESS;
 }

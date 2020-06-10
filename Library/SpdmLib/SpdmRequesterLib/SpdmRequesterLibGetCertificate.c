@@ -90,6 +90,11 @@ SpdmGetCertificate (
       goto Done;
     }
 
+    //
+    // Cache data
+    //
+    AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmRequest, sizeof(SpdmRequest));
+
     SpdmResponseSize = sizeof(SpdmResponse);
     ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
     Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
@@ -117,10 +122,15 @@ SpdmGetCertificate (
       Status = RETURN_DEVICE_ERROR;
       goto Done;
     }
-    if (SpdmResponseSize != sizeof(SPDM_CERTIFICATE_RESPONSE) + SpdmResponse.PortionLength) {
+    if (SpdmResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE) + SpdmResponse.PortionLength) {
       Status = RETURN_DEVICE_ERROR;
       goto Done;
     }
+    SpdmResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + SpdmResponse.PortionLength;
+    //
+    // Cache data
+    //
+    AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmResponse, SpdmResponseSize);
     
     DEBUG((DEBUG_INFO, "Certificate (Offset 0x%x, Size 0x%x):\n", SpdmRequest.Offset, SpdmResponse.PortionLength));
     InternalDumpHex (SpdmResponse.CertChain, SpdmResponse.PortionLength);

@@ -60,6 +60,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 typedef enum {
   //
+  // SPDM IO info
+  //
+  SpdmDataIoSizeAlignment,
+  SpdmDataIoSecureMessageType,
+  //
   // SPDM parameter
   //
   SpdmDataVersion,

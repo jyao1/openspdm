@@ -86,6 +86,11 @@ SpdmNegotiateAlgorithms (
     return RETURN_DEVICE_ERROR;
   }
 
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
+
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
@@ -101,6 +106,20 @@ SpdmNegotiateAlgorithms (
   if (SpdmResponse.Header.RequestResponseCode != SPDM_ALGORITHMS) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponseSize < sizeof(SPDM_ALGORITHMS_RESPONSE) + 
+                         sizeof(UINT32) * SpdmResponse.ExtAsymSelCount +
+                         sizeof(UINT32) * SpdmResponse.ExtHashSelCount +
+                         sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) * SpdmResponse.Header.Param1) {
+    return RETURN_DEVICE_ERROR;
+  }
+  SpdmResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE) + 
+                     sizeof(UINT32) * SpdmResponse.ExtAsymSelCount +
+                     sizeof(UINT32) * SpdmResponse.ExtHashSelCount +
+                     sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) * SpdmResponse.Header.Param1;
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
   
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SpdmResponse.MeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse.BaseAsymSel;

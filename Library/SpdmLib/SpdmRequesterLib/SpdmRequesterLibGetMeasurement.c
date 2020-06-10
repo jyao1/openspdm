@@ -140,6 +140,12 @@ SpdmGetMeasurement (
     return RETURN_DEVICE_ERROR;
   }
 
+  //
+  // Cache data
+  //
+  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
+  AppendManagedBuffer (&SpdmContext->Transcript.L1L2, &SpdmRequest, SpdmRequestSize);
+
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
@@ -208,6 +214,13 @@ SpdmGetMeasurement (
                            SignatureSize) {
       return RETURN_DEVICE_ERROR;
     }
+    SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) +
+                       MeasurementRecordDataLength +
+                       SPDM_NONCE_SIZE +
+                       sizeof(UINT16) +
+                       OpaqueLength +
+                       SignatureSize;
+    AppendManagedBuffer (&SpdmContext->Transcript.L1L2, &SpdmResponse, SpdmResponseSize - SignatureSize);
 
     Opaque = Ptr;
     Ptr += OpaqueLength;
@@ -225,6 +238,13 @@ SpdmGetMeasurement (
     }
 
     ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
+  } else {
+    if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+      SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE);
+    } else {
+      SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurementRecordDataLength;
+    }
+    AppendManagedBuffer (&SpdmContext->Transcript.L1L2, &SpdmResponse, SpdmResponseSize);
   }
   
   if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {

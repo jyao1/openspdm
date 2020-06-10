@@ -37,12 +37,29 @@ SpdmGetResponseAlgorithm (
   )
 {
   SPDM_NEGOTIATE_ALGORITHMS_REQUEST              *SpdmRequest;
+  UINTN                                          SpdmRequestSize;
   SPDM_ALGORITHMS_RESPONSE_MINE                  *SpdmResponse;
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  *StructTable;
   UINTN                                          Index;
   SPDM_DEVICE_CONTEXT                            *SpdmContext;
 
   SpdmContext = Context;
+  SpdmRequest = Request;
+  if (RequestSize < sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) + 
+                    sizeof(UINT32) * SpdmRequest->ExtAsymCount +
+                    sizeof(UINT32) * SpdmRequest->ExtHashCount +
+                    sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) * SpdmRequest->Header.Param1) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SpdmRequestSize = sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) + 
+                    sizeof(UINT32) * SpdmRequest->ExtAsymCount +
+                    sizeof(UINT32) * SpdmRequest->ExtHashCount +
+                    sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) * SpdmRequest->Header.Param1;
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmRequest, SpdmRequestSize);
 
   ASSERT (*ResponseSize >= sizeof(SPDM_ALGORITHMS_RESPONSE_MINE));
   *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE_MINE);
@@ -56,7 +73,6 @@ SpdmGetResponseAlgorithm (
   SpdmResponse->Length = (UINT16)*ResponseSize;
   SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
 
-  SpdmRequest = Request;
   StructTable = (VOID *)((UINTN)SpdmRequest +
                           sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) +
                           sizeof(UINT32) * SpdmRequest->ExtAsymCount +
@@ -97,6 +113,10 @@ SpdmGetResponseAlgorithm (
   SpdmResponse->StructTable[2].AlgCount = 0x20;
   SpdmResponse->StructTable[2].AlgSupported = SpdmContext->LocalContext.Algorithm.KeySchedule &
                                               SpdmContext->ConnectionInfo.Algorithm.KeySchedule;
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmResponse, *ResponseSize);
 
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SpdmResponse->MeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse->BaseAsymSel;

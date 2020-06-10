@@ -31,10 +31,15 @@ SpdmGetCapabilities (
   SpdmRequest.Header.Param2 = 0;
   SpdmRequest.CTExponent = RequesterCTExponent;
   SpdmRequest.Flags = RequesterFlags;
-  Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest.Header), &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
@@ -51,6 +56,12 @@ SpdmGetCapabilities (
   if (SpdmResponse.Header.RequestResponseCode != SPDM_CAPABILITIES) {
     return RETURN_DEVICE_ERROR;
   }
+
+  SpdmResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
 
   SpdmContext->ConnectionInfo.Capability.CTExponent = SpdmResponse.CTExponent;
   SpdmContext->ConnectionInfo.Capability.Flags = SpdmResponse.Flags;

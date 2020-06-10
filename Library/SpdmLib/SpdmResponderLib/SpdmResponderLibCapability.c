@@ -20,10 +20,21 @@ SpdmGetResponseCapability (
   )
 {
   SPDM_GET_CAPABILITIES_REQUEST  *SpdmRequest;
+  UINTN                          SpdmRequestSize;
   SPDM_CAPABILITIES_RESPONSE     *SpdmResponse;
   SPDM_DEVICE_CONTEXT            *SpdmContext;
 
   SpdmContext = Context;
+  SpdmRequest = Request;
+  if (RequestSize != sizeof(SPDM_GET_CAPABILITIES_REQUEST)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SpdmRequestSize = RequestSize;
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmRequest, SpdmRequestSize);
 
   ASSERT (*ResponseSize >= sizeof(SPDM_CAPABILITIES_RESPONSE));
   *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
@@ -36,8 +47,11 @@ SpdmGetResponseCapability (
   SpdmResponse->Header.Param2 = 0;
   SpdmResponse->CTExponent = SpdmContext->LocalContext.Capability.CTExponent;
   SpdmResponse->Flags = SpdmContext->LocalContext.Capability.Flags;
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmResponse, *ResponseSize);
   
-  SpdmRequest = Request;
   SpdmContext->ConnectionInfo.Capability.CTExponent = SpdmRequest->CTExponent;
   SpdmContext->ConnectionInfo.Capability.Flags = SpdmRequest->Flags;
 

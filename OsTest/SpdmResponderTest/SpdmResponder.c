@@ -152,6 +152,11 @@ SpdmServerInit (
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
+  
+  Data32 = 4;
+  SpdmSetData (SpdmContext, SpdmDataIoSizeAlignment, &Parameter, &Data32, sizeof(Data32));
+  Data32 = (UINT32)SpdmIoSecureMessagingTypeDmtfMtcp;
+  SpdmSetData (SpdmContext, SpdmDataIoSecureMessageType, &Parameter, &Data32, sizeof(Data32));
 
   Res = ReadPublicCertificateChain (&Data, &DataSize);
   if (Res) {

@@ -40,6 +40,15 @@ SpdmGetVersion (
     return RETURN_DEVICE_ERROR;
   }
 
+  //
+  // Cache data
+  //
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageA);
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
+  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
+
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
@@ -55,6 +64,14 @@ SpdmGetVersion (
   if (SpdmResponse.Header.RequestResponseCode != SPDM_VERSION) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponseSize < sizeof(SPDM_VERSION_RESPONSE) + SpdmResponse.VersionNumberEntryCount * sizeof(SPDM_VERSION_NUMBER)) {
+    return RETURN_DEVICE_ERROR;
+  }
+  SpdmResponseSize = sizeof(SPDM_VERSION_RESPONSE) + SpdmResponse.VersionNumberEntryCount * sizeof(SPDM_VERSION_NUMBER);
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
 
   if (VersionCount != NULL) {
     if (*VersionCount < SpdmResponse.VersionNumberEntryCount) {
@@ -69,6 +86,6 @@ SpdmGetVersion (
         SpdmResponse.VersionNumberEntryCount * sizeof(SPDM_VERSION_NUMBER)
         );
     }
-  }  
+  }
   return RETURN_SUCCESS;
 }

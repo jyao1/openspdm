@@ -223,5 +223,7 @@ SpdmRegisterSpdmIo (
 
   SpdmContext = Context;
   SpdmContext->SpdmIo = SpdmIo;
+  SpdmContext->SecureMessageType = SpdmIo->SecureMessageType;
+  SpdmContext->Alignment = SpdmIo->Alignment;
   return RETURN_SUCCESS;
 }

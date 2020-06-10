@@ -228,6 +228,11 @@ typedef struct {
 typedef struct {
   UINT32                          Version;
   SPDM_IO_PROTOCOL                *SpdmIo;
+  //
+  // IO information
+  //
+  SPDM_IO_SECURE_MESSAGING_TYPE   SecureMessageType;
+  UINT32                          Alignment;
   
   //
   // Command Status

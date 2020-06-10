@@ -169,6 +169,11 @@ SpdmChallenge (
     return RETURN_DEVICE_ERROR;
   }
 
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, &SpdmRequest, sizeof(SpdmRequest));
+
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
@@ -226,15 +231,26 @@ SpdmChallenge (
   OpaqueLength = *(UINT16 *)Ptr;
   Ptr += sizeof(UINT16);
   
-  if (SpdmResponseSize != sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
-                          HashSize +
-                          SPDM_NONCE_SIZE +
-                          HashSize +
-                          sizeof(UINT16) +
-                          OpaqueLength +
-                          SignatureSize) {
+  if (SpdmResponseSize < sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
+                         HashSize +
+                         SPDM_NONCE_SIZE +
+                         HashSize +
+                         sizeof(UINT16) +
+                         OpaqueLength +
+                         SignatureSize) {
     return RETURN_DEVICE_ERROR;
   }
+  SpdmResponseSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
+                     HashSize +
+                     SPDM_NONCE_SIZE +
+                     HashSize +
+                     sizeof(UINT16) +
+                     OpaqueLength +
+                     SignatureSize;
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, &SpdmResponse, SpdmResponseSize - SignatureSize);
+  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
+  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageB), GetManagedBufferSize(&SpdmContext->Transcript.MessageB));
+  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
 
   Opaque = Ptr;
   Ptr += OpaqueLength;

@@ -28,7 +28,27 @@ SpdmGetResponseVersion (
      OUT VOID                 *Response
   )
 {
+  SPDM_GET_VERSION_REQUEST    *SpdmRequest;
+  UINTN                       SpdmRequestSize;
   MY_SPDM_VERSION_RESPONSE    *SpdmResponse;
+  SPDM_DEVICE_CONTEXT         *SpdmContext;
+
+  SpdmContext = Context;
+  SpdmRequest = Request;
+  if (RequestSize != sizeof(SPDM_GET_VERSION_REQUEST)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SpdmRequestSize = RequestSize;
+  //
+  // Cache
+  //
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageA);
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
+  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmRequest, SpdmRequestSize);
+
 
   ASSERT (*ResponseSize >= sizeof(MY_SPDM_VERSION_RESPONSE));
   *ResponseSize = sizeof(MY_SPDM_VERSION_RESPONSE);
@@ -44,6 +64,10 @@ SpdmGetResponseVersion (
   SpdmResponse->VersionNumberEntry[0].MinorVersion = 0;
   SpdmResponse->VersionNumberEntry[1].MajorVersion = 1;
   SpdmResponse->VersionNumberEntry[1].MinorVersion = 1;
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmResponse, *ResponseSize);
 
   return RETURN_SUCCESS;
 }
