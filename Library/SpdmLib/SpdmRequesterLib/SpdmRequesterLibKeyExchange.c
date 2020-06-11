@@ -95,7 +95,7 @@ VerifyKeyExchangeSignature (
              SignData,
              SignDataSize
              );
-  GetSpdmAsymFree (Context);
+  FreeFunc (Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyKeyExchangeSignature - FAIL !!!\n"));
     return RETURN_SECURITY_VIOLATION;

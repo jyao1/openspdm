@@ -122,8 +122,8 @@ SpdmGetResponseAlgorithm (
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse->BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse->BaseHashSel;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = SpdmResponse->StructTable[0].AlgSupported;
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = SpdmResponse->StructTable[0].AlgSupported;
-  SpdmContext->ConnectionInfo.Algorithm.KeySchedule = SpdmResponse->StructTable[0].AlgSupported;
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = SpdmResponse->StructTable[1].AlgSupported;
+  SpdmContext->ConnectionInfo.Algorithm.KeySchedule = SpdmResponse->StructTable[2].AlgSupported;
 
   return RETURN_SUCCESS;
 }
