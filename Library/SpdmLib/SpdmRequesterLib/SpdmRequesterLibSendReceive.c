@@ -61,13 +61,18 @@ SpdmEncSendRequest (
     return RETURN_UNSUPPORTED;
     break;
   }
-  
+
   AeadEncFunc = GetSpdmAeadEncFunc (SpdmContext);
   AeadBlockSize = GetSpdmAeadBlockSize (SpdmContext);
   AeadTagSize = GetSpdmAeadTagSize (SpdmContext);
   PlainTextSize = sizeof(MCTP_MESSAGE_CIPHERTEXT_HEADER) + RequestSize;
   CipherTextSize = (PlainTextSize + AeadBlockSize - 1) / AeadBlockSize * AeadBlockSize;
   WrappedRequestSize = sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) + CipherTextSize + AeadTagSize;
+  if ((SpdmContext->Alignment > 1) && 
+      ((WrappedRequestSize & (SpdmContext->Alignment - 1)) != 0)) {
+    WrappedRequestSize = (WrappedRequestSize + (SpdmContext->Alignment - 1)) & ~(SpdmContext->Alignment - 1);
+  }
+
   if (*EncRequestSize < WrappedRequestSize) {
     *EncRequestSize = WrappedRequestSize;
     return RETURN_BUFFER_TOO_SMALL;
@@ -137,6 +142,7 @@ SpdmSendRequestSession (
     ZeroMem (EncRequest, sizeof(EncRequest));
     Status = SpdmEncSendRequest (SpdmContext, SessionId, RequestSize, Request, &EncRequestSize, EncRequest);
     if (RETURN_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "SpdmEncSendRequest - %p\n", Status));
       return Status;
     }
     Status = SpdmContext->SpdmIo->SecureSendRequest (SpdmContext->SpdmIo, SessionId, EncRequestSize, EncRequest, 0);
@@ -259,7 +265,6 @@ SpdmDecReceiveResponse (
   if (ResponseSize < sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) + AeadBlockSize + AeadTagSize) {
     return RETURN_DEVICE_ERROR;
   }
-  CipherTextSize = ResponseSize - sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) - AeadTagSize;
   RecordHeader = (VOID *)Response;
   if (RecordHeader->SessionId != SessionId) {
     return RETURN_DEVICE_ERROR;
@@ -267,6 +272,8 @@ SpdmDecReceiveResponse (
   if (RecordHeader->Length != ResponseSize) {
     return RETURN_DEVICE_ERROR;
   }
+  CipherTextSize = (ResponseSize - sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) - AeadTagSize) / AeadBlockSize * AeadBlockSize;
+  ResponseSize = CipherTextSize + sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) + AeadTagSize;
   EncMsgHeader = (VOID *)(RecordHeader + 1);
   AData = (UINT8 *)RecordHeader;
   EncMsg = (UINT8 *)EncMsgHeader;
@@ -341,10 +348,15 @@ SpdmReceiveResponseSession (
       DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] Status - %p\n", SessionId, Status));
       return Status;
     }
+    if (SpdmContext->Alignment > 1) {
+      ASSERT ((MyResponseSize & (SpdmContext->Alignment - 1)) == 0);
+    }
+
     DecResponseSize = sizeof(DecResponse);
     ZeroMem (DecResponse, sizeof(DecResponse));
     Status = SpdmDecReceiveResponse (SpdmContext, SessionId, MyResponseSize, MyResponse, &DecResponseSize, DecResponse);
     if (RETURN_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "SpdmDecReceiveResponse - %p\n", Status));
       return Status;
     }
     if (*ResponseSize < DecResponseSize) {
