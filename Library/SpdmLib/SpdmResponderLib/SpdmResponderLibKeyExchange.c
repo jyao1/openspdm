@@ -24,7 +24,7 @@ SpdmGenerateKeyExchangeSignature (
   OUT UINT8                     *Signature
   )
 {
-  VOID                          *RsaContext;
+  VOID                          *Context;
   UINT8                         HashData[MAX_HASH_SIZE];
   UINT8                         *CertBuffer;
   UINTN                         CertBufferSize;
@@ -32,6 +32,9 @@ SpdmGenerateKeyExchangeSignature (
   UINTN                         SignatureSize;
   UINT32                        HashSize;
   HASH_ALL                      HashFunc;
+  ASYM_GET_PRIVATE_KEY_FROM_PEM GetPrivateKeyFromPemFunc;
+  ASYM_FREE                     FreeFunc;
+  ASYM_SIGN                     SignFunc;
   LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
 
   if (SpdmContext->LocalContext.PrivatePem == NULL) {
@@ -42,7 +45,10 @@ SpdmGenerateKeyExchangeSignature (
   HashSize = GetSpdmHashSize (SpdmContext);
   HashFunc = GetSpdmHashFunc (SpdmContext);
 
-  Result = RsaGetPrivateKeyFromPem (SpdmContext->LocalContext.PrivatePem, SpdmContext->LocalContext.PrivatePemSize, NULL, &RsaContext);
+  GetPrivateKeyFromPemFunc = GetSpdmAsymGetPrivateKeyFromPem (SpdmContext);
+  FreeFunc = GetSpdmAsymFree (SpdmContext);
+  SignFunc = GetSpdmAsymSign (SpdmContext);
+  Result = GetPrivateKeyFromPemFunc (SpdmContext->LocalContext.PrivatePem, SpdmContext->LocalContext.PrivatePemSize, NULL, &Context);
   if (!Result) {
     return FALSE;
   }
@@ -71,14 +77,14 @@ SpdmGenerateKeyExchangeSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  Result = RsaPkcs1Sign (
-             RsaContext,
+  Result = SignFunc (
+             Context,
              HashData,
              HashSize,
              Signature,
              &SignatureSize
              );
-  RsaFree (RsaContext);
+  FreeFunc (Context);
 
   return Result;
 }

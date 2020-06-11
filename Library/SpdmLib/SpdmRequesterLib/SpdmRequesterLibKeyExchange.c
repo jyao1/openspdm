@@ -46,7 +46,10 @@ VerifyKeyExchangeSignature (
   BOOLEAN                                   Result;
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
-  VOID                                      *RsaContext;
+  VOID                                      *Context;
+  ASYM_GET_PUBLIC_KEY_FROM_X509             GetPublicKeyFromX509Func;
+  ASYM_FREE                                 FreeFunc;
+  ASYM_VERIFY                               VerifyFunc;
   LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
 
   HashAll = GetSpdmHashFunc (SpdmContext);
@@ -77,19 +80,22 @@ VerifyKeyExchangeSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  Result = RsaGetPublicKeyFromX509 (CertBuffer, CertBufferSize, &RsaContext);
+  GetPublicKeyFromX509Func = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
+  FreeFunc = GetSpdmAsymFree (SpdmContext);
+  VerifyFunc = GetSpdmAsymVerify (SpdmContext);
+  Result = GetPublicKeyFromX509Func (CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return RETURN_SECURITY_VIOLATION;
   }
 
-  Result = RsaPkcs1Verify (
-             RsaContext,
+  Result = VerifyFunc (
+             Context,
              HashData,
              HashSize,
              SignData,
              SignDataSize
              );
-  RsaFree (RsaContext);
+  GetSpdmAsymFree (Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyKeyExchangeSignature - FAIL !!!\n"));
     return RETURN_SECURITY_VIOLATION;

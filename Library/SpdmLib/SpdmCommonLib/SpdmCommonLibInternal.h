@@ -323,6 +323,49 @@ BOOLEAN
   OUT  UINTN*       DataOutSize
   );
 
+typedef
+BOOLEAN
+(EFIAPI *ASYM_GET_PUBLIC_KEY_FROM_X509) (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **Context
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *ASYM_GET_PRIVATE_KEY_FROM_PEM) (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **Context
+  );
+
+typedef
+VOID
+(EFIAPI *ASYM_FREE) (
+  IN  VOID         *Context
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *ASYM_SIGN) (
+  IN      VOID         *Context,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *ASYM_VERIFY) (
+  IN  VOID         *Context,
+  IN  CONST UINT8  *MessageHash,
+  IN  UINTN        HashSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  );
+
 /**
 
   This function dump raw data.
@@ -484,6 +527,31 @@ GetSpdmAeadEncFunc (
 
 AEAD_DECRYPT
 GetSpdmAeadDecFunc (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_GET_PUBLIC_KEY_FROM_X509
+GetSpdmAsymGetPublicKeyFromX509 (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_GET_PRIVATE_KEY_FROM_PEM
+GetSpdmAsymGetPrivateKeyFromPem (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_FREE
+GetSpdmAsymFree (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_SIGN
+GetSpdmAsymSign (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_VERIFY
+GetSpdmAsymVerify (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
