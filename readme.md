@@ -73,8 +73,6 @@
 
 2) SPDM 1.0
 
-   GET_VERSION check
-
    FLAGS_CACHE_CAP
 
    multiple cert chains

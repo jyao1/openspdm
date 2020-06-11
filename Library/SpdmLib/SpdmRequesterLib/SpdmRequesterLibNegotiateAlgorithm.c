@@ -62,7 +62,7 @@ SpdmNegotiateAlgorithms (
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  *StructTable;
   
   ZeroMem (&SpdmRequest, sizeof(SpdmRequest));
-  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  SpdmRequest.Header.SPDMVersion = SpdmContext->SPDMVersion;
   SpdmRequest.Header.RequestResponseCode = SPDM_NEGOTIATE_ALGORITHMS;
   SpdmRequest.Header.Param1 = 3; // Number of Algorithms Structure Tables
   SpdmRequest.Header.Param2 = 0;

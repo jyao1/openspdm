@@ -464,6 +464,10 @@ SpdmInitContext (
   SpdmContext = Context;
   ZeroMem (SpdmContext, sizeof(SPDM_DEVICE_CONTEXT));
   SpdmContext->Version = SPDM_DEVICE_CONTEXT_VERSION;
+  SpdmContext->SupportedSPDMVersions[0].MajorVersion = 1;
+  SpdmContext->SupportedSPDMVersions[0].MinorVersion = 0;
+  SpdmContext->SupportedSPDMVersions[1].MajorVersion = 1;
+  SpdmContext->SupportedSPDMVersions[1].MinorVersion = 1;
   SpdmContext->Transcript.MessageA.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
   SpdmContext->Transcript.MessageB.MaxBufferSize  = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SpdmContext->Transcript.MessageC.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;

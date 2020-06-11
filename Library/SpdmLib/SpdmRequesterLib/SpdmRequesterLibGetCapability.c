@@ -25,7 +25,7 @@ SpdmGetCapabilities (
   UINTN                                     SpdmResponseSize;
   
   ZeroMem (&SpdmRequest, sizeof(SpdmRequest));
-  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  SpdmRequest.Header.SPDMVersion = SpdmContext->SPDMVersion;
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_CAPABILITIES;
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;

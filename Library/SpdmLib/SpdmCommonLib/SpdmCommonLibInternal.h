@@ -258,6 +258,9 @@ typedef struct {
 
   // TBD: Need support multiple session
   SPDM_SESSION_INFO               SessionInfo[MAX_SPDM_SESSION_COUNT];
+
+  SPDM_VERSION_NUMBER             SupportedSPDMVersions[MAX_SPDM_SUPPORTED_VERSION_COUNT];
+  UINT8                           SPDMVersion;
 } SPDM_DEVICE_CONTEXT;
 
 typedef

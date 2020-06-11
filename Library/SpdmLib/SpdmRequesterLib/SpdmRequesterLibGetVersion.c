@@ -20,8 +20,42 @@ typedef struct {
 
 RETURN_STATUS
 EFIAPI
+FindCommonVersion (
+    IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+    IN     UINT8                VersionNumberEntryCount,
+    IN     SPDM_VERSION_NUMBER  *VersionNumberEntries,
+       OUT SPDM_VERSION_NUMBER  *CommonVersion
+  )
+{
+  RETURN_STATUS Status = RETURN_NOT_FOUND;
+  UINT8         MajorMax = 0;
+  UINT8         MinorMax = 0;
+  UINT8         Idx = 0;
+
+  for(; Idx < VersionNumberEntryCount; Idx++){
+    UINT8 Major = VersionNumberEntries[Idx].MajorVersion;
+    UINT8 Minor = VersionNumberEntries[Idx].MinorVersion;
+    UINT8 Idx2 = 0;
+    for(; Idx2 < MAX_SPDM_SUPPORTED_VERSION_COUNT; Idx2++){
+      if( Major == SpdmContext->SupportedSPDMVersions[Idx2].MajorVersion &&
+          Minor == SpdmContext->SupportedSPDMVersions[Idx2].MinorVersion &&
+          Major >= MajorMax && Minor >= MinorMax){
+            MajorMax = Major;
+            MinorMax = Minor;
+            *CommonVersion = SpdmContext->SupportedSPDMVersions[Idx2];
+            Status = RETURN_SUCCESS;
+            break;
+          }
+    } 
+  }
+
+  return Status;
+}
+
+RETURN_STATUS
+EFIAPI
 SpdmGetVersion (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINT8                *VersionCount,
      OUT VOID                 *VersionNumberEntries
   )
@@ -30,6 +64,7 @@ SpdmGetVersion (
   SPDM_GET_VERSION_REQUEST                  SpdmRequest;
   SPDM_VERSION_RESPONSE_MAX                 SpdmResponse;
   UINTN                                     SpdmResponseSize;
+  SPDM_VERSION_NUMBER                       CommonVersion;
   
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_VERSION;
@@ -85,6 +120,17 @@ SpdmGetVersion (
         SpdmResponse.VersionNumberEntry,
         SpdmResponse.VersionNumberEntryCount * sizeof(SPDM_VERSION_NUMBER)
         );
+    
+
+      // Find a supported version in VersionNumberEntries. Return ERROR if one not found.
+      // Pick highest MajorVersion followed by highest MinorVersion.
+      // Use this version for future transactions.
+      Status = FindCommonVersion(SpdmContext, SpdmResponse.VersionNumberEntryCount, VersionNumberEntries, &CommonVersion);
+      if (RETURN_ERROR(Status)){
+        printf("Didnt find common supported version...\n");
+        return RETURN_DEVICE_ERROR;
+      }
+      SpdmContext->SPDMVersion = (CommonVersion.MajorVersion << 4) + CommonVersion.MinorVersion; 
     }
   }
   return RETURN_SUCCESS;
