@@ -33,90 +33,7 @@ CC_FLAGS = $(CC_FLAGS) -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) /FIBase.h /
 #
 # Build Macro
 #
-SOURCE_FILES =  \
-	$(SOURCE_DIR)\openssl\crypto\chacha\chacha_enc.c \
-	$(SOURCE_DIR)\openssl\crypto\lhash\lh_stats.c \
-	$(SOURCE_DIR)\openssl\crypto\lhash\lhash.c \
-	$(SOURCE_DIR)\openssl\crypto\aria\aria.c \
-	$(SOURCE_DIR)\openssl\crypto\txt_db\txt_db.c \
-	$(SOURCE_DIR)\openssl\crypto\buffer\buffer.c \
-	$(SOURCE_DIR)\openssl\crypto\buffer\buf_err.c \
-	$(SOURCE_DIR)\openssl\crypto\comp\c_zlib.c \
-	$(SOURCE_DIR)\openssl\crypto\comp\comp_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\comp\comp_err.c \
-	$(SOURCE_DIR)\openssl\crypto\hmac\hmac.c \
-	$(SOURCE_DIR)\openssl\crypto\hmac\hm_ameth.c \
-	$(SOURCE_DIR)\openssl\crypto\hmac\hm_pmeth.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\curve448\scalar.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\curve448\f_generic.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\curve448\eddsa.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\curve448\curve448_tables.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\curve448\curve448.c \
-	$(SOURCE_DIR)\openssl\crypto\async\arch\async_win.c \
-	$(SOURCE_DIR)\openssl\crypto\async\arch\async_posix.c \
-	$(SOURCE_DIR)\openssl\crypto\async\arch\async_null.c \
-	$(SOURCE_DIR)\openssl\crypto\md5\md5_one.c \
-	$(SOURCE_DIR)\openssl\crypto\md5\md5_dgst.c \
-	$(SOURCE_DIR)\openssl\crypto\conf\conf_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\conf\conf_def.c \
-	$(SOURCE_DIR)\openssl\crypto\conf\conf_err.c \
-	$(SOURCE_DIR)\openssl\crypto\conf\conf_ssl.c \
-	$(SOURCE_DIR)\openssl\crypto\conf\conf_sap.c \
-	$(SOURCE_DIR)\openssl\crypto\conf\conf_mall.c \
-	$(SOURCE_DIR)\openssl\crypto\conf\conf_mod.c \
-	$(SOURCE_DIR)\openssl\crypto\conf\conf_api.c \
-	$(SOURCE_DIR)\openssl\crypto\err\err_prn.c \
-	$(SOURCE_DIR)\openssl\crypto\err\err.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\curve448\arch_32\f_impl.c \
-	$(SOURCE_DIR)\openssl\crypto\stack\stack.c \
-	$(SOURCE_DIR)\openssl\crypto\async\async_err.c \
-	$(SOURCE_DIR)\openssl\crypto\async\async.c \
-	$(SOURCE_DIR)\openssl\crypto\async\async_wait.c \
-	$(SOURCE_DIR)\openssl\crypto\ui\ui_err.c \
-	$(SOURCE_DIR)\openssl\crypto\ui\ui_util.c \
-	$(SOURCE_DIR)\openssl\crypto\ui\ui_openssl.c \
-	$(SOURCE_DIR)\openssl\crypto\ui\ui_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\ui\ui_null.c \
-	$(SOURCE_DIR)\openssl\crypto\cmac\cm_pmeth.c \
-	$(SOURCE_DIR)\openssl\crypto\cmac\cmac.c \
-	$(SOURCE_DIR)\openssl\crypto\cmac\cm_ameth.c \
-	$(SOURCE_DIR)\openssl\crypto\sha\sha512.c \
-	$(SOURCE_DIR)\openssl\crypto\sha\keccak1600.c \
-	$(SOURCE_DIR)\openssl\crypto\sha\sha1_one.c \
-	$(SOURCE_DIR)\openssl\crypto\sha\sha1dgst.c \
-	$(SOURCE_DIR)\openssl\crypto\sha\sha256.c \
-	$(SOURCE_DIR)\openssl\crypto\kdf\scrypt.c \
-	$(SOURCE_DIR)\openssl\crypto\kdf\kdf_err.c \
-	$(SOURCE_DIR)\openssl\crypto\kdf\tls1_prf.c \
-	$(SOURCE_DIR)\openssl\crypto\kdf\hkdf.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_depr.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_ssl.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_asn1.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_pk1.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_pmeth.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_meth.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_prn.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_crpt.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_mp.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_x931g.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_none.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_oaep.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_pss.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_gen.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_err.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_saos.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_sign.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_chk.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_ossl.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_ameth.c \
-	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_x931.c \
-	$(SOURCE_DIR)\openssl\crypto\siphash\siphash_pmeth.c \
-	$(SOURCE_DIR)\openssl\crypto\siphash\siphash_ameth.c \
-	$(SOURCE_DIR)\openssl\crypto\siphash\siphash.c \
-	$(SOURCE_DIR)\openssl\crypto\poly1305\poly1305_ameth.c \
-	$(SOURCE_DIR)\openssl\crypto\poly1305\poly1305_pmeth.c \
-	$(SOURCE_DIR)\openssl\crypto\poly1305\poly1305.c \
+SOURCE_1_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\aes\aes_ofb.c \
 	$(SOURCE_DIR)\openssl\crypto\aes\aes_misc.c \
 	$(SOURCE_DIR)\openssl\crypto\aes\aes_cfb.c \
@@ -125,152 +42,13 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\aes\aes_cbc.c \
 	$(SOURCE_DIR)\openssl\crypto\aes\aes_wrap.c \
 	$(SOURCE_DIR)\openssl\crypto\aes\aes_core.c \
-	$(SOURCE_DIR)\openssl\crypto\objects\obj_xref.c \
-	$(SOURCE_DIR)\openssl\crypto\objects\obj_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\objects\obj_err.c \
-	$(SOURCE_DIR)\openssl\crypto\objects\o_names.c \
-	$(SOURCE_DIR)\openssl\crypto\objects\obj_dat.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_xaux.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pvkfmt.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_info.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_sign.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_pk8.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_x509.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_err.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_all.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_pkey.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_oth.c \
-	$(SOURCE_DIR)\openssl\crypto\pem\pem_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_err.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_cl.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_prn.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_ext.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_asn.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_srv.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_ht.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\v3_ocsp.c \
-	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_vfy.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_intern.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_rand.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_blind.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_err.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_sqrt.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_gcd.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_mul.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_asm.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_kron.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_add.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_const.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_gf2m.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_recp.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_prime.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_div.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_sqr.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_exp.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_mpi.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_nist.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_dh.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_ctx.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_x931p.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_mod.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_srp.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_mont.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_depr.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_exp2.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_shift.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_word.c \
-	$(SOURCE_DIR)\openssl\crypto\bn\bn_print.c \
-	$(SOURCE_DIR)\openssl\crypto\dso\dso_openssl.c \
-	$(SOURCE_DIR)\openssl\crypto\dso\dso_win32.c \
-	$(SOURCE_DIR)\openssl\crypto\dso\dso_vms.c \
-	$(SOURCE_DIR)\openssl\crypto\dso\dso_err.c \
-	$(SOURCE_DIR)\openssl\crypto\dso\dso_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\dso\dso_dl.c \
-	$(SOURCE_DIR)\openssl\crypto\dso\dso_dlfcn.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_attr.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_doit.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_smime.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs7\pkcs7err.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_asn1.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_mime.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs7\bio_pk7.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x_attrib.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_vpm.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_req.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_cmp.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_v3.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x_crl.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\t_crl.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_r2x.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\t_x509.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x_req.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x_name.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\by_file.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\by_dir.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_att.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_trs.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_ext.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_meth.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_err.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_def.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_vfy.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509name.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_obj.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509cset.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x_exten.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_lu.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_d2.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_txt.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x_pubkey.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509_set.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x_all.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x_x509a.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509type.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509rset.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\t_req.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x_x509.c \
-	$(SOURCE_DIR)\openssl\crypto\x509\x509spki.c \
-	$(SOURCE_DIR)\openssl\crypto\o_dir.c \
-	$(SOURCE_DIR)\openssl\crypto\ctype.c \
-	$(SOURCE_DIR)\openssl\crypto\o_time.c \
-	$(SOURCE_DIR)\openssl\crypto\uid.c \
-	$(SOURCE_DIR)\openssl\crypto\o_fopen.c \
-	$(SOURCE_DIR)\openssl\crypto\ex_data.c \
-	$(SOURCE_DIR)\openssl\crypto\threads_pthread.c \
-	$(SOURCE_DIR)\openssl\crypto\threads_none.c \
-	$(SOURCE_DIR)\openssl\crypto\ebcdic.c \
-	$(SOURCE_DIR)\openssl\crypto\mem_clr.c \
-	$(SOURCE_DIR)\openssl\crypto\threads_win.c \
-	$(SOURCE_DIR)\openssl\crypto\mem_sec.c \
-	$(SOURCE_DIR)\openssl\crypto\o_str.c \
-	$(SOURCE_DIR)\openssl\crypto\mem_dbg.c \
-	$(SOURCE_DIR)\openssl\crypto\mem.c \
-	$(SOURCE_DIR)\openssl\crypto\cversion.c \
-	$(SOURCE_DIR)\openssl\crypto\cpt_err.c \
-	$(SOURCE_DIR)\openssl\crypto\getenv.c \
-	$(SOURCE_DIR)\openssl\crypto\o_fips.c \
-	$(SOURCE_DIR)\openssl\crypto\o_init.c \
-	$(SOURCE_DIR)\openssl\crypto\init.c \
-	$(SOURCE_DIR)\openssl\crypto\cryptlib.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_npas.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_kiss.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_attr.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_key.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_decr.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_add.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_init.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_utl.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_asn.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_mutl.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_sbag.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_crpt.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\pk12err.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_crt.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_p8d.c \
-	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_p8e.c \
+
+
+SOURCE_2_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\aria\aria.c \
+
+
+SOURCE_3_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\asn1\t_bitst.c \
 	$(SOURCE_DIR)\openssl\crypto\asn1\a_gentm.c \
 	$(SOURCE_DIR)\openssl\crypto\asn1\p8_pkey.c \
@@ -335,6 +113,206 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\asn1\a_utf8.c \
 	$(SOURCE_DIR)\openssl\crypto\asn1\p5_pbe.c \
 	$(SOURCE_DIR)\openssl\crypto\asn1\t_pkey.c \
+
+
+SOURCE_4_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\async\arch\async_win.c \
+	$(SOURCE_DIR)\openssl\crypto\async\arch\async_posix.c \
+	$(SOURCE_DIR)\openssl\crypto\async\arch\async_null.c \
+	$(SOURCE_DIR)\openssl\crypto\async\async_err.c \
+	$(SOURCE_DIR)\openssl\crypto\async\async.c \
+	$(SOURCE_DIR)\openssl\crypto\async\async_wait.c \
+
+
+SOURCE_5_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_sock.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bf_nbio.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_dgram.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_null.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bf_null.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_log.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\b_sock2.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_bio.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_fd.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_file.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bio_meth.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bio_err.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_conn.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bio_cb.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\b_addr.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bio_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\b_sock.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_acpt.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bf_buff.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\b_dump.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bss_mem.c \
+	$(SOURCE_DIR)\openssl\crypto\bio\bf_lbuf.c \
+
+
+SOURCE_6_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_intern.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_rand.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_blind.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_err.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_sqrt.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_gcd.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_mul.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_asm.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_kron.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_add.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_const.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_gf2m.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_recp.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_prime.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_div.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_sqr.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_exp.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_mpi.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_nist.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_dh.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_ctx.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_x931p.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_mod.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_srp.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_mont.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_depr.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_exp2.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_shift.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_word.c \
+	$(SOURCE_DIR)\openssl\crypto\bn\bn_print.c \
+
+
+SOURCE_7_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\buffer\buffer.c \
+	$(SOURCE_DIR)\openssl\crypto\buffer\buf_err.c \
+
+
+SOURCE_8_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\chacha\chacha_enc.c \
+
+
+SOURCE_9_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\cmac\cm_pmeth.c \
+	$(SOURCE_DIR)\openssl\crypto\cmac\cmac.c \
+	$(SOURCE_DIR)\openssl\crypto\cmac\cm_ameth.c \
+
+
+SOURCE_10_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\comp\c_zlib.c \
+	$(SOURCE_DIR)\openssl\crypto\comp\comp_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\comp\comp_err.c \
+
+
+SOURCE_11_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\conf\conf_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\conf\conf_def.c \
+	$(SOURCE_DIR)\openssl\crypto\conf\conf_err.c \
+	$(SOURCE_DIR)\openssl\crypto\conf\conf_ssl.c \
+	$(SOURCE_DIR)\openssl\crypto\conf\conf_sap.c \
+	$(SOURCE_DIR)\openssl\crypto\conf\conf_mall.c \
+	$(SOURCE_DIR)\openssl\crypto\conf\conf_mod.c \
+	$(SOURCE_DIR)\openssl\crypto\conf\conf_api.c \
+
+
+SOURCE_12_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\o_dir.c \
+	$(SOURCE_DIR)\openssl\crypto\ctype.c \
+	$(SOURCE_DIR)\openssl\crypto\o_time.c \
+	$(SOURCE_DIR)\openssl\crypto\uid.c \
+	$(SOURCE_DIR)\openssl\crypto\o_fopen.c \
+	$(SOURCE_DIR)\openssl\crypto\ex_data.c \
+	$(SOURCE_DIR)\openssl\crypto\threads_pthread.c \
+	$(SOURCE_DIR)\openssl\crypto\threads_none.c \
+	$(SOURCE_DIR)\openssl\crypto\ebcdic.c \
+	$(SOURCE_DIR)\openssl\crypto\mem_clr.c \
+	$(SOURCE_DIR)\openssl\crypto\threads_win.c \
+	$(SOURCE_DIR)\openssl\crypto\mem_sec.c \
+	$(SOURCE_DIR)\openssl\crypto\o_str.c \
+	$(SOURCE_DIR)\openssl\crypto\mem_dbg.c \
+	$(SOURCE_DIR)\openssl\crypto\mem.c \
+	$(SOURCE_DIR)\openssl\crypto\cversion.c \
+	$(SOURCE_DIR)\openssl\crypto\cpt_err.c \
+	$(SOURCE_DIR)\openssl\crypto\getenv.c \
+	$(SOURCE_DIR)\openssl\crypto\o_fips.c \
+	$(SOURCE_DIR)\openssl\crypto\o_init.c \
+	$(SOURCE_DIR)\openssl\crypto\init.c \
+	$(SOURCE_DIR)\openssl\crypto\cryptlib.c \
+
+
+SOURCE_13_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_key.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_pmeth.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_rfc5114.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_depr.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_check.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_ameth.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_gen.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_rfc7919.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_kdf.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_prn.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_meth.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_err.c \
+	$(SOURCE_DIR)\openssl\crypto\dh\dh_asn1.c \
+
+
+SOURCE_14_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\dso\dso_openssl.c \
+	$(SOURCE_DIR)\openssl\crypto\dso\dso_win32.c \
+	$(SOURCE_DIR)\openssl\crypto\dso\dso_vms.c \
+	$(SOURCE_DIR)\openssl\crypto\dso\dso_err.c \
+	$(SOURCE_DIR)\openssl\crypto\dso\dso_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\dso\dso_dl.c \
+	$(SOURCE_DIR)\openssl\crypto\dso\dso_dlfcn.c \
+
+
+SOURCE_15_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nistputil.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_key.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\curve25519.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_print.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_pmeth.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_oct.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecp_smpl.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nist.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_curve.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec2_smpl.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_asn1.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_cvt.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_err.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecdh_ossl.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecp_oct.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecdsa_vrf.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_mult.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecp_mont.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecdsa_sign.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_ameth.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\eck_prn.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nistp521.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec2_oct.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecdh_kdf.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecdsa_ossl.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nistp256.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecx_meth.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_kmeth.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ec_check.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nistp224.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\curve448\scalar.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\curve448\f_generic.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\curve448\eddsa.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\curve448\curve448_tables.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\curve448\curve448.c \
+	$(SOURCE_DIR)\openssl\crypto\ec\curve448\arch_32\f_impl.c \
+
+
+SOURCE_16_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\err\err_prn.c \
+	$(SOURCE_DIR)\openssl\crypto\err\err.c \
+
+
+SOURCE_17_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\evp\evp_pbe.c \
 	$(SOURCE_DIR)\openssl\crypto\evp\p_enc.c \
 	$(SOURCE_DIR)\openssl\crypto\evp\m_wp.c \
@@ -386,14 +364,32 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\evp\bio_md.c \
 	$(SOURCE_DIR)\openssl\crypto\evp\pmeth_lib.c \
 	$(SOURCE_DIR)\openssl\crypto\evp\c_allc.c \
-	$(SOURCE_DIR)\openssl\crypto\rand\rand_win.c \
-	$(SOURCE_DIR)\openssl\crypto\rand\rand_unix.c \
-	$(SOURCE_DIR)\openssl\crypto\rand\rand_vms.c \
-	$(SOURCE_DIR)\openssl\crypto\rand\drbg_ctr.c \
-	$(SOURCE_DIR)\openssl\crypto\rand\rand_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\rand\rand_egd.c \
-	$(SOURCE_DIR)\openssl\crypto\rand\drbg_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\rand\rand_err.c \
+
+
+SOURCE_18_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\hmac\hmac.c \
+	$(SOURCE_DIR)\openssl\crypto\hmac\hm_ameth.c \
+	$(SOURCE_DIR)\openssl\crypto\hmac\hm_pmeth.c \
+
+
+SOURCE_19_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\kdf\scrypt.c \
+	$(SOURCE_DIR)\openssl\crypto\kdf\kdf_err.c \
+	$(SOURCE_DIR)\openssl\crypto\kdf\tls1_prf.c \
+	$(SOURCE_DIR)\openssl\crypto\kdf\hkdf.c \
+
+
+SOURCE_20_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\lhash\lh_stats.c \
+	$(SOURCE_DIR)\openssl\crypto\lhash\lhash.c \
+
+
+SOURCE_21_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\md5\md5_one.c \
+	$(SOURCE_DIR)\openssl\crypto\md5\md5_dgst.c \
+
+
+SOURCE_22_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\modes\xts128.c \
 	$(SOURCE_DIR)\openssl\crypto\modes\ocb128.c \
 	$(SOURCE_DIR)\openssl\crypto\modes\ctr128.c \
@@ -404,20 +400,185 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\modes\cfb128.c \
 	$(SOURCE_DIR)\openssl\crypto\modes\wrap128.c \
 	$(SOURCE_DIR)\openssl\crypto\modes\ccm128.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_key.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_pmeth.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_rfc5114.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_depr.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_check.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_ameth.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_gen.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_rfc7919.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_kdf.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_prn.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_meth.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_err.c \
-	$(SOURCE_DIR)\openssl\crypto\dh\dh_asn1.c \
+
+
+SOURCE_23_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\objects\obj_xref.c \
+	$(SOURCE_DIR)\openssl\crypto\objects\obj_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\objects\obj_err.c \
+	$(SOURCE_DIR)\openssl\crypto\objects\o_names.c \
+	$(SOURCE_DIR)\openssl\crypto\objects\obj_dat.c \
+
+
+SOURCE_24_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_err.c \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_cl.c \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_prn.c \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_ext.c \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_asn.c \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_srv.c \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_ht.c \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\v3_ocsp.c \
+	$(SOURCE_DIR)\openssl\crypto\ocsp\ocsp_vfy.c \
+
+
+SOURCE_25_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_xaux.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pvkfmt.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_info.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_sign.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_pk8.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_x509.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_err.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_all.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_pkey.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_oth.c \
+	$(SOURCE_DIR)\openssl\crypto\pem\pem_lib.c \
+
+
+SOURCE_26_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_npas.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_kiss.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_attr.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_key.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_decr.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_add.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_init.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_utl.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_asn.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_mutl.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_sbag.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_crpt.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\pk12err.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_crt.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_p8d.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs12\p12_p8e.c \
+
+
+SOURCE_27_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_attr.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_doit.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_smime.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs7\pkcs7err.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_asn1.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_mime.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs7\bio_pk7.c \
+	$(SOURCE_DIR)\openssl\crypto\pkcs7\pk7_lib.c \
+
+
+SOURCE_28_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\poly1305\poly1305_ameth.c \
+	$(SOURCE_DIR)\openssl\crypto\poly1305\poly1305_pmeth.c \
+	$(SOURCE_DIR)\openssl\crypto\poly1305\poly1305.c \
+
+
+SOURCE_29_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\rand\rand_win.c \
+	$(SOURCE_DIR)\openssl\crypto\rand\rand_unix.c \
+	$(SOURCE_DIR)\openssl\crypto\rand\rand_vms.c \
+	$(SOURCE_DIR)\openssl\crypto\rand\drbg_ctr.c \
+	$(SOURCE_DIR)\openssl\crypto\rand\rand_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\rand\rand_egd.c \
+	$(SOURCE_DIR)\openssl\crypto\rand\drbg_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\rand\rand_err.c \
+
+
+SOURCE_30_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_depr.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_ssl.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_asn1.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_pk1.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_pmeth.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_meth.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_prn.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_crpt.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_mp.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_x931g.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_none.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_oaep.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_pss.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_gen.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_err.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_saos.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_sign.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_chk.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_ossl.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_ameth.c \
+	$(SOURCE_DIR)\openssl\crypto\rsa\rsa_x931.c \
+
+
+SOURCE_31_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\sha\sha512.c \
+	$(SOURCE_DIR)\openssl\crypto\sha\keccak1600.c \
+	$(SOURCE_DIR)\openssl\crypto\sha\sha1_one.c \
+	$(SOURCE_DIR)\openssl\crypto\sha\sha1dgst.c \
+	$(SOURCE_DIR)\openssl\crypto\sha\sha256.c \
+
+
+SOURCE_32_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\siphash\siphash_pmeth.c \
+	$(SOURCE_DIR)\openssl\crypto\siphash\siphash_ameth.c \
+	$(SOURCE_DIR)\openssl\crypto\siphash\siphash.c \
+
+
+SOURCE_33_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\stack\stack.c \
+
+
+SOURCE_34_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\txt_db\txt_db.c \
+
+
+SOURCE_35_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\ui\ui_err.c \
+	$(SOURCE_DIR)\openssl\crypto\ui\ui_util.c \
+	$(SOURCE_DIR)\openssl\crypto\ui\ui_openssl.c \
+	$(SOURCE_DIR)\openssl\crypto\ui\ui_lib.c \
+	$(SOURCE_DIR)\openssl\crypto\ui\ui_null.c \
+
+
+SOURCE_36_FILES =  \
+	$(SOURCE_DIR)\openssl\crypto\x509\x_attrib.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_vpm.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_req.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_cmp.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_v3.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x_crl.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\t_crl.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_r2x.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\t_x509.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x_req.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x_name.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\by_file.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\by_dir.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_att.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_trs.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_ext.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_meth.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_err.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_def.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_vfy.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509name.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_obj.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509cset.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x_exten.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_lu.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_d2.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_txt.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x_pubkey.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509_set.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x_all.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x_x509a.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509type.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509rset.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\t_req.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x_x509.c \
+	$(SOURCE_DIR)\openssl\crypto\x509\x509spki.c \
+
+
+SOURCE_37_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\x509v3\v3_akey.c \
 	$(SOURCE_DIR)\openssl\crypto\x509v3\v3_lib.c \
 	$(SOURCE_DIR)\openssl\crypto\x509v3\v3_ncons.c \
@@ -455,64 +616,15 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\openssl\crypto\x509v3\v3_ia5.c \
 	$(SOURCE_DIR)\openssl\crypto\x509v3\pcy_node.c \
 	$(SOURCE_DIR)\openssl\crypto\x509v3\v3_bcons.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_sock.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bf_nbio.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_dgram.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_null.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bf_null.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_log.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\b_sock2.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_bio.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_fd.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_file.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bio_meth.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bio_err.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_conn.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bio_cb.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\b_addr.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bio_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\b_sock.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_acpt.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bf_buff.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\b_dump.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bss_mem.c \
-	$(SOURCE_DIR)\openssl\crypto\bio\bf_lbuf.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nistputil.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_key.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\curve25519.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_print.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_pmeth.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_oct.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecp_smpl.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nist.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_curve.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec2_smpl.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_asn1.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_cvt.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_err.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecdh_ossl.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecp_oct.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecdsa_vrf.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_mult.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecp_mont.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecdsa_sign.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_ameth.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\eck_prn.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nistp521.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec2_oct.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_lib.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecdh_kdf.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecdsa_ossl.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nistp256.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecx_meth.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_kmeth.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ec_check.c \
-	$(SOURCE_DIR)\openssl\crypto\ec\ecp_nistp224.c \
+
+
+SOURCE_38_FILES =  \
 	$(SOURCE_DIR)\rand_pool.c \
 	$(SOURCE_DIR)\ossl_store.c \
 
 
-OBJECT_FILES =  \
+
+OBJECT_1_FILES =  \
     $(OUTPUT_DIR)\aes_cbc.obj \
     $(OUTPUT_DIR)\aes_cfb.obj \
     $(OUTPUT_DIR)\aes_core.obj \
@@ -521,7 +633,13 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\aes_misc.obj \
     $(OUTPUT_DIR)\aes_ofb.obj \
     $(OUTPUT_DIR)\aes_wrap.obj \
+
+
+OBJECT_2_FILES =  \
     $(OUTPUT_DIR)\aria.obj \
+
+
+OBJECT_3_FILES =  \
     $(OUTPUT_DIR)\a_bitstr.obj \
     $(OUTPUT_DIR)\a_d2i_fp.obj \
     $(OUTPUT_DIR)\a_digest.obj \
@@ -586,12 +704,18 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\x_sig.obj \
     $(OUTPUT_DIR)\x_spki.obj \
     $(OUTPUT_DIR)\x_val.obj \
+
+
+OBJECT_4_FILES =  \
     $(OUTPUT_DIR)\async_null.obj \
     $(OUTPUT_DIR)\async_posix.obj \
     $(OUTPUT_DIR)\async_win.obj \
     $(OUTPUT_DIR)\async.obj \
     $(OUTPUT_DIR)\async_err.obj \
     $(OUTPUT_DIR)\async_wait.obj \
+
+
+OBJECT_5_FILES =  \
     $(OUTPUT_DIR)\b_addr.obj \
     $(OUTPUT_DIR)\b_dump.obj \
     $(OUTPUT_DIR)\b_sock.obj \
@@ -614,6 +738,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\bss_mem.obj \
     $(OUTPUT_DIR)\bss_null.obj \
     $(OUTPUT_DIR)\bss_sock.obj \
+
+
+OBJECT_6_FILES =  \
     $(OUTPUT_DIR)\bn_add.obj \
     $(OUTPUT_DIR)\bn_asm.obj \
     $(OUTPUT_DIR)\bn_blind.obj \
@@ -645,15 +772,30 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\bn_srp.obj \
     $(OUTPUT_DIR)\bn_word.obj \
     $(OUTPUT_DIR)\bn_x931p.obj \
+
+
+OBJECT_7_FILES =  \
     $(OUTPUT_DIR)\buf_err.obj \
     $(OUTPUT_DIR)\buffer.obj \
+
+
+OBJECT_8_FILES =  \
     $(OUTPUT_DIR)\chacha_enc.obj \
+
+
+OBJECT_9_FILES =  \
     $(OUTPUT_DIR)\cm_ameth.obj \
     $(OUTPUT_DIR)\cm_pmeth.obj \
     $(OUTPUT_DIR)\cmac.obj \
+
+
+OBJECT_10_FILES =  \
     $(OUTPUT_DIR)\c_zlib.obj \
     $(OUTPUT_DIR)\comp_err.obj \
     $(OUTPUT_DIR)\comp_lib.obj \
+
+
+OBJECT_11_FILES =  \
     $(OUTPUT_DIR)\conf_api.obj \
     $(OUTPUT_DIR)\conf_def.obj \
     $(OUTPUT_DIR)\conf_err.obj \
@@ -662,10 +804,34 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\conf_mod.obj \
     $(OUTPUT_DIR)\conf_sap.obj \
     $(OUTPUT_DIR)\conf_ssl.obj \
+
+
+OBJECT_12_FILES =  \
     $(OUTPUT_DIR)\cpt_err.obj \
     $(OUTPUT_DIR)\cryptlib.obj \
     $(OUTPUT_DIR)\ctype.obj \
     $(OUTPUT_DIR)\cversion.obj \
+    $(OUTPUT_DIR)\ebcdic.obj \
+    $(OUTPUT_DIR)\ex_data.obj \
+    $(OUTPUT_DIR)\getenv.obj \
+    $(OUTPUT_DIR)\init.obj \
+    $(OUTPUT_DIR)\mem.obj \
+    $(OUTPUT_DIR)\mem_clr.obj \
+    $(OUTPUT_DIR)\mem_dbg.obj \
+    $(OUTPUT_DIR)\mem_sec.obj \
+    $(OUTPUT_DIR)\o_dir.obj \
+    $(OUTPUT_DIR)\o_fips.obj \
+    $(OUTPUT_DIR)\o_fopen.obj \
+    $(OUTPUT_DIR)\o_init.obj \
+    $(OUTPUT_DIR)\o_str.obj \
+    $(OUTPUT_DIR)\o_time.obj \
+    $(OUTPUT_DIR)\threads_none.obj \
+    $(OUTPUT_DIR)\threads_pthread.obj \
+    $(OUTPUT_DIR)\threads_win.obj \
+    $(OUTPUT_DIR)\uid.obj \
+
+
+OBJECT_13_FILES =  \
     $(OUTPUT_DIR)\dh_ameth.obj \
     $(OUTPUT_DIR)\dh_asn1.obj \
     $(OUTPUT_DIR)\dh_check.obj \
@@ -680,6 +846,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\dh_prn.obj \
     $(OUTPUT_DIR)\dh_rfc5114.obj \
     $(OUTPUT_DIR)\dh_rfc7919.obj \
+
+
+OBJECT_14_FILES =  \
     $(OUTPUT_DIR)\dso_dl.obj \
     $(OUTPUT_DIR)\dso_dlfcn.obj \
     $(OUTPUT_DIR)\dso_err.obj \
@@ -687,7 +856,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\dso_openssl.obj \
     $(OUTPUT_DIR)\dso_vms.obj \
     $(OUTPUT_DIR)\dso_win32.obj \
-    $(OUTPUT_DIR)\ebcdic.obj \
+
+
+OBJECT_15_FILES =  \
     $(OUTPUT_DIR)\curve25519.obj \
     $(OUTPUT_DIR)\f_impl.obj \
     $(OUTPUT_DIR)\curve448.obj \
@@ -725,8 +896,14 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\ecp_oct.obj \
     $(OUTPUT_DIR)\ecp_smpl.obj \
     $(OUTPUT_DIR)\ecx_meth.obj \
+
+
+OBJECT_16_FILES =  \
     $(OUTPUT_DIR)\err.obj \
     $(OUTPUT_DIR)\err_prn.obj \
+
+
+OBJECT_17_FILES =  \
     $(OUTPUT_DIR)\bio_b64.obj \
     $(OUTPUT_DIR)\bio_enc.obj \
     $(OUTPUT_DIR)\bio_md.obj \
@@ -776,24 +953,32 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\pmeth_fn.obj \
     $(OUTPUT_DIR)\pmeth_gn.obj \
     $(OUTPUT_DIR)\pmeth_lib.obj \
-    $(OUTPUT_DIR)\ex_data.obj \
-    $(OUTPUT_DIR)\getenv.obj \
+
+
+OBJECT_18_FILES =  \
     $(OUTPUT_DIR)\hm_ameth.obj \
     $(OUTPUT_DIR)\hm_pmeth.obj \
     $(OUTPUT_DIR)\hmac.obj \
-    $(OUTPUT_DIR)\init.obj \
+
+
+OBJECT_19_FILES =  \
     $(OUTPUT_DIR)\hkdf.obj \
     $(OUTPUT_DIR)\kdf_err.obj \
     $(OUTPUT_DIR)\scrypt.obj \
     $(OUTPUT_DIR)\tls1_prf.obj \
+
+
+OBJECT_20_FILES =  \
     $(OUTPUT_DIR)\lh_stats.obj \
     $(OUTPUT_DIR)\lhash.obj \
+
+
+OBJECT_21_FILES =  \
     $(OUTPUT_DIR)\md5_dgst.obj \
     $(OUTPUT_DIR)\md5_one.obj \
-    $(OUTPUT_DIR)\mem.obj \
-    $(OUTPUT_DIR)\mem_clr.obj \
-    $(OUTPUT_DIR)\mem_dbg.obj \
-    $(OUTPUT_DIR)\mem_sec.obj \
+
+
+OBJECT_22_FILES =  \
     $(OUTPUT_DIR)\cbc128.obj \
     $(OUTPUT_DIR)\ccm128.obj \
     $(OUTPUT_DIR)\cfb128.obj \
@@ -804,17 +989,17 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\ofb128.obj \
     $(OUTPUT_DIR)\wrap128.obj \
     $(OUTPUT_DIR)\xts128.obj \
-    $(OUTPUT_DIR)\o_dir.obj \
-    $(OUTPUT_DIR)\o_fips.obj \
-    $(OUTPUT_DIR)\o_fopen.obj \
-    $(OUTPUT_DIR)\o_init.obj \
-    $(OUTPUT_DIR)\o_str.obj \
-    $(OUTPUT_DIR)\o_time.obj \
+
+
+OBJECT_23_FILES =  \
     $(OUTPUT_DIR)\o_names.obj \
     $(OUTPUT_DIR)\obj_dat.obj \
     $(OUTPUT_DIR)\obj_err.obj \
     $(OUTPUT_DIR)\obj_lib.obj \
     $(OUTPUT_DIR)\obj_xref.obj \
+
+
+OBJECT_24_FILES =  \
     $(OUTPUT_DIR)\ocsp_asn.obj \
     $(OUTPUT_DIR)\ocsp_cl.obj \
     $(OUTPUT_DIR)\ocsp_err.obj \
@@ -825,6 +1010,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\ocsp_srv.obj \
     $(OUTPUT_DIR)\ocsp_vfy.obj \
     $(OUTPUT_DIR)\v3_ocsp.obj \
+
+
+OBJECT_25_FILES =  \
     $(OUTPUT_DIR)\pem_all.obj \
     $(OUTPUT_DIR)\pem_err.obj \
     $(OUTPUT_DIR)\pem_info.obj \
@@ -836,6 +1024,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\pem_x509.obj \
     $(OUTPUT_DIR)\pem_xaux.obj \
     $(OUTPUT_DIR)\pvkfmt.obj \
+
+
+OBJECT_26_FILES =  \
     $(OUTPUT_DIR)\p12_add.obj \
     $(OUTPUT_DIR)\p12_asn.obj \
     $(OUTPUT_DIR)\p12_attr.obj \
@@ -852,6 +1043,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\p12_sbag.obj \
     $(OUTPUT_DIR)\p12_utl.obj \
     $(OUTPUT_DIR)\pk12err.obj \
+
+
+OBJECT_27_FILES =  \
     $(OUTPUT_DIR)\bio_pk7.obj \
     $(OUTPUT_DIR)\pk7_asn1.obj \
     $(OUTPUT_DIR)\pk7_attr.obj \
@@ -860,9 +1054,15 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\pk7_mime.obj \
     $(OUTPUT_DIR)\pk7_smime.obj \
     $(OUTPUT_DIR)\pkcs7err.obj \
+
+
+OBJECT_28_FILES =  \
     $(OUTPUT_DIR)\poly1305.obj \
     $(OUTPUT_DIR)\poly1305_ameth.obj \
     $(OUTPUT_DIR)\poly1305_pmeth.obj \
+
+
+OBJECT_29_FILES =  \
     $(OUTPUT_DIR)\drbg_ctr.obj \
     $(OUTPUT_DIR)\drbg_lib.obj \
     $(OUTPUT_DIR)\rand_egd.obj \
@@ -871,6 +1071,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\rand_unix.obj \
     $(OUTPUT_DIR)\rand_vms.obj \
     $(OUTPUT_DIR)\rand_win.obj \
+
+
+OBJECT_30_FILES =  \
     $(OUTPUT_DIR)\rsa_ameth.obj \
     $(OUTPUT_DIR)\rsa_asn1.obj \
     $(OUTPUT_DIR)\rsa_chk.obj \
@@ -893,25 +1096,39 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\rsa_ssl.obj \
     $(OUTPUT_DIR)\rsa_x931.obj \
     $(OUTPUT_DIR)\rsa_x931g.obj \
+
+
+OBJECT_31_FILES =  \
     $(OUTPUT_DIR)\keccak1600.obj \
     $(OUTPUT_DIR)\sha1_one.obj \
     $(OUTPUT_DIR)\sha1dgst.obj \
     $(OUTPUT_DIR)\sha256.obj \
     $(OUTPUT_DIR)\sha512.obj \
+
+
+OBJECT_32_FILES =  \
     $(OUTPUT_DIR)\siphash.obj \
     $(OUTPUT_DIR)\siphash_ameth.obj \
     $(OUTPUT_DIR)\siphash_pmeth.obj \
+
+
+OBJECT_33_FILES =  \
     $(OUTPUT_DIR)\stack.obj \
-    $(OUTPUT_DIR)\threads_none.obj \
-    $(OUTPUT_DIR)\threads_pthread.obj \
-    $(OUTPUT_DIR)\threads_win.obj \
+
+
+OBJECT_34_FILES =  \
     $(OUTPUT_DIR)\txt_db.obj \
+
+
+OBJECT_35_FILES =  \
     $(OUTPUT_DIR)\ui_err.obj \
     $(OUTPUT_DIR)\ui_lib.obj \
     $(OUTPUT_DIR)\ui_null.obj \
     $(OUTPUT_DIR)\ui_openssl.obj \
     $(OUTPUT_DIR)\ui_util.obj \
-    $(OUTPUT_DIR)\uid.obj \
+
+
+OBJECT_36_FILES =  \
     $(OUTPUT_DIR)\by_dir.obj \
     $(OUTPUT_DIR)\by_file.obj \
     $(OUTPUT_DIR)\t_crl.obj \
@@ -948,6 +1165,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\x_req.obj \
     $(OUTPUT_DIR)\x_x509.obj \
     $(OUTPUT_DIR)\x_x509a.obj \
+
+OBJECT_37_FILES =  \
     $(OUTPUT_DIR)\pcy_cache.obj \
     $(OUTPUT_DIR)\pcy_data.obj \
     $(OUTPUT_DIR)\pcy_lib.obj \
@@ -985,8 +1204,51 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\v3_tlsf.obj \
     $(OUTPUT_DIR)\v3_utl.obj \
     $(OUTPUT_DIR)\v3err.obj \
+
+OBJECT_38_FILES =  \
     $(OUTPUT_DIR)\ossl_store.obj \
     $(OUTPUT_DIR)\rand_pool.obj \
+
+LIB_FILES = \
+    $(OUTPUT_DIR)\lib1.lib \
+    $(OUTPUT_DIR)\lib2.lib \
+    $(OUTPUT_DIR)\lib3.lib \
+    $(OUTPUT_DIR)\lib4.lib \
+    $(OUTPUT_DIR)\lib5.lib \
+    $(OUTPUT_DIR)\lib6.lib \
+    $(OUTPUT_DIR)\lib7.lib \
+    $(OUTPUT_DIR)\lib8.lib \
+    $(OUTPUT_DIR)\lib9.lib \
+    $(OUTPUT_DIR)\lib10.lib \
+    $(OUTPUT_DIR)\lib11.lib \
+    $(OUTPUT_DIR)\lib12.lib \
+    $(OUTPUT_DIR)\lib13.lib \
+    $(OUTPUT_DIR)\lib14.lib \
+    $(OUTPUT_DIR)\lib15.lib \
+    $(OUTPUT_DIR)\lib16.lib \
+    $(OUTPUT_DIR)\lib17.lib \
+    $(OUTPUT_DIR)\lib18.lib \
+    $(OUTPUT_DIR)\lib19.lib \
+    $(OUTPUT_DIR)\lib20.lib \
+    $(OUTPUT_DIR)\lib21.lib \
+    $(OUTPUT_DIR)\lib22.lib \
+    $(OUTPUT_DIR)\lib23.lib \
+    $(OUTPUT_DIR)\lib24.lib \
+    $(OUTPUT_DIR)\lib25.lib \
+    $(OUTPUT_DIR)\lib26.lib \
+    $(OUTPUT_DIR)\lib27.lib \
+    $(OUTPUT_DIR)\lib28.lib \
+    $(OUTPUT_DIR)\lib29.lib \
+    $(OUTPUT_DIR)\lib30.lib \
+    $(OUTPUT_DIR)\lib31.lib \
+    $(OUTPUT_DIR)\lib32.lib \
+    $(OUTPUT_DIR)\lib33.lib \
+    $(OUTPUT_DIR)\lib34.lib \
+    $(OUTPUT_DIR)\lib35.lib \
+    $(OUTPUT_DIR)\lib36.lib \
+    $(OUTPUT_DIR)\lib37.lib \
+    $(OUTPUT_DIR)\lib38.lib \
+
 
 INC =  \
     /I$(SOURCE_DIR)\openssl\crypto\store \
@@ -1068,11 +1330,238 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OBJECT_FILES):  $(SOURCE_FILES)
-	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_FILES)
+$(OBJECT_1_FILES):  $(SOURCE_1_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_1_FILES)
 
-$(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
-	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@
+$(OUTPUT_DIR)\lib1.lib: $(OBJECT_1_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_1_FILES) /OUT:$(OUTPUT_DIR)\lib1.lib
+
+$(OBJECT_2_FILES):  $(SOURCE_2_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_2_FILES)
+
+$(OUTPUT_DIR)\lib2.lib: $(OBJECT_2_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_2_FILES) /OUT:$(OUTPUT_DIR)\lib2.lib
+
+$(OBJECT_3_FILES):  $(SOURCE_3_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_3_FILES)
+
+$(OUTPUT_DIR)\lib3.lib: $(OBJECT_3_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_3_FILES) /OUT:$(OUTPUT_DIR)\lib3.lib
+
+$(OBJECT_4_FILES):  $(SOURCE_4_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_4_FILES)
+
+$(OUTPUT_DIR)\lib4.lib: $(OBJECT_4_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_4_FILES) /OUT:$(OUTPUT_DIR)\lib4.lib
+
+$(OBJECT_5_FILES):  $(SOURCE_5_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_5_FILES)
+
+$(OUTPUT_DIR)\lib5.lib: $(OBJECT_5_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_5_FILES) /OUT:$(OUTPUT_DIR)\lib5.lib
+
+$(OBJECT_6_FILES):  $(SOURCE_6_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_6_FILES)
+
+$(OUTPUT_DIR)\lib6.lib: $(OBJECT_6_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_6_FILES) /OUT:$(OUTPUT_DIR)\lib6.lib
+
+$(OBJECT_7_FILES):  $(SOURCE_7_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_7_FILES)
+
+$(OUTPUT_DIR)\lib7.lib: $(OBJECT_7_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_7_FILES) /OUT:$(OUTPUT_DIR)\lib7.lib
+
+$(OBJECT_8_FILES):  $(SOURCE_8_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_8_FILES)
+
+$(OUTPUT_DIR)\lib8.lib: $(OBJECT_8_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_8_FILES) /OUT:$(OUTPUT_DIR)\lib8.lib
+
+$(OBJECT_9_FILES):  $(SOURCE_9_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_9_FILES)
+
+$(OUTPUT_DIR)\lib9.lib: $(OBJECT_9_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_9_FILES) /OUT:$(OUTPUT_DIR)\lib9.lib
+
+$(OBJECT_10_FILES):  $(SOURCE_10_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_10_FILES)
+
+$(OUTPUT_DIR)\lib10.lib: $(OBJECT_10_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_10_FILES) /OUT:$(OUTPUT_DIR)\lib10.lib
+
+$(OBJECT_11_FILES):  $(SOURCE_11_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_11_FILES)
+
+$(OUTPUT_DIR)\lib11.lib: $(OBJECT_11_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_11_FILES) /OUT:$(OUTPUT_DIR)\lib11.lib
+
+$(OBJECT_12_FILES):  $(SOURCE_12_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_12_FILES)
+
+$(OUTPUT_DIR)\lib12.lib: $(OBJECT_12_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_12_FILES) /OUT:$(OUTPUT_DIR)\lib12.lib
+
+$(OBJECT_13_FILES):  $(SOURCE_13_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_13_FILES)
+
+$(OUTPUT_DIR)\lib13.lib: $(OBJECT_13_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_13_FILES) /OUT:$(OUTPUT_DIR)\lib13.lib
+
+$(OBJECT_14_FILES):  $(SOURCE_14_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_14_FILES)
+
+$(OUTPUT_DIR)\lib14.lib: $(OBJECT_14_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_14_FILES) /OUT:$(OUTPUT_DIR)\lib14.lib
+
+$(OBJECT_15_FILES):  $(SOURCE_15_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_15_FILES)
+
+$(OUTPUT_DIR)\lib15.lib: $(OBJECT_15_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_15_FILES) /OUT:$(OUTPUT_DIR)\lib15.lib
+
+$(OBJECT_16_FILES):  $(SOURCE_16_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_16_FILES)
+
+$(OUTPUT_DIR)\lib16.lib: $(OBJECT_16_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_16_FILES) /OUT:$(OUTPUT_DIR)\lib16.lib
+
+$(OBJECT_17_FILES):  $(SOURCE_17_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_17_FILES)
+
+$(OUTPUT_DIR)\lib17.lib: $(OBJECT_17_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_17_FILES) /OUT:$(OUTPUT_DIR)\lib17.lib
+
+$(OBJECT_18_FILES):  $(SOURCE_18_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_18_FILES)
+
+$(OUTPUT_DIR)\lib18.lib: $(OBJECT_18_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_18_FILES) /OUT:$(OUTPUT_DIR)\lib18.lib
+
+$(OBJECT_19_FILES):  $(SOURCE_19_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_19_FILES)
+
+$(OUTPUT_DIR)\lib19.lib: $(OBJECT_19_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_19_FILES) /OUT:$(OUTPUT_DIR)\lib19.lib
+
+$(OBJECT_20_FILES):  $(SOURCE_20_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_20_FILES)
+
+$(OUTPUT_DIR)\lib20.lib: $(OBJECT_20_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_20_FILES) /OUT:$(OUTPUT_DIR)\lib20.lib
+
+$(OBJECT_21_FILES):  $(SOURCE_21_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_21_FILES)
+
+$(OUTPUT_DIR)\lib21.lib: $(OBJECT_21_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_21_FILES) /OUT:$(OUTPUT_DIR)\lib21.lib
+
+$(OBJECT_22_FILES):  $(SOURCE_22_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_22_FILES)
+
+$(OUTPUT_DIR)\lib22.lib: $(OBJECT_22_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_22_FILES) /OUT:$(OUTPUT_DIR)\lib22.lib
+
+$(OBJECT_23_FILES):  $(SOURCE_23_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_23_FILES)
+
+$(OUTPUT_DIR)\lib23.lib: $(OBJECT_23_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_23_FILES) /OUT:$(OUTPUT_DIR)\lib23.lib
+
+$(OBJECT_24_FILES):  $(SOURCE_24_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_24_FILES)
+
+$(OUTPUT_DIR)\lib24.lib: $(OBJECT_24_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_24_FILES) /OUT:$(OUTPUT_DIR)\lib24.lib
+
+$(OBJECT_25_FILES):  $(SOURCE_25_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_25_FILES)
+
+$(OUTPUT_DIR)\lib25.lib: $(OBJECT_25_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_25_FILES) /OUT:$(OUTPUT_DIR)\lib25.lib
+
+$(OBJECT_26_FILES):  $(SOURCE_26_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_26_FILES)
+
+$(OUTPUT_DIR)\lib26.lib: $(OBJECT_26_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_26_FILES) /OUT:$(OUTPUT_DIR)\lib26.lib
+
+$(OBJECT_27_FILES):  $(SOURCE_27_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_27_FILES)
+
+$(OUTPUT_DIR)\lib27.lib: $(OBJECT_27_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_27_FILES) /OUT:$(OUTPUT_DIR)\lib27.lib
+
+$(OBJECT_28_FILES):  $(SOURCE_28_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_28_FILES)
+
+$(OUTPUT_DIR)\lib28.lib: $(OBJECT_28_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_28_FILES) /OUT:$(OUTPUT_DIR)\lib28.lib
+
+$(OBJECT_29_FILES):  $(SOURCE_29_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_29_FILES)
+
+$(OUTPUT_DIR)\lib29.lib: $(OBJECT_29_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_29_FILES) /OUT:$(OUTPUT_DIR)\lib29.lib
+
+$(OBJECT_30_FILES):  $(SOURCE_30_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_30_FILES)
+
+$(OUTPUT_DIR)\lib30.lib: $(OBJECT_30_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_30_FILES) /OUT:$(OUTPUT_DIR)\lib30.lib
+
+$(OBJECT_31_FILES):  $(SOURCE_31_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_31_FILES)
+
+$(OUTPUT_DIR)\lib31.lib: $(OBJECT_31_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_31_FILES) /OUT:$(OUTPUT_DIR)\lib31.lib
+
+$(OBJECT_32_FILES):  $(SOURCE_32_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_32_FILES)
+
+$(OUTPUT_DIR)\lib32.lib: $(OBJECT_32_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_32_FILES) /OUT:$(OUTPUT_DIR)\lib32.lib
+
+$(OBJECT_33_FILES):  $(SOURCE_33_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_33_FILES)
+
+$(OUTPUT_DIR)\lib33.lib: $(OBJECT_33_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_33_FILES) /OUT:$(OUTPUT_DIR)\lib33.lib
+
+$(OBJECT_34_FILES):  $(SOURCE_34_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_34_FILES)
+
+$(OUTPUT_DIR)\lib34.lib: $(OBJECT_34_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_34_FILES) /OUT:$(OUTPUT_DIR)\lib34.lib
+
+$(OBJECT_35_FILES):  $(SOURCE_35_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_35_FILES)
+
+$(OUTPUT_DIR)\lib35.lib: $(OBJECT_35_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_35_FILES) /OUT:$(OUTPUT_DIR)\lib35.lib
+
+$(OBJECT_36_FILES):  $(SOURCE_36_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_36_FILES)
+
+$(OUTPUT_DIR)\lib36.lib: $(OBJECT_36_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_36_FILES) /OUT:$(OUTPUT_DIR)\lib36.lib
+
+$(OBJECT_37_FILES):  $(SOURCE_37_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_37_FILES)
+
+$(OUTPUT_DIR)\lib37.lib: $(OBJECT_37_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_37_FILES) /OUT:$(OUTPUT_DIR)\lib37.lib
+
+$(OBJECT_38_FILES):  $(SOURCE_38_FILES)
+	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_38_FILES)
+
+$(OUTPUT_DIR)\lib38.lib: $(OBJECT_38_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_38_FILES) /OUT:$(OUTPUT_DIR)\lib38.lib
+
+$(OUTPUT_DIR)\$(MODULE_NAME).lib : $(LIB_FILES)
+	"$(SLINK)" $(SLINK_FLAGS) $(LIB_FILES) /OUT:$@
+#    echo  $(OBJECT_FILES) > $(OUTPUT_DIR)\object_files.lst
+#    "$(SLINK)" $(SLINK_FLAGS) @$(OUTPUT_DIR)\object_files.lst /OUT:$@
 
 #
 # clean all intermediate files
