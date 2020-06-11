@@ -26,7 +26,18 @@ ReadPrivateCertificate (
   )
 {
   BOOLEAN  Res;
-  Res = ReadInputFile ("TestRoot.key", Data, Size);
+
+  switch (USE_ASYM_ALGO) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+    Res = ReadInputFile ("TestRoot.key", Data, Size);
+    break;
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+    Res = ReadInputFile ("EccTestRoot.key", Data, Size);
+    break;
+  default:
+    assert (0);
+    break;
+  }
   return Res;
 }
 
@@ -42,7 +53,17 @@ ReadPublicCertificateChain (
   SPDM_CERT_CHAIN     *CertChain;
   UINTN               CertChainSize;
   
-  Res = ReadInputFile ("TestRoot.cer", &FileData, &FileSize);
+  switch (USE_ASYM_ALGO) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+    Res = ReadInputFile ("TestRoot.cer", &FileData, &FileSize);
+    break;
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+    Res = ReadInputFile ("EccTestRoot.cer", &FileData, &FileSize);
+    break;
+  default:
+    assert (0);
+    break;
+  }
   if (!Res) {
     return Res;
   }

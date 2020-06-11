@@ -2497,6 +2497,18 @@ EcFree (
   );
 
 /**
+  Release the specified EC context.
+  
+  @param[in]  EcDsaContext  Pointer to the EC context to be released.
+
+**/
+VOID
+EFIAPI
+EcDsaFree (
+  IN  VOID  *EcDsaContext
+  );
+
+/**
   Generates EC key.
 
   If EcContext is NULL, then return FALSE.

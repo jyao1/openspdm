@@ -80,6 +80,22 @@ EcFree (
 }
 
 /**
+  Release the specified ECDSA context.
+  
+  @param[in]  EcDsaContext  Pointer to the EC context to be released.
+
+**/
+VOID
+EFIAPI
+EcDsaFree (
+  IN  VOID  *EcDsaContext
+  )
+{
+  mbedtls_ecdsa_free (EcDsaContext);
+  FreePool (EcDsaContext);
+}
+
+/**
   Generates EC key.
 
   If EcContext is NULL, then return FALSE.
@@ -368,6 +384,17 @@ EcDsaVerify (
 
   if (SigSize > INT_MAX || SigSize == 0) {
     return FALSE;
+  }
+
+  //
+  // Do some basic check for the sigSize
+  //
+  if (SigSize > 2) {
+    if (Signature[0] == 0x30) {
+      if (SigSize > Signature[1] + 2) {
+        SigSize = Signature[1] + 2;
+      }
+    }
   }
 
   Ret = mbedtls_ecdsa_read_signature (EcContext, MessageHash, HashSize,

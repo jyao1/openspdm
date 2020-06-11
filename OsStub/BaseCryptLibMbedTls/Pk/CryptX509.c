@@ -276,10 +276,42 @@ EFIAPI
 EcGetPublicKeyFromX509 (
   IN   CONST UINT8  *Cert,
   IN   UINTN        CertSize,
-  OUT  VOID         **EcContext
+  OUT  VOID         **EcDsaContext
   )
 {
-  return FALSE;
+  mbedtls_x509_crt       crt;
+  mbedtls_ecdsa_context* ecdsa;
+  INT32                  Ret;
+
+  mbedtls_x509_crt_init(&crt);
+
+  if (mbedtls_x509_crt_parse_der(&crt, Cert, CertSize) != 0) {
+    return FALSE;
+  }
+
+  if (mbedtls_pk_get_type(&crt.pk) != MBEDTLS_PK_ECKEY) {
+    mbedtls_x509_crt_free(&crt);
+    return FALSE;
+  }
+
+  ecdsa = AllocateZeroPool(sizeof(mbedtls_ecdsa_context));
+  if (ecdsa == NULL) {
+    mbedtls_x509_crt_free(&crt);
+    return FALSE;
+  }
+  mbedtls_ecdsa_init(ecdsa);
+
+  Ret = mbedtls_ecdsa_from_keypair (ecdsa, mbedtls_pk_ec(crt.pk));
+  if (Ret != 0) {
+    mbedtls_ecdsa_free(ecdsa);
+    FreePool(ecdsa);
+    mbedtls_x509_crt_free(&crt);
+    return FALSE;
+  }
+  mbedtls_x509_crt_free(&crt);
+
+  *EcDsaContext = ecdsa;
+  return TRUE;
 }
 
 /**

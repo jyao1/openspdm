@@ -25,7 +25,7 @@
 
    The SPDM lib requires [cryptolib API](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h), including random number, symmetric crypto, asymmetric crypto, hash and message authentication code etc.
 
-   Current support algorithm: RSA-SSA, SHA-2, FFDHE, SECP, AES_GCM, HMAC.
+   Current support algorithm: SHA-2, RSA-SSA/ECDSA, FFDHE/ECDHE, AES_GCM, HMAC.
 
    An [MbedTls](https://tls.mbed.org/) wrapper is included in [BaseCryptLibMbedTls](https://github.com/jyao1/openspdm/tree/master/OsStub/BaseCryptLibMbedTls).
 
@@ -69,7 +69,7 @@
 
 ## Feature not implemented yet
 
-1) multiple algorithms (ECDSA, RSA-PSS, SHA-3, AEAD-ChaCha20Poly1305)
+1) multiple algorithms (SHA-3, AEAD-ChaCha20Poly1305)
 
 2) SPDM 1.0
 
