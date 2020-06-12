@@ -41,7 +41,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmResponderLibEndSession.o \
     $(OUTPUT_DIR)/SpdmResponderLibError.o \
     $(OUTPUT_DIR)/SpdmResponderLibFinish.o \
+    $(OUTPUT_DIR)/SpdmResponderLibHeartbeat.o \
     $(OUTPUT_DIR)/SpdmResponderLibKeyExchange.o \
+    $(OUTPUT_DIR)/SpdmResponderLibKeyUpdate.o \
     $(OUTPUT_DIR)/SpdmResponderLibMeasurement.o \
     $(OUTPUT_DIR)/SpdmResponderLibPskExchange.o \
     $(OUTPUT_DIR)/SpdmResponderLibPskFinish.o \
@@ -110,6 +112,15 @@ $(OUTPUT_DIR)/SpdmResponderLibError.o : $(SOURCE_DIR)/SpdmResponderLibError.c
 $(OUTPUT_DIR)/SpdmResponderLibFinish.o : $(SOURCE_DIR)/SpdmResponderLibFinish.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
+$(OUTPUT_DIR)/SpdmResponderLibHeartbeat.o : $(SOURCE_DIR)/SpdmResponderLibHeartbeat.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmResponderLibKeyExchange.o : $(SOURCE_DIR)/SpdmResponderLibKeyExchange.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmResponderLibKeyUpdate.o : $(SOURCE_DIR)/SpdmResponderLibKeyUpdate.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
 $(OUTPUT_DIR)/SpdmResponderLibMeasurement.o : $(SOURCE_DIR)/SpdmResponderLibMeasurement.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
@@ -120,9 +131,6 @@ $(OUTPUT_DIR)/SpdmResponderLibPskFinish.o : $(SOURCE_DIR)/SpdmResponderLibPskFin
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmResponderLibReceiveSend.o : $(SOURCE_DIR)/SpdmResponderLibReceiveSend.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/SpdmResponderLibKeyExchange.o : $(SOURCE_DIR)/SpdmResponderLibKeyExchange.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmResponderLibVersion.o : $(SOURCE_DIR)/SpdmResponderLibVersion.c

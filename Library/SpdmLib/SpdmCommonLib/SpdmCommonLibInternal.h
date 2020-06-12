@@ -191,36 +191,45 @@ typedef struct {
 #define INVALID_SESSION_ID  0
 
 typedef struct {
-  UINT8                SessionId;
-  BOOLEAN              UsePsk;
-  UINT8                Mut_Auth_Requested;
-  SPDM_STATE           SessionState;
-  UINTN                DheKeySize;
-  UINTN                HashSize;
-  UINTN                AeadKeySize;
-  UINTN                AeadIvSize;
   UINT8                DheSecret[MAX_DHE_KEY_SIZE];
   UINT8                HandshakeSecret[MAX_HASH_SIZE];
   UINT8                RequestHandshakeSecret[MAX_HASH_SIZE];
   UINT8                ResponseHandshakeSecret[MAX_HASH_SIZE];
   UINT8                MasterSecret[MAX_HASH_SIZE];
-  UINT8                RequestDataSecret[MAX_HASH_SIZE];
-  UINT8                ResponseDataSecret[MAX_HASH_SIZE];
   UINT8                RequestFinishedKey[MAX_HASH_SIZE];
-  UINT8                ResponseFinishedKey[MAX_HASH_SIZE];  
+  UINT8                ResponseFinishedKey[MAX_HASH_SIZE];
   UINT8                RequestHandshakeEncryptionKey[MAX_AEAD_KEY_SIZE];
   UINT8                RequestHandshakeSalt[MAX_AEAD_IV_SIZE];
   UINT64               RequestHandshakeSequenceNumber;
   UINT8                ResponseHandshakeEncryptionKey[MAX_AEAD_KEY_SIZE];
   UINT8                ResponseHandshakeSalt[MAX_AEAD_IV_SIZE];
   UINT64               ResponseHandshakeSequenceNumber;
+} SPDM_SESSION_INFO_HANDSHAKE_SECRET;
+
+typedef struct {
+  UINT8                RequestDataSecret[MAX_HASH_SIZE];
+  UINT8                ResponseDataSecret[MAX_HASH_SIZE];
   UINT8                RequestDataEncryptionKey[MAX_AEAD_KEY_SIZE];
   UINT8                RequestDataSalt[MAX_AEAD_IV_SIZE];
   UINT64               RequestDataSequenceNumber;
   UINT8                ResponseDataEncryptionKey[MAX_AEAD_KEY_SIZE];
   UINT8                ResponseDataSalt[MAX_AEAD_IV_SIZE];
   UINT64               ResponseDataSequenceNumber;
-  SPDM_SESSION_TRANSCRIPT  SessionTranscript;
+} SPDM_SESSION_INFO_APPLICATION_SECRET;
+
+typedef struct {
+  UINT8                                SessionId;
+  BOOLEAN                              UsePsk;
+  UINT8                                Mut_Auth_Requested;
+  SPDM_STATE                           SessionState;
+  UINTN                                DheKeySize;
+  UINTN                                HashSize;
+  UINTN                                AeadKeySize;
+  UINTN                                AeadIvSize;
+  SPDM_SESSION_INFO_HANDSHAKE_SECRET   HandshakeSecret;
+  SPDM_SESSION_INFO_APPLICATION_SECRET ApplicationSecret;
+  SPDM_SESSION_INFO_APPLICATION_SECRET ApplicationSecretBackup;
+  SPDM_SESSION_TRANSCRIPT              SessionTranscript;
 } SPDM_SESSION_INFO;
 
 #define SPDM_DEVICE_CONTEXT_VERSION 0x1
@@ -618,6 +627,37 @@ RETURN_STATUS
 SpdmGenerateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN UINT8                        SessionId
+  );
+
+typedef enum {
+  SpdmKeyUpdateActionRequester = 0x1,
+  SpdmKeyUpdateActionResponder = 0x2,
+  SpdmKeyUpdateActionAll       = 0x3,
+} SPDM_KEY_UPDATE_ACTION;
+
+/**
+  This function update SPDM DataKey.
+
+  @param[in]  SpdmContext            The SPDM context for the device.
+**/
+RETURN_STATUS
+SpdmCreateUpdateSessionDataKey (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN UINT8                        SessionId,
+  IN SPDM_KEY_UPDATE_ACTION       Action
+  );
+
+/**
+  This function activate the update of SPDM DataKey.
+
+  @param[in]  SpdmContext            The SPDM context for the device.
+**/
+RETURN_STATUS
+SpdmFinalizeUpdateSessionDataKey (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN UINT8                        SessionId,
+  IN SPDM_KEY_UPDATE_ACTION       Action,
+  IN BOOLEAN                      UseNewKey
   );
 
 VOID

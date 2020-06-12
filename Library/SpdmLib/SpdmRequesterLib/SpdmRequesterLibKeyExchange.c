@@ -152,7 +152,7 @@ VerifyKeyExchangeHmac (
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->ResponseHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
+  HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
   DEBUG((DEBUG_INFO, "THCurr Hmac - "));
   InternalDumpData (CalcHmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -311,9 +311,9 @@ SpdmSendReceiveKeyExchange (
   DEBUG((DEBUG_INFO, "FinalKey (0x%x):\n", FinalKeySize));
   InternalDumpHex (FinalKey, FinalKeySize);
 
-  ASSERT (FinalKeySize <= sizeof(SessionInfo->DheSecret));
+  ASSERT (FinalKeySize <= sizeof(SessionInfo->HandshakeSecret.DheSecret));
   SessionInfo->DheKeySize = FinalKeySize;
-  CopyMem (SessionInfo->DheSecret, FinalKey, FinalKeySize);
+  CopyMem (SessionInfo->HandshakeSecret.DheSecret, FinalKey, FinalKeySize);
   SessionInfo->Mut_Auth_Requested = SpdmResponse.Mut_Auth_Requested;
 
   Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId);

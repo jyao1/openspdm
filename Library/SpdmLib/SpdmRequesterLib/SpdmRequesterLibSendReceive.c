@@ -45,16 +45,16 @@ SpdmEncSendRequest (
 
   switch (SessionInfo->SessionState) {
   case SpdmStateHandshaking:
-    Key = SessionInfo->RequestHandshakeEncryptionKey;
-    CopyMem (Salt, SessionInfo->RequestHandshakeSalt, SessionInfo->AeadIvSize);
-    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->RequestHandshakeSequenceNumber;
-    SessionInfo->RequestHandshakeSequenceNumber ++;
+    Key = SessionInfo->HandshakeSecret.RequestHandshakeEncryptionKey;
+    CopyMem (Salt, SessionInfo->HandshakeSecret.RequestHandshakeSalt, SessionInfo->AeadIvSize);
+    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber;
+    SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber ++;
     break;
   case SpdmStateEstablished:
-    Key = SessionInfo->RequestDataEncryptionKey;
-    CopyMem (Salt, SessionInfo->RequestDataSalt, SessionInfo->AeadIvSize);
-    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->RequestDataSequenceNumber;
-    SessionInfo->RequestDataSequenceNumber ++;
+    Key = SessionInfo->ApplicationSecret.RequestDataEncryptionKey;
+    CopyMem (Salt, SessionInfo->ApplicationSecret.RequestDataSalt, SessionInfo->AeadIvSize);
+    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ApplicationSecret.RequestDataSequenceNumber;
+    SessionInfo->ApplicationSecret.RequestDataSequenceNumber ++;
     break;
   default:
     ASSERT(FALSE);
@@ -241,16 +241,16 @@ SpdmDecReceiveResponse (
 
   switch (SessionInfo->SessionState) {
   case SpdmStateHandshaking:
-    Key = SessionInfo->ResponseHandshakeEncryptionKey;
-    CopyMem (Salt, SessionInfo->ResponseHandshakeSalt, SessionInfo->AeadIvSize);
-    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ResponseHandshakeSequenceNumber;
-    SessionInfo->ResponseHandshakeSequenceNumber ++;
+    Key = SessionInfo->HandshakeSecret.ResponseHandshakeEncryptionKey;
+    CopyMem (Salt, SessionInfo->HandshakeSecret.ResponseHandshakeSalt, SessionInfo->AeadIvSize);
+    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber;
+    SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber ++;
     break;
   case SpdmStateEstablished:
-    Key = SessionInfo->ResponseDataEncryptionKey;
-    CopyMem (Salt, SessionInfo->ResponseDataSalt, SessionInfo->AeadIvSize);
-    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ResponseDataSequenceNumber;
-    SessionInfo->ResponseDataSequenceNumber ++;
+    Key = SessionInfo->ApplicationSecret.ResponseDataEncryptionKey;
+    CopyMem (Salt, SessionInfo->ApplicationSecret.ResponseDataSalt, SessionInfo->AeadIvSize);
+    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ApplicationSecret.ResponseDataSequenceNumber;
+    SessionInfo->ApplicationSecret.ResponseDataSequenceNumber ++;
     break;
   default:
     ASSERT(FALSE);

@@ -40,7 +40,9 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\SpdmRequesterLibGetDigest.c \
 	$(SOURCE_DIR)\SpdmRequesterLibGetMeasurement.c \
 	$(SOURCE_DIR)\SpdmRequesterLibGetVersion.c \
+	$(SOURCE_DIR)\SpdmRequesterLibHeartbeat.c \
 	$(SOURCE_DIR)\SpdmRequesterLibKeyExchange.c \
+	$(SOURCE_DIR)\SpdmRequesterLibKeyUpdate.c \
 	$(SOURCE_DIR)\SpdmRequesterLibNegotiateAlgorithm.c \
 	$(SOURCE_DIR)\SpdmRequesterLibPskExchange.c \
 	$(SOURCE_DIR)\SpdmRequesterLibPskFinish.c \
@@ -57,7 +59,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmRequesterLibGetDigest.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibGetMeasurement.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibGetVersion.obj \
+    $(OUTPUT_DIR)\SpdmRequesterLibHeartbeat.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibKeyExchange.obj \
+    $(OUTPUT_DIR)\SpdmRequesterLibKeyUpdate.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibNegotiateAlgorithm.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibPskExchange.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibPskFinish.obj \

@@ -19,13 +19,13 @@
 
    SPDM 1.0: GET_VERSION, GET_CAPABILITY, NEGOTIATE_ALGORITHM, GET_DIGEST, GET_CERTIFICATE, CHALLENGE, GET_MEASUREMENT.
 
-   SPDM 1.1: KEY_EXCHANGE, FINISH, PSK_EXCHANGE, PSK_FINISH, END_SESSION.
+   SPDM 1.1: KEY_EXCHANGE, FINISH, PSK_EXCHANGE, PSK_FINISH, END_SESSION, HEARTBEAT, KEY_UPDATE.
 
 5) Cryptographic algorithm support:
 
    The SPDM lib requires [cryptolib API](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h), including random number, symmetric crypto, asymmetric crypto, hash and message authentication code etc.
 
-   Current support algorithm: SHA-2, RSA-SSA/ECDSA, FFDHE/ECDHE, AES_GCM, HMAC.
+   Current support algorithm: SHA-2, RSA-SSA/ECDSA, FFDHE/ECDHE, AES_GCM/ChaCha20Poly1305, HMAC.
 
    An [MbedTls](https://tls.mbed.org/) wrapper is included in [BaseCryptLibMbedTls](https://github.com/jyao1/openspdm/tree/master/OsStub/BaseCryptLibMbedTls).
 
@@ -69,7 +69,7 @@
 
 ## Feature not implemented yet
 
-1) multiple algorithms (SHA-3, AEAD-ChaCha20Poly1305)
+1) multiple algorithms (SHA-3)
 
 2) SPDM 1.0
 
@@ -83,7 +83,9 @@
 
    mutual authentication (ENCAPSULATED message)
 
-   command and response: HEARTBEAT, KEY_UPDATE, GET_ENCAPSULATED
+   Timer (for heartbeat ?)
+
+   command and response: GET_ENCAPSULATED
 
 4) Other architectures such as Arm, AArch64, RiscV64, or Arc.
 

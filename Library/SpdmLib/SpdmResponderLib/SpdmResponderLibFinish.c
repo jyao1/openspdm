@@ -52,7 +52,7 @@ SpdmVerifyFinishHmac (
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->RequestHandshakeSecret, SessionInfo->HashSize, HmacData);
+  HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.RequestHandshakeSecret, SessionInfo->HashSize, HmacData);
   DEBUG((DEBUG_INFO, "Calc THCurr Hmac - "));
   InternalDumpData (HmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));

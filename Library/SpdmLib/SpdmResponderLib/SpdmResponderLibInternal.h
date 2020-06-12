@@ -137,6 +137,28 @@ SpdmGetResponseEndSession (
   );
 
 RETURN_STATUS
+EFIAPI
+SpdmGetResponseHeartbeat (
+  IN     VOID                 *Context,
+  IN     UINT8                SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetResponseKeyUpdate (
+  IN     VOID                 *Context,
+  IN     UINT8                SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
 SpdmReceiveRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
   IN     UINTN                   RequestSize,

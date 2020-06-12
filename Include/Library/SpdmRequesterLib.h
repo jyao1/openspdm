@@ -155,6 +155,21 @@ SpdmSendReceiveSessionData (
 
 RETURN_STATUS
 EFIAPI
+SpdmHeartbeat (
+  IN     VOID                 *SpdmContext,
+  IN     UINT8                SessionId
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmKeyUpdate (
+  IN     VOID                 *SpdmContext,
+  IN     UINT8                SessionId,
+  IN     BOOLEAN              SingleDirection
+  );
+
+RETURN_STATUS
+EFIAPI
 SpdmRegisterSpdmIo (
   IN     VOID                      *SpdmContext,
   IN     SPDM_IO_PROTOCOL          *SpdmIo

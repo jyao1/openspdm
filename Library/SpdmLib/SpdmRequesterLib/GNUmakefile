@@ -41,7 +41,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmRequesterLibGetDigest.o \
     $(OUTPUT_DIR)/SpdmRequesterLibGetMeasurement.o \
     $(OUTPUT_DIR)/SpdmRequesterLibGetVersion.o \
+    $(OUTPUT_DIR)/SpdmRequesterLibHeartbeat.o \
     $(OUTPUT_DIR)/SpdmRequesterLibKeyExchange.o \
+    $(OUTPUT_DIR)/SpdmRequesterLibKeyUpdate.o \
     $(OUTPUT_DIR)/SpdmRequesterLibNegotiateAlgorithm.o \
     $(OUTPUT_DIR)/SpdmRequesterLibPskExchange.o \
     $(OUTPUT_DIR)/SpdmRequesterLibPskFinish.o \
@@ -109,7 +111,13 @@ $(OUTPUT_DIR)/SpdmRequesterLibGetMeasurement.o : $(SOURCE_DIR)/SpdmRequesterLibG
 $(OUTPUT_DIR)/SpdmRequesterLibGetVersion.o : $(SOURCE_DIR)/SpdmRequesterLibGetVersion.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
+$(OUTPUT_DIR)/SpdmRequesterLibHeartbeat.o : $(SOURCE_DIR)/SpdmRequesterLibHeartbeat.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
 $(OUTPUT_DIR)/SpdmRequesterLibKeyExchange.o : $(SOURCE_DIR)/SpdmRequesterLibKeyExchange.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterLibKeyUpdate.o : $(SOURCE_DIR)/SpdmRequesterLibKeyUpdate.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterLibNegotiateAlgorithm.o : $(SOURCE_DIR)/SpdmRequesterLibNegotiateAlgorithm.c

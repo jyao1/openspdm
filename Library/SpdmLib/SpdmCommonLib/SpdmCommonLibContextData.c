@@ -360,71 +360,71 @@ SpdmGetData (
     break;
   case SpdmDataDheSecret:
     TargetDataSize = SessionInfo->DheKeySize;
-    TargetData = SessionInfo->DheSecret;
+    TargetData = SessionInfo->HandshakeSecret.DheSecret;
     break;
   case SpdmDataHandshakeSecret:
     TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret;
+    TargetData = SessionInfo->HandshakeSecret.HandshakeSecret;
     break;
   case SpdmDataMasterSecret:
     TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->MasterSecret;
+    TargetData = SessionInfo->HandshakeSecret.MasterSecret;
     break;
   case SpdmDataRequestHandshakeSecret:
     TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->RequestHandshakeSecret;
+    TargetData = SessionInfo->HandshakeSecret.RequestHandshakeSecret;
     break;
   case SpdmDataResponseHandshakeSecret:
     TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->ResponseHandshakeSecret;
+    TargetData = SessionInfo->HandshakeSecret.ResponseHandshakeSecret;
     break;
   case SpdmDataRequestDataSecret:
     TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->RequestDataSecret;
+    TargetData = SessionInfo->ApplicationSecret.RequestDataSecret;
     break;
   case SpdmDataResponseDataSecret:
     TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->ResponseDataSecret;
+    TargetData = SessionInfo->ApplicationSecret.ResponseDataSecret;
     break;
   case SpdmDataRequestHandshakeEncryptionKey:
     TargetDataSize = SessionInfo->AeadKeySize;
-    TargetData = SessionInfo->RequestHandshakeEncryptionKey;
+    TargetData = SessionInfo->HandshakeSecret.RequestHandshakeEncryptionKey;
     break;
   case SpdmDataRequestHandshakeSalt:
     TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->RequestHandshakeSalt;
+    TargetData = SessionInfo->HandshakeSecret.RequestHandshakeSalt;
     break;
   case SpdmDataResponseHandshakeEncryptionKey:
     TargetDataSize = SessionInfo->AeadKeySize;
-    TargetData = SessionInfo->ResponseHandshakeEncryptionKey;
+    TargetData = SessionInfo->HandshakeSecret.ResponseHandshakeEncryptionKey;
     break;
   case SpdmDataResponseHandshakeSalt:
     TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->ResponseHandshakeSalt;
+    TargetData = SessionInfo->HandshakeSecret.ResponseHandshakeSalt;
     break;
   case SpdmDataRequestDataEncryptionKey:
     TargetDataSize = SessionInfo->AeadKeySize;
-    TargetData = SessionInfo->RequestDataEncryptionKey;
+    TargetData = SessionInfo->ApplicationSecret.RequestDataEncryptionKey;
     break;
   case SpdmDataRequestDataSalt:
     TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->RequestDataSalt;
+    TargetData = SessionInfo->ApplicationSecret.RequestDataSalt;
     break;
   case SpdmDataResponseDataEncryptionKey:
     TargetDataSize = SessionInfo->AeadKeySize;
-    TargetData = SessionInfo->ResponseDataEncryptionKey;
+    TargetData = SessionInfo->ApplicationSecret.ResponseDataEncryptionKey;
     break;
   case SpdmDataResponseDataSalt:
     TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->ResponseDataSalt;
+    TargetData = SessionInfo->ApplicationSecret.ResponseDataSalt;
     break;
   case SpdmDataRequestFinishedKey:
     TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->RequestFinishedKey;
+    TargetData = SessionInfo->HandshakeSecret.RequestFinishedKey;
     break;
   case SpdmDataResponseFinishedKey:
     TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->ResponseFinishedKey;
+    TargetData = SessionInfo->HandshakeSecret.ResponseFinishedKey;
     break;
   default:
     return RETURN_UNSUPPORTED;

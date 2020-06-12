@@ -41,7 +41,7 @@ SpdmGeneratePskExchangeHmac (
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->ResponseFinishedKey, SessionInfo->HashSize, HmacData);
+  HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseFinishedKey, SessionInfo->HashSize, HmacData);
   DEBUG((DEBUG_INFO, "Calc THCurr Hmac - "));
   InternalDumpData (HmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));

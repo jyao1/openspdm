@@ -40,11 +40,13 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\SpdmResponderLibEndSession.c \
 	$(SOURCE_DIR)\SpdmResponderLibError.c \
 	$(SOURCE_DIR)\SpdmResponderLibFinish.c \
+	$(SOURCE_DIR)\SpdmResponderLibHeartbeat.c \
+	$(SOURCE_DIR)\SpdmResponderLibKeyExchange.c \
+	$(SOURCE_DIR)\SpdmResponderLibKeyUpdate.c \
 	$(SOURCE_DIR)\SpdmResponderLibMeasurement.c \
 	$(SOURCE_DIR)\SpdmResponderLibPskExchange.c \
 	$(SOURCE_DIR)\SpdmResponderLibPskFinish.c \
 	$(SOURCE_DIR)\SpdmResponderLibReceiveSend.c \
-	$(SOURCE_DIR)\SpdmResponderLibKeyExchange.c \
 	$(SOURCE_DIR)\SpdmResponderLibVersion.c \
 
 
@@ -58,7 +60,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmResponderLibEndSession.obj \
     $(OUTPUT_DIR)\SpdmResponderLibError.obj \
     $(OUTPUT_DIR)\SpdmResponderLibFinish.obj \
+    $(OUTPUT_DIR)\SpdmResponderLibHeartbeat.obj \
     $(OUTPUT_DIR)\SpdmResponderLibKeyExchange.obj \
+    $(OUTPUT_DIR)\SpdmResponderLibKeyUpdate.obj \
     $(OUTPUT_DIR)\SpdmResponderLibMeasurement.obj \
     $(OUTPUT_DIR)\SpdmResponderLibPskExchange.obj \
     $(OUTPUT_DIR)\SpdmResponderLibPskFinish.obj \

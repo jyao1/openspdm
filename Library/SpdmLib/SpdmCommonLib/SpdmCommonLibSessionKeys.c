@@ -237,13 +237,13 @@ SpdmGenerateSessionHandshakeKey (
   DEBUG((DEBUG_INFO, "\n"));
 
   if (SessionInfo->UsePsk) {
-    RetVal = HmacFunc (SpdmContext->LocalContext.Psk, SpdmContext->LocalContext.PskSize, Salt0, HashSize, SessionInfo->HandshakeSecret);
+    RetVal = HmacFunc (SpdmContext->LocalContext.Psk, SpdmContext->LocalContext.PskSize, Salt0, HashSize, SessionInfo->HandshakeSecret.HandshakeSecret);
   } else {
-    RetVal = HmacFunc (SessionInfo->DheSecret, SessionInfo->DheKeySize, Salt0, HashSize, SessionInfo->HandshakeSecret);
+    RetVal = HmacFunc (SessionInfo->HandshakeSecret.DheSecret, SessionInfo->DheKeySize, Salt0, HashSize, SessionInfo->HandshakeSecret.HandshakeSecret);
   }
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "HandshakeSecret (0x%x) - ", HashSize));
-  InternalDumpData (SessionInfo->HandshakeSecret, HashSize);
+  InternalDumpData (SessionInfo->HandshakeSecret.HandshakeSecret, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   BinStr1Size = sizeof(BinStr1);
@@ -251,49 +251,49 @@ SpdmGenerateSessionHandshakeKey (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr1 (0x%x):\n", BinStr1Size));
   InternalDumpHex (BinStr1, BinStr1Size);
-  RetVal = HkdfExpandFunc (SessionInfo->HandshakeSecret, HashSize, BinStr1, BinStr1Size, SessionInfo->RequestHandshakeSecret, HashSize);
+  RetVal = HkdfExpandFunc (SessionInfo->HandshakeSecret.HandshakeSecret, HashSize, BinStr1, BinStr1Size, SessionInfo->HandshakeSecret.RequestHandshakeSecret, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "RequestHandshakeSecret (0x%x) - ", HashSize));
-  InternalDumpData (SessionInfo->RequestHandshakeSecret, HashSize);
+  InternalDumpData (SessionInfo->HandshakeSecret.RequestHandshakeSecret, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   BinStr2Size = sizeof(BinStr2);
   Status = BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), TH1HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr2 (0x%x):\n", BinStr2Size));
   InternalDumpHex (BinStr2, BinStr2Size);
-  RetVal = HkdfExpandFunc (SessionInfo->HandshakeSecret, HashSize, BinStr2, BinStr2Size, SessionInfo->ResponseHandshakeSecret, HashSize);
+  RetVal = HkdfExpandFunc (SessionInfo->HandshakeSecret.HandshakeSecret, HashSize, BinStr2, BinStr2Size, SessionInfo->HandshakeSecret.ResponseHandshakeSecret, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "ResponseHandshakeSecret (0x%x) - ", HashSize));
-  InternalDumpData (SessionInfo->ResponseHandshakeSecret, HashSize);
+  InternalDumpData (SessionInfo->HandshakeSecret.ResponseHandshakeSecret, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   SpdmGenerateFinalKey (
     SpdmContext,
-    SessionInfo->RequestHandshakeSecret,
-    SessionInfo->RequestFinishedKey
+    SessionInfo->HandshakeSecret.RequestHandshakeSecret,
+    SessionInfo->HandshakeSecret.RequestFinishedKey
     );
 
   SpdmGenerateFinalKey (
     SpdmContext,
-    SessionInfo->ResponseHandshakeSecret,
-    SessionInfo->ResponseFinishedKey
+    SessionInfo->HandshakeSecret.ResponseHandshakeSecret,
+    SessionInfo->HandshakeSecret.ResponseFinishedKey
     );
 
   SpdmGenerateAeadKeyAndIv (
     SpdmContext,
-    SessionInfo->RequestHandshakeSecret,
-    SessionInfo->RequestHandshakeEncryptionKey,
-    SessionInfo->RequestHandshakeSalt
+    SessionInfo->HandshakeSecret.RequestHandshakeSecret,
+    SessionInfo->HandshakeSecret.RequestHandshakeEncryptionKey,
+    SessionInfo->HandshakeSecret.RequestHandshakeSalt
     );
-  SessionInfo->RequestHandshakeSequenceNumber = 0;
+  SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber = 0;
 
   SpdmGenerateAeadKeyAndIv (
     SpdmContext,
-    SessionInfo->ResponseHandshakeSecret,
-    SessionInfo->ResponseHandshakeEncryptionKey,
-    SessionInfo->ResponseHandshakeSalt
+    SessionInfo->HandshakeSecret.ResponseHandshakeSecret,
+    SessionInfo->HandshakeSecret.ResponseHandshakeEncryptionKey,
+    SessionInfo->HandshakeSecret.ResponseHandshakeSalt
     );
-  SessionInfo->ResponseHandshakeSequenceNumber = 0;
+  SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber = 0;
 
   return RETURN_SUCCESS;
 }
@@ -382,16 +382,16 @@ SpdmGenerateSessionDataKey (
   BinStr0Size = sizeof(BinStr0);
   Status = BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
   ASSERT_RETURN_ERROR (Status);
-  RetVal = HkdfExpandFunc (SessionInfo->HandshakeSecret, HashSize, BinStr0, BinStr0Size, Salt1, HashSize);
+  RetVal = HkdfExpandFunc (SessionInfo->HandshakeSecret.HandshakeSecret, HashSize, BinStr0, BinStr0Size, Salt1, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "Salt1 (0x%x) - ", HashSize));
   InternalDumpData (Salt1, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  RetVal = HmacFunc (mZeroFilledBuffer, HashSize, Salt1, HashSize, SessionInfo->MasterSecret);
+  RetVal = HmacFunc (mZeroFilledBuffer, HashSize, Salt1, HashSize, SessionInfo->HandshakeSecret.MasterSecret);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "MasterSecret (0x%x) - ", HashSize));
-  InternalDumpData (SessionInfo->MasterSecret, HashSize);
+  InternalDumpData (SessionInfo->HandshakeSecret.MasterSecret, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   BinStr3Size = sizeof(BinStr3);
@@ -399,37 +399,174 @@ SpdmGenerateSessionDataKey (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr3 (0x%x):\n", BinStr3Size));
   InternalDumpHex (BinStr3, BinStr3Size);
-  RetVal = HkdfExpandFunc (SessionInfo->MasterSecret, HashSize, BinStr3, BinStr3Size, SessionInfo->RequestDataSecret, HashSize);
+  RetVal = HkdfExpandFunc (SessionInfo->HandshakeSecret.MasterSecret, HashSize, BinStr3, BinStr3Size, SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "RequestDataSecret (0x%x) - ", HashSize));
-  InternalDumpData (SessionInfo->RequestDataSecret, HashSize);
+  InternalDumpData (SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   BinStr4Size = sizeof(BinStr4);
   Status = BinConcat (BIN_STR_4_LABEL, sizeof(BIN_STR_4_LABEL), TH2HashData, (UINT16)HashSize, HashSize, BinStr4, &BinStr4Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr4 (0x%x):\n", BinStr4Size));
   InternalDumpHex (BinStr4, BinStr4Size);
-  RetVal = HkdfExpandFunc (SessionInfo->MasterSecret, HashSize, BinStr4, BinStr4Size, SessionInfo->ResponseDataSecret, HashSize);
+  RetVal = HkdfExpandFunc (SessionInfo->HandshakeSecret.MasterSecret, HashSize, BinStr4, BinStr4Size, SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "ResponseDataSecret (0x%x) - ", HashSize));
-  InternalDumpData (SessionInfo->ResponseDataSecret, HashSize);
+  InternalDumpData (SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   SpdmGenerateAeadKeyAndIv (
     SpdmContext,
-    SessionInfo->RequestDataSecret,
-    SessionInfo->RequestDataEncryptionKey,
-    SessionInfo->RequestDataSalt
+    SessionInfo->ApplicationSecret.RequestDataSecret,
+    SessionInfo->ApplicationSecret.RequestDataEncryptionKey,
+    SessionInfo->ApplicationSecret.RequestDataSalt
     );
-  SessionInfo->RequestDataSequenceNumber = 0;
+  SessionInfo->ApplicationSecret.RequestDataSequenceNumber = 0;
 
   SpdmGenerateAeadKeyAndIv (
     SpdmContext,
-    SessionInfo->ResponseDataSecret,
-    SessionInfo->ResponseDataEncryptionKey,
-    SessionInfo->ResponseDataSalt
+    SessionInfo->ApplicationSecret.ResponseDataSecret,
+    SessionInfo->ApplicationSecret.ResponseDataEncryptionKey,
+    SessionInfo->ApplicationSecret.ResponseDataSalt
     );
-  SessionInfo->ResponseDataSequenceNumber = 0;
+  SessionInfo->ApplicationSecret.ResponseDataSequenceNumber = 0;
 
+  return RETURN_SUCCESS;
+}
+
+/**
+  This function update SPDM DataKey.
+
+  @param[in]  SpdmContext            The SPDM context for the device.
+**/
+RETURN_STATUS
+SpdmCreateUpdateSessionDataKey (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN UINT8                        SessionId,
+  IN SPDM_KEY_UPDATE_ACTION       Action
+  )
+{
+  RETURN_STATUS                  Status;
+  BOOLEAN                        RetVal;
+  HKDF_EXPAND                    HkdfExpandFunc;
+  UINTN                          HashSize;
+  UINT8                          BinStr8[128];
+  UINTN                          BinStr8Size;
+  SPDM_SESSION_INFO              *SessionInfo;
+
+  DEBUG ((DEBUG_INFO, "SpdmCreateUpdateSessionDataKey[%x]\n", SessionId));
+
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    ASSERT (FALSE);
+    return RETURN_UNSUPPORTED;
+  }
+
+  ASSERT ((SessionInfo->DheKeySize != 0) || (SpdmContext->LocalContext.PskSize != 0));
+  ASSERT (SessionInfo->HashSize != 0);
+
+  HkdfExpandFunc = GetSpdmHkdfExpandFunc (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext);
+
+  BinStr8Size = sizeof(BinStr8);
+  Status = BinConcat (BIN_STR_8_LABEL, sizeof(BIN_STR_8_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr8, &BinStr8Size);
+  ASSERT_RETURN_ERROR (Status);
+  DEBUG((DEBUG_INFO, "BinStr8 (0x%x):\n", BinStr8Size));
+  InternalDumpHex (BinStr8, BinStr8Size);
+
+  if ((Action & SpdmKeyUpdateActionRequester) != 0) {
+    CopyMem (&SessionInfo->ApplicationSecretBackup.RequestDataSecret, &SessionInfo->ApplicationSecret.RequestDataSecret, MAX_HASH_SIZE);
+    CopyMem (&SessionInfo->ApplicationSecretBackup.RequestDataEncryptionKey, &SessionInfo->ApplicationSecret.RequestDataEncryptionKey, MAX_AEAD_KEY_SIZE);
+    CopyMem (&SessionInfo->ApplicationSecretBackup.RequestDataSalt, &SessionInfo->ApplicationSecret.RequestDataSalt, MAX_AEAD_IV_SIZE);
+    SessionInfo->ApplicationSecretBackup.RequestDataSequenceNumber = SessionInfo->ApplicationSecret.RequestDataSequenceNumber;
+
+    RetVal = HkdfExpandFunc (SessionInfo->ApplicationSecret.RequestDataSecret, HashSize, BinStr8, BinStr8Size, SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
+    ASSERT (RetVal);
+    DEBUG((DEBUG_INFO, "RequestDataSecretUpdate (0x%x) - ", HashSize));
+    InternalDumpData (SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
+    DEBUG((DEBUG_INFO, "\n"));
+
+    SpdmGenerateAeadKeyAndIv (
+      SpdmContext,
+      SessionInfo->ApplicationSecret.RequestDataSecret,
+      SessionInfo->ApplicationSecret.RequestDataEncryptionKey,
+      SessionInfo->ApplicationSecret.RequestDataSalt
+      );
+    SessionInfo->ApplicationSecret.RequestDataSequenceNumber = 0;
+  }
+
+  if ((Action & SpdmKeyUpdateActionResponder) != 0) {
+    CopyMem (&SessionInfo->ApplicationSecretBackup.ResponseDataSecret, &SessionInfo->ApplicationSecret.ResponseDataSecret, MAX_HASH_SIZE);
+    CopyMem (&SessionInfo->ApplicationSecretBackup.ResponseDataEncryptionKey, &SessionInfo->ApplicationSecret.ResponseDataEncryptionKey, MAX_AEAD_KEY_SIZE);
+    CopyMem (&SessionInfo->ApplicationSecretBackup.ResponseDataSalt, &SessionInfo->ApplicationSecret.ResponseDataSalt, MAX_AEAD_IV_SIZE);
+    SessionInfo->ApplicationSecretBackup.ResponseDataSequenceNumber = SessionInfo->ApplicationSecret.ResponseDataSequenceNumber;
+
+    RetVal = HkdfExpandFunc (SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize, BinStr8, BinStr8Size, SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);
+    ASSERT (RetVal);
+    DEBUG((DEBUG_INFO, "ResponseDataSecretUpdate (0x%x) - ", HashSize));
+    InternalDumpData (SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);
+    DEBUG((DEBUG_INFO, "\n"));
+
+    SpdmGenerateAeadKeyAndIv (
+      SpdmContext,
+      SessionInfo->ApplicationSecret.ResponseDataSecret,
+      SessionInfo->ApplicationSecret.ResponseDataEncryptionKey,
+      SessionInfo->ApplicationSecret.ResponseDataSalt
+      );
+    SessionInfo->ApplicationSecret.ResponseDataSequenceNumber = 0;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  This function activate the update of SPDM DataKey.
+
+  @param[in]  SpdmContext            The SPDM context for the device.
+**/
+RETURN_STATUS
+SpdmFinalizeUpdateSessionDataKey (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN UINT8                        SessionId,
+  IN SPDM_KEY_UPDATE_ACTION       Action,
+  IN BOOLEAN                      UseNewKey
+  )
+{
+  SPDM_SESSION_INFO              *SessionInfo;
+
+  DEBUG ((DEBUG_INFO, "SpdmFinalizeUpdateSessionDataKey[%x]\n", SessionId));
+
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    ASSERT (FALSE);
+    return RETURN_UNSUPPORTED;
+  }
+
+  if (!UseNewKey) {
+    if ((Action & SpdmKeyUpdateActionRequester) != 0) {
+      CopyMem (&SessionInfo->ApplicationSecret.RequestDataSecret, &SessionInfo->ApplicationSecretBackup.RequestDataSecret, MAX_HASH_SIZE);
+      CopyMem (&SessionInfo->ApplicationSecret.RequestDataEncryptionKey, &SessionInfo->ApplicationSecretBackup.RequestDataEncryptionKey, MAX_AEAD_KEY_SIZE);
+      CopyMem (&SessionInfo->ApplicationSecret.RequestDataSalt, &SessionInfo->ApplicationSecretBackup.RequestDataSalt, MAX_AEAD_IV_SIZE);
+      SessionInfo->ApplicationSecret.RequestDataSequenceNumber = SessionInfo->ApplicationSecretBackup.RequestDataSequenceNumber;
+    }
+    if ((Action & SpdmKeyUpdateActionResponder) != 0) {
+      CopyMem (&SessionInfo->ApplicationSecret.ResponseDataSecret, &SessionInfo->ApplicationSecretBackup.ResponseDataSecret, MAX_HASH_SIZE);
+      CopyMem (&SessionInfo->ApplicationSecret.ResponseDataEncryptionKey, &SessionInfo->ApplicationSecretBackup.ResponseDataEncryptionKey, MAX_AEAD_KEY_SIZE);
+      CopyMem (&SessionInfo->ApplicationSecret.ResponseDataSalt, &SessionInfo->ApplicationSecretBackup.ResponseDataSalt, MAX_AEAD_IV_SIZE);
+      SessionInfo->ApplicationSecret.ResponseDataSequenceNumber = SessionInfo->ApplicationSecretBackup.ResponseDataSequenceNumber;
+    }
+  }
+
+  if ((Action & SpdmKeyUpdateActionRequester) != 0) {
+    ZeroMem (&SessionInfo->ApplicationSecretBackup.RequestDataSecret, MAX_HASH_SIZE);
+    ZeroMem (&SessionInfo->ApplicationSecretBackup.RequestDataEncryptionKey, MAX_AEAD_KEY_SIZE);
+    ZeroMem (&SessionInfo->ApplicationSecretBackup.RequestDataSalt, MAX_AEAD_IV_SIZE);
+    SessionInfo->ApplicationSecretBackup.RequestDataSequenceNumber = 0;
+  }
+  if ((Action & SpdmKeyUpdateActionResponder) != 0) {
+    ZeroMem (&SessionInfo->ApplicationSecretBackup.ResponseDataSecret, MAX_HASH_SIZE);
+    ZeroMem (&SessionInfo->ApplicationSecretBackup.ResponseDataEncryptionKey, MAX_AEAD_KEY_SIZE);
+    ZeroMem (&SessionInfo->ApplicationSecretBackup.ResponseDataSalt, MAX_AEAD_IV_SIZE);
+    SessionInfo->ApplicationSecretBackup.ResponseDataSequenceNumber = 0;
+  }
   return RETURN_SUCCESS;
 }

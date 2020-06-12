@@ -160,6 +160,26 @@ DoSessionViaSpdm (
 
   DoAppSessionViaSpdm (SessionId2);
 
+  Status = SpdmHeartbeat (SpdmContext, SessionId);
+  if (RETURN_ERROR(Status)) {
+    printf ("SpdmHeartbeat - %x\n", (UINT32)Status);
+  }
+
+  Status = SpdmHeartbeat (SpdmContext, SessionId2);
+  if (RETURN_ERROR(Status)) {
+    printf ("SpdmHeartbeat - %x\n", (UINT32)Status);
+  }
+
+  Status = SpdmKeyUpdate (SpdmContext, SessionId, TRUE);
+  if (RETURN_ERROR(Status)) {
+    printf ("SpdmKeyUpdate - %x\n", (UINT32)Status);
+  }
+
+  Status = SpdmKeyUpdate (SpdmContext, SessionId2, FALSE);
+  if (RETURN_ERROR(Status)) {
+    printf ("SpdmKeyUpdate - %x\n", (UINT32)Status);
+  }
+
   Status = SpdmStopSession (SpdmContext, SessionId, 0);
   if (RETURN_ERROR(Status)) {
     printf ("SpdmStopSession - %x\n", (UINT32)Status);

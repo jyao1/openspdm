@@ -55,7 +55,7 @@ GeneratePskFinishHmac(
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->RequestFinishedKey, SessionInfo->HashSize, CalcHmacData);
+  HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.RequestFinishedKey, SessionInfo->HashSize, CalcHmacData);
   DEBUG((DEBUG_INFO, "THCurr Hmac - "));
   InternalDumpData (CalcHmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
