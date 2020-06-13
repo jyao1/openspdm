@@ -2555,6 +2555,10 @@ EcCheckKey (
   If the Public buffer is too small to hold the public X, Y, FALSE is returned and
   PublicSize is set to the required buffer size to obtain the public X, Y.
 
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+
   If EcContext is NULL, then return FALSE.
   If PublicSize is NULL, then return FALSE.
   If PublicSize is large enough but Public is NULL, then return FALSE.
@@ -2591,6 +2595,10 @@ EcGetPublicKey (
   If Key is NULL, then return FALSE.
   If KeySize is not large enough, then return FALSE.
 
+  For P-256, the PeerPublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PeerPublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PeerPublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+
   @param[in, out]  EcContext          Pointer to the EC context.
   @param[in]       PeerPublic         Pointer to the peer's public X,Y.
   @param[in]       PeerPublicSize     Size of peer's public X,Y in bytes.
@@ -2625,6 +2633,10 @@ EcComputeKey (
   If HashSize is not equal to the size of SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
+
   @param[in]       EcContext    Pointer to EC context for signature generation.
   @param[in]       MessageHash  Pointer to octet message hash to be signed.
   @param[in]       HashSize     Size of the message hash in bytes.
@@ -2640,7 +2652,7 @@ EcComputeKey (
 BOOLEAN
 EFIAPI
 EcDsaSign (
-  IN      VOID         *EcContext,
+  IN      VOID         *EcDsaContext,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
@@ -2655,6 +2667,10 @@ EcDsaSign (
   If Signature is NULL, then return FALSE.
   If HashSize is not equal to the size of SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
 
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
+
   @param[in]  EcContext    Pointer to EC context for signature verification.
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
   @param[in]  HashSize     Size of the message hash in bytes.
@@ -2668,7 +2684,7 @@ EcDsaSign (
 BOOLEAN
 EFIAPI
 EcDsaVerify (
-  IN  VOID         *EcContext,
+  IN  VOID         *EcDsaContext,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,

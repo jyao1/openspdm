@@ -137,15 +137,12 @@ GetSpdmAsymSize (
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
     return 512;
-  //
-  // OPEN: do we need use ASN.1 DER encoding?
-  //
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-    return 72; // (32 * 2 + 8)
+    return 32 * 2;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-    return 104; // (48 * 2 + 8)
+    return 48 * 2;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-    return 140; // (66 * 2 + 8)
+    return 66 * 2;
   }
   return 0xFFFFFFFF;
 }

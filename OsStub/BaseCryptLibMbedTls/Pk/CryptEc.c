@@ -139,6 +139,10 @@ EcGenerateKey (
   If the Public buffer is too small to hold the public X, Y, FALSE is returned and
   PublicSize is set to the required buffer size to obtain the public X, Y.
 
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+
   If EcContext is NULL, then return FALSE.
   If PublicSize is NULL, then return FALSE.
   If PublicSize is large enough but Public is NULL, then return FALSE.
@@ -163,6 +167,7 @@ EcGetPublicKey (
 {
   mbedtls_ecdh_context *ctx;
   INT32                Ret;
+  UINTN                HalfSize;
   UINTN                XSize;
   UINTN                YSize;
 
@@ -175,20 +180,35 @@ EcGetPublicKey (
   }
   
   ctx = EcContext;
-  XSize = mbedtls_mpi_size (&ctx->Q.X);
-  YSize = mbedtls_mpi_size (&ctx->Q.Y);
-
-  if (*PublicSize < XSize + YSize) {
-    *PublicSize = XSize + YSize;
+  switch (ctx->grp.id) {
+  case MBEDTLS_ECP_DP_SECP256R1:
+    HalfSize = 32;
+    break;
+  case MBEDTLS_ECP_DP_SECP384R1:
+    HalfSize = 48;
+    break;
+  case MBEDTLS_ECP_DP_SECP521R1:
+    HalfSize = 66;
+    break;
+  default:
     return FALSE;
   }
-  *PublicSize = XSize + YSize;
+  if (*PublicSize < HalfSize * 2) {
+    *PublicSize = HalfSize * 2;
+    return FALSE;
+  }
+  *PublicSize = HalfSize * 2;
+  ZeroMem (Public, *PublicSize);
 
-  Ret = mbedtls_mpi_write_binary (&ctx->Q.X, Public, XSize);
+  XSize = mbedtls_mpi_size (&ctx->Q.X);
+  YSize = mbedtls_mpi_size (&ctx->Q.Y);
+  ASSERT (XSize <= HalfSize && YSize <= HalfSize);
+
+  Ret = mbedtls_mpi_write_binary (&ctx->Q.X, &Public[0 + HalfSize - XSize], XSize);
   if (Ret != 0) {
     return FALSE;
   }
-  Ret = mbedtls_mpi_write_binary (&ctx->Q.Y, Public + XSize, YSize);
+  Ret = mbedtls_mpi_write_binary (&ctx->Q.Y, &Public[HalfSize + HalfSize - YSize], YSize);
   if (Ret != 0) {
     return FALSE;
   }
@@ -209,6 +229,10 @@ EcGetPublicKey (
   If PeerPublicSize is 0, then return FALSE.
   If Key is NULL, then return FALSE.
   If KeySize is not large enough, then return FALSE.
+
+  For P-256, the PeerPublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PeerPublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PeerPublicSize is 132. First 66-byte is X, Second 66-byte is Y.
 
   @param[in, out]  EcContext          Pointer to the EC context.
   @param[in]       PeerPublic         Pointer to the peer's public X,Y.
@@ -233,6 +257,7 @@ EcComputeKey (
   )
 {
   mbedtls_ecdh_context *ctx;
+  UINTN                HalfSize;
   INT32                Ret;
 
   if (EcContext == NULL || PeerPublic == NULL || KeySize == NULL || Key == NULL) {
@@ -244,12 +269,28 @@ EcComputeKey (
   }
   
   ctx = EcContext;
+  switch (ctx->grp.id) {
+  case MBEDTLS_ECP_DP_SECP256R1:
+    HalfSize = 32;
+    break;
+  case MBEDTLS_ECP_DP_SECP384R1:
+    HalfSize = 48;
+    break;
+  case MBEDTLS_ECP_DP_SECP521R1:
+    HalfSize = 66;
+    break;
+  default:
+    return FALSE;
+  }
+  if (PeerPublicSize != HalfSize * 2) {
+    return FALSE;
+  }
   
-  Ret = mbedtls_mpi_read_binary (&ctx->Qp.X, PeerPublic, PeerPublicSize / 2);
+  Ret = mbedtls_mpi_read_binary (&ctx->Qp.X, PeerPublic, HalfSize);
   if (Ret != 0) {
     return FALSE;
   }
-  Ret = mbedtls_mpi_read_binary (&ctx->Qp.Y, PeerPublic + PeerPublicSize / 2, PeerPublicSize / 2);
+  Ret = mbedtls_mpi_read_binary (&ctx->Qp.Y, PeerPublic + HalfSize, HalfSize);
   if (Ret != 0) {
     return FALSE;
   }
@@ -277,6 +318,53 @@ EcComputeKey (
   return TRUE;
 }
 
+STATIC
+VOID
+EccSignatureDerToBin (
+  IN      UINT8        *DerSignature,
+  IN      UINTN        DerSigSize,
+  OUT     UINT8        *Signature,
+  IN      UINTN        SigSize
+  )
+{
+  UINT8                 DerRSize;
+  UINT8                 DerSSize;
+  UINT8                 *R;
+  UINT8                 *S;
+  UINT8                 RSize;
+  UINT8                 SSize;
+  UINT8                 HalfSize;
+
+  HalfSize = (UINT8)(SigSize / 2);
+
+  ASSERT (DerSignature[0] == 0x30);
+  ASSERT (DerSignature[1] + 2 == DerSigSize);
+  ASSERT (DerSignature[2] == 0x02);
+  DerRSize = DerSignature[3];
+  ASSERT (DerSignature[4 + DerRSize] == 0x02);
+  DerSSize = DerSignature[5 + DerRSize];
+  ASSERT (DerSigSize == DerRSize + DerSSize + 6);
+
+  if (DerSignature[4] != 0) {
+    RSize = DerRSize;
+    R = &DerSignature[4];
+  } else {
+    RSize = DerRSize - 1;
+    R = &DerSignature[5];
+  }
+  if (DerSignature[6 + DerRSize] != 0) {
+    SSize = DerSSize;
+    S = &DerSignature[6 + DerRSize];
+  } else {
+    SSize = DerSSize - 1;
+    S = &DerSignature[7 + DerRSize];
+  }
+  ASSERT (RSize <= HalfSize && SSize <= HalfSize);
+  ZeroMem (Signature, SigSize);
+  CopyMem (&Signature[0 + HalfSize - RSize], R, RSize);
+  CopyMem (&Signature[HalfSize + HalfSize - SSize], S, SSize);
+}
+
 /**
   Carries out the EC-DSA signature.
 
@@ -286,8 +374,12 @@ EcComputeKey (
 
   If EcContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If HashSize is not equal to the size of SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
   If SigSize is large enough but Signature is NULL, then return FALSE.
+
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
 
   @param[in]       EcContext    Pointer to EC context for signature generation.
   @param[in]       MessageHash  Pointer to octet message hash to be signed.
@@ -304,23 +396,47 @@ EcComputeKey (
 BOOLEAN
 EFIAPI
 EcDsaSign (
-  IN      VOID         *EcContext,
+  IN      VOID         *EcDsaContext,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
   )
 {
-  INT32                Ret;
-  mbedtls_md_type_t    md_alg;
-  
-  if (EcContext == NULL || MessageHash == NULL) {
+  INT32                 Ret;
+  mbedtls_md_type_t     md_alg;
+  mbedtls_ecdsa_context *ecdsa;
+  UINT8                 DerSignature[66 * 2 + 8];
+  UINTN                 DerSigSize;
+  UINT8                 HalfSize;
+
+  if (EcDsaContext == NULL || MessageHash == NULL) {
     return FALSE;
   }
   
   if (Signature == NULL) {
     return FALSE;
   }
+
+  ecdsa = EcDsaContext;
+  switch (ecdsa->grp.id) {
+  case MBEDTLS_ECP_DP_SECP256R1:
+    HalfSize = 32;
+    break;
+  case MBEDTLS_ECP_DP_SECP384R1:
+    HalfSize = 48;
+    break;
+  case MBEDTLS_ECP_DP_SECP521R1:
+    HalfSize = 66;
+    break;
+  default:
+    return FALSE;
+  }
+  if (*SigSize < HalfSize * 2) {
+    *SigSize = HalfSize * 2;
+    return FALSE;
+  }
+  *SigSize = HalfSize * 2;
 
   switch (HashSize) {
   case SHA256_DIGEST_SIZE:
@@ -339,13 +455,88 @@ EcDsaSign (
     return FALSE;
   }
 
-  Ret = mbedtls_ecdsa_write_signature (EcContext, md_alg, MessageHash, HashSize,
-                            Signature, SigSize, myrand, NULL );
+  DerSigSize = sizeof(DerSignature);
+  ZeroMem (DerSignature, sizeof(DerSignature));
+  Ret = mbedtls_ecdsa_write_signature (EcDsaContext, md_alg, MessageHash, HashSize,
+                            DerSignature, &DerSigSize, myrand, NULL );
   if (Ret != 0) {
       return FALSE;
   }
 
+  EccSignatureDerToBin (DerSignature, DerSigSize, Signature, *SigSize);
+
   return TRUE;
+}
+
+STATIC
+VOID
+EccSignatureBinToDer (
+  IN      UINT8        *Signature,
+  IN      UINTN        SigSize,
+  OUT     UINT8        *DerSignature,
+  IN OUT  UINTN        *DerSigSizeInOut
+  )
+{
+  UINTN                 DerSigSize;
+  UINT8                 DerRSize;
+  UINT8                 DerSSize;
+  UINT8                 *R;
+  UINT8                 *S;
+  UINT8                 RSize;
+  UINT8                 SSize;
+  UINT8                 HalfSize;
+  UINT8                 Index;
+
+  HalfSize = (UINT8)(SigSize / 2);
+
+  for (Index = 0; Index < HalfSize; Index++) {
+    if (Signature[Index] != 0) {
+      break;
+    }
+  }
+  RSize = (UINT8)(HalfSize - Index);
+  R = &Signature[Index];
+  for (Index = 0; Index < HalfSize; Index++) {
+    if (Signature[HalfSize + Index] != 0) {
+      break;
+    }
+  }
+  SSize = (UINT8)(HalfSize - Index);
+  S = &Signature[HalfSize + Index];
+  if (RSize == 0 || SSize == 0) {
+    *DerSigSizeInOut = 0;
+    return ;
+  }
+  if (R[0] < 0x80) {
+    DerRSize = RSize;
+  } else {
+    DerRSize = RSize + 1;
+  }
+  if (S[0] < 0x80) {
+    DerSSize = SSize;
+  } else {
+    DerSSize = SSize + 1;
+  }
+  DerSigSize = DerRSize + DerSSize + 6;
+  ASSERT (DerSigSize <= *DerSigSizeInOut);
+  *DerSigSizeInOut = DerSigSize;
+  ZeroMem (DerSignature, DerSigSize);
+  DerSignature[0] = 0x30;
+  DerSignature[1] = (UINT8)(DerSigSize - 2);
+  DerSignature[2] = 0x02;
+  DerSignature[3] = DerRSize;
+  if (R[0] < 0x80) {
+    CopyMem (&DerSignature[4], R, RSize);
+  } else {
+    CopyMem (&DerSignature[5], R, RSize);
+  }
+  DerSignature[4 + DerRSize] = 0x02;
+  DerSignature[5 + DerRSize] = DerSSize;
+  if (S[0] < 0x80) {
+    CopyMem (&DerSignature[6 + DerRSize], S, SSize);
+  } else {
+    CopyMem (&DerSignature[7 + DerRSize], S, SSize);
+  }
 }
 
 /**
@@ -354,7 +545,11 @@ EcDsaSign (
   If EcContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If HashSize is not equal to the size of SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+
+  For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
+  For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
+  For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
 
   @param[in]  EcContext    Pointer to EC context for signature verification.
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
@@ -369,16 +564,20 @@ EcDsaSign (
 BOOLEAN
 EFIAPI
 EcDsaVerify (
-  IN  VOID         *EcContext,
+  IN  VOID         *EcDsaContext,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   )
 {
-  INT32                Ret;
+  INT32                 Ret;
+  mbedtls_ecdsa_context *ecdsa;
+  UINT8                 DerSignature[66 * 2 + 8];
+  UINTN                 DerSigSize;
+  UINT8                 HalfSize;
 
-  if (EcContext == NULL || MessageHash == NULL || Signature == NULL) {
+  if (EcDsaContext == NULL || MessageHash == NULL || Signature == NULL) {
     return FALSE;
   }
 
@@ -386,19 +585,29 @@ EcDsaVerify (
     return FALSE;
   }
 
-  //
-  // Do some basic check for the sigSize
-  //
-  if (SigSize > 2) {
-    if (Signature[0] == 0x30) {
-      if (SigSize > Signature[1] + 2) {
-        SigSize = Signature[1] + 2;
-      }
-    }
+  ecdsa = EcDsaContext;
+  switch (ecdsa->grp.id) {
+  case MBEDTLS_ECP_DP_SECP256R1:
+    HalfSize = 32;
+    break;
+  case MBEDTLS_ECP_DP_SECP384R1:
+    HalfSize = 48;
+    break;
+  case MBEDTLS_ECP_DP_SECP521R1:
+    HalfSize = 66;
+    break;
+  default:
+    return FALSE;
+  }
+  if (SigSize != HalfSize * 2) {
+    return FALSE;
   }
 
-  Ret = mbedtls_ecdsa_read_signature (EcContext, MessageHash, HashSize,
-                              Signature, SigSize);
+  DerSigSize = sizeof(DerSignature);
+  EccSignatureBinToDer ((UINT8 *)Signature, SigSize, DerSignature, &DerSigSize);
+
+  Ret = mbedtls_ecdsa_read_signature (EcDsaContext, MessageHash, HashSize,
+                              DerSignature, DerSigSize);
   if (Ret != 0) {
     return FALSE;
   }

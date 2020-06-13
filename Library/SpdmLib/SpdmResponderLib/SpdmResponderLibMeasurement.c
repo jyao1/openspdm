@@ -117,7 +117,6 @@ SpdmGetResponseMeasurement (
 {
   UINT8                          Index;
   SPDM_GET_MEASUREMENTS_REQUEST  *SpdmRequest;
-  UINTN                          SpdmRequestSize;
   SPDM_MEASUREMENTS_RESPONSE     *SpdmResponse;
   UINTN                          SpdmResponseSize;
   RETURN_STATUS                  Status;
@@ -142,7 +141,7 @@ SpdmGetResponseMeasurement (
       return RETURN_SUCCESS;
     }
   }
-  SpdmRequestSize = RequestSize;
+
   //
   // Cache
   //
