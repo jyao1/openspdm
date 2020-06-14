@@ -32,15 +32,17 @@ SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
 };
 
 SPDM_GET_RESPONSE_SESSION_STRUCT  mSpdmGetResponseSessionStruct[] = {
-  {SPDM_FINISH,                 SpdmGetResponseFinish},
-  {SPDM_PSK_FINISH,             SpdmGetResponsePskFinish},
-  {SPDM_END_SESSION,            SpdmGetResponseEndSession},
-  {SPDM_HEARTBEAT,              SpdmGetResponseHeartbeat},
-  {SPDM_KEY_UPDATE,             SpdmGetResponseKeyUpdate},
+  {SPDM_FINISH,                         SpdmGetResponseFinish},
+  {SPDM_PSK_FINISH,                     SpdmGetResponsePskFinish},
+  {SPDM_END_SESSION,                    SpdmGetResponseEndSession},
+  {SPDM_HEARTBEAT,                      SpdmGetResponseHeartbeat},
+  {SPDM_KEY_UPDATE,                     SpdmGetResponseKeyUpdate},
+  {SPDM_GET_ENCAPSULATED_REQUEST,       SpdmGetResponseEncapsulatedRequest},
+  {SPDM_DELIVER_ENCAPSULATED_RESPONSE,  SpdmGetResponseEncapsulatedResponseAck},
 };
 
 SPDM_GET_RESPONSE_FUNC
-SpdmReturnGetResponseFuncViaLastRequest (
+SpdmGetResponseFuncViaLastRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext
   )
 {
@@ -57,7 +59,7 @@ SpdmReturnGetResponseFuncViaLastRequest (
 }
 
 SPDM_GET_RESPONSE_SESSION_FUNC
-SpdmReturnGetResponseSessionFuncViaLastRequest (
+SpdmGetResponseSessionFuncViaLastRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext
   )
 {
@@ -420,7 +422,7 @@ SpdmSendResponseSession (
 
   MyResponseSize = sizeof(MyResponse);
   ZeroMem (MyResponse, sizeof(MyResponse));
-  GetResponseSessionFunc = SpdmReturnGetResponseSessionFuncViaLastRequest (SpdmContext);
+  GetResponseSessionFunc = SpdmGetResponseSessionFuncViaLastRequest (SpdmContext);
   if (GetResponseSessionFunc == NULL) {
     GetResponseSessionFunc = (SPDM_GET_RESPONSE_SESSION_FUNC)SpdmContext->GetResponseSessionFunc;
   }
@@ -513,7 +515,7 @@ SpdmSendResponse (
 
   MyResponseSize = sizeof(MyResponse);
   ZeroMem (MyResponse, sizeof(MyResponse));
-  GetResponseFunc = SpdmReturnGetResponseFuncViaLastRequest (SpdmContext);
+  GetResponseFunc = SpdmGetResponseFuncViaLastRequest (SpdmContext);
   if (GetResponseFunc == NULL) {
     GetResponseFunc = (SPDM_GET_RESPONSE_FUNC)SpdmContext->GetResponseFunc;
   }

@@ -110,6 +110,37 @@ SpdmSendReceiveEndSession (
   );
 
 /**
+  This function executes SPDM Encapsulated Request.
+  
+  @param[in]  SpdmContext            The SPDM context for the device.
+**/
+RETURN_STATUS
+SpdmEncapsulatedRequest (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                SessionId
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetEncapResponseDigest (
+  IN     VOID                 *Context,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetEncapResponseCertificate (
+  IN     VOID                 *Context,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+/**
   Send a SPDM request command to a device.
   
   @param  SpdmContext                  The SPDM context for the device.

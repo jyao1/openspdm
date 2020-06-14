@@ -33,6 +33,10 @@ SOURCE_DIR = $(WORKSPACE)\Library\SpdmLib\$(MODULE_NAME)
 SOURCE_FILES =  \
 	$(SOURCE_DIR)\SpdmRequesterLibChallenge.c \
 	$(SOURCE_DIR)\SpdmRequesterLibCommunication.c \
+	$(SOURCE_DIR)\SpdmRequesterLibEncapCertificate.c \
+	$(SOURCE_DIR)\SpdmRequesterLibEncapDigest.c \
+	$(SOURCE_DIR)\SpdmRequesterLibEncapError.c \
+	$(SOURCE_DIR)\SpdmRequesterLibEncapRequest.c \
 	$(SOURCE_DIR)\SpdmRequesterLibEndSession.c \
 	$(SOURCE_DIR)\SpdmRequesterLibFinish.c \
 	$(SOURCE_DIR)\SpdmRequesterLibGetCapability.c \
@@ -52,6 +56,10 @@ SOURCE_FILES =  \
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmRequesterLibChallenge.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibCommunication.obj \
+    $(OUTPUT_DIR)\SpdmRequesterLibEncapCertificate.obj \
+    $(OUTPUT_DIR)\SpdmRequesterLibEncapDigest.obj \
+    $(OUTPUT_DIR)\SpdmRequesterLibEncapError.obj \
+    $(OUTPUT_DIR)\SpdmRequesterLibEncapRequest.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibEndSession.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibFinish.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibGetCapability.obj \

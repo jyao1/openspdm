@@ -10,7 +10,7 @@
 #include "SpdmResponderLibInternal.h"
 
 BOOLEAN
-SpdmCalculateCertChainHash (
+SpdmResponderCalculateCertChainHash (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN  UINT8                SlotNum,
   OUT UINT8                *CertChainHash
@@ -25,7 +25,7 @@ SpdmCalculateCertChainHash (
 }
 
 BOOLEAN
-CalculateMeasurementSummaryHash (
+SpdmResponderCalculateMeasurementSummaryHash (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN  UINT8                MeasurementSummaryHashType,
   OUT UINT8                *MeasurementSummaryHash
@@ -90,7 +90,7 @@ CalculateMeasurementSummaryHash (
 }
 
 BOOLEAN
-SpdmGenerateChallengeSignature (
+SpdmResponderGenerateChallengeSignature (
   IN  SPDM_DEVICE_CONTEXT        *SpdmContext,
   IN  VOID                       *ResponseMessage,
   IN  UINTN                      ResponseMessageSize,
@@ -216,13 +216,13 @@ SpdmGetResponseChallenge (
   SpdmResponse->Header.Param2 = (1 << SlotNum);
 
   Ptr = (VOID *)(SpdmResponse + 1);
-  SpdmCalculateCertChainHash (SpdmContext, SlotNum, Ptr);
+  SpdmResponderCalculateCertChainHash (SpdmContext, SlotNum, Ptr);
   Ptr += HashSize;
 
   GetRandomNumber (SPDM_NONCE_SIZE, Ptr);
   Ptr += SPDM_NONCE_SIZE;
 
-  Result = CalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param2, Ptr);
+  Result = SpdmResponderCalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param2, Ptr);
   if (!Result) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -237,7 +237,7 @@ SpdmGetResponseChallenge (
   //
   // Calc Sign
   //
-  Result = SpdmGenerateChallengeSignature (SpdmContext, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse, Ptr);
+  Result = SpdmResponderGenerateChallengeSignature (SpdmContext, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse, Ptr);
   if (!Result) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE_AUTH, ResponseSize, Response);
     return RETURN_SUCCESS;

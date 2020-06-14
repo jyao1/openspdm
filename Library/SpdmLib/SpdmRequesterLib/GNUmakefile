@@ -34,6 +34,10 @@ SOURCE_DIR = $(WORKSPACE)/Library/SpdmLib/$(MODULE_NAME)
 OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmRequesterLibChallenge.o \
     $(OUTPUT_DIR)/SpdmRequesterLibCommunication.o \
+    $(OUTPUT_DIR)/SpdmRequesterLibEncapCertificate.o \
+    $(OUTPUT_DIR)/SpdmRequesterLibEncapDigest.o \
+    $(OUTPUT_DIR)/SpdmRequesterLibEncapError.o \
+    $(OUTPUT_DIR)/SpdmRequesterLibEncapRequest.o \
     $(OUTPUT_DIR)/SpdmRequesterLibEndSession.o \
     $(OUTPUT_DIR)/SpdmRequesterLibFinish.o \
     $(OUTPUT_DIR)/SpdmRequesterLibGetCapability.o \
@@ -88,6 +92,18 @@ $(OUTPUT_DIR)/SpdmRequesterLibChallenge.o : $(SOURCE_DIR)/SpdmRequesterLibChalle
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterLibCommunication.o : $(SOURCE_DIR)/SpdmRequesterLibCommunication.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterLibEncapCertificate.o : $(SOURCE_DIR)/SpdmRequesterLibEncapCertificate.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterLibEncapDigest.o : $(SOURCE_DIR)/SpdmRequesterLibEncapDigest.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterLibEncapError.o : $(SOURCE_DIR)/SpdmRequesterLibEncapError.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterLibEncapRequest.o : $(SOURCE_DIR)/SpdmRequesterLibEncapRequest.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterLibEndSession.o : $(SOURCE_DIR)/SpdmRequesterLibEndSession.c

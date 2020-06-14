@@ -65,13 +65,25 @@ WriteOutputFile (
   );
 
 BOOLEAN
-ReadPrivateCertificate (
+ReadResponderPrivateCertificate (
   OUT VOID    **Data,
   OUT UINTN   *Size
   );
 
 BOOLEAN
-ReadPublicCertificateChain (
+ReadRequesterPrivateCertificate (
+  OUT VOID    **Data,
+  OUT UINTN   *Size
+  );
+
+BOOLEAN
+ReadResponderPublicCertificateChain (
+  OUT VOID    **Data,
+  OUT UINTN   *Size
+  );
+
+BOOLEAN
+ReadRequesterPublicCertificateChain (
   OUT VOID    **Data,
   OUT UINTN   *Size
   );

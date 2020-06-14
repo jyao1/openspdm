@@ -55,12 +55,14 @@ typedef struct {
   SPDM_DEVICE_CAPABILITY          Capability;
   SPDM_DEVICE_ALGORITHM           Algorithm;
   //
-  // Certificate provisioned in the responder
+  // My Certificate
   //
   VOID                            *CertificateChain[MAX_SPDM_SLOT_COUNT];
   UINTN                           CertificateChainSize[MAX_SPDM_SLOT_COUNT];
   UINT8                           SlotCount;
-
+  //
+  // My Private Certificate
+  //
   VOID                            *PrivatePem;
   UINTN                           PrivatePemSize;
   //
@@ -70,7 +72,7 @@ typedef struct {
   VOID                            *DeviceMeasurement;
   UINT8                           DeviceMeasurementCount;
   //
-  // Certificate provisioned in the initiator
+  // Peer Certificate
   //
   VOID                            *SpdmCertChainVarBuffer;
   UINTN                           SpdmCertChainVarBufferSize;
@@ -79,6 +81,10 @@ typedef struct {
   //
   UINTN                           PskSize;
   UINT8                           *Psk;
+  //
+  // Responder policy
+  //
+  UINT8                           MutAuthRequested;
 } SPDM_LOCAL_CONTEXT;
 
 typedef struct {
@@ -220,7 +226,7 @@ typedef struct {
 typedef struct {
   UINT8                                SessionId;
   BOOLEAN                              UsePsk;
-  UINT8                                Mut_Auth_Requested;
+  UINT8                                MutAuthRequested;
   SPDM_STATE                           SessionState;
   UINTN                                DheKeySize;
   UINTN                                HashSize;
@@ -231,6 +237,12 @@ typedef struct {
   SPDM_SESSION_INFO_APPLICATION_SECRET ApplicationSecretBackup;
   SPDM_SESSION_TRANSCRIPT              SessionTranscript;
 } SPDM_SESSION_INFO;
+
+typedef struct {
+  UINT32                               EncapState;
+  UINT8                                SlotNum;
+  LARGE_MANAGED_BUFFER                 CertificateChainBuffer;
+} SPDM_ENCAP_CONTEXT;
 
 #define SPDM_DEVICE_CONTEXT_VERSION 0x1
 
@@ -255,17 +267,21 @@ typedef struct {
   UINTN                           LastSpdmRequestSize;
 
   //
-  // Register GetResponse function
+  // Register GetResponse function (responder only)
   //
   UINTN                           GetResponseFunc;
   UINTN                           GetResponseSessionFunc;
+  //
+  // Register GetEncapResponse function (requester only)
+  //
+  UINTN                           GetEncapResponseFunc;
+  SPDM_ENCAP_CONTEXT              EncapContext;
 
   SPDM_LOCAL_CONTEXT              LocalContext;
 
   SPDM_CONNECTION_INFO            ConnectionInfo;
   SPDM_TRANSCRIPT                 Transcript;
 
-  // TBD: Need support multiple session
   SPDM_SESSION_INFO               SessionInfo[MAX_SPDM_SESSION_COUNT];
 } SPDM_DEVICE_CONTEXT;
 
@@ -615,7 +631,8 @@ GetManagedBuffer (
 RETURN_STATUS
 SpdmGenerateSessionHandshakeKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId
+  IN UINT8                        SessionId,
+  IN BOOLEAN                      IsRequester
   );
 
 /**
@@ -626,7 +643,8 @@ SpdmGenerateSessionHandshakeKey (
 RETURN_STATUS
 SpdmGenerateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId
+  IN UINT8                        SessionId,
+  IN BOOLEAN                      IsRequester
   );
 
 typedef enum {

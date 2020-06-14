@@ -73,6 +73,7 @@ SpdmStartSession (
 {
   RETURN_STATUS                 Status;
   SPDM_DEVICE_CONTEXT           *SpdmContext;
+  SPDM_SESSION_INFO             *SessionInfo;
 
   SpdmContext = Context;
 
@@ -81,6 +82,21 @@ SpdmStartSession (
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_INFO, "SpdmStartSession - %p\n", Status));
       return Status;
+    }
+
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);
+    if (SessionInfo == NULL) {
+      ASSERT (FALSE);
+      return RETURN_UNSUPPORTED;
+    }
+
+    switch (SessionInfo->MutAuthRequested) {
+    case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED:
+    case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS:
+      SpdmEncapsulatedRequest (SpdmContext, *SessionId);
+      break;
+    default:
+      break;
     }
 
     Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, SlotNum);

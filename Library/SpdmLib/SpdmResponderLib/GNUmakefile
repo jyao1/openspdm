@@ -38,6 +38,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmResponderLibChallengeAuth.o \
     $(OUTPUT_DIR)/SpdmResponderLibCommunication.o \
     $(OUTPUT_DIR)/SpdmResponderLibDigest.o \
+    $(OUTPUT_DIR)/SpdmResponderLibEncapGetCertificate.o \
+    $(OUTPUT_DIR)/SpdmResponderLibEncapGetDigest.o \
+    $(OUTPUT_DIR)/SpdmResponderLibEncapResponse.o \
     $(OUTPUT_DIR)/SpdmResponderLibEndSession.o \
     $(OUTPUT_DIR)/SpdmResponderLibError.o \
     $(OUTPUT_DIR)/SpdmResponderLibFinish.o \
@@ -101,6 +104,15 @@ $(OUTPUT_DIR)/SpdmResponderLibCommunication.o : $(SOURCE_DIR)/SpdmResponderLibCo
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmResponderLibDigest.o : $(SOURCE_DIR)/SpdmResponderLibDigest.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmResponderLibEncapGetCertificate.o : $(SOURCE_DIR)/SpdmResponderLibEncapGetCertificate.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmResponderLibEncapGetDigest.o : $(SOURCE_DIR)/SpdmResponderLibEncapGetDigest.c
+	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmResponderLibEncapResponse.o : $(SOURCE_DIR)/SpdmResponderLibEncapResponse.c
 	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmResponderLibEndSession.o : $(SOURCE_DIR)/SpdmResponderLibEndSession.c

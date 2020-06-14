@@ -7,11 +7,11 @@
 
 **/
 
-#include "SpdmResponderLibInternal.h"
+#include "SpdmRequesterLibInternal.h"
 
 RETURN_STATUS
 EFIAPI
-SpdmGenerateErrorResponse (
+SpdmGenerateEncapErrorResponse (
   IN     VOID                 *Context,
   IN     UINT8                ErrorCode,
   IN     UINT8                ErrorData,
@@ -21,11 +21,10 @@ SpdmGenerateErrorResponse (
 {
   SPDM_ERROR_RESPONSE     *SpdmResponse;
 
-  ASSERT (*ResponseSize >= sizeof(SPDM_ERROR_RESPONSE));
-  *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-  SpdmResponse = Response;
+  ASSERT (*ResponseSize >= sizeof(SPDM_ERROR_RESPONSE) - 1);
+  *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) - 1;
+  SpdmResponse = (VOID *)((UINT8 *)Response - 1);
 
-  SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
   SpdmResponse->Header.Param1 = ErrorCode;
   SpdmResponse->Header.Param2 = ErrorData;

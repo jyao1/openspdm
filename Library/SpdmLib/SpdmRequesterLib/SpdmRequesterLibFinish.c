@@ -13,41 +13,66 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
+  UINT8                Signature[MAX_ASYM_KEY_SIZE];
   UINT8                VerifyData[MAX_HASH_SIZE];
 } SPDM_FINISH_REQUEST_MINE;
 
 #pragma pack()
 
-RETURN_STATUS
-GenerateFinishHmac(
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                SessionId,
-  OUT    VOID                 *Hmac
+BOOLEAN
+SpdmRequesterGenerateFinishSignature (
+  IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN  SPDM_SESSION_INFO         *SessionInfo,
+  IN  UINT8                     SlotNum,
+  OUT UINT8                     *Signature
   )
 {
-  HMAC_ALL                                  HmacAll;
-  UINTN                                     HashSize;
-  UINT8                                     CalcHmacData[MAX_HASH_SIZE];
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
-  SPDM_SESSION_INFO                         *SessionInfo;
-  
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return RETURN_UNSUPPORTED;
+  VOID                          *Context;
+  UINT8                         HashData[MAX_HASH_SIZE];
+  UINT8                         *CertBuffer;
+  UINTN                         CertBufferSize;
+  UINT8                         CertBufferHash[MAX_HASH_SIZE];
+  UINT8                         *MutCertBuffer;
+  UINTN                         MutCertBufferSize;
+  UINT8                         MutCertBufferHash[MAX_HASH_SIZE];
+  BOOLEAN                       Result;
+  UINTN                         SignatureSize;
+  UINT32                        HashSize;
+  HASH_ALL                      HashFunc;
+  ASYM_GET_PRIVATE_KEY_FROM_PEM GetPrivateKeyFromPemFunc;
+  ASYM_FREE                     FreeFunc;
+  ASYM_SIGN                     SignFunc;
+  LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+
+  if (SpdmContext->LocalContext.PrivatePem == NULL) {
+    return FALSE;
   }
-
-  HmacAll = GetSpdmHmacFunc (SpdmContext);
-  ASSERT(HmacAll != NULL);
-  HashSize = GetSpdmHashSize (SpdmContext);
-
   if ((SpdmContext->LocalContext.SpdmCertChainVarBuffer == NULL) || (SpdmContext->LocalContext.SpdmCertChainVarBufferSize == 0)) {
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
+  if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
+    return FALSE;
+  }
+
+  SignatureSize = GetSpdmAsymSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext);
+  HashFunc = GetSpdmHashFunc (SpdmContext);
+
+  GetPrivateKeyFromPemFunc = GetSpdmAsymGetPrivateKeyFromPem (SpdmContext);
+  FreeFunc = GetSpdmAsymFree (SpdmContext);
+  SignFunc = GetSpdmAsymSign (SpdmContext);
+  Result = GetPrivateKeyFromPemFunc (SpdmContext->LocalContext.PrivatePem, SpdmContext->LocalContext.PrivatePemSize, NULL, &Context);
+  if (!Result) {
+    return FALSE;
+  }
+
   CertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
+
+  MutCertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  MutCertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  HashFunc (MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -58,23 +83,109 @@ GenerateFinishHmac(
   DEBUG((DEBUG_INFO, "MessageK Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
+  DEBUG((DEBUG_INFO, "THMessageCM Data :\n"));
+  InternalDumpHex (MutCertBuffer, MutCertBufferSize);
+
   DEBUG((DEBUG_INFO, "MessageF Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, CertBuffer, CertBufferSize);
+  AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+  AppendManagedBuffer (&THCurr, MutCertBufferHash, HashSize);
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
+
+  HashFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+  DEBUG((DEBUG_INFO, "THCurr Hash - "));
+  InternalDumpData (HashData, HashSize);
+  DEBUG((DEBUG_INFO, "\n"));
+
+  Result = SignFunc (
+             Context,
+             HashData,
+             HashSize,
+             Signature,
+             &SignatureSize
+             );
+  FreeFunc (Context);
+
+  return Result;
+}
+
+BOOLEAN
+SpdmRequesterGenerateFinishHmac (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     SPDM_SESSION_INFO    *SessionInfo,
+  IN     UINT8                SlotNum,
+  OUT    VOID                 *Hmac
+  )
+{
+  HASH_ALL                                  HashFunc;
+  HMAC_ALL                                  HmacFunc;
+  UINTN                                     HashSize;
+  UINT8                                     CalcHmacData[MAX_HASH_SIZE];
+  UINT8                                     *CertBuffer;
+  UINTN                                     CertBufferSize;
+  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
+  UINT8                                     *MutCertBuffer;
+  UINTN                                     MutCertBufferSize;
+  UINT8                                     MutCertBufferHash[MAX_HASH_SIZE];
+  LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+
+  HmacFunc = GetSpdmHmacFunc (SpdmContext);
+  HashFunc = GetSpdmHashFunc (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext);
+
+  if ((SpdmContext->LocalContext.SpdmCertChainVarBuffer == NULL) || (SpdmContext->LocalContext.SpdmCertChainVarBufferSize == 0)) {
+    return FALSE;
+  }
+  CertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
+
+  if (SessionInfo->MutAuthRequested) {
+    if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
+      return FALSE;
+    }
+    MutCertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
+    MutCertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    HashFunc (MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
+  }
+
+  DEBUG((DEBUG_INFO, "MessageA Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
+
+  DEBUG((DEBUG_INFO, "THMessageCt Data :\n"));
+  InternalDumpHex (CertBuffer, CertBufferSize);
+
+  DEBUG((DEBUG_INFO, "MessageK Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+
+  if (SessionInfo->MutAuthRequested) {
+    DEBUG((DEBUG_INFO, "THMessageMyCM Data :\n"));
+    InternalDumpHex (MutCertBuffer, MutCertBufferSize);
+  }
+
+  DEBUG((DEBUG_INFO, "MessageF Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
+
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
+  AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
+  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+  if (SessionInfo->MutAuthRequested) {
+    AppendManagedBuffer (&THCurr, MutCertBufferHash, HashSize);
+  }
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.RequestHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
+  HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.RequestHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
   DEBUG((DEBUG_INFO, "THCurr Hmac - "));
   InternalDumpData (CalcHmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   CopyMem (Hmac, CalcHmacData, HashSize);
 
-  return RETURN_SUCCESS;
+  return TRUE;
 }
 
 /**
@@ -93,10 +204,13 @@ SpdmSendReceiveFinish (
   RETURN_STATUS                             Status;
   SPDM_FINISH_REQUEST_MINE                  SpdmRequest;
   UINTN                                     SpdmRequestSize;
+  UINTN                                     SignatureSize;
   UINTN                                     HmacSize;
   SPDM_FINISH_RESPONSE                      SpdmResponse;
   UINTN                                     SpdmResponseSize;
   SPDM_SESSION_INFO                         *SessionInfo;
+  UINT8                                     *Ptr;
+  BOOLEAN                                   Result;
   
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
@@ -112,14 +226,33 @@ SpdmSendReceiveFinish (
    
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmRequest.Header.RequestResponseCode = SPDM_FINISH;
-  SpdmRequest.Header.Param1 = SessionInfo->Mut_Auth_Requested;
+  if (SessionInfo->MutAuthRequested) {
+    SpdmRequest.Header.Param1 = SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED;
+    SignatureSize = GetSpdmAsymSize (SpdmContext);
+  } else {
+    SpdmRequest.Header.Param1 = 0;
+    SignatureSize = 0;
+  }
   SpdmRequest.Header.Param2 = SlotNum;
   
   HmacSize = GetSpdmHashSize (SpdmContext);
-  SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + HmacSize;
+  SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + SignatureSize + HmacSize;
+  Ptr = SpdmRequest.Signature;
   
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
-  GenerateFinishHmac (SpdmContext, SessionId, SpdmRequest.VerifyData);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, sizeof(SPDM_FINISH_REQUEST));
+  if (SessionInfo->MutAuthRequested) {
+    Result = SpdmRequesterGenerateFinishSignature (SpdmContext, SessionInfo, SlotNum, Ptr);
+    if (!Result) {
+      return RETURN_SECURITY_VIOLATION;
+    }
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Ptr, SignatureSize);
+    Ptr += SignatureSize;
+  }
+
+  Result = SpdmRequesterGenerateFinishHmac (SpdmContext, SessionInfo, SlotNum, Ptr);
+  if (!Result) {
+    return RETURN_SECURITY_VIOLATION;
+  }
   
   Status = SpdmSendRequestSession (SpdmContext, SessionId, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
@@ -141,7 +274,7 @@ SpdmSendReceiveFinish (
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, &SpdmResponse, SpdmResponseSize);
   
-  Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId);
+  Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId, TRUE);
   if (RETURN_ERROR(Status)) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;

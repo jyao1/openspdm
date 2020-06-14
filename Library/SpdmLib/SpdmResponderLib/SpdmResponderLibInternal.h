@@ -159,6 +159,62 @@ SpdmGetResponseKeyUpdate (
   );
 
 RETURN_STATUS
+EFIAPI
+SpdmGetResponseEncapsulatedRequest (
+  IN     VOID                 *Context,
+  IN     UINT8                SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetResponseEncapsulatedResponseAck (
+  IN     VOID                 *Context,
+  IN     UINT8                SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetEncapReqestGetDigest (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT UINTN                *EncapRequestSize,
+     OUT VOID                 *EncapRequest
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmProcessEncapResponseDigest (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINTN                EncapLastResponseSize,
+  IN     VOID                 *EncapLastResponse,
+  OUT    BOOLEAN              *Continue
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetEncapReqestGetCertificate (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT UINTN                *EncapRequestSize,
+     OUT VOID                 *EncapRequest
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmProcessEncapResponseCertificate (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINTN                EncapLastResponseSize,
+  IN     VOID                 *EncapLastResponse,
+  OUT    BOOLEAN              *Continue
+  );
+
+RETURN_STATUS
 SpdmReceiveRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
   IN     UINTN                   RequestSize,

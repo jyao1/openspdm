@@ -286,6 +286,12 @@ SpdmSetData (
     SpdmContext->LocalContext.DeviceMeasurementCount = Parameter->AdditionalData[0];
     SpdmContext->LocalContext.DeviceMeasurement = Data;
     break;
+  case SpdmDataMutAuthRequested:
+    if (DataSize != sizeof(UINT8)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->LocalContext.MutAuthRequested = *(UINT8 *)Data;
+    break;
   case SpdmDataPsk:
     SpdmContext->LocalContext.PskSize = DataSize;
     SpdmContext->LocalContext.Psk = Data;

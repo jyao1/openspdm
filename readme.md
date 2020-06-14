@@ -19,7 +19,7 @@
 
    SPDM 1.0: GET_VERSION, GET_CAPABILITY, NEGOTIATE_ALGORITHM, GET_DIGEST, GET_CERTIFICATE, CHALLENGE, GET_MEASUREMENT.
 
-   SPDM 1.1: KEY_EXCHANGE, FINISH, PSK_EXCHANGE, PSK_FINISH, END_SESSION, HEARTBEAT, KEY_UPDATE.
+   SPDM 1.1: KEY_EXCHANGE, FINISH, PSK_EXCHANGE, PSK_FINISH, END_SESSION, HEARTBEAT, KEY_UPDATE, ENCAPSULATED message
 
 5) Cryptographic algorithm support:
 
@@ -69,7 +69,7 @@
 
 ## Feature not implemented yet
 
-1) multiple algorithms (SHA-3)
+1) Full error handling
 
 2) SPDM 1.0
 
@@ -81,11 +81,7 @@
 
 3) SPDM 1.1
 
-   mutual authentication (ENCAPSULATED message)
-
    Timer (for heartbeat ?)
-
-   command and response: GET_ENCAPSULATED
 
 4) Other architectures such as Arm, AArch64, RiscV64, or Arc.
 

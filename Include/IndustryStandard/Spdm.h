@@ -554,7 +554,7 @@ typedef struct {
   // Param1 == HeartbeatPeriod
   // Param2 == SessionID
   UINT16               Length;
-  UINT8                Mut_Auth_Requested;
+  UINT8                MutAuthRequested;
   UINT8                Reserved;
   UINT8                RandomData[32];
 //UINT8                ExchangeData[D];
@@ -564,7 +564,7 @@ typedef struct {
 } SPDM_KEY_EXCHANGE_RESPONSE;
 
 ///
-/// SPDM KEY_EXCHANGE response Mut_Auth_Requested
+/// SPDM KEY_EXCHANGE response MutAuthRequested
 ///
 #define SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED                   BIT0
 #define SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS  BIT1

@@ -18,27 +18,19 @@ typedef struct {
 
 #pragma pack()
 
-RETURN_STATUS
-GeneratePskFinishHmac(
+BOOLEAN
+SpdmRequesterGeneratePskFinishHmac (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId,
+  IN SPDM_SESSION_INFO            *SessionInfo,
   OUT VOID                        *Hmac
   )
 {
-  HMAC_ALL                                  HmacAll;
+  HMAC_ALL                                  HmacFunc;
   UINTN                                     HashSize;
   UINT8                                     CalcHmacData[MAX_HASH_SIZE];
   LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
-  SPDM_SESSION_INFO                         *SessionInfo;
-  
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return RETURN_UNSUPPORTED;
-  }
 
-  HmacAll = GetSpdmHmacFunc (SpdmContext);
-  ASSERT(HmacAll != NULL);
+  HmacFunc = GetSpdmHmacFunc (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
@@ -55,14 +47,14 @@ GeneratePskFinishHmac(
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.RequestFinishedKey, SessionInfo->HashSize, CalcHmacData);
+  HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.RequestFinishedKey, SessionInfo->HashSize, CalcHmacData);
   DEBUG((DEBUG_INFO, "THCurr Hmac - "));
   InternalDumpData (CalcHmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   CopyMem (Hmac, CalcHmacData, HashSize);
 
-  return RETURN_SUCCESS;
+  return TRUE;
 }
 
 /**
@@ -108,8 +100,8 @@ SpdmSendReceivePskFinish (
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
   
   // Need regenerate the finishedkey
-  SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId);
-  GeneratePskFinishHmac (SpdmContext, SessionId, SpdmRequest.VerifyData);
+  SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, TRUE);
+  SpdmRequesterGeneratePskFinishHmac (SpdmContext, SessionInfo, SpdmRequest.VerifyData);
   
   Status = SpdmSendRequestSession (SpdmContext, SessionId, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
@@ -131,7 +123,7 @@ SpdmSendReceivePskFinish (
   
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, &SpdmResponse, SpdmResponseSize);
 
-  Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId);
+  Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId, TRUE);
   if (RETURN_ERROR(Status)) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return Status;

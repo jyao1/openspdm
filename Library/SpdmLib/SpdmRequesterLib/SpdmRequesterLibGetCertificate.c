@@ -20,8 +20,8 @@ typedef struct {
 
 #pragma pack()
 
-RETURN_STATUS
-VerifyCertificateChain (
+BOOLEAN
+SpdmRequesterVerifyCertificateChain (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *CertificateChain,
   UINTN                           CertificateChainSize
@@ -33,19 +33,19 @@ VerifyCertificateChain (
   CertBuffer = SpdmContext->LocalContext.SpdmCertChainVarBuffer;
   CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize;
   if ((CertBuffer == NULL) || (CertBufferSize == 0)) {
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   
   if (CertBufferSize != CertificateChainSize) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL !!!\n"));
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   if (CompareMem (CertificateChain, CertBuffer, CertificateChainSize) != 0) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL !!!\n"));
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - PASS !!!\n"));
-  return RETURN_SUCCESS;
+  return TRUE;
 }
 
 /*
@@ -60,6 +60,7 @@ SpdmGetCertificate (
      OUT VOID                 *CertChain
   )
 {
+  BOOLEAN                                   Result;
   RETURN_STATUS                             Status;
   SPDM_GET_CERTIFICATE_REQUEST              SpdmRequest;
   SPDM_CERTIFICATE_RESPONSE_MAX             SpdmResponse;
@@ -139,9 +140,10 @@ SpdmGetCertificate (
 
   } while (SpdmResponse.RemainderLength != 0);
 
-  Status = VerifyCertificateChain (SpdmContext, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
-  if (RETURN_ERROR(Status)) {
+  Result = SpdmRequesterVerifyCertificateChain (SpdmContext, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
+  if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    Status = RETURN_SECURITY_VIOLATION;
     goto Done;
   }
 

@@ -146,8 +146,8 @@ SpdmServerInit (
   UINT8                        Data8;
   UINT16                       Data16;
   UINT32                       Data32;
-  BOOLEAN                      HasPubCert;
-  BOOLEAN                      HasPrivKey;
+  BOOLEAN                      HasResPubCert;
+  BOOLEAN                      HasResPrivKey;
 
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   SpdmContext = mSpdmContext;
@@ -158,9 +158,9 @@ SpdmServerInit (
   Data32 = (UINT32)SpdmIoSecureMessagingTypeDmtfMtcp;
   SpdmSetData (SpdmContext, SpdmDataIoSecureMessageType, &Parameter, &Data32, sizeof(Data32));
 
-  Res = ReadPublicCertificateChain (&Data, &DataSize);
+  Res = ReadResponderPublicCertificateChain (&Data, &DataSize);
   if (Res) {
-    HasPubCert = TRUE;
+    HasResPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
     Data8 = SLOT_NUMBER;
@@ -172,18 +172,30 @@ SpdmServerInit (
     }
     // do not free it
   } else {
-    HasPubCert = FALSE;
+    HasResPubCert = FALSE;
   }
 
-  Res = ReadPrivateCertificate (&Data, &DataSize);
+  Res = ReadResponderPrivateCertificate (&Data, &DataSize);
   if (Res) {
-    HasPrivKey = TRUE;
+    HasResPrivKey = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
     SpdmSetData (SpdmContext, SpdmDataPrivateCertificate, &Parameter, Data, DataSize);
     // do not free it
   } else{
-    HasPrivKey = FALSE;
+    HasResPrivKey = FALSE;
+  }
+
+  Res = ReadRequesterPublicCertificateChain (&Data, &DataSize);
+  if (Res) {
+    ZeroMem (&Parameter, sizeof(Parameter));
+    Parameter.Location = SpdmDataLocationLocal;
+    SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
+    // Do not free it.
+    
+    Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED;
+    //Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS;
+    SpdmSetData (SpdmContext, SpdmDataMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
   }
 
   Data8 = 0;
@@ -199,12 +211,12 @@ SpdmServerInit (
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
-  if (!HasPubCert) {
+  if (!HasResPubCert) {
     Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   } else {
     Data32 |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   }
-  if (!HasPrivKey) {
+  if (!HasResPrivKey) {
     Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
     Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
     Data32 |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG;

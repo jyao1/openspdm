@@ -23,51 +23,51 @@ typedef struct {
 
 #pragma pack()
 
-RETURN_STATUS
-VerifyCertificateChainHash (
+BOOLEAN
+SpdmRequesterVerifyCertificateChainHash (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *CertificateChainHash,
   UINTN                           CertificateChainHashSize
   )
 {
-  HASH_ALL                                  HashAll;
+  HASH_ALL                                  HashFunc;
   UINTN                                     HashSize;
-  UINT8                                     HashData[MAX_HASH_SIZE];
+  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
 
   CertBuffer = SpdmContext->LocalContext.SpdmCertChainVarBuffer;
   CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize;
   if ((CertBuffer == NULL) || (CertBufferSize == 0)) {
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   
-  HashAll = GetSpdmHashFunc (SpdmContext);
-  ASSERT(HashAll != NULL);
+  HashFunc = GetSpdmHashFunc (SpdmContext);
+  ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  HashAll (CertBuffer, CertBufferSize, HashData);
+  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
   
   if (HashSize != CertificateChainHashSize) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - FAIL !!!\n"));
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
-  if (CompareMem (CertificateChainHash, HashData, CertificateChainHashSize) != 0) {
+  if (CompareMem (CertificateChainHash, CertBufferHash, CertificateChainHashSize) != 0) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - FAIL !!!\n"));
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - PASS !!!\n"));
-  return RETURN_SUCCESS;
+  return TRUE;
 }
 
-RETURN_STATUS
-VerifyChallengeSignature (
+BOOLEAN
+SpdmRequesterVerifyChallengeSignature (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *SignData,
   UINTN                           SignDataSize
   )
 {
-  HASH_ALL                                  HashAll;
+  HASH_ALL                                  HashFunc;
   UINTN                                     HashSize;
   UINT8                                     HashData[MAX_HASH_SIZE];
   BOOLEAN                                   Result;
@@ -78,8 +78,8 @@ VerifyChallengeSignature (
   ASYM_FREE                                 FreeFunc;
   ASYM_VERIFY                               VerifyFunc;
 
-  HashAll = GetSpdmHashFunc (SpdmContext);
-  ASSERT(HashAll != NULL);
+  HashFunc = GetSpdmHashFunc (SpdmContext);
+  ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
   
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
@@ -91,13 +91,13 @@ VerifyChallengeSignature (
   DEBUG((DEBUG_INFO, "MessageC Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
 
-  HashAll (GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
+  HashFunc (GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
   DEBUG((DEBUG_INFO, "M1M2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   
   if ((SpdmContext->LocalContext.SpdmCertChainVarBuffer == NULL) || (SpdmContext->LocalContext.SpdmCertChainVarBufferSize == 0)) {
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   CertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
@@ -107,7 +107,7 @@ VerifyChallengeSignature (
   VerifyFunc = GetSpdmAsymVerify (SpdmContext);
   Result = GetPublicKeyFromX509Func (CertBuffer, CertBufferSize, &Context);
   if (!Result) {
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   
   Result = VerifyFunc (
@@ -120,11 +120,11 @@ VerifyChallengeSignature (
   FreeFunc (Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyChallengeSignature - FAIL !!!\n"));
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   DEBUG((DEBUG_INFO, "!!! VerifyChallengeSignature - PASS !!!\n"));
   
-  return RETURN_SUCCESS;
+  return TRUE;
 }
 
 /*
@@ -140,6 +140,7 @@ SpdmChallenge (
   )
 {
   RETURN_STATUS                             Status;
+  BOOLEAN                                   Result;
   SPDM_CHALLENGE_REQUEST                    SpdmRequest;
   SPDM_CHALLENGE_AUTH_RESPONSE_MAX          SpdmResponse;
   UINTN                                     SpdmResponseSize;
@@ -216,10 +217,10 @@ SpdmChallenge (
   DEBUG((DEBUG_INFO, "CertChainHash (0x%x) - ", HashSize));
   InternalDumpData (CertChainHash, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
-  Status = VerifyCertificateChainHash (SpdmContext, CertChainHash, HashSize);
-  if (RETURN_ERROR(Status)) {
+  Result = SpdmRequesterVerifyCertificateChainHash (SpdmContext, CertChainHash, HashSize);
+  if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
-    return Status;
+    return RETURN_SECURITY_VIOLATION;
   }
 
   ServerNonce = Ptr;
@@ -266,10 +267,10 @@ SpdmChallenge (
   Signature = Ptr;
   DEBUG((DEBUG_INFO, "Signature (0x%x):\n", SignatureSize));
   InternalDumpHex (Signature, SignatureSize);
-  Status = VerifyChallengeSignature (SpdmContext, Signature, SignatureSize);
-  if (RETURN_ERROR(Status)) {
+  Result = SpdmRequesterVerifyChallengeSignature (SpdmContext, Signature, SignatureSize);
+  if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
-    return Status;
+    return RETURN_SECURITY_VIOLATION;
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;

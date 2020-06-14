@@ -18,39 +18,39 @@ typedef struct {
 
 #pragma pack()
 
-RETURN_STATUS
-VerifyDigest (
+BOOLEAN
+SpemRequesterVerifyDigest (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *Digest,
   UINTN                           DigestSize
   )
 {
-  HASH_ALL                                  HashAll;
+  HASH_ALL                                  HashFunc;
   UINTN                                     HashSize;
-  UINT8                                     HashData[MAX_HASH_SIZE];
+  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   
   CertBuffer = SpdmContext->LocalContext.SpdmCertChainVarBuffer;
   CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize;
   if ((CertBuffer == NULL) || (CertBufferSize == 0)) {
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   
-  HashAll = GetSpdmHashFunc (SpdmContext);
-  ASSERT(HashAll != NULL);
+  HashFunc = GetSpdmHashFunc (SpdmContext);
+  ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  HashAll (CertBuffer, CertBufferSize, HashData);
+  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
   
-  if (CompareMem (Digest, HashData, HashSize) != 0) {
+  if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
     DEBUG((DEBUG_INFO, "!!! VerifyDigest - FAIL !!!\n"));
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   
   DEBUG((DEBUG_INFO, "!!! VerifyDigest - PASS !!!\n"));
 
-  return RETURN_SUCCESS;
+  return TRUE;
 }
 
 /*
@@ -66,6 +66,7 @@ SpdmGetDigest (
      OUT VOID                 *TotalDigestBuffer
   )
 {
+  BOOLEAN                                   Result;
   RETURN_STATUS                             Status;
   SPDM_GET_DIGESTS_REQUEST                  SpdmRequest;
   SPDM_DIGESTS_RESPONSE_MAX                 SpdmResponse;
@@ -134,10 +135,10 @@ SpdmGetDigest (
     DEBUG((DEBUG_INFO, "\n"));
   }
 
-  Status = VerifyDigest (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
-  if (RETURN_ERROR(Status)) {
+  Result = SpemRequesterVerifyDigest (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
+  if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
-    return Status;
+    return RETURN_SECURITY_VIOLATION;
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;

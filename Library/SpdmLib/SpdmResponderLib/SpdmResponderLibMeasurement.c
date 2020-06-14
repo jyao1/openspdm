@@ -21,7 +21,7 @@ typedef struct {
 #pragma pack()
 
 BOOLEAN
-GenerateSpdmMeasurementSignature (
+SpdmResponderGenerateSpdmMeasurementSignature (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN VOID                       *ResponseMessage,
   IN UINTN                      ResponseMessageSize,
@@ -76,8 +76,8 @@ GenerateSpdmMeasurementSignature (
   return Result;
 }
 
-RETURN_STATUS
-CreateMeasurementSig (
+BOOLEAN
+SpdmResponderCreateMeasurementSig (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN VOID                       *ResponseMessage,
   IN UINTN                      ResponseMessageSize
@@ -97,12 +97,8 @@ CreateMeasurementSig (
   SigStruct->OpaqueLength = DEFAULT_OPAQUE_LENGTH;
   SetMem (SigStruct->OpaqueData, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
   
-  Result = GenerateSpdmMeasurementSignature (SpdmContext, ResponseMessage, ResponseMessageSize - SignatureSize, (VOID *)(SigStruct + 1));
-  if (!Result) {
-    return RETURN_DEVICE_ERROR;
-  }
-
-  return RETURN_SUCCESS;
+  Result = SpdmResponderGenerateSpdmMeasurementSignature (SpdmContext, ResponseMessage, ResponseMessageSize - SignatureSize, (VOID *)(SigStruct + 1));
+  return Result;
 }
 
 RETURN_STATUS
@@ -175,7 +171,7 @@ SpdmGetResponseMeasurement (
     *(UINT32 *)SpdmResponse->MeasurementRecordLength = 0;
 
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
-      Status = CreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
+      Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
         return RETURN_SUCCESS;
@@ -210,7 +206,7 @@ SpdmGetResponseMeasurement (
     }
 
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
-      Status = CreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
+      Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
         return RETURN_SUCCESS;
@@ -243,7 +239,7 @@ SpdmGetResponseMeasurement (
       CopyMem (MeasurmentBlock, CachedMeasurmentBlock, MeasurmentBlockSize);
 
       if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
-        Status = CreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
+        Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
         if (RETURN_ERROR(Status)) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
           return RETURN_SUCCESS;

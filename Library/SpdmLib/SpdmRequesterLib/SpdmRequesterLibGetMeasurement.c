@@ -22,14 +22,14 @@ typedef struct {
 } SPDM_MEASUREMENTS_RESPONSE_MAX;
 #pragma pack()
 
-RETURN_STATUS
-VerifyMeasurementSignature (
+BOOLEAN
+SpdmRequesterVerifyMeasurementSignature (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *SignData,
   UINTN                           SignDataSize
   )
 {
-  HASH_ALL                                  HashAll;
+  HASH_ALL                                  HashFunc;
   UINTN                                     HashSize;
   UINT8                                     HashData[MAX_HASH_SIZE];
   BOOLEAN                                   Result;
@@ -40,20 +40,20 @@ VerifyMeasurementSignature (
   ASYM_FREE                                 FreeFunc;
   ASYM_VERIFY                               VerifyFunc;
 
-  HashAll = GetSpdmHashFunc (SpdmContext);
-  ASSERT(HashAll != NULL);
+  HashFunc = GetSpdmHashFunc (SpdmContext);
+  ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
   
   DEBUG((DEBUG_INFO, "L1L2 Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
 
-  HashAll (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
+  HashFunc (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
   DEBUG((DEBUG_INFO, "L1L2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   
   if ((SpdmContext->LocalContext.SpdmCertChainVarBuffer == NULL) || (SpdmContext->LocalContext.SpdmCertChainVarBufferSize == 0)) {
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   CertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
@@ -63,7 +63,7 @@ VerifyMeasurementSignature (
   VerifyFunc = GetSpdmAsymVerify (SpdmContext);
   Result = GetPublicKeyFromX509Func (CertBuffer, CertBufferSize, &Context);
   if (!Result) {
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   
   Result = VerifyFunc (
@@ -76,11 +76,11 @@ VerifyMeasurementSignature (
   FreeFunc (Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - FAIL !!!\n"));
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   
   DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - PASS !!!\n"));
-  return RETURN_SUCCESS;
+  return TRUE;
 }
 
 
@@ -98,6 +98,7 @@ SpdmGetMeasurement (
      OUT VOID                 *MeasurementRecord
   )
 {
+  BOOLEAN                                   Result;
   RETURN_STATUS                             Status;
   SPDM_GET_MEASUREMENTS_REQUEST             SpdmRequest;
   UINTN                                     SpdmRequestSize;
@@ -237,10 +238,10 @@ SpdmGetMeasurement (
     DEBUG((DEBUG_INFO, "Signature (0x%x):\n", SignatureSize));
     InternalDumpHex (Signature, SignatureSize);
         
-    Status = VerifyMeasurementSignature (SpdmContext, Signature, SignatureSize);
-    if (RETURN_ERROR(Status)) {
+    Result = SpdmRequesterVerifyMeasurementSignature (SpdmContext, Signature, SignatureSize);
+    if (!Result) {
       SpdmContext->ErrorState = SPDM_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE;
-      return Status;
+      return RETURN_SECURITY_VIOLATION;
     }
 
     ResetManagedBuffer (&SpdmContext->Transcript.L1L2);

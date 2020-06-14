@@ -175,4 +175,31 @@ SpdmRegisterSpdmIo (
   IN     SPDM_IO_PROTOCOL          *SpdmIo
   );
 
+typedef
+RETURN_STATUS
+(EFIAPI *SPDM_GET_ENCAP_RESPONSE_FUNC) (
+  IN     VOID                 *SpdmContext,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmRegisterGetEncapResponseFunc (
+  IN  VOID                          *SpdmContext,
+  IN  SPDM_GET_ENCAP_RESPONSE_FUNC  GetResponseFunc
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGenerateEncapErrorResponse (
+  IN     VOID                 *Context,
+  IN     UINT8                ErrorCode,
+  IN     UINT8                ErrorData,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
 #endif

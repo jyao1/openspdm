@@ -144,7 +144,8 @@ SpdmGenerateFinalKey (
 RETURN_STATUS
 SpdmGenerateSessionHandshakeKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId
+  IN UINT8                        SessionId,
+  IN BOOLEAN                      IsRequester
   )
 {
   RETURN_STATUS                  Status;
@@ -164,6 +165,7 @@ SpdmGenerateSessionHandshakeKey (
   UINTN                          BinStr2Size;
   UINT8                          *CertBuffer;
   UINTN                          CertBufferSize;
+  UINT8                          CertBufferHash[MAX_HASH_SIZE];
   LARGE_MANAGED_BUFFER           TH1 = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
   UINT8                          SlotNum;
   SPDM_SESSION_INFO              *SessionInfo;
@@ -190,28 +192,23 @@ SpdmGenerateSessionHandshakeKey (
   SessionInfo->AeadIvSize = GetSpdmAeadIvSize(SpdmContext);;
 
   // TBD - cert chain
-  if (SpdmContext->LocalContext.SpdmCertChainVarBuffer != NULL) {
-    //
-    // Requester
-    //
+  if (IsRequester) {
     ASSERT ((SpdmContext->LocalContext.SpdmCertChainVarBuffer != NULL) && (SpdmContext->LocalContext.SpdmCertChainVarBufferSize != 0));
     CertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   } else {
-    //
-    // Responder
-    //
     ASSERT ((SpdmContext->LocalContext.CertificateChain[SlotNum] != NULL) && (SpdmContext->LocalContext.CertificateChainSize[SlotNum] != 0));
     CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   }
+  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SessionInfo->UsePsk) {
     AppendManagedBuffer (&TH1, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
     AppendManagedBuffer (&TH1, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
   } else {
     AppendManagedBuffer (&TH1, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-    AppendManagedBuffer (&TH1, CertBuffer, CertBufferSize);
+    AppendManagedBuffer (&TH1, CertBufferHash, HashSize);
     AppendManagedBuffer (&TH1, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
   }
   
@@ -306,7 +303,8 @@ SpdmGenerateSessionHandshakeKey (
 RETURN_STATUS
 SpdmGenerateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId
+  IN UINT8                        SessionId,
+  IN BOOLEAN                      IsRequester
   )
 {  
   RETURN_STATUS                  Status;
@@ -325,6 +323,10 @@ SpdmGenerateSessionDataKey (
   UINTN                          BinStr4Size;
   UINT8                          *CertBuffer;
   UINTN                          CertBufferSize;
+  UINT8                          CertBufferHash[MAX_HASH_SIZE];
+  UINT8                          *MutCertBuffer;
+  UINTN                          MutCertBufferSize;
+  UINT8                          MutCertBufferHash[MAX_HASH_SIZE];
   LARGE_MANAGED_BUFFER           TH2 = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
   UINT8                          SlotNum;
   SPDM_SESSION_INFO              *SessionInfo;
@@ -348,20 +350,27 @@ SpdmGenerateSessionDataKey (
   SlotNum = 0;
 
   // TBD - cert chain
-  if (SpdmContext->LocalContext.SpdmCertChainVarBuffer != NULL) {
-    //
-    // Requester
-    //
+  if (IsRequester) {
     ASSERT ((SpdmContext->LocalContext.SpdmCertChainVarBuffer != NULL) && (SpdmContext->LocalContext.SpdmCertChainVarBufferSize != 0));
     CertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   } else {
-    //
-    // Responder
-    //
     ASSERT ((SpdmContext->LocalContext.CertificateChain[SlotNum] != NULL) && (SpdmContext->LocalContext.CertificateChainSize[SlotNum] != 0));
     CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  }
+  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
+  if (SessionInfo->MutAuthRequested) {
+    if (IsRequester) {
+      ASSERT ((SpdmContext->LocalContext.CertificateChain[SlotNum] != NULL) && (SpdmContext->LocalContext.CertificateChainSize[SlotNum] != 0));
+      MutCertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
+      MutCertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    } else {
+      ASSERT ((SpdmContext->LocalContext.SpdmCertChainVarBuffer != NULL) && (SpdmContext->LocalContext.SpdmCertChainVarBufferSize != 0));
+      MutCertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+      MutCertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    }
+    HashFunc (MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
   }
 
   if (SessionInfo->UsePsk) {
@@ -370,8 +379,11 @@ SpdmGenerateSessionDataKey (
     AppendManagedBuffer (&TH2, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
   } else {
     AppendManagedBuffer (&TH2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-    AppendManagedBuffer (&TH2, CertBuffer, CertBufferSize);
+    AppendManagedBuffer (&TH2, CertBufferHash, HashSize);
     AppendManagedBuffer (&TH2, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
+    if (SessionInfo->MutAuthRequested) {
+      AppendManagedBuffer (&TH2, MutCertBufferHash, HashSize);
+    }
     AppendManagedBuffer (&TH2, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
   }
   HashFunc (GetManagedBuffer(&TH2), GetManagedBufferSize(&TH2), TH2HashData);

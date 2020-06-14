@@ -90,6 +90,7 @@ typedef enum {
   SpdmDataPublicCertChains,
   SpdmDataPrivateCertificate,
   SpdmDataMeasurementRecord,
+  SpdmDataMutAuthRequested,
   //
   // Pre-shared secret
   // If PSK is present, then PSK_EXCHANGE is used.

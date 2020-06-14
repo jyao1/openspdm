@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmRequesterTest.h"
 
+#define SLOT_NUMBER    2
+
 VOID                          *mSpdmContext;
 SOCKET                        mSocket;
 
@@ -281,6 +283,7 @@ SpdmClientInit (
   )
 {
   VOID                         *SpdmContext;
+  UINT8                        Index;
   RETURN_STATUS                Status;
   BOOLEAN                      Res;
   VOID                         *Data;
@@ -295,12 +298,34 @@ SpdmClientInit (
   SpdmInitContext (SpdmContext);
   SpdmRegisterSpdmIo (SpdmContext, &mSpdmProtocol);
 
-  Res = ReadPublicCertificateChain (&Data, &DataSize);
+  Res = ReadResponderPublicCertificateChain (&Data, &DataSize);
   if (Res) {
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
     SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
     // Do not free it.
+  }
+
+  Res = ReadRequesterPublicCertificateChain (&Data, &DataSize);
+  if (Res) {
+    ZeroMem (&Parameter, sizeof(Parameter));
+    Parameter.Location = SpdmDataLocationLocal;
+    Data8 = SLOT_NUMBER;
+    SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &Data8, sizeof(Data8));
+
+    for (Index = 0; Index < SLOT_NUMBER; Index++) {
+      Parameter.AdditionalData[0] = Index;
+      SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, Data, DataSize);
+    }
+    // do not free it
+  }
+
+  Res = ReadRequesterPrivateCertificate (&Data, &DataSize);
+  if (Res) {
+    ZeroMem (&Parameter, sizeof(Parameter));
+    Parameter.Location = SpdmDataLocationLocal;
+    SpdmSetData (SpdmContext, SpdmDataPrivateCertificate, &Parameter, Data, DataSize);
+    // do not free it
   }
 
   Data8 = 0;

@@ -31,28 +31,20 @@ typedef struct {
 
 #pragma pack()
 
-RETURN_STATUS
-VerifyPskExchangeHmac (
+BOOLEAN
+SpdmRequesterVerifyPskExchangeHmac (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     SPDM_SESSION_INFO    *SessionInfo,
   IN     VOID                 *HmacData,
   IN     UINTN                HmacDataSize
   )
 {
-  HMAC_ALL                                  HmacAll;
+  HMAC_ALL                                  HmacFunc;
   UINTN                                     HashSize;
   UINT8                                     CalcHmacData[MAX_HASH_SIZE];
   LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
-  SPDM_SESSION_INFO                         *SessionInfo;
-  
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return RETURN_UNSUPPORTED;
-  }
 
-  HmacAll = GetSpdmHmacFunc (SpdmContext);
-  ASSERT(HmacAll != NULL);
+  HmacFunc = GetSpdmHmacFunc (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
   ASSERT(HashSize == HmacDataSize);
 
@@ -66,18 +58,18 @@ VerifyPskExchangeHmac (
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacAll (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseFinishedKey, SessionInfo->HashSize, CalcHmacData);
+  HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseFinishedKey, SessionInfo->HashSize, CalcHmacData);
   DEBUG((DEBUG_INFO, "THCurr Hmac - "));
   InternalDumpData (CalcHmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   if (CompareMem (CalcHmacData, HmacData, HashSize) != 0) {
     DEBUG((DEBUG_INFO, "!!! VerifyPskExchangeHmac - FAIL !!!\n"));
-    return RETURN_SECURITY_VIOLATION;
+    return FALSE;
   }
   DEBUG((DEBUG_INFO, "!!! VerifyPskExchangeHmac - PASS !!!\n"));
 
-  return RETURN_SUCCESS;
+  return TRUE;
 }
 
 /**
@@ -95,6 +87,7 @@ SpdmSendReceivePskExchange (
      OUT VOID                 *MeasurementHash
   )
 {
+  BOOLEAN                                   Result;
   RETURN_STATUS                             Status;
   SPDM_PSK_EXCHANGE_REQUEST_MINE            SpdmRequest;
   UINTN                                     SpdmRequestSize;
@@ -190,7 +183,7 @@ SpdmSendReceivePskExchange (
 
   Ptr += HashSize;
 
-  Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId);
+  Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId, TRUE);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
@@ -200,11 +193,11 @@ SpdmSendReceivePskExchange (
   VerifyData = Ptr;
   DEBUG((DEBUG_INFO, "VerifyData (0x%x):\n", HmacSize));
   InternalDumpHex (VerifyData, HmacSize);
-  Status = VerifyPskExchangeHmac (SpdmContext, *SessionId, VerifyData, HmacSize);
-  if (RETURN_ERROR(Status)) {
+  Result = SpdmRequesterVerifyPskExchangeHmac (SpdmContext, SessionInfo, VerifyData, HmacSize);
+  if (!Result) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
-    return Status;
+    return RETURN_SECURITY_VIOLATION;
   }
 
   if (MeasurementHash != NULL) {

@@ -37,6 +37,9 @@ SOURCE_FILES =  \
 	$(SOURCE_DIR)\SpdmResponderLibChallengeAuth.c \
 	$(SOURCE_DIR)\SpdmResponderLibCommunication.c \
 	$(SOURCE_DIR)\SpdmResponderLibDigest.c \
+	$(SOURCE_DIR)\SpdmResponderLibEncapGetCertificate.c \
+	$(SOURCE_DIR)\SpdmResponderLibEncapGetDigest.c \
+	$(SOURCE_DIR)\SpdmResponderLibEncapResponse.c \
 	$(SOURCE_DIR)\SpdmResponderLibEndSession.c \
 	$(SOURCE_DIR)\SpdmResponderLibError.c \
 	$(SOURCE_DIR)\SpdmResponderLibFinish.c \
@@ -57,6 +60,9 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmResponderLibChallengeAuth.obj \
     $(OUTPUT_DIR)\SpdmResponderLibCommunication.obj \
     $(OUTPUT_DIR)\SpdmResponderLibDigest.obj \
+    $(OUTPUT_DIR)\SpdmResponderLibEncapGetCertificate.obj \
+    $(OUTPUT_DIR)\SpdmResponderLibEncapGetDigest.obj \
+    $(OUTPUT_DIR)\SpdmResponderLibEncapResponse.obj \
     $(OUTPUT_DIR)\SpdmResponderLibEndSession.obj \
     $(OUTPUT_DIR)\SpdmResponderLibError.obj \
     $(OUTPUT_DIR)\SpdmResponderLibFinish.obj \

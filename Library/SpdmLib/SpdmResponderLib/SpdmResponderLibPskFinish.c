@@ -10,7 +10,7 @@
 #include "SpdmResponderLibInternal.h"
 
 BOOLEAN
-SpdmVerifyPskFinishHmac (
+SpdmResponderVerifyPskFinishHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN  SPDM_SESSION_INFO         *SessionInfo,
   OUT UINT8                     *Hmac
@@ -44,8 +44,10 @@ SpdmVerifyPskFinishHmac (
   DEBUG((DEBUG_INFO, "\n"));
 
   if (CompareMem(Hmac, HmacData, HashSize) != 0) {
+    DEBUG((DEBUG_INFO, "!!! VerifyPskFinishHmac - FAIL !!!\n"));
     return FALSE;
   }
+  DEBUG((DEBUG_INFO, "!!! VerifyPskFinishHmac - PASS !!!\n"));
   return TRUE;
 }
 
@@ -98,15 +100,15 @@ SpdmGetResponsePskFinish (
   }
 
   // Need regenerate the finishedkey
-  SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId);
-  Result = SpdmVerifyPskFinishHmac (SpdmContext, SessionInfo, (UINT8 *)Request + sizeof(SPDM_PSK_FINISH_REQUEST));
+  SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);
+  Result = SpdmResponderVerifyPskFinishHmac (SpdmContext, SessionInfo, (UINT8 *)Request + sizeof(SPDM_PSK_FINISH_REQUEST));
   if (!Result) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, *ResponseSize);
-  SpdmGenerateSessionDataKey (SpdmContext, SessionId);
+  SpdmGenerateSessionDataKey (SpdmContext, SessionId, FALSE);
 
   return RETURN_SUCCESS;
 }

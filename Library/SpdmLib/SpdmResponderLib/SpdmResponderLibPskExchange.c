@@ -10,14 +10,14 @@
 #include "SpdmResponderLibInternal.h"
 
 BOOLEAN
-CalculateMeasurementSummaryHash (
+SpdmResponderCalculateMeasurementSummaryHash (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN  UINT8                MeasurementSummaryHashType,
   OUT UINT8                *MeasurementSummaryHash
   );
 
 BOOLEAN
-SpdmGeneratePskExchangeHmac (
+SpdmResponderGeneratePskExchangeHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN  SPDM_SESSION_INFO         *SessionInfo,
   OUT UINT8                     *Hmac
@@ -113,7 +113,7 @@ SpdmGetResponsePskExchange (
   GetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += DEFAULT_CONTEXT_LENGTH;
   
-  Result = CalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param1, Ptr);
+  Result = SpdmResponderCalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param1, Ptr);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
@@ -122,9 +122,9 @@ SpdmGetResponsePskExchange (
   Ptr += HashSize;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
-  SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId);
+  SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);
   
-  Result = SpdmGeneratePskExchangeHmac (SpdmContext, SessionInfo, Ptr);
+  Result = SpdmResponderGeneratePskExchangeHmac (SpdmContext, SessionInfo, Ptr);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_PSK_EXCHANGE_RSP, ResponseSize, Response);
