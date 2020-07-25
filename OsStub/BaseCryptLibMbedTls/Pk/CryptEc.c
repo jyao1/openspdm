@@ -338,12 +338,12 @@ EccSignatureDerToBin (
   HalfSize = (UINT8)(SigSize / 2);
 
   ASSERT (DerSignature[0] == 0x30);
-  ASSERT (DerSignature[1] + 2 == DerSigSize);
+  ASSERT ((UINTN)(DerSignature[1] + 2) == DerSigSize);
   ASSERT (DerSignature[2] == 0x02);
   DerRSize = DerSignature[3];
   ASSERT (DerSignature[4 + DerRSize] == 0x02);
   DerSSize = DerSignature[5 + DerRSize];
-  ASSERT (DerSigSize == DerRSize + DerSSize + 6);
+  ASSERT (DerSigSize == (UINTN)(DerRSize + DerSSize + 6));
 
   if (DerSignature[4] != 0) {
     RSize = DerRSize;
@@ -599,7 +599,7 @@ EcDsaVerify (
   default:
     return FALSE;
   }
-  if (SigSize != HalfSize * 2) {
+  if (SigSize != (UINTN)(HalfSize * 2)) {
     return FALSE;
   }
 

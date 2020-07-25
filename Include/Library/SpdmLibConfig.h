@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define DEFAULT_OPAQUE_LENGTH             16
 #define DEFAULT_OPAQUE_DATA               0xCC
 #define DEFAULT_CONTEXT_LENGTH            MAX_HASH_SIZE
+#define DEFAULT_PSK_HINT_LENGTH           16
 #define DEFAULT_SECURE_MCTP_PADDING_SIZE  1
 
 #define MAX_SPDM_MEASUREMENT_BLOCK_COUNT  8

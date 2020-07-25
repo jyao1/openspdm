@@ -323,7 +323,8 @@ SPDM DEFINITIONS ::=BEGIN
 
     SpdmGetMeasurementsRequest ::= SEQUENCE {
         header                      SpdmMessageHeader,
-        nonce                       OCTET STRING (SIZE (32))
+        nonce                       OCTET STRING (SIZE (32)),
+        slotIDParam                 UINT8
     }
 
     /* MEASUREMENTS response */
@@ -395,7 +396,8 @@ SPDM DEFINITIONS ::=BEGIN
     /* KEY_EXCHANGE request */
     SpdmKeyExchangeRequest ::= SEQUENCE {
         header                      SpdmMessageHeader,
-        dheNamedGroup               UINT32,
+        reqSessionID                UINT16,
+        reserved                    UINT16,
         randomData                  OCTET STRING (SIZE (32)),
         exchangeData                SpdmExchangeData,
         opaqueLength                UINT16,
@@ -405,12 +407,14 @@ SPDM DEFINITIONS ::=BEGIN
     /* KEY_EXCHANGE response */
     SpdmKeyExchangeResponse ::= SEQUENCE {
         header                      SpdmMessageHeader,
-        length                      UINT16,
+        rspSessionID                UINT16,
         mutAuthRequested            UINT8,
-        reserved                    UINT8,
+        slotIDParam                 UINT8,
         randomData                  OCTET STRING (SIZE (32)),
         exchangeData                SpdmExchangeData,
         measurementSummaryHash      SpdmDigest,
+        opaqueLength                UINT16,
+        opaqueData                  OCTET STRING,
         signature                   SpdmSignature,
         verifyData                  SpdmHmac
     }
@@ -431,9 +435,11 @@ SPDM DEFINITIONS ::=BEGIN
     /* PSK_EXCHANGE request */
     SpdmPskExchangeRequest ::= SEQUENCE {
         header                      SpdmMessageHeader,
+        reqSessionID                UINT16,
+        pskHintLength               UINT16,
+        requesterContextLength      UINT16,
         opaqueLength                UINT16,
-        requesterContextLength      UINT8,
-        reserved                    UINT8,
+        pskHint                     OCTET STRING,
         requesterContext            OCTET STRING,
         opaqueData                  OCTET STRING
     }
@@ -441,10 +447,13 @@ SPDM DEFINITIONS ::=BEGIN
     /* PSK_EXCHANGE response */
     SpdmPskExchangeResponse ::= SEQUENCE {
         header                      SpdmMessageHeader,
-        responderContextLength      UINT8,
-        reserved                    OCTET STRING (SIZE(3)),
-        responderContext            OCTET STRING,
+        rspSessionID                UINT16,
+        reserved                    UINT16,
+        responderContextLength      UINT16,
+        opaqueLength                UINT16,
         measurementSummaryHash      SpdmDigest,
+        responderContext            OCTET STRING,
+        opaqueData                  OCTET STRING,
         verifyData                  SpdmHmac
     }
 
