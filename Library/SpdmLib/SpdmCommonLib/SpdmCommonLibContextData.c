@@ -92,10 +92,21 @@ SpdmAllocateReqSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext
   )
 {
-  UINT16 ReqSessionId;
+  UINT16                     ReqSessionId;
+  SPDM_SESSION_INFO          *SessionInfo;
+  UINTN                      Index;
 
-  ReqSessionId = 0;
-  return ReqSessionId;
+  SessionInfo = SpdmContext->SessionInfo;
+  for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
+    if ((SessionInfo[Index].SessionId & 0xFFFF0000) == (INVALID_SESSION_ID & 0xFFFF0000)) {
+      ReqSessionId = (UINT16)(0xFFFF - Index);
+      return ReqSessionId;
+    }
+  }
+
+  DEBUG ((DEBUG_ERROR, "SpdmAllocateReqSessionId - MAX SessionId\n"));
+  ASSERT(FALSE);
+  return (INVALID_SESSION_ID & 0xFFFF0000) >> 16;
 }
 
 UINT16
@@ -107,11 +118,10 @@ SpdmAllocateRspSessionId (
   SPDM_SESSION_INFO          *SessionInfo;
   UINTN                      Index;
 
-  RspSessionId = 0xFF;
   SessionInfo = SpdmContext->SessionInfo;
   for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
     if ((SessionInfo[Index].SessionId & 0xFFFF) == (INVALID_SESSION_ID & 0xFFFF)) {
-      RspSessionId = (UINT16)(0xFF - Index);
+      RspSessionId = (UINT16)(0xFFFF - Index);
       return RspSessionId;
     }
   }

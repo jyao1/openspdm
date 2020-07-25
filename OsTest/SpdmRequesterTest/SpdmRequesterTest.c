@@ -29,9 +29,11 @@ BOOLEAN
 CommunicatePlatformData (
   IN SOCKET           Socket,
   IN UINT32           Command,
+  IN UINT32           Session,
   IN UINT8            *SendBuffer,
   IN UINTN            BytesToSend,
   OUT UINT32          *Response,
+  OUT UINT32          *RspSession,
   IN OUT UINTN        *BytesToReceive,
   OUT UINT8           *ReceiveBuffer
   );
@@ -105,6 +107,7 @@ PlatformClientRoutine (
   BOOLEAN Result;
   UINT32  Response;
   UINTN   ResponseSize;
+  UINT32  Session;
   
 #ifdef _MSC_VER
   WSADATA Ws;
@@ -125,9 +128,11 @@ PlatformClientRoutine (
   Result = CommunicatePlatformData (
              PlatformSocket,
              SOCKET_SPDM_COMMAND_TEST,
+             0,
              (UINT8 *)"Client Hello!",
              sizeof("Client Hello!"),
              &Response,
+             &Session,
              &ResponseSize,
              mReceiveBuffer
              );
@@ -149,9 +154,11 @@ PlatformClientRoutine (
   Result = CommunicatePlatformData (
              PlatformSocket,
              SOCKET_SPDM_COMMAND_STOP,
+             0,
              NULL,
              0,
              &Response,
+             &Session,
              &ResponseSize,
              NULL
              );

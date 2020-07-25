@@ -109,6 +109,7 @@ SpdmGetResponseVendorDefinedRequest (
 BOOLEAN
 ProcessSpdmData (
   IN UINT32     Command,
+  IN UINT32     Session,
   IN VOID       *RequestBuffer,
   IN UINTN      RequestBufferSize,
   OUT VOID      *ResponseBuffer,
@@ -123,7 +124,7 @@ ProcessSpdmData (
   if (Command == SOCKET_SPDM_COMMAND_NORMAL) {
     Status = SpdmReceiveSendData (SpdmContext, RequestBuffer, RequestBufferSize, ResponseBuffer, ResponseBufferSize);
   } else {
-    Status = SpdmReceiveSendSessionData (SpdmContext, GET_COMMAND_SESSION_ID(Command), RequestBuffer, RequestBufferSize, ResponseBuffer, ResponseBufferSize);
+    Status = SpdmReceiveSendSessionData (SpdmContext, Session, RequestBuffer, RequestBufferSize, ResponseBuffer, ResponseBufferSize);
   }
   if (RETURN_ERROR(Status)) {
     return FALSE;

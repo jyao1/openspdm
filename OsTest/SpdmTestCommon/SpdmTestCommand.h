@@ -14,7 +14,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 //
 // Client->Server/Server->Client
-//   Command/Response + SessionId: 2 bytes (big endian) + 2 bytes (big endian)
+//   Command/Response: 4 bytes (big endian)
+//   SessionId: 4 bytes (big endian)
 //   PayloadSize (excluding Command and PayloadSize): 4 bytes (big endian)
 //   Payload (SPDM message, starting from SPDM_HEADER): PayloadSize (little endian)
 //
@@ -24,10 +25,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SOCKET_SPDM_COMMAND_STOP     0xFFFE
 #define SOCKET_SPDM_COMMAND_UNKOWN   0xFFFF
 #define SOCKET_SPDM_COMMAND_TEST     0xDEAD
-
-#define GET_COMMAND_OPCODE(c)        ((UINT16)((c) & 0xFFFF))
-#define GET_COMMAND_SESSION_ID(c)    ((UINT8)(((c) & 0xFFFF0000) >> 16))
-#define MAKE_COMMAND(c, s)           ((c) | ((s) << 16))
 
 //
 // Vendor Hello

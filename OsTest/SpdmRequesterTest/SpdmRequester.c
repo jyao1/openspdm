@@ -18,16 +18,18 @@ BOOLEAN
 CommunicatePlatformData (
   IN SOCKET           Socket,
   IN UINT32           Command,
+  IN UINT32           Session,
   IN UINT8            *SendBuffer,
   IN UINTN            BytesToSend,
   OUT UINT32          *Response,
+  OUT UINT32          *RspSession,
   IN OUT UINTN        *BytesToReceive,
   OUT UINT8           *ReceiveBuffer
   )
 {
   BOOLEAN Result;
 
-  Result = SendPlatformData (Socket, Command, SendBuffer, BytesToSend);
+  Result = SendPlatformData (Socket, Command, Session, SendBuffer, BytesToSend);
   if (!Result) {
     printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -39,7 +41,7 @@ CommunicatePlatformData (
     return Result;
   }
 
-  Result = ReceivePlatformData (Socket, Response, ReceiveBuffer, BytesToReceive);
+  Result = ReceivePlatformData (Socket, Response, RspSession, ReceiveBuffer, BytesToReceive);
   if (!Result) {
     printf ("ReceivePlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -86,7 +88,7 @@ SpdmClientSendRequest (
 {
   BOOLEAN Result;
 
-  Result = SendPlatformData (mSocket, SOCKET_SPDM_COMMAND_NORMAL, Request, (UINT32)RequestSize);
+  Result = SendPlatformData (mSocket, SOCKET_SPDM_COMMAND_NORMAL, 0, Request, (UINT32)RequestSize);
   if (!Result) {
     printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -134,8 +136,9 @@ SpdmClientReceiveResponse (
 {
   BOOLEAN Result;
   UINT32  Command;
+  UINT32  Session;
 
-  Result = ReceivePlatformData (mSocket, &Command, Response, ResponseSize);
+  Result = ReceivePlatformData (mSocket, &Command, &Session, Response, ResponseSize);
   if (!Result) {
     printf ("ReceivePlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -191,7 +194,7 @@ SpdmClientSecureSendRequest (
 {
   BOOLEAN Result;
 
-  Result = SendPlatformData (mSocket, MAKE_COMMAND(SOCKET_SPDM_COMMAND_SECURE, SessionId), Request, (UINT32)RequestSize);
+  Result = SendPlatformData (mSocket, SOCKET_SPDM_COMMAND_SECURE, SessionId, Request, (UINT32)RequestSize);
   if (!Result) {
     printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -244,9 +247,9 @@ SpdmClientSecureReceiveResponse (
 {
   BOOLEAN Result;
   UINT32  Command;
+  UINT32  Session;
 
-  Command = MAKE_COMMAND(SOCKET_SPDM_COMMAND_SECURE, SessionId);
-  Result = ReceivePlatformData (mSocket, &Command, Response, ResponseSize);
+  Result = ReceivePlatformData (mSocket, &Command, &Session, Response, ResponseSize);
   if (!Result) {
     printf ("ReceivePlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -257,11 +260,11 @@ SpdmClientSecureReceiveResponse (
       );
     return RETURN_DEVICE_ERROR;
   }
-  if (GET_COMMAND_SESSION_ID(Command) != SessionId) {
+  if (Session != SessionId) {
     printf ("ReceivePlatformData Command Error - %x\n", Command);
     return RETURN_DEVICE_ERROR;
   }
-  if (GET_COMMAND_OPCODE(Command) != SOCKET_SPDM_COMMAND_SECURE) {
+  if (Command != SOCKET_SPDM_COMMAND_SECURE) {
     printf ("ReceivePlatformData Command Error - %x\n", Command);
     return RETURN_DEVICE_ERROR;
   }

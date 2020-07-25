@@ -19,6 +19,7 @@ SpdmServerInit (
 BOOLEAN
 ProcessSpdmData (
   IN UINT32     Command,
+  IN UINT32     Session,
   IN VOID       *RequestBuffer,
   IN UINTN      RequestBufferSize,
   OUT VOID      *ResponseBuffer,
@@ -93,12 +94,13 @@ PlatformServer(
 {
   BOOLEAN            Result;
   UINT32             Command;
+  UINT32             Session;
   UINTN              BytesReceived;
   UINTN              BytesToReceive;
 
   while (TRUE) {
     BytesReceived = sizeof(mReceiveBuffer);
-    Result = ReceivePlatformData (Socket, &Command, mReceiveBuffer, &BytesReceived);
+    Result = ReceivePlatformData (Socket, &Command, &Session, mReceiveBuffer, &BytesReceived);
     if (!Result) {
       printf ("ReceivePlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -109,11 +111,12 @@ PlatformServer(
       );
       return TRUE;
     }
-    switch(GET_COMMAND_OPCODE(Command)) {
+    switch(Command) {
     case SOCKET_SPDM_COMMAND_TEST:
       Result = SendPlatformData (
                  Socket,
                  SOCKET_SPDM_COMMAND_TEST,
+                 0,
                  (UINT8 *)"Server Hello!",
                  sizeof("Server Hello!")
                  );
@@ -133,6 +136,7 @@ PlatformServer(
       BytesToReceive = sizeof(mReceiveBuffer);
       Result = ProcessSpdmData (
                  Command,
+                 Session,
                  mReceiveBuffer,
                  BytesReceived,
                  mReceiveBuffer,
@@ -149,7 +153,7 @@ PlatformServer(
         return TRUE;
       }
                 
-      Result = SendPlatformData (Socket, Command, mReceiveBuffer, BytesToReceive);
+      Result = SendPlatformData (Socket, Command, Session, mReceiveBuffer, BytesToReceive);
       if (!Result) {
         printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -162,7 +166,7 @@ PlatformServer(
       }
       break;
     case SOCKET_SPDM_COMMAND_STOP:
-      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_STOP, NULL, 0);
+      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_STOP, 0, NULL, 0);
       if (!Result) {
         printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -177,7 +181,7 @@ PlatformServer(
       break;
     default:
       printf ("Unrecognized platform interface command %x\n", Command);
-      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_UNKOWN, NULL, 0);
+      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_UNKOWN, 0, NULL, 0);
       if (!Result) {
         printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
