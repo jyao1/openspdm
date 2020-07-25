@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 
 ///
-/// SPDM response code
+/// SPDM response code (1.0)
 ///
 #define SPDM_DIGESTS                        0x01
 #define SPDM_CERTIFICATE                    0x02
@@ -23,6 +23,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPDM_MEASUREMENTS                   0x60
 #define SPDM_CAPABILITIES                   0x61
 #define SPDM_ALGORITHMS                     0x63
+#define SPDM_VENDOR_DEFINED_RESPONSE        0x7E
+#define SPDM_ERROR                          0x7F
+///
+/// SPDM response code (1.1)
+///
 #define SPDM_KEY_EXCHANGE_RSP               0x64
 #define SPDM_FINISH_RSP                     0x65
 #define SPDM_PSK_EXCHANGE_RSP               0x66
@@ -32,10 +37,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPDM_ENCAPSULATED_REQUEST           0x6A
 #define SPDM_ENCAPSULATED_RESPONSE_ACK      0x6B
 #define SPDM_END_SESSION_ACK                0x6C
-#define SPDM_VENDOR_DEFINED_RESPONSE        0x7E
-#define SPDM_ERROR                          0x7F
 ///
-/// SPDM request code
+/// SPDM request code (1.0)
 ///
 #define SPDM_GET_DIGESTS                    0x81
 #define SPDM_GET_CERTIFICATE                0x82
@@ -44,6 +47,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPDM_GET_MEASUREMENTS               0xE0
 #define SPDM_GET_CAPABILITIES               0xE1
 #define SPDM_NEGOTIATE_ALGORITHMS           0xE3
+#define SPDM_VENDOR_DEFINED_REQUEST         0xFE
+#define SPDM_RESPOND_IF_READY               0xFF
+///
+/// SPDM request code (1.1)
+///
 #define SPDM_KEY_EXCHANGE                   0xE4
 #define SPDM_FINISH                         0xE5
 #define SPDM_PSK_EXCHANGE                   0xE6
@@ -53,8 +61,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPDM_GET_ENCAPSULATED_REQUEST       0xEA
 #define SPDM_DELIVER_ENCAPSULATED_RESPONSE  0xEB
 #define SPDM_END_SESSION                    0xEC
-#define SPDM_VENDOR_DEFINED_REQUEST         0xFE
-#define SPDM_RESPOND_IF_READY               0xFF
 
 ///
 /// SPDM message header
@@ -108,6 +114,7 @@ typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   // Param1 == RSVD
   // Param2 == RSVD
+  // Below field is added in 1.1.
   UINT8                Reserved;
   UINT8                CTExponent;
   UINT16               Reserved2;
@@ -128,27 +135,51 @@ typedef struct {
 } SPDM_CAPABILITIES_RESPONSE;
 
 ///
-/// SPDM GET_CAPABILITIES response Flags
+/// SPDM GET_CAPABILITIES request Flags (1.1)
 ///
-#define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP                       BIT0 // responder only
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP                        BIT1
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP                        BIT2
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP                        (BIT3 | BIT4)
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_NO_SIG                   BIT3
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_SIG                      BIT4
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_FRESH_CAP                  BIT5
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP                     BIT6
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP                         BIT7
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP                    BIT8
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP                      BIT9
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP                         (BIT10 | BIT11)
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP_REQUESTER                 BIT10
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP                       BIT12
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP                       BIT13
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP                     BIT14
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP      BIT15
+#define SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP                  BIT16
+
+///
+/// SPDM GET_CAPABILITIES response Flags (1.0)
+///
+#define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP                       BIT0
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP                        BIT1
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP                        BIT2
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP                        (BIT3 | BIT4)
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG                   BIT3
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG                      BIT4
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_FRESH_CAP                  BIT5
+///
+/// SPDM GET_CAPABILITIES response Flags (1.1)
+///
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP                     BIT6
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP                         BIT7
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP                    BIT8
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP                      BIT9
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP                         (BIT10 | BIT11)
-#define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_REQUESTER                 BIT10
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER                 BIT10
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT    BIT11
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP                       BIT12
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP                       BIT13
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP                     BIT14
 #define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP      BIT15
+#define SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP                  BIT16
 
 ///
 /// SPDM NEGOTIATE_ALGORITHMS request
@@ -166,8 +197,9 @@ typedef struct {
   UINT8                ExtAsymCount;
   UINT8                ExtHashCount;
   UINT16               Reserved3;
-//UINT32               ExtAsym[ExtAsymCount];
-//UINT32               ExtHash[ExtHashCount];
+//SPDM_EXTENDED_ALGORITHM                 ExtAsym[ExtAsymCount];
+//SPDM_EXTENDED_ALGORITHM                 ExtHash[ExtHashCount];
+  // Below field is added in 1.1.
 //SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE  AlgStruct[Param1];
 } SPDM_NEGOTIATE_ALGORITHMS_REQUEST;
 
@@ -178,10 +210,15 @@ typedef struct {
 //UINT32               AlgExternal[ExtAlgCount];
 } SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE;
 
-#define SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE                0
-#define SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD               1
-#define SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG  2
-#define SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE       3
+typedef struct {
+  UINT8                ExtAlgCount:4;
+  UINT8                FixedAlgByteCount:4;
+} SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_COUNT;
+
+#define SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE                2
+#define SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD               3
+#define SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG  4
+#define SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE       5
 
 typedef struct {
   UINT8                AlgType;
@@ -251,8 +288,9 @@ typedef struct {
   UINT8                ExtAsymSelCount;
   UINT8                ExtHashSelCount;
   UINT16               Reserved3;
-//UINT32               ExtAsymSel[ExtAsymSelCount];
-//UINT32               ExtHashSel[ExtHashSelCount];
+//SPDM_EXTENDED_ALGORITHM                 ExtAsymSel[ExtAsymSelCount];
+//SPDM_EXTENDED_ALGORITHM                 ExtHashSel[ExtHashSelCount];
+  // Below field is added in 1.1.
 //SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE  AlgStruct[Param1];
 } SPDM_ALGORITHMS_RESPONSE;
 
@@ -286,6 +324,8 @@ typedef struct {
 #define SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_IANA      4
 #define SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_HDBASET   5
 #define SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_MIPI      6
+#define SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_CXL       7
+#define SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_JEDEC     8
 
 ///
 /// SPDM GET_DIGESTS request
@@ -372,7 +412,7 @@ typedef struct {
 ///
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
-  // Param1 == SlotNum
+  // Param1 == ResponseAttribute
   // Param2 == SlotMask
 //UINT8                CertChainHash[DigestSize];
 //UINT8                Nonce[32];
@@ -382,6 +422,12 @@ typedef struct {
 //UINT8                Signature[KeySize];
 } SPDM_CHALLENGE_AUTH_RESPONSE;
 
+typedef struct {
+  UINT8                SlotNum:4;
+  UINT8                Reserved:3;
+  UINT8                BasicMutAuthReq:1;
+} SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE;
+
 ///
 /// SPDM GET_MEASUREMENTS request
 ///
@@ -390,7 +436,14 @@ typedef struct {
   // Param1 == Attributes
   // Param2 == MeasurementOperation
   UINT8                Nonce[32];
+  // Below field is added in 1.1.
+  UINT8                SlotIDParam; // BIT[0:3]=SlotNum, BIT[4:7]=Reserved
 } SPDM_GET_MEASUREMENTS_REQUEST;
+
+typedef struct {
+  UINT8                SlotNum:4;
+  UINT8                Reserved:4;
+} SPDM_GET_MEASUREMENTS_REQUEST_SLOT_ID_PARAMETER;
 
 ///
 /// SPDM GET_MEASUREMENTS request Attributes
@@ -431,6 +484,11 @@ typedef struct {
 //UINT8                                 HashValue[HashSize];
 } SPDM_MEASUREMENT_BLOCK_DMTF;
 
+typedef struct {
+  UINT8                Content:7;
+  UINT8                Presentation:1;
+} SPDM_MEASUREMENTS_BLOCK_MEASUREMENT_TYPE;
+
 ///
 /// SPDM MEASUREMENTS block MeasurementValueType
 ///
@@ -438,6 +496,7 @@ typedef struct {
 #define SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MUTABLE_FIRMWARE        1
 #define SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_HARDWARE_CONFIGURATION  2
 #define SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_FIRMWARE_CONFIGURATION  3
+#define SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MASK                    0x7
 #define SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_RAW_BIT_STREAM          BIT7
 
 ///
@@ -446,7 +505,7 @@ typedef struct {
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   // Param1 == TotalNumberOfMeasurement/RSVD
-  // Param2 == RSVD
+  // Param2 == SlotNum
   UINT8                NumberOfBlocks;
   UINT8                MeasurementRecordLength[3];
 //UINT8                MeasurementRecord[MeasurementRecordLength];
@@ -515,6 +574,10 @@ typedef struct {
 //UINT8                VendorDefinedPayload[PayloadLength];
 } SPDM_VENDOR_DEFINED_RESPONSE_MSG;
 
+//
+// Below command is defined in SPDM 1.1
+//
+
 ///
 /// SPDM KEY_EXCHANGE request
 ///
@@ -522,7 +585,8 @@ typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   // Param1 == HashType
   // Param2 == SlotNum
-  UINT32               DHE_Named_Group;
+  UINT16               ReqSessionID;
+  UINT16               Reserved;
   UINT8                RandomData[32];
 //UINT8                ExchangeData[D];
 //UINT16               OpaqueLength;
@@ -537,37 +601,30 @@ typedef struct {
 #define SPDM_KEY_EXCHANGE_REQUEST_ALL_MEASUREMENTS_HASH            0xFF
 
 ///
-/// SPDM KEY_EXCHANGE request DHE_Named_Group
-///
-#define SPDM_KEY_EXCHANGE_REQUEST_DHE_NAME_GROUP_FFDHE2048 BIT0
-#define SPDM_KEY_EXCHANGE_REQUEST_DHE_NAME_GROUP_FFDHE3072 BIT1
-#define SPDM_KEY_EXCHANGE_REQUEST_DHE_NAME_GROUP_FFDHE4096 BIT2
-#define SPDM_KEY_EXCHANGE_REQUEST_DHE_NAME_GROUP_SECP256R1 BIT3
-#define SPDM_KEY_EXCHANGE_REQUEST_DHE_NAME_GROUP_SECP384R1 BIT4
-#define SPDM_KEY_EXCHANGE_REQUEST_DHE_NAME_GROUP_SECP521R1 BIT5
-
-///
 /// SPDM KEY_EXCHANGE response
 ///
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   // Param1 == HeartbeatPeriod
-  // Param2 == SessionID
-  UINT16               Length;
+  // Param2 == RSVD
+  UINT16               RspSessionID;
   UINT8                MutAuthRequested;
-  UINT8                Reserved;
+  UINT8                SlotIDParam;
   UINT8                RandomData[32];
 //UINT8                ExchangeData[D];
 //UINT8                MeasurementSummaryHash[DigestSize];
+//UINT16               OpaqueLength;
+//UINT8                OpaqueData[OpaqueLength];
 //UINT8                Signature[S];
-//UINT8                VerifyData[O];
+//UINT8                ResponderVerifyData[H];
 } SPDM_KEY_EXCHANGE_RESPONSE;
 
 ///
 /// SPDM KEY_EXCHANGE response MutAuthRequested
 ///
-#define SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED                   BIT0
-#define SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS  BIT1
+#define SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED                     BIT0
+#define SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST  BIT1
+#define SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS    BIT2
 
 ///
 /// SPDM FINISH request
@@ -577,7 +634,7 @@ typedef struct {
   // Param1 == SignatureIncluded
   // Param2 == SlotNum
 //UINT8                Signature[S];
-//UINT8                VerifyData[H];
+//UINT8                RequesterVerifyData[H];
 } SPDM_FINISH_REQUEST;
 
 ///
@@ -592,7 +649,7 @@ typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   // Param1 == RSVD
   // Param2 == RSVD
-//UINT8                VerifyData[O];
+//UINT8                ResponderVerifyData[H];
 } SPDM_FINISH_RESPONSE;
 
 ///
@@ -602,9 +659,11 @@ typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   // Param1 == HashType
   // Param2 == RSVD
+  UINT16               ReqSessionID;
+  UINT16               PSKHintLength;
+  UINT16               RequesterContextLength;
   UINT16               OpaqueLength;
-  UINT8                RequesterContextLength;
-  UINT8                Reserved;
+//UINT8                PSKHint[PSKHintLength];
 //UINT8                RequesterContext[RequesterContextLength];
 //UINT8                OpaqueData[OpaqueLength];
 } SPDM_PSK_EXCHANGE_REQUEST;
@@ -615,12 +674,15 @@ typedef struct {
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   // Param1 == HeartbeatPeriod
-  // Param2 == SessionID
-  UINT8                ResponderContextLength;
-  UINT8                Reserved[3];
-//UINT8                ResponderContext[ResponderContextLength];
+  // Param2 == RSVD
+  UINT16               RspSessionID;
+  UINT16               Reserved;
+  UINT16               ResponderContextLength;
+  UINT16               OpaqueLength;
 //UINT8                MeasurementSummaryHash[DigestSize];
-//UINT8                VerifyData[H];
+//UINT8                ResponderContext[ResponderContextLength];
+//UINT8                OpaqueData[OpaqueLength];
+//UINT8                ResponderVerifyData[H];
 } SPDM_PSK_EXCHANGE_RESPONSE;
 
 ///
@@ -720,9 +782,16 @@ typedef struct {
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   // Param1 == RequestID
-  // Param2 == RSVD
+  // Param2 == PayloadType
 //UINT8                EncapsulatedRequest[];
 } SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE;
+
+///
+/// SPDM ENCAPSULATED_RESPONSE_ACK_RESPONSE Payload Type
+///
+#define SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_ABSENT       0
+#define SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_PRESENT      1
+#define SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER  2
 
 ///
 /// SPDM END_SESSION request

@@ -13,19 +13,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
+  UINT16               ReqSessionID;
+  UINT16               PSKHintLength;
+  UINT16               RequesterContextLength;
   UINT16               OpaqueLength;
-  UINT8                RequesterContextLength;
-  UINT8                Reserved;
+  UINT8                PSKHint[DEFAULT_PSK_HINT_LENGTH];
   UINT8                RequesterContext[DEFAULT_CONTEXT_LENGTH];
   UINT8                OpaqueData[DEFAULT_OPAQUE_LENGTH];
 } SPDM_PSK_EXCHANGE_REQUEST_MINE;
 
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
-  UINT8                ResponderContextLength;
-  UINT8                Reserved[3];
-  UINT8                ResponderContext[DEFAULT_CONTEXT_LENGTH];
+  UINT16               RspSessionID;
+  UINT16               Reserved;
+  UINT16               ResponderContextLength;
+  UINT16               OpaqueLength;
   UINT8                MeasurementSummaryHash[MAX_HASH_SIZE];
+  UINT8                ResponderContext[DEFAULT_CONTEXT_LENGTH];
+  UINT8                OpaqueData[MAX_SPDM_OPAQUE_DATA_SIZE];
   UINT8                VerifyData[MAX_HASH_SIZE];
 } SPDM_PSK_EXCHANGE_RESPONSE_MAX;
 
@@ -83,7 +88,7 @@ SpdmSendReceivePskExchange (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MeasurementHashType,
      OUT UINT8                *HeartbeatPeriod,
-     OUT UINT8                *SessionId,
+     OUT UINT32               *SessionId,
      OUT VOID                 *MeasurementHash
   )
 {
@@ -98,6 +103,8 @@ SpdmSendReceivePskExchange (
   UINT8                                     *Ptr;
   VOID                                      *MeasurementSummaryHash;
   UINT8                                     *VerifyData;
+  UINT16                                    ReqSessionId;
+  UINT16                                    RspSessionId;
   SPDM_SESSION_INFO                         *SessionInfo;
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP) == 0) {
@@ -110,15 +117,21 @@ SpdmSendReceivePskExchange (
   SpdmRequest.Header.RequestResponseCode = SPDM_PSK_EXCHANGE;
   SpdmRequest.Header.Param1 = MeasurementHashType;
   SpdmRequest.Header.Param2 = 0;
-  SpdmRequest.OpaqueLength = DEFAULT_OPAQUE_LENGTH;
+  SpdmRequest.PSKHintLength = DEFAULT_PSK_HINT_LENGTH;
   SpdmRequest.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  SpdmRequest.Reserved = 0;
+  SpdmRequest.OpaqueLength = DEFAULT_OPAQUE_LENGTH;
+
+  ReqSessionId = SpdmAllocateReqSessionId (SpdmContext);
+  SpdmRequest.ReqSessionID = ReqSessionId;
+
   GetRandomNumber (DEFAULT_CONTEXT_LENGTH, SpdmRequest.RequesterContext);
   DEBUG((DEBUG_INFO, "ClientRandomData (0x%x) - ", SpdmRequest.RequesterContextLength));
   InternalDumpData (SpdmRequest.RequesterContext, SpdmRequest.RequesterContextLength);
   DEBUG((DEBUG_INFO, "\n"));
 
   SetMem (SpdmRequest.OpaqueData, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
+
+  // TBD: set PSKHint
 
   SpdmRequestSize = sizeof(SPDM_PSK_EXCHANGE_REQUEST_MINE);
   Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
@@ -144,44 +157,52 @@ SpdmSendReceivePskExchange (
   if (HeartbeatPeriod != NULL) {
     *HeartbeatPeriod = SpdmResponse.Header.Param1;
   }
-  *SessionId = SpdmResponse.Header.Param2;
+  RspSessionId = SpdmResponse.RspSessionID;
+  *SessionId = (ReqSessionId << 16) | RspSessionId;
   SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId);
   SessionInfo->UsePsk = TRUE;
+
+  HashSize = GetSpdmHashSize (SpdmContext);
+  HmacSize = GetSpdmHashSize (SpdmContext);
+
+  if (SpdmResponseSize < sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
+                         SpdmResponse.ResponderContextLength +
+                         SpdmResponse.OpaqueLength +
+                         HashSize +
+                         HmacSize) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_DEVICE_ERROR;
+  }
+  SpdmResponseSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
+                     SpdmResponse.ResponderContextLength +
+                     SpdmResponse.OpaqueLength +
+                     HashSize +
+                     HmacSize;
 
   //
   // Cache session data
   //
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
   // Need remove HMAC.
-  HmacSize = GetSpdmHashSize (SpdmContext);
   if (SpdmResponseSize > HmacSize) {
     AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - HmacSize);
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
-  HmacSize = GetSpdmHashSize (SpdmContext);
-
-  if (SpdmResponseSize != sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
-                          SpdmResponse.ResponderContextLength +
-                          HashSize +
-                          HmacSize) {
-    SpdmFreeSessionId (SpdmContext, *SessionId);
-    return RETURN_DEVICE_ERROR;
-  }
-
-  Ptr = (UINT8 *)(SpdmResponse.ResponderContext);
-  DEBUG((DEBUG_INFO, "ServerRandomData (0x%x) - ", SpdmResponse.ResponderContextLength));
-  InternalDumpData (Ptr, SpdmResponse.ResponderContextLength);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  Ptr += SpdmResponse.ResponderContextLength;
-  
+  Ptr = (UINT8 *)(SpdmResponse.MeasurementSummaryHash);
   MeasurementSummaryHash = Ptr;
   DEBUG((DEBUG_INFO, "MeasurementSummaryHash (0x%x) - ", HashSize));
   InternalDumpData (MeasurementSummaryHash, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   Ptr += HashSize;
+
+  DEBUG((DEBUG_INFO, "ServerRandomData (0x%x) - ", SpdmResponse.ResponderContextLength));
+  InternalDumpData (Ptr, SpdmResponse.ResponderContextLength);
+  DEBUG((DEBUG_INFO, "\n"));
+
+  Ptr += SpdmResponse.ResponderContextLength;
+
+  Ptr += SpdmResponse.OpaqueLength;
 
   Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId, TRUE);
   if (RETURN_ERROR(Status)) {

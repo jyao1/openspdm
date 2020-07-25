@@ -129,7 +129,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedRequest (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -178,7 +178,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedResponseAck (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -215,7 +215,7 @@ SpdmGetResponseEncapsulatedResponseAck (
   SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmResponse->Header.RequestResponseCode = SPDM_ENCAPSULATED_RESPONSE_ACK;
   SpdmResponse->Header.Param1 = 0;
-  SpdmResponse->Header.Param2 = 0;
+  SpdmResponse->Header.Param2 = SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_PRESENT;
 
   EncapRequestSize = *ResponseSize - sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE);
   EncapRequest = SpdmResponse + 1;
@@ -229,6 +229,9 @@ SpdmGetResponseEncapsulatedResponseAck (
 
   *ResponseSize = sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE) + EncapRequestSize;
   SpdmResponse->Header.Param1 = RequestId;
+  if (EncapRequestSize == 0) {
+    SpdmResponse->Header.Param2 = SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_ABSENT;
+  }
 
   return RETURN_SUCCESS;
 }

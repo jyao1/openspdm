@@ -144,7 +144,7 @@ SpdmGenerateFinalKey (
 RETURN_STATUS
 SpdmGenerateSessionHandshakeKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId,
+  IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester
   )
 {
@@ -303,7 +303,7 @@ SpdmGenerateSessionHandshakeKey (
 RETURN_STATUS
 SpdmGenerateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId,
+  IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester
   )
 {  
@@ -454,7 +454,7 @@ SpdmGenerateSessionDataKey (
 RETURN_STATUS
 SpdmCreateUpdateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId,
+  IN UINT32                       SessionId,
   IN SPDM_KEY_UPDATE_ACTION       Action
   )
 {
@@ -538,7 +538,7 @@ SpdmCreateUpdateSessionDataKey (
 RETURN_STATUS
 SpdmFinalizeUpdateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId,
+  IN UINT32                       SessionId,
   IN SPDM_KEY_UPDATE_ACTION       Action,
   IN BOOLEAN                      UseNewKey
   )

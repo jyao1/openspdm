@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 SpdmSendReceiveEndSession (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINT8                EndSessionAttributes
   )
 {

@@ -97,7 +97,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseFinish (
   IN     VOID                 *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -118,7 +118,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponsePskFinish (
   IN     VOID                 *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -129,7 +129,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseEndSession (
   IN     VOID                 *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -140,7 +140,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseHeartbeat (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -151,7 +151,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseKeyUpdate (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -162,7 +162,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedRequest (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -173,7 +173,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedResponseAck (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -231,7 +231,7 @@ SpdmSendResponse (
 RETURN_STATUS
 SpdmReceiveRequestSession (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT8                   SessionId,
+  IN     UINT32                  SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request
   );
@@ -239,21 +239,26 @@ SpdmReceiveRequestSession (
 RETURN_STATUS
 SpdmSendResponseSession (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT8                   SessionId,
+  IN     UINT32                  SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response
   );
 
+UINT16
+SpdmAllocateRspSessionId (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext
+  );
+
 SPDM_SESSION_INFO *
-SpdmAllocateSessionId (
+SpdmAssignSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-     OUT UINT8                     *SessionId
+  IN     UINT32                    SessionId
   );
 
 SPDM_SESSION_INFO *
 SpdmFreeSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     UINT8                     SessionId
+  IN     UINT32                    SessionId
   );
 
 #endif

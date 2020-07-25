@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 VOID
 SpdmSessionInfoInit (
   IN     SPDM_SESSION_INFO       *SessionInfo,
-  IN     UINT8                   SessionId
+  IN     UINT32                  SessionId
   )
 {
   ZeroMem (SessionInfo, sizeof(*SessionInfo));
@@ -26,7 +26,7 @@ SpdmSessionInfoInit (
 SPDM_SESSION_INFO *
 SpdmGetSessionInfoViaSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     UINT8                     SessionId
+  IN     UINT32                    SessionId
   )
 {
   SPDM_SESSION_INFO          *SessionInfo;
@@ -53,7 +53,7 @@ SpdmGetSessionInfoViaSessionId (
 SPDM_SESSION_INFO *
 SpdmAssignSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     UINT8                     SessionId
+  IN     UINT32                    SessionId
   )
 {
   SPDM_SESSION_INFO          *SessionInfo;
@@ -87,33 +87,44 @@ SpdmAssignSessionId (
   return NULL;
 }
 
-SPDM_SESSION_INFO *
-SpdmAllocateSessionId (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-     OUT UINT8                     *SessionId
+UINT16
+SpdmAllocateReqSessionId (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext
   )
 {
+  UINT16 ReqSessionId;
+
+  ReqSessionId = 0;
+  return ReqSessionId;
+}
+
+UINT16
+SpdmAllocateRspSessionId (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext
+  )
+{
+  UINT16                     RspSessionId;
   SPDM_SESSION_INFO          *SessionInfo;
   UINTN                      Index;
 
+  RspSessionId = 0xFF;
   SessionInfo = SpdmContext->SessionInfo;
   for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
-    if (SessionInfo[Index].SessionId == INVALID_SESSION_ID) {
-      *SessionId = (UINT8)(0xFF - Index);
-      SpdmSessionInfoInit (&SessionInfo[Index], *SessionId);
-      return &SessionInfo[Index];
+    if ((SessionInfo[Index].SessionId & 0xFFFF) == (INVALID_SESSION_ID & 0xFFFF)) {
+      RspSessionId = (UINT16)(0xFF - Index);
+      return RspSessionId;
     }
   }
 
-  DEBUG ((DEBUG_ERROR, "SpdmAllocateSessionId - MAX SessionId\n"));
+  DEBUG ((DEBUG_ERROR, "SpdmAllocateRspSessionId - MAX SessionId\n"));
   ASSERT(FALSE);
-  return NULL;
+  return (INVALID_SESSION_ID & 0xFFFF);
 }
 
 SPDM_SESSION_INFO *
 SpdmFreeSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     UINT8                     SessionId
+  IN     UINT32                    SessionId
   )
 {
   SPDM_SESSION_INFO          *SessionInfo;
@@ -335,7 +346,7 @@ SpdmGetData (
   SPDM_DEVICE_CONTEXT        *SpdmContext;
   UINTN                      TargetDataSize;
   VOID                       *TargetData;
-  UINT8                      SessionId;
+  UINT32                     SessionId;
   SPDM_SESSION_INFO          *SessionInfo;
 
   SpdmContext = Context;
@@ -344,7 +355,7 @@ SpdmGetData (
     if (Parameter->Location != SpdmDataLocationSession) {
       return RETURN_INVALID_PARAMETER;
     }
-    SessionId = Parameter->AdditionalData[0];
+    SessionId = *(UINT32 *)Parameter->AdditionalData;
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
     if (SessionInfo == NULL) {
       return RETURN_INVALID_PARAMETER;

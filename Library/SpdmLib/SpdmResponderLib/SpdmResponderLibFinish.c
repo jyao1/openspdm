@@ -186,7 +186,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseFinish (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,

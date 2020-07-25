@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 SpdmEncSendRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *EncRequestSize,
@@ -113,7 +113,7 @@ SpdmEncSendRequest (
 RETURN_STATUS
 SpdmSendRequestSession (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request
   )
@@ -210,7 +210,7 @@ SpdmSendRequest (
 RETURN_STATUS
 SpdmDecReceiveResponse (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                ResponseSize,
   IN     VOID                 *Response,
   IN OUT UINTN                *DecResponseSize,
@@ -317,7 +317,7 @@ SpdmDecReceiveResponse (
 RETURN_STATUS
 SpdmReceiveResponseSession (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN OUT UINTN                *ResponseSize,
   IN OUT VOID                 *Response
   )

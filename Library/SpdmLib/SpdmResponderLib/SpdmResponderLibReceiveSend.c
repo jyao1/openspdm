@@ -78,7 +78,7 @@ SpdmGetResponseSessionFuncViaLastRequest (
 RETURN_STATUS
 SpdmDecReceiveRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT8                   SessionId,
+  IN     UINT32                  SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
   IN OUT UINTN                   *DecRequestSize,
@@ -185,7 +185,7 @@ SpdmDecReceiveRequest (
 RETURN_STATUS
 SpdmReceiveRequestSession (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT8                   SessionId,
+  IN     UINT32                  SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request
   )
@@ -281,7 +281,7 @@ SpdmReceiveRequest (
 RETURN_STATUS
 SpdmEncSendResponse (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT8                   SessionId,
+  IN     UINT32                  SessionId,
   IN     UINTN                   ResponseSize,
   IN     VOID                    *Response,
   IN OUT UINTN                   *EncResponseSize,
@@ -382,7 +382,7 @@ SpdmEncSendResponse (
 RETURN_STATUS
 SpdmSendResponseSession (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT8                   SessionId,
+  IN     UINT32                  SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response
   )

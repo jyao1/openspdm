@@ -183,7 +183,7 @@ RETURN_STATUS
 EFIAPI
 SpdmClientSecureSendRequest (
   IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT8                                  SessionId,
+  IN     UINT32                                 SessionId,
   IN     UINTN                                  RequestSize,
   IN     VOID                                   *Request,
   IN     UINT64                                 Timeout
@@ -236,7 +236,7 @@ RETURN_STATUS
 EFIAPI
 SpdmClientSecureReceiveResponse (
   IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT8                                  SessionId,
+  IN     UINT32                                 SessionId,
   IN OUT UINTN                                  *ResponseSize,
   IN OUT VOID                                   *Response,
   IN     UINT64                                 Timeout

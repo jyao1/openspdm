@@ -66,7 +66,7 @@ SpdmRequesterGeneratePskFinishHmac (
 RETURN_STATUS
 SpdmSendReceivePskFinish (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                SessionId
+  IN     UINT32               SessionId
   )
 {
   RETURN_STATUS                             Status;

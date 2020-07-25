@@ -224,7 +224,7 @@ typedef struct {
 } SPDM_SESSION_INFO_APPLICATION_SECRET;
 
 typedef struct {
-  UINT8                                SessionId;
+  UINT32                               SessionId;
   BOOLEAN                              UsePsk;
   UINT8                                MutAuthRequested;
   SPDM_STATE                           SessionState;
@@ -631,7 +631,7 @@ GetManagedBuffer (
 RETURN_STATUS
 SpdmGenerateSessionHandshakeKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId,
+  IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester
   );
 
@@ -643,7 +643,7 @@ SpdmGenerateSessionHandshakeKey (
 RETURN_STATUS
 SpdmGenerateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId,
+  IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester
   );
 
@@ -661,7 +661,7 @@ typedef enum {
 RETURN_STATUS
 SpdmCreateUpdateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId,
+  IN UINT32                       SessionId,
   IN SPDM_KEY_UPDATE_ACTION       Action
   );
 
@@ -673,7 +673,7 @@ SpdmCreateUpdateSessionDataKey (
 RETURN_STATUS
 SpdmFinalizeUpdateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT8                        SessionId,
+  IN UINT32                       SessionId,
   IN SPDM_KEY_UPDATE_ACTION       Action,
   IN BOOLEAN                      UseNewKey
   );
@@ -699,7 +699,7 @@ ComputeDHEFinalKey (
 SPDM_SESSION_INFO *
 SpdmGetSessionInfoViaSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     UINT8                     SessionId
+  IN     UINT32                    SessionId
   );
 
 #endif

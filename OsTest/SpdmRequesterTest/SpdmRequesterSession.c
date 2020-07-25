@@ -52,7 +52,7 @@ SPDM_VENDOR_DEFINED_REQUEST_MINE  mVendorDefinedRequest = {
 
 RETURN_STATUS
 DoAppSessionViaSpdm (
-  IN UINT8                           SessionId
+  IN UINT32                          SessionId
   )
 {
   VOID                               *SpdmContext;
@@ -93,8 +93,8 @@ DoSessionViaSpdm (
   UINTN                            DataSize;
   UINT8                            Data[MAX_DHE_KEY_SIZE];
   UINTN                            Index;
-  UINT8                            SessionId;
-  UINT8                            SessionId2;
+  UINT32                           SessionId;
+  UINT32                           SessionId2;
   SPDM_DATA_PARAMETER              Parameter;
   UINT8                            HeartbeatPeriod;
   UINT8                            MeasurementHash[MAX_HASH_SIZE];
@@ -143,7 +143,7 @@ DoSessionViaSpdm (
 
   ZeroMem (&Parameter, sizeof(Parameter));
   Parameter.Location = SpdmDataLocationSession;
-  Parameter.AdditionalData[0] = SessionId;
+  *(UINT32 *)Parameter.AdditionalData = SessionId;
   for (Index = 0; Index < ARRAY_SIZE(mDataTypeString); Index++) {
     DataSize = sizeof(Data);
     ZeroMem (Data, sizeof(Data));

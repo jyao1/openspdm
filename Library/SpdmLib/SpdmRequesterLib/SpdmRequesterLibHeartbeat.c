@@ -13,7 +13,7 @@ RETURN_STATUS
 EFIAPI
 SpdmHeartbeat (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId
+  IN     UINT32               SessionId
   )
 {
   RETURN_STATUS                             Status;

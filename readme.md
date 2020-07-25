@@ -4,7 +4,7 @@
 
 1) Specification
 
-   DSP0274	Security Protocol and Data Model (SPDM) Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.0.0.pdf) and version [1.1.0b](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.1.0b.pdf))
+   DSP0274	Security Protocol and Data Model (SPDM) Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.0.0.pdf) and version [1.1.0c](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.1.0c.pdf))
 
    DSP0276	Secured MCTP Messages over MCTP Binding Specification (version [1.0.0a](https://www.dmtf.org/sites/default/files/standards/documents/DSP0276_1.0.0a.pdf))
 
@@ -69,25 +69,9 @@
 
 ## Feature not implemented yet
 
-1) Full error handling
+1) Other architectures such as Arm, AArch64, RiscV64, or Arc.
 
-2) SPDM 1.0
-
-   GET_VERSION check
-
-   FLAGS_CACHE_CAP
-
-   multiple cert chains
-
-3) SPDM 1.1
-
-   Timer (for heartbeat ?)
-
-4) Other architectures such as Arm, AArch64, RiscV64, or Arc.
-
-5) Other compilers such as VS2019 or LLVM.
-
-6) Other crypto library.
+2) Please refer to [issues](https://github.com/jyao1/openspdm/issues) for detail
 
 ## Known limitation
 This package is only the sample code to show the concept.

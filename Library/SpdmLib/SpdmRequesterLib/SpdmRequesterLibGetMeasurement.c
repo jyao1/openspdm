@@ -93,6 +93,7 @@ SpdmGetMeasurement (
   IN     VOID                 *Context,
   IN     UINT8                RequestAttribute,
   IN     UINT8                MeasurementOperation,
+  IN     UINT8                SlotNum,
      OUT UINT8                *NumberOfBlocks,
   IN OUT UINT32               *MeasurementRecordLength,
      OUT VOID                 *MeasurementRecord
@@ -139,6 +140,7 @@ SpdmGetMeasurement (
     DEBUG((DEBUG_INFO, "ClientNonce - "));
     InternalDumpData (SpdmRequest.Nonce, SPDM_NONCE_SIZE);
     DEBUG((DEBUG_INFO, "\n"));
+    SpdmRequest.SlotIDParam = SlotNum;
   } else {
     SpdmRequestSize = sizeof(SpdmRequest.Header);
   }
@@ -209,10 +211,10 @@ SpdmGetMeasurement (
     InternalDumpData (ServerNonce, SPDM_NONCE_SIZE);
     DEBUG((DEBUG_INFO, "\n"));
     Ptr += SPDM_NONCE_SIZE;
-        
+
     OpaqueLength = *(UINT16 *)Ptr;
     Ptr += sizeof(UINT16);
-        
+
     if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE) +
                            MeasurementRecordDataLength +
                            SPDM_NONCE_SIZE +

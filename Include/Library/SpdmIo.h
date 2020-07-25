@@ -107,7 +107,7 @@ typedef
 RETURN_STATUS
 (EFIAPI *SPDM_IO_SECURE_SEND_REQUEST_FUNC) (
   IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT8                                  SessionId,
+  IN     UINT32                                 SessionId,
   IN     UINTN                                  RequestSize,
   IN     VOID                                   *Request,
   IN     UINT64                                 Timeout
@@ -144,7 +144,7 @@ typedef
 RETURN_STATUS
 (EFIAPI *SPDM_IO_SECURE_RECEIVE_RESPONSE_FUNC) (
   IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT8                                  SessionId,
+  IN     UINT32                                 SessionId,
   IN OUT UINTN                                  *ResponseSize,
   IN OUT VOID                                   *Response,
   IN     UINT64                                 Timeout

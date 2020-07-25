@@ -40,7 +40,7 @@ RETURN_STATUS
 EFIAPI
 SpdmReceiveSendSessionData (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     VOID                 *RequestBuffer,
   IN     UINTN                RequestBufferSize,
      OUT VOID                 *ResponseBuffer,

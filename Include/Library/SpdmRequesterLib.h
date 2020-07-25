@@ -69,6 +69,7 @@ SpdmGetMeasurement (
   IN     VOID                 *SpdmContext,
   IN     UINT8                RequestAttribute,
   IN     UINT8                MeasurementOperation,
+  IN     UINT8                SlotNum,
      OUT UINT8                *NumberOfBlocks,
   IN OUT UINT32               *MeasurementRecordLength,
      OUT VOID                 *MeasurementRecord
@@ -102,7 +103,7 @@ SpdmStartSession (
   IN     UINT8                MeasurementHashType,
   IN     UINT8                SlotNum,
      OUT UINT8                *HeartbeatPeriod,
-     OUT UINT8                *SessionId,
+     OUT UINT32               *SessionId,
      OUT VOID                 *MeasurementHash
   );
 
@@ -117,7 +118,7 @@ RETURN_STATUS
 EFIAPI
 SpdmStopSession (
   IN     VOID                 *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINT8                EndSessionAttributes
   );
 
@@ -146,7 +147,7 @@ RETURN_STATUS
 EFIAPI
 SpdmSendReceiveSessionData (
   IN     VOID                 *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     VOID                 *Request,
   IN     UINTN                RequestSize,
   IN OUT VOID                 *Response,
@@ -157,14 +158,14 @@ RETURN_STATUS
 EFIAPI
 SpdmHeartbeat (
   IN     VOID                 *SpdmContext,
-  IN     UINT8                SessionId
+  IN     UINT32               SessionId
   );
 
 RETURN_STATUS
 EFIAPI
 SpdmKeyUpdate (
   IN     VOID                 *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     BOOLEAN              SingleDirection
   );
 

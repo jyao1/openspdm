@@ -163,13 +163,15 @@ SpdmGetResponseKeyExchange (
   UINT8                         *Ptr;
   BOOLEAN                       Result;
   UINT8                         SlotNum;
-  UINT8                         SessionId;
+  UINT32                        SessionId;
   VOID                          *DHEContext;
   UINT8                         FinalKey[MAX_DHE_KEY_SIZE];
   UINTN                         FinalKeySize;
   SPDM_SESSION_INFO             *SessionInfo;
   UINTN                         TotalSize;
   SPDM_DEVICE_CONTEXT           *SpdmContext;
+  UINT16                        ReqSessionId;
+  UINT16                        RspSessionId;
 
   SpdmContext = Context;
 
@@ -177,11 +179,6 @@ SpdmGetResponseKeyExchange (
   SlotNum = SpdmRequest->Header.Param2;
 
   if (SlotNum > SpdmContext->LocalContext.SlotCount) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
-
-  if (SpdmRequest->DHE_Named_Group != SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
@@ -194,6 +191,8 @@ SpdmGetResponseKeyExchange (
   TotalSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DHEKeySize +
               HashSize +
+              sizeof(UINT16) +
+              DEFAULT_OPAQUE_LENGTH +
               SignatureSize +
               HmacSize;
 
@@ -206,15 +205,19 @@ SpdmGetResponseKeyExchange (
   SpdmResponse->Header.RequestResponseCode = SPDM_KEY_EXCHANGE_RSP;
   SpdmResponse->Header.Param1 = 0;
 
-  SessionInfo = SpdmAllocateSessionId (SpdmContext, &SessionId);
+  ReqSessionId = SpdmRequest->ReqSessionID;
+  RspSessionId = SpdmAllocateRspSessionId (SpdmContext);
+  SessionId = (ReqSessionId << 16) | RspSessionId;
+  SessionInfo = SpdmAssignSessionId (SpdmContext, SessionId);
+  ASSERT(SessionInfo != NULL);
   SessionInfo->UsePsk = FALSE;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
 
-  SpdmResponse->Header.Param2 = SessionId;
+  SpdmResponse->RspSessionID = RspSessionId;
 
-  SpdmResponse->Length = (UINT16)*ResponseSize;
   SpdmResponse->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
+  SpdmResponse->SlotIDParam = 0;
 
   GetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
   
@@ -244,6 +247,11 @@ SpdmGetResponseKeyExchange (
     return RETURN_SUCCESS;
   }
   Ptr += HashSize;
+
+  *(UINT16 *)Ptr = DEFAULT_OPAQUE_LENGTH;
+  Ptr += sizeof(UINT16);
+  SetMem (Ptr, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
+  Ptr += DEFAULT_OPAQUE_LENGTH;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
   Result = SpdmResponderGenerateKeyExchangeSignature (SpdmContext, SessionInfo, SlotNum, Ptr);

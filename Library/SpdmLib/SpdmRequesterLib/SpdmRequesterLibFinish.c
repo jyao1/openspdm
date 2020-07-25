@@ -197,7 +197,7 @@ SpdmRequesterGenerateFinishHmac (
 RETURN_STATUS
 SpdmSendReceiveFinish (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINT8                SlotNum
   )
 {

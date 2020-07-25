@@ -36,6 +36,7 @@ SpdmSendReceiveGetMeasurement (
              SpdmContext,
              SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE,
              SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS,
+             0,
              &NumberOfBlocks,
              NULL,
              NULL
@@ -55,6 +56,7 @@ SpdmSendReceiveGetMeasurement (
               SpdmContext,
               SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE,
               Index,
+              0,
               &NumberOfBlock,
               &MeasurementRecordLength,
               MeasurementRecord

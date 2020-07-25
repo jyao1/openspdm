@@ -36,7 +36,7 @@ typedef struct {
 } MCTP_MESSAGE_TYPE;
 
 typedef struct {
-  UINT8    SessionId;
+  UINT32   SessionId;
   UINT16   Length; // This field shall be the remaining length of data in the MCTP message.
 } MCTP_MESSAGE_PLAINTEXT_HEADER;
 

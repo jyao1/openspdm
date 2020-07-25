@@ -123,6 +123,7 @@ SpdmGetResponseMeasurement (
   SPDM_MEASUREMENT_BLOCK_DMTF    *MeasurmentBlock;
   SPDM_MEASUREMENT_BLOCK_DMTF    *CachedMeasurmentBlock;
   SPDM_DEVICE_CONTEXT            *SpdmContext;
+  UINT8                          SlotNum;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -170,7 +171,12 @@ SpdmGetResponseMeasurement (
     SpdmResponse->NumberOfBlocks = 0;
     *(UINT32 *)SpdmResponse->MeasurementRecordLength = 0;
 
-    if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
+    if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {   
+      SlotNum = SpdmRequest->SlotIDParam;
+      if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+        return RETURN_SUCCESS;
+      }
       Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
@@ -206,6 +212,11 @@ SpdmGetResponseMeasurement (
     }
 
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
+      SlotNum = SpdmRequest->SlotIDParam;
+      if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+        return RETURN_SUCCESS;
+      }
       Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
@@ -239,6 +250,11 @@ SpdmGetResponseMeasurement (
       CopyMem (MeasurmentBlock, CachedMeasurmentBlock, MeasurmentBlockSize);
 
       if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
+        SlotNum = SpdmRequest->SlotIDParam;
+        if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+          SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+          return RETURN_SUCCESS;
+        }
         Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
         if (RETURN_ERROR(Status)) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);

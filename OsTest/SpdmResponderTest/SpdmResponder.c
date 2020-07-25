@@ -59,7 +59,7 @@ RegisterMeasurement (
 RETURN_STATUS
 EFIAPI
 TestSpdmProcessPacketCallback (
-  IN     UINT8                        SessionId,
+  IN     UINT32                       SessionId,
   IN     VOID                         *Request,
   IN     UINTN                        RequestSize,
      OUT VOID                         *Response,
@@ -84,7 +84,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseVendorDefinedRequest (
   IN     VOID                *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -194,6 +194,7 @@ SpdmServerInit (
     // Do not free it.
     
     Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED;
+    //Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST;
     //Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS;
     SpdmSetData (SpdmContext, SpdmDataMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
   }

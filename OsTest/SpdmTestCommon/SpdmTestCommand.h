@@ -26,7 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SOCKET_SPDM_COMMAND_TEST     0xDEAD
 
 #define GET_COMMAND_OPCODE(c)        ((UINT16)((c) & 0xFFFF))
-#define GET_COMMAND_SESSION_ID(c)    ((UINT8)(((c) & 0x00FF0000) >> 16))
+#define GET_COMMAND_SESSION_ID(c)    ((UINT8)(((c) & 0xFFFF0000) >> 16))
 #define MAKE_COMMAND(c, s)           ((c) | ((s) << 16))
 
 //

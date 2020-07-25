@@ -13,7 +13,7 @@ RETURN_STATUS
 EFIAPI
 SpdmKeyUpdate (
   IN     VOID                 *SpdmContext,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     BOOLEAN              SingleDirection
   )
 {

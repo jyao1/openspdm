@@ -67,7 +67,7 @@ SpdmStartSession (
   IN     UINT8                MeasurementHashType,
   IN     UINT8                SlotNum,
      OUT UINT8                *HeartbeatPeriod,
-     OUT UINT8                *SessionId,
+     OUT UINT32               *SessionId,
      OUT VOID                 *MeasurementHash
   )
 {
@@ -92,6 +92,7 @@ SpdmStartSession (
 
     switch (SessionInfo->MutAuthRequested) {
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED:
+    case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST:
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS:
       SpdmEncapsulatedRequest (SpdmContext, *SessionId);
       break;
@@ -125,7 +126,7 @@ RETURN_STATUS
 EFIAPI
 SpdmStopSession (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     UINT8                EndSessionAttributes
   )
 {
@@ -172,7 +173,7 @@ RETURN_STATUS
 EFIAPI
 SpdmSendReceiveSessionData (
   IN     VOID                 *Context,
-  IN     UINT8                SessionId,
+  IN     UINT32               SessionId,
   IN     VOID                 *Request,
   IN     UINTN                RequestSize,
   IN OUT VOID                 *Response,
