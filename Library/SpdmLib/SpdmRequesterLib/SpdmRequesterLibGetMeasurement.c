@@ -129,7 +129,7 @@ SpdmGetMeasurement (
     SignatureSize = 0;
   }
 
-  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_MEASUREMENTS;
   SpdmRequest.Header.Param1 = RequestAttribute;
   SpdmRequest.Header.Param2 = MeasurementOperation;

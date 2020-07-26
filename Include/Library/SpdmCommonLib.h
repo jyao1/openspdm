@@ -99,6 +99,15 @@ typedef enum {
   //
   SpdmDataPsk,
   SpdmDataPskHint,
+  //
+  // OpaqueData
+  //
+  SpdmDataOpaqueChallengeAuthRsp,
+  SpdmDataOpaqueMeasurementRsp,
+  SpdmDataOpaqueKeyExchangeReq,
+  SpdmDataOpaqueKeyExchangeRsp,
+  SpdmDataOpaquePskExchangeReq,
+  SpdmDataOpaquePskExchangeRsp,
 
   //
   // MAX

@@ -91,7 +91,7 @@ SpdmGetResponsePskExchange (
   TotalSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
-              DEFAULT_OPAQUE_LENGTH +
+              SpdmContext->LocalContext.OpaquePskExchangeRspSize +
               HmacSize;
 
   ASSERT (*ResponseSize >= TotalSize);
@@ -115,7 +115,7 @@ SpdmGetResponsePskExchange (
   SpdmResponse->RspSessionID = RspSessionId;
 
   SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
-  SpdmResponse->OpaqueLength = DEFAULT_OPAQUE_LENGTH;
+  SpdmResponse->OpaqueLength = (UINT16)SpdmContext->LocalContext.OpaquePskExchangeRspSize;
 
   Ptr = (VOID *)(SpdmResponse + 1);
   
@@ -130,8 +130,8 @@ SpdmGetResponsePskExchange (
   GetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += DEFAULT_CONTEXT_LENGTH;
 
-  SetMem (Ptr, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
-  Ptr += DEFAULT_OPAQUE_LENGTH;
+  CopyMem (Ptr, SpdmContext->LocalContext.OpaquePskExchangeRsp, SpdmContext->LocalContext.OpaquePskExchangeRspSize);
+  Ptr += SpdmContext->LocalContext.OpaquePskExchangeRspSize;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);

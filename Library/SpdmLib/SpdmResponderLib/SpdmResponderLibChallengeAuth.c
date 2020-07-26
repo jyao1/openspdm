@@ -202,7 +202,7 @@ SpdmGetResponseChallenge (
               SPDM_NONCE_SIZE +
               HashSize +
               sizeof(UINT16) +
-              DEFAULT_OPAQUE_LENGTH +
+              SpdmContext->LocalContext.OpaqueChallengeAuthRspSize +
               SignatureSize;
 
   ASSERT (*ResponseSize >= TotalSize);
@@ -229,10 +229,10 @@ SpdmGetResponseChallenge (
   }
   Ptr += HashSize;
 
-  *(UINT16 *)Ptr = DEFAULT_OPAQUE_LENGTH;
+  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueChallengeAuthRspSize;
   Ptr += sizeof(UINT16);
-  SetMem (Ptr, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
-  Ptr += DEFAULT_OPAQUE_LENGTH;
+  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueChallengeAuthRsp, SpdmContext->LocalContext.OpaqueChallengeAuthRspSize);
+  Ptr += SpdmContext->LocalContext.OpaqueChallengeAuthRspSize;
   
   //
   // Calc Sign

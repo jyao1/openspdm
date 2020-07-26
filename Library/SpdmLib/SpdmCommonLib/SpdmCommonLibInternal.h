@@ -85,6 +85,21 @@ typedef struct {
   UINTN                           PskHintSize;
   UINT8                           *PskHint;
   //
+  // OpaqueData provision locally
+  //
+  UINTN                           OpaqueChallengeAuthRspSize;
+  UINT8                           *OpaqueChallengeAuthRsp;
+  UINTN                           OpaqueMeasurementRspSize;
+  UINT8                           *OpaqueMeasurementRsp;
+  UINTN                           OpaqueKeyExchangeReqSize;
+  UINT8                           *OpaqueKeyExchangeReq;
+  UINTN                           OpaqueKeyExchangeRspSize;
+  UINT8                           *OpaqueKeyExchangeRsp;
+  UINTN                           OpaquePskExchangeReqSize;
+  UINT8                           *OpaquePskExchangeReq;
+  UINTN                           OpaquePskExchangeRspSize;
+  UINT8                           *OpaquePskExchangeRsp;
+  //
   // Responder policy
   //
   UINT8                           MutAuthRequested;

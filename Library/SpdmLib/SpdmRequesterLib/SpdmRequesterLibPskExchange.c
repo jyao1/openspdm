@@ -19,7 +19,7 @@ typedef struct {
   UINT16               OpaqueLength;
   UINT8                PSKHint[MAX_SPDM_PSK_HINT_LENGTH];
   UINT8                RequesterContext[DEFAULT_CONTEXT_LENGTH];
-  UINT8                OpaqueData[DEFAULT_OPAQUE_LENGTH];
+  UINT8                OpaqueData[MAX_SPDM_OPAQUE_DATA_SIZE];
 } SPDM_PSK_EXCHANGE_REQUEST_MINE;
 
 typedef struct {
@@ -119,7 +119,7 @@ SpdmSendReceivePskExchange (
   SpdmRequest.Header.Param2 = 0;
   SpdmRequest.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   SpdmRequest.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  SpdmRequest.OpaqueLength = DEFAULT_OPAQUE_LENGTH;
+  SpdmRequest.OpaqueLength = (UINT16)SpdmContext->LocalContext.OpaquePskExchangeReqSize;
 
   ReqSessionId = SpdmAllocateReqSessionId (SpdmContext);
   SpdmRequest.ReqSessionID = ReqSessionId;
@@ -137,8 +137,8 @@ SpdmSendReceivePskExchange (
   DEBUG((DEBUG_INFO, "\n"));
   Ptr += SpdmRequest.RequesterContextLength;
 
-  SetMem (Ptr, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
-  Ptr += DEFAULT_OPAQUE_LENGTH;
+  CopyMem (Ptr, SpdmContext->LocalContext.OpaquePskExchangeReq, SpdmContext->LocalContext.OpaquePskExchangeReqSize);
+  Ptr += SpdmContext->LocalContext.OpaquePskExchangeReqSize;
 
   SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
   Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);

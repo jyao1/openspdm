@@ -10,8 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __SPDM_LIB_CONFIG_H__
 #define __SPDM_LIB_CONFIG_H__
 
-#define DEFAULT_OPAQUE_LENGTH             16
-#define DEFAULT_OPAQUE_DATA               0xCC
 #define DEFAULT_CONTEXT_LENGTH            MAX_HASH_SIZE
 #define DEFAULT_SECURE_MCTP_PADDING_SIZE  1
 

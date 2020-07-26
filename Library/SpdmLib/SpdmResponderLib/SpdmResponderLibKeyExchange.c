@@ -161,6 +161,7 @@ SpdmGetResponseKeyExchange (
   UINT32                        SignatureSize;
   UINT32                        HmacSize;
   UINT8                         *Ptr;
+  UINT16                        OpaqueDataLength;
   BOOLEAN                       Result;
   UINT8                         SlotNum;
   UINT32                        SessionId;
@@ -192,7 +193,7 @@ SpdmGetResponseKeyExchange (
               DHEKeySize +
               HashSize +
               sizeof(UINT16) +
-              DEFAULT_OPAQUE_LENGTH +
+              SpdmContext->LocalContext.OpaqueKeyExchangeRspSize +
               SignatureSize +
               HmacSize;
 
@@ -211,6 +212,25 @@ SpdmGetResponseKeyExchange (
   SessionInfo = SpdmAssignSessionId (SpdmContext, SessionId);
   ASSERT(SessionInfo != NULL);
   SessionInfo->UsePsk = FALSE;
+
+  if (RequestSize < sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
+                    DHEKeySize +
+                    sizeof(UINT16)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  OpaqueDataLength = *(UINT16 *)((UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DHEKeySize);
+  if (RequestSize < sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
+                    DHEKeySize +
+                    sizeof(UINT16) +
+                    OpaqueDataLength) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  RequestSize = sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
+                DHEKeySize +
+                sizeof(UINT16) +
+                OpaqueDataLength;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
 
@@ -248,10 +268,10 @@ SpdmGetResponseKeyExchange (
   }
   Ptr += HashSize;
 
-  *(UINT16 *)Ptr = DEFAULT_OPAQUE_LENGTH;
+  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueKeyExchangeRspSize;
   Ptr += sizeof(UINT16);
-  SetMem (Ptr, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
-  Ptr += DEFAULT_OPAQUE_LENGTH;
+  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueKeyExchangeRsp, SpdmContext->LocalContext.OpaqueKeyExchangeRspSize);
+  Ptr += SpdmContext->LocalContext.OpaqueKeyExchangeRspSize;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
   Result = SpdmResponderGenerateKeyExchangeSignature (SpdmContext, SessionInfo, SlotNum, Ptr);

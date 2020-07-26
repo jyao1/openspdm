@@ -9,17 +9,6 @@
 
 #include "SpdmResponderLibInternal.h"
 
-#pragma pack(1)
-
-typedef struct {
-  UINT8                       Nonce[SPDM_NONCE_SIZE];
-  UINT16                      OpaqueLength;
-  UINT8                       OpaqueData[DEFAULT_OPAQUE_LENGTH];
-//UINT8                       Signature[SignatureSize];
-} SPDM_MEASUREMENT_SIG;
-
-#pragma pack()
-
 BOOLEAN
 SpdmResponderGenerateSpdmMeasurementSignature (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
@@ -83,21 +72,28 @@ SpdmResponderCreateMeasurementSig (
   IN UINTN                      ResponseMessageSize
   )
 {
-  SPDM_MEASUREMENT_SIG          *SigStruct;
+  UINT8                         *Ptr;
   UINTN                         MeasurmentSigSize;
   UINTN                         SignatureSize;
   BOOLEAN                       Result;
   
   SignatureSize = GetSpdmAsymSize (SpdmContext);
-  MeasurmentSigSize = sizeof(SPDM_MEASUREMENT_SIG) + SignatureSize;
+  MeasurmentSigSize = SPDM_NONCE_SIZE +
+                      sizeof(UINT16) +
+                      SpdmContext->LocalContext.OpaqueMeasurementRspSize +
+                      SignatureSize;
   ASSERT (ResponseMessageSize > MeasurmentSigSize);
-  SigStruct = (VOID *)((UINT8 *)ResponseMessage + ResponseMessageSize - MeasurmentSigSize);
+  Ptr = (VOID *)((UINT8 *)ResponseMessage + ResponseMessageSize - MeasurmentSigSize);
   
-  GetRandomNumber (SPDM_NONCE_SIZE, SigStruct->Nonce);
-  SigStruct->OpaqueLength = DEFAULT_OPAQUE_LENGTH;
-  SetMem (SigStruct->OpaqueData, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
+  GetRandomNumber (SPDM_NONCE_SIZE, Ptr);
+  Ptr += SPDM_NONCE_SIZE;
+
+  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueMeasurementRspSize;
+  Ptr += sizeof(UINT16);
+  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueMeasurementRsp, SpdmContext->LocalContext.OpaqueMeasurementRspSize);
+  Ptr += SpdmContext->LocalContext.OpaqueMeasurementRspSize;
   
-  Result = SpdmResponderGenerateSpdmMeasurementSignature (SpdmContext, ResponseMessage, ResponseMessageSize - SignatureSize, (VOID *)(SigStruct + 1));
+  Result = SpdmResponderGenerateSpdmMeasurementSignature (SpdmContext, ResponseMessage, ResponseMessageSize - SignatureSize, (VOID *)Ptr);
   return Result;
 }
 
@@ -128,9 +124,18 @@ SpdmGetResponseMeasurement (
   SpdmContext = Context;
   SpdmRequest = Request;
   if (SpdmRequest->Header.Param1 == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {
-    if (RequestSize != sizeof(SPDM_GET_MEASUREMENTS_REQUEST)) {
+    if (RequestSize < sizeof(SPDM_GET_MEASUREMENTS_REQUEST) - 1) {
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
       return RETURN_SUCCESS;
+    }
+    if (SpdmRequest->Header.SPDMVersion > SPDM_MESSAGE_VERSION_10) {
+      if (RequestSize < sizeof(SPDM_GET_MEASUREMENTS_REQUEST)) {
+        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+        return RETURN_SUCCESS;
+      }
+      RequestSize = sizeof(SPDM_GET_MEASUREMENTS_REQUEST);
+    } else {
+      RequestSize = sizeof(SPDM_GET_MEASUREMENTS_REQUEST) - 1;
     }
   } else {
     if (RequestSize != sizeof(SPDM_MESSAGE_HEADER)) {
@@ -147,7 +152,10 @@ SpdmGetResponseMeasurement (
 
   HashSize = GetSpdmMeasurementHashSize (SpdmContext);
   SignatureSize = GetSpdmAsymSize (SpdmContext);
-  MeasurmentSigSize = sizeof(SPDM_MEASUREMENT_SIG) + SignatureSize;
+  MeasurmentSigSize = SPDM_NONCE_SIZE +
+                      sizeof(UINT16) +
+                      SpdmContext->LocalContext.OpaqueMeasurementRspSize +
+                      SignatureSize;
   MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize;
 
   ASSERT(SpdmContext->LocalContext.DeviceMeasurementCount <= MAX_SPDM_MEASUREMENT_BLOCK_COUNT);

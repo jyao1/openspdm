@@ -17,6 +17,8 @@ typedef struct {
   UINT16               Reserved;
   UINT8                RandomData[SPDM_RANDOM_DATA_SIZE];
   UINT8                ExchangeData[MAX_DHE_KEY_SIZE];
+  UINT16               OpaqueLength;
+  UINT8                OpaqueData[MAX_SPDM_OPAQUE_DATA_SIZE];
 } SPDM_KEY_EXCHANGE_REQUEST_MINE;
 
 typedef struct {
@@ -223,11 +225,19 @@ SpdmSendReceiveKeyExchange (
   ReqSessionId = SpdmAllocateReqSessionId (SpdmContext);
   SpdmRequest.ReqSessionID = ReqSessionId;
 
+  Ptr = SpdmRequest.ExchangeData;
   DHEKeySize = GetSpdmDHEKeySize (SpdmContext);
-  GenerateDHESelfKey (SpdmContext, DHEKeySize, SpdmRequest.ExchangeData, &DHEContext);
+  GenerateDHESelfKey (SpdmContext, DHEKeySize, Ptr, &DHEContext);
   DEBUG((DEBUG_INFO, "ClientKey (0x%x):\n", DHEKeySize));
-  InternalDumpHex (SpdmRequest.ExchangeData, DHEKeySize);
-  SpdmRequestSize = sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DHEKeySize;
+  InternalDumpHex (Ptr, DHEKeySize);
+  Ptr += DHEKeySize;
+
+  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueKeyExchangeReqSize;
+  Ptr += sizeof(UINT16);
+  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueKeyExchangeReq, SpdmContext->LocalContext.OpaqueKeyExchangeReqSize);
+  Ptr += SpdmContext->LocalContext.OpaqueKeyExchangeReqSize;
+
+  SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
   Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
