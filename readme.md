@@ -51,7 +51,11 @@
 
    Tool : Visual Studio 2015 (TOOLCHAIN=VS2015)
 
-   Open command prompt at openspdm dir and type "nmake ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>".
+   Open visual studio 2015 command prompt at openspdm dir and type "nmake ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>". (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
+
+   Tool : Visual Studio 2019 (TOOLCHAIN=VS2019)
+
+   Open visual studio 2019 command prompt at openspdm dir and type "nmake ARCH=<X64|Ia32> TOOLCHAIN=VS2019 TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>". (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
 
 3) Linux Build:
 

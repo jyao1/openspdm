@@ -11,9 +11,9 @@
 # Build Configuration Macro Definition
 #
 ARCH = X64
-TOOLCHAIN = VS2015
 TARGET = DEBUG
 CRYPTO_DEF = MbedTls
+TOOLCHAIN_DEF = VS2015
 
 !IF "$(ARCH)" == "X64"
 !MESSAGE ARCH=X64
@@ -42,6 +42,17 @@ CRYPTO = $(CRYPTO_DEF)
 !ERROR Unknown CRYPTO!
 !ENDIF
 
+!IF "$(TOOLCHAIN)" == ""
+TOOLCHAIN = $(TOOLCHAIN_DEF)
+!ENDIF
+!IF "$(TOOLCHAIN)" == "VS2015"
+!MESSAGE TOOLCHAIN=VS2015
+!ELSEIF "$(TOOLCHAIN)" == "VS2019"
+!MESSAGE TOOLCHAIN=VS2019
+!ELSE
+!ERROR Unknown TOOLCHAIN!
+!ENDIF
+
 #
 # Shell Command Macro
 #
@@ -55,13 +66,23 @@ RD = rmdir /s /q
 # Tools definitions specific to this module
 #
 
-MAKE = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\nmake.exe
+!IF "$(TOOLCHAIN)" == "VS2015"
+VS_BIN_HOST = %VCINSTALLDIR%bin
+VS_BIN_IA32 = %VCINSTALLDIR%bin
+VS_BIN_X64  = %VCINSTALLDIR%bin\x86_amd64
+!ELSEIF "$(TOOLCHAIN)" == "VS2019"
+VS_BIN_HOST = %VCToolsInstallDir%bin\Hostx64\x64
+VS_BIN_IA32 = %VCToolsInstallDir%bin\Hostx86\x86
+VS_BIN_X64  = %VCToolsInstallDir%bin\Hostx64\x64
+!ENDIF
+
+MAKE = nmake.exe
 MAKEFILE = Makefile
 
 !IF "$(ARCH)" == "X64"
-CC = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\cl.exe
+CC = cl.exe
 !ELSEIF "$(ARCH)" == "Ia32"
-CC = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\cl.exe
+CC = cl.exe
 !ENDIF
 
 CC_FLAGS = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /EHs-c- /GR- /GF /Z7 /Gw /Oy- /D_CRT_SECURE_NO_WARNINGS
@@ -72,17 +93,17 @@ CC_FLAGS = $(CC_FLAGS) /GL /O1b2s
 !ENDIF
 
 !IF "$(ARCH)" == "X64"
-SLINK = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\lib.exe
+SLINK = lib.exe
 !ELSEIF "$(ARCH)" == "Ia32"
-SLINK = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\lib.exe
+SLINK = lib.exe
 !ENDIF
 
 SLINK_FLAGS = /NOLOGO /LTCG
 
 !IF "$(ARCH)" == "X64"
-DLINK = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\link.exe
+DLINK = link.exe
 !ELSEIF "$(ARCH)" == "Ia32"
-DLINK = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\link.exe
+DLINK = link.exe
 !ENDIF
 
 DLINK_FLAGS = /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF
@@ -91,10 +112,26 @@ DLINK_FLAGS = $(DLINK_FLAGS) /DEBUG
 !ELSEIF "$(TARGET)" == "RELEASE"
 DLINK_FLAGS = $(DLINK_FLAGS) /LTCG
 !ENDIF
-!IF "$(ARCH)" == "X64"
-DLINK_FLAGS = $(DLINK_FLAGS) /MACHINE:AMD64 /LIBPATH:"%VCINSTALLDIR%\Lib\AMD64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
-!ELSEIF "$(ARCH)" == "Ia32"
-DLINK_FLAGS = $(DLINK_FLAGS) /MACHINE:I386 /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
-!ENDIF
-DLINK_FLAGS = $(DLINK_FLAGS) Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib ws2_32.lib
 
+!IF "$(ARCH)" == "X64"
+DLINK_FLAGS = $(DLINK_FLAGS) /MACHINE:AMD64
+!ELSEIF "$(ARCH)" == "Ia32"
+DLINK_FLAGS = $(DLINK_FLAGS) /MACHINE:I386
+!ENDIF
+
+!IF "$(TOOLCHAIN)" == "VS2015"
+!IF "$(ARCH)" == "X64"
+DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCINSTALLDIR%Lib\AMD64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
+!ELSEIF "$(ARCH)" == "Ia32"
+DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCINSTALLDIR%Lib"       /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
+!ENDIF
+
+!ELSEIF "$(TOOLCHAIN)" == "VS2019"
+!IF "$(ARCH)" == "X64"
+DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
+!ELSEIF "$(ARCH)" == "Ia32"
+DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
+!ENDIF
+!ENDIF
+
+DLINK_FLAGS = $(DLINK_FLAGS) Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib ws2_32.lib
