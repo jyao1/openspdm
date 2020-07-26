@@ -24,6 +24,7 @@ typedef struct {
   UINT32               BaseHashAlgo;
   UINT16               DHENamedGroup;
   UINT16               AEADCipherSuite;
+  UINT16               ReqBaseAsymAlg;
   UINT16               KeySchedule;
 } SPDM_DEVICE_ALGORITHM;
 
@@ -434,7 +435,7 @@ GetSpdmHashSize (
   );
 
 /**
-  This function returns the SPDM hash size.
+  This function returns the SPDM asym size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
   
@@ -442,6 +443,18 @@ GetSpdmHashSize (
 **/
 UINT32
 GetSpdmAsymSize (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+/**
+  This function returns the SPDM Request asym size.
+
+  @param[in]  SpdmContext             The SPDM context for the device.
+  
+  @return TCG SPDM hash size
+**/
+UINT32
+GetSpdmReqAsymSize (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
@@ -579,6 +592,31 @@ GetSpdmAsymSign (
 
 ASYM_VERIFY
 GetSpdmAsymVerify (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_GET_PUBLIC_KEY_FROM_X509
+GetSpdmReqAsymGetPublicKeyFromX509 (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_GET_PRIVATE_KEY_FROM_PEM
+GetSpdmReqAsymGetPrivateKeyFromPem (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_FREE
+GetSpdmReqAsymFree (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_SIGN
+GetSpdmReqAsymSign (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  );
+
+ASYM_VERIFY
+GetSpdmReqAsymVerify (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 

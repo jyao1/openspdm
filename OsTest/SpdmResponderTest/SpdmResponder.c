@@ -239,6 +239,8 @@ SpdmServerInit (
   SpdmSetData (SpdmContext, SpdmDataDHENamedGroup, &Parameter, &Data16, sizeof(Data16));
   Data16 = USE_AEAD_ALGO;
   SpdmSetData (SpdmContext, SpdmDataAEADCipherSuite, &Parameter, &Data16, sizeof(Data16));
+  Data16 = USE_REQ_ASYM_ALGO;
+  SpdmSetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, sizeof(Data16));
   Data16 = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
   SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
 

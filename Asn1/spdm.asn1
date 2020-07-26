@@ -159,7 +159,9 @@ SPDM DEFINITIONS ::=BEGIN
         pcisig  (3),
         iana    (4),
         hdbaset (5),
-        mipi    (6)
+        mipi    (6),
+        cxl     (7),
+        jedec   (8)
     }
 
     SpdmExtendedAlgorithm ::= SEQUENCE {
@@ -215,6 +217,18 @@ SPDM DEFINITIONS ::=BEGIN
         aes128gcm        (0),
         aes256gcm        (1),
         chacha20poly1305 (2)
+    }
+
+    SpdmAlgorithmReqBaseAsymAlg ::= BIT STRING {
+        rsaSsa2048       (0),
+        rsaPss2048       (1),
+        rsaSsa3072       (2),
+        rsaPss3072       (3),
+        ecdsaEccNistP256 (4),
+        rsaSsa4096       (5),
+        rsaPss4096       (6),
+        ecdsaEccNistP384 (7),
+        ecdsaEccNistP521 (8)
     }
 
     SpdmAlgorithmKeyShedule ::= BIT STRING {

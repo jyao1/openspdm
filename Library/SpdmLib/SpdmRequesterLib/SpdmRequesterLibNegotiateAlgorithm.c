@@ -21,9 +21,7 @@ typedef struct {
   UINT8                ExtAsymCount;
   UINT8                ExtHashCount;
   UINT16               Reserved3;
-  SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE Dhe;
-  SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE Aead;
-  SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE KeySchedule;
+  SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE StructTable[4];
 } SPDM_NEGOTIATE_ALGORITHMS_REQUEST_MINE;
 
 typedef struct {
@@ -64,7 +62,7 @@ SpdmNegotiateAlgorithms (
   ZeroMem (&SpdmRequest, sizeof(SpdmRequest));
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   SpdmRequest.Header.RequestResponseCode = SPDM_NEGOTIATE_ALGORITHMS;
-  SpdmRequest.Header.Param1 = 3; // Number of Algorithms Structure Tables
+  SpdmRequest.Header.Param1 = 4; // Number of Algorithms Structure Tables
   SpdmRequest.Header.Param2 = 0;
   SpdmRequest.Length = sizeof(SpdmRequest);
   SpdmRequest.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
@@ -72,15 +70,18 @@ SpdmNegotiateAlgorithms (
   SpdmRequest.BaseHashAlgo = SpdmContext->LocalContext.Algorithm.BaseHashAlgo;
   SpdmRequest.ExtAsymCount = 0;
   SpdmRequest.ExtHashCount = 0;
-  SpdmRequest.Dhe.AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE;
-  SpdmRequest.Dhe.AlgCount = 0x20;
-  SpdmRequest.Dhe.AlgSupported = SpdmContext->LocalContext.Algorithm.DHENamedGroup;
-  SpdmRequest.Aead.AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD;
-  SpdmRequest.Aead.AlgCount = 0x20;
-  SpdmRequest.Aead.AlgSupported = SpdmContext->LocalContext.Algorithm.AEADCipherSuite;
-  SpdmRequest.KeySchedule.AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE;
-  SpdmRequest.KeySchedule.AlgCount = 0x20;
-  SpdmRequest.KeySchedule.AlgSupported = SpdmContext->LocalContext.Algorithm.KeySchedule;
+  SpdmRequest.StructTable[0].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE;
+  SpdmRequest.StructTable[0].AlgCount = 0x20;
+  SpdmRequest.StructTable[0].AlgSupported = SpdmContext->LocalContext.Algorithm.DHENamedGroup;
+  SpdmRequest.StructTable[1].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD;
+  SpdmRequest.StructTable[1].AlgCount = 0x20;
+  SpdmRequest.StructTable[1].AlgSupported = SpdmContext->LocalContext.Algorithm.AEADCipherSuite;
+  SpdmRequest.StructTable[2].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG;
+  SpdmRequest.StructTable[2].AlgCount = 0x20;
+  SpdmRequest.StructTable[2].AlgSupported = SpdmContext->LocalContext.Algorithm.ReqBaseAsymAlg;
+  SpdmRequest.StructTable[3].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE;
+  SpdmRequest.StructTable[3].AlgCount = 0x20;
+  SpdmRequest.StructTable[3].AlgSupported = SpdmContext->LocalContext.Algorithm.KeySchedule;
   Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
@@ -136,6 +137,9 @@ SpdmNegotiateAlgorithms (
       break;
     case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
       SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = StructTable[Index].AlgSupported;
+      break;
+    case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
+      SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = StructTable[Index].AlgSupported;
       break;
     case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
       SpdmContext->ConnectionInfo.Algorithm.KeySchedule = StructTable[Index].AlgSupported;

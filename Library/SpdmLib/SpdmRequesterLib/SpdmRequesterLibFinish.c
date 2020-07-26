@@ -58,9 +58,9 @@ SpdmRequesterGenerateFinishSignature (
   HashSize = GetSpdmHashSize (SpdmContext);
   HashFunc = GetSpdmHashFunc (SpdmContext);
 
-  GetPrivateKeyFromPemFunc = GetSpdmAsymGetPrivateKeyFromPem (SpdmContext);
-  FreeFunc = GetSpdmAsymFree (SpdmContext);
-  SignFunc = GetSpdmAsymSign (SpdmContext);
+  GetPrivateKeyFromPemFunc = GetSpdmReqAsymGetPrivateKeyFromPem (SpdmContext);
+  FreeFunc = GetSpdmReqAsymFree (SpdmContext);
+  SignFunc = GetSpdmReqAsymSign (SpdmContext);
   Result = GetPrivateKeyFromPemFunc (SpdmContext->LocalContext.PrivatePem, SpdmContext->LocalContext.PrivatePemSize, NULL, &Context);
   if (!Result) {
     return FALSE;

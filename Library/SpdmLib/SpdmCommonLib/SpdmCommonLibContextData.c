@@ -271,6 +271,12 @@ SpdmSetData (
     }
     SpdmContext->LocalContext.Algorithm.AEADCipherSuite = *(UINT16 *)Data;
     break;
+  case SpdmDataReqBaseAsymAlg:
+    if (DataSize != sizeof(UINT16)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->LocalContext.Algorithm.ReqBaseAsymAlg = *(UINT16 *)Data;
+    break;
   case SpdmDataKeySchedule:
     if (DataSize != sizeof(UINT16)) {
       return RETURN_INVALID_PARAMETER;

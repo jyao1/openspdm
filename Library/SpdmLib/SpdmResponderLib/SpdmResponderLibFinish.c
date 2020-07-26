@@ -78,9 +78,9 @@ SpdmResponderVerifyFinishSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  GetPublicKeyFromX509Func = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
-  FreeFunc = GetSpdmAsymFree (SpdmContext);
-  VerifyFunc = GetSpdmAsymVerify (SpdmContext);
+  GetPublicKeyFromX509Func = GetSpdmReqAsymGetPublicKeyFromX509 (SpdmContext);
+  FreeFunc = GetSpdmReqAsymFree (SpdmContext);
+  VerifyFunc = GetSpdmReqAsymVerify (SpdmContext);
   Result = GetPublicKeyFromX509Func (MutCertBuffer, MutCertBufferSize, &Context);
   if (!Result) {
     return FALSE;

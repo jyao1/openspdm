@@ -81,6 +81,7 @@ typedef enum {
   SpdmDataBaseHashAlgo,
   SpdmDataDHENamedGroup,
   SpdmDataAEADCipherSuite,
+  SpdmDataReqBaseAsymAlg,
   SpdmDataKeySchedule,
   //
   // Certificate info
