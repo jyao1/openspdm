@@ -97,6 +97,7 @@ typedef enum {
   // Otherwise, the KEY_EXCHANGE is used.
   //
   SpdmDataPsk,
+  SpdmDataPskHint,
 
   //
   // MAX

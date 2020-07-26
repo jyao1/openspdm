@@ -17,7 +17,7 @@ typedef struct {
   UINT16               PSKHintLength;
   UINT16               RequesterContextLength;
   UINT16               OpaqueLength;
-  UINT8                PSKHint[DEFAULT_PSK_HINT_LENGTH];
+  UINT8                PSKHint[MAX_SPDM_PSK_HINT_LENGTH];
   UINT8                RequesterContext[DEFAULT_CONTEXT_LENGTH];
   UINT8                OpaqueData[DEFAULT_OPAQUE_LENGTH];
 } SPDM_PSK_EXCHANGE_REQUEST_MINE;
@@ -117,23 +117,30 @@ SpdmSendReceivePskExchange (
   SpdmRequest.Header.RequestResponseCode = SPDM_PSK_EXCHANGE;
   SpdmRequest.Header.Param1 = MeasurementHashType;
   SpdmRequest.Header.Param2 = 0;
-  SpdmRequest.PSKHintLength = DEFAULT_PSK_HINT_LENGTH;
+  SpdmRequest.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   SpdmRequest.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
   SpdmRequest.OpaqueLength = DEFAULT_OPAQUE_LENGTH;
 
   ReqSessionId = SpdmAllocateReqSessionId (SpdmContext);
   SpdmRequest.ReqSessionID = ReqSessionId;
 
-  GetRandomNumber (DEFAULT_CONTEXT_LENGTH, SpdmRequest.RequesterContext);
-  DEBUG((DEBUG_INFO, "ClientRandomData (0x%x) - ", SpdmRequest.RequesterContextLength));
-  InternalDumpData (SpdmRequest.RequesterContext, SpdmRequest.RequesterContextLength);
+  Ptr = SpdmRequest.PSKHint;
+  CopyMem (Ptr, SpdmContext->LocalContext.PskHint, SpdmContext->LocalContext.PskHintSize);
+  DEBUG((DEBUG_INFO, "PskHint (0x%x) - ", SpdmRequest.PSKHintLength));
+  InternalDumpData (Ptr, SpdmRequest.PSKHintLength);
   DEBUG((DEBUG_INFO, "\n"));
+  Ptr += SpdmRequest.PSKHintLength;
 
-  SetMem (SpdmRequest.OpaqueData, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
+  GetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
+  DEBUG((DEBUG_INFO, "ClientRandomData (0x%x) - ", SpdmRequest.RequesterContextLength));
+  InternalDumpData (Ptr, SpdmRequest.RequesterContextLength);
+  DEBUG((DEBUG_INFO, "\n"));
+  Ptr += SpdmRequest.RequesterContextLength;
 
-  // TBD: set PSKHint
+  SetMem (Ptr, DEFAULT_OPAQUE_LENGTH, DEFAULT_OPAQUE_DATA);
+  Ptr += DEFAULT_OPAQUE_LENGTH;
 
-  SpdmRequestSize = sizeof(SPDM_PSK_EXCHANGE_REQUEST_MINE);
+  SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
   Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;

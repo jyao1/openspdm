@@ -261,6 +261,11 @@ SpdmServerInit (
     printf ("SpdmSetData - %x\n", (UINT32)Status);
     return ;
   }
+  Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, "TestPskHint", sizeof("TestPskHint"));
+  if (RETURN_ERROR(Status)) {
+    printf ("SpdmSetData - %x\n", (UINT32)Status);
+    return ;
+  }
 #endif
 
   return ;

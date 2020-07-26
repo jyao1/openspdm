@@ -81,6 +81,8 @@ typedef struct {
   //
   UINTN                           PskSize;
   UINT8                           *Psk;
+  UINTN                           PskHintSize;
+  UINT8                           *PskHint;
   //
   // Responder policy
   //

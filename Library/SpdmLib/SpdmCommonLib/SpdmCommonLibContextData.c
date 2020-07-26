@@ -317,6 +317,13 @@ SpdmSetData (
     SpdmContext->LocalContext.PskSize = DataSize;
     SpdmContext->LocalContext.Psk = Data;
     break;
+  case SpdmDataPskHint:
+    if (DataSize > MAX_SPDM_PSK_HINT_LENGTH) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->LocalContext.PskHintSize = DataSize;
+    SpdmContext->LocalContext.PskHint = Data;
+    break;
   default:
     return RETURN_UNSUPPORTED;
     break;

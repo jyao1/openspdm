@@ -89,8 +89,9 @@ SpdmGetResponsePskExchange (
   HmacSize = GetSpdmHashSize (SpdmContext);
 
   TotalSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
-              DEFAULT_CONTEXT_LENGTH +
               HashSize +
+              DEFAULT_CONTEXT_LENGTH +
+              DEFAULT_OPAQUE_LENGTH +
               HmacSize;
 
   ASSERT (*ResponseSize >= TotalSize);
