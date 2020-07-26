@@ -41,7 +41,7 @@ ReadBytes (
 
   NumberReceived = 0;
   while (NumberReceived < NumberOfBytes) {
-    Result = recv (Socket, Buffer + NumberReceived, NumberOfBytes - NumberReceived, 0);
+    Result = recv (Socket, (CHAR8 *)(Buffer + NumberReceived), NumberOfBytes - NumberReceived, 0);
     if (Result == -1) {
       printf ("Receive error - 0x%x\n",
 #ifdef _MSC_VER
@@ -181,7 +181,7 @@ WriteBytes(
 
   NumberSent = 0;
   while (NumberSent < NumberOfBytes) {
-    Result = send (Socket, Buffer + NumberSent, NumberOfBytes - NumberSent, 0);
+    Result = send (Socket, (CHAR8 *)(Buffer + NumberSent), NumberOfBytes - NumberSent, 0);
     if (Result == -1) {
 #ifdef _MSC_VER
       if (WSAGetLastError() == 0x2745) {

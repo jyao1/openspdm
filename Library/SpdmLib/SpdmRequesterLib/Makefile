@@ -30,28 +30,6 @@ SOURCE_DIR = $(WORKSPACE)\Library\SpdmLib\$(MODULE_NAME)
 #
 # Build Macro
 #
-SOURCE_FILES =  \
-	$(SOURCE_DIR)\SpdmRequesterLibChallenge.c \
-	$(SOURCE_DIR)\SpdmRequesterLibCommunication.c \
-	$(SOURCE_DIR)\SpdmRequesterLibEncapCertificate.c \
-	$(SOURCE_DIR)\SpdmRequesterLibEncapDigest.c \
-	$(SOURCE_DIR)\SpdmRequesterLibEncapError.c \
-	$(SOURCE_DIR)\SpdmRequesterLibEncapRequest.c \
-	$(SOURCE_DIR)\SpdmRequesterLibEndSession.c \
-	$(SOURCE_DIR)\SpdmRequesterLibFinish.c \
-	$(SOURCE_DIR)\SpdmRequesterLibGetCapability.c \
-	$(SOURCE_DIR)\SpdmRequesterLibGetCertificate.c \
-	$(SOURCE_DIR)\SpdmRequesterLibGetDigest.c \
-	$(SOURCE_DIR)\SpdmRequesterLibGetMeasurement.c \
-	$(SOURCE_DIR)\SpdmRequesterLibGetVersion.c \
-	$(SOURCE_DIR)\SpdmRequesterLibHeartbeat.c \
-	$(SOURCE_DIR)\SpdmRequesterLibKeyExchange.c \
-	$(SOURCE_DIR)\SpdmRequesterLibKeyUpdate.c \
-	$(SOURCE_DIR)\SpdmRequesterLibNegotiateAlgorithm.c \
-	$(SOURCE_DIR)\SpdmRequesterLibPskExchange.c \
-	$(SOURCE_DIR)\SpdmRequesterLibPskFinish.c \
-	$(SOURCE_DIR)\SpdmRequesterLibSendReceive.c \
-
 
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmRequesterLibChallenge.obj \
@@ -77,11 +55,11 @@ OBJECT_FILES =  \
 
 
 INC =  \
-    /I$(SOURCE_DIR) \
-    /I$(WORKSPACE)\Library\SpdmLib\SpdmCommonLib \
-    /I$(WORKSPACE)\Include \
-    /I$(WORKSPACE)\Include\Hal \
-    /I$(WORKSPACE)\Include\Hal\$(ARCH)
+    -I$(SOURCE_DIR) \
+    -I$(WORKSPACE)\Library\SpdmLib\SpdmCommonLib \
+    -I$(WORKSPACE)\Include \
+    -I$(WORKSPACE)\Include\Hal \
+    -I$(WORKSPACE)\Include\Hal\$(ARCH)
 
 #
 # Overridable Target Macro Definitions
@@ -110,8 +88,65 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OBJECT_FILES):  $(SOURCE_FILES)
-	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_FILES)
+$(OUTPUT_DIR)\SpdmRequesterLibChallenge.obj : $(SOURCE_DIR)\SpdmRequesterLibChallenge.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibChallenge.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibCommunication.obj : $(SOURCE_DIR)\SpdmRequesterLibCommunication.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibCommunication.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibEncapCertificate.obj : $(SOURCE_DIR)\SpdmRequesterLibEncapCertificate.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibEncapCertificate.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibEncapDigest.obj : $(SOURCE_DIR)\SpdmRequesterLibEncapDigest.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibEncapDigest.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibEncapError.obj : $(SOURCE_DIR)\SpdmRequesterLibEncapError.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibEncapError.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibEncapRequest.obj : $(SOURCE_DIR)\SpdmRequesterLibEncapRequest.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibEncapRequest.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibEndSession.obj : $(SOURCE_DIR)\SpdmRequesterLibEndSession.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibEndSession.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibFinish.obj : $(SOURCE_DIR)\SpdmRequesterLibFinish.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibFinish.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibGetCapability.obj : $(SOURCE_DIR)\SpdmRequesterLibGetCapability.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibGetCapability.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibGetCertificate.obj : $(SOURCE_DIR)\SpdmRequesterLibGetCertificate.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibGetCertificate.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibGetDigest.obj : $(SOURCE_DIR)\SpdmRequesterLibGetDigest.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibGetDigest.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibGetMeasurement.obj : $(SOURCE_DIR)\SpdmRequesterLibGetMeasurement.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibGetMeasurement.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibGetVersion.obj : $(SOURCE_DIR)\SpdmRequesterLibGetVersion.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibGetVersion.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibHeartbeat.obj : $(SOURCE_DIR)\SpdmRequesterLibHeartbeat.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibHeartbeat.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibKeyExchange.obj : $(SOURCE_DIR)\SpdmRequesterLibKeyExchange.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibKeyExchange.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibKeyUpdate.obj : $(SOURCE_DIR)\SpdmRequesterLibKeyUpdate.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibKeyUpdate.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibNegotiateAlgorithm.obj : $(SOURCE_DIR)\SpdmRequesterLibNegotiateAlgorithm.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibNegotiateAlgorithm.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibPskExchange.obj : $(SOURCE_DIR)\SpdmRequesterLibPskExchange.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibPskExchange.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibPskFinish.obj : $(SOURCE_DIR)\SpdmRequesterLibPskFinish.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibPskFinish.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibSendReceive.obj : $(SOURCE_DIR)\SpdmRequesterLibSendReceive.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibSendReceive.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@

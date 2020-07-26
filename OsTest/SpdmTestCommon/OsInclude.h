@@ -45,6 +45,7 @@ typedef UINT32 size_t ;
 #include <winioctl.h>
 #include "windows.h"
 #include "windowsx.h"
+#include <WS2tcpip.h>
 
 #undef GUID
 #undef _LIST_ENTRY

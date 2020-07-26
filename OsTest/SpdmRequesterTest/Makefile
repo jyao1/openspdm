@@ -31,16 +31,6 @@ SOURCE_DIR = $(WORKSPACE)\OsTest\$(MODULE_NAME)
 #
 # Build Macro
 #
-SOURCE_FILES =  \
-	$(SOURCE_DIR)\SpdmRequester.c \
-	$(SOURCE_DIR)\SpdmRequesterAuthentication.c \
-	$(SOURCE_DIR)\SpdmRequesterMeasurement.c \
-	$(SOURCE_DIR)\SpdmRequesterSession.c \
-	$(SOURCE_DIR)\SpdmRequesterTest.c \
-	$(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestCommand.c \
-	$(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestKey.c \
-	$(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestSupport.c \
-
 
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmRequester.obj \
@@ -65,11 +55,11 @@ STATIC_LIBRARY_FILES =  \
 
 
 INC =  \
-    /I$(SOURCE_DIR) \
-    /I$(WORKSPACE)\OsTest\SpdmTestCommon \
-    /I$(WORKSPACE)\Include \
-    /I$(WORKSPACE)\Include\Hal \
-    /I$(WORKSPACE)\Include\Hal\$(ARCH)
+    -I$(SOURCE_DIR) \
+    -I$(WORKSPACE)\OsTest\SpdmTestCommon \
+    -I$(WORKSPACE)\Include \
+    -I$(WORKSPACE)\Include\Hal \
+    -I$(WORKSPACE)\Include\Hal\$(ARCH)
 
 #
 # Overridable Target Macro Definitions
@@ -110,8 +100,29 @@ gen_libs:
 #
 # Individual Object Build Targets
 #
-$(OBJECT_FILES):  $(SOURCE_FILES)
-	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_FILES)
+$(OUTPUT_DIR)\SpdmRequester.obj : $(SOURCE_DIR)\SpdmRequester.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequester.c
+
+$(OUTPUT_DIR)\SpdmRequesterAuthentication.obj : $(SOURCE_DIR)\SpdmRequesterAuthentication.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterAuthentication.c
+
+$(OUTPUT_DIR)\SpdmRequesterMeasurement.obj : $(SOURCE_DIR)\SpdmRequesterMeasurement.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterMeasurement.c
+
+$(OUTPUT_DIR)\SpdmRequesterSession.obj : $(SOURCE_DIR)\SpdmRequesterSession.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterSession.c
+
+$(OUTPUT_DIR)\SpdmRequesterTest.obj : $(SOURCE_DIR)\SpdmRequesterTest.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterTest.c
+
+$(OUTPUT_DIR)\SpdmTestCommand.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestCommand.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestCommand.c
+
+$(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestKey.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestKey.c
+
+$(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestSupport.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestSupport.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@

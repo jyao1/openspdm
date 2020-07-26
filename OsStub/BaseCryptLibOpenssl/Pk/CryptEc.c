@@ -282,7 +282,7 @@ EcGetPublicKey (
     RetVal = FALSE;
     goto Done;
   }
-  ASSERT (XSize <= HalfSize && YSize <= HalfSize);
+  ASSERT ((UINTN)XSize <= HalfSize && (UINTN)YSize <= HalfSize);
 
   if (Public != NULL) {
     BN_bn2bin (BnX, &Public[0 + HalfSize - XSize]);
@@ -445,12 +445,12 @@ EccSignatureDerToBin (
   HalfSize = (UINT8)(SigSize / 2);
 
   ASSERT (DerSignature[0] == 0x30);
-  ASSERT (DerSignature[1] + 2 == DerSigSize);
+  ASSERT ((UINTN)(DerSignature[1] + 2) == DerSigSize);
   ASSERT (DerSignature[2] == 0x02);
   DerRSize = DerSignature[3];
   ASSERT (DerSignature[4 + DerRSize] == 0x02);
   DerSSize = DerSignature[5 + DerRSize];
-  ASSERT (DerSigSize == DerRSize + DerSSize + 6);
+  ASSERT (DerSigSize == (UINTN)(DerRSize + DerSSize + 6));
 
   if (DerSignature[4] != 0) {
     RSize = DerRSize;
@@ -541,7 +541,7 @@ EcDsaSign (
   default:
     return FALSE;
   }
-  if (*SigSize < HalfSize * 2) {
+  if (*SigSize < (UINTN)(HalfSize * 2)) {
     *SigSize = HalfSize * 2;
     return FALSE;
   }
@@ -719,7 +719,7 @@ EcDsaVerify (
   default:
     return FALSE;
   }
-  if (SigSize != HalfSize * 2) {
+  if (SigSize != (UINTN)(HalfSize * 2)) {
     return FALSE;
   }
 

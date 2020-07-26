@@ -27,32 +27,9 @@ OUTPUT_DIR = $(BIN_DIR)\OsStub\$(MODULE_NAME)
 
 SOURCE_DIR = $(WORKSPACE)\OsStub\$(MODULE_NAME)
 
-CC_FLAGS = $(CC_FLAGS) /wd4090 /wd4018
-
 #
 # Build Macro
 #
-SOURCE_FILES =  \
-	$(SOURCE_DIR)\Cipher\CryptAeadAesCcm.c \
-	$(SOURCE_DIR)\Cipher\CryptAeadAesGcm.c \
-	$(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c \
-	$(SOURCE_DIR)\Hash\CryptSha256.c \
-	$(SOURCE_DIR)\Hash\CryptSha512.c \
-	$(SOURCE_DIR)\Hmac\CryptHmacSha256.c \
-	$(SOURCE_DIR)\Kdf\CryptHkdf.c \
-	$(SOURCE_DIR)\Mac\CryptCmacAes.c \
-	$(SOURCE_DIR)\Mac\CryptGmacAes.c \
-	$(SOURCE_DIR)\Pem\CryptPem.c \
-	$(SOURCE_DIR)\Pk\CryptEc.c \
-	$(SOURCE_DIR)\Pk\CryptDh.c \
-	$(SOURCE_DIR)\Pk\CryptRsaBasic.c \
-	$(SOURCE_DIR)\Pk\CryptRsaExt.c \
-	$(SOURCE_DIR)\Pk\CryptX509.c \
-	$(SOURCE_DIR)\Rand\CryptRand.c \
-	$(SOURCE_DIR)\SysCall\BaseMemAllocation.c \
-	$(SOURCE_DIR)\SysCall\CrtWrapperHost.c \
-	$(SOURCE_DIR)\SysCall\TimerWrapperHost.c \
-
 
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\CryptAeadAesCcm.obj \
@@ -76,12 +53,12 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TimerWrapperHost.obj \
 
 INC =  \
-    /I$(SOURCE_DIR)\
-    /I$(WORKSPACE)\Include \
-    /I$(WORKSPACE)\Include\Hal \
-    /I$(WORKSPACE)\Include\Hal\$(ARCH) \
-    /I$(WORKSPACE)\OsStub\Include \
-    /I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include
+    -I$(SOURCE_DIR)\
+    -I$(WORKSPACE)\Include \
+    -I$(WORKSPACE)\Include\Hal \
+    -I$(WORKSPACE)\Include\Hal\$(ARCH) \
+    -I$(WORKSPACE)\OsStub\Include \
+    -I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include
 
 #
 # Overridable Target Macro Definitions
@@ -110,8 +87,62 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OBJECT_FILES):  $(SOURCE_FILES)
-	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_FILES)
+$(OUTPUT_DIR)\CryptAeadAesCcm.obj : $(SOURCE_DIR)\Cipher/CryptAeadAesCcm.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Cipher/CryptAeadAesCcm.c
+
+$(OUTPUT_DIR)\CryptAeadAesGcm.obj : $(SOURCE_DIR)\Cipher/CryptAeadAesGcm.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Cipher/CryptAeadAesGcm.c
+
+$(OUTPUT_DIR)\CryptAeadChaCha20Poly1305.obj : $(SOURCE_DIR)\Cipher/CryptAeadChaCha20Poly1305.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Cipher/CryptAeadChaCha20Poly1305.c
+
+$(OUTPUT_DIR)\CryptSha256.obj : $(SOURCE_DIR)\Hash/CryptSha256.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Hash/CryptSha256.c
+
+$(OUTPUT_DIR)\CryptSha512.obj : $(SOURCE_DIR)\Hash/CryptSha512.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Hash/CryptSha512.c
+
+$(OUTPUT_DIR)\CryptHmacSha256.obj : $(SOURCE_DIR)\Hmac/CryptHmacSha256.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Hmac/CryptHmacSha256.c
+
+$(OUTPUT_DIR)\CryptHkdf.obj : $(SOURCE_DIR)\Kdf/CryptHkdf.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Kdf/CryptHkdf.c
+
+$(OUTPUT_DIR)\CryptCmacAes.obj : $(SOURCE_DIR)\Mac/CryptCmacAes.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Mac/CryptCmacAes.c
+
+$(OUTPUT_DIR)\CryptGmacAes.obj : $(SOURCE_DIR)\Mac/CryptGmacAes.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Mac/CryptGmacAes.c
+
+$(OUTPUT_DIR)\CryptPem.obj : $(SOURCE_DIR)\Pem/CryptPem.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pem/CryptPem.c
+
+$(OUTPUT_DIR)\CryptEc.obj : $(SOURCE_DIR)\Pk/CryptEc.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk/CryptEc.c
+
+$(OUTPUT_DIR)\CryptDh.obj : $(SOURCE_DIR)\Pk/CryptDh.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk/CryptDh.c
+
+$(OUTPUT_DIR)\CryptRsaBasic.obj : $(SOURCE_DIR)\Pk/CryptRsaBasic.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk/CryptRsaBasic.c
+
+$(OUTPUT_DIR)\CryptRsaExt.obj : $(SOURCE_DIR)\Pk/CryptRsaExt.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk/CryptRsaExt.c
+
+$(OUTPUT_DIR)\CryptX509.obj : $(SOURCE_DIR)\Pk/CryptX509.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk/CryptX509.c
+
+$(OUTPUT_DIR)\CryptRand.obj : $(SOURCE_DIR)\Rand/CryptRand.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Rand/CryptRand.c
+
+$(OUTPUT_DIR)\BaseMemAllocation.obj : $(SOURCE_DIR)\SysCall/BaseMemAllocation.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SysCall/BaseMemAllocation.c
+
+$(OUTPUT_DIR)\CrtWrapperHost.obj : $(SOURCE_DIR)\SysCall/CrtWrapperHost.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SysCall/CrtWrapperHost.c
+
+$(OUTPUT_DIR)\TimerWrapperHost.obj : $(SOURCE_DIR)\SysCall/TimerWrapperHost.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SysCall/TimerWrapperHost.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@

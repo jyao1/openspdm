@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define IP_ADDRESS "127.0.0.1"
 
 #ifdef _MSC_VER
-struct  in_addr mIpAddress = {127, 0, 0, 1};
+struct  in_addr mIpAddress = {{{127, 0, 0, 1}}};
 #else
 struct  in_addr mIpAddress = {0x0100007F};
 #endif

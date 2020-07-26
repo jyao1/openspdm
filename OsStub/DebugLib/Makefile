@@ -30,9 +30,6 @@ SOURCE_DIR = $(WORKSPACE)\OsStub\$(MODULE_NAME)
 #
 # Build Macro
 #
-SOURCE_FILES =  \
-	$(SOURCE_DIR)\DebugLib.c \
-
 
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\DebugLib.obj \
@@ -40,9 +37,9 @@ OBJECT_FILES =  \
 
 
 INC =  \
-    /I$(WORKSPACE)\Include \
-    /I$(WORKSPACE)\Include\Hal \
-    /I$(WORKSPACE)\Include\Hal\$(ARCH)
+    -I$(WORKSPACE)\Include \
+    -I$(WORKSPACE)\Include\Hal \
+    -I$(WORKSPACE)\Include\Hal\$(ARCH)
 
 #
 # Overridable Target Macro Definitions
@@ -71,8 +68,8 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OBJECT_FILES):  $(SOURCE_FILES)
-	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_FILES)
+$(OUTPUT_DIR)\DebugLib.obj : $(SOURCE_DIR)\DebugLib.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\DebugLib.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@

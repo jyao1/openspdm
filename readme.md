@@ -57,6 +57,10 @@
 
    Open visual studio 2019 command prompt at openspdm dir and type "nmake ARCH=<X64|Ia32> TOOLCHAIN=VS2019 TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>". (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
 
+   Tool : CLANG9 x86_64-pc-windows-msvc (TOOLCHAIN=CLANG)
+
+   Open visual studio 2019 command prompt at openspdm dir and type "make ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>".
+
 3) Linux Build:
 
    Tool : GCC (TOOLCHAIN=GCC)

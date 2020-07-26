@@ -49,6 +49,8 @@ TOOLCHAIN = $(TOOLCHAIN_DEF)
 !MESSAGE TOOLCHAIN=VS2015
 !ELSEIF "$(TOOLCHAIN)" == "VS2019"
 !MESSAGE TOOLCHAIN=VS2019
+!ELSEIF "$(TOOLCHAIN)" == "CLANG"
+!MESSAGE TOOLCHAIN=CLANG
 !ELSE
 !ERROR Unknown TOOLCHAIN!
 !ENDIF
@@ -79,11 +81,60 @@ VS_BIN_X64  = %VCToolsInstallDir%bin\Hostx64\x64
 MAKE = nmake.exe
 MAKEFILE = Makefile
 
-!IF "$(ARCH)" == "X64"
-CC = cl.exe
-!ELSEIF "$(ARCH)" == "Ia32"
-CC = cl.exe
+!IF "$(TOOLCHAIN)" == "CLANG"
+CC = clang.exe
+
+CC_OBJ_FLAG = -o
+MBEDTLS_FLAGS = 
+OPENSSL_FLAGS = -include Base.h -Wno-error=format -Wno-format
+
+CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall  -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector  -mno-red-zone -Wno-address -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -funwind-tables -D_CRT_SECURE_NO_WARNINGS
+!IF "$(TARGET)" == "DEBUG"
+CC_FLAGS = $(CC_FLAGS) -O0 -gcodeview
+!ELSEIF "$(TARGET)" == "RELEASE"
+CC_FLAGS = $(CC_FLAGS) -Oz
 !ENDIF
+
+!IF "$(ARCH)" == "X64"
+CC_FLAGS = $(CC_FLAGS) -m64 -mcmodel=small
+!ELSEIF "$(ARCH)" == "Ia32"
+CC_FLAGS = $(CC_FLAGS) -m32 -march=i586
+!ENDIF
+
+SLINK = llvm-lib.exe
+
+SLINK_FLAGS = 
+
+DLINK = lld-link.exe
+
+DLINK_FLAGS = /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MLLVM:-exception-model=wineh /lldmap /OPT:REF
+!IF "$(TARGET)" == "DEBUG"
+DLINK_FLAGS = $(DLINK_FLAGS) /DEBUG:GHASH
+!ELSEIF "$(TARGET)" == "RELEASE"
+DLINK_FLAGS = $(DLINK_FLAGS)
+!ENDIF
+
+!IF "$(ARCH)" == "X64"
+DLINK_FLAGS = $(DLINK_FLAGS) /MACHINE:AMD64
+!ELSEIF "$(ARCH)" == "Ia32"
+DLINK_FLAGS = $(DLINK_FLAGS) /MACHINE:I386
+!ENDIF
+
+!IF "$(ARCH)" == "X64"
+DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
+!ELSEIF "$(ARCH)" == "Ia32"
+DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
+!ENDIF
+
+DLINK_FLAGS = $(DLINK_FLAGS) Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib ws2_32.lib
+
+!ELSE
+
+CC = cl.exe
+
+CC_OBJ_FLAG = /Fo:
+MBEDTLS_FLAGS = /wd4244 /wd4132 /wd4245 /wd4310 /wd4701 /wd4127
+OPENSSL_FLAGS = /FIBase.h /wd4090 /wd4132 /wd4244 /wd4245 /wd4267 /wd4306 /wd4310 /wd4700 /wd4389 /wd4702 /wd4706 /wd4819
 
 CC_FLAGS = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /EHs-c- /GR- /GF /Z7 /Gw /Oy- /D_CRT_SECURE_NO_WARNINGS
 !IF "$(TARGET)" == "DEBUG"
@@ -92,19 +143,11 @@ CC_FLAGS = $(CC_FLAGS) /Od
 CC_FLAGS = $(CC_FLAGS) /GL /O1b2s
 !ENDIF
 
-!IF "$(ARCH)" == "X64"
 SLINK = lib.exe
-!ELSEIF "$(ARCH)" == "Ia32"
-SLINK = lib.exe
-!ENDIF
 
 SLINK_FLAGS = /NOLOGO /LTCG
 
-!IF "$(ARCH)" == "X64"
 DLINK = link.exe
-!ELSEIF "$(ARCH)" == "Ia32"
-DLINK = link.exe
-!ENDIF
 
 DLINK_FLAGS = /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF
 !IF "$(TARGET)" == "DEBUG"
@@ -135,3 +178,5 @@ DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%Un
 !ENDIF
 
 DLINK_FLAGS = $(DLINK_FLAGS) Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib ws2_32.lib
+
+!ENDIF

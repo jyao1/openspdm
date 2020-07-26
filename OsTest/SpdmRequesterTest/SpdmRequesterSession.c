@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 extern VOID          *mSpdmContext;
 
 typedef struct {
-  SPDM_DATA_TYPE  DataType;
-  CHAR8           *String;
+  SPDM_DEBUG_DATA_TYPE  DataType;
+  CHAR8                 *String;
 } DATA_TYPE_STRING;
 
 DATA_TYPE_STRING  mDataTypeString[] = {
@@ -152,7 +152,7 @@ DoSessionViaSpdm (
   for (Index = 0; Index < ARRAY_SIZE(mDataTypeString); Index++) {
     DataSize = sizeof(Data);
     ZeroMem (Data, sizeof(Data));
-    Status = SpdmGetData (SpdmContext, mDataTypeString[Index].DataType, &Parameter, Data, &DataSize);
+    Status = SpdmGetData (SpdmContext, (SPDM_DATA_TYPE)mDataTypeString[Index].DataType, &Parameter, Data, &DataSize);
     if (!RETURN_ERROR(Status)) {
       printf ("%s (%d) - ", mDataTypeString[Index].String, (UINT32)DataSize);
       DumpData (Data, DataSize);

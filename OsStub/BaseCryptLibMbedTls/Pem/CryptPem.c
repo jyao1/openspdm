@@ -84,7 +84,7 @@ RsaGetPrivateKeyFromPem (
     PasswordLen = 0;
   }
 
-  Ret = mbedtls_pk_parse_key (&pk, PemData, PemSize, Password, PasswordLen);
+  Ret = mbedtls_pk_parse_key (&pk, PemData, PemSize, (CONST UINT8 *)Password, PasswordLen);
   
   if (NewPemData != NULL) {
     FreePool (NewPemData);
@@ -173,7 +173,7 @@ EcGetPrivateKeyFromPem (
     PasswordLen = 0;
   }
 
-  Ret = mbedtls_pk_parse_key (&pk, PemData, PemSize, Password, PasswordLen);
+  Ret = mbedtls_pk_parse_key (&pk, PemData, PemSize, (CONST UINT8 *)Password, PasswordLen);
 
   if (NewPemData != NULL) {
     FreePool (NewPemData);

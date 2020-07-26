@@ -65,6 +65,8 @@ MAKEFILE = GNUmakefile
 ifeq ("$(TOOLCHAIN)","GCC")
     CC = gcc
     CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare
+    MBEDTLS_FLAGS = 
+    OPENSSL_FLAGS = -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable
     SLINK = gcc-ar
     DLINK = gcc
     DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
@@ -73,6 +75,8 @@ ifeq ("$(TOOLCHAIN)","GCC")
 else ifeq ("$(TOOLCHAIN)","CLANG")
     CC = clang
     CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall  -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector  -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch 
+    MBEDTLS_FLAGS = 
+    OPENSSL_FLAGS = -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable
     SLINK = llvm-ar
     DLINK = clang
     DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib

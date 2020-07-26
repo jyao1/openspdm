@@ -219,7 +219,7 @@ PlatformServerRoutine (
     printf ("Platform server listening on port %d\n", PortNumber);
 
     Length = sizeof(PeerAddress);
-    ServerSocket = accept(ListenSocket, (struct sockaddr*) &PeerAddress, &Length);
+    ServerSocket = accept(ListenSocket, (struct sockaddr*) &PeerAddress, (socklen_t *)&Length);
     if (ServerSocket == INVALID_SOCKET) {
       printf ("Accept error.  Error is 0x%x\n",
 #ifdef _MSC_VER

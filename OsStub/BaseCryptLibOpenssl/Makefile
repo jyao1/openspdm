@@ -27,71 +27,44 @@ OUTPUT_DIR = $(BIN_DIR)\OsStub\$(MODULE_NAME)
 
 SOURCE_DIR = $(WORKSPACE)\OsStub\$(MODULE_NAME)
 
-CC_FLAGS = $(CC_FLAGS) /wd4090 /wd4018
-
 #
 # Build Macro
 #
-SOURCE_FILES =  \
-	$(SOURCE_DIR)\Cipher\CryptAeadAesCcm.c \
-	$(SOURCE_DIR)\Cipher\CryptAeadAesGcm.c \
-	$(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c \
-	$(SOURCE_DIR)\Cipher\CryptAes.c \
-	$(SOURCE_DIR)\Hash\CryptSha256.c \
-	$(SOURCE_DIR)\Hash\CryptSha512.c \
-	$(SOURCE_DIR)\Hmac\CryptHmacSha256.c \
-	$(SOURCE_DIR)\Kdf\CryptHkdf.c \
-	$(SOURCE_DIR)\Mac\CryptCmacAes.c \
-	$(SOURCE_DIR)\Mac\CryptGmacAes.c \
-	$(SOURCE_DIR)\Pem\CryptPem.c \
-	$(SOURCE_DIR)\Pk\CryptEc.c \
-	$(SOURCE_DIR)\Pk\CryptDh.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs1Oaep.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs7Sign.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs7VerifyBase.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs7VerifyCommon.c \
-	$(SOURCE_DIR)\Pk\CryptPkcs7VerifyEku.c \
-	$(SOURCE_DIR)\Pk\CryptRsaBasic.c \
-	$(SOURCE_DIR)\Pk\CryptRsaExt.c \
-	$(SOURCE_DIR)\Pk\CryptX509.c \
-	$(SOURCE_DIR)\Rand\CryptRand.c \
-	$(SOURCE_DIR)\SysCall\CrtWrapperHost.c \
-
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\CryptAeadAesCcm.obj \
-    $(OUTPUT_DIR)\CryptAeadAesGcm.obj \
-    $(OUTPUT_DIR)\CryptAeadChaCha20Poly1305.obj \
-    $(OUTPUT_DIR)\CryptAes.obj \
-    $(OUTPUT_DIR)\CryptSha256.obj \
-    $(OUTPUT_DIR)\CryptSha512.obj \
-    $(OUTPUT_DIR)\CryptHmacSha256.obj \
-    $(OUTPUT_DIR)\CryptHkdf.obj \
-    $(OUTPUT_DIR)\CryptCmacAes.obj \
-    $(OUTPUT_DIR)\CryptGmacAes.obj \
-    $(OUTPUT_DIR)\CryptPem.obj \
-    $(OUTPUT_DIR)\CryptDh.obj \
-    $(OUTPUT_DIR)\CryptEc.obj \
-    $(OUTPUT_DIR)\CryptPkcs1Oaep.obj \
-    $(OUTPUT_DIR)\CryptPkcs7Sign.obj \
-    $(OUTPUT_DIR)\CryptPkcs7VerifyBase.obj \
-    $(OUTPUT_DIR)\CryptPkcs7VerifyCommon.obj \
-    $(OUTPUT_DIR)\CryptPkcs7VerifyEku.obj \
-    $(OUTPUT_DIR)\CryptRsaBasic.obj \
-    $(OUTPUT_DIR)\CryptRsaExt.obj \
-    $(OUTPUT_DIR)\CryptX509.obj \
-    $(OUTPUT_DIR)\CryptRand.obj \
-    $(OUTPUT_DIR)\CrtWrapperHost.obj \
+    $(OUTPUT_DIR)\Cipher\CryptAeadAesCcm.obj \
+    $(OUTPUT_DIR)\Cipher\CryptAeadAesGcm.obj \
+    $(OUTPUT_DIR)\Cipher\CryptAeadChaCha20Poly1305.obj \
+    $(OUTPUT_DIR)\Cipher\CryptAes.obj \
+    $(OUTPUT_DIR)\Hash\CryptSha256.obj \
+    $(OUTPUT_DIR)\Hash\CryptSha512.obj \
+    $(OUTPUT_DIR)\Hmac\CryptHmacSha256.obj \
+    $(OUTPUT_DIR)\Kdf\CryptHkdf.obj \
+    $(OUTPUT_DIR)\Mac\CryptCmacAes.obj \
+    $(OUTPUT_DIR)\Mac\CryptGmacAes.obj \
+    $(OUTPUT_DIR)\Pem\CryptPem.obj \
+    $(OUTPUT_DIR)\Pk\CryptDh.obj \
+    $(OUTPUT_DIR)\Pk\CryptEc.obj \
+    $(OUTPUT_DIR)\Pk\CryptPkcs1Oaep.obj \
+    $(OUTPUT_DIR)\Pk\CryptPkcs7Sign.obj \
+    $(OUTPUT_DIR)\Pk\CryptPkcs7VerifyBase.obj \
+    $(OUTPUT_DIR)\Pk\CryptPkcs7VerifyCommon.obj \
+    $(OUTPUT_DIR)\Pk\CryptPkcs7VerifyEku.obj \
+    $(OUTPUT_DIR)\Pk\CryptRsaBasic.obj \
+    $(OUTPUT_DIR)\Pk\CryptRsaExt.obj \
+    $(OUTPUT_DIR)\Pk\CryptX509.obj \
+    $(OUTPUT_DIR)\Rand\CryptRand.obj \
+    $(OUTPUT_DIR)\SysCall\CrtWrapperHost.obj \
 
 INC =  \
-    /I$(SOURCE_DIR)\
-    /I$(WORKSPACE)\Include \
-    /I$(WORKSPACE)\Include\Hal \
-    /I$(WORKSPACE)\Include\Hal\$(ARCH) \
-    /I$(WORKSPACE)\OsStub\Include \
-    /I$(WORKSPACE)\OsStub\OpensslLib\Include \
-    /I$(WORKSPACE)\OsStub\OpensslLib\openssl\include \
-    /I$(WORKSPACE)\OsStub\OpensslLib\openssl\crypto\include
+    -I$(SOURCE_DIR)\
+    -I$(WORKSPACE)\Include \
+    -I$(WORKSPACE)\Include\Hal \
+    -I$(WORKSPACE)\Include\Hal\$(ARCH) \
+    -I$(WORKSPACE)\OsStub\Include \
+    -I$(WORKSPACE)\OsStub\OpensslLib\Include \
+    -I$(WORKSPACE)\OsStub\OpensslLib\openssl\include \
+    -I$(WORKSPACE)\OsStub\OpensslLib\openssl\crypto\include
 
 #
 # Overridable Target Macro Definitions
@@ -116,12 +89,87 @@ mbuild: $(INIT_TARGET) $(CODA_TARGET)
 #
 init:
 	-@if not exist $(OUTPUT_DIR) $(MD) $(OUTPUT_DIR)
+	-@if not exist $(OUTPUT_DIR)\Cipher $(MD) $(OUTPUT_DIR)\Cipher
+	-@if not exist $(OUTPUT_DIR)\Hash $(MD) $(OUTPUT_DIR)\Hash
+	-@if not exist $(OUTPUT_DIR)\Hmac $(MD) $(OUTPUT_DIR)\Hmac
+	-@if not exist $(OUTPUT_DIR)\Kdf $(MD) $(OUTPUT_DIR)\Kdf
+	-@if not exist $(OUTPUT_DIR)\Mac $(MD) $(OUTPUT_DIR)\Mac
+	-@if not exist $(OUTPUT_DIR)\Pem $(MD) $(OUTPUT_DIR)\Pem
+	-@if not exist $(OUTPUT_DIR)\Pk $(MD) $(OUTPUT_DIR)\Pk
+	-@if not exist $(OUTPUT_DIR)\Rand $(MD) $(OUTPUT_DIR)\Rand
+	-@if not exist $(OUTPUT_DIR)\SysCall $(MD) $(OUTPUT_DIR)\SysCall
 
 #
 # Individual Object Build Targets
 #
-$(OBJECT_FILES):  $(SOURCE_FILES)
-	"$(CC)" /Fo$(OUTPUT_DIR)\.\ $(CC_FLAGS) $(INC) $(SOURCE_FILES)
+$(OUTPUT_DIR)\Cipher\CryptAeadAesCcm.obj : $(SOURCE_DIR)\Cipher\CryptAeadAesCcm.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Cipher\CryptAeadAesCcm.c
+
+$(OUTPUT_DIR)\Cipher\CryptAeadAesGcm.obj : $(SOURCE_DIR)\Cipher\CryptAeadAesGcm.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Cipher\CryptAeadAesGcm.c
+
+$(OUTPUT_DIR)\Cipher\CryptAeadChaCha20Poly1305.obj : $(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c
+
+$(OUTPUT_DIR)\Cipher\CryptAes.obj : $(SOURCE_DIR)\Cipher\CryptAes.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Cipher\CryptAes.c
+
+$(OUTPUT_DIR)\Hash\CryptSha256.obj : $(SOURCE_DIR)\Hash\CryptSha256.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Hash\CryptSha256.c
+
+$(OUTPUT_DIR)\Hash\CryptSha512.obj : $(SOURCE_DIR)\Hash\CryptSha512.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Hash\CryptSha512.c
+
+$(OUTPUT_DIR)\Hmac\CryptHmacSha256.obj : $(SOURCE_DIR)\Hmac\CryptHmacSha256.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Hmac\CryptHmacSha256.c
+
+$(OUTPUT_DIR)\Kdf\CryptHkdf.obj : $(SOURCE_DIR)\Kdf\CryptHkdf.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Kdf\CryptHkdf.c
+
+$(OUTPUT_DIR)\Mac\CryptCmacAes.obj : $(SOURCE_DIR)\Mac\CryptCmacAes.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Mac\CryptCmacAes.c
+
+$(OUTPUT_DIR)\Mac\CryptGmacAes.obj : $(SOURCE_DIR)\Mac\CryptGmacAes.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Mac\CryptGmacAes.c
+
+$(OUTPUT_DIR)\Pem\CryptPem.obj : $(SOURCE_DIR)\Pem\CryptPem.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pem\CryptPem.c
+
+$(OUTPUT_DIR)\Pk\CryptEc.obj : $(SOURCE_DIR)\Pk\CryptEc.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptEc.c
+
+$(OUTPUT_DIR)\Pk\CryptDh.obj : $(SOURCE_DIR)\Pk\CryptDh.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptDh.c
+
+$(OUTPUT_DIR)\Pk\CryptPkcs1Oaep.obj : $(SOURCE_DIR)\Pk\CryptPkcs1Oaep.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptPkcs1Oaep.c
+
+$(OUTPUT_DIR)\Pk\CryptPkcs7Sign.obj : $(SOURCE_DIR)\Pk\CryptPkcs7Sign.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptPkcs7Sign.c
+
+$(OUTPUT_DIR)\Pk\CryptPkcs7VerifyBase.obj : $(SOURCE_DIR)\Pk\CryptPkcs7VerifyBase.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptPkcs7VerifyBase.c
+
+$(OUTPUT_DIR)\Pk\CryptPkcs7VerifyCommon.obj : $(SOURCE_DIR)\Pk\CryptPkcs7VerifyCommon.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptPkcs7VerifyCommon.c
+
+$(OUTPUT_DIR)\Pk\CryptPkcs7VerifyEku.obj : $(SOURCE_DIR)\Pk\CryptPkcs7VerifyEku.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptPkcs7VerifyEku.c
+
+$(OUTPUT_DIR)\Pk\CryptRsaBasic.obj : $(SOURCE_DIR)\Pk\CryptRsaBasic.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptRsaBasic.c
+
+$(OUTPUT_DIR)\Pk\CryptRsaExt.obj : $(SOURCE_DIR)\Pk\CryptRsaExt.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptRsaExt.c
+
+$(OUTPUT_DIR)\Pk\CryptX509.obj : $(SOURCE_DIR)\Pk\CryptX509.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Pk\CryptX509.c
+
+$(OUTPUT_DIR)\Rand\CryptRand.obj : $(SOURCE_DIR)\Rand\CryptRand.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\Rand\CryptRand.c
+
+$(OUTPUT_DIR)\SysCall\CrtWrapperHost.obj : $(SOURCE_DIR)\SysCall\CrtWrapperHost.c
+	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SysCall\CrtWrapperHost.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@
