@@ -536,6 +536,25 @@ typedef struct {
 #define SPDM_ERROR_CODE_MAJOR_VERSION_MISMATCH  0x41
 #define SPDM_ERROR_CODE_RESPONSE_NOT_READY      0x42
 #define SPDM_ERROR_CODE_REQUEST_RESYNCH         0x43
+#define SPDM_ERROR_CODE_VENDOR_DEFINED          0xFF
+///
+/// SPDM error code (1.1)
+///
+#define SPDM_ERROR_CODE_INVALID_SESSION         0x02
+#define SPDM_ERROR_CODE_DECRYPT_ERROR           0x06
+#define SPDM_ERROR_CODE_REQUEST_IN_FLIGHT       0x08
+#define SPDM_ERROR_CODE_INVALID_RESPONSE_CODE   0x09
+#define SPDM_ERROR_CODE_SESSION_LIMIT_EXCEEDED  0x0A
+
+///
+/// SPDM ResponseNotReady extended data
+///
+typedef struct {
+  UINT8                RDTExponent;
+  UINT8                RequestCode;
+  UINT8                Token;
+  UINT8                RDTM;
+} SPDM_ERROR_DATA_RESPONSE_NOT_READY;
 
 ///
 /// SPDM RESPONSE_IF_READY request
