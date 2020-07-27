@@ -27,7 +27,6 @@ SpdmRequesterGenerateFinishSignature (
   OUT UINT8                     *Signature
   )
 {
-  VOID                          *Context;
   UINT8                         HashData[MAX_HASH_SIZE];
   UINT8                         *CertBuffer;
   UINTN                         CertBufferSize;
@@ -39,12 +38,9 @@ SpdmRequesterGenerateFinishSignature (
   UINTN                         SignatureSize;
   UINT32                        HashSize;
   HASH_ALL                      HashFunc;
-  ASYM_GET_PRIVATE_KEY_FROM_PEM GetPrivateKeyFromPemFunc;
-  ASYM_FREE                     FreeFunc;
-  ASYM_SIGN                     SignFunc;
   LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
 
-  if (SpdmContext->LocalContext.PrivatePem == NULL) {
+  if (SpdmContext->LocalContext.SpdmDataSignFunc == NULL) {
     return FALSE;
   }
   if ((SpdmContext->LocalContext.SpdmCertChainVarBuffer == NULL) || (SpdmContext->LocalContext.SpdmCertChainVarBufferSize == 0)) {
@@ -57,14 +53,6 @@ SpdmRequesterGenerateFinishSignature (
   SignatureSize = GetSpdmAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
   HashFunc = GetSpdmHashFunc (SpdmContext);
-
-  GetPrivateKeyFromPemFunc = GetSpdmReqAsymGetPrivateKeyFromPem (SpdmContext);
-  FreeFunc = GetSpdmReqAsymFree (SpdmContext);
-  SignFunc = GetSpdmReqAsymSign (SpdmContext);
-  Result = GetPrivateKeyFromPemFunc (SpdmContext->LocalContext.PrivatePem, SpdmContext->LocalContext.PrivatePemSize, NULL, &Context);
-  if (!Result) {
-    return FALSE;
-  }
 
   CertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
@@ -100,14 +88,15 @@ SpdmRequesterGenerateFinishSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  Result = SignFunc (
-             Context,
+  Result = SpdmContext->LocalContext.SpdmDataSignFunc (
+             SpdmContext,
+             FALSE,
+             SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
              HashData,
              HashSize,
              Signature,
              &SignatureSize
              );
-  FreeFunc (Context);
 
   return Result;
 }

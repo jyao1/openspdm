@@ -64,19 +64,18 @@ typedef struct {
   //
   // My Private Certificate
   //
-  VOID                            *PrivatePem;
-  UINTN                           PrivatePemSize;
+  SPDM_DATA_SIGN_FUNC             SpdmDataSignFunc;
+  //
+  // Peer Certificate
+  //
+  VOID                            *SpdmCertChainVarBuffer;
+  UINTN                           SpdmCertChainVarBufferSize;
   //
   // measurement collected in the responder
   // SPDM_MEASUREMENT_BLOCK + Hash
   //
   VOID                            *DeviceMeasurement;
   UINT8                           DeviceMeasurementCount;
-  //
-  // Peer Certificate
-  //
-  VOID                            *SpdmCertChainVarBuffer;
-  UINTN                           SpdmCertChainVarBufferSize;
   //
   // PSK provision locally
   //

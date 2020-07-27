@@ -17,17 +17,13 @@ SpdmResponderGenerateSpdmMeasurementSignature (
   OUT UINT8                     *Signature
   )
 {
-  VOID                          *Context;
   UINT8                         HashData[MAX_HASH_SIZE];
   BOOLEAN                       Result;
   UINTN                         SignatureSize;
   UINT32                        HashSize;
   HASH_ALL                      HashFunc;
-  ASYM_GET_PRIVATE_KEY_FROM_PEM GetPrivateKeyFromPemFunc;
-  ASYM_FREE                     FreeFunc;
-  ASYM_SIGN                     SignFunc;
 
-  if (SpdmContext->LocalContext.PrivatePem == NULL) {
+  if (SpdmContext->LocalContext.SpdmDataSignFunc == NULL) {
     return FALSE;
   }
 
@@ -35,14 +31,6 @@ SpdmResponderGenerateSpdmMeasurementSignature (
   HashSize = GetSpdmHashSize (SpdmContext);
   HashFunc = GetSpdmHashFunc (SpdmContext);
 
-  GetPrivateKeyFromPemFunc = GetSpdmAsymGetPrivateKeyFromPem (SpdmContext);
-  FreeFunc = GetSpdmAsymFree (SpdmContext);
-  SignFunc = GetSpdmAsymSign (SpdmContext);
-  Result = GetPrivateKeyFromPemFunc (SpdmContext->LocalContext.PrivatePem, SpdmContext->LocalContext.PrivatePemSize, NULL, &Context);
-  if (!Result) {
-    return FALSE;
-  }
-  
   AppendManagedBuffer (&SpdmContext->Transcript.L1L2, ResponseMessage, ResponseMessageSize);
   
   DEBUG((DEBUG_INFO, "Calc L1L2 Data :\n"));
@@ -53,14 +41,15 @@ SpdmResponderGenerateSpdmMeasurementSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   
-  Result = SignFunc (
-             Context,
+  Result = SpdmContext->LocalContext.SpdmDataSignFunc (
+             SpdmContext,
+             TRUE,
+             SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
              HashData,
              HashSize,
              Signature,
              &SignatureSize
              );
-  FreeFunc (Context);
 
   return Result;
 }

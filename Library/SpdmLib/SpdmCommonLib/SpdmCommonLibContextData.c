@@ -305,10 +305,6 @@ SpdmSetData (
     SpdmContext->LocalContext.CertificateChainSize[SlotNum] = DataSize;
     SpdmContext->LocalContext.CertificateChain[SlotNum] = Data;
     break;
-  case SpdmDataPrivateCertificate:
-    SpdmContext->LocalContext.PrivatePemSize = DataSize;
-    SpdmContext->LocalContext.PrivatePem = Data;
-    break;
   case SpdmDataMeasurementRecord:
     SpdmContext->LocalContext.DeviceMeasurementCount = Parameter->AdditionalData[0];
     SpdmContext->LocalContext.DeviceMeasurement = Data;
@@ -478,6 +474,20 @@ SpdmGetData (
   *DataSize = TargetDataSize;
   CopyMem (Data, TargetData, TargetDataSize);
 
+  return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+EFIAPI
+SpdmRegisterDataSignFunc (
+  IN     VOID                      *Context,
+  IN     SPDM_DATA_SIGN_FUNC       SpdmDataSignFunc
+  )
+{
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+
+  SpdmContext = Context;
+  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
   return RETURN_SUCCESS;
 }
 

@@ -94,4 +94,16 @@ ReadRequesterPublicCertificateChain (
   OUT UINTN   *Size
   );
 
+BOOLEAN
+EFIAPI
+SpdmDataSignFunc (
+  IN      VOID         *SpdmContext,
+  IN      BOOLEAN      IsResponder,
+  IN      UINT32       AsymAlgo,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  );
+
 #endif

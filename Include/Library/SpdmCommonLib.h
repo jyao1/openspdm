@@ -89,7 +89,6 @@ typedef enum {
   SpdmDataPeerPublicCertChains,
   SpdmDataSlotCount,
   SpdmDataPublicCertChains,
-  SpdmDataPrivateCertificate,
   SpdmDataMeasurementRecord,
   SpdmDataMutAuthRequested,
   //
@@ -238,6 +237,28 @@ UINTN
 EFIAPI
 SpdmGetContextSize (
   VOID
+  );
+
+/**
+  The asym algo is aligned with SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*
+**/
+typedef
+BOOLEAN
+(EFIAPI *SPDM_DATA_SIGN_FUNC) (
+  IN      VOID         *SpdmContext,
+  IN      BOOLEAN      IsResponder,
+  IN      UINT32       AsymAlgo,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmRegisterDataSignFunc (
+  IN     VOID                      *SpdmContext,
+  IN     SPDM_DATA_SIGN_FUNC       SpdmDataSignFunc
   );
 
 #endif

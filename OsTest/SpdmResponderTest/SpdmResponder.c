@@ -179,10 +179,7 @@ SpdmServerInit (
   Res = ReadResponderPrivateCertificate (&Data, &DataSize);
   if (Res) {
     HasResPrivKey = TRUE;
-    ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = SpdmDataLocationLocal;
-    SpdmSetData (SpdmContext, SpdmDataPrivateCertificate, &Parameter, Data, DataSize);
-    // do not free it
+    SpdmRegisterDataSignFunc (SpdmContext, SpdmDataSignFunc);
   } else{
     HasResPrivKey = FALSE;
   }

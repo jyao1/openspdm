@@ -325,10 +325,7 @@ SpdmClientInit (
 
   Res = ReadRequesterPrivateCertificate (&Data, &DataSize);
   if (Res) {
-    ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = SpdmDataLocationLocal;
-    SpdmSetData (SpdmContext, SpdmDataPrivateCertificate, &Parameter, Data, DataSize);
-    // do not free it
+    SpdmRegisterDataSignFunc (SpdmContext, SpdmDataSignFunc);
   }
 
   Data8 = 0;
