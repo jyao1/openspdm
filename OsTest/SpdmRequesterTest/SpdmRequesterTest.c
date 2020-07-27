@@ -108,6 +108,7 @@ PlatformClientRoutine (
   UINT32  Response;
   UINTN   ResponseSize;
   UINT32  Session;
+  RETURN_STATUS  Status;
   
 #ifdef _MSC_VER
   WSADATA Ws;
@@ -142,14 +143,27 @@ PlatformClientRoutine (
 
   // Do test - begin
 
-  DoMeasurementViaSpdm ();
+  Status = DoAuthenticationViaSpdm ();
+  if (RETURN_ERROR(Status)) {
+    printf ("DoAuthenticationViaSpdm - %x\n", (UINT32)Status);
+    goto Done;
+  }
 
-  DoAuthenticationViaSpdm ();
+  Status = DoMeasurementViaSpdm ();
+  if (RETURN_ERROR(Status)) {
+    printf ("DoMeasurementViaSpdm - %x\n", (UINT32)Status);
+    goto Done;
+  }
 
-  DoSessionViaSpdm ();
+  Status = DoSessionViaSpdm ();
+  if (RETURN_ERROR(Status)) {
+    printf ("DoSessionViaSpdm - %x\n", (UINT32)Status);
+    goto Done;
+  }
 
   // Do test - end
 
+Done:
   ResponseSize = 0;
   Result = CommunicatePlatformData (
              PlatformSocket,

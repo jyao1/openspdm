@@ -149,6 +149,8 @@ SpdmServerInit (
   UINT32                       Data32;
   BOOLEAN                      HasResPubCert;
   BOOLEAN                      HasResPrivKey;
+  VOID                         *Hash;
+  UINTN                        HashSize;
 
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   SpdmContext = mSpdmContext;
@@ -159,7 +161,7 @@ SpdmServerInit (
   Data32 = (UINT32)SpdmIoSecureMessagingTypeDmtfMtcp;
   SpdmSetData (SpdmContext, SpdmDataIoSecureMessageType, &Parameter, &Data32, sizeof(Data32));
 
-  Res = ReadResponderPublicCertificateChain (&Data, &DataSize);
+  Res = ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
   if (Res) {
     HasResPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
@@ -184,11 +186,12 @@ SpdmServerInit (
     HasResPrivKey = FALSE;
   }
 
-  Res = ReadRequesterPublicCertificateChain (&Data, &DataSize);
+  Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
-    SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
+    //SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
+    SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
     // Do not free it.
     
     Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED;

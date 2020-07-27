@@ -121,7 +121,9 @@ ReadRequesterPrivateCertificate (
 BOOLEAN
 ReadResponderPublicCertificateChain (
   OUT VOID    **Data,
-  OUT UINTN   *Size
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
   )
 {
   BOOLEAN             Res;
@@ -169,6 +171,12 @@ ReadResponderPublicCertificateChain (
 
   *Data = CertChain;
   *Size = CertChainSize;
+  if (Hash != NULL) {
+    *Hash = (CertChain + 1);
+  }
+  if (HashSize != NULL) {
+    *HashSize = SHA256_HASH_SIZE;
+  }
 
   return TRUE;
 }
@@ -176,7 +184,9 @@ ReadResponderPublicCertificateChain (
 BOOLEAN
 ReadRequesterPublicCertificateChain (
   OUT VOID    **Data,
-  OUT UINTN   *Size
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
   )
 {
   BOOLEAN             Res;
@@ -224,6 +234,12 @@ ReadRequesterPublicCertificateChain (
 
   *Data = CertChain;
   *Size = CertChainSize;
+  if (Hash != NULL) {
+    *Hash = (CertChain + 1);
+  }
+  if (HashSize != NULL) {
+    *HashSize = SHA256_HASH_SIZE;
+  }
 
   return TRUE;
 }

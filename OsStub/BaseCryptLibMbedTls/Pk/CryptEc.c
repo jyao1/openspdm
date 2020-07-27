@@ -432,7 +432,7 @@ EcDsaSign (
   default:
     return FALSE;
   }
-  if (*SigSize < HalfSize * 2) {
+  if (*SigSize < (UINTN)(HalfSize * 2)) {
     *SigSize = HalfSize * 2;
     return FALSE;
   }

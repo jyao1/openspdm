@@ -295,21 +295,24 @@ SpdmClientInit (
   UINT8                        Data8;
   UINT16                       Data16;
   UINT32                       Data32;
+  VOID                         *Hash;
+  UINTN                        HashSize;
 
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
   SpdmRegisterSpdmIo (SpdmContext, &mSpdmProtocol);
 
-  Res = ReadResponderPublicCertificateChain (&Data, &DataSize);
+  Res = ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
-    SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
+    //SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
+    SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
     // Do not free it.
   }
 
-  Res = ReadRequesterPublicCertificateChain (&Data, &DataSize);
+  Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, NULL, NULL);
   if (Res) {
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;

@@ -283,9 +283,13 @@ SpdmSetData (
     }
     SpdmContext->LocalContext.Algorithm.KeySchedule = *(UINT16 *)Data;
     break;
+  case SpdmDataPeerPublicRootCertHash:
+    SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = DataSize;
+    SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Data;
+    break;
   case SpdmDataPeerPublicCertChains:
-    SpdmContext->LocalContext.SpdmCertChainVarBufferSize = DataSize;
-    SpdmContext->LocalContext.SpdmCertChainVarBuffer = Data;
+    SpdmContext->LocalContext.PeerCertChainVarBufferSize = DataSize;
+    SpdmContext->LocalContext.PeerCertChainVarBuffer = Data;
     break;
   case SpdmDataSlotCount:
     if (DataSize != sizeof(UINT8)) {

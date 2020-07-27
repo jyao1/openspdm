@@ -31,10 +31,10 @@ SpemRequesterVerifyDigest (
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   
-  CertBuffer = SpdmContext->LocalContext.SpdmCertChainVarBuffer;
-  CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize;
+  CertBuffer = SpdmContext->LocalContext.PeerCertChainVarBuffer;
+  CertBufferSize = SpdmContext->LocalContext.PeerCertChainVarBufferSize;
   if ((CertBuffer == NULL) || (CertBufferSize == 0)) {
-    return FALSE;
+    return TRUE;
   }
   
   HashFunc = GetSpdmHashFunc (SpdmContext);

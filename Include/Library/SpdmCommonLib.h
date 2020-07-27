@@ -86,6 +86,7 @@ typedef enum {
   //
   // Certificate info
   //
+  SpdmDataPeerPublicRootCertHash,
   SpdmDataPeerPublicCertChains,
   SpdmDataSlotCount,
   SpdmDataPublicCertChains,

@@ -66,10 +66,15 @@ typedef struct {
   //
   SPDM_DATA_SIGN_FUNC             SpdmDataSignFunc;
   //
-  // Peer Certificate
+  // Peer Root Certificate Hash
   //
-  VOID                            *SpdmCertChainVarBuffer;
-  UINTN                           SpdmCertChainVarBufferSize;
+  VOID                            *PeerRootCertHashVarBuffer;
+  UINTN                           PeerRootCertHashVarBufferSize;
+  //
+  // Peer CertificateChain
+  //
+  VOID                            *PeerCertChainVarBuffer;
+  UINTN                           PeerCertChainVarBufferSize;
   //
   // measurement collected in the responder
   // SPDM_MEASUREMENT_BLOCK + Hash
@@ -111,6 +116,11 @@ typedef struct {
   UINT16                          Version;
   SPDM_DEVICE_CAPABILITY          Capability;
   SPDM_DEVICE_ALGORITHM           Algorithm;
+  //
+  // Peer CertificateChain
+  //
+  UINT8                           PeerCertChainBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINTN                           PeerCertChainBufferSize;
 } SPDM_CONNECTION_INFO;
 
 

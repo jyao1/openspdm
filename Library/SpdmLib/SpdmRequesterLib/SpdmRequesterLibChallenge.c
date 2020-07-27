@@ -36,9 +36,9 @@ SpdmRequesterVerifyCertificateChainHash (
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
 
-  CertBuffer = SpdmContext->LocalContext.SpdmCertChainVarBuffer;
-  CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize;
-  if ((CertBuffer == NULL) || (CertBufferSize == 0)) {
+  CertBuffer = SpdmContext->ConnectionInfo.PeerCertChainBuffer;
+  CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize;
+  if (CertBufferSize == 0) {
     return FALSE;
   }
   
@@ -96,11 +96,11 @@ SpdmRequesterVerifyChallengeSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   
-  if ((SpdmContext->LocalContext.SpdmCertChainVarBuffer == NULL) || (SpdmContext->LocalContext.SpdmCertChainVarBufferSize == 0)) {
+  if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
     return FALSE;
   }
-  CertBuffer = (UINT8 *)SpdmContext->LocalContext.SpdmCertChainVarBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->LocalContext.SpdmCertChainVarBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
 
   GetPublicKeyFromX509Func = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
   FreeFunc = GetSpdmAsymFree (SpdmContext);

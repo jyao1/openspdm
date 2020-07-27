@@ -85,13 +85,17 @@ ReadRequesterPrivateCertificate (
 BOOLEAN
 ReadResponderPublicCertificateChain (
   OUT VOID    **Data,
-  OUT UINTN   *Size
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
   );
 
 BOOLEAN
 ReadRequesterPublicCertificateChain (
   OUT VOID    **Data,
-  OUT UINTN   *Size
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
   );
 
 BOOLEAN
