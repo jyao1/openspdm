@@ -257,7 +257,6 @@ SpdmServerInit (
   if (RETURN_ERROR(Status)) {
   }
 
-#if USE_PSK
   Status = SpdmSetData (SpdmContext, SpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);
@@ -268,7 +267,6 @@ SpdmServerInit (
     printf ("SpdmSetData - %x\n", (UINT32)Status);
     return ;
   }
-#endif
 
   return ;
 }

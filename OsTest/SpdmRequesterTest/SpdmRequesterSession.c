@@ -101,7 +101,6 @@ DoSessionViaSpdm (
 
   SpdmContext = mSpdmContext;
 
-#if USE_PSK
   Status = SpdmSetData (SpdmContext, SpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);
@@ -112,13 +111,12 @@ DoSessionViaSpdm (
     printf ("SpdmSetData - %x\n", (UINT32)Status);
     return Status;
   }
-#endif
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmStartSession (
              SpdmContext,
-             USE_PSK,
+             FALSE, // KeyExchange
              SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH,
              0,
              &HeartbeatPeriod,
@@ -134,7 +132,7 @@ DoSessionViaSpdm (
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmStartSession (
              SpdmContext,
-             USE_PSK,
+             TRUE, // PSK
              SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH,
              0,
              &HeartbeatPeriod,
