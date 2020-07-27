@@ -88,6 +88,22 @@ SpdmGetResponsePskExchange (
   HashSize = GetSpdmHashSize (SpdmContext);
   HmacSize = GetSpdmHashSize (SpdmContext);
 
+  if (RequestSize < sizeof(SPDM_PSK_EXCHANGE_REQUEST)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  if (RequestSize < sizeof(SPDM_PSK_EXCHANGE_REQUEST) +
+                    SpdmRequest->PSKHintLength +
+                    SpdmRequest->RequesterContextLength +
+                    SpdmRequest->OpaqueLength) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  RequestSize = sizeof(SPDM_PSK_EXCHANGE_REQUEST) +
+                SpdmRequest->PSKHintLength +
+                SpdmRequest->RequesterContextLength +
+                SpdmRequest->OpaqueLength;
+
   TotalSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +

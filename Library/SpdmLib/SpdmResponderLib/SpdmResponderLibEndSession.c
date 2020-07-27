@@ -22,6 +22,11 @@ SpdmGetResponseEndSession (
 {
   SPDM_END_SESSION_RESPONSE     *SpdmResponse;
 
+  if (RequestSize != sizeof(SPDM_END_SESSION_REQUEST)) {
+    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   ASSERT (*ResponseSize >= sizeof(SPDM_END_SESSION_RESPONSE));
   *ResponseSize = sizeof(SPDM_END_SESSION_RESPONSE);
   ZeroMem (Response, *ResponseSize);

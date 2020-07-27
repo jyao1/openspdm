@@ -78,9 +78,13 @@ SpdmGetResponsePskFinish (
   
   // remove HMAC
   HmacSize = GetSpdmHashSize (SpdmContext);
-  if (RequestSize > HmacSize) {
-    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Request, RequestSize - HmacSize);
+
+  if (RequestSize != sizeof(SPDM_PSK_FINISH_REQUEST) + HmacSize) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
+
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Request, RequestSize - HmacSize);
 
   ASSERT (*ResponseSize >= sizeof(SPDM_PSK_FINISH_RESPONSE));
   *ResponseSize = sizeof(SPDM_PSK_FINISH_RESPONSE);
@@ -91,13 +95,6 @@ SpdmGetResponsePskFinish (
   SpdmResponse->Header.RequestResponseCode = SPDM_PSK_FINISH_RSP;
   SpdmResponse->Header.Param1 = 0;
   SpdmResponse->Header.Param2 = 0;
-
-  HmacSize = GetSpdmHashSize (SpdmContext);
-
-  if (RequestSize != sizeof(SPDM_PSK_FINISH_REQUEST) + HmacSize) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
 
   // Need regenerate the finishedkey
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);

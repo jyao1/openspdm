@@ -45,6 +45,10 @@ SpdmGetResponseAlgorithm (
 
   SpdmContext = Context;
   SpdmRequest = Request;
+  if (RequestSize < sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   if (RequestSize < sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) + 
                     sizeof(UINT32) * SpdmRequest->ExtAsymCount +
                     sizeof(UINT32) * SpdmRequest->ExtHashCount +

@@ -22,6 +22,11 @@ SpdmGetResponseHeartbeat (
 {
   SPDM_HEARTBEAT_RESPONSE     *SpdmResponse;
 
+  if (RequestSize != sizeof(SPDM_HEARTBEAT_REQUEST)) {
+    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   ASSERT (*ResponseSize >= sizeof(SPDM_HEARTBEAT_RESPONSE));
   *ResponseSize = sizeof(SPDM_HEARTBEAT_RESPONSE);
   ZeroMem (Response, *ResponseSize);

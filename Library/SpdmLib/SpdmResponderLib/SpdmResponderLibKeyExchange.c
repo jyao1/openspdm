@@ -189,6 +189,25 @@ SpdmGetResponseKeyExchange (
   HmacSize = GetSpdmHashSize (SpdmContext);
   DHEKeySize = GetSpdmDHEKeySize (SpdmContext);
 
+  if (RequestSize < sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
+                    DHEKeySize +
+                    sizeof(UINT16)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  OpaqueDataLength = *(UINT16 *)((UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DHEKeySize);
+  if (RequestSize < sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
+                    DHEKeySize +
+                    sizeof(UINT16) +
+                    OpaqueDataLength) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  RequestSize = sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
+                DHEKeySize +
+                sizeof(UINT16) +
+                OpaqueDataLength;
+
   TotalSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DHEKeySize +
               HashSize +
@@ -212,25 +231,6 @@ SpdmGetResponseKeyExchange (
   SessionInfo = SpdmAssignSessionId (SpdmContext, SessionId);
   ASSERT(SessionInfo != NULL);
   SessionInfo->UsePsk = FALSE;
-
-  if (RequestSize < sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
-                    DHEKeySize +
-                    sizeof(UINT16)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
-  OpaqueDataLength = *(UINT16 *)((UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DHEKeySize);
-  if (RequestSize < sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
-                    DHEKeySize +
-                    sizeof(UINT16) +
-                    OpaqueDataLength) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
-  RequestSize = sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
-                DHEKeySize +
-                sizeof(UINT16) +
-                OpaqueDataLength;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
 
