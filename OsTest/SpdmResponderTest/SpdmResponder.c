@@ -147,8 +147,9 @@ SpdmServerInit (
   UINT8                        Data8;
   UINT16                       Data16;
   UINT32                       Data32;
-  BOOLEAN                      HasResPubCert;
-  BOOLEAN                      HasResPrivKey;
+  BOOLEAN                      HasRspPubCert;
+  BOOLEAN                      HasRspPrivKey;
+  BOOLEAN                      HasReqPubCert;
   VOID                         *Hash;
   UINTN                        HashSize;
 
@@ -163,7 +164,7 @@ SpdmServerInit (
 
   Res = ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
   if (Res) {
-    HasResPubCert = TRUE;
+    HasRspPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
     Data8 = SLOT_NUMBER;
@@ -175,19 +176,20 @@ SpdmServerInit (
     }
     // do not free it
   } else {
-    HasResPubCert = FALSE;
+    HasRspPubCert = FALSE;
   }
 
   Res = ReadResponderPrivateCertificate (&Data, &DataSize);
   if (Res) {
-    HasResPrivKey = TRUE;
+    HasRspPrivKey = TRUE;
     SpdmRegisterDataSignFunc (SpdmContext, SpdmDataSignFunc);
   } else{
-    HasResPrivKey = FALSE;
+    HasRspPrivKey = FALSE;
   }
 
   Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {
+    HasReqPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
     //SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
@@ -198,6 +200,8 @@ SpdmServerInit (
     //Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST;
     //Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS;
     SpdmSetData (SpdmContext, SpdmDataMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
+  } else{
+    HasReqPubCert = FALSE;
   }
 
   Data8 = 0;
@@ -211,6 +215,7 @@ SpdmServerInit (
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP |
+           SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP |
 //           SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT |
@@ -219,12 +224,12 @@ SpdmServerInit (
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP |
            SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP;
-  if (!HasResPubCert) {
+  if (!HasRspPubCert) {
     Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   } else {
     Data32 |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   }
-  if (!HasResPrivKey) {
+  if (!HasRspPrivKey) {
     Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
     Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
     Data32 |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG;

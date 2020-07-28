@@ -295,8 +295,9 @@ SpdmClientInit (
   UINT8                        Data8;
   UINT16                       Data16;
   UINT32                       Data32;
-  BOOLEAN                      HasResPubCert;
-  BOOLEAN                      HasResPrivKey;
+  BOOLEAN                      HasReqPubCert;
+  BOOLEAN                      HasReqPrivKey;
+  BOOLEAN                      HasRspPubCert;
   VOID                         *Hash;
   UINTN                        HashSize;
 
@@ -307,16 +308,19 @@ SpdmClientInit (
 
   Res = ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {
+    HasRspPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
     //SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
     SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
     // Do not free it.
+  } else{
+    HasRspPubCert = FALSE;
   }
 
   Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, NULL, NULL);
   if (Res) {
-    HasResPubCert = TRUE;
+    HasReqPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
     Data8 = SLOT_NUMBER;
@@ -328,15 +332,15 @@ SpdmClientInit (
     }
     // do not free it
   } else {
-    HasResPubCert = FALSE;
+    HasReqPubCert = FALSE;
   }
 
   Res = ReadRequesterPrivateCertificate (&Data, &DataSize);
   if (Res) {
-    HasResPrivKey = TRUE;
+    HasReqPrivKey = TRUE;
     SpdmRegisterDataSignFunc (SpdmContext, SpdmDataSignFunc);
   } else{
-    HasResPrivKey = FALSE;
+    HasReqPrivKey = FALSE;
   }
 
   Data8 = 0;
@@ -350,6 +354,7 @@ SpdmClientInit (
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_SIG |
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP |
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP |
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP |
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP_REQUESTER |
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP |
@@ -357,6 +362,20 @@ SpdmClientInit (
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP |
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP |
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP;
+  if (!HasRspPubCert) {
+    Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
+    Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
+    Data32 |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG;
+  } else {
+    Data32 |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
+    Data32 |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
+    Data32 &= ~SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG;
+  }
+  if (!HasReqPrivKey) {
+    Data32 &= ~SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP;
+  } else {
+    Data32 |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP;
+  }
   SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &Data32, sizeof(Data32));
 
   Data32 = USE_ASYM_ALGO;
