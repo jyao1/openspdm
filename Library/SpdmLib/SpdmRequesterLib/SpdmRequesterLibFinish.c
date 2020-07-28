@@ -201,14 +201,14 @@ SpdmSendReceiveFinish (
   UINT8                                     *Ptr;
   BOOLEAN                                   Result;
   
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) == 0) {
+    return RETURN_DEVICE_ERROR;
+  }
+
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     ASSERT (FALSE);
     return RETURN_UNSUPPORTED;
-  }
-
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) == 0) {
-    return RETURN_DEVICE_ERROR;
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;

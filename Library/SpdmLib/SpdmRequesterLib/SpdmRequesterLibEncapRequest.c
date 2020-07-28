@@ -106,6 +106,10 @@ SpdmEncapsulatedRequest (
   VOID                                        *EncapsulatedResponse;
   UINTN                                       EncapsulatedResponseSize;
   
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP) == 0) {
+    return RETURN_DEVICE_ERROR;
+  }
+
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     ASSERT (FALSE);

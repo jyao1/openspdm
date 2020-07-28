@@ -77,16 +77,16 @@ SpdmSendReceivePskFinish (
   UINTN                                     SpdmResponseSize;
   SPDM_SESSION_INFO                         *SessionInfo;
   
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP) == 0) {
+    return RETURN_DEVICE_ERROR;
+  }
+
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     ASSERT (FALSE);
     return RETURN_UNSUPPORTED;
   }
   
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP) == 0) {
-    return RETURN_DEVICE_ERROR;
-  }
-
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
    
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;

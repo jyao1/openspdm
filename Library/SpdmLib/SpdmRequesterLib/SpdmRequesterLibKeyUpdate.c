@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 EFIAPI
 SpdmKeyUpdate (
-  IN     VOID                 *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT32               SessionId,
   IN     BOOLEAN              SingleDirection
   )
@@ -22,6 +22,13 @@ SpdmKeyUpdate (
   SPDM_KEY_UPDATE_RESPONSE           SpdmResponse;
   UINTN                              SpdmResponseSize;
   SPDM_KEY_UPDATE_ACTION             Action;
+  SPDM_DEVICE_CONTEXT                *SpdmContext;
+
+  SpdmContext = Context;
+
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP) == 0) {
+    return RETURN_DEVICE_ERROR;
+  }
 
   if (SingleDirection) {
     Action = SpdmKeyUpdateActionRequester;

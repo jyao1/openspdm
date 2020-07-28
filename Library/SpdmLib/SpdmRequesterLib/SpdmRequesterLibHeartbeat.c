@@ -24,6 +24,10 @@ SpdmHeartbeat (
 
   SpdmContext = Context;
 
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP) == 0) {
+    return RETURN_DEVICE_ERROR;
+  }
+
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmRequest.Header.RequestResponseCode = SPDM_HEARTBEAT;
   SpdmRequest.Header.Param1 = 0;

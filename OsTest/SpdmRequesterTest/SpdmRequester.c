@@ -295,6 +295,8 @@ SpdmClientInit (
   UINT8                        Data8;
   UINT16                       Data16;
   UINT32                       Data32;
+  BOOLEAN                      HasResPubCert;
+  BOOLEAN                      HasResPrivKey;
   VOID                         *Hash;
   UINTN                        HashSize;
 
@@ -314,6 +316,7 @@ SpdmClientInit (
 
   Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, NULL, NULL);
   if (Res) {
+    HasResPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
     Data8 = SLOT_NUMBER;
@@ -324,11 +327,16 @@ SpdmClientInit (
       SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, Data, DataSize);
     }
     // do not free it
+  } else {
+    HasResPubCert = FALSE;
   }
 
   Res = ReadRequesterPrivateCertificate (&Data, &DataSize);
   if (Res) {
+    HasResPrivKey = TRUE;
     SpdmRegisterDataSignFunc (SpdmContext, SpdmDataSignFunc);
+  } else{
+    HasResPrivKey = FALSE;
   }
 
   Data8 = 0;
@@ -336,13 +344,19 @@ SpdmClientInit (
   Parameter.Location = SpdmDataLocationLocal;
   SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof(Data8));
 
-  Data32 = SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP |
-           SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP |
-           SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG |
-           SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG |
-           SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP |
-           SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP |
-           SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
+  Data32 = SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP |
+//           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_NO_SIG |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_SIG |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP_REQUESTER |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP |
+           SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP;
   SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &Data32, sizeof(Data32));
 
   Data32 = USE_ASYM_ALGO;
