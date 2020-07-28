@@ -69,6 +69,9 @@ SpdmGetResponseVersion (
   //
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmResponse, *ResponseSize);
 
+  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_10;
+  SpdmContext->ConnectionInfo.Version[1] = SPDM_MESSAGE_VERSION_11;
+
   return RETURN_SUCCESS;
 }
 

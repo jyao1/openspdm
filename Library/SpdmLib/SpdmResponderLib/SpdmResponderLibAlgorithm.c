@@ -70,9 +70,15 @@ SpdmGetResponseAlgorithm (
   ZeroMem (Response, *ResponseSize);
   SpdmResponse = Response;
 
-  SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+    SpdmResponse->Header.Param1 = 4; // Number of Algorithms Structure Tables
+  } else {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse->Header.Param1 = 0;
+    *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE_MINE) - sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) * 4;
+  }
   SpdmResponse->Header.RequestResponseCode = SPDM_ALGORITHMS;
-  SpdmResponse->Header.Param1 = 4; // Number of Algorithms Structure Tables
   SpdmResponse->Header.Param2 = 0;
   SpdmResponse->Length = (UINT16)*ResponseSize;
   SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
@@ -132,11 +138,13 @@ SpdmGetResponseAlgorithm (
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SpdmResponse->MeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse->BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse->BaseHashSel;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = SpdmResponse->StructTable[0].AlgSupported;
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = SpdmResponse->StructTable[1].AlgSupported;
-  SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = SpdmResponse->StructTable[2].AlgSupported;
-  SpdmContext->ConnectionInfo.Algorithm.KeySchedule = SpdmResponse->StructTable[3].AlgSupported;
 
+  if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+    SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = SpdmResponse->StructTable[0].AlgSupported;
+    SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = SpdmResponse->StructTable[1].AlgSupported;
+    SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = SpdmResponse->StructTable[2].AlgSupported;
+    SpdmContext->ConnectionInfo.Algorithm.KeySchedule = SpdmResponse->StructTable[3].AlgSupported;
+  }
   return RETURN_SUCCESS;
 }
 

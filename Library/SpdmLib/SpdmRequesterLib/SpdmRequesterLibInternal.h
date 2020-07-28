@@ -206,16 +206,4 @@ SpdmAllocateReqSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext
   );
 
-SPDM_SESSION_INFO *
-SpdmAssignSessionId (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     UINT32                    SessionId
-  );
-
-SPDM_SESSION_INFO *
-SpdmFreeSessionId (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     UINT32                    SessionId
-  );
-
 #endif

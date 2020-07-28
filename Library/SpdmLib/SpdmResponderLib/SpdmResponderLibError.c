@@ -25,7 +25,11 @@ SpdmGenerateErrorResponse (
   *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
   SpdmResponse = Response;
 
-  SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  if (SpdmIsVersionSupported (Context, SPDM_MESSAGE_VERSION_11)) {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
   SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
   SpdmResponse->Header.Param1 = ErrorCode;
   SpdmResponse->Header.Param2 = ErrorData;
@@ -51,7 +55,11 @@ SpdmGenerateExtendedErrorResponse (
   *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + ExtendedErrorDataSize;
   SpdmResponse = Response;
 
-  SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  if (SpdmIsVersionSupported (Context, SPDM_MESSAGE_VERSION_11)) {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
   SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
   SpdmResponse->Header.Param1 = ErrorCode;
   SpdmResponse->Header.Param2 = ErrorData;

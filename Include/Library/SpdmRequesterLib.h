@@ -203,4 +203,16 @@ SpdmGenerateEncapErrorResponse (
      OUT VOID                 *Response
   );
 
+RETURN_STATUS
+EFIAPI
+SpdmGenerateEncapExtendedErrorResponse (
+  IN     VOID                 *Context,
+  IN     UINT8                ErrorCode,
+  IN     UINT8                ErrorData,
+  IN     UINTN                ExtendedErrorDataSize,
+  IN     UINT8                *ExtendedErrorData,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
 #endif

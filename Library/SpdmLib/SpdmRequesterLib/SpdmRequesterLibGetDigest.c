@@ -84,7 +84,11 @@ SpdmGetDigest (
   
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
  
-  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_DIGESTS;
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;

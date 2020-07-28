@@ -21,17 +21,24 @@ SpdmGetCapabilities (
 {
   RETURN_STATUS                             Status;
   SPDM_GET_CAPABILITIES_REQUEST             SpdmRequest;
+  UINTN                                     SpdmRequestSize;
   SPDM_CAPABILITIES_RESPONSE                SpdmResponse;
   UINTN                                     SpdmResponseSize;
   
   ZeroMem (&SpdmRequest, sizeof(SpdmRequest));
-  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+    SpdmRequestSize = sizeof(SpdmRequest);
+  } else {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmRequestSize = sizeof(SpdmRequest.Header);
+  }
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_CAPABILITIES;
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;
   SpdmRequest.CTExponent = RequesterCTExponent;
   SpdmRequest.Flags = RequesterFlags;
-  Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

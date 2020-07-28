@@ -41,7 +41,11 @@ SpdmGetResponseCapability (
   ZeroMem (Response, *ResponseSize);
   SpdmResponse = Response;
 
-  SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
   SpdmResponse->Header.RequestResponseCode = SPDM_CAPABILITIES;
   SpdmResponse->Header.Param1 = 0;
   SpdmResponse->Header.Param2 = 0;
@@ -52,8 +56,10 @@ SpdmGetResponseCapability (
   //
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmResponse, *ResponseSize);
   
-  SpdmContext->ConnectionInfo.Capability.CTExponent = SpdmRequest->CTExponent;
-  SpdmContext->ConnectionInfo.Capability.Flags = SpdmRequest->Flags;
+  if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+    SpdmContext->ConnectionInfo.Capability.CTExponent = SpdmRequest->CTExponent;
+    SpdmContext->ConnectionInfo.Capability.Flags = SpdmRequest->Flags;
+  }
 
   return RETURN_SUCCESS;
 }

@@ -481,6 +481,22 @@ SpdmGetData (
   return RETURN_SUCCESS;
 }
 
+BOOLEAN
+SpdmIsVersionSupported (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     UINT8                     Version
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < MAX_SPDM_VERSION_COUNT; Index++) {
+    if (Version == SpdmContext->ConnectionInfo.Version[Index]) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
 RETURN_STATUS
 EFIAPI
 SpdmRegisterDataSignFunc (

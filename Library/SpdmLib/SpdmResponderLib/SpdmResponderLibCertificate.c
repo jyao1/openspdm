@@ -76,7 +76,11 @@ SpdmGetResponseCertificate (
   ZeroMem (Response, *ResponseSize);
   SpdmResponse = Response;
 
-  SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
   SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
   SpdmResponse->Header.Param1 = SlotNum;
   SpdmResponse->Header.Param2 = 0;

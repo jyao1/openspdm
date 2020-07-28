@@ -60,11 +60,17 @@ SpdmNegotiateAlgorithms (
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  *StructTable;
   
   ZeroMem (&SpdmRequest, sizeof(SpdmRequest));
-  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+    SpdmRequest.Length = sizeof(SpdmRequest);
+    SpdmRequest.Header.Param1 = 4; // Number of Algorithms Structure Tables
+  } else {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmRequest.Length = sizeof(SpdmRequest) - sizeof(SpdmRequest.StructTable);
+    SpdmRequest.Header.Param1 = 0;
+  }
   SpdmRequest.Header.RequestResponseCode = SPDM_NEGOTIATE_ALGORITHMS;
-  SpdmRequest.Header.Param1 = 4; // Number of Algorithms Structure Tables
   SpdmRequest.Header.Param2 = 0;
-  SpdmRequest.Length = sizeof(SpdmRequest);
   SpdmRequest.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
   SpdmRequest.BaseAsymAlgo = SpdmContext->LocalContext.Algorithm.BaseAsymAlgo;
   SpdmRequest.BaseHashAlgo = SpdmContext->LocalContext.Algorithm.BaseHashAlgo;
@@ -82,7 +88,7 @@ SpdmNegotiateAlgorithms (
   SpdmRequest.StructTable[3].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE;
   SpdmRequest.StructTable[3].AlgCount = 0x20;
   SpdmRequest.StructTable[3].AlgSupported = SpdmContext->LocalContext.Algorithm.KeySchedule;
-  Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, SpdmRequest.Length, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -125,27 +131,6 @@ SpdmNegotiateAlgorithms (
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SpdmResponse.MeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse.BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse.BaseHashSel;
-  StructTable = (VOID *)((UINTN)&SpdmResponse +
-                          sizeof(SPDM_ALGORITHMS_RESPONSE) +
-                          sizeof(UINT32) * SpdmResponse.ExtAsymSelCount +
-                          sizeof(UINT32) * SpdmResponse.ExtHashSelCount
-                          );
-  for (Index = 0; Index < SpdmResponse.Header.Param1; Index++) {
-    switch (StructTable[Index].AlgType) {
-    case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-      SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = StructTable[Index].AlgSupported;
-      break;
-    case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-      SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = StructTable[Index].AlgSupported;
-      break;
-    case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-      SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = StructTable[Index].AlgSupported;
-      break;
-    case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-      SpdmContext->ConnectionInfo.Algorithm.KeySchedule = StructTable[Index].AlgSupported;
-      break;
-    }
-  }
 
   AlgoSize = GetSpdmMeasurementHashSize (SpdmContext);
   if (AlgoSize == 0xFFFFFFFF) {
@@ -159,9 +144,42 @@ SpdmNegotiateAlgorithms (
   if (AlgoSize == 0xFFFFFFFF) {
     return RETURN_SECURITY_VIOLATION;
   }
-  AlgoSize = GetSpdmDHEKeySize (SpdmContext);
-  if (AlgoSize == 0xFFFFFFFF) {
-    return RETURN_SECURITY_VIOLATION;
+
+  if (SpdmResponse.Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+    StructTable = (VOID *)((UINTN)&SpdmResponse +
+                            sizeof(SPDM_ALGORITHMS_RESPONSE) +
+                            sizeof(UINT32) * SpdmResponse.ExtAsymSelCount +
+                            sizeof(UINT32) * SpdmResponse.ExtHashSelCount
+                            );
+    for (Index = 0; Index < SpdmResponse.Header.Param1; Index++) {
+      switch (StructTable[Index].AlgType) {
+      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
+        SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = StructTable[Index].AlgSupported;
+        break;
+      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
+        SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = StructTable[Index].AlgSupported;
+        break;
+      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
+        SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = StructTable[Index].AlgSupported;
+        break;
+      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
+        SpdmContext->ConnectionInfo.Algorithm.KeySchedule = StructTable[Index].AlgSupported;
+        break;
+      }
+    }
+
+    AlgoSize = GetSpdmDHEKeySize (SpdmContext);
+    if (AlgoSize == 0xFFFFFFFF) {
+      return RETURN_SECURITY_VIOLATION;
+    }
+    AlgoSize = GetSpdmAeadKeySize (SpdmContext);
+    if (AlgoSize == 0xFFFFFFFF) {
+      return RETURN_SECURITY_VIOLATION;
+    }
+    AlgoSize = GetSpdmReqAsymSize (SpdmContext);
+    if (AlgoSize == 0xFFFFFFFF) {
+      return RETURN_SECURITY_VIOLATION;
+    }
   }
 
   return RETURN_SUCCESS;

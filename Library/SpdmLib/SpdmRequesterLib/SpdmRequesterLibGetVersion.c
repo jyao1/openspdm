@@ -30,6 +30,7 @@ SpdmGetVersion (
   SPDM_GET_VERSION_REQUEST                  SpdmRequest;
   SPDM_VERSION_RESPONSE_MAX                 SpdmResponse;
   UINTN                                     SpdmResponseSize;
+  UINTN                                     Index;
   
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_VERSION;
@@ -64,6 +65,9 @@ SpdmGetVersion (
   if (SpdmResponse.Header.RequestResponseCode != SPDM_VERSION) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.VersionNumberEntryCount > MAX_SPDM_VERSION_COUNT) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_VERSION_RESPONSE) + SpdmResponse.VersionNumberEntryCount * sizeof(SPDM_VERSION_NUMBER)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -72,6 +76,11 @@ SpdmGetVersion (
   // Cache data
   //
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+
+  for (Index = 0; Index < SpdmResponse.VersionNumberEntryCount; Index++) {
+    SpdmContext->ConnectionInfo.Version[Index] = (UINT8)((SpdmResponse.VersionNumberEntry[Index].MajorVersion << 4) |
+                                                         SpdmResponse.VersionNumberEntry[Index].MinorVersion);
+  }
 
   if (VersionCount != NULL) {
     if (*VersionCount < SpdmResponse.VersionNumberEntryCount) {

@@ -113,7 +113,7 @@ typedef struct {
   //
   // Peer device info (negotiated)
   //
-  UINT16                          Version;
+  UINT8                           Version[MAX_SPDM_VERSION_COUNT];
   SPDM_DEVICE_CAPABILITY          Capability;
   SPDM_DEVICE_ALGORITHM           Algorithm;
   //
@@ -764,6 +764,24 @@ SPDM_SESSION_INFO *
 SpdmGetSessionInfoViaSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN     UINT32                    SessionId
+  );
+
+SPDM_SESSION_INFO *
+SpdmAssignSessionId (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     UINT32                    SessionId
+  );
+
+SPDM_SESSION_INFO *
+SpdmFreeSessionId (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     UINT32                    SessionId
+  );
+
+BOOLEAN
+SpdmIsVersionSupported (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     UINT8                     Version
   );
 
 #endif

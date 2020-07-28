@@ -129,12 +129,20 @@ SpdmGetMeasurement (
     SignatureSize = 0;
   }
 
-  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_MEASUREMENTS;
   SpdmRequest.Header.Param1 = RequestAttribute;
   SpdmRequest.Header.Param2 = MeasurementOperation;
   if (RequestAttribute == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {
-    SpdmRequestSize = sizeof(SpdmRequest);
+    if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+      SpdmRequestSize = sizeof(SpdmRequest);
+    } else {
+      SpdmRequestSize = sizeof(SpdmRequest) - sizeof(SpdmRequest.SlotIDParam);
+    }
 
     GetRandomNumber (SPDM_NONCE_SIZE, SpdmRequest.Nonce);
     DEBUG((DEBUG_INFO, "ClientNonce - "));

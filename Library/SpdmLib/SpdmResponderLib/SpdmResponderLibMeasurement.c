@@ -113,18 +113,18 @@ SpdmGetResponseMeasurement (
   SpdmContext = Context;
   SpdmRequest = Request;
   if (SpdmRequest->Header.Param1 == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {
-    if (RequestSize < sizeof(SPDM_GET_MEASUREMENTS_REQUEST) - 1) {
-      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-      return RETURN_SUCCESS;
-    }
-    if (SpdmRequest->Header.SPDMVersion > SPDM_MESSAGE_VERSION_10) {
+    if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
       if (RequestSize < sizeof(SPDM_GET_MEASUREMENTS_REQUEST)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
         return RETURN_SUCCESS;
       }
       RequestSize = sizeof(SPDM_GET_MEASUREMENTS_REQUEST);
     } else {
-      RequestSize = sizeof(SPDM_GET_MEASUREMENTS_REQUEST) - 1;
+      if (RequestSize < sizeof(SPDM_GET_MEASUREMENTS_REQUEST) - sizeof(SpdmRequest->SlotIDParam)) {
+        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+        return RETURN_SUCCESS;
+      }
+      RequestSize = sizeof(SPDM_GET_MEASUREMENTS_REQUEST) - sizeof(SpdmRequest->SlotIDParam);
     }
   } else {
     if (RequestSize != sizeof(SPDM_MESSAGE_HEADER)) {
@@ -161,18 +161,25 @@ SpdmGetResponseMeasurement (
     ZeroMem (Response, *ResponseSize);
     SpdmResponse = Response;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+
+    if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+    } else {
+      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    }
     SpdmResponse->Header.RequestResponseCode = SPDM_MEASUREMENTS;
     SpdmResponse->Header.Param1 = SpdmContext->LocalContext.DeviceMeasurementCount;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 0;
     *(UINT32 *)SpdmResponse->MeasurementRecordLength = 0;
 
-    if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {   
-      SlotNum = SpdmRequest->SlotIDParam;
-      if (SlotNum > SpdmContext->LocalContext.SlotCount) {
-        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-        return RETURN_SUCCESS;
+    if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
+      if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+        SlotNum = SpdmRequest->SlotIDParam;
+        if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+          SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+          return RETURN_SUCCESS;
+        }
       }
       Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
@@ -209,10 +216,12 @@ SpdmGetResponseMeasurement (
     }
 
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
-      SlotNum = SpdmRequest->SlotIDParam;
-      if (SlotNum > SpdmContext->LocalContext.SlotCount) {
-        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-        return RETURN_SUCCESS;
+      if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+        SlotNum = SpdmRequest->SlotIDParam;
+        if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+          SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+          return RETURN_SUCCESS;
+        }
       }
       Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
@@ -247,10 +256,12 @@ SpdmGetResponseMeasurement (
       CopyMem (MeasurmentBlock, CachedMeasurmentBlock, MeasurmentBlockSize);
 
       if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
-        SlotNum = SpdmRequest->SlotIDParam;
-        if (SlotNum > SpdmContext->LocalContext.SlotCount) {
-          SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-          return RETURN_SUCCESS;
+        if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+          SlotNum = SpdmRequest->SlotIDParam;
+          if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+            SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+            return RETURN_SUCCESS;
+          }
         }
         Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
         if (RETURN_ERROR(Status)) {
