@@ -30,6 +30,11 @@ SpdmGetResponseCapability (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
+  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_VERSION_RECEIVE_FLAG) == 0) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   SpdmRequestSize = RequestSize;
   //
   // Cache
@@ -60,6 +65,7 @@ SpdmGetResponseCapability (
     SpdmContext->ConnectionInfo.Capability.CTExponent = SpdmRequest->CTExponent;
     SpdmContext->ConnectionInfo.Capability.Flags = SpdmRequest->Flags;
   }
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;
 }

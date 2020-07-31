@@ -71,6 +71,7 @@ SpdmGetResponseVersion (
 
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_10;
   SpdmContext->ConnectionInfo.Version[1] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;
 }

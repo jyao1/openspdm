@@ -273,6 +273,17 @@ typedef struct {
 
 #define SPDM_DEVICE_CONTEXT_VERSION 0x1
 
+///
+/// SPDM request command receive Flags (responder only)
+///
+#define SPDM_GET_VERSION_RECEIVE_FLAG                   BIT0 // responder only
+#define SPDM_GET_CAPABILITIES_RECEIVE_FLAG              BIT1
+#define SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG          BIT2
+#define SPDM_GET_DIGESTS_RECEIVE_FLAG                   BIT3
+#define SPDM_GET_CERTIFICATE_RECEIVE_FLAG               BIT4
+#define SPDM_CHALLENGE_RECEIVE_FLAG                     BIT5
+#define SPDM_GET_MEASUREMENTS_RECEIVE_FLAG              BIT6
+
 typedef struct {
   UINT32                          Version;
   SPDM_IO_PROTOCOL                *SpdmIo;
@@ -310,6 +321,10 @@ typedef struct {
   SPDM_TRANSCRIPT                 Transcript;
 
   SPDM_SESSION_INFO               SessionInfo[MAX_SPDM_SESSION_COUNT];
+  //
+  // Register Spdm request command receive Status (responder only)
+  //
+  UINT64                          SpdmCmdReceiveState;
 } SPDM_DEVICE_CONTEXT;
 
 typedef

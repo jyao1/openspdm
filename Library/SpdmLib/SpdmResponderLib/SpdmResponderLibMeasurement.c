@@ -132,6 +132,12 @@ SpdmGetResponseMeasurement (
       return RETURN_SUCCESS;
     }
   }
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CERTIFICATE_RECEIVE_FLAG) == 0)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   //
   // Cache
@@ -283,6 +289,7 @@ SpdmGetResponseMeasurement (
   } else {
     AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmResponse, *ResponseSize);
   }
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_MEASUREMENTS_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }
 
