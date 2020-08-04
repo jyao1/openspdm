@@ -68,11 +68,11 @@ init:
 # Individual Object Build Targets
 #
 $(OUTPUT_DIR)/DebugLib.o : $(SOURCE_DIR)/DebugLib.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
 	$(RM) $(OUTPUT_DIR)/$(MODULE_NAME).a
-	"$(SLINK)" cr $@ $(SLINK_FLAGS) $^
+	$(SLINK) cr $@ $(SLINK_FLAGS) $^ $(SLINK_FLAGS2)
 
 #
 # clean all intermediate files

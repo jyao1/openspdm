@@ -41,35 +41,65 @@
 
 1) Download Crypto library :
 
-   To use MbedTls as Crypto librarym, Please download [mbedtls-2.16.6](https://tls.mbed.org/download/start/mbedtls-2.16.6-apache.tgz) and unzip it.
+1.1) Use MbedTls as Crypto library
+
+   Please download [mbedtls-2.16.6](https://tls.mbed.org/download/start/mbedtls-2.16.6-apache.tgz) and unzip it.
    Rename mbedtls-2.16.6 to mbedtls and put mbedtls under [MbedTlsLib](https://github.com/jyao1/openspdm/tree/master/OsStub/MbedTlsLib)
 
-   To use Openssl as crypto library, please download [openssl-1.1.1b](https://www.openssl.org/source/openssl-1.1.1b.tar.gz) and unzip it.
+1.2) Use Openssl as crypto library
+
+   Please download [openssl-1.1.1b](https://www.openssl.org/source/openssl-1.1.1b.tar.gz) and unzip it.
    Rename openssl-1.1.1b to openssl and put openssl under [OpensslLib](https://github.com/jyao1/openspdm/tree/master/OsStub/OpensslLib)
 
 2) Windows Build:
 
+2.1) Use Visual Studio
+
    Tool : Visual Studio 2015 (TOOLCHAIN=VS2015)
 
-   Open visual studio 2015 command prompt at openspdm dir and type "nmake ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>". (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
+   Open visual studio 2015 command prompt at openspdm dir and type `nmake ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
 
    Tool : Visual Studio 2019 (TOOLCHAIN=VS2019)
 
-   Open visual studio 2019 command prompt at openspdm dir and type "nmake ARCH=<X64|Ia32> TOOLCHAIN=VS2019 TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>". (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
+   Open visual studio 2019 command prompt at openspdm dir and type `nmake ARCH=<X64|Ia32> TOOLCHAIN=VS2019 TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
 
-   Tool : CLANG9 x86_64-pc-windows-msvc (TOOLCHAIN=CLANG)
+2.2) Use LLVM
 
-   Open visual studio 2019 command prompt at openspdm dir and type "make ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>".
+   Tool : LLVM9 x86_64-pc-windows-msvc (TOOLCHAIN=CLANG)
+
+   Install [LLVM tool](http://releases.llvm.org/download.html#9.0.0), and ensure LLVM9 executable directory is in PATH environment variable
+
+   Open visual studio 2019 command prompt at openspdm dir and type `make ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
+
+2.3) Use [CBMC](http://www.cprover.org/cbmc/) for test
+
+   Tool : CMBC (TOOLCHAIN=CBMC)
+
+   Install [CBMC tool](http://www.cprover.org/cprover-manual/). Unzip [cbmc-5-10-win](http://www.cprover.org/cbmc/download/cbmc-5-10-win.zip) and ensure CBMC executable directory is in PATH environment variable.
+
+   Open visual studio 2019 command prompt at openspdm dir and type `make ARCH=Ia32 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 only)
 
 3) Linux Build:
 
+3.1) Use GCC
+
    Tool : GCC (TOOLCHAIN=GCC)
 
-   Open command prompt at openspdm dir and type "make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>".
+   Open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`.
 
-   Tool : CLANG (TOOLCHAIN=CLANG)
+3.2) Use LLVM
 
-   Open command prompt at openspdm dir and type "make -f GNUmakefile ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>".
+   Tool : LLVM9 (TOOLCHAIN=CLANG)
+
+   Open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`.
+
+3.3) Use [CBMC](http://www.cprover.org/cbmc/) for test
+
+   Tool : CMBC (TOOLCHAIN=CBMC)
+
+   Install [CBMC tool](http://www.cprover.org/cprover-manual/). Unzip [cbmc-5-11-linux-64](http://www.cprover.org/cbmc/download/cbmc-5-11-linux-64.tgz) and ensure CBMC executable directory is in PATH environment variable.
+
+   Open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=X64 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`.
 
 4) Run :
    The output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.

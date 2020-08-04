@@ -27,6 +27,8 @@ ifeq ("$(TOOLCHAIN)","GCC")
     $(info TOOLCHAIN=GCC)
 else ifeq ("$(TOOLCHAIN)","CLANG")
     $(info TOOLCHAIN=CLANG)
+else ifeq ("$(TOOLCHAIN)","CBMC")
+    $(info TOOLCHAIN=CBMC)
 else
     $(error unknown TOOLCHAIN)
 endif
@@ -62,13 +64,30 @@ RM = rm -f
 MAKE = make
 MAKEFILE = GNUmakefile
 
-ifeq ("$(TOOLCHAIN)","GCC")
+ifeq ("$(TOOLCHAIN)","CBMC")
+    CC = goto-cc
+    CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare
+    MBEDTLS_FLAGS = 
+    OPENSSL_FLAGS = -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable
+
+    SLINK = echo
+    SLINK_FLAGS2 = >$@
+
+    DLINK = goto-cc
+    DLINK_OBJECT_FILES = $(STATIC_LIBRARY_OBJECT_FILES)
+    DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
+    DLINK_FLAGS2 = -Wno-error -no-pie
+
+else ifeq ("$(TOOLCHAIN)","GCC")
     CC = gcc
     CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare
     MBEDTLS_FLAGS = 
     OPENSSL_FLAGS = -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable
+
     SLINK = gcc-ar
+
     DLINK = gcc
+    DLINK_OBJECT_FILES = -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group
     DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
     DLINK_FLAGS2 = -Wno-error -no-pie
 
@@ -77,8 +96,11 @@ else ifeq ("$(TOOLCHAIN)","CLANG")
     CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall  -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector  -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch 
     MBEDTLS_FLAGS = 
     OPENSSL_FLAGS = -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable
+
     SLINK = llvm-ar
+
     DLINK = clang
+    DLINK_OBJECT_FILES = -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group
     DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
     DLINK_FLAGS2 = -Wno-error -no-pie
 endif
@@ -93,19 +115,4 @@ ifeq ("$(TARGET)","DEBUG")
 else ifeq ("$(TARGET)","RELEASE")
     CC_FLAGS += -Os
 endif
-
-
-
-ifeq ("$(ARCH)","X64")
-    DLINK_FLAGS += -m64
-else ifeq ("$(ARCH)","Ia32")
-    DLINK_FLAGS += -m32
-endif
-ifeq ("$(TARGET)","DEBUG")
-    DLINK_FLAGS += -O0
-else ifeq ("$(TARGET)","RELEASE")
-    DLINK_FLAGS += -Os
-endif
-
-
 

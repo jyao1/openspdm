@@ -71,19 +71,19 @@ init:
 # Individual Object Build Targets
 #
 $(OUTPUT_DIR)\CompareMem.obj : $(SOURCE_DIR)\CompareMem.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\CompareMem.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\CompareMem.c
 
 $(OUTPUT_DIR)\CopyMem.obj : $(SOURCE_DIR)\CopyMem.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\CopyMem.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\CopyMem.c
 
 $(OUTPUT_DIR)\SetMem.obj : $(SOURCE_DIR)\SetMem.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SetMem.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SetMem.c
 
 $(OUTPUT_DIR)\ZeroMem.obj : $(SOURCE_DIR)\ZeroMem.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\ZeroMem.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\ZeroMem.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
-	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@
+	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@
 
 #
 # clean all intermediate files

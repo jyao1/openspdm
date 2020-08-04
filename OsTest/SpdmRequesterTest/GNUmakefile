@@ -54,6 +54,17 @@ STATIC_LIBRARY_FILES =  \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
 
 
+STATIC_LIBRARY_OBJECT_FILES =  \
+    $(BIN_DIR)/OsStub/BaseMemoryLib/*.o \
+    $(BIN_DIR)/OsStub/DebugLib/*.o \
+    $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/*.o \
+    $(BIN_DIR)/OsStub/$(CRYPTO)Lib/*.o \
+    $(BIN_DIR)/OsStub/MemoryAllocationLib/*.o \
+    $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/*.o \
+    $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/*.o \
+    $(OUTPUT_DIR)/*.o \
+
+
 INC =  \
     -I$(SOURCE_DIR) \
     -I$(WORKSPACE)/OsTest/SpdmTestCommon \
@@ -101,32 +112,32 @@ gen_libs:
 # Individual Object Build Targets
 #
 $(OUTPUT_DIR)/SpdmRequester.o : $(SOURCE_DIR)/SpdmRequester.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterAuthentication.o : $(SOURCE_DIR)/SpdmRequesterAuthentication.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterMeasurement.o : $(SOURCE_DIR)/SpdmRequesterMeasurement.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterSession.o : $(SOURCE_DIR)/SpdmRequesterSession.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterTest.o : $(SOURCE_DIR)/SpdmRequesterTest.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmTestCommand.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestCommand.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestKey.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestSupport.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
 	$(RM) $(OUTPUT_DIR)/$(MODULE_NAME).a
-	"$(SLINK)" cr $@ $(SLINK_FLAGS) $^
+	$(SLINK) cr $@ $(SLINK_FLAGS) $^ $(SLINK_FLAGS2)
 
 $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/OsStub/BaseMemoryLib/BaseMemoryLib.a > $(OUTPUT_DIR)/tmp.list
@@ -137,7 +148,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/SpdmRequesterLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
-	"$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group $(DLINK_FLAGS2)
+	$(DLINK) $(DLINK_FLAGS) $(DLINK_SPATH) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS2)
 
 #
 # clean all intermediate files

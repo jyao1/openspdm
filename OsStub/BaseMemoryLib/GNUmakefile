@@ -71,20 +71,20 @@ init:
 # Individual Object Build Targets
 #
 $(OUTPUT_DIR)/CompareMem.o : $(SOURCE_DIR)/CompareMem.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CopyMem.o : $(SOURCE_DIR)/CopyMem.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SetMem.o : $(SOURCE_DIR)/SetMem.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/ZeroMem.o : $(SOURCE_DIR)/ZeroMem.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
 	$(RM) $(OUTPUT_DIR)/$(MODULE_NAME).a
-	"$(SLINK)" cr $@ $(SLINK_FLAGS) $^
+	$(SLINK) cr $@ $(SLINK_FLAGS) $^ $(SLINK_FLAGS2)
 
 #
 # clean all intermediate files

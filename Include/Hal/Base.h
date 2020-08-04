@@ -797,7 +797,7 @@ typedef UINTN  *BASE_LIST;
   @param  Message     Raised compiler diagnostic message when expression is false.
 
 **/
-#ifdef MDE_CPU_EBC
+#if defined(MDE_CPU_EBC) || defined(CBMC_CC)
   #define STATIC_ASSERT(Expression, Message)
 #elif _MSC_EXTENSIONS
   #define STATIC_ASSERT static_assert

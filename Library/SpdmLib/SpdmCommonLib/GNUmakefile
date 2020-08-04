@@ -72,20 +72,20 @@ init:
 # Individual Object Build Targets
 #
 $(OUTPUT_DIR)/SpdmCommonLibContextData.o : $(SOURCE_DIR)/SpdmCommonLibContextData.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmCommonLibCrypto.o : $(SOURCE_DIR)/SpdmCommonLibCrypto.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmCommonLibSessionKeys.o : $(SOURCE_DIR)/SpdmCommonLibSessionKeys.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmCommonLibSupport.o : $(SOURCE_DIR)/SpdmCommonLibSupport.c
-	"$(CC)" $(CC_FLAGS) -o $@ $(INC) $^
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
 	$(RM) $(OUTPUT_DIR)/$(MODULE_NAME).a
-	"$(SLINK)" cr $@ $(SLINK_FLAGS) $^
+	$(SLINK) cr $@ $(SLINK_FLAGS) $^ $(SLINK_FLAGS2)
 
 #
 # clean all intermediate files

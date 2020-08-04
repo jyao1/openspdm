@@ -69,10 +69,10 @@ init:
 # Individual Object Build Targets
 #
 $(OUTPUT_DIR)\DebugLib.obj : $(SOURCE_DIR)\DebugLib.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\DebugLib.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\DebugLib.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
-	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@
+	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@
 
 #
 # clean all intermediate files

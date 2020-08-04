@@ -89,67 +89,67 @@ init:
 # Individual Object Build Targets
 #
 $(OUTPUT_DIR)\SpdmResponderLibAlgorithm.obj : $(SOURCE_DIR)\SpdmResponderLibAlgorithm.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibAlgorithm.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibAlgorithm.c
 
 $(OUTPUT_DIR)\SpdmResponderLibCapability.obj : $(SOURCE_DIR)\SpdmResponderLibCapability.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibCapability.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibCapability.c
 
 $(OUTPUT_DIR)\SpdmResponderLibCertificate.obj : $(SOURCE_DIR)\SpdmResponderLibCertificate.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibCertificate.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibCertificate.c
 
 $(OUTPUT_DIR)\SpdmResponderLibChallengeAuth.obj : $(SOURCE_DIR)\SpdmResponderLibChallengeAuth.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibChallengeAuth.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibChallengeAuth.c
 
 $(OUTPUT_DIR)\SpdmResponderLibCommunication.obj : $(SOURCE_DIR)\SpdmResponderLibCommunication.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibCommunication.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibCommunication.c
 
 $(OUTPUT_DIR)\SpdmResponderLibDigest.obj : $(SOURCE_DIR)\SpdmResponderLibDigest.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibDigest.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibDigest.c
 
 $(OUTPUT_DIR)\SpdmResponderLibEncapGetCertificate.obj : $(SOURCE_DIR)\SpdmResponderLibEncapGetCertificate.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEncapGetCertificate.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEncapGetCertificate.c
 
 $(OUTPUT_DIR)\SpdmResponderLibEncapGetDigest.obj : $(SOURCE_DIR)\SpdmResponderLibEncapGetDigest.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEncapGetDigest.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEncapGetDigest.c
 
 $(OUTPUT_DIR)\SpdmResponderLibEncapResponse.obj : $(SOURCE_DIR)\SpdmResponderLibEncapResponse.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEncapResponse.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEncapResponse.c
 
 $(OUTPUT_DIR)\SpdmResponderLibEndSession.obj : $(SOURCE_DIR)\SpdmResponderLibEndSession.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEndSession.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEndSession.c
 
 $(OUTPUT_DIR)\SpdmResponderLibError.obj : $(SOURCE_DIR)\SpdmResponderLibError.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibError.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibError.c
 
 $(OUTPUT_DIR)\SpdmResponderLibFinish.obj : $(SOURCE_DIR)\SpdmResponderLibFinish.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibFinish.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibFinish.c
 
 $(OUTPUT_DIR)\SpdmResponderLibHeartbeat.obj : $(SOURCE_DIR)\SpdmResponderLibHeartbeat.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibHeartbeat.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibHeartbeat.c
 
 $(OUTPUT_DIR)\SpdmResponderLibKeyExchange.obj : $(SOURCE_DIR)\SpdmResponderLibKeyExchange.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibKeyExchange.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibKeyExchange.c
 
 $(OUTPUT_DIR)\SpdmResponderLibKeyUpdate.obj : $(SOURCE_DIR)\SpdmResponderLibKeyUpdate.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibKeyUpdate.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibKeyUpdate.c
 
 $(OUTPUT_DIR)\SpdmResponderLibMeasurement.obj : $(SOURCE_DIR)\SpdmResponderLibMeasurement.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibMeasurement.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibMeasurement.c
 
 $(OUTPUT_DIR)\SpdmResponderLibPskExchange.obj : $(SOURCE_DIR)\SpdmResponderLibPskExchange.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibPskExchange.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibPskExchange.c
 
 $(OUTPUT_DIR)\SpdmResponderLibPskFinish.obj : $(SOURCE_DIR)\SpdmResponderLibPskFinish.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibPskFinish.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibPskFinish.c
 
 $(OUTPUT_DIR)\SpdmResponderLibReceiveSend.obj : $(SOURCE_DIR)\SpdmResponderLibReceiveSend.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibReceiveSend.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibReceiveSend.c
 
 $(OUTPUT_DIR)\SpdmResponderLibVersion.obj : $(SOURCE_DIR)\SpdmResponderLibVersion.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmResponderLibVersion.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibVersion.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
-	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@
+	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@
 
 #
 # clean all intermediate files

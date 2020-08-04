@@ -54,6 +54,17 @@ STATIC_LIBRARY_FILES =  \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
 
 
+STATIC_LIBRARY_OBJECT_FILES =  \
+    $(OBJECT_FILES) \
+    $(BIN_DIR)\OsStub\BaseMemoryLib\*.obj \
+    $(BIN_DIR)\OsStub\DebugLib\*.obj \
+    $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\*.obj \
+    $(BIN_DIR)\OsStub\$(CRYPTO)Lib\*.obj \
+    $(BIN_DIR)\OsStub\MemoryAllocationLib\*.obj \
+    $(BIN_DIR)\Library\SpdmLib\SpdmCommonLib\*.obj \
+    $(BIN_DIR)\Library\SpdmLib\SpdmRequesterLib\*.obj \
+
+
 INC =  \
     -I$(SOURCE_DIR) \
     -I$(WORKSPACE)\OsTest\SpdmTestCommon \
@@ -101,34 +112,34 @@ gen_libs:
 # Individual Object Build Targets
 #
 $(OUTPUT_DIR)\SpdmRequester.obj : $(SOURCE_DIR)\SpdmRequester.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequester.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequester.c
 
 $(OUTPUT_DIR)\SpdmRequesterAuthentication.obj : $(SOURCE_DIR)\SpdmRequesterAuthentication.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterAuthentication.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterAuthentication.c
 
 $(OUTPUT_DIR)\SpdmRequesterMeasurement.obj : $(SOURCE_DIR)\SpdmRequesterMeasurement.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterMeasurement.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterMeasurement.c
 
 $(OUTPUT_DIR)\SpdmRequesterSession.obj : $(SOURCE_DIR)\SpdmRequesterSession.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterSession.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterSession.c
 
 $(OUTPUT_DIR)\SpdmRequesterTest.obj : $(SOURCE_DIR)\SpdmRequesterTest.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\SpdmRequesterTest.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterTest.c
 
 $(OUTPUT_DIR)\SpdmTestCommand.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestCommand.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestCommand.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestCommand.c
 
 $(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestKey.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestKey.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestKey.c
 
 $(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestSupport.c
-	"$(CC)" $(CC_FLAGS) $(CC_OBJ_FLAG) $@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestSupport.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestSupport.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
-	"$(SLINK)" $(SLINK_FLAGS) $(OBJECT_FILES) /OUT:$@
+	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@
 
 $(OUTPUT_DIR)\$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
-	"$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) $(STATIC_LIBRARY_FILES)
+	$(DLINK) $(DLINK_FLAGS) $(DLINK_SPATH) $(DLINK_OBJECT_FILES)
 
 #
 # clean all intermediate files
