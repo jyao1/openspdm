@@ -96,5 +96,6 @@ SpdmGetVersion (
         );
     }
   }
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }

@@ -156,7 +156,11 @@ SpdmChallenge (
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
 
   SpdmContext = Context;
-  
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CERTIFICATE_RECEIVE_FLAG) == 0)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
   }
@@ -284,6 +288,6 @@ SpdmChallenge (
   if (MeasurementHash != NULL) {
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);
   }
-
+  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }

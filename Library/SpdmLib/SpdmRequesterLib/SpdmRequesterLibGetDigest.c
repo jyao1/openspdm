@@ -77,7 +77,10 @@ SpdmGetDigest (
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
 
   SpdmContext = Context;
-  
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
   }
@@ -153,6 +156,6 @@ SpdmGetDigest (
   if (TotalDigestBuffer != NULL) {
     CopyMem (TotalDigestBuffer, SpdmResponse.Digest, DigestSize * DigestCount);
   }
-
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }

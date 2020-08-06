@@ -58,7 +58,11 @@ SpdmNegotiateAlgorithms (
   UINT32                                         AlgoSize;
   UINTN                                          Index;
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  *StructTable;
-  
+
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_GET_VERSION_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0)) {
+    return RETURN_DEVICE_ERROR;
+  }
   ZeroMem (&SpdmRequest, sizeof(SpdmRequest));
   if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
     SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -181,6 +185,6 @@ SpdmNegotiateAlgorithms (
       return RETURN_SECURITY_VIOLATION;
     }
   }
-
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }

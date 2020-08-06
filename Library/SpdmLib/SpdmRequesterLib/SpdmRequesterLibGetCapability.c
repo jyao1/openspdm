@@ -24,7 +24,10 @@ SpdmGetCapabilities (
   UINTN                                     SpdmRequestSize;
   SPDM_CAPABILITIES_RESPONSE                SpdmResponse;
   UINTN                                     SpdmResponseSize;
-  
+
+  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_VERSION_RECEIVE_FLAG) == 0) {
+    return RETURN_DEVICE_ERROR;
+  }
   ZeroMem (&SpdmRequest, sizeof(SpdmRequest));
   if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
     SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -75,6 +78,7 @@ SpdmGetCapabilities (
 
   *ResponderCTExponent = SpdmResponse.CTExponent;
   *ResponderFlags = SpdmResponse.Flags;
-  
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+
   return RETURN_SUCCESS;
 }
