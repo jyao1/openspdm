@@ -105,6 +105,18 @@
    The output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
    Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
 
+4.1) Run [CBMC](http://www.cprover.org/cbmc/) for test
+
+   The output binary is created by the [goto-cc](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/goto-cc.md).
+
+   For more infomration on how to use [CBMC](https://github.com/diffblue/cbmc/), please refer to [CBMC Manual](https://github.com/diffblue/cbmc/tree/develop/doc/cprover-manual), such as [properties](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/properties.md), [modeling-nondeterminism](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/modeling-nondeterminism.md), [api](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/api.md). Example below:
+
+   Using [goto-instrument](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/goto-instrument.md) static analyzer operates on goto-binaries and generate a modified binary:
+   `goto-instrument SpdmRequester.exe SpdmRequester.gb <instrumentation-options>`
+
+   Using [CBMC](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/cbmc-tutorial.md) on the modified binary:
+   `cbmc SpdmRequester.gb --show-properties`
+
 ## Feature not implemented yet
 
 1) Other architectures such as Arm, AArch64, RiscV64, or Arc.
