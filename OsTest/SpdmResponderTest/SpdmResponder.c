@@ -157,6 +157,7 @@ SpdmServerInit (
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
   
+  ZeroMem (&Parameter, sizeof(Parameter));
   Data32 = 4;
   SpdmSetData (SpdmContext, SpdmDataIoSizeAlignment, &Parameter, &Data32, sizeof(Data32));
   Data32 = (UINT32)SpdmIoSecureMessagingTypeDmtfMtcp;

@@ -39,14 +39,21 @@
 
 ## Build
 
+0) Download Unit Test framework :
+
+0.1) Use [cmocka](https://cmocka.org/)
+
+   Please download [cmocka-1.1.5](https://cmocka.org/files/1.1/cmocka-1.1.5.tar.xz) and unzip it.
+   Rename cmocka-1.1.5 to cmocka and put cmocka under [CmockaLib](https://github.com/jyao1/openspdm/tree/master/UnitTest/CmockaLib)
+
 1) Download Crypto library :
 
-1.1) Use MbedTls as Crypto library
+1.1) Use [MbedTls](https://tls.mbed.org) as Crypto library
 
    Please download [mbedtls-2.16.6](https://tls.mbed.org/download/start/mbedtls-2.16.6-apache.tgz) and unzip it.
    Rename mbedtls-2.16.6 to mbedtls and put mbedtls under [MbedTlsLib](https://github.com/jyao1/openspdm/tree/master/OsStub/MbedTlsLib)
 
-1.2) Use Openssl as crypto library
+1.2) Use [Openssl](https://www.openssl.org) as crypto library
 
    Please download [openssl-1.1.1b](https://www.openssl.org/source/openssl-1.1.1b.tar.gz) and unzip it.
    Rename openssl-1.1.1b to openssl and put openssl under [OpensslLib](https://github.com/jyao1/openspdm/tree/master/OsStub/OpensslLib)
@@ -101,11 +108,31 @@
 
    Open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=X64 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`.
 
-4) Run :
-   The output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
+## Run Test
+
+1) Run [OsTest](https://github.com/jyao1/openspdm/tree/master/OsTest)
+
+   The OsTest output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
    Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
 
-4.1) Run [CBMC](http://www.cprover.org/cbmc/) for test
+2) Run [UnitTest](https://github.com/jyao1/openspdm/tree/master/UnitTest)
+
+   The UnitTest output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
+   Open one command prompt at output dir to run TestSpdmRequester* and TestSpdmResponder*.
+
+   You may see something like:
+
+   <pre>
+      [==========] Running 2 test(s).
+      [ RUN      ] TestSpdmResponderVersionCase1
+      [       OK ] TestSpdmResponderVersionCase1
+      [ RUN      ] TestSpdmResponderVersionCase2
+      [       OK ] TestSpdmResponderVersionCase2
+      [==========] 2 test(s) run.
+      [  PASSED  ] 2 test(s).
+   </pre>
+
+3) Run [CBMC](http://www.cprover.org/cbmc/) for test
 
    The output binary is created by the [goto-cc](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/goto-cc.md).
 
