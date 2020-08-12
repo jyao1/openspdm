@@ -191,7 +191,9 @@
 
    The final report is index.html.
 
-### Run Model Checker [CBMC](http://www.cprover.org/cbmc/)
+### Run Model Checker
+
+   Use [CBMC](http://www.cprover.org/cbmc/) as an example.
 
    The output binary is created by the [goto-cc](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/goto-cc.md).
 
@@ -202,6 +204,35 @@
 
    Using [CBMC](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/cbmc-tutorial.md) on the modified binary:
    `cbmc SpdmRequester.gb --show-properties`
+
+### Run Static Analysis
+
+   Use [Klocwork](https://www.perforce.com/products/klocwork) as an example in windows.
+
+   Install Klocwork and set environment.
+   ```
+   set KW_HOME=C:\Klocwork
+   set KW_ROOT=%KW_HOME%\<version>\projects_root
+   set KW_TABLE_ROOT=%KW_HOME%\Tables
+   set KW_CONFIG=%KW_ROOT%\projects\workspace\rules\analysis_profile.pconf
+   set KW_PROJECT_NAME=openspdm
+   ```
+
+   Build openspdm with Klocwork :
+   ```
+   kwinject --output %KW_ROOT%\%KW_PROJECT_NAME%.out nmake ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>
+   ```
+
+   Collect analysis data :
+   ```
+   kwservice start
+   kwadmin create-project %KW_PROJECT_NAME%
+   kwadmin import-config %KW_PROJECT_NAME% %KW_CONFIG%
+   kwbuildproject --project %KW_PROJECT_NAME% --tables-directory %KW_TABLE_ROOT%\%KW_PROJECT_NAME% %KW_ROOT%\%KW_PROJECT_NAME%.out --force
+   kwadmin load %KW_PROJECT_NAME% %KW_TABLE_ROOT%\%KW_PROJECT_NAME%`
+   ```
+
+   View report at http://localhost:8080/.
 
 ## Feature not implemented yet
 
