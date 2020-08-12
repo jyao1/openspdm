@@ -21,7 +21,7 @@ typedef struct {
 
 RETURN_STATUS
 EFIAPI
-SpdmClientSendRequest (
+SpdmRequesterGetVersionTestSendRequest (
   IN     SPDM_IO_PROTOCOL        *This,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
@@ -45,7 +45,7 @@ SpdmClientSendRequest (
 
 RETURN_STATUS
 EFIAPI
-SpdmClientReceiveResponse (
+SpdmRequesterGetVersionTestReceiveResponse (
   IN     SPDM_IO_PROTOCOL        *This,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,
@@ -101,7 +101,7 @@ SpdmClientReceiveResponse (
 
 RETURN_STATUS
 EFIAPI
-SpdmClientSecureSendRequest (
+SpdmRequesterGetVersionTestSecureSendRequest (
   IN     SPDM_IO_PROTOCOL                       *This,
   IN     UINT32                                 SessionId,
   IN     UINTN                                  RequestSize,
@@ -114,7 +114,7 @@ SpdmClientSecureSendRequest (
 
 RETURN_STATUS
 EFIAPI
-SpdmClientSecureReceiveResponse (
+SpdmRequesterGetVersionTestSecureReceiveResponse (
   IN     SPDM_IO_PROTOCOL                       *This,
   IN     UINT32                                 SessionId,
   IN OUT UINTN                                  *ResponseSize,
@@ -124,19 +124,6 @@ SpdmClientSecureReceiveResponse (
 {
   return RETURN_UNSUPPORTED;
 }
-
-SPDM_TEST_CONTEXT       mSpdmTestContext = {
-  SPDM_TEST_CONTEXT_SIGNATURE,
-  TRUE,
-  {
-    SpdmClientSendRequest,
-    SpdmClientReceiveResponse,
-    SpdmClientSecureSendRequest,
-    SpdmClientSecureReceiveResponse,
-    SpdmIoSecureMessagingTypeDmtfMtcp,
-    sizeof(UINT32)
-  },
-};
 
 void TestSpdmRequesterGetVersionCase1(void **state) {
   RETURN_STATUS        Status;
@@ -189,12 +176,27 @@ void TestSpdmRequesterGetVersionCase3(void **state) {
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
-int main(void) {
-  const struct CMUnitTest tests[] = {
+SPDM_TEST_CONTEXT       mSpdmRequesterGetVersionTestContext = {
+  SPDM_TEST_CONTEXT_SIGNATURE,
+  TRUE,
+  {
+    SpdmRequesterGetVersionTestSendRequest,
+    SpdmRequesterGetVersionTestReceiveResponse,
+    SpdmRequesterGetVersionTestSecureSendRequest,
+    SpdmRequesterGetVersionTestSecureReceiveResponse,
+    SpdmIoSecureMessagingTypeDmtfMtcp,
+    sizeof(UINT32)
+  },
+};
+
+int SpdmRequesterGetVersionTestMain(void) {
+  const struct CMUnitTest SpdmRequesterGetVersionTests[] = {
       cmocka_unit_test(TestSpdmRequesterGetVersionCase1),
       cmocka_unit_test(TestSpdmRequesterGetVersionCase2),
       cmocka_unit_test(TestSpdmRequesterGetVersionCase3),
   };
+  
+  SetupSpdmTestContext (&mSpdmRequesterGetVersionTestContext);
 
-  return cmocka_run_group_tests(tests, TestSpdmRequesterGroupSetup, TestSpdmRequesterGroupTeardown);
+  return cmocka_run_group_tests(SpdmRequesterGetVersionTests, TestSpdmRequesterGroupSetup, TestSpdmRequesterGroupTeardown);
 }

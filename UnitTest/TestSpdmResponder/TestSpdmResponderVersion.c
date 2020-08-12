@@ -19,34 +19,21 @@ typedef struct {
 } MY_SPDM_VERSION_RESPONSE;
 #pragma pack()
 
-SPDM_TEST_CONTEXT       mSpdmTestContext = {
-  SPDM_TEST_CONTEXT_SIGNATURE,
-  FALSE,
-  {
-    NULL, // SpdmClientSendRequest,
-    NULL, // SpdmClientReceiveResponse,
-    NULL, // SpdmClientSecureSendRequest,
-    NULL, // SpdmClientSecureReceiveResponse,
-    SpdmIoSecureMessagingTypeDmtfMtcp,
-    sizeof(UINT32)
-  },
-};
-
-SPDM_GET_VERSION_REQUEST    mSpdmRequest1 = {
+SPDM_GET_VERSION_REQUEST    mSpdmGetVersionRequest1 = {
   {
     SPDM_MESSAGE_VERSION_10,
     SPDM_GET_VERSION,
   },
 };
-UINTN mSpdmRequest1Size = sizeof(mSpdmRequest1);
+UINTN mSpdmGetVersionRequest1Size = sizeof(mSpdmGetVersionRequest1);
 
-SPDM_GET_VERSION_REQUEST    mSpdmRequest2 = {
+SPDM_GET_VERSION_REQUEST    mSpdmGetVersionRequest2 = {
   {
     SPDM_MESSAGE_VERSION_10,
     SPDM_GET_VERSION,
   },
 };
-UINTN mSpdmRequest2Size = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+UINTN mSpdmGetVersionRequest2Size = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 
 void TestSpdmResponderVersionCase1(void **state) {
   RETURN_STATUS        Status;
@@ -61,7 +48,7 @@ void TestSpdmResponderVersionCase1(void **state) {
   SpdmTestContext->CaseId = 0x1;
 
   ResponseSize = sizeof(Response);
-  Status = SpdmGetResponseVersion (SpdmContext, mSpdmRequest1Size, &mSpdmRequest1, &ResponseSize, Response);
+  Status = SpdmGetResponseVersion (SpdmContext, mSpdmGetVersionRequest1Size, &mSpdmGetVersionRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (ResponseSize, sizeof(MY_SPDM_VERSION_RESPONSE));
   SpdmResponse = (VOID *)Response;
@@ -81,7 +68,7 @@ void TestSpdmResponderVersionCase2(void **state) {
   SpdmTestContext->CaseId = 0x2;
 
   ResponseSize = sizeof(Response);
-  Status = SpdmGetResponseVersion (SpdmContext, mSpdmRequest2Size, &mSpdmRequest2, &ResponseSize, Response);
+  Status = SpdmGetResponseVersion (SpdmContext, mSpdmGetVersionRequest2Size, &mSpdmGetVersionRequest2, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (ResponseSize, sizeof(SPDM_ERROR_RESPONSE));
   SpdmResponse = (VOID *)Response;
@@ -90,11 +77,26 @@ void TestSpdmResponderVersionCase2(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
 }
 
-int main(void) {
-  const struct CMUnitTest tests[] = {
+SPDM_TEST_CONTEXT       mSpdmResponderVersionTestContext = {
+  SPDM_TEST_CONTEXT_SIGNATURE,
+  FALSE,
+  {
+    NULL, // SpdmClientSendRequest,
+    NULL, // SpdmClientReceiveResponse,
+    NULL, // SpdmClientSecureSendRequest,
+    NULL, // SpdmClientSecureReceiveResponse,
+    SpdmIoSecureMessagingTypeDmtfMtcp,
+    sizeof(UINT32)
+  },
+};
+
+int SpdmResponderVersionTestMain(void) {
+  const struct CMUnitTest SpdmResponderVersionTests[] = {
     cmocka_unit_test(TestSpdmResponderVersionCase1),
     cmocka_unit_test(TestSpdmResponderVersionCase2),
   };
 
-  return cmocka_run_group_tests(tests, TestSpdmRequesterGroupSetup, TestSpdmRequesterGroupTeardown);
+  SetupSpdmTestContext (&mSpdmResponderVersionTestContext);
+
+  return cmocka_run_group_tests(SpdmResponderVersionTests, TestSpdmRequesterGroupSetup, TestSpdmRequesterGroupTeardown);
 }

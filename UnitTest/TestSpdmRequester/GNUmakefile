@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = TestSpdmRequesterGetVersion
+MODULE_NAME = TestSpdmRequester
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -24,15 +24,16 @@ BASE_NAME = $(MODULE_NAME)
 #
 BUILD_DIR = $(WORKSPACE)/Build
 BIN_DIR = $(BUILD_DIR)/$(TARGET)_$(TOOLCHAIN)/$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)/UnitTest/TestSpdmRequester/$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)/UnitTest/$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)/UnitTest/TestSpdmRequester/$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)/UnitTest/$(MODULE_NAME)
 
 #
 # Build Macro
 #
 
 OBJECT_FILES =  \
+    $(OUTPUT_DIR)/TestSpdmRequester.o \
     $(OUTPUT_DIR)/TestSpdmRequesterGetVersion.o \
     $(OUTPUT_DIR)/SpdmUnitTestCommon.o \
 
@@ -117,10 +118,13 @@ gen_libs:
 #
 # Individual Object Build Targets
 #
+$(OUTPUT_DIR)/TestSpdmRequester.o : $(SOURCE_DIR)/TestSpdmRequester.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
 $(OUTPUT_DIR)/TestSpdmRequesterGetVersion.o : $(SOURCE_DIR)/TestSpdmRequesterGetVersion.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmUnitTestCommon.o : $(SOURCE_DIR)/../../SpdmUnitTestCommon/SpdmUnitTestCommon.c
+$(OUTPUT_DIR)/SpdmUnitTestCommon.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

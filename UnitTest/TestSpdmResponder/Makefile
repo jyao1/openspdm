@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = TestSpdmRequesterGetVersion
+MODULE_NAME = TestSpdmResponder
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -24,16 +24,17 @@ BASE_NAME = $(MODULE_NAME)
 #
 BUILD_DIR = $(WORKSPACE)\Build
 BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)\UnitTest\TestSpdmRequester\$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)\UnitTest\$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)\UnitTest\TestSpdmRequester\$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)\UnitTest\$(MODULE_NAME)
 
 #
 # Build Macro
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\TestSpdmRequesterGetVersion.obj \
+    $(OUTPUT_DIR)\TestSpdmResponder.obj \
+    $(OUTPUT_DIR)\TestSpdmResponderVersion.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
 
 
@@ -117,11 +118,14 @@ gen_libs:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\TestSpdmRequesterGetVersion.obj : $(SOURCE_DIR)\TestSpdmRequesterGetVersion.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterGetVersion.c
+$(OUTPUT_DIR)\TestSpdmResponder.obj : $(SOURCE_DIR)\TestSpdmResponder.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponder.c
 
-$(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
+$(OUTPUT_DIR)\TestSpdmResponderVersion.obj : $(SOURCE_DIR)\TestSpdmResponderVersion.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderVersion.c
+
+$(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

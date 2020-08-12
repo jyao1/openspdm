@@ -42,4 +42,9 @@ int TestSpdmRequesterGroupSetup(void **state);
 
 int TestSpdmRequesterGroupTeardown(void **state);
 
+VOID
+SetupSpdmTestContext (
+  IN SPDM_TEST_CONTEXT       *SpdmTestContext
+  );
+
 #endif

@@ -9,7 +9,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmUnitTest.h"
 
-extern SPDM_TEST_CONTEXT       mSpdmTestContext;
+SPDM_TEST_CONTEXT       *mSpdmTestContext;
+
+VOID
+SetupSpdmTestContext (
+  IN SPDM_TEST_CONTEXT       *SpdmTestContext
+  )
+{
+  mSpdmTestContext = SpdmTestContext;
+}
 
 int TestSpdmRequesterGroupSetup(void **state)
 {
@@ -18,7 +26,7 @@ int TestSpdmRequesterGroupSetup(void **state)
   UINT32                  Data32;
   SPDM_DATA_PARAMETER     Parameter;
 
-  SpdmTestContext = &mSpdmTestContext;
+  SpdmTestContext = mSpdmTestContext;
   SpdmContext = &SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xFFFFFFFF;
 
