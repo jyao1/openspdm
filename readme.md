@@ -107,12 +107,6 @@
 
    Open visual studio 2019 command prompt at openspdm dir and type `make ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
 
-3) Use [CBMC](http://www.cprover.org/cbmc/)
-
-   Tool : CMBC (TOOLCHAIN=CBMC)
-
-   Open visual studio 2019 command prompt at openspdm dir and type `make ARCH=Ia32 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 only)
-
 ### Linux Build:
 
 1) Use GCC
@@ -127,12 +121,6 @@
 
    Open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`.
 
-3) Use [CBMC](http://www.cprover.org/cbmc/)
-
-   Tool : CMBC (TOOLCHAIN=CBMC)
-
-   Open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=X64 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`.
-
 ## Run Test
 
 ### Run [OsTest](https://github.com/jyao1/openspdm/tree/master/OsTest)
@@ -143,7 +131,7 @@
 ### Run [UnitTest](https://github.com/jyao1/openspdm/tree/master/UnitTest)
 
    The UnitTest output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
-   Open one command prompt at output dir to run TestSpdmRequester* and TestSpdmResponder*.
+   Open one command prompt at output dir to run TestSpdmRequester and TestSpdmResponder.
 
    You may see something like:
 
@@ -194,6 +182,10 @@
 ### Run Model Checker
 
    Use [CBMC](http://www.cprover.org/cbmc/) as an example.
+
+   For Windowns, open visual studio 2019 command prompt at openspdm dir and type `make ARCH=Ia32 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 only)
+
+   For Linux, open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=X64 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`.
 
    The output binary is created by the [goto-cc](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/goto-cc.md).
 
