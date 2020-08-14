@@ -41,11 +41,11 @@
 
 ### Build Tool
 
-1) [Visual Studio](https://visualstudio.microsoft.com/) (2015 or 2019)
+1) [Visual Studio](https://visualstudio.microsoft.com/) (VS2015 or VS2019)
 
-2) [GCC](https://gcc.gnu.org/)
+2) [GCC](https://gcc.gnu.org/) (above GCC5)
 
-3) [LLVM](https://llvm.org/)
+3) [LLVM](https://llvm.org/) (LLVM9)
 
    Download and install [LLVM9](http://releases.llvm.org/download.html#9.0.0). Ensure LLVM9 executable directory is in PATH environment variable.
 
@@ -103,7 +103,7 @@
 
 2) Use LLVM
 
-   Tool : LLVM9 x86_64-pc-windows-msvc (TOOLCHAIN=CLANG)
+   Tool : LLVM x86_64-pc-windows-msvc (TOOLCHAIN=CLANG)
 
    Open visual studio 2019 command prompt at openspdm dir and type `make ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64)
 
@@ -117,7 +117,7 @@
 
 2) Use LLVM
 
-   Tool : LLVM9 (TOOLCHAIN=CLANG)
+   Tool : LLVM (TOOLCHAIN=CLANG)
 
    Open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`.
 
