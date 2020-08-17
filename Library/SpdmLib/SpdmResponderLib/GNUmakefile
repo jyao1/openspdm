@@ -52,7 +52,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmResponderLibPskFinish.o \
     $(OUTPUT_DIR)/SpdmResponderLibReceiveSend.o \
     $(OUTPUT_DIR)/SpdmResponderLibVersion.o \
-
+    $(OUTPUT_DIR)/SpdmResponderLibHandleResponseState.o \
+    $(OUTPUT_DIR)/SpdmResponderLibRespondIfReady.o \
 
 INC =  \
     -I$(SOURCE_DIR) \
@@ -146,6 +147,12 @@ $(OUTPUT_DIR)/SpdmResponderLibReceiveSend.o : $(SOURCE_DIR)/SpdmResponderLibRece
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmResponderLibVersion.o : $(SOURCE_DIR)/SpdmResponderLibVersion.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmResponderLibHandleResponseState.o : $(SOURCE_DIR)/SpdmResponderLibHandleResponseState.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmResponderLibRespondIfReady.o : $(SOURCE_DIR)/SpdmResponderLibRespondIfReady.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

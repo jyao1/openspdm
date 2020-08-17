@@ -29,6 +29,7 @@ SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
   {SPDM_GET_MEASUREMENTS,       SpdmGetResponseMeasurement},
   {SPDM_KEY_EXCHANGE,           SpdmGetResponseKeyExchange},
   {SPDM_PSK_EXCHANGE,           SpdmGetResponsePskExchange},
+  {SPDM_RESPOND_IF_READY,       SpdmGetResponseRespondIfReady},
 };
 
 SPDM_GET_RESPONSE_SESSION_STRUCT  mSpdmGetResponseSessionStruct[] = {
@@ -52,6 +53,22 @@ SpdmGetResponseFuncViaLastRequest (
   SpdmRequest = (VOID *)SpdmContext->LastSpdmRequest;
   for (Index = 0; Index < sizeof(mSpdmGetResponseStruct)/sizeof(mSpdmGetResponseStruct[0]); Index++) {
     if (SpdmRequest->RequestResponseCode == mSpdmGetResponseStruct[Index].RequestResponseCode) {
+      return mSpdmGetResponseStruct[Index].GetResponseFunc;
+    }
+  }
+  return NULL;
+}
+
+SPDM_GET_RESPONSE_FUNC
+SpdmGetResponseFuncViaRequestCode (
+  IN     UINT8                    RequestCode
+  )
+{
+  UINTN                Index;
+
+  ASSERT(RequestCode != SPDM_RESPOND_IF_READY);
+  for (Index = 0; Index < sizeof(mSpdmGetResponseStruct)/sizeof(mSpdmGetResponseStruct[0]); Index++) {
+    if (RequestCode == mSpdmGetResponseStruct[Index].RequestResponseCode) {
       return mSpdmGetResponseStruct[Index].GetResponseFunc;
     }
   }

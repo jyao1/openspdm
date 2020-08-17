@@ -45,6 +45,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmRequesterLibGetDigest.o \
     $(OUTPUT_DIR)/SpdmRequesterLibGetMeasurement.o \
     $(OUTPUT_DIR)/SpdmRequesterLibGetVersion.o \
+    $(OUTPUT_DIR)/SpdmRequesterLibHandleErrorResponse.o \
     $(OUTPUT_DIR)/SpdmRequesterLibHeartbeat.o \
     $(OUTPUT_DIR)/SpdmRequesterLibKeyExchange.o \
     $(OUTPUT_DIR)/SpdmRequesterLibKeyUpdate.o \
@@ -125,6 +126,9 @@ $(OUTPUT_DIR)/SpdmRequesterLibGetMeasurement.o : $(SOURCE_DIR)/SpdmRequesterLibG
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterLibGetVersion.o : $(SOURCE_DIR)/SpdmRequesterLibGetVersion.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterLibHandleErrorResponse.o : $(SOURCE_DIR)/SpdmRequesterLibHandleErrorResponse.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterLibHeartbeat.o : $(SOURCE_DIR)/SpdmRequesterLibHeartbeat.c

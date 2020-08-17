@@ -52,6 +52,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmResponderLibPskFinish.obj \
     $(OUTPUT_DIR)\SpdmResponderLibReceiveSend.obj \
     $(OUTPUT_DIR)\SpdmResponderLibVersion.obj \
+    $(OUTPUT_DIR)\SpdmResponderLibHandleResponseState.obj \
+	$(OUTPUT_DIR)\SpdmResponderLibRespondIfReady.obj \
 
 
 INC =  \
@@ -147,6 +149,12 @@ $(OUTPUT_DIR)\SpdmResponderLibReceiveSend.obj : $(SOURCE_DIR)\SpdmResponderLibRe
 
 $(OUTPUT_DIR)\SpdmResponderLibVersion.obj : $(SOURCE_DIR)\SpdmResponderLibVersion.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibVersion.c
+
+$(OUTPUT_DIR)\SpdmResponderLibHandleResponseState.obj : $(SOURCE_DIR)\SpdmResponderLibHandleResponseState.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibHandleResponseState.c
+
+$(OUTPUT_DIR)\SpdmResponderLibRespondIfReady.obj : $(SOURCE_DIR)\SpdmResponderLibRespondIfReady.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibRespondIfReady.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

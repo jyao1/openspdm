@@ -23,6 +23,29 @@ SpdmGetVersion (
 
 RETURN_STATUS
 EFIAPI
+SpdmHandleErrorResponseMain (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT VOID                 *MBuffer,
+  IN     UINTN                 ShrinkBufferSize,
+  IN OUT UINTN                *ResponseSize,
+  IN OUT VOID                 *Response,
+  IN     UINT8                 OriginRequestCode,
+  IN     UINT8                 ExpectResponseCode,
+  IN     UINTN                 ExpectResponseSize
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmRequesterRespondIfReady (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT UINTN                *ResponseSize,
+  IN OUT VOID                 *Response,
+  IN     UINT8                 ExpectResponseCode,
+  IN     UINTN                 ExpectResponseSize
+  );
+
+RETURN_STATUS
+EFIAPI
 SpdmGetCapabilities (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                RequesterCTExponent,

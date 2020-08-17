@@ -94,6 +94,32 @@ AppendManagedBuffer (
 }
 
 /**
+  Shrink the size of the managed buffer.
+**/
+RETURN_STATUS
+ShrinkManagedBuffer (
+  IN OUT VOID            *MBuffer,
+  IN UINTN               BufferSize
+  )
+{
+  MANAGED_BUFFER  *ManagedBuffer;
+
+  ManagedBuffer = MBuffer;
+
+  if (BufferSize == 0) {
+    return RETURN_SUCCESS;
+  }
+  ASSERT (BufferSize != 0);
+  ASSERT ((ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_BUFFER_SIZE) ||
+          (ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
+  ASSERT (ManagedBuffer->MaxBufferSize >= ManagedBuffer->BufferSize);
+  ASSERT (BufferSize <= ManagedBuffer->BufferSize);
+
+  ManagedBuffer->BufferSize -= BufferSize;
+  return RETURN_SUCCESS;
+}
+
+/**
   Reset the managed buffer.
   The BufferSize is reset to 0.
   The MaxBufferSize is unchanged.
