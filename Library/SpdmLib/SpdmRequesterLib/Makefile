@@ -45,6 +45,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmRequesterLibGetDigest.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibGetMeasurement.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibGetVersion.obj \
+    $(OUTPUT_DIR)\SpdmRequesterLibHandleErrorResponse.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibHeartbeat.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibKeyExchange.obj \
     $(OUTPUT_DIR)\SpdmRequesterLibKeyUpdate.obj \
@@ -126,6 +127,9 @@ $(OUTPUT_DIR)\SpdmRequesterLibGetMeasurement.obj : $(SOURCE_DIR)\SpdmRequesterLi
 
 $(OUTPUT_DIR)\SpdmRequesterLibGetVersion.obj : $(SOURCE_DIR)\SpdmRequesterLibGetVersion.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibGetVersion.c
+
+$(OUTPUT_DIR)\SpdmRequesterLibHandleErrorResponse.obj : $(SOURCE_DIR)\SpdmRequesterLibHandleErrorResponse.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibHandleErrorResponse.c
 
 $(OUTPUT_DIR)\SpdmRequesterLibHeartbeat.obj : $(SOURCE_DIR)\SpdmRequesterLibHeartbeat.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterLibHeartbeat.c

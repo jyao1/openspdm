@@ -25,6 +25,25 @@ SpdmGetResponseVersion (
 
 RETURN_STATUS
 EFIAPI
+SpdmResponderHandleResponseState (
+  IN     VOID                 *Context,
+  IN     UINT8                 RequestCode,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetResponseRespondIfReady (
+  IN     VOID                 *Context,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
 SpdmGetResponseCapability (
   IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
@@ -226,6 +245,11 @@ SpdmSendResponse (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response
+  );
+
+SPDM_GET_RESPONSE_FUNC
+SpdmGetResponseFuncViaRequestCode (
+  IN     UINT8                    RequestCode
   );
 
 RETURN_STATUS

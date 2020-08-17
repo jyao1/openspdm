@@ -19,8 +19,7 @@ typedef struct {
 #pragma pack()
 
 RETURN_STATUS
-EFIAPI
-SpdmGetVersion (
+TrySpdmGetVersion (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINT8                *VersionCount,
      OUT VOID                 *VersionNumberEntries
@@ -56,16 +55,24 @@ SpdmGetVersion (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageA, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_VERSION, SPDM_VERSION, sizeof(SPDM_VERSION_RESPONSE_MAX));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_VERSION) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_VERSION_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_VERSION) {
+  if (SpdmResponse.VersionNumberEntryCount > MAX_SPDM_VERSION_COUNT) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse.VersionNumberEntryCount > MAX_SPDM_VERSION_COUNT) {
+  if (SpdmResponse.VersionNumberEntryCount == 0) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize < sizeof(SPDM_VERSION_RESPONSE) + SpdmResponse.VersionNumberEntryCount * sizeof(SPDM_VERSION_NUMBER)) {
@@ -99,3 +106,24 @@ SpdmGetVersion (
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }
+
+RETURN_STATUS
+EFIAPI
+SpdmGetVersion (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT UINT8                *VersionCount,
+     OUT VOID                 *VersionNumberEntries
+  )
+{
+  int retry = SpdmContext->RetryTimes;
+  RETURN_STATUS Status;
+
+  while(retry--) {
+    Status = TrySpdmGetVersion(SpdmContext, VersionCount, VersionNumberEntries);
+    if (RETURN_NO_RESPONSE != Status)
+      return Status;
+  }
+
+  return Status;
+}
+

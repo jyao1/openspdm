@@ -271,6 +271,14 @@ typedef struct {
   LARGE_MANAGED_BUFFER                 CertificateChainBuffer;
 } SPDM_ENCAP_CONTEXT;
 
+typedef enum {
+  SpdmResponseStateNormal,
+  SpdmResponseStateBusy,
+  SpdmResponseStateNotReady,
+  SpdmResponseStateNeedResync,
+  SpdmResponseStateMax,
+} SPDM_RESPONSE_STATE;
+
 #define SPDM_DEVICE_CONTEXT_VERSION 0x1
 
 ///
@@ -325,6 +333,21 @@ typedef struct {
   // Register Spdm request command receive Status (responder only)
   //
   UINT64                          SpdmCmdReceiveState;
+  //
+  // Register for Responder state, be initial to Normal (responder only)
+  //
+  SPDM_RESPONSE_STATE             ResponseState;
+  //
+  // Cached data for SPDM_ERROR_CODE_RESPONSE_NOT_READY/SPDM_RESPOND_IF_READY
+  //
+  SPDM_ERROR_DATA_RESPONSE_NOT_READY  ErrorData;
+  UINT8                           CachSpdmRequest[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINTN                           CachSpdmRequestSize;
+  UINT8                           CurrentToken;
+  //
+  // Register for the retry times when receive "BUSY" Error response (requester only)
+  //
+  UINT8                           RetryTimes;
 } SPDM_DEVICE_CONTEXT;
 
 typedef
@@ -672,6 +695,15 @@ RETURN_STATUS
 AppendManagedBuffer (
   IN OUT VOID            *ManagedBuffer,
   IN VOID                *Buffer,
+  IN UINTN               BufferSize
+  );
+
+/**
+  Shrink the size of the managed buffer.
+**/
+RETURN_STATUS
+ShrinkManagedBuffer (
+  IN OUT VOID            *MBuffer,
   IN UINTN               BufferSize
   );
 
