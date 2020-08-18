@@ -81,6 +81,28 @@
 
    Install lcov `sudo apt-get install lcov`.
 
+### Fuzzing Tool
+
+1) [AFL](https://lcamtuf.coredump.cx/afl/) for Linux
+
+   Download and install [AFL](http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz). Unzip and build it with `make`. Ensure AFL binary is in PATH environment variable. Then:
+   ```
+   sudo bash -c 'echo core >/proc/sys/kernel/core_pattern'
+   cd /sys/devices/system/cpu/
+   sudo bash -c 'echo performance | tee cpu*/cpufreq/scaling_governor'
+   ```
+
+2) [winafl](https://github.com/googleprojectzero/winafl) for Windows
+
+   Clone [winafl](https://github.com/googleprojectzero/winafl).
+   Download [DynamoRIO](https://dynamorio.org/).
+
+### Symbolic Execution Tool
+
+1) [KLEE](https://klee.github.io/)
+
+   Download and install [KLEE](https://klee.github.io/build-llvm9/) with LLVM9.
+
 ### Model Checker Tool
 
 1) [CBMC](http://www.cprover.org/cbmc/)
@@ -152,16 +174,13 @@
    Goto openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>. mkdir log and cd log.
 
    Run all tests and generate log file :
-   `%DRIO_PATH%\bin64\drrun.exe -c %DRIO_PATH%\tools\lib64\release\drcov.dll -- XXX.exe` or 
-   `%DRIO_PATH%\bin32\drrun.exe -c %DRIO_PATH%\tools\lib32\release\drcov.dll -- XXX.exe`
+   `%DRIO_PATH%\<bin64|bin32>\drrun.exe -c %DRIO_PATH%\tools\<lib64|lib32>\release\drcov.dll -- <test_app>`
    
    Generate coverage data with filter :
-   `%DRIO_PATH%\tools\bin64\drcov2lcov.exe -dir . -src_filter openspdm` or
-   `%DRIO_PATH%\tools\bin32\drcov2lcov.exe -dir . -src_filter openspdm`
+   `%DRIO_PATH%\tools\<bin64|bin32>\drcov2lcov.exe -dir . -src_filter openspdm`
    
    Generate coverage report :
-   `perl %DRIO_PATH%\tools\bin64\genhtml coverage.info` or
-   `perl %DRIO_PATH%\tools\bin32\genhtml coverage.info`
+   `perl %DRIO_PATH%\tools\<bin64|bin32>\genhtml coverage.info`
 
    The final report is index.html.
 
@@ -178,6 +197,36 @@
    `genhtml coverage.info --output-directory .`
 
    The final report is index.html.
+
+### Run Fuzzing
+
+1) Fuzzing in Linux with [AFL](https://lcamtuf.coredump.cx/afl/)
+   
+   ```
+   mkdir testcase_dir
+   mkdir /dev/shm/findings_dir
+   cp <seed> testcase_dir
+   afl-fuzz -i testcase_dir -o /dev/shm/findings_dir <test_app> @@
+   ```
+   Note: /dev/shm is tmpfs.
+
+2) Fuzzing in Windows with [AFL](https://lcamtuf.coredump.cx/afl/)
+
+   ```
+   cp <test_app> winafl\<bin64|bin32>
+   cp <test_app_pdb> winaft\<bin64|bin32>
+   cd winaft\<bin64|bin32>
+   afl-fuzz.exe -i in -o out -D %DRIO_PATH%\<bin64|bin32> -t 20000 -- -coverage_module <test_app> -fuzz_iterations 1000 -target_module <test_app> -target_method main -nargs 2 -- <test_app> @@
+   ```
+
+3) Fuzzing with LLVM [LibFuzzer](https://llvm.org/docs/LibFuzzer.html)  (TBD)
+
+### Run Symbolic Execution
+
+   Use KLEE to [generate ktest](https://klee.github.io/tutorials/testing-coreutils/):
+   `klee --only-output-states-covering-new <test_app>`
+
+   Transfer .ktest to seed file, which can be used for AFL-fuzzer. (TBD)
 
 ### Run Model Checker
 
