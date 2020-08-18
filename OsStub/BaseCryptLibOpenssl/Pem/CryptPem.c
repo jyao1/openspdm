@@ -1,7 +1,7 @@
 /** @file
   PEM (Privacy Enhanced Mail) Format Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -99,7 +99,7 @@ RsaGetPrivateKeyFromPem (
 
   //
   // Add possible block-cipher descriptor for PEM data decryption.
-  // NOTE: Only support most popular ciphers (AES) for the encrypted PEM.
+  // NOTE: Only support most popular ciphers AES for the encrypted PEM.
   //
   if (EVP_add_cipher (EVP_aes_128_cbc ()) == 0) {
     return FALSE;
@@ -180,7 +180,7 @@ EcGetPrivateKeyFromPem (
 
   //
   // Add possible block-cipher descriptor for PEM data decryption.
-  // NOTE: Only support most popular ciphers (AES) for the encrypted PEM.
+  // NOTE: Only support most popular ciphers AES for the encrypted PEM.
   //
   if (EVP_add_cipher (EVP_aes_128_cbc ()) == 0) {
     return FALSE;

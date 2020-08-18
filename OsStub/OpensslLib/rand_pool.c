@@ -1,5 +1,5 @@
 /** @file
-  OpenSSL_1_1_1b doesn't implement rand_pool_* functions for UEFI.
+  OpenSSL doesn't implement rand_pool_* functions for UEFI.
   The file implement these functions.
 
 Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
@@ -7,9 +7,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "internal/rand_int.h"
-
+#include "crypto/rand.h"
 #include <Base.h>
+#include <Library/BaseMemoryLib.h>
 
 /**
    Get 64-bit noise source.

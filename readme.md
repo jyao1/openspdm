@@ -58,8 +58,8 @@
 
 2) [Openssl](https://www.openssl.org) as crypto library
 
-   Please download [openssl-1.1.1b](https://www.openssl.org/source/openssl-1.1.1b.tar.gz) and unzip it.
-   Rename openssl-1.1.1b to openssl and put openssl under [OpensslLib](https://github.com/jyao1/openspdm/tree/master/OsStub/OpensslLib)
+   Please download [openssl-1.1.1g](https://www.openssl.org/source/openssl-1.1.1g.tar.gz) and unzip it.
+   Rename openssl-1.1.1g to openssl and put openssl under [OpensslLib](https://github.com/jyao1/openspdm/tree/master/OsStub/OpensslLib)
 
 ### Unit Test framework
 

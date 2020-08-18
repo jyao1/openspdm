@@ -9,7 +9,7 @@
 
   RFC 8017 - PKCS #1: RSA Cryptography Specifications Version 2.2
 
-Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -329,12 +329,13 @@ RsaPkcs1Sign (
 
   //
   // Determine the message digest algorithm according to digest size.
+  //   Only SHA-256, SHA-384 or SHA-512 algorithm is supported.
   //
   switch (HashSize) {
   case SHA256_DIGEST_SIZE:
     DigestType = NID_sha256;
     break;
-    
+
   case SHA384_DIGEST_SIZE:
     DigestType = NID_sha384;
     break;
