@@ -60,10 +60,10 @@ RunTestHarness(
   mSpdmResponderVersionTestContext.TestBuffer = TestBuffer;
   mSpdmResponderVersionTestContext.TestBufferSize = TestBufferSize;
 
-  TestSpdmRequesterGroupSetup (&State);
+  SpdmUnitTestGroupSetup (&State);
 
   TestSpdmResponderVersion (&State);
 
-  TestSpdmRequesterGroupTeardown (&State);
+  SpdmUnitTestGroupTeardown (&State);
 }
 

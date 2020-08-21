@@ -468,5 +468,5 @@ int SpdmRequesterGetVersionTestMain(void) {
   
   SetupSpdmTestContext (&mSpdmRequesterGetVersionTestContext);
 
-  return cmocka_run_group_tests(SpdmRequesterGetVersionTests, TestSpdmRequesterGroupSetup, TestSpdmRequesterGroupTeardown);
+  return cmocka_run_group_tests(SpdmRequesterGetVersionTests, SpdmUnitTestGroupSetup, SpdmUnitTestGroupTeardown);
 }

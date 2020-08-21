@@ -179,5 +179,5 @@ int SpdmResponderVersionTestMain(void) {
 
   SetupSpdmTestContext (&mSpdmResponderVersionTestContext);
 
-  return cmocka_run_group_tests(SpdmResponderVersionTests, TestSpdmRequesterGroupSetup, TestSpdmRequesterGroupTeardown);
+  return cmocka_run_group_tests(SpdmResponderVersionTests, SpdmUnitTestGroupSetup, SpdmUnitTestGroupTeardown);
 }

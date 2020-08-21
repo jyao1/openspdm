@@ -38,9 +38,9 @@ typedef struct {
 #define SPDM_TEST_CONTEXT_FROM_SPDM_PROTOCOL(a)  BASE_CR (a, SPDM_TEST_CONTEXT, SpdmProtocol)
 #define SPDM_TEST_CONTEXT_FROM_SPDM_CONTEXT(a)   BASE_CR (a, SPDM_TEST_CONTEXT, SpdmContext)
 
-int TestSpdmRequesterGroupSetup(void **state);
+int SpdmUnitTestGroupSetup(void **state);
 
-int TestSpdmRequesterGroupTeardown(void **state);
+int SpdmUnitTestGroupTeardown(void **state);
 
 VOID
 SetupSpdmTestContext (

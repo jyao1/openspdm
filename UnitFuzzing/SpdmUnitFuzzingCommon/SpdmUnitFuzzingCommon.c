@@ -19,7 +19,7 @@ SetupSpdmTestContext (
   mSpdmTestContext = SpdmTestContext;
 }
 
-UINTN TestSpdmRequesterGroupSetup(VOID **State)
+UINTN SpdmUnitTestGroupSetup(VOID **State)
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
   SPDM_DEVICE_CONTEXT     *SpdmContext;
@@ -44,7 +44,7 @@ UINTN TestSpdmRequesterGroupSetup(VOID **State)
   return 0;
 }
 
-UINTN TestSpdmRequesterGroupTeardown(VOID **State)
+UINTN SpdmUnitTestGroupTeardown(VOID **State)
 {
   return 0;
 }
