@@ -20,7 +20,6 @@ SpdmGetResponseRespondIfReady (
   )
 {
   SPDM_MESSAGE_HEADER         *SpdmRequest;
-  UINTN                        SpdmRequestSize;
   SPDM_DEVICE_CONTEXT         *SpdmContext;
   SPDM_GET_RESPONSE_FUNC       GetResponseFunc;
   RETURN_STATUS                Status;
@@ -31,7 +30,6 @@ SpdmGetResponseRespondIfReady (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  SpdmRequestSize = RequestSize;
 
   ASSERT (SpdmRequest->RequestResponseCode == SPDM_RESPOND_IF_READY);
   if (SpdmRequest->Param1 != SpdmContext->ErrorData.RequestCode) {
