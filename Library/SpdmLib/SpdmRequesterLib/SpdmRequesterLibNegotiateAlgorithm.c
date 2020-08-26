@@ -180,9 +180,11 @@ SpdmNegotiateAlgorithms (
     if (AlgoSize == 0xFFFFFFFF) {
       return RETURN_SECURITY_VIOLATION;
     }
-    AlgoSize = GetSpdmReqAsymSize (SpdmContext);
-    if (AlgoSize == 0xFFFFFFFF) {
-      return RETURN_SECURITY_VIOLATION;
+    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
+      AlgoSize = GetSpdmReqAsymSize (SpdmContext);
+      if (AlgoSize == 0xFFFFFFFF) {
+        return RETURN_SECURITY_VIOLATION;
+      }
     }
   }
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
