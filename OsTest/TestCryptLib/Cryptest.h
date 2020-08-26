@@ -119,17 +119,17 @@ ValidateCryptAeadCipher (
   VOID
   );
 
-// /**
-//   Validate UEFI-OpenSSL RSA Interfaces.
+/**
+  Validate UEFI-OpenSSL RSA Interfaces.
 
-//   @retval  EFI_SUCCESS  Validation succeeded.
-//   @retval  EFI_ABORTED  Validation failed.
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
 
-// **/
-// EFI_STATUS
-// ValidateCryptRsa (
-//   VOID
-//   );
+**/
+EFI_STATUS
+ValidateCryptRsa (
+  VOID
+  );
 
 /**
   Validate UEFI-OpenSSL RSA Key Retrieving (from PEM & X509) & Signature Interfaces.

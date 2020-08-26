@@ -35,10 +35,10 @@ SOURCE_DIR = $(WORKSPACE)\OsTest\$(MODULE_NAME)
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\Cryptest.obj \
     $(OUTPUT_DIR)\HashVerify.obj \
-    $(OUTPUT_DIR)\HashVerify.obj \
     $(OUTPUT_DIR)\HmacVerify.obj \
     $(OUTPUT_DIR)\MacVerify.obj \
     $(OUTPUT_DIR)\AeadVerify.obj \
+    $(OUTPUT_DIR)\RsaVerify.obj \
     $(OUTPUT_DIR)\RsaVerify2.obj \
     $(OUTPUT_DIR)\DhVerify.obj \
     $(OUTPUT_DIR)\EcVerify.obj \
@@ -118,6 +118,8 @@ $(OUTPUT_DIR)\MacVerify.obj : $(SOURCE_DIR)\../TestCryptLib/MacVerify.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/MacVerify.c
 $(OUTPUT_DIR)\AeadVerify.obj : $(SOURCE_DIR)\../TestCryptLib/AeadVerify.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/AeadVerify.c
+$(OUTPUT_DIR)\RsaVerify.obj : $(SOURCE_DIR)\../TestCryptLib/RsaVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/RsaVerify.c
 $(OUTPUT_DIR)\RsaVerify2.obj : $(SOURCE_DIR)\../TestCryptLib/RsaVerify2.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/RsaVerify2.c
 $(OUTPUT_DIR)\DhVerify.obj : $(SOURCE_DIR)\../TestCryptLib/DhVerify.c

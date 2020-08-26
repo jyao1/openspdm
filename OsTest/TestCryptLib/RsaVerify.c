@@ -1,4 +1,4 @@
-/** @file  
+/** @file
   Application for RSA Primitives Validation.
 
 Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
@@ -24,7 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Public Modulus of RSA Key
 //
 GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 RsaN[] = {
-  0xBB, 0xF8, 0x2F, 0x09, 0x06, 0x82, 0xCE, 0x9C, 0x23, 0x38, 0xAC, 0x2B, 0x9D, 0xA8, 0x71, 0xF7, 
+  0xBB, 0xF8, 0x2F, 0x09, 0x06, 0x82, 0xCE, 0x9C, 0x23, 0x38, 0xAC, 0x2B, 0x9D, 0xA8, 0x71, 0xF7,
   0x36, 0x8D, 0x07, 0xEE, 0xD4, 0x10, 0x43, 0xA4, 0x40, 0xD6, 0xB6, 0xF0, 0x74, 0x54, 0xF5, 0x1F,
   0xB8, 0xDF, 0xBA, 0xAF, 0x03, 0x5C, 0x02, 0xAB, 0x61, 0xEA, 0x48, 0xCE, 0xEB, 0x6F, 0xCD, 0x48,
   0x76, 0xED, 0x52, 0x0D, 0x60, 0xE1, 0xEC, 0x46, 0x19, 0x71, 0x9D, 0x8A, 0x5B, 0x8B, 0x80, 0x7F,
@@ -92,7 +92,7 @@ ValidateCryptRsa (
   )
 {
   VOID     *Rsa;
-  UINT8    HashValue[SHA1_DIGEST_SIZE];
+  UINT8    HashValue[SHA256_DIGEST_SIZE];
   UINTN    HashSize;
   UINTN    CtxSize;
   VOID     *Sha1Ctx;
@@ -130,7 +130,7 @@ ValidateCryptRsa (
 
   KeySize = 0;
   Status = RsaGetKey (Rsa, RsaKeyN, NULL, &KeySize);
-  if (Status || KeySize != sizeof (RsaN)) {
+  if (!Status || KeySize != sizeof (RsaN)) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   }
@@ -234,7 +234,7 @@ ValidateCryptRsa (
     Print (L"[Fail]");
     return EFI_ABORTED;
   }
-  
+
   if (KeySize != 3 ||
       CompareMem (KeyBuffer, DefaultPublicKey, 3) != 0) {
     Print (L"[Fail]");
@@ -269,7 +269,7 @@ ValidateCryptRsa (
     return EFI_ABORTED;
   }
 
-  if (RsaCheckKey (Rsa)) {
+  if (!RsaCheckKey (Rsa)) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   }
@@ -291,7 +291,7 @@ ValidateCryptRsa (
     return EFI_ABORTED;
   }
 
-  if (RsaCheckKey (Rsa)) {
+  if (!RsaCheckKey (Rsa)) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   }
@@ -299,27 +299,27 @@ ValidateCryptRsa (
   FreePool (KeyBuffer);
 
   //
-  // SHA-1 Digest Message for PKCS#1 Signature 
+  // SHA-256 Digest Message for PKCS#1 Signature
   //
   Print (L"Hash Original Message ... ");
-  HashSize = SHA1_DIGEST_SIZE;
+  HashSize = SHA256_DIGEST_SIZE;
   ZeroMem (HashValue, HashSize);
-  CtxSize = Sha1GetContextSize ();
+  CtxSize = Sha256GetContextSize ();
   Sha1Ctx = AllocatePool (CtxSize);
 
-  Status  = Sha1Init (Sha1Ctx);
+  Status  = Sha256Init (Sha1Ctx);
   if (!Status) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   }
 
-  Status  = Sha1Update (Sha1Ctx, RsaSignData, AsciiStrLen (RsaSignData));
+  Status  = Sha256Update (Sha1Ctx, RsaSignData, AsciiStrLen (RsaSignData));
   if (!Status) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   }
 
-  Status  = Sha1Final (Sha1Ctx, HashValue);
+  Status  = Sha256Final (Sha1Ctx, HashValue);
   if (!Status) {
     Print (L"[Fail]");
     return EFI_ABORTED;
@@ -373,11 +373,6 @@ ValidateCryptRsa (
   }
 
   if (SigSize != sizeof (RsaPkcs1Signature)) {
-    Print (L"[Fail]");
-    return EFI_ABORTED;
-  }
-
-  if (CompareMem (Signature, RsaPkcs1Signature, SigSize) != 0) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   }

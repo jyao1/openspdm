@@ -43,10 +43,10 @@ CryptestMain (
     return Status;
   }
 
-  // Status = ValidateCryptHmac ();
-  // if (EFI_ERROR (Status)) {
-  //   return Status;
-  // }
+  Status = ValidateCryptHmac ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   // Status = ValidateCryptBlockCipher ();
   // if (EFI_ERROR (Status)) {
@@ -63,15 +63,15 @@ CryptestMain (
     return Status;
   }
 
-  // Status = ValidateCryptRsa ();
-  // if (EFI_ERROR (Status)) {
-  //   return Status;
-  // }
+  Status = ValidateCryptRsa ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-  // Status = ValidateCryptRsa2 ();
-  // if (EFI_ERROR (Status)) {
-  //   return Status;
-  // }
+  Status = ValidateCryptRsa2 ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   // Status = ValidateCryptPkcs5Pbkdf2 ();
   // if (EFI_ERROR (Status)) {
