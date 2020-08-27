@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmRequesterLibInternal.h"
 
 RETURN_STATUS
-EFIAPI
-SpdmGetCapabilities (
+TrySpdmGetCapabilities (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                RequesterCTExponent,
   IN     UINT32               RequesterFlags,
@@ -57,16 +56,20 @@ SpdmGetCapabilities (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageA, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_CAPABILITIES, SPDM_CAPABILITIES, sizeof(SPDM_CAPABILITIES_RESPONSE));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_CAPABILITIES) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_CAPABILITIES_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_CAPABILITIES) {
-    return RETURN_DEVICE_ERROR;
-  }
-
   SpdmResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
   //
   // Cache data
@@ -82,3 +85,26 @@ SpdmGetCapabilities (
 
   return RETURN_SUCCESS;
 }
+
+RETURN_STATUS
+EFIAPI
+SpdmGetCapabilities (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                RequesterCTExponent,
+  IN     UINT32               RequesterFlags,
+     OUT UINT8                *ResponderCTExponent,
+     OUT UINT32               *ResponderFlags
+  )
+{
+  int retry = SpdmContext->RetryTimes;
+  RETURN_STATUS Status;
+
+  while(retry--) {
+    Status = TrySpdmGetCapabilities(SpdmContext, RequesterCTExponent, RequesterFlags, ResponderCTExponent, ResponderFlags);
+    if (RETURN_NO_RESPONSE != Status)
+      return Status;
+  }
+
+  return Status;
+}
+

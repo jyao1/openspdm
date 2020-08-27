@@ -11,9 +11,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <SpdmRequesterLibInternal.h>
 
 int SpdmRequesterGetVersionTestMain (void);
+int SpdmRequesterGetCapabilityTestMain (void);
+
 
 int main(void) {
   SpdmRequesterGetVersionTestMain();
+
+  SpdmRequesterGetCapabilityTestMain();
 
   return 0;
 }
