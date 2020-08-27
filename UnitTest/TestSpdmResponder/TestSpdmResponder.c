@@ -11,9 +11,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <SpdmResponderLibInternal.h>
 
 int SpdmResponderVersionTestMain (void);
+int SpdmResponderCapabilityTestMain (void);
 
 int main(void) {
   SpdmResponderVersionTestMain ();
+
+  SpdmResponderCapabilityTestMain ();
 
   return 0;
 }

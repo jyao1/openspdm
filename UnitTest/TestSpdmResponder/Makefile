@@ -35,6 +35,7 @@ SOURCE_DIR = $(WORKSPACE)\UnitTest\$(MODULE_NAME)
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmResponder.obj \
     $(OUTPUT_DIR)\TestSpdmResponderVersion.obj \
+    $(OUTPUT_DIR)\TestSpdmResponderCapability.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
 
 
@@ -123,6 +124,9 @@ $(OUTPUT_DIR)\TestSpdmResponder.obj : $(SOURCE_DIR)\TestSpdmResponder.c
 
 $(OUTPUT_DIR)\TestSpdmResponderVersion.obj : $(SOURCE_DIR)\TestSpdmResponderVersion.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderVersion.c
+
+$(OUTPUT_DIR)\TestSpdmResponderCapability.obj : $(SOURCE_DIR)\TestSpdmResponderCapability.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderCapability.c
 
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c

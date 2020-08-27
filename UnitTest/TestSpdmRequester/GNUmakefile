@@ -35,6 +35,7 @@ SOURCE_DIR = $(WORKSPACE)/UnitTest/$(MODULE_NAME)
 OBJECT_FILES =  \
     $(OUTPUT_DIR)/TestSpdmRequester.o \
     $(OUTPUT_DIR)/TestSpdmRequesterGetVersion.o \
+    $(OUTPUT_DIR)/TestSpdmRequesterGetCapability.o \
     $(OUTPUT_DIR)/SpdmUnitTestCommon.o \
 
 
@@ -122,6 +123,9 @@ $(OUTPUT_DIR)/TestSpdmRequester.o : $(SOURCE_DIR)/TestSpdmRequester.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/TestSpdmRequesterGetVersion.o : $(SOURCE_DIR)/TestSpdmRequesterGetVersion.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/TestSpdmRequesterGetCapability.o : $(SOURCE_DIR)/TestSpdmRequesterGetCapability.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmUnitTestCommon.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmUnitTestCommon.c
