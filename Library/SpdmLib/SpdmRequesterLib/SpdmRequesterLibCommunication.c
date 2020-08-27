@@ -228,19 +228,3 @@ SpdmSendReceiveData (
 
   return RETURN_SUCCESS;
 }
-
-RETURN_STATUS
-EFIAPI
-SpdmRegisterSpdmIo (
-  IN     VOID                      *Context,
-  IN     SPDM_IO_PROTOCOL          *SpdmIo
-  )
-{
-  SPDM_DEVICE_CONTEXT           *SpdmContext;
-
-  SpdmContext = Context;
-  SpdmContext->SpdmIo = SpdmIo;
-  SpdmContext->SecureMessageType = SpdmIo->SecureMessageType;
-  SpdmContext->Alignment = SpdmIo->Alignment;
-  return RETURN_SUCCESS;
-}

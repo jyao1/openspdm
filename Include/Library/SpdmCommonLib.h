@@ -14,11 +14,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Base.h>
 #include <IndustryStandard/Spdm.h>
-#include <IndustryStandard/SpdmMctp.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
-#include "SpdmIo.h"
+#include <Library/SpdmDeviceLib.h>
 
 //
 // Connection: When a host sends messgages to a device, they create a connection.
@@ -63,7 +62,6 @@ typedef enum {
   // SPDM IO info
   //
   SpdmDataIoSizeAlignment,
-  SpdmDataIoSecureMessageType,
   //
   // SPDM parameter
   //
@@ -225,6 +223,12 @@ SpdmGetData (
 UINT32
 EFIAPI
 SpdmGetLastError (
+  IN     VOID                      *SpdmContext
+  );
+
+UINT32
+EFIAPI
+SpdmGetAlignment (
   IN     VOID                      *SpdmContext
   );
 

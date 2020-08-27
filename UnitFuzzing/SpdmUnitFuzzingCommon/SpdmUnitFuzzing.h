@@ -28,7 +28,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef struct {
   UINT32                 Signature;
   BOOLEAN                IsRequester;
-  SPDM_IO_PROTOCOL       SpdmProtocol;
   SPDM_DEVICE_CONTEXT    SpdmContext;
   VOID                   *TestBuffer;
   UINTN                  TestBufferSize;
@@ -44,6 +43,11 @@ UINTN SpdmUnitTestGroupTeardown(VOID **State);
 VOID
 SetupSpdmTestContext (
   IN SPDM_TEST_CONTEXT       *SpdmTestContext
+  );
+
+SPDM_TEST_CONTEXT *
+GetSpdmTestContext (
+  VOID
   );
 
 #endif

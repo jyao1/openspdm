@@ -9,21 +9,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmResponderTest.h"
 
+UINT32 mCommand;
+UINTN  mReceiveBufferSize;
 UINT8  mReceiveBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+
+SOCKET mServerSocket;
+
+extern VOID *mSpdmContext;
 
 VOID
 SpdmServerInit (
   VOID
-  );
-
-BOOLEAN
-ProcessSpdmData (
-  IN UINT32     Command,
-  IN UINT32     Session,
-  IN VOID       *RequestBuffer,
-  IN UINTN      RequestBufferSize,
-  OUT VOID      *ResponseBuffer,
-  IN OUT UINTN  *ResponseBufferSize
   );
 
 BOOLEAN
@@ -93,25 +89,14 @@ PlatformServer(
   )
 {
   BOOLEAN            Result;
-  UINT32             Command;
-  UINT32             Session;
-  UINTN              BytesReceived;
-  UINTN              BytesToReceive;
+  RETURN_STATUS      Status;
 
   while (TRUE) {
-    BytesReceived = sizeof(mReceiveBuffer);
-    Result = ReceivePlatformData (Socket, &Command, &Session, mReceiveBuffer, &BytesReceived);
-    if (!Result) {
-      printf ("ReceivePlatformData Error - %x\n",
-#ifdef _MSC_VER
-      WSAGetLastError()
-#else
-      errno
-#endif
-      );
-      return TRUE;
+    Status = SpdmResponderDispatchMessage (mSpdmContext);
+    if (Status != RETURN_UNSUPPORTED) {
+      continue;
     }
-    switch(Command) {
+    switch(mCommand) {
     case SOCKET_SPDM_COMMAND_TEST:
       Result = SendPlatformData (
                  Socket,
@@ -120,40 +105,6 @@ PlatformServer(
                  (UINT8 *)"Server Hello!",
                  sizeof("Server Hello!")
                  );
-      if (!Result) {
-        printf ("SendPlatformData Error - %x\n",
-#ifdef _MSC_VER
-          WSAGetLastError()
-#else
-          errno
-#endif
-          );
-        return TRUE;
-      }
-      break;
-    case SOCKET_SPDM_COMMAND_NORMAL:
-    case SOCKET_SPDM_COMMAND_SECURE:
-      BytesToReceive = sizeof(mReceiveBuffer);
-      Result = ProcessSpdmData (
-                 Command,
-                 Session,
-                 mReceiveBuffer,
-                 BytesReceived,
-                 mReceiveBuffer,
-                 &BytesToReceive
-                 );
-      if (!Result) {
-        printf ("SendPlatformData Error - %x\n",
-#ifdef _MSC_VER
-          WSAGetLastError()
-#else
-          errno
-#endif
-          );
-        return TRUE;
-      }
-                
-      Result = SendPlatformData (Socket, Command, Session, mReceiveBuffer, BytesToReceive);
       if (!Result) {
         printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -179,8 +130,11 @@ PlatformServer(
       }
       return FALSE;
       break;
+    case SOCKET_SPDM_COMMAND_NORMAL:
+    case SOCKET_SPDM_COMMAND_SECURE:
+      assert (0);
     default:
-      printf ("Unrecognized platform interface command %x\n", Command);
+      printf ("Unrecognized platform interface command %x\n", mCommand);
       Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_UNKOWN, 0, NULL, 0);
       if (!Result) {
         printf ("SendPlatformData Error - %x\n",
@@ -203,7 +157,6 @@ PlatformServerRoutine (
   )
 {
   SOCKET               ListenSocket;
-  SOCKET               ServerSocket;
   struct               sockaddr_in PeerAddress;
   BOOLEAN              Result;
   UINT32               Length;
@@ -219,8 +172,8 @@ PlatformServerRoutine (
     printf ("Platform server listening on port %d\n", PortNumber);
 
     Length = sizeof(PeerAddress);
-    ServerSocket = accept(ListenSocket, (struct sockaddr*) &PeerAddress, (socklen_t *)&Length);
-    if (ServerSocket == INVALID_SOCKET) {
+    mServerSocket = accept(ListenSocket, (struct sockaddr*) &PeerAddress, (socklen_t *)&Length);
+    if (mServerSocket == INVALID_SOCKET) {
       printf ("Accept error.  Error is 0x%x\n",
 #ifdef _MSC_VER
         WSAGetLastError()
@@ -235,8 +188,8 @@ PlatformServerRoutine (
     }
     printf ("Client accepted\n");
 
-    ContinueServing = PlatformServer(ServerSocket);
-    closesocket(ServerSocket);
+    ContinueServing = PlatformServer(mServerSocket);
+    closesocket(mServerSocket);
 
   } while(ContinueServing);
 #ifdef _MSC_VER

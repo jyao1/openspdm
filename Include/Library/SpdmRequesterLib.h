@@ -169,13 +169,6 @@ SpdmKeyUpdate (
   IN     BOOLEAN              SingleDirection
   );
 
-RETURN_STATUS
-EFIAPI
-SpdmRegisterSpdmIo (
-  IN     VOID                      *SpdmContext,
-  IN     SPDM_IO_PROTOCOL          *SpdmIo
-  );
-
 typedef
 RETURN_STATUS
 (EFIAPI *SPDM_GET_ENCAP_RESPONSE_FUNC) (

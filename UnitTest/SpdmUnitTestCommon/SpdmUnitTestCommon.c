@@ -9,37 +9,64 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmUnitTest.h"
 
-SPDM_TEST_CONTEXT       *mSpdmTestContext;
+SPDM_TEST_CONTEXT             *mSpdmTestContext;
+
+RETURN_STATUS
+EFIAPI
+SpdmDeviceSendMessage (
+  IN     UINT32                  *SessionId,
+  IN     UINTN                   RequestSize,
+  IN     VOID                    *Request,
+  IN     UINT64                  Timeout
+  )
+{
+  if (mSpdmTestContext->SpdmDeviceSendMessage == NULL) {
+    return RETURN_UNSUPPORTED;
+  }
+  return mSpdmTestContext->SpdmDeviceSendMessage (SessionId, RequestSize, Request, Timeout);
+}
+
+RETURN_STATUS
+EFIAPI
+SpdmDeviceReceiveMessage (
+     OUT UINT32                  **SessionId,
+  IN OUT UINTN                   *ResponseSize,
+  IN OUT VOID                    *Response,
+  IN     UINT64                  Timeout
+  )
+{
+  if (mSpdmTestContext->SpdmDeviceReceiveMessage == NULL) {
+    return RETURN_UNSUPPORTED;
+  }
+  return mSpdmTestContext->SpdmDeviceReceiveMessage (SessionId, ResponseSize, Response, Timeout);
+}
+
+SPDM_TEST_CONTEXT *
+GetSpdmTestContext (
+  VOID
+  )
+{
+  return mSpdmTestContext;
+}
 
 VOID
 SetupSpdmTestContext (
-  IN SPDM_TEST_CONTEXT       *SpdmTestContext
+  IN SPDM_TEST_CONTEXT             *SpdmTestContext
   )
 {
-  mSpdmTestContext = SpdmTestContext;
+  mSpdmTestContext          = SpdmTestContext;
 }
 
 int SpdmUnitTestGroupSetup(void **state)
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
   SPDM_DEVICE_CONTEXT     *SpdmContext;
-  UINT32                  Data32;
-  SPDM_DATA_PARAMETER     Parameter;
 
   SpdmTestContext = mSpdmTestContext;
   SpdmContext = &SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xFFFFFFFF;
 
   SpdmInitContext (SpdmContext);
-  if (SpdmTestContext->IsRequester) {
-    SpdmRegisterSpdmIo (SpdmContext, &SpdmTestContext->SpdmProtocol);
-  } else {
-    ZeroMem (&Parameter, sizeof(Parameter));
-    Data32 = SpdmTestContext->SpdmProtocol.Alignment;
-    SpdmSetData (SpdmContext, SpdmDataIoSizeAlignment, &Parameter, &Data32, sizeof(Data32));
-    Data32 = (UINT32)SpdmTestContext->SpdmProtocol.SecureMessageType;
-    SpdmSetData (SpdmContext, SpdmDataIoSecureMessageType, &Parameter, &Data32, sizeof(Data32));
-  }
 
   *state = SpdmTestContext;
   return 0;

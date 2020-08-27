@@ -14,8 +14,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 RETURN_STATUS
 EFIAPI
-SpdmRequesterGetCapabilityTestSendRequest (
-  IN     SPDM_IO_PROTOCOL        *This,
+SpdmRequesterGetCapabilityTestSendMessage (
+  IN     UINT32                  *SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
   IN     UINT64                  Timeout
@@ -23,7 +23,7 @@ SpdmRequesterGetCapabilityTestSendRequest (
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
 
-  SpdmTestContext = SPDM_TEST_CONTEXT_FROM_SPDM_PROTOCOL(This);
+  SpdmTestContext = GetSpdmTestContext ();
   switch (SpdmTestContext->CaseId) {
   case 0x1:
     return RETURN_DEVICE_ERROR;
@@ -50,8 +50,8 @@ SpdmRequesterGetCapabilityTestSendRequest (
 
 RETURN_STATUS
 EFIAPI
-SpdmRequesterGetCapabilityTestReceiveResponse (
-  IN     SPDM_IO_PROTOCOL        *This,
+SpdmRequesterGetCapabilityTestReceiveMessage (
+     OUT UINT32                  **SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,
   IN     UINT64                  Timeout
@@ -59,7 +59,9 @@ SpdmRequesterGetCapabilityTestReceiveResponse (
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
 
-  SpdmTestContext = SPDM_TEST_CONTEXT_FROM_SPDM_PROTOCOL(This);
+  *SessionId = NULL;
+
+  SpdmTestContext = GetSpdmTestContext ();
   switch (SpdmTestContext->CaseId) {
   case 0x1:
     return RETURN_DEVICE_ERROR;
@@ -237,32 +239,6 @@ SpdmRequesterGetCapabilityTestReceiveResponse (
   default:
     return RETURN_DEVICE_ERROR;
   }
-}
-
-RETURN_STATUS
-EFIAPI
-SpdmRequesterGetCapabilityTestSecureSendRequest (
-  IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT32                                 SessionId,
-  IN     UINTN                                  RequestSize,
-  IN     VOID                                   *Request,
-  IN     UINT64                                 Timeout
-  )
-{
-  return RETURN_UNSUPPORTED;
-}
-
-RETURN_STATUS
-EFIAPI
-SpdmRequesterGetCapabilityTestSecureReceiveResponse (
-  IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT32                                 SessionId,
-  IN OUT UINTN                                  *ResponseSize,
-  IN OUT VOID                                   *Response,
-  IN     UINT64                                 Timeout
-  )
-{
-  return RETURN_UNSUPPORTED;
 }
 
 void TestSpdmRequesterGetCapabilityCase1(void **state) {
@@ -455,14 +431,8 @@ void TestSpdmRequesterGetCapabilityCase9(void **state) {
 SPDM_TEST_CONTEXT       mSpdmRequesterGetCapabilityTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
-  {
-    SpdmRequesterGetCapabilityTestSendRequest,
-    SpdmRequesterGetCapabilityTestReceiveResponse,
-    SpdmRequesterGetCapabilityTestSecureSendRequest,
-    SpdmRequesterGetCapabilityTestSecureReceiveResponse,
-    SpdmIoSecureMessagingTypeDmtfMtcp,
-    sizeof(UINT32)
-  },
+  SpdmRequesterGetCapabilityTestSendMessage,
+  SpdmRequesterGetCapabilityTestReceiveMessage,
 };
 
 int SpdmRequesterGetCapabilityTestMain(void) {

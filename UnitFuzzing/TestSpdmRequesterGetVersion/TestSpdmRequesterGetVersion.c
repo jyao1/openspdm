@@ -22,8 +22,8 @@ GetMaxBufferSize (
 
 RETURN_STATUS
 EFIAPI
-SpdmRequesterGetVersionTestSendRequest (
-  IN     SPDM_IO_PROTOCOL        *This,
+SpdmDeviceSendMessage (
+  IN     UINT32                  *SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
   IN     UINT64                  Timeout
@@ -34,8 +34,8 @@ SpdmRequesterGetVersionTestSendRequest (
 
 RETURN_STATUS
 EFIAPI
-SpdmRequesterGetVersionTestReceiveResponse (
-  IN     SPDM_IO_PROTOCOL        *This,
+SpdmDeviceReceiveMessage (
+     OUT UINT32                  **SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,
   IN     UINT64                  Timeout
@@ -43,39 +43,13 @@ SpdmRequesterGetVersionTestReceiveResponse (
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
 
-  SpdmTestContext = SPDM_TEST_CONTEXT_FROM_SPDM_PROTOCOL(This);
-        
+  SpdmTestContext = GetSpdmTestContext ();
+  *SessionId = NULL;
   *ResponseSize = SpdmTestContext->TestBufferSize;
   *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
   CopyMem (Response, SpdmTestContext->TestBuffer, SpdmTestContext->TestBufferSize);
 
   return RETURN_SUCCESS;
-}
-
-RETURN_STATUS
-EFIAPI
-SpdmRequesterGetVersionTestSecureSendRequest (
-  IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT32                                 SessionId,
-  IN     UINTN                                  RequestSize,
-  IN     VOID                                   *Request,
-  IN     UINT64                                 Timeout
-  )
-{
-  return RETURN_UNSUPPORTED;
-}
-
-RETURN_STATUS
-EFIAPI
-SpdmRequesterGetVersionTestSecureReceiveResponse (
-  IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT32                                 SessionId,
-  IN OUT UINTN                                  *ResponseSize,
-  IN OUT VOID                                   *Response,
-  IN     UINT64                                 Timeout
-  )
-{
-  return RETURN_UNSUPPORTED;
 }
 
 VOID TestSpdmRequesterGetVersion (VOID **State) {
@@ -95,14 +69,6 @@ VOID TestSpdmRequesterGetVersion (VOID **State) {
 SPDM_TEST_CONTEXT       mSpdmRequesterGetVersionTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
-  {
-    SpdmRequesterGetVersionTestSendRequest,
-    SpdmRequesterGetVersionTestReceiveResponse,
-    SpdmRequesterGetVersionTestSecureSendRequest,
-    SpdmRequesterGetVersionTestSecureReceiveResponse,
-    SpdmIoSecureMessagingTypeDmtfMtcp,
-    sizeof(UINT32)
-  },
 };
 
 VOID

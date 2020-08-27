@@ -223,12 +223,6 @@ SpdmSetData (
     }
     SpdmContext->Alignment = *(UINT32 *)Data;
     break;
-  case SpdmDataIoSecureMessageType:
-    if (DataSize != sizeof(SPDM_IO_SECURE_MESSAGING_TYPE)) {
-      return RETURN_INVALID_PARAMETER;
-    }
-    SpdmContext->SecureMessageType = *(SPDM_IO_SECURE_MESSAGING_TYPE *)Data;
-    break;
   case SpdmDataCapabilityFlags:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
@@ -523,6 +517,18 @@ SpdmGetLastError (
   return SpdmContext->ErrorState;
 }
 
+UINT32
+EFIAPI
+SpdmGetAlignment (
+  IN     VOID                      *Context
+  )
+{
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+
+  SpdmContext = Context;
+  return SpdmContext->Alignment;
+}
+
 RETURN_STATUS
 EFIAPI
 SpdmInitContext (
@@ -534,6 +540,7 @@ SpdmInitContext (
   SpdmContext = Context;
   ZeroMem (SpdmContext, sizeof(SPDM_DEVICE_CONTEXT));
   SpdmContext->Version = SPDM_DEVICE_CONTEXT_VERSION;
+  SpdmContext->Alignment = 1;
   SpdmContext->Transcript.MessageA.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
   SpdmContext->Transcript.MessageB.MaxBufferSize  = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SpdmContext->Transcript.MessageC.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;

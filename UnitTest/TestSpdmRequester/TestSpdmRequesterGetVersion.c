@@ -21,8 +21,8 @@ typedef struct {
 
 RETURN_STATUS
 EFIAPI
-SpdmRequesterGetVersionTestSendRequest (
-  IN     SPDM_IO_PROTOCOL        *This,
+SpdmRequesterGetVersionTestSendMessage (
+  IN     UINT32                  *SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
   IN     UINT64                  Timeout
@@ -30,7 +30,7 @@ SpdmRequesterGetVersionTestSendRequest (
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
 
-  SpdmTestContext = SPDM_TEST_CONTEXT_FROM_SPDM_PROTOCOL(This);
+  SpdmTestContext = GetSpdmTestContext ();
   switch (SpdmTestContext->CaseId) {
   case 0x1:
     return RETURN_DEVICE_ERROR;
@@ -57,8 +57,8 @@ SpdmRequesterGetVersionTestSendRequest (
 
 RETURN_STATUS
 EFIAPI
-SpdmRequesterGetVersionTestReceiveResponse (
-  IN     SPDM_IO_PROTOCOL        *This,
+SpdmRequesterGetVersionTestReceiveMessage (
+     OUT UINT32                  **SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,
   IN     UINT64                  Timeout
@@ -66,7 +66,9 @@ SpdmRequesterGetVersionTestReceiveResponse (
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
 
-  SpdmTestContext = SPDM_TEST_CONTEXT_FROM_SPDM_PROTOCOL(This);
+  *SessionId = NULL;
+
+  SpdmTestContext = GetSpdmTestContext ();
   switch (SpdmTestContext->CaseId) {
   case 0x1:
     return RETURN_DEVICE_ERROR;
@@ -254,32 +256,6 @@ SpdmRequesterGetVersionTestReceiveResponse (
   }
 }
 
-RETURN_STATUS
-EFIAPI
-SpdmRequesterGetVersionTestSecureSendRequest (
-  IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT32                                 SessionId,
-  IN     UINTN                                  RequestSize,
-  IN     VOID                                   *Request,
-  IN     UINT64                                 Timeout
-  )
-{
-  return RETURN_UNSUPPORTED;
-}
-
-RETURN_STATUS
-EFIAPI
-SpdmRequesterGetVersionTestSecureReceiveResponse (
-  IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT32                                 SessionId,
-  IN OUT UINTN                                  *ResponseSize,
-  IN OUT VOID                                   *Response,
-  IN     UINT64                                 Timeout
-  )
-{
-  return RETURN_UNSUPPORTED;
-}
-
 void TestSpdmRequesterGetVersionCase1(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -437,14 +413,8 @@ void TestSpdmRequesterGetVersionCase9(void **state) {
 SPDM_TEST_CONTEXT       mSpdmRequesterGetVersionTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
-  {
-    SpdmRequesterGetVersionTestSendRequest,
-    SpdmRequesterGetVersionTestReceiveResponse,
-    SpdmRequesterGetVersionTestSecureSendRequest,
-    SpdmRequesterGetVersionTestSecureReceiveResponse,
-    SpdmIoSecureMessagingTypeDmtfMtcp,
-    sizeof(UINT32)
-  },
+  SpdmRequesterGetVersionTestSendMessage,
+  SpdmRequesterGetVersionTestReceiveMessage,
 };
 
 int SpdmRequesterGetVersionTestMain(void) {

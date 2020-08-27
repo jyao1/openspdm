@@ -93,113 +93,6 @@ SpdmGetResponseSessionFuncViaLastRequest (
 }
 
 RETURN_STATUS
-SpdmDecReceiveRequest (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT32                  SessionId,
-  IN     UINTN                   RequestSize,
-  IN     VOID                    *Request,
-  IN OUT UINTN                   *DecRequestSize,
-     OUT VOID                    *DecRequest
-  )
-{
-  UINTN                          PlainTextSize;
-  UINTN                          CipherTextSize;
-  UINTN                          AeadBlockSize;
-  UINTN                          AeadTagSize;
-  UINT8                          *AData;
-  UINT8                          *EncMsg;
-  UINT8                          *DecMsg;
-  UINT8                          *Tag;
-  MCTP_MESSAGE_PLAINTEXT_HEADER  *RecordHeader;
-  MCTP_MESSAGE_CIPHERTEXT_HEADER *EncMsgHeader;
-  AEAD_DECRYPT                   AeadDecFunc;
-  BOOLEAN                        Result;
-  VOID                           *Key;
-  UINT8                          Salt[MAX_AEAD_IV_SIZE];
-  SPDM_SESSION_INFO              *SessionInfo;
-
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return RETURN_UNSUPPORTED;
-  }
-  
-  switch (SessionInfo->SessionState) {
-  case SpdmStateHandshaking:
-    Key = SessionInfo->HandshakeSecret.RequestHandshakeEncryptionKey;
-    CopyMem (Salt, SessionInfo->HandshakeSecret.RequestHandshakeSalt, SessionInfo->AeadIvSize);
-    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber;
-    SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber ++;
-    break;
-  case SpdmStateEstablished:
-    Key = SessionInfo->ApplicationSecret.RequestDataEncryptionKey;
-    CopyMem (Salt, SessionInfo->ApplicationSecret.RequestDataSalt, SessionInfo->AeadIvSize);
-    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ApplicationSecret.RequestDataSequenceNumber;
-    SessionInfo->ApplicationSecret.RequestDataSequenceNumber ++;
-    break;
-  default:
-    ASSERT(FALSE);
-    return RETURN_UNSUPPORTED;
-    break;
-  }
-  
-  AeadDecFunc = GetSpdmAeadDecFunc (SpdmContext);
-  AeadBlockSize = GetSpdmAeadBlockSize (SpdmContext);
-  AeadTagSize = GetSpdmAeadTagSize (SpdmContext);
-
-  if (RequestSize < sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) + AeadBlockSize + AeadTagSize) {
-    return RETURN_DEVICE_ERROR;
-  }
-  RecordHeader = (VOID *)Request;
-  if (RecordHeader->SessionId != SessionId) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (RecordHeader->Length != RequestSize) {
-    return RETURN_DEVICE_ERROR;
-  }
-  CipherTextSize = (RequestSize - sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) - AeadTagSize) / AeadBlockSize * AeadBlockSize;
-  RequestSize = CipherTextSize + sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) + AeadTagSize;
-  EncMsgHeader = (VOID *)(RecordHeader + 1);
-  AData = (UINT8 *)RecordHeader;
-  EncMsg = (UINT8 *)EncMsgHeader;
-  DecMsg = (UINT8 *)EncMsgHeader;
-  Tag = (UINT8 *)Request + RequestSize - AeadTagSize;
-  Result = AeadDecFunc (
-             Key,
-             SessionInfo->AeadKeySize,
-             Salt,
-             SessionInfo->AeadIvSize,
-             (UINT8 *)AData,
-             sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER),
-             EncMsg,
-             CipherTextSize,
-             Tag,
-             AeadTagSize,
-             DecMsg,
-             &CipherTextSize
-             );
-  if (!Result) {
-    return RETURN_DEVICE_ERROR;
-  }
-  PlainTextSize = EncMsgHeader->TrueLength;
-  if (PlainTextSize > CipherTextSize) {
-    return RETURN_DEVICE_ERROR;      
-  }
-  if (EncMsgHeader->EncapsulatedMessageType.MessageType != MCTP_MESSAGE_TYPE_SPDM) {
-    return RETURN_DEVICE_ERROR;
-  }
-
-  if (*DecRequestSize < PlainTextSize) {
-    *DecRequestSize = PlainTextSize;
-    return RETURN_BUFFER_TOO_SMALL;
-  }
-  *DecRequestSize = PlainTextSize;
-  CopyMem (DecRequest, EncMsgHeader + 1, PlainTextSize);
-
-  return RETURN_SUCCESS;
-}
-
-RETURN_STATUS
 SpdmReceiveRequestSession (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
   IN     UINT32                  SessionId,
@@ -208,10 +101,7 @@ SpdmReceiveRequestSession (
   )
 {
   RETURN_STATUS             Status;
-  UINTN                     DecRequestSize;
-  UINT8                     DecRequest[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_SESSION_INFO         *SessionInfo;
-  SPDM_MESSAGE_HEADER       *SpdmRequest;
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
@@ -232,35 +122,15 @@ SpdmReceiveRequestSession (
 
   DEBUG((DEBUG_INFO, "SpdmReceiveRequestSession[%x] ...\n", SessionId));
 
-  SpdmRequest = (VOID *)SpdmContext->LastSpdmRequest;
-  SpdmContext->LastSpdmRequestSize = 0;
-  ZeroMem (SpdmContext->LastSpdmRequest, sizeof(SpdmContext->LastSpdmRequest));
-
-  switch (SessionInfo->SessionState) {
-  case SpdmStateHandshaking:
-  case SpdmStateEstablished:
-  
-    ASSERT (SpdmContext->SecureMessageType == SpdmIoSecureMessagingTypeDmtfMtcp);
-
-    DecRequestSize = sizeof(DecRequest);
-    ZeroMem (DecRequest, sizeof(DecRequest));
-    Status = SpdmDecReceiveRequest (SpdmContext, SessionId, RequestSize, Request, &DecRequestSize, DecRequest);
-    if (RETURN_ERROR(Status)) {
-      DEBUG ((DEBUG_ERROR, "SpdmDecReceiveRequest - %p\n", Status));
-      return Status;
-    }
-    SpdmContext->LastSpdmRequestSize = DecRequestSize;
-    CopyMem (SpdmRequest, DecRequest, DecRequestSize);
-
-    DEBUG((DEBUG_INFO, "SpdmReceiveRequestSession[%x] (0x%x): \n", SessionId, SpdmContext->LastSpdmRequestSize));
-    InternalDumpHex ((UINT8 *)SpdmContext->LastSpdmRequest, SpdmContext->LastSpdmRequestSize);
-
-    break;
-  default:
-    ASSERT (FALSE);
-    return RETURN_OUT_OF_RESOURCES;
-    break;
+  SpdmContext->LastSpdmRequestSize = sizeof(SpdmContext->LastSpdmRequest);
+  Status = SpdmDecodeRequest (SpdmContext, &SessionId, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
+  if (RETURN_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "SpdmDecodeRequest : %p\n", Status));
+    return Status;
   }
+
+  DEBUG((DEBUG_INFO, "SpdmReceiveRequestSession[%x] (0x%x): \n", SessionId, SpdmContext->LastSpdmRequestSize));
+  InternalDumpHex ((UINT8 *)SpdmContext->LastSpdmRequest, SpdmContext->LastSpdmRequestSize);
 
   return RETURN_SUCCESS;
 }
@@ -272,7 +142,7 @@ SpdmReceiveRequest (
   IN     VOID                    *Request
   )
 {
-  SPDM_MESSAGE_HEADER       *SpdmRequest;
+  RETURN_STATUS             Status;
 
   if (Request == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -281,119 +151,17 @@ SpdmReceiveRequest (
     return RETURN_INVALID_PARAMETER;
   }
 
-  if (SpdmContext->Alignment > 1) {
-    ASSERT ((RequestSize & (SpdmContext->Alignment - 1)) == 0);
+  SpdmContext->LastSpdmRequestSize = sizeof(SpdmContext->LastSpdmRequest);
+  Status = SpdmDecodeRequest (SpdmContext, NULL, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
+  if (RETURN_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "SpdmDecodeRequest : %p\n", Status));
+    return Status;
   }
 
-  DEBUG((DEBUG_INFO, "SpdmReceiveRequest (0x%x): \n", RequestSize));
-  InternalDumpHex (Request, RequestSize);
+  DEBUG((DEBUG_INFO, "SpdmReceiveRequest (0x%x): \n", SpdmContext->LastSpdmRequestSize));
+  InternalDumpHex (SpdmContext->LastSpdmRequest, SpdmContext->LastSpdmRequestSize);
 
-  SpdmRequest = (VOID *)SpdmContext->LastSpdmRequest;
-  SpdmContext->LastSpdmRequestSize = RequestSize;
-  CopyMem (SpdmRequest, Request, RequestSize);
-
-  return RETURN_SUCCESS;
-}
-
-RETURN_STATUS
-SpdmEncSendResponse (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT32                  SessionId,
-  IN     UINTN                   ResponseSize,
-  IN     VOID                    *Response,
-  IN OUT UINTN                   *EncResponseSize,
-     OUT VOID                    *EncResponse
-  )
-{
-  UINT8                          *WrappedResponse;
-  UINTN                          WrappedResponseSize;
-  UINTN                          PlainTextSize;
-  UINTN                          CipherTextSize;
-  UINTN                          AeadBlockSize;
-  UINTN                          AeadTagSize;
-  UINT8                          *AData;
-  UINT8                          *EncMsg;
-  UINT8                          *DecMsg;
-  UINT8                          *Tag;
-  MCTP_MESSAGE_PLAINTEXT_HEADER  *RecordHeader;
-  MCTP_MESSAGE_CIPHERTEXT_HEADER *EncMsgHeader;
-  AEAD_ENCRYPT                   AeadEncFunc;
-  BOOLEAN                        Result;
-  VOID                           *Key;
-  UINT8                          Salt[MAX_AEAD_IV_SIZE];
-  SPDM_SESSION_INFO              *SessionInfo;
-  
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return RETURN_UNSUPPORTED;
-  }
-  
-  switch (SessionInfo->SessionState) {
-  case SpdmStateHandshaking:
-    Key = SessionInfo->HandshakeSecret.ResponseHandshakeEncryptionKey;
-    CopyMem (Salt, SessionInfo->HandshakeSecret.ResponseHandshakeSalt, SessionInfo->AeadIvSize);
-    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber;
-    SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber ++;
-    break;
-  case SpdmStateEstablished:
-    Key = SessionInfo->ApplicationSecret.ResponseDataEncryptionKey;
-    CopyMem (Salt, SessionInfo->ApplicationSecret.ResponseDataSalt, SessionInfo->AeadIvSize);
-    *(UINT64 *)Salt = *(UINT64 *)Salt ^ SessionInfo->ApplicationSecret.ResponseDataSequenceNumber;
-    SessionInfo->ApplicationSecret.ResponseDataSequenceNumber ++;
-    break;
-  default:
-    ASSERT(FALSE);
-    return RETURN_UNSUPPORTED;
-    break;
-  }
-    
-  AeadEncFunc = GetSpdmAeadEncFunc (SpdmContext);
-  AeadBlockSize = GetSpdmAeadBlockSize (SpdmContext);
-  AeadTagSize = GetSpdmAeadTagSize (SpdmContext);
-  PlainTextSize = sizeof(MCTP_MESSAGE_CIPHERTEXT_HEADER) + ResponseSize;
-  CipherTextSize = (PlainTextSize + AeadBlockSize - 1) / AeadBlockSize * AeadBlockSize;
-  WrappedResponseSize = sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) + CipherTextSize + AeadTagSize;
-  if ((SpdmContext->Alignment > 1) && 
-      ((WrappedResponseSize & (SpdmContext->Alignment - 1)) != 0)) {
-    WrappedResponseSize = (WrappedResponseSize + (SpdmContext->Alignment - 1)) & ~(SpdmContext->Alignment - 1);
-  }
-
-  if (*EncResponseSize < WrappedResponseSize) {
-    *EncResponseSize = WrappedResponseSize;
-    return RETURN_BUFFER_TOO_SMALL;
-  }
-  *EncResponseSize = WrappedResponseSize;
-  WrappedResponse = EncResponse;
-  RecordHeader = (VOID *)WrappedResponse;
-  RecordHeader->SessionId = SessionId;
-  RecordHeader->Length = (UINT16)WrappedResponseSize;
-  EncMsgHeader = (VOID *)(RecordHeader + 1);
-  EncMsgHeader->TrueLength = (UINT16)ResponseSize;
-  EncMsgHeader->EncapsulatedMessageType.MessageType = MCTP_MESSAGE_TYPE_SPDM;
-  CopyMem (EncMsgHeader + 1, Response, ResponseSize);
-  AData = (UINT8 *)RecordHeader;
-  EncMsg = (UINT8 *)EncMsgHeader;
-  DecMsg = (UINT8 *)EncMsgHeader;
-  Tag = WrappedResponse + sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) + CipherTextSize;
-  Result = AeadEncFunc (
-             Key,
-             SessionInfo->AeadKeySize,
-             Salt,
-             SessionInfo->AeadIvSize,
-             (UINT8 *)AData,
-             sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER),
-             DecMsg,
-             CipherTextSize,
-             Tag,
-             AeadTagSize,
-             EncMsg,
-             &CipherTextSize
-             );
-  if (!Result) {
-    return RETURN_OUT_OF_RESOURCES;
-  }
-  return RETURN_SUCCESS;
+  return Status;
 }
 
 RETURN_STATUS
@@ -406,8 +174,6 @@ SpdmSendResponseSession (
 {
   UINT8                             MyResponse[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                             MyResponseSize;
-  UINTN                             EncResponseSize;
-  UINT8                             EncResponse[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   RETURN_STATUS                     Status;
   SPDM_GET_RESPONSE_SESSION_FUNC    GetResponseSessionFunc;
   SPDM_SESSION_INFO                 *SessionInfo;
@@ -455,32 +221,10 @@ SpdmSendResponseSession (
   DEBUG((DEBUG_INFO, "SpdmSendResponseSession[%x] (0x%x): \n", SessionId, MyResponseSize));
   InternalDumpHex (MyResponse, MyResponseSize);
 
-  switch (SessionInfo->SessionState) {
-  case SpdmStateHandshaking:
-  case SpdmStateEstablished:
-  
-    ASSERT (SpdmContext->SecureMessageType == SpdmIoSecureMessagingTypeDmtfMtcp);
-
-    EncResponseSize = sizeof(EncResponse);
-    ZeroMem (EncResponse, sizeof(EncResponse));
-    Status = SpdmEncSendResponse (SpdmContext, SessionId, MyResponseSize, MyResponse, &EncResponseSize, EncResponse);
-    if (RETURN_ERROR(Status)) {
-      DEBUG ((DEBUG_ERROR, "SpdmEncSendResponse - %p\n", Status));
-      return Status;
-    }
-
-    if (*ResponseSize < EncResponseSize) {
-      CopyMem (Response, EncResponse, *ResponseSize);
-      *ResponseSize = EncResponseSize;
-      return RETURN_BUFFER_TOO_SMALL;
-    }  
-    CopyMem (Response, EncResponse, EncResponseSize);
-    *ResponseSize = EncResponseSize;
-    break;
-  default:
-    ASSERT (FALSE);
-    return RETURN_OUT_OF_RESOURCES;
-    break;
+  Status = SpdmEncodeResponse (SpdmContext, &SessionId, MyResponseSize, MyResponse, ResponseSize, Response);
+  if (RETURN_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "SpdmEncodeResponse : %p\n", Status));
+    return Status;
   }
 
   SpdmResponse = (VOID *)MyResponse;
@@ -545,17 +289,11 @@ SpdmSendResponse (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SpdmRequest->RequestResponseCode, &MyResponseSize, MyResponse);
   }
 
-  if (SpdmContext->Alignment > 1) {
-    MyResponseSize = (MyResponseSize + (SpdmContext->Alignment - 1)) & ~(SpdmContext->Alignment - 1);
+  Status = SpdmEncodeResponse (SpdmContext, NULL, MyResponseSize, MyResponse, ResponseSize, Response);
+  if (RETURN_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "SpdmEncodeResponse : %p\n", Status));
+    return Status;
   }
-
-  if (*ResponseSize < MyResponseSize) {
-    CopyMem (Response, MyResponse, *ResponseSize);
-    *ResponseSize = MyResponseSize;
-    return RETURN_BUFFER_TOO_SMALL;
-  }  
-  CopyMem (Response, MyResponse, MyResponseSize);
-  *ResponseSize = MyResponseSize;
 
   DEBUG((DEBUG_INFO, "SpdmSendResponse (0x%x): \n", *ResponseSize));
   InternalDumpHex (Response, *ResponseSize);

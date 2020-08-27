@@ -56,137 +56,37 @@ CommunicatePlatformData (
 }
 
 /**
-  Send a SPDM request command to a device.
+  Send a SPDM message to a device.
+
+  For requester, the message is an SPDM request.
+  For responder, the message is an SPDM response.
 
   @param  This                         Indicates a pointer to the calling context.
-  @param  RequestSize                  Size in bytes of the request data buffer.
-  @param  Request                      A pointer to a destination buffer to store the request.
+  @param  SessionId                    The SessionId of a SPDM message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secure message.
+  @param  MessageSize                  Size in bytes of the message data buffer.
+  @param  Message                      A pointer to a destination buffer to store the message.
                                        The caller is responsible for having
                                        either implicit or explicit ownership of the buffer.
   @param  Timeout                      The timeout, in 100ns units, to use for the execution
-                                       of the request. A Timeout value of 0
+                                       of the message. A Timeout value of 0
                                        means that this function will wait indefinitely for the
-                                       request to execute. If Timeout is greater
+                                       message to execute. If Timeout is greater
                                        than zero, then this function will return RETURN_TIMEOUT if the
-                                       time required to execute the request is greater
+                                       time required to execute the message is greater
                                        than Timeout.
                                        
-  @retval RETURN_SUCCESS                  The SPDM request is sent successfully.
-  @retval RETURN_DEVICE_ERROR             A device error occurs when the SPDM request is sent to the device.
-  @retval RETURN_INVALID_PARAMETER        The Request is NULL or the RequestSize is zero.
-  @retval RETURN_TIMEOUT                  A timeout occurred while waiting for the SPDM request
-                                          to execute.
+  @retval RETURN_SUCCESS               The SPDM message is sent successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is sent to the device.
+  @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
+  @retval RETURN_TIMEOUT               A timeout occurred while waiting for the SPDM message
+                                       to execute.
 **/
 RETURN_STATUS
 EFIAPI
-SpdmClientSendRequest (
-  IN     SPDM_IO_PROTOCOL        *This,
-  IN     UINTN                   RequestSize,
-  IN     VOID                    *Request,
-  IN     UINT64                  Timeout
-  )
-{
-  BOOLEAN Result;
-
-  Result = SendPlatformData (mSocket, SOCKET_SPDM_COMMAND_NORMAL, 0, Request, (UINT32)RequestSize);
-  if (!Result) {
-    printf ("SendPlatformData Error - %x\n",
-#ifdef _MSC_VER
-      WSAGetLastError()
-#else
-      errno
-#endif
-      );
-    return RETURN_DEVICE_ERROR;
-  }
-  return RETURN_SUCCESS;
-}
-
-/**
-  Receive a SPDM response from a device.
-
-  @param  This                         Indicates a pointer to the calling context.
-  @param  ResponseSize                 Size in bytes of the response data buffer.
-  @param  Response                     A pointer to a destination buffer to store the response.
-                                       The caller is responsible for having
-                                       either implicit or explicit ownership of the buffer.
-  @param  Timeout                      The timeout, in 100ns units, to use for the execution
-                                       of the response. A Timeout value of 0
-                                       means that this function will wait indefinitely for the
-                                       response to execute. If Timeout is greater
-                                       than zero, then this function will return RETURN_TIMEOUT if the
-                                       time required to execute the response is greater
-                                       than Timeout.
-                                       
-  @retval RETURN_SUCCESS                  The SPDM response is received successfully.
-  @retval RETURN_DEVICE_ERROR             A device error occurs when the SPDM response is received from the device.
-  @retval RETURN_INVALID_PARAMETER        The Reponse is NULL, ResponseSize is NULL or
-                                          the *RequestSize is zero.
-  @retval RETURN_TIMEOUT                  A timeout occurred while waiting for the SPDM response
-                                          to execute.
-**/
-RETURN_STATUS
-EFIAPI
-SpdmClientReceiveResponse (
-  IN     SPDM_IO_PROTOCOL        *This,
-  IN OUT UINTN                   *ResponseSize,
-  IN OUT VOID                    *Response,
-  IN     UINT64                  Timeout
-  )
-{
-  BOOLEAN Result;
-  UINT32  Command;
-  UINT32  Session;
-
-  Result = ReceivePlatformData (mSocket, &Command, &Session, Response, ResponseSize);
-  if (!Result) {
-    printf ("ReceivePlatformData Error - %x\n",
-#ifdef _MSC_VER
-      WSAGetLastError()
-#else
-      errno
-#endif
-      );
-    return RETURN_DEVICE_ERROR;
-  }
-  if (Command != SOCKET_SPDM_COMMAND_NORMAL) {
-    printf ("ReceivePlatformData Command Error - %x\n", Command);
-    return RETURN_DEVICE_ERROR;
-  }
-  return RETURN_SUCCESS;
-}
-
-/**
-  Send a SPDM request command to a device.
-
-  The request is a data blob to send to the messaging device directly,
-  including session ID, length, encrypted message and MAC.
-  The caller need use GetSecureMessagingType() to decide the format of the message.
-
-  @param  This                         Indicates a pointer to the calling context.
-  @param  RequestSize                  Size in bytes of the request data buffer.
-  @param  Request                      A pointer to a destination buffer to store the request.
-                                       The caller is responsible for having
-                                       either implicit or explicit ownership of the buffer.
-  @param  Timeout                      The timeout, in 100ns units, to use for the execution
-                                       of the request. A Timeout value of 0
-                                       means that this function will wait indefinitely for the
-                                       request to execute. If Timeout is greater
-                                       than zero, then this function will return RETURN_TIMEOUT if the
-                                       time required to execute the request is greater
-                                       than Timeout.
-                                       
-  @retval RETURN_SUCCESS                  The SPDM request is sent successfully.
-  @retval RETURN_DEVICE_ERROR             A device error occurs when the SPDM request is sent to the device.
-  @retval RETURN_INVALID_PARAMETER        The Request is NULL or the RequestSize is zero.
-  @retval RETURN_TIMEOUT                  A timeout occurred while waiting for the SPDM request
-                                          to execute.
-**/
-RETURN_STATUS
-EFIAPI
-SpdmClientSecureSendRequest (
-  IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT32                                 SessionId,
+SpdmDeviceSendMessage (
+  IN     UINT32                                 *SessionId,
   IN     UINTN                                  RequestSize,
   IN     VOID                                   *Request,
   IN     UINT64                                 Timeout
@@ -194,7 +94,11 @@ SpdmClientSecureSendRequest (
 {
   BOOLEAN Result;
 
-  Result = SendPlatformData (mSocket, SOCKET_SPDM_COMMAND_SECURE, SessionId, Request, (UINT32)RequestSize);
+  if (SessionId == NULL) {
+    Result = SendPlatformData (mSocket, SOCKET_SPDM_COMMAND_NORMAL, 0, Request, (UINT32)RequestSize);
+  } else {
+    Result = SendPlatformData (mSocket, SOCKET_SPDM_COMMAND_SECURE, *SessionId, Request, (UINT32)RequestSize);
+  }
   if (!Result) {
     printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -209,37 +113,38 @@ SpdmClientSecureSendRequest (
 }
 
 /**
-  Receive a SPDM response from a device.
+  Receive a SPDM message from a device.
 
-  The response is a data blob received from the messaging device directly,
-  including session ID, length, encrypted message and MAC.
-  The caller need use GetSecureMessagingType() to decide the format of the message.
+  For requester, the message is an SPDM response.
+  For responder, the message is an SPDM request.
 
   @param  This                         Indicates a pointer to the calling context.
-  @param  ResponseSize                 Size in bytes of the response data buffer.
-  @param  Response                     A pointer to a destination buffer to store the response.
+  @param  SessionId                    The SessionId of a SPDM message.
+                                       If *SessionId is NULL, it is a normal message.
+                                       If *SessionId is NOT NULL, it is a secure message.
+  @param  MessageSize                  Size in bytes of the message data buffer.
+  @param  Message                      A pointer to a destination buffer to store the message.
                                        The caller is responsible for having
                                        either implicit or explicit ownership of the buffer.
   @param  Timeout                      The timeout, in 100ns units, to use for the execution
-                                       of the response. A Timeout value of 0
+                                       of the message. A Timeout value of 0
                                        means that this function will wait indefinitely for the
-                                       response to execute. If Timeout is greater
+                                       message to execute. If Timeout is greater
                                        than zero, then this function will return RETURN_TIMEOUT if the
-                                       time required to execute the response is greater
+                                       time required to execute the message is greater
                                        than Timeout.
                                        
-  @retval RETURN_SUCCESS                  The SPDM response is received successfully.
-  @retval RETURN_DEVICE_ERROR             A device error occurs when the SPDM response is received from the device.
-  @retval RETURN_INVALID_PARAMETER        The Reponse is NULL, ResponseSize is NULL or
-                                          the *RequestSize is zero.
-  @retval RETURN_TIMEOUT                  A timeout occurred while waiting for the SPDM response
-                                          to execute.
+  @retval RETURN_SUCCESS               The SPDM message is received successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is received from the device.
+  @retval RETURN_INVALID_PARAMETER     The Message is NULL, MessageSize is NULL or
+                                       the *MessageSize is zero.
+  @retval RETURN_TIMEOUT               A timeout occurred while waiting for the SPDM message
+                                       to execute.
 **/
 RETURN_STATUS
 EFIAPI
-SpdmClientSecureReceiveResponse (
-  IN     SPDM_IO_PROTOCOL                       *This,
-  IN     UINT32                                 SessionId,
+SpdmDeviceReceiveMessage (
+     OUT UINT32                                 **SessionId,
   IN OUT UINTN                                  *ResponseSize,
   IN OUT VOID                                   *Response,
   IN     UINT64                                 Timeout
@@ -260,25 +165,13 @@ SpdmClientSecureReceiveResponse (
       );
     return RETURN_DEVICE_ERROR;
   }
-  if (Session != SessionId) {
-    printf ("ReceivePlatformData Command Error - %x\n", Command);
-    return RETURN_DEVICE_ERROR;
-  }
-  if (Command != SOCKET_SPDM_COMMAND_SECURE) {
-    printf ("ReceivePlatformData Command Error - %x\n", Command);
-    return RETURN_DEVICE_ERROR;
+  if (Command == SOCKET_SPDM_COMMAND_NORMAL) {
+    *SessionId = NULL;
+  } else {
+    *SessionId = &Session;
   }
   return RETURN_SUCCESS;
 }
-
-SPDM_IO_PROTOCOL       mSpdmProtocol = {
-  SpdmClientSendRequest,
-  SpdmClientReceiveResponse,
-  SpdmClientSecureSendRequest,
-  SpdmClientSecureReceiveResponse,
-  SpdmIoSecureMessagingTypeDmtfMtcp,
-  sizeof(UINT32)
-};
 
 VOID
 SpdmClientInit (
@@ -304,7 +197,6 @@ SpdmClientInit (
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
-  SpdmRegisterSpdmIo (SpdmContext, &mSpdmProtocol);
 
   Res = ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {

@@ -49,6 +49,12 @@ SpdmRegisterGetResponseSessionFunc (
 
 RETURN_STATUS
 EFIAPI
+SpdmResponderDispatchMessage (
+  IN     VOID                 *SpdmContext
+  );
+
+RETURN_STATUS
+EFIAPI
 SpdmReceiveSendData (
   IN     VOID                 *SpdmContext,
   IN     VOID                 *RequestBuffer,

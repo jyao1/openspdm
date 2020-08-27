@@ -174,14 +174,6 @@ void TestSpdmResponderCapabilityCase6(void **state) {
 SPDM_TEST_CONTEXT       mSpdmResponderCapabilityTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   FALSE,
-  {
-    NULL, // SpdmClientSendRequest,
-    NULL, // SpdmClientReceiveResponse,
-    NULL, // SpdmClientSecureSendRequest,
-    NULL, // SpdmClientSecureReceiveResponse,
-    SpdmIoSecureMessagingTypeDmtfMtcp,
-    sizeof(UINT32)
-  },
 };
 
 int SpdmResponderCapabilityTestMain(void) {
