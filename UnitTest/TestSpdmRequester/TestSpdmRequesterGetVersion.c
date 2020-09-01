@@ -22,6 +22,7 @@ typedef struct {
 RETURN_STATUS
 EFIAPI
 SpdmRequesterGetVersionTestSendMessage (
+  IN     VOID                    *SpdmContext,
   IN     UINT32                  *SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
@@ -58,6 +59,7 @@ SpdmRequesterGetVersionTestSendMessage (
 RETURN_STATUS
 EFIAPI
 SpdmRequesterGetVersionTestReceiveMessage (
+  IN     VOID                    *SpdmContext,
      OUT UINT32                  **SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,

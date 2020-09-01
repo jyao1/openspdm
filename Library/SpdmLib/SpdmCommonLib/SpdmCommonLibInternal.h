@@ -297,7 +297,9 @@ typedef struct {
   //
   // IO information
   //
-  UINT32                          Alignment;
+  SPDM_DEVICE_SEND_MESSAGE_FUNC     SendMessage;
+  SPDM_DEVICE_RECEIVE_MESSAGE_FUNC  ReceiveMessage;
+  UINT32                            Alignment;
   
   //
   // Command Status

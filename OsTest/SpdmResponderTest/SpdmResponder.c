@@ -143,6 +143,7 @@ SpdmGetResponseVendorDefinedRequest (
 RETURN_STATUS
 EFIAPI
 SpdmDeviceSendMessage (
+  IN     VOID                                   *SpdmContext,
   IN     UINT32                                 *SessionId,
   IN     UINTN                                  RequestSize,
   IN     VOID                                   *Request,
@@ -201,6 +202,7 @@ SpdmDeviceSendMessage (
 RETURN_STATUS
 EFIAPI
 SpdmDeviceReceiveMessage (
+  IN     VOID                                   *SpdmContext,
      OUT UINT32                                 **SessionId,
   IN OUT UINTN                                  *ResponseSize,
   IN OUT VOID                                   *Response,
@@ -265,6 +267,8 @@ SpdmServerInit (
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
+  SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
+  SpdmSetAlignment (SpdmContext, 1);
 
   Res = ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
   if (Res) {

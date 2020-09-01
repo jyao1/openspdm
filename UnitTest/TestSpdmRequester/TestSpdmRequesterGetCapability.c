@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 EFIAPI
 SpdmRequesterGetCapabilityTestSendMessage (
+  IN     VOID                    *SpdmContext,
   IN     UINT32                  *SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
@@ -51,6 +52,7 @@ SpdmRequesterGetCapabilityTestSendMessage (
 RETURN_STATUS
 EFIAPI
 SpdmRequesterGetCapabilityTestReceiveMessage (
+  IN     VOID                    *SpdmContext,
      OUT UINT32                  **SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,

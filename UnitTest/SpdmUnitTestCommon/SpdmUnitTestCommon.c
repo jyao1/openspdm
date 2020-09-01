@@ -11,36 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 SPDM_TEST_CONTEXT             *mSpdmTestContext;
 
-RETURN_STATUS
-EFIAPI
-SpdmDeviceSendMessage (
-  IN     UINT32                  *SessionId,
-  IN     UINTN                   RequestSize,
-  IN     VOID                    *Request,
-  IN     UINT64                  Timeout
-  )
-{
-  if (mSpdmTestContext->SpdmDeviceSendMessage == NULL) {
-    return RETURN_UNSUPPORTED;
-  }
-  return mSpdmTestContext->SpdmDeviceSendMessage (SessionId, RequestSize, Request, Timeout);
-}
-
-RETURN_STATUS
-EFIAPI
-SpdmDeviceReceiveMessage (
-     OUT UINT32                  **SessionId,
-  IN OUT UINTN                   *ResponseSize,
-  IN OUT VOID                    *Response,
-  IN     UINT64                  Timeout
-  )
-{
-  if (mSpdmTestContext->SpdmDeviceReceiveMessage == NULL) {
-    return RETURN_UNSUPPORTED;
-  }
-  return mSpdmTestContext->SpdmDeviceReceiveMessage (SessionId, ResponseSize, Response, Timeout);
-}
-
 SPDM_TEST_CONTEXT *
 GetSpdmTestContext (
   VOID
@@ -54,7 +24,7 @@ SetupSpdmTestContext (
   IN SPDM_TEST_CONTEXT             *SpdmTestContext
   )
 {
-  mSpdmTestContext          = SpdmTestContext;
+  mSpdmTestContext = SpdmTestContext;
 }
 
 int SpdmUnitTestGroupSetup(void **state)
@@ -67,6 +37,7 @@ int SpdmUnitTestGroupSetup(void **state)
   SpdmTestContext->CaseId = 0xFFFFFFFF;
 
   SpdmInitContext (SpdmContext);
+  SpdmRegisterDeviceIoFunc (SpdmContext, SpdmTestContext->SendMessage, SpdmTestContext->ReceiveMessage);
 
   *state = SpdmTestContext;
   return 0;

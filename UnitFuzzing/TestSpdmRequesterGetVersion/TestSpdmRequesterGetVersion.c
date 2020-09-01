@@ -23,6 +23,7 @@ GetMaxBufferSize (
 RETURN_STATUS
 EFIAPI
 SpdmDeviceSendMessage (
+  IN     VOID                    *SpdmContext,
   IN     UINT32                  *SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
@@ -35,6 +36,7 @@ SpdmDeviceSendMessage (
 RETURN_STATUS
 EFIAPI
 SpdmDeviceReceiveMessage (
+  IN     VOID                    *SpdmContext,
      OUT UINT32                  **SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,
@@ -69,6 +71,8 @@ VOID TestSpdmRequesterGetVersion (VOID **State) {
 SPDM_TEST_CONTEXT       mSpdmRequesterGetVersionTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
+  SpdmDeviceSendMessage,
+  SpdmDeviceReceiveMessage,
 };
 
 VOID

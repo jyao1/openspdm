@@ -26,11 +26,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPDM_TEST_CONTEXT_SIGNATURE  SIGNATURE_32 ('S', 'T', 'C', 'S')
 
 typedef struct {
-  UINT32                 Signature;
-  BOOLEAN                IsRequester;
-  SPDM_DEVICE_CONTEXT    SpdmContext;
-  VOID                   *TestBuffer;
-  UINTN                  TestBufferSize;
+  UINT32                            Signature;
+  BOOLEAN                           IsRequester;
+  SPDM_DEVICE_SEND_MESSAGE_FUNC     SendMessage;
+  SPDM_DEVICE_RECEIVE_MESSAGE_FUNC  ReceiveMessage;
+  SPDM_DEVICE_CONTEXT               SpdmContext;
+  VOID                              *TestBuffer;
+  UINTN                             TestBufferSize;
 } SPDM_TEST_CONTEXT;
 
 #define SPDM_TEST_CONTEXT_FROM_SPDM_PROTOCOL(a)  BASE_CR (a, SPDM_TEST_CONTEXT, SpdmProtocol)

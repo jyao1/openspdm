@@ -31,7 +31,7 @@ SpdmSendRequestSession (
     return Status;
   }
 
-  Status = SpdmDeviceSendMessage (&SessionId, MessageSize, Message, 0);
+  Status = SpdmContext->SendMessage (SpdmContext, &SessionId, MessageSize, Message, 0);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmSendRequestSession[%x] Status - %p\n", SessionId, Status));
   }
@@ -77,7 +77,7 @@ SpdmSendRequest (
     return Status;
   }
 
-  Status = SpdmDeviceSendMessage (NULL, MessageSize, Message, 0);
+  Status = SpdmContext->SendMessage (SpdmContext, NULL, MessageSize, Message, 0);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmSendRequest Status - %p\n", Status));
   }
@@ -102,7 +102,7 @@ SpdmReceiveResponseSession (
 
   MessageSize = sizeof(Message);
   MessageSessionId = NULL;
-  Status = SpdmDeviceReceiveMessage (&MessageSessionId, &MessageSize, Message, 0);
+  Status = SpdmContext->ReceiveMessage (SpdmContext, &MessageSessionId, &MessageSize, Message, 0);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] Status - %p\n", SessionId, Status));
     return Status;
@@ -160,7 +160,7 @@ SpdmReceiveResponse (
 
   MessageSize = sizeof(Message);
   MessageSessionId = NULL;
-  Status = SpdmDeviceReceiveMessage (&MessageSessionId, &MessageSize, Message, 0);
+  Status = SpdmContext->ReceiveMessage (SpdmContext, &MessageSessionId, &MessageSize, Message, 0);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmDeviceReceiveMessage Status - %p\n", Status));    
     return Status;

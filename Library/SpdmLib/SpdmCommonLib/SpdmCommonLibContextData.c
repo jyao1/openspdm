@@ -217,12 +217,6 @@ SpdmSetData (
   SpdmContext = Context;
 
   switch (DataType) {
-  case SpdmDataIoSizeAlignment:
-    if (DataSize != sizeof(UINT32)) {
-      return RETURN_INVALID_PARAMETER;
-    }
-    SpdmContext->Alignment = *(UINT32 *)Data;
-    break;
   case SpdmDataCapabilityFlags:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
@@ -505,6 +499,22 @@ SpdmRegisterDataSignFunc (
   return RETURN_SUCCESS;
 }
 
+RETURN_STATUS
+EFIAPI
+SpdmRegisterDeviceIoFunc (
+  IN     VOID                              *Context,
+  IN     SPDM_DEVICE_SEND_MESSAGE_FUNC     SendMessage,
+  IN     SPDM_DEVICE_RECEIVE_MESSAGE_FUNC  ReceiveMessage
+  )
+{
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+
+  SpdmContext = Context;
+  SpdmContext->SendMessage = SendMessage;
+  SpdmContext->ReceiveMessage = ReceiveMessage;
+  return RETURN_SUCCESS;
+}
+
 UINT32
 EFIAPI
 SpdmGetLastError (
@@ -515,6 +525,20 @@ SpdmGetLastError (
 
   SpdmContext = Context;
   return SpdmContext->ErrorState;
+}
+
+RETURN_STATUS
+EFIAPI
+SpdmSetAlignment (
+  IN     VOID                      *Context,
+  IN     UINT32                    Alignment
+  )
+{
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+
+  SpdmContext = Context;
+  SpdmContext->Alignment = Alignment;
+  return RETURN_SUCCESS;
 }
 
 UINT32

@@ -46,12 +46,12 @@ RETURN_STATUS
   );
 
 typedef struct {
-  UINT32                        Signature;
-  BOOLEAN                       IsRequester;
-  SPDM_DEVICE_SEND_MESSAGE      SpdmDeviceSendMessage;
-  SPDM_DEVICE_RECEIVE_MESSAGE   SpdmDeviceReceiveMessage;
-  SPDM_DEVICE_CONTEXT           SpdmContext;
-  UINT32                        CaseId;
+  UINT32                            Signature;
+  BOOLEAN                           IsRequester;
+  SPDM_DEVICE_SEND_MESSAGE_FUNC     SendMessage;
+  SPDM_DEVICE_RECEIVE_MESSAGE_FUNC  ReceiveMessage;
+  SPDM_DEVICE_CONTEXT               SpdmContext;
+  UINT32                            CaseId;
 } SPDM_TEST_CONTEXT;
 
 #define SPDM_TEST_CONTEXT_FROM_SPDM_PROTOCOL(a)  BASE_CR (a, SPDM_TEST_CONTEXT, SpdmProtocol)

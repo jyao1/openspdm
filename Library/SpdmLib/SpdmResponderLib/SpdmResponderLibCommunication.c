@@ -83,7 +83,7 @@ SpdmResponderDispatchMessage (
 
   RequestSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   MessageSessionId = NULL;
-  Status = SpdmDeviceReceiveMessage (&MessageSessionId, &RequestSize, Request, 0);
+  Status = SpdmContext->ReceiveMessage (SpdmContext, &MessageSessionId, &RequestSize, Request, 0);
   if (!RETURN_ERROR(Status)) {
     ResponseSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
     if (MessageSessionId == NULL) {
@@ -95,7 +95,7 @@ SpdmResponderDispatchMessage (
       Status = SpdmReceiveSendSessionData (SpdmContext, SessionId, Request, RequestSize, Response, &ResponseSize);
     }
     if (!RETURN_ERROR(Status)) {
-      Status = SpdmDeviceSendMessage (MessageSessionId, ResponseSize, Response, 0);
+      Status = SpdmContext->SendMessage (SpdmContext, MessageSessionId, ResponseSize, Response, 0);
     }
   }
 
