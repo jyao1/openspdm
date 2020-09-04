@@ -75,6 +75,10 @@ INC =  \
     -I$(WORKSPACE)/Library/SpdmLib/SpdmResponderLib \
     -I$(WORKSPACE)/UnitFuzzing/SpdmUnitFuzzingCommon \
 
+ifeq ("$(TOOLCHAIN)", "KLEE")
+	INC+=-I$(KLEE_SRC_PATH)/include
+endif
+
 #
 # Overridable Target Macro Definitions
 #
@@ -139,9 +143,12 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/SpdmRequesterLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmResponderLib/SpdmResponderLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmEncodingLib/SpdmEncodingLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/UnitTest/CmockaLib/CmockaLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
+ifeq ("$(TOOLCHAIN)", "KLEE")
+	$(DLINK) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS)	
+else
 	$(DLINK) $(DLINK_FLAGS) $(DLINK_SPATH) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS2)
+endif
 
 #
 # clean all intermediate files

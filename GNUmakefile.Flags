@@ -29,6 +29,10 @@ else ifeq ("$(TOOLCHAIN)","CLANG")
     $(info TOOLCHAIN=CLANG)
 else ifeq ("$(TOOLCHAIN)","CBMC")
     $(info TOOLCHAIN=CBMC)
+else ifeq ("$(TOOLCHAIN)","AFL")
+    $(info TOOLCHAIN=AFL)
+else ifeq ("$(TOOLCHAIN)","KLEE")
+    $(info TOOLCHAIN=KLEE)
 else
     $(error unknown TOOLCHAIN)
 endif
@@ -95,6 +99,20 @@ else ifeq ("$(TOOLCHAIN)","GCC")
     DLINK_FLAGS2 = -Wno-error -no-pie
     DLINK_FLAGS += --coverage -lgcov -fprofile-arcs -ftest-coverage
 
+else ifeq ("$(TOOLCHAIN)","AFL")
+    CC = afl-gcc
+    CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare
+    MBEDTLS_FLAGS = 
+    OPENSSL_FLAGS = -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable
+    CMOCKA_FLAGS = -std=gnu99 -Wpedantic -Wall -Wshadow -Wmissing-prototypes -Wcast-align -Werror=address -Wstrict-prototypes -Werror=strict-prototypes -Wwrite-strings -Werror=write-strings -Werror-implicit-function-declaration -Wpointer-arith -Werror=pointer-arith -Wdeclaration-after-statement -Werror=declaration-after-statement -Wreturn-type -Werror=return-type -Wuninitialized -Werror=uninitialized -Werror=strict-overflow -Wstrict-overflow=2 -Wno-format-zero-length -Wmissing-field-initializers -Wformat-security -Werror=format-security -fno-common -Wformat -fno-common -fstack-protector-strong
+  
+    SLINK = gcc-ar
+
+    DLINK = gcc
+    DLINK_OBJECT_FILES = -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group
+    DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
+    DLINK_FLAGS2 = -Wno-error -no-pie
+
 else ifeq ("$(TOOLCHAIN)","CLANG")
     CC = clang
     CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall  -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector  -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch 
@@ -108,6 +126,20 @@ else ifeq ("$(TOOLCHAIN)","CLANG")
     DLINK_OBJECT_FILES = -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group
     DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
     DLINK_FLAGS2 = -Wno-error -no-pie
+	
+else ifeq ("$(TOOLCHAIN)","KLEE")
+    CC = clang
+    CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall  -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector  -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -emit-llvm -DTEST_WITH_KLEE=TRUE 
+    MBEDTLS_FLAGS = 
+    OPENSSL_FLAGS = -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable
+    CMOCKA_FLAGS = -std=gnu99 -Wpedantic -Wall -Wshadow -Wmissing-prototypes -Wcast-align -Werror=address -Wstrict-prototypes -Werror=strict-prototypes -Wwrite-strings -Werror=write-strings -Werror-implicit-function-declaration -Wpointer-arith -Werror=pointer-arith -Wdeclaration-after-statement -Werror=declaration-after-statement -Wreturn-type -Werror=return-type -Wuninitialized -Werror=uninitialized -Werror=strict-overflow -Wstrict-overflow=2 -Wno-format-zero-length -Wmissing-field-initializers -Wformat-security -Werror=format-security -fno-common -Wformat -fno-common -fstack-protector-strong
+
+    SLINK = llvm-ar
+
+    DLINK = llvm-link
+	DLINK_OBJECT_FILES = $(STATIC_LIBRARY_OBJECT_FILES)
+    DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME)
+	
 endif
 
 ifeq ("$(ARCH)","X64")
