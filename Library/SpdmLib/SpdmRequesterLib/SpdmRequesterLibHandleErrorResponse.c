@@ -48,7 +48,8 @@ SpdmRequesterRespondIfReady (
   if (((SPDM_MESSAGE_HEADER*)Response)->RequestResponseCode != ExpectResponseCode) {
     return RETURN_DEVICE_ERROR;
   }
-  if (*ResponseSize != ExpectResponseSize) {
+  // For response like SPDM_ALGORITHMS, we just can expect the max response size
+  if (*ResponseSize > ExpectResponseSize) {
     return RETURN_DEVICE_ERROR;
   }
   return RETURN_SUCCESS;

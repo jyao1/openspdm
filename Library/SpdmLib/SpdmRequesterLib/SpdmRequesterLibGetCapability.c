@@ -96,10 +96,10 @@ SpdmGetCapabilities (
      OUT UINT32               *ResponderFlags
   )
 {
-  int retry = SpdmContext->RetryTimes;
+  UINTN Retry = SpdmContext->RetryTimes;
   RETURN_STATUS Status;
 
-  while(retry--) {
+  while(Retry-- != 0) {
     Status = TrySpdmGetCapabilities(SpdmContext, RequesterCTExponent, RequesterFlags, ResponderCTExponent, ResponderFlags);
     if (RETURN_NO_RESPONSE != Status)
       return Status;

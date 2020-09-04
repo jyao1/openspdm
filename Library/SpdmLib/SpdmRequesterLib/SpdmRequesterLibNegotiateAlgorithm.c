@@ -46,8 +46,7 @@ typedef struct {
   The negotiated data can be get via GetData.
 */
 RETURN_STATUS
-EFIAPI
-SpdmNegotiateAlgorithms (
+TrySpdmNegotiateAlgorithms (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
 {
@@ -100,7 +99,7 @@ SpdmNegotiateAlgorithms (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, SpdmRequest.Length);
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
@@ -108,13 +107,18 @@ SpdmNegotiateAlgorithms (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageA, SpdmRequest.Length, &SpdmResponseSize, &SpdmResponse, SPDM_NEGOTIATE_ALGORITHMS, SPDM_ALGORITHMS, sizeof(SPDM_ALGORITHMS_RESPONSE_MAX));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_ALGORITHMS) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_ALGORITHMS_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_ALGORITHMS) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize < sizeof(SPDM_ALGORITHMS_RESPONSE) + 
@@ -190,3 +194,22 @@ SpdmNegotiateAlgorithms (
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }
+
+RETURN_STATUS
+EFIAPI
+SpdmNegotiateAlgorithms (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
+  )
+{
+  UINTN Retry = SpdmContext->RetryTimes;
+  RETURN_STATUS Status;
+
+  while(Retry-- != 0) {
+    Status = TrySpdmNegotiateAlgorithms(SpdmContext);
+    if (RETURN_NO_RESPONSE != Status)
+      return Status;
+  }
+
+  return Status;
+}
+

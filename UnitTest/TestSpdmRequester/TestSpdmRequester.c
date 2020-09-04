@@ -12,12 +12,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 int SpdmRequesterGetVersionTestMain (void);
 int SpdmRequesterGetCapabilityTestMain (void);
-
+int SpdmRequesterNegotiateAlgorithmTestMain (void);
 
 int main(void) {
   SpdmRequesterGetVersionTestMain();
 
   SpdmRequesterGetCapabilityTestMain();
+
+  SpdmRequesterNegotiateAlgorithmTestMain();
 
   return 0;
 }
