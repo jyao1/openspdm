@@ -61,6 +61,9 @@ SpdmGetResponseAlgorithm (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
+  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
+  }
   SpdmRequestSize = sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) + 
                     sizeof(UINT32) * SpdmRequest->ExtAsymCount +
                     sizeof(UINT32) * SpdmRequest->ExtHashCount +

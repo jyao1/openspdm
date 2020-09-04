@@ -115,10 +115,10 @@ SpdmGetVersion (
      OUT VOID                 *VersionNumberEntries
   )
 {
-  int retry = SpdmContext->RetryTimes;
+  UINTN Retry = SpdmContext->RetryTimes;
   RETURN_STATUS Status;
 
-  while(retry--) {
+  while(Retry-- != 0) {
     Status = TrySpdmGetVersion(SpdmContext, VersionCount, VersionNumberEntries);
     if (RETURN_NO_RESPONSE != Status)
       return Status;
