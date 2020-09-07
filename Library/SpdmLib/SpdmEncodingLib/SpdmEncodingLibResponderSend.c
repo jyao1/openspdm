@@ -19,30 +19,33 @@ SpdmEncryptResponse (
      OUT VOID                 *EncResponse
   )
 {
-  UINT8                          *WrappedResponse;
-  UINTN                          WrappedResponseSize;
-  UINTN                          PlainTextSize;
-  UINTN                          CipherTextSize;
-  UINTN                          AeadBlockSize;
-  UINTN                          AeadTagSize;
-  UINT8                          *AData;
-  UINT8                          *EncMsg;
-  UINT8                          *DecMsg;
-  UINT8                          *Tag;
-  MCTP_MESSAGE_PLAINTEXT_HEADER  *RecordHeader;
-  MCTP_MESSAGE_CIPHERTEXT_HEADER *EncMsgHeader;
-  AEAD_ENCRYPT                   AeadEncFunc;
-  BOOLEAN                        Result;
-  VOID                           *Key;
-  UINT8                          Salt[MAX_AEAD_IV_SIZE];
-  SPDM_SESSION_INFO              *SessionInfo;
-  UINT32                         Alignment;
+  UINTN                             TotalResponseSize;
+  UINTN                             PlainTextSize;
+  UINTN                             CipherTextSize;
+  UINTN                             AeadBlockSize;
+  UINTN                             AeadTagSize;
+  UINT8                             *AData;
+  UINT8                             *EncMsg;
+  UINT8                             *DecMsg;
+  UINT8                             *Tag;
+  SPDM_SECURE_MESSAGE_ADATA_HEADER  *RecordHeader;
+  SPDM_SECURE_MESSAGE_CIPHER_HEADER *EncMsgHeader;
+  AEAD_ENCRYPT                      AeadEncFunc;
+  BOOLEAN                           Result;
+  VOID                              *Key;
+  UINT8                             Salt[MAX_AEAD_IV_SIZE];
+  SPDM_SESSION_INFO                 *SessionInfo;
+  UINT32                            Alignment;
+  SPDM_SESSION_TYPE                 SessionType;
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     ASSERT (FALSE);
     return RETURN_UNSUPPORTED;
   }
+
+  SessionType = SpdmGetSessionType (SpdmContext);
+  ASSERT ((SessionType == SpdmSessionTypeMacOnly) || (SessionType == SpdmSessionTypeEncMac));
 
   Alignment = SpdmGetAlignment (SpdmContext);
 
@@ -68,46 +71,82 @@ SpdmEncryptResponse (
   AeadEncFunc = GetSpdmAeadEncFunc (SpdmContext);
   AeadBlockSize = GetSpdmAeadBlockSize (SpdmContext);
   AeadTagSize = GetSpdmAeadTagSize (SpdmContext);
-  PlainTextSize = sizeof(MCTP_MESSAGE_CIPHERTEXT_HEADER) + ResponseSize;
-  CipherTextSize = (PlainTextSize + AeadBlockSize - 1) / AeadBlockSize * AeadBlockSize;
-  WrappedResponseSize = sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) + CipherTextSize + AeadTagSize;
-  if ((Alignment > 1) && 
-      ((WrappedResponseSize & (Alignment - 1)) != 0)) {
-    WrappedResponseSize = (WrappedResponseSize + (Alignment - 1)) & ~(Alignment - 1);
-  }
 
-  ASSERT (*EncResponseSize >= WrappedResponseSize);
-  if (*EncResponseSize < WrappedResponseSize) {
-    *EncResponseSize = WrappedResponseSize;
-    return RETURN_BUFFER_TOO_SMALL;
+  if (SessionType == SpdmSessionTypeEncMac) {
+    PlainTextSize = sizeof(SPDM_SECURE_MESSAGE_CIPHER_HEADER) + ResponseSize;
+    CipherTextSize = (PlainTextSize + AeadBlockSize - 1) / AeadBlockSize * AeadBlockSize;
+    TotalResponseSize = sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + CipherTextSize + AeadTagSize;
+    if ((Alignment > 1) && 
+        ((TotalResponseSize & (Alignment - 1)) != 0)) {
+      TotalResponseSize = (TotalResponseSize + (Alignment - 1)) & ~(Alignment - 1);
+    }
+
+    ASSERT (*EncResponseSize >= TotalResponseSize);
+    if (*EncResponseSize < TotalResponseSize) {
+      *EncResponseSize = TotalResponseSize;
+      return RETURN_BUFFER_TOO_SMALL;
+    }
+    *EncResponseSize = TotalResponseSize;
+    RecordHeader = (VOID *)EncResponse;
+    RecordHeader->SessionId = SessionId;
+    RecordHeader->Length = (UINT16)(CipherTextSize + AeadTagSize);
+    EncMsgHeader = (VOID *)(RecordHeader + 1);
+    EncMsgHeader->TrueLength = (UINT16)ResponseSize;
+    CopyMem (EncMsgHeader + 1, Response, ResponseSize);
+    AData = (UINT8 *)RecordHeader;
+    EncMsg = (UINT8 *)EncMsgHeader;
+    DecMsg = (UINT8 *)EncMsgHeader;
+    Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + CipherTextSize;
+
+    Result = AeadEncFunc (
+              Key,
+              SessionInfo->AeadKeySize,
+              Salt,
+              SessionInfo->AeadIvSize,
+              (UINT8 *)AData,
+              sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER),
+              DecMsg,
+              CipherTextSize,
+              Tag,
+              AeadTagSize,
+              EncMsg,
+              &CipherTextSize
+              );
+  } else { // SessionType == SpdmSessionTypeMacOnly
+    TotalResponseSize = sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + ResponseSize + AeadTagSize;
+    if ((Alignment > 1) && 
+        ((TotalResponseSize & (Alignment - 1)) != 0)) {
+      TotalResponseSize = (TotalResponseSize + (Alignment - 1)) & ~(Alignment - 1);
+    }
+
+    ASSERT (*EncResponseSize >= TotalResponseSize);
+    if (*EncResponseSize < TotalResponseSize) {
+      *EncResponseSize = TotalResponseSize;
+      return RETURN_BUFFER_TOO_SMALL;
+    }
+    *EncResponseSize = TotalResponseSize;
+    RecordHeader = (VOID *)EncResponse;
+    RecordHeader->SessionId = SessionId;
+    RecordHeader->Length = (UINT16)(ResponseSize + AeadTagSize);
+    CopyMem (RecordHeader + 1, Response, ResponseSize);
+    AData = (UINT8 *)RecordHeader;
+    Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + ResponseSize;
+
+    Result = AeadEncFunc (
+              Key,
+              SessionInfo->AeadKeySize,
+              Salt,
+              SessionInfo->AeadIvSize,
+              (UINT8 *)AData,
+              sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + ResponseSize,
+              NULL,
+              0,
+              Tag,
+              AeadTagSize,
+              NULL,
+              NULL
+              );
   }
-  *EncResponseSize = WrappedResponseSize;
-  WrappedResponse = EncResponse;
-  RecordHeader = (VOID *)WrappedResponse;
-  RecordHeader->SessionId = SessionId;
-  RecordHeader->Length = (UINT16)WrappedResponseSize;
-  EncMsgHeader = (VOID *)(RecordHeader + 1);
-  EncMsgHeader->TrueLength = (UINT16)ResponseSize;
-  EncMsgHeader->EncapsulatedMessageType.MessageType = MCTP_MESSAGE_TYPE_SPDM;
-  CopyMem (EncMsgHeader + 1, Response, ResponseSize);
-  AData = (UINT8 *)RecordHeader;
-  EncMsg = (UINT8 *)EncMsgHeader;
-  DecMsg = (UINT8 *)EncMsgHeader;
-  Tag = WrappedResponse + sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER) + CipherTextSize;
-  Result = AeadEncFunc (
-             Key,
-             SessionInfo->AeadKeySize,
-             Salt,
-             SessionInfo->AeadIvSize,
-             (UINT8 *)AData,
-             sizeof(MCTP_MESSAGE_PLAINTEXT_HEADER),
-             DecMsg,
-             CipherTextSize,
-             Tag,
-             AeadTagSize,
-             EncMsg,
-             &CipherTextSize
-             );
   if (!Result) {
     return RETURN_OUT_OF_RESOURCES;
   }

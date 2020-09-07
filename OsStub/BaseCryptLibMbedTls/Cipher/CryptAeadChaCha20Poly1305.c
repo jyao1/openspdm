@@ -71,8 +71,10 @@ AeadChaCha20Poly1305Encrypt(
   if (TagSize != 16) {
     return FALSE;
   }
-  if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
-    return FALSE;
+  if (DataOutSize != NULL) {
+    if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
+      return FALSE;
+    }
   }
 
   mbedtls_chachapoly_init (&ctx);
@@ -88,7 +90,9 @@ AeadChaCha20Poly1305Encrypt(
   if (Ret != 0) {
     return FALSE;
   }
-  *DataOutSize = DataInSize;
+  if (DataOutSize != NULL) {
+    *DataOutSize = DataInSize;
+  }
 
   return TRUE;
 }
@@ -153,8 +157,10 @@ AeadChaCha20Poly1305Decrypt(
   if (TagSize != 16) {
     return FALSE;
   }
-  if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
-    return FALSE;
+  if (DataOutSize != NULL) {
+    if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
+      return FALSE;
+    }
   }
 
   mbedtls_chachapoly_init (&ctx);
@@ -170,7 +176,9 @@ AeadChaCha20Poly1305Decrypt(
   if (Ret != 0) {
     return FALSE;
   }
-  *DataOutSize = DataInSize;
+  if (DataOutSize != NULL) {
+    *DataOutSize = DataInSize;
+  }
 
   return TRUE;
 }

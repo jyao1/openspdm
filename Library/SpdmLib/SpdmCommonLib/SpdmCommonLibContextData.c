@@ -553,6 +553,28 @@ SpdmGetAlignment (
   return SpdmContext->Alignment;
 }
 
+SPDM_SESSION_TYPE
+EFIAPI
+SpdmGetSessionType (
+  IN     VOID                      *Context
+  )
+{
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+
+  SpdmContext = Context;
+  switch (SpdmContext->ConnectionInfo.Capability.Flags &
+          (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP)) {
+  case 0:
+    return SpdmSessionTypeNone;
+  case (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP) :
+    return SpdmSessionTypeEncMac;
+  case SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP :
+    return SpdmSessionTypeMacOnly;
+  default:
+    return SpdmSessionTypeMax;
+  }
+}
+
 RETURN_STATUS
 EFIAPI
 SpdmInitContext (

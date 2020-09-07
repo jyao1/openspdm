@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/SpdmEncodingLib.h>
 
-#include <IndustryStandard/SpdmMctp.h>
+#include <IndustryStandard/SpdmSecureMessage.h>
 #include "SpdmCommonLibInternal.h"
 
 #endif

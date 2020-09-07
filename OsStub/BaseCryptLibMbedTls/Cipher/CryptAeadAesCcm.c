@@ -77,8 +77,10 @@ AeadAesCcmEncrypt (
     (TagSize != 12) && (TagSize != 14) && (TagSize != 16)) {
     return FALSE;
   }
-  if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
-    return FALSE;
+  if (DataOutSize != NULL) {
+    if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
+      return FALSE;
+    }
   }
 
   mbedtls_ccm_init (&ctx);
@@ -95,7 +97,9 @@ AeadAesCcmEncrypt (
   if (Ret != 0) {
     return FALSE;
   }
-  *DataOutSize = DataInSize;
+  if (DataOutSize != NULL) {
+    *DataOutSize = DataInSize;
+  }
 
   return TRUE;
 }
@@ -166,8 +170,10 @@ AeadAesCcmDecrypt (
     (TagSize != 12) && (TagSize != 14) && (TagSize != 16)) {
     return FALSE;
   }
-  if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
-    return FALSE;
+  if (DataOutSize != NULL) {
+    if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
+      return FALSE;
+    }
   }
 
   mbedtls_ccm_init (&ctx);
@@ -184,7 +190,9 @@ AeadAesCcmDecrypt (
   if (Ret != 0) {
     return FALSE;
   }
-  *DataOutSize = DataInSize;
+  if (DataOutSize != NULL) {
+    *DataOutSize = DataInSize;
+  }
 
   return TRUE;
 }

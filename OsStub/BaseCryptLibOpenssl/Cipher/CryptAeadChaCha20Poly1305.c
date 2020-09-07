@@ -73,8 +73,10 @@ AeadChaCha20Poly1305Encrypt(
   if (TagSize != 16) {
     return FALSE;
   }
-  if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
-    return FALSE;
+  if (DataOutSize != NULL) {
+    if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
+      return FALSE;
+    }
   }
 
   Ctx = EVP_CIPHER_CTX_new();
@@ -102,17 +104,16 @@ AeadChaCha20Poly1305Encrypt(
     goto Done;
   }
 
-  RetValue = (BOOLEAN) EVP_EncryptUpdate(Ctx, NULL, (INT32*)DataOutSize, AData, (INT32)ADataSize);
+  RetValue = (BOOLEAN) EVP_EncryptUpdate(Ctx, NULL, (INT32*)&TempOutSize, AData, (INT32)ADataSize);
   if (!RetValue) {
     goto Done;
   }
 
-  RetValue = (BOOLEAN) EVP_EncryptUpdate(Ctx, DataOut, (INT32*)DataOutSize, DataIn, (INT32)DataInSize);
+  RetValue = (BOOLEAN) EVP_EncryptUpdate(Ctx, DataOut, (INT32*)&TempOutSize, DataIn, (INT32)DataInSize);
   if (!RetValue) {
     goto Done;
   }
 
-  TempOutSize = *DataOutSize;
   RetValue = (BOOLEAN) EVP_EncryptFinal_ex(Ctx, DataOut, (INT32*)&TempOutSize);
   if (!RetValue) {
     goto Done;
@@ -122,6 +123,13 @@ AeadChaCha20Poly1305Encrypt(
 
 Done:
   EVP_CIPHER_CTX_free(Ctx);
+  if (!RetValue) {
+    return RetValue;
+  }
+
+  if (DataOutSize != NULL) {
+    *DataOutSize = DataInSize;
+  }
 
   return RetValue;
 }
@@ -169,6 +177,7 @@ AeadChaCha20Poly1305Decrypt(
   )
 {
   EVP_CIPHER_CTX* Ctx;
+  UINTN           TempOutSize;
   BOOLEAN         RetValue;
 
   if (DataInSize > INT_MAX) {
@@ -186,8 +195,10 @@ AeadChaCha20Poly1305Decrypt(
   if (TagSize != 16) {
     return FALSE;
   }
-  if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
-    return FALSE;
+  if (DataOutSize != NULL) {
+    if ((*DataOutSize > INT_MAX) || (*DataOutSize < DataInSize)) {
+      return FALSE;
+    }
   }
 
   Ctx = EVP_CIPHER_CTX_new();
@@ -215,15 +226,27 @@ AeadChaCha20Poly1305Decrypt(
     goto Done;
   }
 
-  RetValue = (BOOLEAN) EVP_DecryptUpdate(Ctx, NULL, (INT32*)DataOutSize, AData, (INT32)ADataSize);
+  RetValue = (BOOLEAN) EVP_DecryptUpdate(Ctx, NULL, (INT32*)&TempOutSize, AData, (INT32)ADataSize);
   if (!RetValue) {
     goto Done;
   }
 
-  RetValue = (BOOLEAN)EVP_DecryptUpdate(Ctx, DataOut, (INT32*)DataOutSize, DataIn, (INT32)DataInSize);
+  RetValue = (BOOLEAN)EVP_DecryptUpdate(Ctx, DataOut, (INT32*)&TempOutSize, DataIn, (INT32)DataInSize);
+  if (!RetValue) {
+    goto Done;
+  }
+
+  RetValue = (BOOLEAN) EVP_DecryptFinal_ex(Ctx, DataOut, (INT32 *)&TempOutSize);
 
 Done:
   EVP_CIPHER_CTX_free(Ctx);
+  if (!RetValue) {
+    return RetValue;
+  }
+
+  if (DataOutSize != NULL) {
+    *DataOutSize = DataInSize;
+  }
 
   return RetValue;
 }

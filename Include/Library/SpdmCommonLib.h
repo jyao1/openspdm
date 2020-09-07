@@ -163,6 +163,13 @@ typedef struct {
   UINT8                AdditionalData[4];
 } SPDM_DATA_PARAMETER;
 
+typedef enum {
+  SpdmSessionTypeNone,
+  SpdmSessionTypeMacOnly,
+  SpdmSessionTypeEncMac,
+  SpdmSessionTypeMax,
+} SPDM_SESSION_TYPE;
+
 /**
   Set a SPDM Session Data.
 
@@ -231,6 +238,12 @@ SpdmSetAlignment (
 UINT32
 EFIAPI
 SpdmGetAlignment (
+  IN     VOID                      *SpdmContext
+  );
+
+SPDM_SESSION_TYPE
+EFIAPI
+SpdmGetSessionType (
   IN     VOID                      *SpdmContext
   );
 
