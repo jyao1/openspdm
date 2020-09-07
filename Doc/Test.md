@@ -8,22 +8,51 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
 1) [cmake](https://cmake.org/) for Windows and Linux.
 
-### Code Coverage Tool
+## Run Test
 
-1) [DynamoRIO](https://dynamorio.org/) for Windows
+### Collect Code Coverage
+
+1) Code Coverage in Windows with [DynamoRIO](https://dynamorio.org/)
 
    Download and install [DynamoRIO 8.0.0](https://github.com/DynamoRIO/dynamorio/wiki/Downloads).
    Then `set DRIO_PATH=<DynameRIO_PATH>`
 
    Install Perl [ActivePerl 5.26](https://www.activestate.com/products/perl/downloads/).
 
-2) [lcov](http://ltp.sourceforge.net/coverage/lcov.php) for Linux
+   Build cases.
+   Goto openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>. mkdir log and cd log.
+
+   Run all tests and generate log file :
+   `%DRIO_PATH%\<bin64|bin32>\drrun.exe -c %DRIO_PATH%\tools\<lib64|lib32>\release\drcov.dll -- <test_app>`
+   
+   Generate coverage data with filter :
+   `%DRIO_PATH%\tools\<bin64|bin32>\drcov2lcov.exe -dir . -src_filter openspdm`
+   
+   Generate coverage report :
+   `perl %DRIO_PATH%\tools\<bin64|bin32>\genhtml coverage.info`
+
+   The final report is index.html.
+
+2) Code Coverage in Linux with GCC and [lcov](http://ltp.sourceforge.net/coverage/lcov.php).
 
    Install lcov `sudo apt-get install lcov`.
 
-### Fuzzing Tool
+   Build cases.
+   Goto openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>. mkdir log and cd log.
 
-1) [AFL](https://lcamtuf.coredump.cx/afl/) for Linux
+   Run all tests.
+
+   Collect coverage data :
+   `lcov --capture --directory <openspdm_root_dir> --output-file coverage.info`
+
+   Collect coverage report :
+   `genhtml coverage.info --output-directory .`
+
+   The final report is index.html.
+
+### Run Fuzzing
+
+1) Fuzzing in Linux with [AFL](https://lcamtuf.coredump.cx/afl/)
 
    Download and install [AFL](http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz).
    Unzip and follow docs\QuickStartGuide.txt.
@@ -43,7 +72,19 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
    Known issue: Above command cannot run in Windows Linux Subsystem.
 
-2) [winafl](https://github.com/googleprojectzero/winafl) for Windows
+   Build cases with AFL toolchain:
+   `make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> TOOLCHAIN=AFL CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
+
+   Run cases:
+   ```
+   mkdir testcase_dir
+   mkdir /dev/shm/findings_dir
+   cp <seed> testcase_dir
+   afl-fuzz -i testcase_dir -o /dev/shm/findings_dir <test_app> @@
+   ```
+   Note: /dev/shm is tmpfs.
+
+2) Fuzzing in Windows with [winafl](https://github.com/googleprojectzero/winafl)
 
    Clone [winafl](https://github.com/googleprojectzero/winafl).
    Download [DynamoRIO](https://dynamorio.org/).
@@ -64,7 +105,19 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
    Copy all binary under [build32|build64]/bin/Release to [bin32|bin64]. `robocopy /E /is /it [build32|build64]/bin/Release [bin32|bin64]`.
 
-### Symbolic Execution Tool
+   Build cases with VS2019 toolchain. (non AFL toolchain in Windows)
+
+   Run cases:
+   ```
+   cp <test_app> winafl\<bin64|bin32>
+   cp <test_app_pdb> winaft\<bin64|bin32>
+   cd winaft\<bin64|bin32>
+   afl-fuzz.exe -i in -o out -D %DRIO_PATH%\<bin64|bin32> -t 20000 -- -coverage_module <test_app> -fuzz_iterations 1000 -target_module <test_app> -target_method main -nargs 2 -- <test_app> @@
+   ```
+
+3) Fuzzing with LLVM [LibFuzzer](https://llvm.org/docs/LibFuzzer.html)  (TBD)
+
+### Run Symbolic Execution
 
 1) [KLEE](https://klee.github.io/)
 
@@ -98,94 +151,28 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
    export PATH=$KLEE_BIN_PATH:$PATH
    ```
 
-### Model Checker Tool
-
-1) [CBMC](http://www.cprover.org/cbmc/)
-
-   Install [CBMC tool](http://www.cprover.org/cprover-manual/). For Windows, unzip [cbmc-5-10-win](http://www.cprover.org/cbmc/download/cbmc-5-10-win.zip). For Linux, unzip [cbmc-5-11-linux-64](http://www.cprover.org/cbmc/download/cbmc-5-11-linux-64.tgz). Ensure CBMC executable directory is in PATH environment variable.
-
-## Run Test
-
-### Collect Code Coverage
-
-1) Code Coverage in Windows with [DynamoRIO](https://dynamorio.org/)
-
-   Goto openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>. mkdir log and cd log.
-
-   Run all tests and generate log file :
-   `%DRIO_PATH%\<bin64|bin32>\drrun.exe -c %DRIO_PATH%\tools\<lib64|lib32>\release\drcov.dll -- <test_app>`
-   
-   Generate coverage data with filter :
-   `%DRIO_PATH%\tools\<bin64|bin32>\drcov2lcov.exe -dir . -src_filter openspdm`
-   
-   Generate coverage report :
-   `perl %DRIO_PATH%\tools\<bin64|bin32>\genhtml coverage.info`
-
-   The final report is index.html.
-
-2) Code Coverage in Linux with GCC and [lcov](http://ltp.sourceforge.net/coverage/lcov.php).
-
-   Goto openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>. mkdir log and cd log.
-
-   Run all tests.
-
-   Collect coverage data :
-   `lcov --capture --directory <openspdm_root_dir> --output-file coverage.info`
-
-   Collect coverage report :
-   `genhtml coverage.info --output-directory .`
-
-   The final report is index.html.
-
-### Run Fuzzing
-
-1) Fuzzing in Linux with [AFL](https://lcamtuf.coredump.cx/afl/)
-
-   Build cases with AFL toolchain:
-   `make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> TOOLCHAIN=AFL CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
-
-   Run cases:
-   ```
-   mkdir testcase_dir
-   mkdir /dev/shm/findings_dir
-   cp <seed> testcase_dir
-   afl-fuzz -i testcase_dir -o /dev/shm/findings_dir <test_app> @@
-   ```
-   Note: /dev/shm is tmpfs.
-
-2) Fuzzing in Windows with [AFL](https://lcamtuf.coredump.cx/afl/)
-
-   Build cases with VS2019 toolchain. (non AFL toolchain in Windows)
-
-   Run cases:
-   ```
-   cp <test_app> winafl\<bin64|bin32>
-   cp <test_app_pdb> winaft\<bin64|bin32>
-   cd winaft\<bin64|bin32>
-   afl-fuzz.exe -i in -o out -D %DRIO_PATH%\<bin64|bin32> -t 20000 -- -coverage_module <test_app> -fuzz_iterations 1000 -target_module <test_app> -target_method main -nargs 2 -- <test_app> @@
-   ```
-
-3) Fuzzing with LLVM [LibFuzzer](https://llvm.org/docs/LibFuzzer.html)  (TBD)
-
-### Run Symbolic Execution
-
-   Use [KLEE](http://klee.github.io/tutorials) as an example.
-
    Build cases in Linux with KLEE toolchain. (KLEE does not support Windows)
    `make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> TOOLCHAIN=KLEE CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
 
-   Use KLEE to [generate ktest](https://klee.github.io/tutorials/testing-coreutils/):
+   Use [KLEE](http://klee.github.io/tutorials) to [generate ktest](https://klee.github.io/tutorials/testing-coreutils/):
    `klee --only-output-states-covering-new <test_app>`
 
    Transfer .ktest to seed file, which can be used for AFL-fuzzer. (TBD)
 
 ### Run Model Checker
 
-   Use [CBMC](http://www.cprover.org/cbmc/) as an example.
+1) [CBMC](http://www.cprover.org/cbmc/)
+
+   Install [CBMC tool](http://www.cprover.org/cprover-manual/).
+   For Windows, unzip [cbmc-5-10-win](http://www.cprover.org/cbmc/download/cbmc-5-10-win.zip).
+   For Linux, unzip [cbmc-5-11-linux-64](http://www.cprover.org/cbmc/download/cbmc-5-11-linux-64.tgz).
+   Ensure CBMC executable directory is in PATH environment variable.
+
+   Build cases with CBMC toolchain:
 
    For Windowns, open visual studio 2019 command prompt at openspdm dir and type `make ARCH=Ia32 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 only)
 
-   For Linux, open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=X64 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`.
+   For Linux, open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=X64 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`. (ARCH=X64 only)
 
    The output binary is created by the [goto-cc](https://github.com/diffblue/cbmc/blob/develop/doc/cprover-manual/goto-cc.md).
 
@@ -199,7 +186,7 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
 ### Run Static Analysis
 
-   Use [Klocwork](https://www.perforce.com/products/klocwork) as an example in windows.
+1) Use [Klocwork](https://www.perforce.com/products/klocwork) in windows as an example.
 
    Install Klocwork and set environment.
    ```
