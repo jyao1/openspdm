@@ -4,6 +4,10 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
 ## Prerequisit
 
+### Build Tool
+
+1) [cmake](https://cmake.org/) for Windows and Linux.
+
 ### Code Coverage Tool
 
 1) [DynamoRIO](https://dynamorio.org/) for Windows
@@ -21,23 +25,78 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
 1) [AFL](https://lcamtuf.coredump.cx/afl/) for Linux
 
-   Download and install [AFL](http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz). Unzip and build it with `make`. Ensure AFL binary is in PATH environment variable. Then:
+   Download and install [AFL](http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz).
+   Unzip and follow docs\QuickStartGuide.txt.
+   Build it with `make`.
+   Ensure AFL binary is in PATH environment variable.
+   ```
+   export AFL_PATH=<AFL_PATH>
+   export PATH=$PATH:$AFL_PATH
+   ```
+   
+   Then run commands as root (every time reboot the OS):
    ```
    sudo bash -c 'echo core >/proc/sys/kernel/core_pattern'
    cd /sys/devices/system/cpu/
    sudo bash -c 'echo performance | tee cpu*/cpufreq/scaling_governor'
    ```
 
+   Known issue: Above command cannot run in Windows Linux Subsystem.
+
 2) [winafl](https://github.com/googleprojectzero/winafl) for Windows
 
    Clone [winafl](https://github.com/googleprojectzero/winafl).
    Download [DynamoRIO](https://dynamorio.org/).
 
+   Set path `set AFL_PATH=<AFL_PATH>` and `set DRIO_PATH=<DynameRIO_PATH>`.
+
+   NOTE: as known issue https://github.com/googleprojectzero/winafl/issues/145 that cause compatibility issues in recent Windows versions, the author has disabled Drsyms in recent WinAFL builds, if you want you use the newest version, please according to Method.2 to rebuild winafl yourself.
+
+   Build winafl:
+   ```
+   mkdir [build32|build64]
+   cd [build32|build64]
+   cmake -G"Visual Studio 16 2019" -A [Win32|x64] .. -DDynamoRIO_DIR=%DRIO_PATH%\cmake -DUSE_DRSYMS=1
+   cmake --build . --config Release
+   ```
+
+   NOTE: If you get errors where the linker couldn't find certain .lib files. please refer to https://github.com/googleprojectzero/winafl/issues/145 and delete the nonexistent files from "Additional Dependencies".
+
+   Copy all binary under [build32|build64]/bin/Release to [bin32|bin64]. `robocopy /E /is /it [build32|build64]/bin/Release [bin32|bin64]`.
+
 ### Symbolic Execution Tool
 
 1) [KLEE](https://klee.github.io/)
 
-   Download and install [KLEE](https://klee.github.io/build-llvm9/) with LLVM9.
+   Download and install [KLEE with LLVM3.8](https://klee.github.io/build-llvm38/). Please follow all 12 steps including optional ones.
+
+   In step 3, constrint solver [STP](http://klee.github.io/build-stp) is recommended here.
+   Set size of the stack to a very large value: `$ ulimit -s unlimited`.
+
+   In step 8, below example can be use:
+   ```
+   $ cmake \
+      -DENABLE_SOLVER_STP=ON \
+      -DENABLE_POSIX_RUNTIME=ON \
+      -DENABLE_KLEE_UCLIBC=ON \
+      -DKLEE_UCLIBC_PATH=/home/tiano/env/klee-uclibc \
+      -DGTEST_SRC_DIR=/home/tiano/env/googletest-release-1.7.0 \
+      -DENABLE_SYSTEM_TESTS=ON \
+      -DENABLE_UNIT_TESTS=ON \
+      -DLLVM_CONFIG_BINARY=/usr/bin/llvm-config \
+      -DLLVMCC=/usr/bin/clang \
+      -DLLVMCXX=/usr/bin/clang++
+      /home/tiano/env/klee
+   ```
+
+   NOTE: Installing [KLEE with LLVM9](https://klee.github.io/build-llvm9/) is NOT supported yet.
+
+   Ensure KLEE binary is in PATH environment variable.
+   ```
+   export KLEE_SRC_PATH=<KLEE_SOURCE_DIR>
+   export KLEE_BIN_PATH=<KLEE_BUILD_DIR>
+   export PATH=$KLEE_BIN_PATH:$PATH
+   ```
 
 ### Model Checker Tool
 
@@ -81,7 +140,11 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 ### Run Fuzzing
 
 1) Fuzzing in Linux with [AFL](https://lcamtuf.coredump.cx/afl/)
-   
+
+   Build cases with AFL toolchain:
+   `make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> TOOLCHAIN=AFL CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
+
+   Run cases:
    ```
    mkdir testcase_dir
    mkdir /dev/shm/findings_dir
@@ -92,6 +155,9 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
 2) Fuzzing in Windows with [AFL](https://lcamtuf.coredump.cx/afl/)
 
+   Build cases with VS2019 toolchain. (non AFL toolchain in Windows)
+
+   Run cases:
    ```
    cp <test_app> winafl\<bin64|bin32>
    cp <test_app_pdb> winaft\<bin64|bin32>
@@ -102,6 +168,11 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 3) Fuzzing with LLVM [LibFuzzer](https://llvm.org/docs/LibFuzzer.html)  (TBD)
 
 ### Run Symbolic Execution
+
+   Use [KLEE](http://klee.github.io/tutorials) as an example.
+
+   Build cases in Linux with KLEE toolchain. (KLEE does not support Windows)
+   `make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> TOOLCHAIN=KLEE CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
 
    Use KLEE to [generate ktest](https://klee.github.io/tutorials/testing-coreutils/):
    `klee --only-output-states-covering-new <test_app>`
