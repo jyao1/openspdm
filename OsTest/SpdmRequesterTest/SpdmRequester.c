@@ -200,7 +200,7 @@ SpdmClientInit (
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
-  SpdmSetAlignment (SpdmContext, 1);
+  SpdmSetAlignment (SpdmContext, 4);
 
   Res = ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {

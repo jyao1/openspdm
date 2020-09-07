@@ -550,6 +550,9 @@ SpdmGetAlignment (
   SPDM_DEVICE_CONTEXT       *SpdmContext;
 
   SpdmContext = Context;
+  if (SpdmContext->Alignment == 0) {
+    SpdmContext->Alignment = 1;
+  }
   return SpdmContext->Alignment;
 }
 

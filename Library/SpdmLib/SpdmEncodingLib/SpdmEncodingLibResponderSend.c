@@ -37,6 +37,7 @@ SpdmEncryptResponse (
   SPDM_SESSION_INFO                 *SessionInfo;
   UINT32                            Alignment;
   SPDM_SESSION_TYPE                 SessionType;
+  UINT8                             RandCount;
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
@@ -73,11 +74,13 @@ SpdmEncryptResponse (
   AeadTagSize = GetSpdmAeadTagSize (SpdmContext);
 
   if (SessionType == SpdmSessionTypeEncMac) {
-    PlainTextSize = sizeof(SPDM_SECURE_MESSAGE_CIPHER_HEADER) + ResponseSize;
+    RandomBytes (&RandCount, sizeof(RandCount));
+    RandCount = (UINT8)((RandCount % 32) + 1);
+
+    PlainTextSize = sizeof(SPDM_SECURE_MESSAGE_CIPHER_HEADER) + ResponseSize + RandCount;
     CipherTextSize = (PlainTextSize + AeadBlockSize - 1) / AeadBlockSize * AeadBlockSize;
     TotalResponseSize = sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + CipherTextSize + AeadTagSize;
-    if ((Alignment > 1) && 
-        ((TotalResponseSize & (Alignment - 1)) != 0)) {
+    if ((TotalResponseSize & (Alignment - 1)) != 0) {
       TotalResponseSize = (TotalResponseSize + (Alignment - 1)) & ~(Alignment - 1);
     }
 
@@ -93,6 +96,8 @@ SpdmEncryptResponse (
     EncMsgHeader = (VOID *)(RecordHeader + 1);
     EncMsgHeader->TrueLength = (UINT16)ResponseSize;
     CopyMem (EncMsgHeader + 1, Response, ResponseSize);
+    RandomBytes ((UINT8 *)EncMsgHeader + sizeof(SPDM_SECURE_MESSAGE_CIPHER_HEADER) + ResponseSize, RandCount);
+
     AData = (UINT8 *)RecordHeader;
     EncMsg = (UINT8 *)EncMsgHeader;
     DecMsg = (UINT8 *)EncMsgHeader;
@@ -114,8 +119,7 @@ SpdmEncryptResponse (
               );
   } else { // SessionType == SpdmSessionTypeMacOnly
     TotalResponseSize = sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + ResponseSize + AeadTagSize;
-    if ((Alignment > 1) && 
-        ((TotalResponseSize & (Alignment - 1)) != 0)) {
+    if ((TotalResponseSize & (Alignment - 1)) != 0) {
       TotalResponseSize = (TotalResponseSize + (Alignment - 1)) & ~(Alignment - 1);
     }
 
@@ -207,11 +211,7 @@ SpdmEncodeResponse (
     return SpdmEncodeResponseSession (SpdmContext, *SessionId, ResponseSize, Response, MessageSize, Message);
   }
 
-  if (Alignment > 1) {
-    CalcResponseSize = (ResponseSize + (Alignment - 1)) & ~(Alignment - 1);
-  } else {
-    CalcResponseSize = ResponseSize;
-  }
+  CalcResponseSize = (ResponseSize + (Alignment - 1)) & ~(Alignment - 1);
 
   ASSERT (*MessageSize >= CalcResponseSize);
   if (*MessageSize < CalcResponseSize) {

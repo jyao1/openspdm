@@ -189,9 +189,7 @@ SpdmDecodeResponseSession (
   switch (SessionInfo->SessionState) {
   case SpdmStateHandshaking:
   case SpdmStateEstablished:
-    if (Alignment > 1) {
-      ASSERT ((MessageSize & (Alignment - 1)) == 0);
-    }
+    ASSERT ((MessageSize & (Alignment - 1)) == 0);
 
     Status = SpdmDecryptResponse (SpdmContext, SessionId, MessageSize, Message, ResponseSize, Response);
     if (RETURN_ERROR(Status)) {
@@ -223,12 +221,14 @@ SpdmDecodeResponse (
     return SpdmDecodeResponseSession (SpdmContext, *SessionId, MessageSize, Message, ResponseSize, Response);
   }
 
-  if (Alignment > 1) {
-    ASSERT ((MessageSize & (Alignment - 1)) == 0);
-  }
+  ASSERT ((MessageSize & (Alignment - 1)) == 0);
 
-  ASSERT (*ResponseSize >= MessageSize);
   if (*ResponseSize < MessageSize) {
+    if (*ResponseSize + Alignment - 1 >= MessageSize) {
+      CopyMem (Response, Message, *ResponseSize);
+      return RETURN_SUCCESS;
+    }
+    ASSERT (*ResponseSize >= MessageSize);
     *ResponseSize = MessageSize;
     return RETURN_BUFFER_TOO_SMALL;
   }

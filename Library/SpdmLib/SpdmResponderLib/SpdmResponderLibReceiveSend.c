@@ -116,10 +116,6 @@ SpdmReceiveRequestSession (
     return RETURN_INVALID_PARAMETER;
   }
 
-  if (SpdmContext->Alignment > 1) {
-    ASSERT ((RequestSize & (SpdmContext->Alignment - 1)) == 0);
-  }
-
   DEBUG((DEBUG_INFO, "SpdmReceiveRequestSession[%x] ...\n", SessionId));
 
   SpdmContext->LastSpdmRequestSize = sizeof(SpdmContext->LastSpdmRequest);

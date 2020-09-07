@@ -37,6 +37,7 @@ SpdmEncryptRequest (
   SPDM_SESSION_INFO                 *SessionInfo;
   UINT32                            Alignment;
   SPDM_SESSION_TYPE                 SessionType;
+  UINT8                             RandCount;
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
@@ -73,11 +74,13 @@ SpdmEncryptRequest (
   AeadTagSize = GetSpdmAeadTagSize (SpdmContext);
 
   if (SessionType == SpdmSessionTypeEncMac) {
-    PlainTextSize = sizeof(SPDM_SECURE_MESSAGE_CIPHER_HEADER) + RequestSize;
+    RandomBytes (&RandCount, sizeof(RandCount));
+    RandCount = (UINT8)((RandCount % 32) + 1);
+
+    PlainTextSize = sizeof(SPDM_SECURE_MESSAGE_CIPHER_HEADER) + RequestSize + RandCount;
     CipherTextSize = (PlainTextSize + AeadBlockSize - 1) / AeadBlockSize * AeadBlockSize;
     TotalRequestSize = sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + CipherTextSize + AeadTagSize;
-    if ((Alignment > 1) && 
-        ((TotalRequestSize & (Alignment - 1)) != 0)) {
+    if ((TotalRequestSize & (Alignment - 1)) != 0) {
       TotalRequestSize = (TotalRequestSize + (Alignment - 1)) & ~(Alignment - 1);
     }
 
@@ -93,6 +96,8 @@ SpdmEncryptRequest (
     EncMsgHeader = (VOID *)(RecordHeader + 1);
     EncMsgHeader->TrueLength = (UINT16)RequestSize;
     CopyMem (EncMsgHeader + 1, Request, RequestSize);
+    RandomBytes ((UINT8 *)EncMsgHeader + sizeof(SPDM_SECURE_MESSAGE_CIPHER_HEADER) + RequestSize, RandCount);
+
     AData = (UINT8 *)RecordHeader;
     EncMsg = (UINT8 *)EncMsgHeader;
     DecMsg = (UINT8 *)EncMsgHeader;
@@ -114,8 +119,7 @@ SpdmEncryptRequest (
               );
   } else { // SessionType == SpdmSessionTypeMacOnly
     TotalRequestSize = sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + RequestSize + AeadTagSize;
-    if ((Alignment > 1) && 
-        ((TotalRequestSize & (Alignment - 1)) != 0)) {
+    if ((TotalRequestSize & (Alignment - 1)) != 0) {
       TotalRequestSize = (TotalRequestSize + (Alignment - 1)) & ~(Alignment - 1);
     }
 
@@ -207,11 +211,7 @@ SpdmEncodeRequest (
     return SpdmEncodeRequestSession (SpdmContext, *SessionId, RequestSize, Request, MessageSize, Message);
   }
 
-  if (Alignment > 1) {
-    CalcMessageSize = (RequestSize + (Alignment - 1)) & ~(Alignment - 1);
-  } else {
-    CalcMessageSize = RequestSize;
-  }
+  CalcMessageSize = (RequestSize + (Alignment - 1)) & ~(Alignment - 1);
 
   ASSERT (*MessageSize >= CalcMessageSize);
   if (*MessageSize < CalcMessageSize) {
