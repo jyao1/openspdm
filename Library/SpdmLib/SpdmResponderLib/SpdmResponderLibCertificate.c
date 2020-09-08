@@ -71,9 +71,6 @@ SpdmGetResponseCertificate (
     Length = (UINT16)(SpdmContext->LocalContext.CertificateChainSize[SlotNum] - Offset);
   }
   RemainderLength = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (Length + Offset);
-  if (RemainderLength >= MAX_SPDM_CERT_CHAIN_BLOCK_LEN) {
-    RemainderLength = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-  }
 
   ASSERT (*ResponseSize >= sizeof(SPDM_CERTIFICATE_RESPONSE) + Length);
   *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + Length;
