@@ -62,7 +62,7 @@ SpdmGetResponseCertificate (
     Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   }
   
-  if (Offset > SpdmContext->LocalContext.CertificateChainSize[SlotNum]) {
+  if (Offset >= SpdmContext->LocalContext.CertificateChainSize[SlotNum]) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
