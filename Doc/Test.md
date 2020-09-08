@@ -121,7 +121,7 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
 1) [KLEE](https://klee.github.io/)
 
-   Download and install [KLEE with LLVM3.8](https://klee.github.io/build-llvm38/). Please follow all 12 steps including optional ones.
+   Download and install [KLEE with LLVM9](https://klee.github.io/build-llvm9/). Please follow all 12 steps including optional ones.
 
    In step 3, constrint solver [STP](http://klee.github.io/build-stp) is recommended here.
    Set size of the stack to a very large value: `$ ulimit -s unlimited`.
@@ -134,15 +134,12 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
       -DENABLE_KLEE_UCLIBC=ON \
       -DKLEE_UCLIBC_PATH=/home/tiano/env/klee-uclibc \
       -DGTEST_SRC_DIR=/home/tiano/env/googletest-release-1.7.0 \
-      -DENABLE_SYSTEM_TESTS=ON \
       -DENABLE_UNIT_TESTS=ON \
       -DLLVM_CONFIG_BINARY=/usr/bin/llvm-config \
       -DLLVMCC=/usr/bin/clang \
       -DLLVMCXX=/usr/bin/clang++
       /home/tiano/env/klee
    ```
-
-   NOTE: Installing [KLEE with LLVM9](https://klee.github.io/build-llvm9/) is NOT supported yet.
 
    Ensure KLEE binary is in PATH environment variable.
    ```
@@ -157,7 +154,14 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
    Use [KLEE](http://klee.github.io/tutorials) to [generate ktest](https://klee.github.io/tutorials/testing-coreutils/):
    `klee --only-output-states-covering-new <test_app>`
 
-   Transfer .ktest to seed file, which can be used for AFL-fuzzer. (TBD)
+   Transfer .ktest to seed file, which can be used for AFL-fuzzer.
+   `python UnitFuzzing/Tools/TransferKtestToSeed.py <Arguments>`
+
+   Arguments:
+   <KtestFile>                          the path of .ktest file.
+   <KtestFile1> <KtestFile2> ...        the paths of .ktest files.
+   <KtestFolder>                        the path of folder contains .ktest file.
+   <KtestFolder1> <KtestFolder2> ...    the paths of folders contain .ktest file.
 
 ### Run Model Checker
 

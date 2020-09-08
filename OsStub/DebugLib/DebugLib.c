@@ -22,7 +22,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define DEBUG_ASSERT_DEADLOOP    1
 #define DEBUG_ASSERT_BREAKPOINT  2
 
+#ifndef DEBUG_ASSERT_CHOICE
 #define DEBUG_ASSERT_CHOICE      DEBUG_ASSERT_DEADLOOP
+#endif
 
 VOID
 EFIAPI
