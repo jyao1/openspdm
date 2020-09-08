@@ -475,6 +475,8 @@ ValidateCryptX509 (
   )
 {
   INT32 Status;
+  UINT8 *LeafCert;
+  UINTN LeafCertLen;
 
   //
   // X509 Certificate Verification.
@@ -499,6 +501,67 @@ ValidateCryptX509 (
   } else {
     Print (L"[Pass]\n");
   }
+
+  //
+  // X509 Get leaf certificate from CertChain Verificate
+  //
+  DEBUG((DEBUG_INFO, "- X509 Certificate Chain get leaf certificate Verification ... "));
+  Status = X509GetCertFromCertChain((UINT8 *)TEST_BUNDLE_CERT_DER, sizeof(TEST_BUNDLE_CERT_DER), -1, &LeafCert, &LeafCertLen);
+  if (!Status) {
+    Print (L"[Fail]\n");
+    return EFI_ABORTED;
+  }
+  if (LeafCertLen != sizeof(TestEndCert)) {
+    Print (L"[Fail]\n");
+    return EFI_ABORTED;
+  }
+  if (CompareMem (LeafCert, TestEndCert, LeafCertLen) != 0) {
+    Print (L"[Fail]\n");
+    return EFI_ABORTED;
+  } else {
+    Print (L"[Pass]\n");
+  }
+
+  //
+  // X509 Get leaf certificate from CertChain Verificate
+  //
+  DEBUG((DEBUG_INFO, "- X509 Certificate Chain get leaf certificate Verification ... "));
+  Status = X509GetCertFromCertChain((UINT8 *)TEST_BUNDLE_CERT_DER, sizeof(TEST_BUNDLE_CERT_DER), 2, &LeafCert, &LeafCertLen);
+  if (!Status) {
+    Print (L"[Fail]\n");
+    return EFI_ABORTED;
+  }
+  if (LeafCertLen != sizeof(TestEndCert)) {
+    Print (L"[Fail]\n");
+    return EFI_ABORTED;
+  }
+  if (CompareMem (LeafCert, TestEndCert, LeafCertLen) != 0) {
+    Print (L"[Fail]\n");
+    return EFI_ABORTED;
+  } else {
+    Print (L"[Pass]\n");
+  }
+
+  //
+  // X509 Get root certificate from CertChain Verificate
+  //
+  DEBUG((DEBUG_INFO, "- X509 Certificate Chain get root certificate Verification ... "));
+  Status = X509GetCertFromCertChain((UINT8 *)TEST_BUNDLE_CERT_DER, sizeof(TEST_BUNDLE_CERT_DER), 0, &LeafCert, &LeafCertLen);
+  if (!Status) {
+    Print (L"[Fail]\n");
+    return EFI_ABORTED;
+  }
+  if (LeafCertLen != sizeof(TestCACert)) {
+    Print (L"[Fail]\n");
+    return EFI_ABORTED;
+  }
+  if (CompareMem (LeafCert, TestCACert, LeafCertLen) != 0) {
+    Print (L"[Fail]\n");
+    return EFI_ABORTED;
+  } else {
+    Print (L"[Pass]\n");
+  }
+
 
   return EFI_SUCCESS;
 }
