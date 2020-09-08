@@ -44,6 +44,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\EcVerify.obj \
     $(OUTPUT_DIR)\EcVerify2.obj \
     $(OUTPUT_DIR)\RandVerify.obj \
+    $(OUTPUT_DIR)\X509Verify.obj \
+
 
 STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\BaseMemoryLib\BaseMemoryLib.lib \
@@ -130,8 +132,8 @@ $(OUTPUT_DIR)\EcVerify2.obj : $(SOURCE_DIR)\../TestCryptLib/EcVerify2.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/EcVerify2.c
 $(OUTPUT_DIR)\RandVerify.obj : $(SOURCE_DIR)\../TestCryptLib/RandVerify.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/RandVerify.c
-
-
+$(OUTPUT_DIR)\X509Verify.obj : $(SOURCE_DIR)\../TestCryptLib/X509Verify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/X509Verify.c
 
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)

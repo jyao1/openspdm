@@ -73,6 +73,11 @@ CryptestMain (
     return Status;
   }
 
+  Status = ValidateCryptX509 ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   // Status = ValidateCryptPkcs5Pbkdf2 ();
   // if (EFI_ERROR (Status)) {
   //   return Status;

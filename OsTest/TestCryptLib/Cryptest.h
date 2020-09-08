@@ -143,6 +143,18 @@ ValidateCryptRsa2 (
   VOID
   );
 
+/**
+  Validate UEFI-Crypto  X509 certificate Verify
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateCryptX509 (
+  VOID
+  );
+
 // /**
 //   Validate UEFI-OpenSSL PKCS#5 PBKDF2 Interface.
 
