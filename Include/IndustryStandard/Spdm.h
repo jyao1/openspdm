@@ -347,7 +347,7 @@ typedef struct {
 } SPDM_DIGESTS_RESPONSE;
 
 ///
-/// SPDM GET_DIGESTS request
+/// SPDM GET_CERTIFICATE request
 ///
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
@@ -358,7 +358,7 @@ typedef struct {
 } SPDM_GET_CERTIFICATE_REQUEST;
 
 ///
-/// SPDM GET_DIGESTS response
+/// SPDM GET_CERTIFICATE response
 ///
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
