@@ -903,3 +903,179 @@ X509GetTBSCert (
 
   return TRUE;
 }
+
+
+/**
+  Verify one X509 certificate was issued by the trusted CA.
+
+  @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
+                                    where the first certificate is signed by the Root
+                                    Certificate or is the Root Cerificate itself. and
+                                    subsequent cerificate is signed by the preceding
+                                    cerificate.
+  @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
+
+  @param[in]      RootCert          Trusted Root Certificate buffer
+
+  @param[in]      RootCertLength    Trusted Root Certificate buffer length
+
+  @retval  TRUE   All cerificates was issued by the first certificate in X509Certchain.
+  @retval  FALSE  Invalid certificate or the certificate was not issued by the given
+                  trusted CA.
+**/
+BOOLEAN
+EFIAPI
+X509VerifyCertChain (
+  IN UINT8 *  RootCert,
+  IN UINTN    RootCertLength,
+  IN UINT8 *  CertChain,
+  IN UINTN    CertChainLength
+  )
+{
+  UINT8 *TmpPtr;
+  UINTN Length;
+  UINT32  Asn1Tag;
+  UINT32 ObjClass;
+  UINT8 *CurrentCert;
+  UINTN CurrentCertLen;
+  UINT8 *PrecedingCert;
+  UINTN PrecedingCertLen;
+  BOOLEAN VerifyFlag;
+  INT32 Ret;
+
+  PrecedingCert = RootCert;
+  PrecedingCertLen = RootCertLength;
+
+  CurrentCert = CertChain;
+  Length = 0;
+  CurrentCertLen = 0;
+
+  VerifyFlag = FALSE;
+  while (TRUE) {
+    TmpPtr = CurrentCert;
+    Ret = ASN1_get_object (
+      &TmpPtr, (long *)&Length,
+      (int *)&Asn1Tag, (int *)&ObjClass,
+      (long)(CertChainLength + CertChain - TmpPtr));
+    if (Asn1Tag != V_ASN1_SEQUENCE || Ret == 0x80) {
+      break;
+    }
+
+    //
+    // Calculate CurrentCert length;
+    //
+    CurrentCertLen = TmpPtr - CurrentCert + Length;
+
+    //
+    // Verify CurrentCert with preceding cert;
+    //
+    VerifyFlag = X509VerifyCert(CurrentCert, CurrentCertLen, PrecedingCert, PrecedingCertLen);
+    if (VerifyFlag == FALSE) {
+      break;
+    }
+
+    //
+    // move Current cert to Preceding cert
+    //
+    PrecedingCertLen = CurrentCertLen;
+    PrecedingCert = CurrentCert;
+
+    //
+    // Move to next
+    //
+    CurrentCert = CurrentCert + CurrentCertLen;
+  }
+
+  return VerifyFlag;
+}
+
+/**
+  Get one X509 certificate from CertChain.
+
+  @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
+                                    where the first certificate is signed by the Root
+                                    Certificate or is the Root Cerificate itself. and
+                                    subsequent cerificate is signed by the preceding
+                                    cerificate.
+  @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
+
+  @param[in]      CertIndex         Index of certificate.
+
+  @param[out]     Cert              The certificate at the index of CertChain.
+  @param[out]     CertLength        The length certificate at the index of CertChain.
+
+  @retval  TRUE   Success.
+  @retval  FALSE  Failed to get certificate from certificate chain.
+**/
+BOOLEAN
+EFIAPI
+X509GetCertFromCertChain (
+  IN UINT8  *CertChain,
+  IN UINTN  CertChainLength,
+  IN INT32  CertIndex,
+  OUT UINT8 **Cert,
+  OUT UINTN *CertLength)
+{
+  UINTN Asn1Len;
+  INT32 CurrentIndex;
+  UINTN CurrentCertLen;
+  UINT8 *CurrentCert;
+  UINT8 *TmpPtr;
+  INT32 Ret;
+  UINT32  Asn1Tag;
+  UINT32 ObjClass;
+
+  //
+  // Check input parameters.
+  //
+  if ((CertChain == NULL) || (Cert == NULL) ||
+      (CertIndex < -1) || (CertLength == NULL)) {
+    return FALSE;
+  }
+
+  CurrentCert = CertChain;
+  CurrentIndex = -1;
+
+  //
+  // Traverse the certificate chain
+  //
+  while (TRUE) {
+    TmpPtr = CurrentCert;
+
+    // Get asn1 object and taglen
+    Ret = ASN1_get_object (
+      &TmpPtr, (long *)&Asn1Len,
+      (int *)&Asn1Tag, (int *)&ObjClass,
+      (long)(CertChainLength + CertChain - TmpPtr));
+    if (Asn1Tag != V_ASN1_SEQUENCE || Ret == 0x80) {
+      break;
+    }
+    //
+    // Calculate CurrentCert length;
+    //
+    CurrentCertLen = TmpPtr - CurrentCert + Asn1Len;
+    CurrentIndex ++;
+
+    if (CurrentIndex == CertIndex) {
+      *Cert = CurrentCert;
+      *CertLength = CurrentCertLen;
+      return TRUE;
+    }
+
+    //
+    // Move to next
+    //
+    CurrentCert = CurrentCert + CurrentCertLen;
+  }
+
+  //
+  // If CertIndex is -1, Return the last certificate
+  //
+  if (CertIndex == -1 && CurrentIndex >= 0) {
+    *Cert = CurrentCert - CurrentCertLen;
+    *CertLength = CurrentCertLen;
+    return TRUE;
+  }
+
+  return FALSE;
+}

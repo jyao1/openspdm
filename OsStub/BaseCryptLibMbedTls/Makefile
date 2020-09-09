@@ -51,6 +51,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\BaseMemAllocation.obj \
     $(OUTPUT_DIR)\CrtWrapperHost.obj \
     $(OUTPUT_DIR)\TimerWrapperHost.obj \
+    $(OUTPUT_DIR)\CryptPkcs7.obj \
 
 INC =  \
     -I$(SOURCE_DIR)\
@@ -143,6 +144,9 @@ $(OUTPUT_DIR)\CrtWrapperHost.obj : $(SOURCE_DIR)\SysCall/CrtWrapperHost.c
 
 $(OUTPUT_DIR)\TimerWrapperHost.obj : $(SOURCE_DIR)\SysCall/TimerWrapperHost.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SysCall/TimerWrapperHost.c
+
+$(OUTPUT_DIR)\CryptPkcs7.obj : $(SOURCE_DIR)\Pk/CryptPkcs7.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptPkcs7.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@
