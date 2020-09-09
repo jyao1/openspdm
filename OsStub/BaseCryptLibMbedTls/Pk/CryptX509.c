@@ -36,6 +36,57 @@ X509ConstructCertificate (
   return FALSE;
 }
 
+STATIC
+BOOLEAN
+EFIAPI
+X509ConstructCertificateStackV (
+  IN OUT  UINT8    **X509Stack,
+  IN      VA_LIST  Args
+  )
+{
+  UINT8* Cert;
+  UINTN CertSize;
+  INT32 Index;
+  INT32 Ret;
+
+  if (X509Stack == NULL) {
+    return FALSE;
+  }
+
+  Ret = 0;
+  mbedtls_x509_crt *Crt = (mbedtls_x509_crt *)*X509Stack;
+  if (Crt == NULL) {
+    Crt = AllocatePool(sizeof(mbedtls_x509_crt));
+    if (Crt == NULL) {
+      return FALSE;
+    }
+    mbedtls_x509_crt_init(Crt);
+    *X509Stack = (UINT8 *)Crt;
+  }
+
+  for (Index = 0; ; Index++) {
+    //
+    // If Cert is NULL, then it is the end of the list.
+    //
+    Cert = VA_ARG (Args, UINT8 *);
+    if (Cert == NULL) {
+      break;
+    }
+
+    CertSize = VA_ARG (Args, UINTN);
+    if (CertSize == 0) {
+      break;
+    }
+
+    Ret = mbedtls_x509_crt_parse_der(Crt, Cert, CertSize);
+
+    if (Ret != 0) {
+      break;
+    }
+  }
+  return Ret == 0;
+}
+
 /**
   Construct a X509 stack object from a list of DER-encoded certificate data.
 
@@ -59,7 +110,13 @@ X509ConstructCertificateStack (
   ...
   )
 {
-  return FALSE;
+  VA_LIST  Args;
+  BOOLEAN  Result;
+
+  VA_START (Args, X509Stack);
+  Result = X509ConstructCertificateStackV (X509Stack, Args);
+  VA_END (Args);
+  return Result;
 }
 
 /**
@@ -76,6 +133,10 @@ X509Free (
   IN  VOID  *X509Cert
   )
 {
+  if (X509Cert) {
+    mbedtls_x509_crt_free(X509Cert);
+    FreePool(X509Cert);
+  }
 }
 
 /**
@@ -339,8 +400,199 @@ X509VerifyCert (
   IN  UINTN        CACertSize
   )
 {
+  INT32 Ret;
+  mbedtls_x509_crt Ca, End;
+  UINT32  VFlag = 0;
+  mbedtls_x509_crt_profile Profile = {0};
+
+  if (Cert == NULL || CACert == NULL) {
+    return FALSE;
+  }
+
+  CopyMem(&Profile, &mbedtls_x509_crt_profile_default, sizeof(mbedtls_x509_crt_profile));
+
+  mbedtls_x509_crt_init(&Ca);
+  mbedtls_x509_crt_init(&End);
+
+  Ret = mbedtls_x509_crt_parse_der(&Ca, CACert, CACertSize);
+
+  if (Ret == 0) {
+    Ret = mbedtls_x509_crt_parse_der(&End, Cert, CertSize);
+  }
+
+  if (Ret == 0) {
+    Ret = mbedtls_x509_crt_verify_with_profile(&End, &Ca, NULL, &Profile, NULL, &VFlag, NULL, NULL);
+  }
+
+  mbedtls_x509_crt_free(&Ca);
+  mbedtls_x509_crt_free(&End);
+
+  return Ret == 0;
+}
+
+/**
+  Verify one X509 certificate was issued by the trusted CA.
+
+  @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
+                                    where the first certificate is signed by the Root
+                                    Certificate or is the Root Cerificate itself. and
+                                    subsequent cerificate is signed by the preceding
+                                    cerificate.
+  @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
+
+  @param[in]      RootCert          Trusted Root Certificate buffer
+
+  @param[in]      RootCertLength    Trusted Root Certificate buffer length
+
+  @retval  TRUE   All cerificates was issued by the first certificate in X509Certchain.
+  @retval  FALSE  Invalid certificate or the certificate was not issued by the given
+                  trusted CA.
+**/
+BOOLEAN
+EFIAPI
+X509VerifyCertChain (
+  IN UINT8 *  RootCert,
+  IN UINTN    RootCertLength,
+  IN UINT8 *  CertChain,
+  IN UINTN    CertChainLength
+  )
+{
+  UINTN   Asn1Len;
+  UINTN   PrecedingCertLen;
+  UINT8   *PrecedingCert;
+  UINTN   CurrentCertLen;
+  UINT8   *CurrentCert;
+  UINT8   *TmpPtr;
+  UINT32  Ret;
+  BOOLEAN VerifyFlag;
+
+  VerifyFlag = FALSE;
+  PrecedingCert = RootCert;
+  PrecedingCertLen = RootCertLength;
+
+  CurrentCert = CertChain;
+
+  //
+  // Get Current certificate from Certificates buffer and Verify with preciding cert
+  //
+  do {
+    TmpPtr = CurrentCert;
+    Ret = mbedtls_asn1_get_tag (&TmpPtr, CertChain + CertChainLength, &Asn1Len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+    if (Ret != 0) {
+      break;
+    }
+
+    CurrentCertLen = Asn1Len + (TmpPtr - CurrentCert);
+
+    if (X509VerifyCert (CurrentCert, CurrentCertLen, PrecedingCert, PrecedingCertLen) == FALSE) {
+      VerifyFlag = FALSE;
+      break;
+    } else {
+      VerifyFlag = TRUE;
+    }
+
+    //
+    // Save preceding certificate
+    //
+    PrecedingCert = CurrentCert;
+    PrecedingCertLen = CurrentCertLen;
+
+    //
+    // Move current certificate to next;
+    //
+    CurrentCert = CurrentCert + CurrentCertLen;
+  } while (1);
+
+  return VerifyFlag;
+}
+
+
+/**
+  Get one X509 certificate from CertChain.
+
+  @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
+                                    where the first certificate is signed by the Root
+                                    Certificate or is the Root Cerificate itself. and
+                                    subsequent cerificate is signed by the preceding
+                                    cerificate.
+  @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
+
+  @param[in]      CertIndex         Index of certificate.
+
+  @param[out]     Cert              The certificate at the index of CertChain.
+  @param[out]     CertLength        The length certificate at the index of CertChain.
+
+  @retval  TRUE   Success.
+  @retval  FALSE  Failed to get certificate from certificate chain.
+**/
+BOOLEAN
+EFIAPI
+X509GetCertFromCertChain (
+  IN UINT8  *CertChain,
+  IN UINTN  CertChainLength,
+  IN INT32  CertIndex,
+  OUT UINT8 **Cert,
+  OUT UINTN *CertLength)
+{
+
+  UINTN Asn1Len;
+  INT32 CurrentIndex;
+  UINTN CurrentCertLen;
+  UINT8 *CurrentCert;
+  UINT8 *TmpPtr;
+  INT32 Ret;
+
+  //
+  // Check input parameters.
+  //
+  if ((CertChain == NULL) || (Cert == NULL) ||
+      (CertIndex < -1) || (CertLength == NULL)) {
+    return FALSE;
+  }
+
+  CurrentCert = CertChain;
+  CurrentIndex = -1;
+
+  //
+  // Traverse the certificate chain
+  //
+  while (TRUE) {
+    //
+    // Get asn1 tag len
+    //
+    TmpPtr = CurrentCert;
+    Ret = mbedtls_asn1_get_tag (&TmpPtr, CertChain + CertChainLength, &Asn1Len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+    if (Ret != 0) {
+      break;
+    }
+
+    CurrentCertLen = Asn1Len + (TmpPtr - CurrentCert);
+    CurrentIndex ++;
+
+    if (CurrentIndex == CertIndex) {
+      *Cert = CurrentCert;
+      *CertLength = CurrentCertLen;
+      return TRUE;
+    }
+
+    //
+    // Move to next
+    //
+    CurrentCert = CurrentCert + CurrentCertLen;
+  }
+
+  //
+  // If CertIndex is -1, Return the last certificate
+  //
+  if (CertIndex == -1 && CurrentIndex >= 0) {
+    *Cert = CurrentCert - CurrentCertLen;
+    *CertLength = CurrentCertLen;
+    return TRUE;
+  }
+
   return FALSE;
 }
+
 
 /**
   Retrieve the TBSCertificate from one given X.509 certificate.
