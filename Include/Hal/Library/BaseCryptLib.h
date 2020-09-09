@@ -593,7 +593,7 @@ HmacSha256Final (
   the digest value into the specified memory.
 
   If this interface is not supported, then return FALSE.
-  
+
   @param[in]   Data        Pointer to the buffer containing the data to be digested.
   @param[in]   DataSize    Size of Data buffer in bytes.
   @param[in]   Key         Pointer to the user-supplied key.
@@ -644,7 +644,7 @@ CmacAesFree (
 /**
   Initializes user-supplied memory pointed by CmacAesContext as CMAC-AES context for
   subsequent use.
-  
+
   KeySize must be 16, 24 or 32, otherwise FALSE is returned.
 
   If CmacAesContext is NULL, then return FALSE.
@@ -743,11 +743,11 @@ CmacAesFinal (
 
   This function performs the CMAC-AES digest of a given data buffer, and places
   the digest value into the specified memory.
-  
+
   KeySize must be 16, 24 or 32, otherwise FALSE is returned.
 
   If this interface is not supported, then return FALSE.
-  
+
   @param[in]   Data        Pointer to the buffer containing the data to be digested.
   @param[in]   DataSize    Size of Data buffer in bytes.
   @param[in]   Key         Pointer to the user-supplied key.
@@ -821,7 +821,7 @@ GmacAesInit (
 
 /**
   Set IV for GmacAesContext as GMAC-AES context for subsequent use.
-  
+
   IvSize must be 12, otherwise FALSE is returned.
 
   If GmacAesContext is NULL, then return FALSE.
@@ -925,7 +925,7 @@ GmacAesFinal (
   the digest value into the specified memory.
 
   If this interface is not supported, then return FALSE.
-  
+
   @param[in]   Data        Pointer to the buffer containing the data to be digested.
   @param[in]   DataSize    Size of Data buffer in bytes.
   @param[in]   Key         Pointer to the user-supplied key.
@@ -1203,7 +1203,7 @@ AeadAesGcmEncrypt (
 
 /**
   Performs AEAD AES-GCM authenticated decryption on a data buffer and additional authenticated data (AAD).
-  
+
   IvSize must be 12, otherwise FALSE is returned.
   KeySize must be 16, 24 or 32, otherwise FALSE is returned.
   TagSize must be 12, 13, 14, 15, 16, otherwise FALSE is returned.
@@ -1286,7 +1286,7 @@ AeadChaCha20Poly1305Encrypt(
 
 /**
   Performs AEAD ChaCha20Poly1305 authenticated decryption on a data buffer and additional authenticated data (AAD).
-  
+
   IvSize must be 12, otherwise FALSE is returned.
   KeySize must be 32, otherwise FALSE is returned.
   TagSize must be 16, otherwise FALSE is returned.
@@ -1555,7 +1555,7 @@ RsaPkcs1Verify (
 
   This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
   RSA PKCS#1 v2.2.
-  
+
   The salt length is same as digest length.
 
   If the Signature buffer is too small to hold the contents of signature, FALSE
@@ -1591,7 +1591,7 @@ RsaPssSign (
 /**
   Verifies the RSA-SSA signature with EMSA-PSS encoding scheme defined in
   RSA PKCS#1 v2.2.
-  
+
   The salt length is same as digest length.
 
   If RsaContext is NULL, then return FALSE.
@@ -1847,6 +1847,62 @@ X509VerifyCert (
   IN  CONST UINT8  *CACert,
   IN  UINTN        CACertSize
   );
+
+/**
+  Verify one X509 certificate was issued by the trusted CA.
+
+  @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
+                                    where the first certificate is signed by the Root
+                                    Certificate or is the Root Cerificate itself. and
+                                    subsequent cerificate is signed by the preceding
+                                    cerificate.
+  @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
+
+  @param[in]      RootCert          Trusted Root Certificate buffer
+
+  @param[in]      RootCertLength    Trusted Root Certificate buffer length
+
+  @retval  TRUE   All cerificates was issued by the first certificate in X509Certchain.
+  @retval  FALSE  Invalid certificate or the certificate was not issued by the given
+                  trusted CA.
+**/
+BOOLEAN
+EFIAPI
+X509VerifyCertChain (
+  IN UINT8 *  RootCert,
+  IN UINTN    RootCartLength,
+  IN UINT8 *  CertChain,
+  IN UINTN    CertChainLength
+  );
+
+/**
+  Get one X509 certificate from CertChain.
+
+  @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
+                                    where the first certificate is signed by the Root
+                                    Certificate or is the Root Cerificate itself. and
+                                    subsequent cerificate is signed by the preceding
+                                    cerificate.
+  @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
+
+  @param[in]      CertIndex         Index of certificate. If index is -1 indecate the
+                                    last certificate in CertChain.
+
+  @param[out]     Cert              The certificate at the index of CertChain.
+  @param[out]     CertLength        The length certificate at the index of CertChain.
+
+  @retval  TRUE   Success.
+  @retval  FALSE  Failed to get certificate from certificate chain.
+**/
+BOOLEAN
+EFIAPI
+X509GetCertFromCertChain (
+  IN UINT8  *CertChain,
+  IN UINTN  CertChainLength,
+  IN INT32  CertIndex,
+  OUT UINT8 **Cert,
+  OUT UINTN *CertLength);
+
 
 /**
   Construct a X509 object from DER-encoded certificate data.
@@ -2469,7 +2525,7 @@ EcNewByNid (
 
 /**
   Release the specified EC context.
-  
+
   @param[in]  EcContext  Pointer to the EC context to be released.
 
 **/
@@ -2481,7 +2537,7 @@ EcFree (
 
 /**
   Release the specified EC context.
-  
+
   @param[in]  EcDsaContext  Pointer to the EC context to be released.
 
 **/
