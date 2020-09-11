@@ -19,7 +19,7 @@ typedef struct {
 #pragma pack()
 
 BOOLEAN
-SpemRequesterVerifyDigest (
+SpdmRequesterVerifyDigest (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *Digest,
   UINTN                           DigestSize
@@ -59,8 +59,7 @@ SpemRequesterVerifyDigest (
   TotalDigestSize = sizeof(Digest) * Count in SlotMask
 */
 RETURN_STATUS
-EFIAPI
-SpdmGetDigest (
+TrySpdmGetDigest (
   IN     VOID                 *Context,
      OUT UINT8                *SlotMask,
      OUT VOID                 *TotalDigestBuffer
@@ -112,13 +111,18 @@ SpdmGetDigest (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageB, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_DIGESTS, SPDM_DIGESTS, sizeof(SPDM_DIGESTS_RESPONSE_MAX));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_DIGESTS) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_DIGESTS_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_DIGESTS) {
     return RETURN_DEVICE_ERROR;
   }
 
@@ -142,7 +146,7 @@ SpdmGetDigest (
     DEBUG((DEBUG_INFO, "\n"));
   }
 
-  Result = SpemRequesterVerifyDigest (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
+  Result = SpdmRequesterVerifyDigest (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
   if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
@@ -158,4 +162,27 @@ SpdmGetDigest (
   }
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+EFIAPI
+SpdmGetDigest (
+  IN     VOID                 *Context,
+     OUT UINT8                *SlotMask,
+     OUT VOID                 *TotalDigestBuffer
+  )
+{
+  SPDM_DEVICE_CONTEXT    *SpdmContext;
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+  
+  SpdmContext = Context;
+  Retry = SpdmContext->RetryTimes;
+  while(Retry-- != 0) {
+    Status = TrySpdmGetDigest(SpdmContext, SlotMask, TotalDigestBuffer);
+    if (RETURN_NO_RESPONSE != Status)
+      return Status;
+  }
+
+  return Status;
 }

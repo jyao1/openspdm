@@ -37,6 +37,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmResponderVersion.obj \
     $(OUTPUT_DIR)\TestSpdmResponderCapability.obj \
     $(OUTPUT_DIR)\TestSpdmResponderAlgorithm.obj \
+    $(OUTPUT_DIR)\TestSpdmResponderDigest.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
 
 
@@ -134,6 +135,9 @@ $(OUTPUT_DIR)\TestSpdmResponderCapability.obj : $(SOURCE_DIR)\TestSpdmResponderC
 
 $(OUTPUT_DIR)\TestSpdmResponderAlgorithm.obj : $(SOURCE_DIR)\TestSpdmResponderAlgorithm.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderAlgorithm.c
+
+$(OUTPUT_DIR)\TestSpdmResponderDigest.obj : $(SOURCE_DIR)\TestSpdmResponderDigest.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderDigest.c
 
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c

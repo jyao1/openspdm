@@ -37,6 +37,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmRequesterGetVersion.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterGetCapability.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterNegotiateAlgorithm.obj \
+    $(OUTPUT_DIR)\TestSpdmRequesterGetDigest.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
 
 
@@ -134,6 +135,9 @@ $(OUTPUT_DIR)\TestSpdmRequesterGetCapability.obj : $(SOURCE_DIR)\TestSpdmRequest
 
 $(OUTPUT_DIR)\TestSpdmRequesterNegotiateAlgorithm.obj : $(SOURCE_DIR)\TestSpdmRequesterNegotiateAlgorithm.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterNegotiateAlgorithm.c
+
+$(OUTPUT_DIR)\TestSpdmRequesterGetDigest.obj : $(SOURCE_DIR)\TestSpdmRequesterGetDigest.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterGetDigest.c
 
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
