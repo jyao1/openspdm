@@ -37,6 +37,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/TestSpdmRequesterGetVersion.o \
     $(OUTPUT_DIR)/TestSpdmRequesterGetCapability.o \
     $(OUTPUT_DIR)/TestSpdmRequesterNegotiateAlgorithm.o \
+    $(OUTPUT_DIR)/TestSpdmRequesterGetDigest.o \
     $(OUTPUT_DIR)/SpdmUnitTestCommon.o \
 
 
@@ -133,6 +134,9 @@ $(OUTPUT_DIR)/TestSpdmRequesterGetCapability.o : $(SOURCE_DIR)/TestSpdmRequester
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/TestSpdmRequesterNegotiateAlgorithm.o : $(SOURCE_DIR)/TestSpdmRequesterNegotiateAlgorithm.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/TestSpdmRequesterGetDigest.o : $(SOURCE_DIR)/TestSpdmRequesterGetDigest.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmUnitTestCommon.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmUnitTestCommon.c
