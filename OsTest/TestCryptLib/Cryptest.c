@@ -2,13 +2,7 @@
   Application for Cryptographic Primitives Validation.
 
 Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -63,15 +57,15 @@ CryptestMain (
     return Status;
   }
 
-  Status = ValidateCryptRsa ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  // Status = ValidateCryptRsa ();
+  // if (EFI_ERROR (Status)) {
+  //   return Status;
+  // }
 
-  Status = ValidateCryptRsa2 ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  // Status = ValidateCryptRsa2 ();
+  // if (EFI_ERROR (Status)) {
+  //   return Status;
+  // }
 
   Status = ValidateCryptX509 ();
   if (EFI_ERROR (Status)) {

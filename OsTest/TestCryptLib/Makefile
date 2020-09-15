@@ -45,6 +45,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\EcVerify2.obj \
     $(OUTPUT_DIR)\RandVerify.obj \
     $(OUTPUT_DIR)\X509Verify.obj \
+    $(OUTPUT_DIR)\OsSupport.obj \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -97,6 +98,9 @@ mbuild: $(INIT_TARGET) gen_libs $(CODA_TARGET)
 init:
 	-@if not exist $(OUTPUT_DIR) $(MD) $(OUTPUT_DIR)
 
+	@if exist $(BIN_DIR)\test $(RD) $(BIN_DIR)\test
+	@$(MD) $(BIN_DIR)\test
+	@$(CP) $(WORKSPACE)\OsTest\TestKey\test\* $(BIN_DIR)\test
 #
 # GenLibsTarget
 #
@@ -134,6 +138,9 @@ $(OUTPUT_DIR)\RandVerify.obj : $(SOURCE_DIR)\../TestCryptLib/RandVerify.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/RandVerify.c
 $(OUTPUT_DIR)\X509Verify.obj : $(SOURCE_DIR)\../TestCryptLib/X509Verify.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/X509Verify.c
+$(OUTPUT_DIR)\OsSupport.obj : $(SOURCE_DIR)\../TestCryptLib/OsSupport.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/OsSupport.c
+
 
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
