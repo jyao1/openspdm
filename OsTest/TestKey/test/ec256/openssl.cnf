@@ -1,0 +1,15 @@
+[ v3_end ]
+basicConstraints = critical,CA:false
+keyUsage = nonRepudiation, digitalSignature
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+subjectAltName = @alt_names
+
+[ v3_inter ]
+basicConstraints = CA:true
+keyUsage = cRLSign, keyCertSign, digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement, keyCertSign, cRLSign
+subjectKeyIdentifier = hash
+extendedKeyUsage = critical, serverAuth, clientAuth
+
+[ alt_names ]
+otherName = 1.3.6.1.4.1.412.274.1;UTF8:123456
