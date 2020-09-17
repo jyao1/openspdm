@@ -17,10 +17,8 @@ SpdmSessionInfoInit (
 {
   ZeroMem (SessionInfo, sizeof(*SessionInfo));
   SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize  = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
   SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
+  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 }
 
 SPDM_SESSION_INFO *
@@ -362,7 +360,7 @@ SpdmGetData (
 
   SpdmContext = Context;
 
-  if (NeedSessionInfoForData (DataType)) {    
+  if (NeedSessionInfoForData (DataType)) {
     if (Parameter->Location != SpdmDataLocationSession) {
       return RETURN_INVALID_PARAMETER;
     }
