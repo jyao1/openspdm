@@ -56,7 +56,7 @@ endif
 #
 # Shell Command Macro
 #
-CP = cp -f
+CP = cp -r -f
 MD = mkdir -p
 MV = mv -f
 RD = rm -r -f
