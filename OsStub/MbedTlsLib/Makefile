@@ -27,7 +27,7 @@ OUTPUT_DIR = $(BIN_DIR)\OsStub\$(MODULE_NAME)
 
 SOURCE_DIR = $(WORKSPACE)\OsStub\$(MODULE_NAME)
 
-CC_FLAGS = $(CC_FLAGS) $(MBEDTLS_FLAGS) -DNO_MSABI_VA_FUNCS
+CC_FLAGS = $(CC_FLAGS) $(MBEDTLS_FLAGS)
 
 !IF "$(ARCH)" == "X64"
 CC_FLAGS = $(CC_FLAGS) -DEFIX64
@@ -124,6 +124,7 @@ INC =  \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \
     -I$(WORKSPACE)\OsStub\Include \
     -I$(WORKSPACE)\OsStub\MbedTlsLib\Include \
+    -I$(WORKSPACE)\OsStub\MbedTlsLib\Include\mbedtls \
     -I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include \
     -I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include\mbedtls \
 
