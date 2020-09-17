@@ -59,7 +59,10 @@ INC =  \
     -I$(WORKSPACE)\Include\Hal \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \
     -I$(WORKSPACE)\OsStub\Include \
-    -I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include
+    -I$(WORKSPACE)\OsStub\MbedTlsLib\Include \
+    -I$(WORKSPACE)\OsStub\MbedTlsLib\Include\mbedtls \
+    -I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include \
+    -I$(WORKSPACE)\OsStub\MbedTlsLib\mbedtls\include\mbedtls \
 
 #
 # Overridable Target Macro Definitions

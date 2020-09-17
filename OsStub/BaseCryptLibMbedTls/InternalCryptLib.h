@@ -16,6 +16,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseCryptLib.h>
 #include <stdio.h>
 
+//
+// We should alwasy add mbedtls/config.h here
+// to ensure the config override takes effect.
+//
+#include <mbedtls/config.h>
+
 int myrand( void *rng_state, unsigned char *output, size_t len );
 
 #endif
