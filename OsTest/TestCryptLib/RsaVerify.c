@@ -189,7 +189,7 @@ ValidateCryptRsa (
 
   KeySize = 1;
   Status = RsaGetKey (Rsa, RsaKeyN, NULL, &KeySize);
-  if (Status || KeySize != 0) {
+  if (!Status || KeySize != 0) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   }
@@ -205,7 +205,7 @@ ValidateCryptRsa (
 
   KeySize = 1;
   Status = RsaGetKey (Rsa, RsaKeyE, NULL, &KeySize);
-  if (Status || KeySize != 0) {
+  if (!Status || KeySize != 0) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   }

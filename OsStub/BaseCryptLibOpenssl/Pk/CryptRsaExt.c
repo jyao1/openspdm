@@ -136,20 +136,21 @@ RsaGetKey (
   }
 
   if (BnKey == NULL) {
-    *BnSize = 0;
     return FALSE;
   }
 
-  *BnSize = BN_num_bytes (BnKey);
+  *BnSize = Size;
+  Size    = BN_num_bytes (BnKey);
+
+  if (*BnSize < Size) {
+    *BnSize = Size;
+    return FALSE;
+  }
 
   if (BigNumber == NULL) {
-    return FALSE;
+    *BnSize = Size;
+    return TRUE;
   }
-
-  if (*BnSize > Size) {
-    return FALSE;
-  }
-
   *BnSize = BN_bn2bin (BnKey, BigNumber) ;
 
   return TRUE;
