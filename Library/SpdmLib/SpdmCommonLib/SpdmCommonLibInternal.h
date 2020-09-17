@@ -31,7 +31,7 @@ typedef struct {
 typedef enum {
   //
   // Before send KEY_EXCHANGE/PSK_EXCHANGE
-  // or after END_SESSION 
+  // or after END_SESSION
   //
   SpdmStateNotStarted,
   //
@@ -199,7 +199,7 @@ typedef struct {
   // F  = Concatenate (FINISH request, FINISH response)
   //
   LARGE_MANAGED_BUFFER            MessageK;
-  SMALL_MANAGED_BUFFER            MessageF;
+  LARGE_MANAGED_BUFFER            MessageF;
   //
   // TH for PSK_EXCHANGE response HMAC: Concatenate (A, K)
   // K  = Concatenate (PSK_EXCHANGE request, PSK_EXCHANGE response\VerifyData)
@@ -300,7 +300,7 @@ typedef struct {
   SPDM_DEVICE_SEND_MESSAGE_FUNC     SendMessage;
   SPDM_DEVICE_RECEIVE_MESSAGE_FUNC  ReceiveMessage;
   UINT32                            Alignment;
-  
+
   //
   // Command Status
   //
@@ -488,7 +488,7 @@ InternalDumpHex (
   This function returns the SPDM hash size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM hash size
 **/
 UINT32
@@ -500,7 +500,7 @@ GetSpdmHashSize (
   This function returns the SPDM asym size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM hash size
 **/
 UINT32
@@ -512,7 +512,7 @@ GetSpdmAsymSize (
   This function returns the SPDM Request asym size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM hash size
 **/
 UINT32
@@ -524,7 +524,7 @@ GetSpdmReqAsymSize (
   This function returns the SPDM measurement hash size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM measurement hash size
 **/
 UINT32
@@ -556,7 +556,7 @@ GetSpdmHkdfExpandFunc (
   This function returns the SPDM DHENamedGroup size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM DHENamedGroup size
 **/
 UINT32
@@ -578,7 +578,7 @@ IsSpdmECDHE (
   This function returns the SPDM AEAD key size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM AEAD key size
 **/
 UINT32
@@ -590,7 +590,7 @@ GetSpdmAeadKeySize (
   This function returns the SPDM AEAD iv size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM AEAD iv size
 **/
 UINT32
@@ -602,7 +602,7 @@ GetSpdmAeadIvSize (
   This function returns the SPDM AEAD tag size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM AEAD iv size
 **/
 UINT32
@@ -614,7 +614,7 @@ GetSpdmAeadTagSize (
   This function returns the SPDM AEAD block size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM AEAD iv size
 **/
 UINT32
@@ -736,7 +736,7 @@ GetManagedBuffer (
 
 /**
   This function generate SPDM HandshakeKey.
-  
+
   @param[in]  SpdmContext            The SPDM context for the device.
 **/
 RETURN_STATUS
@@ -748,7 +748,7 @@ SpdmGenerateSessionHandshakeKey (
 
 /**
   This function generate SPDM DataKey.
-  
+
   @param[in]  SpdmContext            The SPDM context for the device.
 **/
 RETURN_STATUS
