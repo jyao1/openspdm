@@ -106,7 +106,7 @@ SpdmGetResponseVendorDefinedRequest (
              Response,
              ResponseSize
              );
-  if (RETURN_ERROR(Status)) {                              
+  if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
   }
   return RETURN_SUCCESS;
@@ -133,7 +133,7 @@ SpdmGetResponseVendorDefinedRequest (
                                        than zero, then this function will return RETURN_TIMEOUT if the
                                        time required to execute the message is greater
                                        than Timeout.
-                                       
+
   @retval RETURN_SUCCESS               The SPDM message is sent successfully.
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is sent to the device.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -191,7 +191,7 @@ SpdmDeviceSendMessage (
                                        than zero, then this function will return RETURN_TIMEOUT if the
                                        time required to execute the message is greater
                                        than Timeout.
-                                       
+
   @retval RETURN_SUCCESS               The SPDM message is received successfully.
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is received from the device.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL, MessageSize is NULL or
@@ -295,7 +295,7 @@ SpdmServerInit (
     HasRspPrivKey = FALSE;
   }
 
-  Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  Res = ReadRequesterRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {
     HasReqPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
@@ -303,7 +303,7 @@ SpdmServerInit (
     //SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
     SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
     // Do not free it.
-    
+
     Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED;
     //Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST;
     //Data8 = SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS;
