@@ -47,6 +47,7 @@ SpdmResponderGenerateKeyExchangeSignature (
   }
   CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+
   HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
@@ -100,7 +101,7 @@ SpdmResponderGenerateKeyExchangeHmac (
   if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
     return FALSE;
   }
-  
+
   HmacFunc = GetSpdmHmacFunc (SpdmContext);
   HashFunc = GetSpdmHashFunc (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
@@ -229,7 +230,7 @@ SpdmGetResponseKeyExchange (
   SpdmResponse->SlotIDParam = 0;
 
   GetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
-  
+
   Ptr = (VOID *)(SpdmResponse + 1);
   GenerateDHESelfKey (SpdmContext, DHEKeySize, Ptr, &DHEContext);
   DEBUG((DEBUG_INFO, "Calc SelfKey (0x%x):\n", DHEKeySize));
@@ -273,7 +274,7 @@ SpdmGetResponseKeyExchange (
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, SignatureSize);
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);
   Ptr += SignatureSize;
-  
+
   Result = SpdmResponderGenerateKeyExchangeHmac (SpdmContext, SessionInfo, SlotNum, Ptr);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, SessionId);

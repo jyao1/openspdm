@@ -39,11 +39,13 @@ SpdmRequesterVerifyMeasurementSignature (
   ASYM_GET_PUBLIC_KEY_FROM_X509             GetPublicKeyFromX509Func;
   ASYM_FREE                                 FreeFunc;
   ASYM_VERIFY                               VerifyFunc;
+  UINT8                                     *CertChainBuffer;
+  UINTN                                     CertChainBufferSize;
 
   HashFunc = GetSpdmHashFunc (SpdmContext);
   ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
-  
+
   DEBUG((DEBUG_INFO, "L1L2 Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
 
@@ -51,12 +53,21 @@ SpdmRequesterVerifyMeasurementSignature (
   DEBUG((DEBUG_INFO, "L1L2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
-  
+
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
     return FALSE;
   }
-  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+
+  CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+
+  //
+  // Get leaf cert from cert chain
+  //
+  Result = X509GetCertFromCertChain (CertChainBuffer, CertChainBufferSize, -1,  &CertBuffer, &CertBufferSize);
+  if (!Result) {
+    return FALSE;
+  }
 
   GetPublicKeyFromX509Func = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
   FreeFunc = GetSpdmAsymFree (SpdmContext);
@@ -65,7 +76,7 @@ SpdmRequesterVerifyMeasurementSignature (
   if (!Result) {
     return FALSE;
   }
-  
+
   Result = VerifyFunc (
              Context,
              HashData,
@@ -78,7 +89,7 @@ SpdmRequesterVerifyMeasurementSignature (
     DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - FAIL !!!\n"));
     return FALSE;
   }
-  
+
   DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - PASS !!!\n"));
   return TRUE;
 }
@@ -255,7 +266,7 @@ SpdmGetMeasurement (
     Signature = Ptr;
     DEBUG((DEBUG_INFO, "Signature (0x%x):\n", SignatureSize));
     InternalDumpHex (Signature, SignatureSize);
-        
+
     Result = SpdmRequesterVerifyMeasurementSignature (SpdmContext, Signature, SignatureSize);
     if (!Result) {
       SpdmContext->ErrorState = SPDM_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE;
@@ -271,7 +282,7 @@ SpdmGetMeasurement (
     }
     AppendManagedBuffer (&SpdmContext->Transcript.L1L2, &SpdmResponse, SpdmResponseSize);
   }
-  
+
   if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
     *NumberOfBlocks = SpdmResponse.Header.Param1;
   } else {

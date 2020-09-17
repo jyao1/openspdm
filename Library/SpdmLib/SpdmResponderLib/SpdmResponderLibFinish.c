@@ -27,6 +27,8 @@ SpdmResponderVerifyFinishSignature (
   UINT8                                     CertBufferHash[MAX_HASH_SIZE];
   UINT8                                     *MutCertBuffer;
   UINTN                                     MutCertBufferSize;
+  UINT8                                     *MutCertChainBuffer;
+  UINTN                                     MutCertChainBufferSize;
   UINT8                                     MutCertBufferHash[MAX_HASH_SIZE];
   VOID                                      *Context;
   ASYM_GET_PUBLIC_KEY_FROM_X509             GetPublicKeyFromX509Func;
@@ -48,9 +50,10 @@ SpdmResponderVerifyFinishSignature (
   CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
 
-  MutCertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  MutCertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  HashFunc (MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
+  MutCertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  MutCertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+
+  HashFunc (MutCertChainBuffer, MutCertChainBufferSize, MutCertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -62,7 +65,7 @@ SpdmResponderVerifyFinishSignature (
   InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   DEBUG((DEBUG_INFO, "THMessageCM Data :\n"));
-  InternalDumpHex (MutCertBuffer, MutCertBufferSize);
+  InternalDumpHex (MutCertChainBuffer, MutCertChainBufferSize);
 
   DEBUG((DEBUG_INFO, "MessageF Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
@@ -81,6 +84,15 @@ SpdmResponderVerifyFinishSignature (
   GetPublicKeyFromX509Func = GetSpdmReqAsymGetPublicKeyFromX509 (SpdmContext);
   FreeFunc = GetSpdmReqAsymFree (SpdmContext);
   VerifyFunc = GetSpdmReqAsymVerify (SpdmContext);
+
+  //
+  // Get leaf cert from cert chain
+  //
+  Result = X509GetCertFromCertChain (MutCertChainBuffer, MutCertChainBufferSize, -1,  &MutCertBuffer, &MutCertBufferSize);
+  if (!Result) {
+    return FALSE;
+  }
+
   Result = GetPublicKeyFromX509Func (MutCertBuffer, MutCertBufferSize, &Context);
   if (!Result) {
     return FALSE;
@@ -201,7 +213,7 @@ SpdmGetResponseFinish (
   SPDM_FINISH_RESPONSE     *SpdmResponse;
   SPDM_DEVICE_CONTEXT      *SpdmContext;
   SPDM_SESSION_INFO        *SessionInfo;
-  
+
   SpdmContext = Context;
   SpdmRequest = Request;
 
@@ -245,7 +257,7 @@ SpdmGetResponseFinish (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  
+
   ASSERT (*ResponseSize >= sizeof(SPDM_FINISH_RESPONSE));
   *ResponseSize = sizeof(SPDM_FINISH_RESPONSE);
   ZeroMem (Response, *ResponseSize);

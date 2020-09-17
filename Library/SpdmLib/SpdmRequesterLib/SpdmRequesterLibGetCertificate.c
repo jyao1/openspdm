@@ -32,6 +32,9 @@ SpdmRequesterVerifyCertificateChain (
   UINTN                                     HashSize;
   UINT8                                     *RootCertHash;
   UINTN                                     RootCertHashSize;
+  UINT8                                     *RootCertBuffer;
+  UINTN                                     RootCertBufferSize;
+
 
   if (CertificateChainSize > MAX_SPDM_MESSAGE_BUFFER_SIZE) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (buffer too large) !!!\n"));
@@ -54,7 +57,17 @@ SpdmRequesterVerifyCertificateChain (
       DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (root hash mismatch) !!!\n"));
       return FALSE;
     }
-    // TBD verify the CertChain
+    // verify the CertChain
+    CertBuffer = (UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN) + HashSize;
+    CertBufferSize = CertificateChainSize - sizeof(SPDM_CERT_CHAIN) - HashSize;
+    if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
+      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get root certificate failed)!!!\n"));
+      return FALSE;
+    }
+    if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertBuffer, CertBufferSize)) {
+      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert chain verify failed)!!!\n"));
+      return FALSE;
+    }
   } else if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
     if (CertBufferSize != CertificateChainSize) {
       DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL !!!\n"));
@@ -101,7 +114,7 @@ SpdmGetCertificate (
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
- 
+
   do {
     if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
       SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -162,7 +175,7 @@ SpdmGetCertificate (
     // Cache data
     //
     AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmResponse, SpdmResponseSize);
-    
+
     DEBUG((DEBUG_INFO, "Certificate (Offset 0x%x, Size 0x%x):\n", SpdmRequest.Offset, SpdmResponse.PortionLength));
     InternalDumpHex (SpdmResponse.CertChain, SpdmResponse.PortionLength);
 
