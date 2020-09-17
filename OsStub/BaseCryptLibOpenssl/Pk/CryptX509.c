@@ -954,7 +954,7 @@ X509VerifyCertChain (
   while (TRUE) {
     TmpPtr = CurrentCert;
     Ret = ASN1_get_object (
-      &TmpPtr, (long *)&Length,
+      (CONST UINT8 **)&TmpPtr, (long *)&Length,
       (int *)&Asn1Tag, (int *)&ObjClass,
       (long)(CertChainLength + CertChain - TmpPtr));
     if (Asn1Tag != V_ASN1_SEQUENCE || Ret == 0x80) {
@@ -1033,6 +1033,8 @@ X509GetCertFromCertChain (
     return FALSE;
   }
 
+  Asn1Len = 0;
+  CurrentCertLen = 0;
   CurrentCert = CertChain;
   CurrentIndex = -1;
 
@@ -1044,7 +1046,7 @@ X509GetCertFromCertChain (
 
     // Get asn1 object and taglen
     Ret = ASN1_get_object (
-      &TmpPtr, (long *)&Asn1Len,
+      (CONST UINT8 **)&TmpPtr, (long *)&Asn1Len,
       (int *)&Asn1Tag, (int *)&ObjClass,
       (long)(CertChainLength + CertChain - TmpPtr));
     if (Asn1Tag != V_ASN1_SEQUENCE || Ret == 0x80) {
