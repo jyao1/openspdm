@@ -80,7 +80,7 @@ SpdmStartSession (
   if (!UsePsk) {
     Status = SpdmSendReceiveKeyExchange (SpdmContext, MeasurementHashType, SlotNum, HeartbeatPeriod, SessionId, MeasurementHash);
     if (RETURN_ERROR(Status)) {
-      DEBUG ((DEBUG_INFO, "SpdmStartSession - %p\n", Status));
+      DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceiveKeyExchange - %p\n", Status));
       return Status;
     }
 
@@ -101,16 +101,16 @@ SpdmStartSession (
     }
 
     Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, SlotNum);
-    DEBUG ((DEBUG_INFO, "SpdmStartSession - %p\n", Status));
+    DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceiveFinish - %p\n", Status));
   } else {
     Status = SpdmSendReceivePskExchange (SpdmContext, MeasurementHashType, HeartbeatPeriod, SessionId, MeasurementHash);
     if (RETURN_ERROR(Status)) {
-      DEBUG ((DEBUG_INFO, "SpdmStartSession - %p\n", Status));
+      DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceivePskExchange - %p\n", Status));
       return Status;
     }
 
     Status = SpdmSendReceivePskFinish (SpdmContext, *SessionId);
-    DEBUG ((DEBUG_INFO, "SpdmStartSession - %p\n", Status));
+    DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceivePskFinish - %p\n", Status));
   }
   return Status;
 }

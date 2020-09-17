@@ -231,7 +231,7 @@ SpdmGetResponseFinish (
 
   HmacSize = GetSpdmHashSize (SpdmContext);
   if (SessionInfo->MutAuthRequested) {
-    SignatureSize = GetSpdmAsymSize (SpdmContext);
+    SignatureSize = GetSpdmReqAsymSize (SpdmContext);
   } else {
     SignatureSize = 0;
   }

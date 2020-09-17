@@ -94,7 +94,7 @@ ReadRequesterPrivateCertificate (
   BOOLEAN  Res;
   CHAR8    *File;
 
-  switch (USE_ASYM_ALGO) {
+  switch (USE_REQ_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
     File = "test/end_requester.key";
     break;
@@ -201,7 +201,7 @@ ReadRequesterRootPublicCertificate (
   CHAR8               *File;
 
 
-  switch (USE_ASYM_ALGO) {
+  switch (USE_REQ_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
     File = "test/ca.cert.der";
     break;
@@ -344,7 +344,7 @@ ReadRequesterPublicCertificateChain (
   UINT8               *RootCert;
   UINTN               RootCertLen;
 
-  switch (USE_ASYM_ALGO) {
+  switch (USE_REQ_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
     File = "test/bundle_requester.certchain.der";
     break;
@@ -486,8 +486,14 @@ SpdmDataSignFunc (
   UINTN                         PrivatePemSize;
   BOOLEAN                       Result;
 
-  if (AsymAlgo != USE_ASYM_ALGO) {
-    return FALSE;
+  if (IsResponder) {
+    if (AsymAlgo != USE_ASYM_ALGO) {
+      return FALSE;
+    }
+  } else {
+    if (AsymAlgo != USE_REQ_ASYM_ALGO) {
+      return FALSE;
+    }
   }
 
   GetPrivateKeyFromPemFunc = TestGetSpdmAsymGetPrivateKeyFromPem (AsymAlgo);
@@ -514,5 +520,5 @@ SpdmDataSignFunc (
              );
   FreeFunc (Context);
 
-  return TRUE;
+  return Result;
 }

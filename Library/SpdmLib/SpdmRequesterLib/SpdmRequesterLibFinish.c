@@ -50,7 +50,7 @@ SpdmRequesterGenerateFinishSignature (
     return FALSE;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
+  SignatureSize = GetSpdmReqAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
   HashFunc = GetSpdmHashFunc (SpdmContext);
 
@@ -200,7 +200,7 @@ SpdmSendReceiveFinish (
   SPDM_SESSION_INFO                         *SessionInfo;
   UINT8                                     *Ptr;
   BOOLEAN                                   Result;
-  
+
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
   }
@@ -217,7 +217,7 @@ SpdmSendReceiveFinish (
   SpdmRequest.Header.RequestResponseCode = SPDM_FINISH;
   if (SessionInfo->MutAuthRequested) {
     SpdmRequest.Header.Param1 = SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED;
-    SignatureSize = GetSpdmAsymSize (SpdmContext);
+    SignatureSize = GetSpdmReqAsymSize (SpdmContext);
   } else {
     SpdmRequest.Header.Param1 = 0;
     SignatureSize = 0;
