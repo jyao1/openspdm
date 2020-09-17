@@ -98,9 +98,7 @@ mbuild: $(INIT_TARGET) gen_libs $(CODA_TARGET)
 init:
 	-@if not exist $(OUTPUT_DIR) $(MD) $(OUTPUT_DIR)
 
-	@if exist $(BIN_DIR)\test $(RD) $(BIN_DIR)\test
-	@$(MD) $(BIN_DIR)\test
-	@$(CP) $(WORKSPACE)\OsTest\TestKey\test\* $(BIN_DIR)\test
+    @xcopy /Y /S $(WORKSPACE)\OsTest\TestKey\*.* $(BIN_DIR)
 #
 # GenLibsTarget
 #

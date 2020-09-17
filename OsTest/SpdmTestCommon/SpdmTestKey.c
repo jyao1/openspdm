@@ -68,6 +68,7 @@ ReadResponderPrivateCertificate (
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
     File = "ResEccP256TestRoot.pem";
+    File = "test/ec256/end_responder.key";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
     File = "ResEccP384TestRoot.pem";
@@ -102,6 +103,7 @@ ReadRequesterPrivateCertificate (
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
     File = "ReqEccP256TestRoot.pem";
+    File = "test/ec256/end_requester.key";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
     File = "ReqEccP384TestRoot.pem";
@@ -134,7 +136,23 @@ ReadResponderRootPublicCertificate (
   UINTN               CertChainSize;
   CHAR8               *File;
 
-  File = "test/ca.cert.der";
+  switch (USE_ASYM_ALGO) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+    File = "test/ca.cert.der";
+    break;
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
+    File = "ResRsa3072TestRoot.cer";
+    break;
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+    File = "test/ec256/ca.cert.der";
+    break;
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
+    File = "ResEccP384TestRoot.cer";
+    break;
+  default:
+    assert (0);
+    return FALSE;
+  }
   Res = ReadInputFile (File, &FileData, &FileSize);
   if (!Res) {
     return Res;
@@ -182,7 +200,25 @@ ReadRequesterRootPublicCertificate (
   UINTN               CertChainSize;
   CHAR8               *File;
 
-  File = "test/ca.cert.der";
+
+  switch (USE_ASYM_ALGO) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+    File = "test/ca.cert.der";
+    break;
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
+    File = "ResRsa3072TestRoot.cer";
+    break;
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+    File = "test/ec256/ca.cert.der";
+    break;
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
+    File = "ResEccP384TestRoot.cer";
+    break;
+  default:
+    assert (0);
+    return FALSE;
+  }
+
   Res = ReadInputFile (File, &FileData, &FileSize);
   if (!Res) {
     return Res;
@@ -242,6 +278,7 @@ ReadResponderPublicCertificateChain (
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
     File = "ResEccP256TestRoot.cer";
+    File = "test/ec256/bundle_responder.certchain.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
     File = "ResEccP384TestRoot.cer";
@@ -316,6 +353,7 @@ ReadRequesterPublicCertificateChain (
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
     File = "ReqEccP256TestRoot.cer";
+    File = "test/ec256/bundle_requester.certchain.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
     File = "ReqEccP384TestRoot.cer";
