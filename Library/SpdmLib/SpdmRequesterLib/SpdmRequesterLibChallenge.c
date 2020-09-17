@@ -41,13 +41,13 @@ SpdmRequesterVerifyCertificateChainHash (
   if (CertBufferSize == 0) {
     return FALSE;
   }
-  
+
   HashFunc = GetSpdmHashFunc (SpdmContext);
   ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
 
   HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
-  
+
   if (HashSize != CertificateChainHashSize) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - FAIL !!!\n"));
     return FALSE;
@@ -77,11 +77,13 @@ SpdmRequesterVerifyChallengeSignature (
   ASYM_GET_PUBLIC_KEY_FROM_X509             GetPublicKeyFromX509Func;
   ASYM_FREE                                 FreeFunc;
   ASYM_VERIFY                               VerifyFunc;
+  UINT8                                     *CertChainBuffer;
+  UINTN                                     CertChainBufferSize;
 
   HashFunc = GetSpdmHashFunc (SpdmContext);
   ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
-  
+
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
 
@@ -95,12 +97,21 @@ SpdmRequesterVerifyChallengeSignature (
   DEBUG((DEBUG_INFO, "M1M2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
-  
+
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
     return FALSE;
   }
-  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+
+  CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+
+  //
+  // Get leaf cert from cert chain
+  //
+  Result = X509GetCertFromCertChain (CertChainBuffer, CertChainBufferSize, -1,  &CertBuffer, &CertBufferSize);
+  if (!Result) {
+    return FALSE;
+  }
 
   GetPublicKeyFromX509Func = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
   FreeFunc = GetSpdmAsymFree (SpdmContext);
@@ -109,7 +120,7 @@ SpdmRequesterVerifyChallengeSignature (
   if (!Result) {
     return FALSE;
   }
-  
+
   Result = VerifyFunc (
              Context,
              HashData,
@@ -123,7 +134,7 @@ SpdmRequesterVerifyChallengeSignature (
     return FALSE;
   }
   DEBUG((DEBUG_INFO, "!!! VerifyChallengeSignature - PASS !!!\n"));
-  
+
   return TRUE;
 }
 
@@ -166,7 +177,7 @@ SpdmChallenge (
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
- 
+
   if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
     SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   } else {
@@ -245,7 +256,7 @@ SpdmChallenge (
 
   OpaqueLength = *(UINT16 *)Ptr;
   Ptr += sizeof(UINT16);
-  
+
   if (SpdmResponseSize < sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
                          HashSize +
                          SPDM_NONCE_SIZE +
@@ -282,7 +293,7 @@ SpdmChallenge (
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-  
+
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
 
   if (MeasurementHash != NULL) {

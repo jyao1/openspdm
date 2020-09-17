@@ -57,6 +57,8 @@ SpdmRequesterVerifyKeyExchangeSignature (
   ASYM_FREE                                 FreeFunc;
   ASYM_VERIFY                               VerifyFunc;
   LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  UINT8                                     *CertChainBuffer;
+  UINTN                                     CertChainBufferSize;
 
   HashFunc = GetSpdmHashFunc (SpdmContext);
   ASSERT(HashFunc != NULL);
@@ -65,15 +67,17 @@ SpdmRequesterVerifyKeyExchangeSignature (
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
     return FALSE;
   }
-  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
+
+  CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+
+  HashFunc (CertChainBuffer, CertChainBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
 
   DEBUG((DEBUG_INFO, "THMessageCt Data :\n"));
-  InternalDumpHex (CertBuffer, CertBufferSize);
+  InternalDumpHex (CertChainBuffer, CertChainBufferSize);
 
   DEBUG((DEBUG_INFO, "MessageK Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
@@ -90,6 +94,15 @@ SpdmRequesterVerifyKeyExchangeSignature (
   GetPublicKeyFromX509Func = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
   FreeFunc = GetSpdmAsymFree (SpdmContext);
   VerifyFunc = GetSpdmAsymVerify (SpdmContext);
+
+  //
+  // Get leaf cert from cert chain
+  //
+  Result = X509GetCertFromCertChain (CertChainBuffer, CertChainBufferSize, -1,  &CertBuffer, &CertBufferSize);
+  if (!Result) {
+    return FALSE;
+  }
+
   Result = GetPublicKeyFromX509Func (CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return FALSE;
@@ -171,7 +184,7 @@ SpdmRequesterVerifyKeyExchangeHmac (
 
 /**
   This function executes SPDM key change.
-  
+
   @param[in]  SpdmContext            The SPDM context for the device.
   @param[out] DeviceSecurityState    The Device Security state associated with the device.
 **/
@@ -294,7 +307,7 @@ SpdmSendReceiveKeyExchange (
 
   Ptr = SpdmResponse.ExchangeData;
   Ptr += DHEKeySize;
-  
+
   MeasurementSummaryHash = Ptr;
   DEBUG((DEBUG_INFO, "MeasurementSummaryHash (0x%x) - ", HashSize));
   InternalDumpData (MeasurementSummaryHash, HashSize);
@@ -329,7 +342,7 @@ SpdmSendReceiveKeyExchange (
   Signature = Ptr;
   DEBUG((DEBUG_INFO, "Signature (0x%x):\n", SignatureSize));
   InternalDumpHex (Signature, SignatureSize);
-  Ptr += SignatureSize;  
+  Ptr += SignatureSize;
   Result = SpdmRequesterVerifyKeyExchangeSignature (SpdmContext, SessionInfo, Signature, SignatureSize);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
@@ -375,7 +388,7 @@ SpdmSendReceiveKeyExchange (
 
   SessionInfo->SessionState = SpdmStateHandshaking;
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-  
+
   return RETURN_SUCCESS;
 }
 
