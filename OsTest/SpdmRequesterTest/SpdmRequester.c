@@ -76,7 +76,7 @@ CommunicatePlatformData (
                                        than zero, then this function will return RETURN_TIMEOUT if the
                                        time required to execute the message is greater
                                        than Timeout.
-                                       
+
   @retval RETURN_SUCCESS               The SPDM message is sent successfully.
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is sent to the device.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -134,7 +134,7 @@ SpdmDeviceSendMessage (
                                        than zero, then this function will return RETURN_TIMEOUT if the
                                        time required to execute the message is greater
                                        than Timeout.
-                                       
+
   @retval RETURN_SUCCESS               The SPDM message is received successfully.
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is received from the device.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL, MessageSize is NULL or
@@ -202,7 +202,7 @@ SpdmClientInit (
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
   SpdmSetAlignment (SpdmContext, 4);
 
-  Res = ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  Res = ReadResponderRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {
     HasRspPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
