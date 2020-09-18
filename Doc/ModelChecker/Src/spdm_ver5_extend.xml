@@ -1,0 +1,1505 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ACES xmlns="http://intel.com/XMLSchema/ACES/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Data>
+		<Title>C:\Users\shuwende\Documents\code_library\spdmfv\src\Visio\spdm_ver5_extendToSecure.vsdx</Title>
+		<Diagram Id="Page-1">
+			<Name>Page-1</Name>
+			<Source>
+				<Document>
+					<Name>spdm_ver5_extendToSecure.vsdx</Name>
+					<Timestamp>2020-07-20T15:07:37</Timestamp>
+					<Version/>
+				</Document>
+			</Source>
+			<Node Id="331">
+				<Name>task.331</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>GET_MEASUREMENTS_12</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.771993876213497" Y="13.25833333333333"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value="GET_MEASUREMENTS_11"/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1471">
+				<Name>message.1471</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ENCAPSULATED_REQUEST</Text>
+				<Subnode Id="1473" IsSource="false"/>
+				<Subnode Id="1421" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="427">
+				<Name>task.427</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>CAPABILITIES_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="19"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="version_match==1"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="860">
+				<Name>task.860</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>VENDOR_DEFINED_REQUEST_11</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.785654459365331" Y="12.11666664963677"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1137">
+				<Name>message.1137</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>KEY_EXCHANGE_RSP</Text>
+				<Subnode Id="968" IsSource="false"/>
+				<Subnode Id="944" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1573">
+				<Name>task.1573</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>END_SESSION_11</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.818749979541327" Y="0.8750002086162514"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="1345">
+				<Name>task.1345</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>KEY_UPDATE_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.818749979541327" Y="4.81250013411045"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="910">
+				<Name>branch</Name>
+				<Type>Branch</Type>
+				<Class>iFlow</Class>
+				<Text>GET_MEASUREMENTS_1</Text>
+				<Appearance Angle="0" Height="0.5625000116617789" LocX="0.4365178051296639" LocY="0.2812500058308894" Width="0.8730356102593277" X="1.710476078858353" Y="14.56902978602168"/>
+				<CustomProperty Label="Case" Name="Case" Value="[[CHALLENGE_AUTH], [!(MEAS_CAP==1||MEAS_CAP==2), MEAS_CAP==1||MEAS_CAP==2, MEAS_FRESH_CAP==0]]"/>
+			</Node>
+			<Node Id="11">
+				<Name>Phase List</Name>
+				<Type>PhaseList</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="12" RelType="2"/>
+				<Appearance Angle="0" Height="20.2109372841025" LocX="0" LocY="20.2109372841025" Width="2.712381143119548" X="1.037618856880485" Y="20.75"/>
+			</Node>
+			<Node Id="1271">
+				<Name>task.1271</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>HEARTBEAT_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.785654459365331" Y="6.475280379105549"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="PSK_EXCHANGE_1, PSK_FINISH_11, FINISH_1"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="791">
+				<Name>message.791</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>!(MEAS_CAP==1||MEAS_CAP==2)</Text>
+				<Subnode Id="910" IsSource="true"/>
+				<Subnode Id="307" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1178">
+				<Name>task.1178</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_FINISH_11</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.785654459365331" Y="7.687500056895342"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="1394">
+				<Name>task.1394</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>KEY_UPDATE_11</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.818749979541327" Y="4.12500016018748"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="18">
+				<Name>CFF Container.18</Name>
+				<Type>Diagram</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="22" RelType="1"/>
+				<Subnode Id="21" RelType="1"/>
+				<Appearance Angle="0" Height="20.6874997846105" LocX="1.125000032371517" LocY="10.34374989230525" Width="2.250000064743086" X="5.875000169051071" Y="10.90625010769475"/>
+				<CustomProperty Label="Name" Name="BpmnName" Value="Title"/>
+				<CustomProperty Label="Variables" Name="Variables" Value=""/>
+				<CustomProperty Label="Args" Name="Args" Value=""/>
+				<CustomProperty Label="Atomic" Name="Atomic" Value="FALSE"/>
+				<CustomProperty Label="Max_num_instances" Name="Max_num_instances" Value="1"/>
+			</Node>
+			<Node Id="547">
+				<Name>task.547</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>CERTIFICATE_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="15.91277971410738"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="765">
+				<Name>message.765</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>CAPABILITIES</Text>
+				<Subnode Id="427" IsSource="true"/>
+				<Subnode Id="115" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1418">
+				<Name>message.1418</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>KEY_UPDATE_ACK</Text>
+				<Subnode Id="1394" IsSource="false"/>
+				<Subnode Id="1369" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1393">
+				<Name>message.1393</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>KEY_UPDATE</Text>
+				<Subnode Id="1369" IsSource="false"/>
+				<Subnode Id="1345" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="12">
+				<Name>Separator (vertical)</Name>
+				<Type>Phase</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="1573" RelType="1"/>
+				<Subnode Id="1649" RelType="1"/>
+				<Subnode Id="1625" RelType="1"/>
+				<Subnode Id="1600" RelType="1"/>
+				<Subnode Id="1524" RelType="1"/>
+				<Subnode Id="1473" RelType="1"/>
+				<Subnode Id="1445" RelType="1"/>
+				<Subnode Id="1419" RelType="1"/>
+				<Subnode Id="1394" RelType="1"/>
+				<Subnode Id="1345" RelType="1"/>
+				<Subnode Id="1320" RelType="1"/>
+				<Subnode Id="1271" RelType="1"/>
+				<Subnode Id="1205" RelType="1"/>
+				<Subnode Id="1203" RelType="1"/>
+				<Subnode Id="1178" RelType="1"/>
+				<Subnode Id="1169" RelType="1"/>
+				<Subnode Id="1016" RelType="1"/>
+				<Subnode Id="968" RelType="1"/>
+				<Subnode Id="920" RelType="1"/>
+				<Subnode Id="860" RelType="1"/>
+				<Subnode Id="836" RelType="1"/>
+				<Subnode Id="910" RelType="1"/>
+				<Subnode Id="792" RelType="1"/>
+				<Subnode Id="791" RelType="1"/>
+				<Subnode Id="331" RelType="1"/>
+				<Subnode Id="307" RelType="1"/>
+				<Subnode Id="259" RelType="1"/>
+				<Subnode Id="211" RelType="1"/>
+				<Subnode Id="187" RelType="1"/>
+				<Subnode Id="139" RelType="1"/>
+				<Subnode Id="115" RelType="1"/>
+				<Subnode Id="82" RelType="1"/>
+				<Subnode Id="34" RelType="1"/>
+				<Appearance Angle="0" Height="20.2109372841025" LocX="1.356190571559772" LocY="10.10546864205125" Width="2.712381143119548" X="2.393809428440257" Y="10.64453135794875"/>
+			</Node>
+			<Node Id="1112">
+				<Name>task.1112</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_FINISH_RSP_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000100711265" Y="8.4375"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="ERROR, ResonseNotReady"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="784">
+				<Name>message.784</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>RespondIfReady</Text>
+				<Subnode Id="259" IsSource="true"/>
+				<Subnode Id="547" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1138">
+				<Name>message.1138</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>FINISH</Text>
+				<Subnode Id="992" IsSource="false"/>
+				<Subnode Id="968" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1369">
+				<Name>task.1369</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>KEY_UPDATE_ACK_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="4.625000127337193"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="ERROR, ResonseNotReady, Busy"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1419">
+				<Name>sequence.1419</Name>
+				<Type>Sequence</Type>
+				<Class>iFlow</Class>
+				<Text>VerifyNewKey</Text>
+				<Subnode Id="1345" IsSource="false"/>
+				<Subnode Id="1394" IsSource="true"/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="Yield" Name="yield" Value="false"/>
+			</Edge>
+			<Node Id="82">
+				<Name>task.82</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>GET_CAPABILITIES_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.748035602484809" Y="19.375"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="909">
+				<Name>message.909</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>VENDOR_DEFINED_RESPONSE</Text>
+				<Subnode Id="860" IsSource="false"/>
+				<Subnode Id="884" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="767">
+				<Name>message.767</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (except ResponseNotReady)</Text>
+				<Subnode Id="451" IsSource="true"/>
+				<Subnode Id="115" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1141">
+				<Name>message.1141</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_EXCHANGE_RSP</Text>
+				<Subnode Id="1169" IsSource="false"/>
+				<Subnode Id="1088" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1497">
+				<Name>task.1497</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>ENCAPSULATED_RESPONSE_ACK_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="2.125000184571198"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="ERROR, ResonseNotReady, RequestInFlight"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1597">
+				<Name>message.1597</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>END_SESSION_ACK</Text>
+				<Subnode Id="1573" IsSource="false"/>
+				<Subnode Id="1548" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1524">
+				<Name>task.379</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>END_SESSION_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.818749979541327" Y="1.312500203197649"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="777">
+				<Name>message.777</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (ResponseNotReady)</Text>
+				<Subnode Id="499" IsSource="true"/>
+				<Subnode Id="259" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1625">
+				<Name>task.1625</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_FINISH_12</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.785654459365331" Y="7.231109927624535"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1136">
+				<Name>message.1136</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>KEY_EXCHANGE</Text>
+				<Subnode Id="944" IsSource="false"/>
+				<Subnode Id="920" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="22">
+				<Name>Phase List.22</Name>
+				<Type>PhaseList</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="23" RelType="2"/>
+				<Appearance Angle="0" Height="20.18749978461049" LocX="0" LocY="20.1874997846105" Width="2.25000006474305" X="4.75000013667959" Y="20.75"/>
+			</Node>
+			<Node Id="1649">
+				<Name>task.1649</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>DELIVER_ENCAPSULATED_RESPONSE_11</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.818749979541327" Y="1.81250019236044"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="944">
+				<Name>task.944</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>KEY_EXCHANGE_RSP_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000100711265" Y="11.125"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="ERROR, ResonseNotReady"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1203">
+				<Name>sequence</Name>
+				<Type>Sequence</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_CAP==2</Text>
+				<Subnode Id="1178" IsSource="false"/>
+				<Subnode Id="1169" IsSource="true"/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="Yield" Name="yield" Value="false"/>
+			</Edge>
+			<Edge Id="771">
+				<Name>message.771</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (except ResponseNotReady)</Text>
+				<Subnode Id="451" IsSource="true"/>
+				<Subnode Id="34" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="763">
+				<Name>message.763</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>GET_CAPABILITIES</Text>
+				<Subnode Id="427" IsSource="false"/>
+				<Subnode Id="82" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1140">
+				<Name>message.1140</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_EXCHANGE</Text>
+				<Subnode Id="1088" IsSource="false"/>
+				<Subnode Id="1016" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="801">
+				<Name>message.801</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ResdpondIfReady</Text>
+				<Subnode Id="643" IsSource="false"/>
+				<Subnode Id="259" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1522">
+				<Name>message.1522</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>DELIVER_ENCAPSULATED_RESPONSE</Text>
+				<Subnode Id="1649" IsSource="false"/>
+				<Subnode Id="1497" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="106">
+				<Name>message</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>GET_VERSION</Text>
+				<Subnode Id="58" IsSource="false"/>
+				<Subnode Id="34" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="643">
+				<Name>task.643</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>MEASUREMENTS_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="13.47527971410738"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="451">
+				<Name>task.451</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>ALGORITHMS_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="18.2188898570537"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="788">
+				<Name>message.788</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (ResponseNotReady)</Text>
+				<Subnode Id="571" IsSource="true"/>
+				<Subnode Id="259" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="786">
+				<Name>message.786</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (except ResponseNotReady)</Text>
+				<Subnode Id="571" IsSource="true"/>
+				<Subnode Id="211" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="800">
+				<Name>message.800</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (ResponseNotReady)</Text>
+				<Subnode Id="643" IsSource="true"/>
+				<Subnode Id="259" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="7">
+				<Name>CFF Container</Name>
+				<Type>Diagram</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="11" RelType="1"/>
+				<Subnode Id="10" RelType="1"/>
+				<Appearance Angle="0" Height="20.7109372841025" LocX="1.356190571559789" LocY="10.35546864205125" Width="2.712381143119584" X="2.393809428440238" Y="10.89453135794875"/>
+				<CustomProperty Label="Name" Name="BpmnName" Value="Title"/>
+				<CustomProperty Label="Variables" Name="Variables" Value=""/>
+				<CustomProperty Label="Args" Name="Args" Value=""/>
+				<CustomProperty Label="Atomic" Name="Atomic" Value="FALSE"/>
+				<CustomProperty Label="Max_num_instances" Name="Max_num_instances" Value="1"/>
+			</Node>
+			<Node Id="21">
+				<Name>Swimlane List.21</Name>
+				<Type>SwimlaneList</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="15" RelType="2"/>
+				<Subnode Id="1497" RelType="1"/>
+				<Subnode Id="1421" RelType="1"/>
+				<Subnode Id="1369" RelType="1"/>
+				<Subnode Id="1295" RelType="1"/>
+				<Subnode Id="1112" RelType="1"/>
+				<Subnode Id="1088" RelType="1"/>
+				<Subnode Id="992" RelType="1"/>
+				<Subnode Id="944" RelType="1"/>
+				<Subnode Id="884" RelType="1"/>
+				<Subnode Id="643" RelType="1"/>
+				<Subnode Id="571" RelType="1"/>
+				<Subnode Id="547" RelType="1"/>
+				<Subnode Id="499" RelType="1"/>
+				<Subnode Id="451" RelType="1"/>
+				<Subnode Id="427" RelType="1"/>
+				<Subnode Id="58" RelType="1"/>
+				<Appearance Angle="0" Height="20.68749978461049" LocX="0" LocY="20.6874997846105" Width="2.250000064742977" X="4.750000136679662" Y="21.25"/>
+			</Node>
+			<Node Id="23">
+				<Name>Separator (vertical).23</Name>
+				<Type>Phase</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="1497" RelType="1"/>
+				<Subnode Id="1421" RelType="1"/>
+				<Subnode Id="1369" RelType="1"/>
+				<Subnode Id="1295" RelType="1"/>
+				<Subnode Id="1112" RelType="1"/>
+				<Subnode Id="1088" RelType="1"/>
+				<Subnode Id="992" RelType="1"/>
+				<Subnode Id="944" RelType="1"/>
+				<Subnode Id="884" RelType="1"/>
+				<Subnode Id="643" RelType="1"/>
+				<Subnode Id="571" RelType="1"/>
+				<Subnode Id="547" RelType="1"/>
+				<Subnode Id="499" RelType="1"/>
+				<Subnode Id="451" RelType="1"/>
+				<Subnode Id="427" RelType="1"/>
+				<Subnode Id="58" RelType="1"/>
+				<Appearance Angle="0" Height="20.18749978461049" LocX="1.125000032371507" LocY="10.09374989230525" Width="2.25000006474305" X="5.875000169051097" Y="10.65625010769475"/>
+			</Node>
+			<Edge Id="794">
+				<Name>message.794</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>GET_MEASUREMENTS(sig)</Text>
+				<Subnode Id="331" IsSource="true"/>
+				<Subnode Id="643" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1016">
+				<Name>task.1016</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_EXCHANGE_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.785654459365331" Y="9.687500018626452"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="778">
+				<Name>message.778</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>RespondIfReady</Text>
+				<Subnode Id="259" IsSource="true"/>
+				<Subnode Id="499" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="968">
+				<Name>task.968</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>FINISH_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.785654459365331" Y="10.9374999945814"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="789">
+				<Name>message.789</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>RespondIfReady</Text>
+				<Subnode Id="259" IsSource="true"/>
+				<Subnode Id="571" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1548">
+				<Name>task.739</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>END_SESSION_ACK_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="1.312500203197649"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="ERROR, ResonseNotReady, InvalidEndSession"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1139">
+				<Name>message.1139</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>FINISH_RSP</Text>
+				<Subnode Id="1600" IsSource="false"/>
+				<Subnode Id="992" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="908">
+				<Name>message.908</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>VENDOR_DEFINED_REQUEST</Text>
+				<Subnode Id="884" IsSource="false"/>
+				<Subnode Id="836" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="4">
+				<Name>agent.205</Name>
+				<Type>Agent</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="1573" RelType="1"/>
+				<Subnode Id="1649" RelType="1"/>
+				<Subnode Id="1625" RelType="1"/>
+				<Subnode Id="1600" RelType="1"/>
+				<Subnode Id="1524" RelType="1"/>
+				<Subnode Id="1473" RelType="1"/>
+				<Subnode Id="1445" RelType="1"/>
+				<Subnode Id="1419" RelType="1"/>
+				<Subnode Id="1394" RelType="1"/>
+				<Subnode Id="1345" RelType="1"/>
+				<Subnode Id="1320" RelType="1"/>
+				<Subnode Id="1271" RelType="1"/>
+				<Subnode Id="1205" RelType="1"/>
+				<Subnode Id="1203" RelType="1"/>
+				<Subnode Id="1178" RelType="1"/>
+				<Subnode Id="1169" RelType="1"/>
+				<Subnode Id="1016" RelType="1"/>
+				<Subnode Id="968" RelType="1"/>
+				<Subnode Id="920" RelType="1"/>
+				<Subnode Id="860" RelType="1"/>
+				<Subnode Id="836" RelType="1"/>
+				<Subnode Id="910" RelType="1"/>
+				<Subnode Id="792" RelType="1"/>
+				<Subnode Id="791" RelType="1"/>
+				<Subnode Id="331" RelType="1"/>
+				<Subnode Id="307" RelType="1"/>
+				<Subnode Id="259" RelType="1"/>
+				<Subnode Id="211" RelType="1"/>
+				<Subnode Id="187" RelType="1"/>
+				<Subnode Id="139" RelType="1"/>
+				<Subnode Id="115" RelType="1"/>
+				<Subnode Id="82" RelType="1"/>
+				<Subnode Id="34" RelType="1"/>
+				<Appearance Angle="0" Height="20.7109372841025" LocX="1.356190571559738" LocY="10.35546864205125" Width="2.712381143119475" X="2.39380942844026" Y="10.89453135794875"/>
+				<CustomProperty Label="Variables" Name="Variables" Value=""/>
+				<CustomProperty Label="Max_num_services" Name="Max_num_services" Value="1"/>
+				<CustomProperty Label="Name" Name="BpmnName" Value="Party1_Requester"/>
+			</Node>
+			<Edge Id="112">
+				<Name>message.112</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>VERSION</Text>
+				<Subnode Id="82" IsSource="false"/>
+				<Subnode Id="58" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1143">
+				<Name>message.1143</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_FINISH_RSP</Text>
+				<Subnode Id="1625" IsSource="false"/>
+				<Subnode Id="1112" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="499">
+				<Name>task.499</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>DIGESTS_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="17.38138985705368"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="766">
+				<Name>message.766</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>NEGOTIATE_ALGORITHMS</Text>
+				<Subnode Id="115" IsSource="true"/>
+				<Subnode Id="451" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1169">
+				<Name>branch.1169</Name>
+				<Type>Branch</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_FINISH_1</Text>
+				<Appearance Angle="0" Height="0.6093749818392104" LocX="0.4062499878928069" LocY="0.3046874909196052" Width="0.8124999757856137" X="1.785654459365331" Y="8.511077719757246"/>
+				<CustomProperty Label="Case" Name="Case" Value=""/>
+			</Node>
+			<Edge Id="797">
+				<Name>message.797</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>MEASUREMENTS(sig)</Text>
+				<Subnode Id="643" IsSource="true"/>
+				<Subnode Id="307" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="571">
+				<Name>task.571</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>CHALLENGE_AUTH_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="14.85027971410738"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="764">
+				<Name>message.764</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (exceptResponseNotReady)</Text>
+				<Subnode Id="427" IsSource="true"/>
+				<Subnode Id="82" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1599">
+				<Name>message.1599</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (except ResponseNotReady)</Text>
+				<Subnode Id="34" IsSource="false"/>
+				<Subnode Id="451" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="782">
+				<Name>message.782</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>CERTIFICATE</Text>
+				<Subnode Id="547" IsSource="true"/>
+				<Subnode Id="211" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="307">
+				<Name>task.307</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>GET_MEASUREMENTS_11</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.771993876213497" Y="13.87500007599592"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value="GET_MEASUREMENTS_12"/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1344">
+				<Name>message.1344</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>HEARTBEAT_ACK</Text>
+				<Subnode Id="1320" IsSource="false"/>
+				<Subnode Id="1295" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1295">
+				<Name>task.1295</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>HEARTBEAT_ACK_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000100711265" Y="6.187500097534871"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="ERROR, ResonseNotReady, InvalidSessionID"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="774">
+				<Name>message.774</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>GET_DIGESTS</Text>
+				<Subnode Id="139" IsSource="true"/>
+				<Subnode Id="499" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="58">
+				<Name>task.58</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>VERSION_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="19.87500024835269"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="187">
+				<Name>task.187</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>GET_CERTIFICATE_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.771993876213497" Y="16.78777971410738"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="919">
+				<Name>message.919</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ALGORITHMS</Text>
+				<Subnode Id="1016" IsSource="false"/>
+				<Subnode Id="451" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1521">
+				<Name>message.1521</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>DELIVER_ENCAPSULATED_RESPONSE</Text>
+				<Subnode Id="1497" IsSource="false"/>
+				<Subnode Id="1473" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="796">
+				<Name>message.796</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (except ResponseNotReady)</Text>
+				<Subnode Id="643" IsSource="true"/>
+				<Subnode Id="331" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1469">
+				<Name>message.1469</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>GET_ENCAPSULATED_REQUEST</Text>
+				<Subnode Id="1421" IsSource="false"/>
+				<Subnode Id="1445" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="775">
+				<Name>message.775</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (except ResponseNotReady)</Text>
+				<Subnode Id="499" IsSource="true"/>
+				<Subnode Id="139" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="884">
+				<Name>task.884</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>VENDOR_DEFINED_RESPONSE_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000100711265" Y="12.43749999095287"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="1600">
+				<Name>task.1600</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>FINISH_11</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.785654459365331" Y="10.4375000054186"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="10">
+				<Name>Swimlane List</Name>
+				<Type>SwimlaneList</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="4" RelType="2"/>
+				<Subnode Id="1573" RelType="1"/>
+				<Subnode Id="1649" RelType="1"/>
+				<Subnode Id="1625" RelType="1"/>
+				<Subnode Id="1600" RelType="1"/>
+				<Subnode Id="1524" RelType="1"/>
+				<Subnode Id="1473" RelType="1"/>
+				<Subnode Id="1445" RelType="1"/>
+				<Subnode Id="1419" RelType="1"/>
+				<Subnode Id="1394" RelType="1"/>
+				<Subnode Id="1345" RelType="1"/>
+				<Subnode Id="1320" RelType="1"/>
+				<Subnode Id="1271" RelType="1"/>
+				<Subnode Id="1205" RelType="1"/>
+				<Subnode Id="1203" RelType="1"/>
+				<Subnode Id="1178" RelType="1"/>
+				<Subnode Id="1169" RelType="1"/>
+				<Subnode Id="1016" RelType="1"/>
+				<Subnode Id="968" RelType="1"/>
+				<Subnode Id="920" RelType="1"/>
+				<Subnode Id="860" RelType="1"/>
+				<Subnode Id="836" RelType="1"/>
+				<Subnode Id="910" RelType="1"/>
+				<Subnode Id="792" RelType="1"/>
+				<Subnode Id="791" RelType="1"/>
+				<Subnode Id="331" RelType="1"/>
+				<Subnode Id="307" RelType="1"/>
+				<Subnode Id="259" RelType="1"/>
+				<Subnode Id="211" RelType="1"/>
+				<Subnode Id="187" RelType="1"/>
+				<Subnode Id="139" RelType="1"/>
+				<Subnode Id="115" RelType="1"/>
+				<Subnode Id="82" RelType="1"/>
+				<Subnode Id="34" RelType="1"/>
+				<Appearance Angle="0" Height="20.7109372841025" LocX="0" LocY="20.7109372841025" Width="2.712381143119475" X="1.037618856880557" Y="21.25"/>
+			</Node>
+			<Node Id="259">
+				<Name>task.259</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>RespondIfReady_1</Text>
+				<Appearance Angle="0" Height="0.4374999999999982" LocX="0.3730356024848085" LocY="0.2187499999999991" Width="0.746071204969617" X="3.01806508118311" Y="16.19402971410738"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="776">
+				<Name>message.776</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>DIGESTS</Text>
+				<Subnode Id="499" IsSource="true"/>
+				<Subnode Id="187" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="920">
+				<Name>task.920</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>KEY_EXCHANGE_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.785654459365331" Y="11.49583332075443"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="1445">
+				<Name>task.1445</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>GET_ENCAPSULATED_REQUEST_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.818749979541327" Y="3.3125001899898"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="768">
+				<Name>message.768</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ALGORITHMS</Text>
+				<Subnode Id="451" IsSource="true"/>
+				<Subnode Id="139" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="787">
+				<Name>message.787</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>CHALLENGE_AUTH</Text>
+				<Subnode Id="571" IsSource="true"/>
+				<Subnode Id="910" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1205">
+				<Name>sequence.1205</Name>
+				<Type>Sequence</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_CAP!=2</Text>
+				<Subnode Id="1016" IsSource="false"/>
+				<Subnode Id="1169" IsSource="true"/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="Yield" Name="yield" Value="false"/>
+			</Edge>
+			<Node Id="1421">
+				<Name>task.1421</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>ENCAPSULATED_REQUEST_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000169051111" Y="2.937500165944747"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="ERROR, ResonseNotReady, RequestInFlight"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="1473">
+				<Name>task.1473</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>DELIVER_ENCAPSULATED_RESPONSE_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.818749979541327" Y="2.62500020489096"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="139">
+				<Name>task.139</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>GET_DIGESTS_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.771993876213497" Y="17.6875"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1319">
+				<Name>message.1319</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>HEARTBEAT</Text>
+				<Subnode Id="1295" IsSource="false"/>
+				<Subnode Id="1271" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="1320">
+				<Name>task.1320</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>HEARTBEAT_11</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.785654459365331" Y="5.719450830586563"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="HEARTBEAT_1"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="780">
+				<Name>message.780</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>GET_CERTIFICATE</Text>
+				<Subnode Id="187" IsSource="true"/>
+				<Subnode Id="547" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="109">
+				<Name>message.109</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (except ResponseNotReady)</Text>
+				<Subnode Id="34" IsSource="false"/>
+				<Subnode Id="58" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="792">
+				<Name>message.792</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>MEAS_CAP==1||MEAS_CAP==2</Text>
+				<Subnode Id="910" IsSource="true"/>
+				<Subnode Id="331" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="992">
+				<Name>task.992</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>FINISH_RSP_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000100711265" Y="10.125"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="ERROR, ResonseNotReady"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="34">
+				<Name>task</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>GET_VERSION_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.748035602484809" Y="20.3125"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="15">
+				<Name>agent</Name>
+				<Type>Agent</Type>
+				<Class>iFlow</Class>
+				<Text></Text>
+				<Subnode Id="1497" RelType="1"/>
+				<Subnode Id="1421" RelType="1"/>
+				<Subnode Id="1369" RelType="1"/>
+				<Subnode Id="1295" RelType="1"/>
+				<Subnode Id="1112" RelType="1"/>
+				<Subnode Id="1088" RelType="1"/>
+				<Subnode Id="992" RelType="1"/>
+				<Subnode Id="944" RelType="1"/>
+				<Subnode Id="884" RelType="1"/>
+				<Subnode Id="643" RelType="1"/>
+				<Subnode Id="571" RelType="1"/>
+				<Subnode Id="547" RelType="1"/>
+				<Subnode Id="499" RelType="1"/>
+				<Subnode Id="451" RelType="1"/>
+				<Subnode Id="427" RelType="1"/>
+				<Subnode Id="58" RelType="1"/>
+				<Appearance Angle="0" Height="20.68749978461049" LocX="1.125000032371489" LocY="10.34374989230525" Width="2.250000064742977" X="5.875000169051111" Y="10.90625010769475"/>
+				<CustomProperty Label="Variables" Name="Variables" Value=""/>
+				<CustomProperty Label="Max_num_services" Name="Max_num_services" Value="1"/>
+				<CustomProperty Label="Name" Name="BpmnName" Value="Party2_Responder"/>
+			</Node>
+			<Edge Id="779">
+				<Name>message.779</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>RespondIfReady</Text>
+				<Subnode Id="259" IsSource="true"/>
+				<Subnode Id="499" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="211">
+				<Name>task.211</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>CHALLENGE_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.771993876213497" Y="15.28777971410738"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="115">
+				<Name>task.115</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>NEGOTIATE_ALGORITHMS_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.748035602484809" Y="18.4375"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Node Id="1088">
+				<Name>task.1088</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_EXCHANGE_RSP_2</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="5.875000100711265" Y="9.281249728985138"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value="ERROR, ResonseNotReady"/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="783">
+				<Name>message.783</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>Error (ResponseNotReady))</Text>
+				<Subnode Id="547" IsSource="true"/>
+				<Subnode Id="259" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="781">
+				<Name>message.781</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>ERROR (except ResponseNotReady)</Text>
+				<Subnode Id="547" IsSource="true"/>
+				<Subnode Id="187" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="785">
+				<Name>message.785</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>CHALLENGE</Text>
+				<Subnode Id="211" IsSource="true"/>
+				<Subnode Id="571" IsSource="false"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Node Id="836">
+				<Name>task.836</Name>
+				<Type>Task</Type>
+				<Class>iFlow</Class>
+				<Text>VENDOR_DEFINED_REQUEST_1</Text>
+				<Appearance Angle="0" Height="0.375" LocX="0.4980356024848085" LocY="0.1875" Width="0.996071204969617" X="1.771993876213497" Y="12.68749999148505"/>
+				<CustomProperty Label="OutBranch" Name="OutBranch" Value="false"/>
+				<CustomProperty Label="Action" Name="Action" Value=""/>
+				<CustomProperty Label="Condition" Name="Condition" Value=""/>
+				<CustomProperty Label="InSync" Name="InSync" Value="false"/>
+			</Node>
+			<Edge Id="1144">
+				<Name>message.1144</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>CERTIFICATE</Text>
+				<Subnode Id="920" IsSource="false"/>
+				<Subnode Id="547" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1142">
+				<Name>message.1142</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>PSK_FINISH</Text>
+				<Subnode Id="1112" IsSource="false"/>
+				<Subnode Id="1178" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<Edge Id="1572">
+				<Name>message.1572</Name>
+				<Type>Message</Type>
+				<Class>iFlow</Class>
+				<Text>END_SESSION</Text>
+				<Subnode Id="1548" IsSource="false"/>
+				<Subnode Id="1524" IsSource="true"/>
+				<CustomProperty Label="Data" Name="Data" Value=""/>
+				<CustomProperty Label="Repository" Name="Repository" Value=""/>
+				<CustomProperty Label="FlowType" Name="FlowType" Value="P"/>
+				<CustomProperty Label="Command" Name="Command" Value="Other"/>
+				<CustomProperty Label="Fabric" Name="Fabric" Value="GENERIC"/>
+			</Edge>
+			<CustomProperty Label="iFlow" Name="iFlow" Value="4"/>
+		</Diagram>
+	</Data>
+</ACES>

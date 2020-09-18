@@ -1,0 +1,193 @@
+@startuml
+'hide footbox
+'hide empty description
+'title SPDM Protocol
+'skinparam ParticipantPadding 20
+'skinparam BoxPadding 10
+'skinparam backgroundColor #AAFFFF
+skinparam defaultFontName Lato
+left to right direction
+
+
+rectangle Party1_Requester {
+
+  rectangle GET_VERSION {
+      usecase "GET_VERSION_L1" as L1
+      usecase "GET_VERSION_L2" as L2
+  }
+
+  rectangle GET_CAPABILITIES{
+      usecase "GET_CAPABILITIES_L3" as L3
+  }
+
+  rectangle NEGOTIATE_ALGORITHMS_L{
+      usecase "NEGOTIATE_ALGORITHMS_L4" as L4
+  }
+
+  rectangle ALGORITHMS_L{
+      usecase "ALGORITHMS_L5" as L5
+  }
+
+  rectangle GET_DIGESTS{
+      usecase "GET_DIGESTS_L6" as L6
+  }
+
+  rectangle GET_CERTIFICATES{
+      usecase "GET_CERTIFICATES_L7" as L7
+  }
+
+  rectangle CHALLENGE{
+      usecase "CHALLENGE_L8" as L8
+  }
+
+  rectangle RespondIfReady{
+      usecase "RespondIfReady_L9" as L9
+  }
+
+  rectangle GET_MEASUREMENTS{
+      usecase "GET_MEASUREMENTS_L10" as L10
+      usecase "GET_MEASUREMENTS_L13" as L13
+      usecase "GET_MEASUREMENTS_L14" as L14
+  }
+
+  rectangle END_SESSION{
+      usecase "END_SESSION_L11" as L11
+      usecase "END_SESSION_L12" as L12
+  }
+
+}
+
+rectangle Party2_Responder {
+
+  rectangle VERSION {
+      usecase "VERSION_R1" as R1
+  }
+
+  rectangle CAPABILITIES{
+      usecase "CAPABILITIES_R2" as R2
+  }
+
+  rectangle ALGORITHMS_R{
+      usecase "ALGORITHMS_R3" as R3
+  }
+
+  'rectangle NEGOTIATE_ALGORITHMS{
+  '    usecase "NEGOTIATE_ALGORITHMS_R3" as R3
+  '}
+
+  rectangle DIGESTS{
+      usecase "DIGESTS_R4" as R4
+  }
+
+  rectangle CERTIFICATES{
+      usecase "GET_CERTIFICATES_R5" as R5
+  }
+
+  rectangle CHALLENGE_AUTH{
+      usecase "CHALLENGE_AUTH_R6" as R6
+  }
+
+  'rectangle RespondIfReady{
+  '    usecase "RespondIfReady_L9" as L9
+  '}
+
+  rectangle MEASUREMENTS{
+      usecase "MEASUREMENTS_R9" as R9
+      usecase "MEASUREMENTS_R10" as R10
+  }
+
+  rectangle END_SESSION_ACK{
+      usecase "END_SESSION_ACK_R7" as R7
+      usecase "END_SESSION_ACK_R8" as R8
+  }
+
+}
+
+'GET_VERSION
+'VERSION
+L1 --> R1: GET_VERSION
+R1 --> L1: ERROR (except \nResponseNotReady)
+R1 --> L2: VERSION
+
+'GET_CAPABILITIES
+'CAPABILITIES
+L2 --> R2: GET_CAPABILITIES
+R2 --> L2: ERROR (except \nResponseNotReady)
+R2 --> L3: CAPABILITIES
+
+'NEGOTIATE_ALGORITHMS
+'ALGORITHMS
+L3 --> R3: NEGOTIATE_ALGORITHMS
+R3 --> L3: ERROR (except \nResponseNotReady)
+R3 --> L1: ERROR (except \nResponseNotReady)
+R3 --> L4: ALGORITHMS
+
+R3 --> L5: NEGOTIATE_ALGORITHMS
+L5 --> R3: ERROR (except \nResponseNotReady)
+L5 --> L1: ERROR (except \nResponseNotReady)
+L5 --> L4: ALGORITHMS
+
+'GET_DIGESTS
+'DIGESTS
+L4 --> R4: GET_DIGESTS
+R4 --> L4: ERROR (except \nResponseNotReady)
+R4 --> L6: DIGESTS
+R4 --> L9: ERROR \n(ResponseNotReady)
+L9 --> R4: RespondIfReady
+
+'GET_CERTIFICATES
+'CERTIFICATES
+L6 --> R5: GET_CERTIFICATES
+R5 --> L6: ERROR (except \nResponseNotReady)
+R5 --> L7: CERTIFICATES
+R5 --> L9: ERROR \n(ResponseNotReady)
+L9 --> R5: RespondIfReady
+
+'CHALLENGE
+'CHALLENGE_AUTH
+L7 --> R6: CHALLENGE
+R6 --> L7: ERROR (except \nResponseNotReady)
+R6 --> L8: CHALLENGE_AUTH
+R6 --> L9: ERROR \n(ResponseNotReady)
+L9 --> R6: RespondIfReady
+
+'GET_MEASUREMENTS
+'MEASUREMENTS
+L8 --> L10: MEAS_CAP\n=others
+L8 --> L13: MEAS_CAP\n=01b/10b
+L8 --> L14: MEAS_FRESH_\nCAP==0
+
+L13 --> R9:GET_MEASUREMENTS(sig)
+
+L14 --> R10: reset \nbefore mea
+
+R9 --> L13: ERROR (except \nResponseNotReady)
+R9 --> L10: MEASUREMENTS(sig)
+R9 --> L9: ERROR \n(ResponseNotReady)
+L9 --> R9: RespondIfReady
+  
+R10 --> L13: after \nreset
+
+'END_SESSION
+'END_SESSION_ACK
+L10 --> R7: END_SESSION(k)
+L11 --> R8: Any requests
+
+R7 --> L11: END_SESSION_ACK
+R8 --> L12: ERROR \n(InvalidSession)
+
+rectangle Party1_Requester_VEN {
+  'VENDOR_DEFINED_REQUEST
+  usecase "vendor_VENL1" as VENL1
+  usecase "vendor_VENL2" as VENL2
+}
+
+rectangle Party2_Responder_VEN {
+  'VENDOR_DEFINED_RESPONSE
+  usecase "vendor_VENR1" as VENR1
+}
+
+VENL1 --> VENR1: VENDOR_DEFINED\n_REQUEST
+VENR1 --> VENL2: VENDOR_DEFINED\n_RESPONSE
+
+@enduml

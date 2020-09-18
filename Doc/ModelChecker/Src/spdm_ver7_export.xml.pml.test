@@ -1,0 +1,891 @@
+// function code
+#define GET_DIGESTS 129//0x81
+#define GET_CERTIFICATE 130//0x82
+#define CHALLENGE 131//0x83
+#define GET_VERSION 132//0x84
+#define GET_MEASUREMENTS 224//0xE0
+#define GET_CAPABILITIES 225//0xE1
+#define NEGOTIATE_ALGORITHMS 227//0xE3
+#define KEY_EXCHANGE 228//0xE4
+#define FINISH 229//0xE5
+#define PSK_EXCHANGE 230//0xE6
+#define PSK_FINISH 231//0xE7
+#define HEARTBEAT 232//0xE8
+#define KEY_UPDATE 233//0xE9
+#define GET_ENCAPSULATED_REQUEST 234//0xEA
+#define DELIVER_ENCAPSULATED_RESPONSE 235//0xEB
+#define END_SESSION 236//0xEC
+#define RESPOND_IF_READY 255//0xFF
+#define VENDOR_DEFINED_REQUEST 254//0xFE
+#define DIGESTS 1//0x01
+#define CERTIFICATE 2//0x02
+#define CHALLENGE_AUTH 3//0x03
+#define VERSION 4//0x04
+#define MEASUREMENTS 96//0x60
+#define CAPABILITIES 97//0x61
+#define ALGORITHMS 99//0x63
+#define KEY_EXCHANGE_RSP 100//0x64
+#define FINISH_RSP 101//0x65
+#define PSK_EXCHANGE_RSP 102//0x66
+#define PSK_FINISH_RSP 103//0x67
+#define HEARTBEAT_ACK 104//0x68
+#define KEY_UPDATE_ACK 105//0x69
+#define ENCAPSULATED_REQUEST 106//0x6A
+#define ENCAPSULATED_RESPONSE_ACK 107//0x6B
+#define END_SESSION_ACK 108//0x6C
+#define VENDOR_DEFINED_RESPONSE 126//0x7E
+#define ERROR 127//0x7F
+
+#define channelType 1
+
+#define ResponseNotReady 66 //0x42
+#define InvalidSessionID 2 // 0x02
+#define RequestInFlight 8 //0x08
+
+#define UpdateKey 1
+#define UpdateAllKeys 2
+#define VerifyNewKey 3
+
+#define MAX_LENGTH 100
+#define REQUE_ARR_COUNT 4
+
+
+typedef requester_cache {
+    byte version[10];
+    byte capabilities;
+    byte algorithms;
+    byte digests;
+    byte certificate;
+    byte challenge_auth;
+    byte measurements;
+    byte vendor_defined_response;
+    byte key_exchange_rsp;
+    byte finish_rsp;
+    byte psk_exchange_rsp;
+    byte psk_finish_rsp;
+    byte heartbeat_ack;
+    byte key_update_ack;
+    byte encapsulated_request;
+    byte encapsulated_response_ack;
+    byte end_session_ack;
+    byte version_match;
+    byte capabilities_match;
+    byte algorithms_match;
+    byte digests_match;
+    byte certificate_match;
+    byte challenge_auth_match;
+    byte measurements_match;
+    byte vendor_defined_response_match;
+    byte key_exchange_rsp_match;
+    byte finish_rsp_match;
+    byte psk_exchange_rsp_match;
+    byte psk_finish_rsp_match;
+    byte heartbeat_ack_match;
+    byte key_update_ack_match;
+    byte encapsulated_request_match;
+    byte encapsulated_response_ack_match;
+    byte end_session_ack_match;
+
+}
+
+typedef responder_cache {
+    byte version[10];
+    byte capabilities;
+    byte algorithms;
+    byte error;
+    byte digests;
+    byte certificate;
+    byte challenge_auth;
+    byte measurements;
+    byte vendor_defined_response;
+    byte key_exchange_rsp;
+    byte finish_rsp;
+    byte psk_exchange_rsp;
+    byte psk_finish_rsp;
+    byte heartbeat_ack;
+    byte key_update_ack;
+    byte encapsulated_request;
+    byte encapsulated_response_ack;
+    byte end_session_ack;
+}
+
+typedef payload_message {                                                           
+    byte payload_content[MAX_LENGTH];                                                       
+}  
+
+byte cur_phase=0;
+chan spdm1Que = [2] of { byte, payload_message, byte, byte, byte, byte };
+chan spdm1Spd = [2] of { byte, payload_message, byte, byte, byte, byte };
+// channelType, variable length payload, Param2, Param1, function code, major|minor version
+
+requester_cache Requester_Cache;
+responder_cache Responder_Cache;
+
+bit global_error;
+byte if_error=0;
+
+byte response_toEncapRsp=0;
+
+byte version_match=0;
+byte capabilities_match=0;
+byte algorithms_match=0;
+byte digests_match=0;
+byte certificate_match=0;
+byte challenge_auth_match=0;
+byte measurements_match=0;
+byte vendor_defined_response_match=0;
+byte key_exchange_rsp_match=0;
+byte finish_rsp_match=0;
+byte psk_exchange_rsp_match=0;
+byte psk_finish_rsp_match=0;
+byte heartbeat_ack_match=0;
+byte key_update_ack_match=0;
+byte encapsulated_request_match=0;
+byte encapsulated_response_ack_match=0;
+byte end_session_ack_match=0;
+
+byte signal;
+byte signal2;
+byte param1;
+byte param2;
+payload_message payload;
+// byte payload[MAX_LENGTH]=0;
+
+byte response_signal;
+byte response_signal2;
+byte response_param1;
+byte response_param2;
+payload_message response_payload;
+// byte response_payload[MAX_LENGTH]=0;
+
+byte RESPOND_IF_READY_response_code;
+byte ERROR_response_code;
+
+byte support_measurements=0;
+
+byte MEAS_FRESH_CAP=0;
+byte MEAS_CAP=1;
+
+byte PSK_CAP=2;
+
+byte payload_length=0;                                                              
+// By default this number is 4. Will be larger if the message has payload.          
+// This length is for model-only use to define the message length to solve the one-size channel problem 
+
+
+
+proctype Party2_Responder(chan Que, Spd)
+{
+START:   
+    if
+    :: 1==0 ->
+        { printf("to nego in responder\n"); /*goto NEGOTIATE_ALGORITHMS_2;*/}
+    :: else ->
+    atomic{
+        printf("to wait for reque\n");// goto START;}
+        Que?channelType(response_payload, 0, response_param1, response_signal, 0);
+        if 
+        :: skip->global_error=0;
+        :: skip->global_error=1;
+        fi
+        printf("Enter Responder\n");
+        if 
+        :: response_signal==GET_MEASUREMENTS -> { printf("to get measurements\n"); printf("1 response_signal=%d, global_error=%d\n",response_signal, global_error);goto MEASUREMENTS_2};
+        :: response_signal==RESPOND_IF_READY && response_param1==GET_MEASUREMENTS -> { printf("to get measurements after error\n"); printf("2 response_signal=%d, global_error=%d\n",response_signal, global_error); goto MEASUREMENTS_2};
+        :: response_signal==CHALLENGE -> { printf("to get challenge_auth\n"); printf("1 response_signal=%d, global_error=%d\n",response_signal, global_error);goto CHALLENGE_AUTH_2};
+        :: response_signal==RESPOND_IF_READY && response_param1==CHALLENGE -> { printf("to get challenge_auth after error\n"); printf("2 response_signal=%d, global_error=%d\n",response_signal, global_error); goto CHALLENGE_AUTH_2};
+        :: response_signal==GET_CERTIFICATE -> { printf("to get certificate\n"); printf("1 response_signal=%d, global_error=%d\n",response_signal, global_error);goto CERTIFICATE_2};
+        :: response_signal==RESPOND_IF_READY && response_param1==GET_CERTIFICATE -> { printf("to get certificate after error\n"); printf("2 response_signal=%d, global_error=%d\n",response_signal, global_error); goto CERTIFICATE_2};
+        :: response_signal==GET_DIGESTS -> { printf("to get digests\n"); printf("1 response_signal=%d, global_error=%d\n",response_signal, global_error);goto DIGESTS_2};
+        :: response_signal==RESPOND_IF_READY && response_param1==GET_DIGESTS -> { printf("to get digests after error\n"); printf("2 response_signal=%d, global_error=%d\n",response_signal, global_error); goto DIGESTS_2};
+        :: response_signal==NEGOTIATE_ALGORITHMS -> { printf("to get algorithms\n"); printf("1 response_signal=%d, global_error=%d\n",response_signal, global_error);goto ALGORITHMS_2};
+        :: response_signal==RESPOND_IF_READY && response_param1==NEGOTIATE_ALGORITHMS -> { printf("to get algorithms after error\n"); printf("2 response_signal=%d, global_error=%d\n",response_signal, global_error); goto ALGORITHMS_2};
+        :: response_signal==GET_CAPABILITIES -> { printf("to get capabilities\n"); printf("1 response_signal=%d, global_error=%d\n",response_signal, global_error);goto CAPABILITIES_2};
+        :: response_signal==RESPOND_IF_READY && response_param1==GET_CAPABILITIES -> { printf("to get capabilities after error\n"); printf("2 response_signal=%d, global_error=%d\n",response_signal, global_error); goto CAPABILITIES_2};
+        :: response_signal==GET_VERSION -> { printf("to get version\n"); printf("1 response_signal=%d, global_error=%d\n",response_signal, global_error);goto VERSION_2};
+        :: response_signal==RESPOND_IF_READY && response_param1==GET_VERSION -> { printf("to get version after error\n"); printf("2 response_signal=%d, global_error=%d\n",response_signal, global_error); goto VERSION_2};
+        :: else -> { printf("will go to somewhere else\n"); }
+        fi
+    }
+    fi
+VERSION_2:
+   printf("response_signal=%d, global_error=%d, param1=%d\n",response_signal, global_error,param1);
+    atomic{
+        if
+        :: (response_signal==GET_VERSION || (response_signal==RESPOND_IF_READY && response_param1==GET_VERSION)) && global_error!=1-> 
+            atomic{Spd!channelType(response_payload, 0, 0, VERSION, Responder_Cache.version);
+                   //ERROR 1 // respondIfReady 2
+                   assert(global_error==0);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady+1, ERROR, 0);
+                   ERROR_response_code=VERSION;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: else ->
+            printf("VERSION error\n");
+        fi
+        goto START;
+    }
+CAPABILITIES_2:
+   printf("response_signal=%d, global_error=%d, param1=%d\n",response_signal, global_error,param1);
+    atomic{
+        if
+        :: (response_signal==GET_CAPABILITIES || (response_signal==RESPOND_IF_READY && response_param1==GET_CAPABILITIES)) && global_error!=1-> 
+            atomic{Spd!channelType(response_payload, 0, 0, CAPABILITIES, Responder_Cache.capabilities);
+                   //ERROR 1 // respondIfReady 2
+                   assert(global_error==0);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady+1, ERROR, 0);
+                   ERROR_response_code=CAPABILITIES;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: else ->
+            printf("CAPABILITIES error\n");
+        fi
+        goto START;
+    }
+ALGORITHMS_2:
+   printf("response_signal=%d, global_error=%d, param1=%d\n",response_signal, global_error,param1);
+    atomic{
+        if
+        :: (response_signal==NEGOTIATE_ALGORITHMS || (response_signal==RESPOND_IF_READY && response_param1==NEGOTIATE_ALGORITHMS)) && global_error!=1-> 
+            atomic{Spd!channelType(response_payload, 0, 0, ALGORITHMS, Responder_Cache.algorithms);
+                   //ERROR 1 // respondIfReady 2
+                   assert(global_error==0);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady+1, ERROR, 0);
+                   ERROR_response_code=ALGORITHMS;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: else ->
+            printf("ALGORITHMS error\n");
+        fi
+        goto START;
+    }
+DIGESTS_2:
+   printf("response_signal=%d, global_error=%d, param1=%d\n",response_signal, global_error,param1);
+    atomic{
+        if
+        :: (response_signal==GET_DIGESTS || (response_signal==RESPOND_IF_READY && response_param1==GET_DIGESTS)) && global_error!=1-> 
+            atomic{Spd!channelType(response_payload, 0, 0, DIGESTS, Responder_Cache.digests);
+                   //ERROR 1 // respondIfReady 2
+                   assert(global_error==0);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady+1, ERROR, 0);
+                   ERROR_response_code=DIGESTS;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady, ERROR, 0);
+                   RESPOND_IF_READY_response_code=DIGESTS;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: else ->
+            printf("DIGESTS error\n");
+        fi
+        goto START;
+    }
+CERTIFICATE_2:
+   printf("response_signal=%d, global_error=%d, param1=%d\n",response_signal, global_error,param1);
+    atomic{
+        if
+        :: (response_signal==GET_CERTIFICATE || (response_signal==RESPOND_IF_READY && response_param1==GET_CERTIFICATE)) && global_error!=1-> 
+            atomic{Spd!channelType(response_payload, 0, 0, CERTIFICATE, Responder_Cache.certificate);
+                   //ERROR 1 // respondIfReady 2
+                   assert(global_error==0);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady+1, ERROR, 0);
+                   ERROR_response_code=CERTIFICATE;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady, ERROR, 0);
+                   RESPOND_IF_READY_response_code=CERTIFICATE;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: else ->
+            printf("CERTIFICATE error\n");
+        fi
+        goto START;
+    }
+CHALLENGE_AUTH_2:
+   printf("response_signal=%d, global_error=%d, param1=%d\n",response_signal, global_error,param1);
+    atomic{
+        if
+        :: (response_signal==CHALLENGE || (response_signal==RESPOND_IF_READY && response_param1==CHALLENGE)) && global_error!=1-> 
+            atomic{Spd!channelType(response_payload, 0, 0, CHALLENGE_AUTH, Responder_Cache.challenge_auth);
+                   //ERROR 1 // respondIfReady 2
+                   assert(global_error==0);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady+1, ERROR, 0);
+                   ERROR_response_code=CHALLENGE_AUTH;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady, ERROR, 0);
+                   RESPOND_IF_READY_response_code=CHALLENGE_AUTH;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: else ->
+            printf("CHALLENGE_AUTH error\n");
+        fi
+        goto START;
+    }
+MEASUREMENTS_2:
+   printf("response_signal=%d, global_error=%d, param1=%d\n",response_signal, global_error,param1);
+    atomic{
+        if
+        :: (response_signal==GET_MEASUREMENTS || (response_signal==RESPOND_IF_READY && response_param1==GET_MEASUREMENTS)) && global_error!=1-> 
+            atomic{Spd!channelType(response_payload, 0, 0, MEASUREMENTS, Responder_Cache.measurements);
+                   //ERROR 1 // respondIfReady 2
+                   assert(global_error==0);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady+1, ERROR, 0);
+                   ERROR_response_code=MEASUREMENTS;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: global_error==1 ->
+            atomic{Spd!channelType(response_payload, 0, ResponseNotReady, ERROR, 0);
+                   RESPOND_IF_READY_response_code=MEASUREMENTS;
+                   //ERROR 1
+                   assert(global_error==1);}
+        :: else ->
+            printf("MEASUREMENTS error\n");
+        fi
+        goto START;
+    }
+}
+proctype Party1_Requester(chan Que, Spd)
+{
+INI:
+    goto GET_VERSION_1;
+GET_VERSION_1:
+atomic{
+    Que!channelType(payload, 0, 0, GET_VERSION, 0);
+   printf("signal=%d, global_error=%d, param1=%d\n",signal, global_error, param1);
+    goto GET_CAPABILITIES_1;
+}
+GET_CAPABILITIES_1:
+    Spd?channelType(payload,0,param1,signal,signal2);
+    printf("signal=%d, global_error=%d, param1=%d\n",signal, global_error, param1);
+    assert(!(signal==ERROR && param1==ResponseNotReady && RESPOND_IF_READY_response_code==CAPABILITIES ))
+    if 
+    :: signal==VERSION && signal2==Requester_Cache.version ->
+        atomic{
+        printf("							version 0 match\n");
+        Requester_Cache.version_match=1;
+        version_match=1;
+        Que!channelType(payload, 0, 0, GET_CAPABILITIES, 0);
+        if 
+        :: skip -> goto NEGOTIATE_ALGORITHMS_1;
+        fi 
+        } 
+    :: signal==PSK_EXCHANGE_RSP && signal2==Requester_Cache.psk_exchange_rsp && PSK_CAP!=2 ->
+        atomic{
+        printf("							psk_exchange_rsp 1 match\n");
+        Requester_Cache.psk_exchange_rsp_match=1;
+        psk_exchange_rsp_match=1;
+        // PSK_EXCHANGE 11
+        assert(PSK_CAP==2 && GET_CAPABILITIES==PSK_FINISH||PSK_CAP!=2)
+        Que!channelType(payload, 0, 0, GET_CAPABILITIES, 0);
+        if 
+        :: skip -> goto NEGOTIATE_ALGORITHMS_1;
+        fi 
+        } 
+    :: signal==PSK_FINISH_RSP && signal2==Requester_Cache.psk_finish_rsp && PSK_CAP==2 ->
+        atomic{
+        printf("							psk_finish_rsp 2 match\n");
+        Requester_Cache.psk_finish_rsp_match=1;
+        psk_finish_rsp_match=1;
+        Que!channelType(payload, 0, 0, GET_CAPABILITIES, 0);
+        if 
+        :: skip -> goto NEGOTIATE_ALGORITHMS_1;
+        fi 
+        } 
+    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==VERSION->
+        atomic{
+        printf("Has not ResponseNotReady error in VERSION 3\n");
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==VERSION);
+        Que!channelType(payload, 0, 0, GET_VERSION, 0);
+        goto GET_CAPABILITIES_1;
+        }
+    :: signal==VERSION && signal2!=Requester_Cache.version ->
+        atomic{
+        printf("version 4 not match\n");
+        version_match=2;
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==VERSION);
+        Que!channelType(payload, 0, 0, GET_VERSION, 0);
+        goto GET_CAPABILITIES_1;
+        }
+    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==PSK_EXCHANGE_RSP->
+        atomic{
+        printf("Has not ResponseNotReady error in PSK_EXCHANGE_RSP 5\n");
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==PSK_EXCHANGE_RSP);
+        Que!channelType(payload, 0, 0, PSK_EXCHANGE, 0);
+        goto GET_CAPABILITIES_1;
+        }
+    :: signal==ERROR && param1==ResponseNotReady && RESPOND_IF_READY_response_code==PSK_EXCHANGE_RSP ->
+        atomic{
+        printf("ResponseNotReady error in PSK_EXCHANGE_RSP 6\n");
+        goto RespondIfReady_1;
+        }
+    :: signal==PSK_EXCHANGE_RSP && signal2!=Requester_Cache.psk_exchange_rsp ->
+        atomic{
+        printf("psk_exchange_rsp 7 not match\n");
+        psk_exchange_rsp_match=2;
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==PSK_EXCHANGE_RSP);
+        Que!channelType(payload, 0, 0, PSK_EXCHANGE, 0);
+        goto GET_CAPABILITIES_1;
+        }
+    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==PSK_FINISH_RSP->
+        atomic{
+        printf("Has not ResponseNotReady error in PSK_FINISH_RSP 8\n");
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==PSK_FINISH_RSP);
+        Que!channelType(payload, 0, 0, PSK_FINISH, 0);
+        goto GET_CAPABILITIES_1;
+        }
+    :: signal==ERROR && param1==ResponseNotReady && RESPOND_IF_READY_response_code==PSK_FINISH_RSP ->
+        atomic{
+        printf("ResponseNotReady error in PSK_FINISH_RSP 9\n");
+        goto RespondIfReady_1;
+        }
+    :: signal==PSK_FINISH_RSP && signal2!=Requester_Cache.psk_finish_rsp ->
+        atomic{
+        printf("psk_finish_rsp 10 not match\n");
+        psk_finish_rsp_match=2;
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==PSK_FINISH_RSP);
+        Que!channelType(payload, 0, 0, PSK_FINISH, 0);
+        goto GET_CAPABILITIES_1;
+        }
+    :: else ->
+        atomic{
+        printf("GET_CAPABILITIES has error, signal=%d, param1=%d, ERROR_response_code=%d, RESPOND_IF_READY_response_code=%d\n", signal, param1, ERROR_response_code, RESPOND_IF_READY_response_code);
+        }
+    fi
+NEGOTIATE_ALGORITHMS_1:
+    Spd?channelType(payload,0,param1,signal,signal2);
+    printf("signal=%d, global_error=%d, param1=%d\n",signal, global_error, param1);
+    assert(!(signal==ERROR && param1==ResponseNotReady && RESPOND_IF_READY_response_code==ALGORITHMS ))
+    if 
+    :: signal==CAPABILITIES && signal2==Requester_Cache.capabilities ->
+        atomic{
+        printf("							capabilities 11 match\n");
+        Requester_Cache.capabilities_match=1;
+        capabilities_match=1;
+        Que!channelType(payload, 0, 0, NEGOTIATE_ALGORITHMS, 0);
+        if 
+        :: skip -> goto GET_DIGESTS_1;
+        fi 
+        } 
+    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==CAPABILITIES->
+        atomic{
+        printf("Has not ResponseNotReady error in CAPABILITIES 12\n");
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==CAPABILITIES);
+        Que!channelType(payload, 0, 0, GET_CAPABILITIES, 0);
+        goto NEGOTIATE_ALGORITHMS_1;
+        }
+    :: signal==CAPABILITIES && signal2!=Requester_Cache.capabilities ->
+        atomic{
+        printf("capabilities 13 not match\n");
+        capabilities_match=2;
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==CAPABILITIES);
+        Que!channelType(payload, 0, 0, GET_CAPABILITIES, 0);
+        goto NEGOTIATE_ALGORITHMS_1;
+        }
+    :: else ->
+        atomic{
+        printf("NEGOTIATE_ALGORITHMS has error, signal=%d, param1=%d, ERROR_response_code=%d, RESPOND_IF_READY_response_code=%d\n", signal, param1, ERROR_response_code, RESPOND_IF_READY_response_code);
+        }
+    fi
+GET_DIGESTS_1:
+    Spd?channelType(payload,0,param1,signal,signal2);
+    printf("signal=%d, global_error=%d, param1=%d\n",signal, global_error, param1);
+    if 
+    :: signal==ALGORITHMS && signal2==Requester_Cache.algorithms ->
+        atomic{
+        printf("							algorithms 14 match\n");
+        Requester_Cache.algorithms_match=1;
+        algorithms_match=1;
+        Que!channelType(payload, 0, 0, GET_DIGESTS, 0);
+        if 
+        :: skip -> goto GET_CERTIFICATE_1;
+        fi 
+        } 
+    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==ALGORITHMS->
+        atomic{
+        printf("Has not ResponseNotReady error in NEGOTIATE_ALGORITHMS and will go to GET_VERSION again\n");
+        Que!channelType(payload, 0, 0, GET_VERSION, 0);
+        goto GET_CAPABILITIES_1;
+        }
+    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==ALGORITHMS->
+        atomic{
+        printf("Has not ResponseNotReady error in ALGORITHMS 15\n");
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==ALGORITHMS);
+        Que!channelType(payload, 0, 0, NEGOTIATE_ALGORITHMS, 0);
+        goto GET_DIGESTS_1;
+        }
+    :: signal==ALGORITHMS && signal2!=Requester_Cache.algorithms ->
+        atomic{
+        printf("algorithms 16 not match\n");
+        algorithms_match=2;
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==ALGORITHMS);
+        Que!channelType(payload, 0, 0, NEGOTIATE_ALGORITHMS, 0);
+        goto GET_DIGESTS_1;
+        }
+    :: else ->
+        atomic{
+        printf("GET_DIGESTS has error, signal=%d, param1=%d, ERROR_response_code=%d, RESPOND_IF_READY_response_code=%d\n", signal, param1, ERROR_response_code, RESPOND_IF_READY_response_code);
+        }
+    fi
+GET_CERTIFICATE_1:
+    Spd?channelType(payload,0,param1,signal,signal2);
+    printf("signal=%d, global_error=%d, param1=%d\n",signal, global_error, param1);
+    if 
+    :: signal==DIGESTS && signal2==Requester_Cache.digests ->
+        atomic{
+        printf("							digests 17 match\n");
+        Requester_Cache.digests_match=1;
+        digests_match=1;
+        Que!channelType(payload, 0, 0, GET_CERTIFICATE, 0);
+        if 
+        :: skip -> goto CHALLENGE_1;
+        fi 
+        } 
+    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==DIGESTS->
+        atomic{
+        printf("Has not ResponseNotReady error in DIGESTS 18\n");
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==DIGESTS);
+        Que!channelType(payload, 0, 0, GET_DIGESTS, 0);
+        goto GET_CERTIFICATE_1;
+        }
+    :: signal==ERROR && param1==ResponseNotReady && RESPOND_IF_READY_response_code==DIGESTS ->
+        atomic{
+        printf("ResponseNotReady error in DIGESTS 19\n");
+        goto RespondIfReady_1;
+        }
+    :: signal==DIGESTS && signal2!=Requester_Cache.digests ->
+        atomic{
+        printf("digests 20 not match\n");
+        digests_match=2;
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==DIGESTS);
+        Que!channelType(payload, 0, 0, GET_DIGESTS, 0);
+        goto GET_CERTIFICATE_1;
+        }
+    :: else ->
+        atomic{
+        printf("GET_CERTIFICATE has error, signal=%d, param1=%d, ERROR_response_code=%d, RESPOND_IF_READY_response_code=%d\n", signal, param1, ERROR_response_code, RESPOND_IF_READY_response_code);
+        }
+    fi
+CHALLENGE_1:
+    Spd?channelType(payload,0,param1,signal,signal2);
+    printf("signal=%d, global_error=%d, param1=%d\n",signal, global_error, param1);
+    if 
+    :: signal==CERTIFICATE && signal2==Requester_Cache.certificate ->
+        atomic{
+        printf("							certificate 21 match\n");
+        Requester_Cache.certificate_match=1;
+        certificate_match=1;
+        Que!channelType(payload, 0, 0, CHALLENGE, 0);
+        if 
+        :: skip -> goto GET_MEASUREMENTS_1;
+        fi 
+        } 
+    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==CERTIFICATE->
+        atomic{
+        printf("Has not ResponseNotReady error in CERTIFICATE 22\n");
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==CERTIFICATE);
+        Que!channelType(payload, 0, 0, GET_CERTIFICATE, 0);
+        goto CHALLENGE_1;
+        }
+    :: signal==ERROR && param1==ResponseNotReady && RESPOND_IF_READY_response_code==CERTIFICATE ->
+        atomic{
+        printf("ResponseNotReady error in CERTIFICATE 23\n");
+        goto RespondIfReady_1;
+        }
+    :: signal==CERTIFICATE && signal2!=Requester_Cache.certificate ->
+        atomic{
+        printf("certificate 24 not match\n");
+        certificate_match=2;
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==CERTIFICATE);
+        Que!channelType(payload, 0, 0, GET_CERTIFICATE, 0);
+        goto CHALLENGE_1;
+        }
+    :: else ->
+        atomic{
+        printf("CHALLENGE has error, signal=%d, param1=%d, ERROR_response_code=%d, RESPOND_IF_READY_response_code=%d\n", signal, param1, ERROR_response_code, RESPOND_IF_READY_response_code);
+        }
+    fi
+RespondIfReady_1:
+    if 
+    :: param1==ResponseNotReady && RESPOND_IF_READY_response_code==DIGESTS ->
+        atomic{
+            // respondIfReady 1
+            assert(RESPOND_IF_READY_response_code==DIGESTS);
+            Que!channelType(payload, 0, GET_DIGESTS, RESPOND_IF_READY, 0);
+            printf("send RESPOND_IF_READY for GET_DIGESTS\n");
+        if 
+        :: skip -> goto GET_CERTIFICATE_1;
+        fi 
+        }
+    :: param1==ResponseNotReady && RESPOND_IF_READY_response_code==CERTIFICATE ->
+        atomic{
+            // respondIfReady 1
+            assert(RESPOND_IF_READY_response_code==CERTIFICATE);
+            Que!channelType(payload, 0, GET_CERTIFICATE, RESPOND_IF_READY, 0);
+            printf("send RESPOND_IF_READY for GET_CERTIFICATE\n");
+        if 
+        :: skip -> goto CHALLENGE_1;
+        fi 
+        }
+    :: param1==ResponseNotReady && RESPOND_IF_READY_response_code==CHALLENGE_AUTH ->
+        atomic{
+            // respondIfReady 1
+            assert(RESPOND_IF_READY_response_code==CHALLENGE_AUTH);
+            Que!channelType(payload, 0, CHALLENGE, RESPOND_IF_READY, 0);
+            printf("send RESPOND_IF_READY for CHALLENGE\n");
+        if 
+        :: skip -> goto GET_MEASUREMENTS_1;
+        fi 
+        }
+    :: param1==ResponseNotReady && RESPOND_IF_READY_response_code==MEASUREMENTS ->
+        atomic{
+            // respondIfReady 1
+            assert(RESPOND_IF_READY_response_code==MEASUREMENTS);
+            Que!channelType(payload, 0, GET_MEASUREMENTS, RESPOND_IF_READY, 0);
+            printf("send RESPOND_IF_READY for GET_MEASUREMENTS\n");
+            goto GET_MEASUREMENTS_11;
+        }
+    :: else->
+        atomic{
+        printf("respondIfReady parameter error, param1=%d, RESPOND_IF_READY_response_code=%d\n", param1, RESPOND_IF_READY_response_code);
+        /*goto;*/
+        }
+    fi
+GET_MEASUREMENTS_11:
+    if 
+    :: support_measurements==1 ->{
+        Spd?channelType(payload,0,param1,signal,signal2);
+        if 
+        :: signal==MEASUREMENTS && signal2==Requester_Cache.measurements ->
+           atomic{
+           printf("							measurements match\n");
+           Requester_Cache.measurements_match=1;
+           measurements_match=1;
+           printf("Keep requesting GET_MEASUREMENTS or GET_VERSION\n");
+           if  
+           :: skip -> atomic{//Que!channelType(payload, 0, 0, GET_MEASUREMENTS, 0); 
+                             goto GET_MEASUREMENTS_12;} 
+           :: skip -> atomic{goto GET_VERSION_1;} 
+           fi 
+           } 
+	    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==MEASUREMENTS->
+	        atomic{
+	        printf("Has not ResponseNotReady error in MEASUREMENTS 25\n");
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==MEASUREMENTS);
+	        Que!channelType(payload, 0, 0, GET_MEASUREMENTS, 0);
+	        goto GET_MEASUREMENTS_11;
+	        }
+	    :: signal==ERROR && param1==ResponseNotReady && RESPOND_IF_READY_response_code==MEASUREMENTS ->
+	        atomic{
+	        printf("ResponseNotReady error in MEASUREMENTS 26\n");
+	        goto RespondIfReady_1;
+	        }
+	    :: signal==MEASUREMENTS && signal2!=Requester_Cache.measurements ->
+	        atomic{
+	        printf("measurements 27 not match\n");
+	        measurements_match=2;
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==MEASUREMENTS);
+	        Que!channelType(payload, 0, 0, GET_MEASUREMENTS, 0);
+	        goto GET_MEASUREMENTS_11;
+	        }
+        fi} 
+    :: else ->
+        printf("Measurement is not supported. \n");
+        goto LEAVE;
+    fi 
+GET_MEASUREMENTS_12:
+    if 
+    :: MEAS_FRESH_CAP==0 ->
+        atomic{
+        Requester_Cache.measurements_match=0;
+        measurements_match=0;
+        printf("Send reset before GET_MEASUREMENTS\n");
+        }
+    fi 
+        // GET_MEASUREMENTS 2
+        assert(!(MEAS_FRESH_CAP==0 && measurements_match==1));
+        atomic{
+        Que!channelType(payload, 0, 0, GET_MEASUREMENTS, 0);
+        goto GET_MEASUREMENTS_11;
+        }
+GET_MEASUREMENTS_1:
+    Spd?channelType(payload,0,param1,signal,signal2);
+    if 
+    :: signal==CHALLENGE_AUTH && signal2==Requester_Cache.challenge_auth ->
+        atomic{
+        printf("							challenge_auth match\n");
+        Requester_Cache.challenge_auth_match=1;
+        challenge_auth_match=1;
+        if
+        :: !(MEAS_CAP==1||MEAS_CAP==2)->
+            goto GET_MEASUREMENTS_11;
+        :: MEAS_CAP==1||MEAS_CAP==2->
+            support_measurements=1;
+            goto GET_MEASUREMENTS_12;
+        fi
+        //Que!channelType(payload, 0, 0, CHALLENGE, 0);
+        //goto GET_MEASUREMENTS_1;
+        }  
+    :: signal==ERROR && param1!=ResponseNotReady && ERROR_response_code==CHALLENGE_AUTH->
+        atomic{
+        printf("Has not ResponseNotReady error in CHALLENGE_AUTH 28\n");
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==CHALLENGE_AUTH);
+        Que!channelType(payload, 0, 0, CHALLENGE, 0);
+        goto GET_MEASUREMENTS_1;
+        }
+    :: signal==ERROR && param1==ResponseNotReady && RESPOND_IF_READY_response_code==CHALLENGE_AUTH ->
+        atomic{
+        printf("ResponseNotReady error in CHALLENGE_AUTH 29\n");
+        goto RespondIfReady_1;
+        }
+    :: signal==CHALLENGE_AUTH && signal2!=Requester_Cache.challenge_auth ->
+        atomic{
+        printf("challenge_auth 30 not match\n");
+        challenge_auth_match=2;
+                 // KEY_UPDATE 6
+                 assert(ERROR_response_code==CHALLENGE_AUTH);
+        Que!channelType(payload, 0, 0, CHALLENGE, 0);
+        goto GET_MEASUREMENTS_1;
+        }
+    :: else ->
+        atomic{
+        printf("GET_MEASUREMENTS has error\n");
+        }
+    fi
+LEAVE:
+}
+init{
+    atomic{
+        Requester_Cache.measurements=3;
+        Responder_Cache.measurements=3;
+        Requester_Cache.challenge_auth=3;
+        Responder_Cache.challenge_auth=3;
+        Requester_Cache.certificate=3;
+        Responder_Cache.certificate=3;
+        Requester_Cache.digests=3;
+        Responder_Cache.digests=3;
+        Requester_Cache.algorithms=3;
+        Responder_Cache.algorithms=3;
+        Requester_Cache.capabilities=3;
+        Responder_Cache.capabilities=3;
+        Requester_Cache.version=3;
+        Responder_Cache.version=3;
+    }
+
+    atomic{
+        run Party2_Responder(spdm1Que, spdm1Spd);
+        run Party1_Requester(spdm1Que, spdm1Spd);
+    }
+}
+// GET_VERSION 1
+ltl p0 {!<> ((version_match == 0) && (signal==CAPABILITIES))};
+ltl p1 {!<> ((version_match == 0) && (response_signal==GET_CAPABILITIES))};
+ltl p2 {!<> ((version_match == 0) && (signal==ALGORITHMS))};
+ltl p3 {!<> ((version_match == 0) && (response_signal==NEGOTIATE_ALGORITHMS))};
+ltl p4 {!<> ((version_match == 0) && (signal==DIGESTS))};
+ltl p5 {!<> ((version_match == 0) && (response_signal==GET_DIGESTS))};
+ltl p6 {!<> ((version_match == 0) && (signal==CERTIFICATE))};
+ltl p7 {!<> ((version_match == 0) && (response_signal==GET_CERTIFICATE))};
+ltl p8 {!<> ((version_match == 0) && (signal==CHALLENGE_AUTH))};
+ltl p9 {!<> ((version_match == 0) && (response_signal==CHALLENGE))};
+ltl p10 {!<> ((version_match == 0) && (signal==MEASUREMENTS))};
+ltl p11 {!<> ((version_match == 0) && (response_signal==GET_MEASUREMENTS))};
+ltl p12 {!<> ((version_match == 0) && (signal==KEY_EXCHANGE_RSP))};
+ltl p13 {!<> ((version_match == 0) && (response_signal==KEY_EXCHANGE))};
+ltl p14 {!<> ((version_match == 0) && (signal==FINISH_RSP))};
+ltl p15 {!<> ((version_match == 0) && (response_signal==FINISH))};
+ltl p16 {!<> ((version_match == 0) && (signal==PSK_EXCHANGE_RSP))};
+ltl p17 {!<> ((version_match == 0) && (response_signal==PSK_EXCHANGE))};
+ltl p18 {!<> ((version_match == 0) && (signal==PSK_FINISH_RSP))};
+ltl p19 {!<> ((version_match == 0) && (response_signal==PSK_FINISH))};
+ltl p20 {!<> ((version_match == 0) && (signal==KEY_UPDATE_ACK))};
+ltl p21 {!<> ((version_match == 0) && (response_signal==KEY_UPDATE))};
+ltl p22 {!<> ((version_match == 0) && (signal==ENCAPSULATED_REQUEST))};
+ltl p23 {!<> ((version_match == 0) && (response_signal==GET_ENCAPSULATED_REQUEST))};
+ltl p24 {!<> ((version_match == 0) && (signal==ENCAPSULATED_RESPONSE_ACK))};
+ltl p25 {!<> ((version_match == 0) && (response_signal==DELIVER_ENCAPSULATED_RESPONSE))};
+ltl p26 {!<> ((version_match == 0) && (signal==HEARTBEAT_ACK))};
+ltl p27 {!<> ((version_match == 0) && (response_signal==HEARTBEAT))};
+ltl p28 {!<> ((version_match == 0) && (signal==END_SESSION_ACK))};
+ltl p29 {!<> ((version_match == 0) && (response_signal==END_SESSION))};
+ltl p30 {!<> ((version_match == 0) && (signal==VENDOR_DEFINED_RESPONSE))};
+ltl p31 {!<> ((version_match == 0) && (response_signal==VENDOR_DEFINED_REQUEST))};
+// GET_VERSION 2, GET_CAPABILITIES 1, NEGOTIATE_ALGORITHMS 3
+ltl p32 {!<> (signal==ERROR && param1 == ResponseNotReady && version_match!=1)}; 
+ltl p33 {!<> (signal==ERROR && param1 == ResponseNotReady && capabilities_match!=1)}; 
+ltl p34 {!<> (signal==ERROR && param1 == ResponseNotReady && algorithms_match!=1)}; 
+// NEGOTIATE_ALGORITHMS 1
+ltl p35 {!<> ((capabilities_match == 0) && (response_signal==NEGOTIATE_ALGORITHMS))};
+// NEGOTIATE_ALGORITHMS 2
+ltl p36 {!<> ((algorithms_match == 0 && capabilities_match == 1) && (response_signal==GET_CAPABILITIES))};
+ltl p37 {!<> ((algorithms_match == 0) && (signal==DIGESTS))};
+ltl p38 {!<> ((algorithms_match == 0) && (response_signal==GET_DIGESTS))};
+ltl p39 {!<> ((algorithms_match == 0) && (signal==CERTIFICATE))};
+ltl p40 {!<> ((algorithms_match == 0) && (response_signal==GET_CERTIFICATE))};
+ltl p41 {!<> ((algorithms_match == 0) && (signal==CHALLENGE_AUTH))};
+ltl p42 {!<> ((algorithms_match == 0) && (response_signal==CHALLENGE))};
+ltl p43 {!<> ((algorithms_match == 0) && (signal==MEASUREMENTS))};
+ltl p44 {!<> ((algorithms_match == 0) && (response_signal==GET_MEASUREMENTS))};
+ltl p45 {!<> ((algorithms_match == 0) && (signal==KEY_EXCHANGE_RSP))};
+ltl p46 {!<> ((algorithms_match == 0) && (response_signal==KEY_EXCHANGE))};
+ltl p47 {!<> ((algorithms_match == 0) && (signal==FINISH_RSP))};
+ltl p48 {!<> ((algorithms_match == 0) && (response_signal==FINISH))};
+ltl p49 {!<> ((algorithms_match == 0) && (signal==PSK_EXCHANGE_RSP))};
+ltl p50 {!<> ((algorithms_match == 0) && (response_signal==PSK_EXCHANGE))};
+ltl p51 {!<> ((algorithms_match == 0) && (signal==PSK_FINISH_RSP))};
+ltl p52 {!<> ((algorithms_match == 0) && (response_signal==PSK_FINISH))};
+ltl p53 {!<> ((algorithms_match == 0) && (signal==KEY_UPDATE_ACK))};
+ltl p54 {!<> ((algorithms_match == 0) && (response_signal==KEY_UPDATE))};
+ltl p55 {!<> ((algorithms_match == 0) && (signal==ENCAPSULATED_REQUEST))};
+ltl p56 {!<> ((algorithms_match == 0) && (response_signal==GET_ENCAPSULATED_REQUEST))};
+ltl p57 {!<> ((algorithms_match == 0) && (signal==ENCAPSULATED_RESPONSE_ACK))};
+ltl p58 {!<> ((algorithms_match == 0) && (response_signal==DELIVER_ENCAPSULATED_RESPONSE))};
+ltl p59 {!<> ((algorithms_match == 0) && (signal==HEARTBEAT_ACK))};
+ltl p60 {!<> ((algorithms_match == 0) && (response_signal==HEARTBEAT))};
+ltl p61 {!<> ((algorithms_match == 0) && (signal==END_SESSION_ACK))};
+ltl p62 {!<> ((algorithms_match == 0) && (response_signal==END_SESSION))};
+ltl p63 {!<> ((algorithms_match == 0) && (signal==VENDOR_DEFINED_RESPONSE))};
+ltl p64 {!<> ((algorithms_match == 0) && (response_signal==VENDOR_DEFINED_REQUEST))};
+// CHALLENGE 1
+ltl p66{(<> (signal==CAPABILITIES W signal==ALGORITHMS)) || (<> (signal==CAPABILITIES W signal==ERROR))};
+// GET_MEASUREMENTS 1
+ltl p70{!<> (response_signal==GET_MEASUREMENTS && (!(MEAS_CAP==1 || MEAS_CAP==2)))}; 
+// GET_MEASUREMENTS 2
+// GET_MEASUREMENTS 3
+ltl p72{!<> ((challenge_auth_match == 0) && (response_signal==GET_MEASUREMENTS))}; 
+// ERROR 1
+// VENDOR_DEFINED_REQUEST 1
+ltl p74{!<> ((version_match == 0) && (response_signal==VENDOR_DEFINED_REQUEST))}; 
+ltl p75{!<> ((capabilities_match == 0) && (response_signal==VENDOR_DEFINED_REQUEST))}; 
+ltl p76{!<> ((algorithms_match == 0) && (response_signal==VENDOR_DEFINED_REQUEST))}; 
+// FINISH 1
+// PSK_EXCHAGE 7
+ltl p78{!<> ((version_match == 0) && (response_signal==PSK_EXCHANGE))}; 
+// PSK_EXCHAGE 11
