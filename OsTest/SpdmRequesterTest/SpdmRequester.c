@@ -202,7 +202,8 @@ SpdmClientInit (
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
   SpdmSetAlignment (SpdmContext, 4);
 
-  Res = ReadResponderRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
+#ifndef CBMC
+  Res = ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {
     HasRspPubCert = TRUE;
     ZeroMem (&Parameter, sizeof(Parameter));
@@ -238,6 +239,7 @@ SpdmClientInit (
   } else{
     HasReqPrivKey = FALSE;
   }
+#endif
 
   Data8 = 0;
   ZeroMem (&Parameter, sizeof(Parameter));

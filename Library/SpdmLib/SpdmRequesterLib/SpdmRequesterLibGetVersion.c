@@ -35,7 +35,11 @@ TrySpdmGetVersion (
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_VERSION;
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;
+#ifndef CBMC
   Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest), &SpdmRequest);
+#else
+  Status = 0;
+#endif
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -43,20 +47,30 @@ TrySpdmGetVersion (
   //
   // Cache data
   //
+#ifndef CBMC
   ResetManagedBuffer (&SpdmContext->Transcript.MessageA);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
+#endif
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+#ifndef CBMC
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
+#else
+  Status = 0;
+#endif
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+  #ifndef CBMC
     Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageA, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_VERSION, SPDM_VERSION, sizeof(SPDM_VERSION_RESPONSE_MAX));
+  #else
+    Status = 0;
+  #endif
     if (RETURN_ERROR(Status)) {
       return Status;
     }
@@ -82,7 +96,9 @@ TrySpdmGetVersion (
   //
   // Cache data
   //
+#ifndef CBMC
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+#endif
 
   for (Index = 0; Index < SpdmResponse.VersionNumberEntryCount; Index++) {
     SpdmContext->ConnectionInfo.Version[Index] = (UINT8)((SpdmResponse.VersionNumberEntry[Index].MajorVersion << 4) |

@@ -91,7 +91,11 @@ TrySpdmNegotiateAlgorithms (
   SpdmRequest.StructTable[3].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE;
   SpdmRequest.StructTable[3].AlgCount = 0x20;
   SpdmRequest.StructTable[3].AlgSupported = SpdmContext->LocalContext.Algorithm.KeySchedule;
+#ifndef CBMC
   Status = SpdmSendRequest (SpdmContext, SpdmRequest.Length, &SpdmRequest);
+#else
+  Status = 0;
+#endif
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -99,16 +103,26 @@ TrySpdmNegotiateAlgorithms (
   //
   // Cache data
   //
+#ifndef CBMC
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, SpdmRequest.Length);
+#endif
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+#ifndef CBMC
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
+#else
+  Status = 0;
+#endif
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+  #ifndef CBMC
     Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageA, SpdmRequest.Length, &SpdmResponseSize, &SpdmResponse, SPDM_NEGOTIATE_ALGORITHMS, SPDM_ALGORITHMS, sizeof(SPDM_ALGORITHMS_RESPONSE_MAX));
+  #else
+    Status = 0;
+  #endif  
     if (RETURN_ERROR(Status)) {
       return Status;
     }
@@ -134,7 +148,9 @@ TrySpdmNegotiateAlgorithms (
   //
   // Cache data
   //
+#ifndef CBMC
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+#endif
   
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SpdmResponse.MeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse.BaseAsymSel;

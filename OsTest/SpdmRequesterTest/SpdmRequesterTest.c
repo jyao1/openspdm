@@ -186,9 +186,103 @@ Done:
   return TRUE;
 }
 
+BOOLEAN
+ExperimentalTesting (
+)
+{
+ RETURN_STATUS  Status;
+  
+#ifdef _MSC_VER
+  WSADATA Ws;
+  if (WSAStartup(MAKEWORD(2,2), &Ws) != 0) {
+    printf ("Init Windows Socket Failed - %x\n", WSAGetLastError());
+    return FALSE;
+  }
+#endif
+  // Result = InitClient (&PlatformSocket, PortNumber);
+  // if (!Result) {
+  //   return FALSE;
+  // }
+  
+  // mSocket = PlatformSocket;
+  printf("Start to init client\n");
+  // __CPROVER_printf("Start execution\n");
+  SpdmClientInit ();
+
+  Status = 0;
+  // if (RETURN_ERROR(Status)) {
+  //   printf ("Empty - %x\n", (UINT32)Status);
+  //   goto Done;
+  // }
+
+  // ResponseSize = sizeof(mReceiveBuffer);
+  // Result = CommunicatePlatformData (
+  //            PlatformSocket,
+  //            SOCKET_SPDM_COMMAND_TEST,
+  //            0,
+  //            (UINT8 *)"Client Hello!",
+  //            sizeof("Client Hello!"),
+  //            &Response,
+  //            &Session,
+  //            &ResponseSize,
+  //            mReceiveBuffer
+  //            );
+  // if (!Result) {
+  //   return FALSE;
+  // }
+
+  // Do test - begin
+
+  // Status = DoAuthenticationViaSpdm ();
+  // if (RETURN_ERROR(Status)) {
+  //   printf ("DoAuthenticationViaSpdm - %x\n", (UINT32)Status);
+  //   // goto Done;
+  // }
+
+  // Status = DoMeasurementViaSpdm ();
+  // if (RETURN_ERROR(Status)) {
+  //   printf ("DoMeasurementViaSpdm - %x\n", (UINT32)Status);
+  //   goto Done;
+  // }
+
+  // Status = DoSessionViaSpdm ();
+  // if (RETURN_ERROR(Status)) {
+  //   printf ("DoSessionViaSpdm - %x\n", (UINT32)Status);
+  //   goto Done;
+  // }
+
+  // Do test - end
+
+// Done:
+//   ResponseSize = 0;
+//   Result = CommunicatePlatformData (
+//              PlatformSocket,
+//              SOCKET_SPDM_COMMAND_STOP,
+//              0,
+//              NULL,
+//              0,
+//              &Response,
+//              &Session,
+//              &ResponseSize,
+//              NULL
+//              );
+
+//   closesocket (PlatformSocket);
+  
+#ifdef _MSC_VER
+  WSACleanup();
+#endif
+
+  return TRUE; 
+}
+
 
 int main (void)
 {
+#ifdef CBMC
+  ExperimentalTesting();
+#else
   PlatformClientRoutine (DEFAULT_SPDM_PLATFORM_PORT);
+#endif
   printf ("Client stopped\n");
 }

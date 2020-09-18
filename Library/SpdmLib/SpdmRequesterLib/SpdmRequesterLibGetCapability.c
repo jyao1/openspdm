@@ -40,7 +40,11 @@ TrySpdmGetCapabilities (
   SpdmRequest.Header.Param2 = 0;
   SpdmRequest.CTExponent = RequesterCTExponent;
   SpdmRequest.Flags = RequesterFlags;
+#ifndef CBMC
   Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
+#else
+  Status = 0;
+#endif
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -48,16 +52,26 @@ TrySpdmGetCapabilities (
   //
   // Cache data
   //
+#ifndef CBMC
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
+#endif
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+#ifndef CBMC
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
+#else
+  Status = 0;
+#endif
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+  #ifndef CBMC
     Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageA, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_CAPABILITIES, SPDM_CAPABILITIES, sizeof(SPDM_CAPABILITIES_RESPONSE));
+  #else
+    Status = 0;
+  #endif  
     if (RETURN_ERROR(Status)) {
       return Status;
     }
@@ -74,7 +88,9 @@ TrySpdmGetCapabilities (
   //
   // Cache data
   //
+#ifndef CBMC
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+#endif
 
   SpdmContext->ConnectionInfo.Capability.CTExponent = SpdmResponse.CTExponent;
   SpdmContext->ConnectionInfo.Capability.Flags = SpdmResponse.Flags;
