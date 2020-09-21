@@ -84,84 +84,84 @@ ValidateCryptMac (
   UINT8    MacResult[16];
   BOOLEAN  Status;
 
-  Print (L" \nUEFI-OpenSSL CMAC Engine Testing:\n");
+  Print (" \nUEFI-OpenSSL CMAC Engine Testing:\n");
 
-  Print (L"- CMAC-AES:    ");
+  Print ("- CMAC-AES:    ");
 
   CmacCtx = CmacAesNew ();
 
-  Print (L"Init... ");
+  Print ("Init... ");
   Status  = CmacAesInit (CmacCtx, CmacKey, sizeof (CmacKey));
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Update... ");
+  Print ("Update... ");
   Status  = CmacAesUpdate (CmacCtx, CmacData, sizeof(CmacData));
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Finalize... ");
+  Print ("Finalize... ");
   Status  = CmacAesFinal (CmacCtx, MacResult);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   CmacAesFree (CmacCtx);
 
-  Print (L"Check Value... ");
+  Print ("Check Value... ");
   if (CompareMem (MacResult, CmacResult, 16) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"[Pass]\n");
+  Print ("[Pass]\n");
   
-  Print (L"- GMAC-AES:    ");
+  Print ("- GMAC-AES:    ");
 
   GmacCtx = GmacAesNew ();
 
-  Print (L"Init... ");
+  Print ("Init... ");
   Status  = GmacAesInit (GmacCtx, GmacKey, sizeof (GmacKey));
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   
-  Print (L"SetIv... ");
+  Print ("SetIv... ");
   Status  = GmacAesSetIv (GmacCtx, GmacIv, sizeof (GmacIv));
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Update... ");
+  Print ("Update... ");
   Status  = GmacAesUpdate (GmacCtx, GmacData, sizeof(GmacData));
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Finalize... ");
+  Print ("Finalize... ");
   Status  = GmacAesFinal (GmacCtx, MacResult);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   GmacAesFree (GmacCtx);
 
-  Print (L"Check Value... ");
+  Print ("Check Value... ");
   if (CompareMem (MacResult, GmacResult, 16) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"[Pass]\n");
+  Print ("[Pass]\n");
   
   return EFI_SUCCESS;
 }

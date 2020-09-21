@@ -37,19 +37,19 @@ ValidateCryptPkcs5Pbkdf2 (
   BOOLEAN  Status;
   UINT8    *OutKey;
 
-  Print (L"\nUEFI-OpenSSL PKCS#5 PBKDF2 Testing: ");
-  Print (L"\n- PKCS#5 PBKDF2 Verification: ");
+  Print ("\nUEFI-OpenSSL PKCS#5 PBKDF2 Testing: ");
+  Print ("\n- PKCS#5 PBKDF2 Verification: ");
 
   OutKey = AllocatePool (KeyLen);
   if (OutKey == NULL) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   //
   // Verify PKCS#5 PBKDF2 Key Derivation Function
   //
-  Print (L"Deriving Key... ");
+  Print ("Deriving Key... ");
   Status = Pkcs5HashPassword (
              PassLen,
              Password,
@@ -62,7 +62,7 @@ ValidateCryptPkcs5Pbkdf2 (
              );
 
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     FreePool (OutKey);
     return EFI_ABORTED;
   }
@@ -70,14 +70,14 @@ ValidateCryptPkcs5Pbkdf2 (
   //
   // Check the output key with the expected key result
   //
-  Print (L"Check Derived Key... ");
+  Print ("Check Derived Key... ");
   if (CompareMem (OutKey, DerivedKey, KeyLen) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     FreePool (OutKey);
     return EFI_ABORTED;
   }
 
-  Print (L"[Pass]\n");
+  Print ("[Pass]\n");
 
   //
   // Release Resources

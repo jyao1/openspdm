@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmResponderTest
+MODULE_NAME = TestCryptLib
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -33,12 +33,19 @@ SOURCE_DIR = $(WORKSPACE)/OsTest/$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)/SpdmResponder.o \
-    $(OUTPUT_DIR)/SpdmResponderMeasurement.o \
-    $(OUTPUT_DIR)/SpdmResponderTest.o \
-    $(OUTPUT_DIR)/SpdmTestCommand.o \
-    $(OUTPUT_DIR)/SpdmTestKey.o \
-    $(OUTPUT_DIR)/SpdmTestSupport.o \
+    $(OUTPUT_DIR)/Cryptest.o \
+    $(OUTPUT_DIR)/HashVerify.o \
+    $(OUTPUT_DIR)/HmacVerify.o \
+    $(OUTPUT_DIR)/MacVerify.o \
+    $(OUTPUT_DIR)/AeadVerify.o \
+    $(OUTPUT_DIR)/RsaVerify.o \
+    $(OUTPUT_DIR)/RsaVerify2.o \
+    $(OUTPUT_DIR)/DhVerify.o \
+    $(OUTPUT_DIR)/EcVerify.o \
+    $(OUTPUT_DIR)/EcVerify2.o \
+    $(OUTPUT_DIR)/RandVerify.o \
+    $(OUTPUT_DIR)/X509Verify.o \
+    $(OUTPUT_DIR)/OsSupport.o \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -47,8 +54,6 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a \
     $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a \
-    $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a \
-    $(BIN_DIR)/Library/SpdmLib/SpdmResponderLib/SpdmResponderLib.a \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
 
 
@@ -58,8 +63,6 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/*.o \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/*.o \
     $(BIN_DIR)/OsStub/MemoryAllocationLib/*.o \
-    $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/*.o \
-    $(BIN_DIR)/Library/SpdmLib/SpdmResponderLib/*.o \
     $(OUTPUT_DIR)/*.o \
 
 
@@ -68,7 +71,8 @@ INC =  \
     -I$(WORKSPACE)/OsTest/SpdmTestCommon \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
-    -I$(WORKSPACE)/Include/Hal/$(ARCH)
+    -I$(WORKSPACE)/Include/Hal/$(ARCH) \
+    -I$(WORKSPACE)/OsStub/Include
 
 #
 # Overridable Target Macro Definitions
@@ -103,28 +107,47 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseCryptLib$(CRYPTO)/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/$(CRYPTO)Lib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/MemoryAllocationLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmCommonLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmResponderLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)/SpdmResponder.o : $(SOURCE_DIR)/SpdmResponder.c
+$(OUTPUT_DIR)/Cryptest.o : $(SOURCE_DIR)/Cryptest.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmResponderMeasurement.o : $(SOURCE_DIR)/SpdmResponderMeasurement.c
+$(OUTPUT_DIR)/HashVerify.o : $(SOURCE_DIR)/HashVerify.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmResponderTest.o : $(SOURCE_DIR)/SpdmResponderTest.c
+$(OUTPUT_DIR)/HmacVerify.o : $(SOURCE_DIR)/HmacVerify.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestCommand.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestCommand.c
+$(OUTPUT_DIR)/MacVerify.o : $(SOURCE_DIR)/MacVerify.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestKey.c
+$(OUTPUT_DIR)/AeadVerify.o : $(SOURCE_DIR)/AeadVerify.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestSupport.c
+$(OUTPUT_DIR)/RsaVerify.o : $(SOURCE_DIR)/RsaVerify.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/RsaVerify2.o : $(SOURCE_DIR)/RsaVerify2.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/DhVerify.o : $(SOURCE_DIR)/DhVerify.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/EcVerify.o : $(SOURCE_DIR)/EcVerify.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/EcVerify2.o : $(SOURCE_DIR)/EcVerify2.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/RandVerify.o : $(SOURCE_DIR)/RandVerify.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/X509Verify.o : $(SOURCE_DIR)/X509Verify.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/OsSupport.o : $(SOURCE_DIR)/OsSupport.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
@@ -137,8 +160,6 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/Library/SpdmLib/SpdmResponderLib/SpdmResponderLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
 	$(DLINK) $(DLINK_FLAGS) $(DLINK_SPATH) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS2)
 

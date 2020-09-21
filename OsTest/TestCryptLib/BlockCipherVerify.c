@@ -47,14 +47,14 @@ ValidateCryptBlockCipher (
   UINT8    Decrypt[256];
   BOOLEAN  Status;
 
-  Print (L"\nUEFI-OpenSSL Block Cipher Engine Testing: ");
+  Print ("\nUEFI-OpenSSL Block Cipher Engine Testing: ");
 
   CtxSize   = AesGetContextSize ();
   CipherCtx = AllocatePool (CtxSize);
   
-  Print (L"\n- AES Validation:  ");
+  Print ("\n- AES Validation:  ");
 
-  Print (L"CBC-128... ");
+  Print ("CBC-128... ");
 
   //
   // AES-128 CBC Validation
@@ -64,35 +64,35 @@ ValidateCryptBlockCipher (
 
   Status = AesInit (CipherCtx, Aes128CbcKey, 128);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   Status = AesCbcEncrypt (CipherCtx, Aes128CbcData, sizeof (Aes128CbcData), Aes128CbcIvec, Encrypt);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   Status = AesCbcDecrypt (CipherCtx, Encrypt, sizeof (Aes128CbcData), Aes128CbcIvec, Decrypt);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   if (CompareMem (Encrypt, Aes128CbcCipher, sizeof (Aes128CbcCipher)) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   if (CompareMem (Decrypt, Aes128CbcData, sizeof (Aes128CbcData)) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"[Pass]");
+  Print ("[Pass]");
 
-  Print (L"\n");
+  Print ("\n");
 
   return EFI_SUCCESS;
 }

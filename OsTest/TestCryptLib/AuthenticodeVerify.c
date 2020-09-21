@@ -957,7 +957,7 @@ VerifyAuthenticode (
   BOOLEAN  Status;
 
   Status = FALSE;
-  Print (L"\n- PE/COFF Authenticode (Digested by SHA-1) Verification   ... ");
+  Print ("\n- PE/COFF Authenticode (Digested by SHA-1) Verification   ... ");
     
   //
   // Sample Code: Demonstrate how to check the Hash algorithm in PE/COFF Authenticode.
@@ -984,16 +984,16 @@ VerifyAuthenticode (
                SHA1_DIGEST_SIZE
                );
     if (Status) {
-      Print (L"[Pass]");
+      Print ("[Pass]");
     } else {
-      Print (L"[Fail]");
+      Print ("[Fail]");
     }       
   } else {
-    Print (L"[Invalid Hash]");
+    Print ("[Invalid Hash]");
   }
 
 
-  Print (L"\n- PE/COFF Authenticode (Digested by SHA-256) Verification ... ");
+  Print ("\n- PE/COFF Authenticode (Digested by SHA-256) Verification ... ");
 
   if (CompareMem (AuthenticodeWithSha256 + 32, &HashOidValue[22], 9) == 0) {
     Status = AuthenticodeVerify (
@@ -1005,12 +1005,12 @@ VerifyAuthenticode (
                SHA256_DIGEST_SIZE
                );
     if (Status) {
-      Print (L"[Pass]");
+      Print ("[Pass]");
     } else {
-      Print (L"[Fail]");
+      Print ("[Fail]");
     }       
   } else {
-    Print (L"[Invalid Hash]");
+    Print ("[Invalid Hash]");
   }
 
   return Status;
@@ -1030,11 +1030,11 @@ ValidateAuthenticode (
 {
   BOOLEAN Status;
 
-  Print (L"\nUEFI-OpenSSL Authenticode Testing: ");
+  Print ("\nUEFI-OpenSSL Authenticode Testing: ");
 
   Status = VerifyAuthenticode ();
 
-  Print (L"\n");
+  Print ("\n");
 
   if (Status) {
     return EFI_SUCCESS;

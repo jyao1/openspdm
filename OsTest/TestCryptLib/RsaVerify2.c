@@ -382,78 +382,78 @@ ValidateCryptRsa2 (
   // CHAR16         CommonNameUnicode[64];
   // UINTN          CommonNameSize;
 
-  Print (L"\nUEFI-OpenSSL RSA Key Retrieving Testing: ");
+  Print ("\nUEFI-OpenSSL RSA Key Retrieving Testing: ");
 
   //
   // Retrieve RSA private key from encrypted PEM data.
   //
-  Print (L"\n- Retrieve RSA Private Key for PEM ...");
+  Print ("\n- Retrieve RSA Private Key for PEM ...");
   Status = RsaGetPrivateKeyFromPem (TestKeyPem, sizeof (TestKeyPem), PemPass, &RsaPrivKey);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
   //
   // Retrieve RSA public key from X509 Certificate.
   //
-  Print (L"\n- Retrieve RSA Public Key from X509 ... ");
+  Print ("\n- Retrieve RSA Public Key from X509 ... ");
   RsaPubKey = NULL;
   Status    = RsaGetPublicKeyFromX509 (TestCert, sizeof (TestCert), &RsaPubKey);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
   //
   // Generate RSA PKCS#1 Signature.
   //
-  Print (L"\n- PKCS#1 Signature ... ");
+  Print ("\n- PKCS#1 Signature ... ");
   SigSize = 0;
   Status  = RsaPkcs1Sign (RsaPrivKey, MsgHash, SHA256_DIGEST_SIZE, NULL, &SigSize);
   if (Status || SigSize == 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   Signature = AllocatePool (SigSize);
   Status    = RsaPkcs1Sign (RsaPrivKey, MsgHash, SHA256_DIGEST_SIZE, Signature, &SigSize);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
   //
   // Verify RSA PKCS#1-encoded Signature.
   //
-  Print (L"\n- PKCS#1 Signature Verification ... ");
+  Print ("\n- PKCS#1 Signature Verification ... ");
   Status = RsaPkcs1Verify (RsaPubKey, MsgHash, SHA256_DIGEST_SIZE, Signature, SigSize);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
   // //
   // // X509 Certificate Subject Retrieving.
   // //
-  // Print (L"\n- X509 Certificate Subject Bytes Retrieving ... ");
+  // Print ("\n- X509 Certificate Subject Bytes Retrieving ... ");
   // SubjectSize = 0;
   // Status  = X509GetSubjectName (TestCert, sizeof (TestCert), NULL, &SubjectSize);
   // Subject = (UINT8 *)AllocatePool (SubjectSize);
   // Status  = X509GetSubjectName (TestCert, sizeof (TestCert), Subject, &SubjectSize);
   // if (!Status) {
-  //   Print (L"[Fail]");
+  //   Print ("[Fail]");
   //   return EFI_ABORTED;
   // } else {
-  //   Print (L"[Pass]");
+  //   Print ("[Pass]");
   // }
 
   // //
@@ -463,11 +463,11 @@ ValidateCryptRsa2 (
   // ZeroMem (CommonName, CommonNameSize);
   // ReturnStatus = X509GetCommonName (TestCert, sizeof (TestCert), CommonName, &CommonNameSize);
   // if (RETURN_ERROR (ReturnStatus)) {
-  //   Print (L"\n  - Retrieving Common Name - [Fail]");
+  //   Print ("\n  - Retrieving Common Name - [Fail]");
   //   return EFI_ABORTED;
   // } else {
   //   AsciiStrToUnicodeStrS (CommonName, CommonNameUnicode, CommonNameSize);
-  //   Print (L"\n  - Retrieving Common Name = \"%s\" (Size = %d)", CommonNameUnicode, CommonNameSize);
+  //   Print ("\n  - Retrieving Common Name = \"%s\" (Size = %d)", CommonNameUnicode, CommonNameSize);
   // }
 
   //
@@ -501,19 +501,19 @@ ValidateCryptPkcs7 (
   P7SignedData = NULL;
   SignCert     = NULL;
 
-  Print (L"\nUEFI-OpenSSL PKCS#7 Signing & Verification Testing: ");
+  Print ("\nUEFI-OpenSSL PKCS#7 Signing & Verification Testing: ");
 
-  Print (L"\n- Create PKCS#7 signedData ...");
+  Print ("\n- Create PKCS#7 signedData ...");
 
   //
   // Construct Signer Certificate from RAW data.
   //
   Status = X509ConstructCertificate (TestCert, sizeof (TestCert), (UINT8 **) &SignCert);
   if (!Status || SignCert == NULL) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     goto _Exit;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
   //
@@ -532,13 +532,13 @@ ValidateCryptPkcs7 (
              &P7SignedDataSize
              );
   if (!Status || P7SignedDataSize == 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     goto _Exit;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
-  Print (L"\n- Verify PKCS#7 signedData ...");
+  Print ("\n- Verify PKCS#7 signedData ...");
 
   Status = Pkcs7Verify (
              P7SignedData,
@@ -549,9 +549,9 @@ ValidateCryptPkcs7 (
              AsciiStrLen (Payload)
              );
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
 _Exit:
@@ -562,6 +562,6 @@ _Exit:
     X509Free (SignCert);
   }
 
-  Print (L"\n");
+  Print ("\n");
   return EFI_SUCCESS;
 }

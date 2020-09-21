@@ -63,10 +63,10 @@ ValidateCryptDigest (
   UINT8    Digest[MAX_DIGEST_SIZE];
   BOOLEAN  Status;
 
-  Print (L" UEFI-OpenSSL Hash Engine Testing:\n");
+  Print (" UEFI-OpenSSL Hash Engine Testing:\n");
   DataSize = AsciiStrLen (HashData);
 
-  Print (L"- SHA256: ");
+  Print ("- SHA256: ");
 
   //
   // SHA256 Digest Validation
@@ -75,50 +75,50 @@ ValidateCryptDigest (
   CtxSize = Sha256GetContextSize ();
   HashCtx = AllocatePool (CtxSize);
 
-  Print (L"Init... ");
+  Print ("Init... ");
   Status  = Sha256Init (HashCtx);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Update... ");
+  Print ("Update... ");
   Status  = Sha256Update (HashCtx, HashData, DataSize);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Finalize... ");
+  Print ("Finalize... ");
   Status  = Sha256Final (HashCtx, Digest);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   FreePool (HashCtx);
 
-  Print (L"Check Value... ");
+  Print ("Check Value... ");
   if (CompareMem (Digest, Sha256Digest, SHA256_DIGEST_SIZE) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"HashAll... ");
+  Print ("HashAll... ");
   ZeroMem (Digest, SHA256_DIGEST_SIZE);
   Status  = Sha256HashAll (HashData, DataSize, Digest);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (CompareMem (Digest, Sha256Digest, SHA256_DIGEST_SIZE) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"[Pass]\n");
+  Print ("[Pass]\n");
 
-  Print (L"- SHA384: ");
+  Print ("- SHA384: ");
 
   //
   // SHA384 Digest Validation
@@ -127,50 +127,50 @@ ValidateCryptDigest (
   CtxSize = Sha384GetContextSize ();
   HashCtx = AllocatePool (CtxSize);
 
-  Print (L"Init... ");
+  Print ("Init... ");
   Status  = Sha384Init (HashCtx);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Update... ");
+  Print ("Update... ");
   Status  = Sha384Update (HashCtx, HashData, DataSize);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Finalize... ");
+  Print ("Finalize... ");
   Status  = Sha384Final (HashCtx, Digest);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   FreePool (HashCtx);
 
-  Print (L"Check Value... ");
+  Print ("Check Value... ");
   if (CompareMem (Digest, Sha384Digest, SHA384_DIGEST_SIZE) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"HashAll... ");
+  Print ("HashAll... ");
   ZeroMem (Digest, SHA384_DIGEST_SIZE);
   Status  = Sha384HashAll (HashData, DataSize, Digest);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (CompareMem (Digest, Sha384Digest, SHA384_DIGEST_SIZE) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"[Pass]\n");
+  Print ("[Pass]\n");
 
-  Print (L"- SHA512: ");
+  Print ("- SHA512: ");
 
   //
   // SHA512 Digest Validation
@@ -179,48 +179,48 @@ ValidateCryptDigest (
   CtxSize = Sha512GetContextSize ();
   HashCtx = AllocatePool (CtxSize);
 
-  Print (L"Init... ");
+  Print ("Init... ");
   Status  = Sha512Init (HashCtx);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Update... ");
+  Print ("Update... ");
   Status  = Sha512Update (HashCtx, HashData, DataSize);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Finalize... ");
+  Print ("Finalize... ");
   Status  = Sha512Final (HashCtx, Digest);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   FreePool (HashCtx);
 
-  Print (L"Check Value... ");
+  Print ("Check Value... ");
   if (CompareMem (Digest, Sha512Digest, SHA512_DIGEST_SIZE) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"HashAll... ");
+  Print ("HashAll... ");
   ZeroMem (Digest, SHA512_DIGEST_SIZE);
   Status  = Sha512HashAll (HashData, DataSize, Digest);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (CompareMem (Digest, Sha512Digest, SHA512_DIGEST_SIZE) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"[Pass]\n");
+  Print ("[Pass]\n");
 
   return EFI_SUCCESS;
 }

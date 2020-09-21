@@ -54,7 +54,8 @@ TOOLCHAIN = VS2015
 #
 # Shell Command Macro
 #
-CP = copy /y
+#CP = copy /y
+CP = xcopy /y /s
 MV = move /y
 RM = del /f /q
 MD = mkdir

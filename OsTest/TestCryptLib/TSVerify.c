@@ -309,7 +309,7 @@ VerifyTSCounterSignature (
 
   Status = FALSE;
 
-  Print (L"\n- Verify RFC3161 TimeStamp CounterSignature in PE/COFF Authenticode ... ");
+  Print ("\n- Verify RFC3161 TimeStamp CounterSignature in PE/COFF Authenticode ... ");
   //
   // Verify RFC3161 Timestamp CounterSignature.
   //
@@ -321,10 +321,10 @@ VerifyTSCounterSignature (
              &SigningTime
              );
   if (Status) {
-    Print (L"[Pass]\n");
-    Print (L" --> The PE/COFF was signed at <%t>", &SigningTime);
+    Print ("[Pass]\n");
+    Print (" --> The PE/COFF was signed at <%t>", &SigningTime);
   } else {
-    Print (L"[Fail]");
+    Print ("[Fail]");
   }
 
   return Status;
@@ -344,11 +344,11 @@ ValidateTSCounterSignature (
 {
   BOOLEAN Status;
 
-  Print (L"\nUEFI-OpenSSL RFC3161 Timestamp Signature Testing: ");
+  Print ("\nUEFI-OpenSSL RFC3161 Timestamp Signature Testing: ");
 
   Status = VerifyTSCounterSignature ();
 
-  Print (L"\n");
+  Print ("\n");
 
   if (Status) {
     return EFI_SUCCESS;

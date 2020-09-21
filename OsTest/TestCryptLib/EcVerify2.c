@@ -94,30 +94,30 @@ ValidateCryptEc2 (
   UINT8   Signature[512]; // 0x48/72, 0x68/104, 0x8A/138
   UINTN   SigSize;
 
-  Print (L"\nUEFI-OpenSSL EC Key Retrieving Testing: ");
+  Print ("\nUEFI-OpenSSL EC Key Retrieving Testing: ");
 
   //
   // Retrieve EC private key from PEM data.
   //
-  Print (L"\n- Retrieve EC Private Key for PEM ...");
+  Print ("\n- Retrieve EC Private Key for PEM ...");
   Status = EcGetPrivateKeyFromPem (EccTestPemKey, sizeof (EccTestPemKey), NULL, &EcPrivKey);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
   //
   // Retrieve EC public key from X509 Certificate.
   //
-  Print (L"\n- Retrieve EC Public Key from X509 ... ");
+  Print ("\n- Retrieve EC Public Key from X509 ... ");
   Status    = EcGetPublicKeyFromX509 (EccTestRootCer, sizeof (EccTestRootCer), &EcPubKey);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
   
   //
@@ -125,22 +125,22 @@ ValidateCryptEc2 (
   //
   HashSize = sizeof(HashValue);
   SigSize = sizeof(Signature);
-  Print (L"\n- EC-DSA Signing ... ");
+  Print ("\n- EC-DSA Signing ... ");
   Status  = EcDsaSign (EcPrivKey, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
-  Print (L"\n- EC-DSA Verification ... ");
+  Print ("\n- EC-DSA Verification ... ");
   Status = EcDsaVerify (EcPubKey, HashValue, HashSize, Signature, SigSize);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]\n");
+    Print ("[Pass]\n");
   }
   
   return EFI_SUCCESS;
@@ -166,22 +166,22 @@ ValidateCryptPkcs7Ec (
   P7SignedData = NULL;
   SignCert     = NULL;
 
-  Print (L"\nUEFI-OpenSSL PKCS#7 Signing & Verification for EC Testing: ");
+  Print ("\nUEFI-OpenSSL PKCS#7 Signing & Verification for EC Testing: ");
 
-  Print (L"\n- Create PKCS#7 certificate ...");
+  Print ("\n- Create PKCS#7 certificate ...");
 
   //
   // Construct Signer Certificate from RAW data.
   //
   Status = X509ConstructCertificate (EccTestRootCer, sizeof (EccTestRootCer), (UINT8 **) &SignCert);
   if (!Status || SignCert == NULL) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     goto _Exit;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
   
-  Print (L"\n- Create PKCS#7 signedData ...");
+  Print ("\n- Create PKCS#7 signedData ...");
 
   //
   // Create PKCS#7 signedData on Payload. 
@@ -190,7 +190,7 @@ ValidateCryptPkcs7Ec (
   Status = Pkcs7Sign (
              EccTestPemKey,
              sizeof (EccTestPemKey),
-             "",
+             (CONST UINT8 *) "",
              (UINT8 *) EcPayload,
              AsciiStrLen (EcPayload),
              SignCert,
@@ -199,13 +199,13 @@ ValidateCryptPkcs7Ec (
              &P7SignedDataSize
              );
   if (!Status || P7SignedDataSize == 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     goto _Exit;
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
-  Print (L"\n- Verify PKCS#7 signedData ...");
+  Print ("\n- Verify PKCS#7 signedData ...");
 
   Status = Pkcs7Verify (
              P7SignedData,
@@ -216,9 +216,9 @@ ValidateCryptPkcs7Ec (
              AsciiStrLen (EcPayload)
              );
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
   } else {
-    Print (L"[Pass]");
+    Print ("[Pass]");
   }
 
 _Exit:
@@ -229,6 +229,6 @@ _Exit:
     X509Free (SignCert);
   }
 
-  Print (L"\n");
+  Print ("\n");
   return EFI_SUCCESS;
 }

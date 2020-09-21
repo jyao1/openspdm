@@ -32,21 +32,21 @@ ValidateCryptX509 (
   UINTN TestEndCertLen;
 
 
-  Status = ReadInputFile ("test\\inter.cert.der", &TestCert, &TestCertLen);
-  Status = ReadInputFile ("test\\ca.cert.der", &TestCACert, &TestCACertLen);
-  Status = ReadInputFile ("test\\bundle_requester.certchain.der", &TestBundleCert, &TestBundleCertLen);
-  Status = ReadInputFile ("test\\end_requester.cert.der", &TestEndCert, &TestEndCertLen);
+  Status = ReadInputFile ("test/inter.cert.der", (VOID **)&TestCert, &TestCertLen);
+  Status = ReadInputFile ("test/ca.cert.der", (VOID **)&TestCACert, &TestCACertLen);
+  Status = ReadInputFile ("test/bundle_requester.certchain.der", (VOID **)&TestBundleCert, &TestBundleCertLen);
+  Status = ReadInputFile ("test/end_requester.cert.der", (VOID **)&TestEndCert, &TestEndCertLen);
 
   //
   // X509 Certificate Verification.
   //
-  Print (L"\n- X509 Certificate Verification with Trusted CA ...");
+  Print ("\n- X509 Certificate Verification with Trusted CA ...");
   Status = X509VerifyCert (TestCert, TestCertLen, TestCACert, TestCACertLen);
   if (!Status) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]\n");
+    Print ("[Pass]\n");
   }
 
   //
@@ -55,10 +55,10 @@ ValidateCryptX509 (
   DEBUG((DEBUG_INFO, "- X509 Certificate Chain Verification ... "));
   Status = X509VerifyCertChain((UINT8 *)TestCACert, TestCACertLen, (UINT8 *)TestBundleCert, TestBundleCertLen);
   if (!Status) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]\n");
+    Print ("[Pass]\n");
   }
 
   //
@@ -67,18 +67,18 @@ ValidateCryptX509 (
   DEBUG((DEBUG_INFO, "- X509 Certificate Chain get leaf certificate Verification ... "));
   Status = X509GetCertFromCertChain(TestBundleCert, TestBundleCertLen, -1, &LeafCert, &LeafCertLen);
   if (!Status) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   }
   if (LeafCertLen != TestEndCertLen) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   }
   if (CompareMem (LeafCert, TestEndCert, LeafCertLen) != 0) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]\n");
+    Print ("[Pass]\n");
   }
 
   //
@@ -87,18 +87,18 @@ ValidateCryptX509 (
   DEBUG((DEBUG_INFO, "- X509 Certificate Chain get leaf certificate Verification ... "));
   Status = X509GetCertFromCertChain(TestBundleCert, TestBundleCertLen, 2, &LeafCert, &LeafCertLen);
   if (!Status) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   }
   if (LeafCertLen != TestEndCertLen) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   }
   if (CompareMem (LeafCert, TestEndCert, LeafCertLen) != 0) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]\n");
+    Print ("[Pass]\n");
   }
 
   //
@@ -107,18 +107,18 @@ ValidateCryptX509 (
   DEBUG((DEBUG_INFO, "- X509 Certificate Chain get root certificate Verification ... "));
   Status = X509GetCertFromCertChain(TestBundleCert, TestBundleCertLen, 0, &LeafCert, &LeafCertLen);
   if (!Status) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   }
   if (LeafCertLen != TestCACertLen) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   }
   if (CompareMem (LeafCert, TestCACert, LeafCertLen) != 0) {
-    Print (L"[Fail]\n");
+    Print ("[Fail]\n");
     return EFI_ABORTED;
   } else {
-    Print (L"[Pass]\n");
+    Print ("[Pass]\n");
   }
 
 

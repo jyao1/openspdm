@@ -31,32 +31,32 @@ ValidateCryptPrng (
   UINTN    Index;
   BOOLEAN  Status;
 
-  Print (L" \nUEFI-OpenSSL PRNG Engine Testing:\n");
+  Print (" \nUEFI-OpenSSL PRNG Engine Testing:\n");
 
-  Print (L"- Random Generation...");
+  Print ("- Random Generation...");
 
   Status = RandomSeed (SeedString, sizeof (SeedString));
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   for (Index = 0; Index < 10; Index ++) {
     Status = RandomBytes (RandomBuffer, RANDOM_NUMBER_SIZE);
     if (!Status) {
-      Print (L"[Fail]");
+      Print ("[Fail]");
       return EFI_ABORTED;
     }
 
     if (CompareMem (PreviousRandomBuffer, RandomBuffer, RANDOM_NUMBER_SIZE) == 0) {
-      Print (L"[Fail]");
+      Print ("[Fail]");
       return EFI_ABORTED;
     }
 
     CopyMem (PreviousRandomBuffer, RandomBuffer, RANDOM_NUMBER_SIZE);
   }
 
-  Print (L"[Pass]\n");
+  Print ("[Pass]\n");
 
   return EFI_SUCCESS;
 

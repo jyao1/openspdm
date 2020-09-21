@@ -8,6 +8,30 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Cryptest.h"
 
+UINTN
+EFIAPI
+AsciiStrLen (
+  IN      CONST CHAR8               *String
+  )
+{
+  UINTN                             Length;
+
+  ASSERT (String != NULL);
+
+  for (Length = 0; *String != '\0'; String++, Length++) {
+    ;
+  }
+  return Length;
+}
+
+VOID
+Print (
+  IN CHAR8 *Message
+  )
+{
+  DebugPrint(DEBUG_INFO, "%s", Message);
+}
+
 /**
   Entry Point of Cryptographic Validation Utility.
 
@@ -27,8 +51,8 @@ CryptestMain (
 {
   EFI_STATUS  Status;
 
-  Print (L"\nUEFI-OpenSSL Wrapper Cryptosystem Testing: \n");
-  Print (L"-------------------------------------------- \n");
+  Print ("\nUEFI-OpenSSL Wrapper Cryptosystem Testing: \n");
+  Print ("-------------------------------------------- \n");
 
   RandomSeed (NULL, 0);
 
@@ -57,10 +81,10 @@ CryptestMain (
     return Status;
   }
 
-  Status = ValidateCryptRsa ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  // Status = ValidateCryptRsa ();
+  // if (EFI_ERROR (Status)) {
+  //   return Status;
+  // }
 
   Status = ValidateCryptRsa2 ();
   if (EFI_ERROR (Status)) {

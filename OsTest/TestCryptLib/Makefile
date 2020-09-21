@@ -98,7 +98,6 @@ mbuild: $(INIT_TARGET) gen_libs $(CODA_TARGET)
 init:
 	-@if not exist $(OUTPUT_DIR) $(MD) $(OUTPUT_DIR)
 
-    @xcopy /Y /S $(WORKSPACE)\OsTest\TestKey\*.* $(BIN_DIR)
 #
 # GenLibsTarget
 #
@@ -112,34 +111,44 @@ gen_libs:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\Cryptest.obj : $(SOURCE_DIR)\../TestCryptLib/Cryptest.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/Cryptest.c
-$(OUTPUT_DIR)\HashVerify.obj : $(SOURCE_DIR)\../TestCryptLib/HashVerify.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/HashVerify.c
-$(OUTPUT_DIR)\HmacVerify.obj : $(SOURCE_DIR)\../TestCryptLib/HmacVerify.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/HmacVerify.c
-$(OUTPUT_DIR)\MacVerify.obj : $(SOURCE_DIR)\../TestCryptLib/MacVerify.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/MacVerify.c
-$(OUTPUT_DIR)\AeadVerify.obj : $(SOURCE_DIR)\../TestCryptLib/AeadVerify.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/AeadVerify.c
-$(OUTPUT_DIR)\RsaVerify.obj : $(SOURCE_DIR)\../TestCryptLib/RsaVerify.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/RsaVerify.c
-$(OUTPUT_DIR)\RsaVerify2.obj : $(SOURCE_DIR)\../TestCryptLib/RsaVerify2.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/RsaVerify2.c
-$(OUTPUT_DIR)\DhVerify.obj : $(SOURCE_DIR)\../TestCryptLib/DhVerify.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/DhVerify.c
-$(OUTPUT_DIR)\EcVerify.obj : $(SOURCE_DIR)\../TestCryptLib/EcVerify.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/EcVerify.c
-$(OUTPUT_DIR)\EcVerify2.obj : $(SOURCE_DIR)\../TestCryptLib/EcVerify2.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/EcVerify2.c
-$(OUTPUT_DIR)\RandVerify.obj : $(SOURCE_DIR)\../TestCryptLib/RandVerify.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/RandVerify.c
-$(OUTPUT_DIR)\X509Verify.obj : $(SOURCE_DIR)\../TestCryptLib/X509Verify.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/X509Verify.c
-$(OUTPUT_DIR)\OsSupport.obj : $(SOURCE_DIR)\../TestCryptLib/OsSupport.c
-    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../TestCryptLib/OsSupport.c
+$(OUTPUT_DIR)\Cryptest.obj : $(SOURCE_DIR)\Cryptest.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cryptest.c
 
+$(OUTPUT_DIR)\HashVerify.obj : $(SOURCE_DIR)\HashVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\HashVerify.c
 
+$(OUTPUT_DIR)\HmacVerify.obj : $(SOURCE_DIR)\HmacVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\HmacVerify.c
+
+$(OUTPUT_DIR)\MacVerify.obj : $(SOURCE_DIR)\MacVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\MacVerify.c
+
+$(OUTPUT_DIR)\AeadVerify.obj : $(SOURCE_DIR)\AeadVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\AeadVerify.c
+
+$(OUTPUT_DIR)\RsaVerify.obj : $(SOURCE_DIR)\RsaVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\RsaVerify.c
+
+$(OUTPUT_DIR)\RsaVerify2.obj : $(SOURCE_DIR)\RsaVerify2.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\RsaVerify2.c
+
+$(OUTPUT_DIR)\DhVerify.obj : $(SOURCE_DIR)\DhVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\DhVerify.c
+
+$(OUTPUT_DIR)\EcVerify.obj : $(SOURCE_DIR)\EcVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\EcVerify.c
+
+$(OUTPUT_DIR)\EcVerify2.obj : $(SOURCE_DIR)\EcVerify2.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\EcVerify2.c
+
+$(OUTPUT_DIR)\RandVerify.obj : $(SOURCE_DIR)\RandVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\RandVerify.c
+
+$(OUTPUT_DIR)\X509Verify.obj : $(SOURCE_DIR)\X509Verify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\X509Verify.c
+
+$(OUTPUT_DIR)\OsSupport.obj : $(SOURCE_DIR)\OsSupport.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\OsSupport.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

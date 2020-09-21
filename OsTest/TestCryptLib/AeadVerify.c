@@ -137,9 +137,9 @@ ValidateCryptAeadCipher (
   UINT8    OutTag[1024];
   UINTN    OutTagSize;
 
-  Print (L"\nUEFI-OpenSSL AEAD Testing: ");
+  Print ("\nUEFI-OpenSSL AEAD Testing: ");
 
-  Print (L"\n- AES-CCM Encryption: ");
+  Print ("\n- AES-CCM Encryption: ");
   OutBufferSize = sizeof(OutBuffer);
   OutTagSize = sizeof(ccm_tag);
   Status = AeadAesCcmEncrypt (
@@ -157,25 +157,25 @@ ValidateCryptAeadCipher (
              &OutBufferSize
              );
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (OutBufferSize != sizeof(ccm_ct)) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (CompareMem (OutBuffer, ccm_ct, sizeof(ccm_ct)) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } 
   if (CompareMem (OutTag, ccm_tag, sizeof(ccm_tag)) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   } 
-  Print (L"[Pass]");
+  Print ("[Pass]");
 
 
-  Print (L"\n- AES-CCM Decryption: ");
+  Print ("\n- AES-CCM Decryption: ");
   Status = AeadAesCcmDecrypt (
              ccm_key,
              sizeof(ccm_key),
@@ -191,22 +191,22 @@ ValidateCryptAeadCipher (
              &OutBufferSize
              );
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (OutBufferSize != sizeof(ccm_pt)) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (CompareMem (OutBuffer, ccm_pt, sizeof(ccm_pt)) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"[Pass]");
+  Print ("[Pass]");
 
 
-  Print(L"\n- AES-GCM Encryption: ");
+  Print ("\n- AES-GCM Encryption: ");
   OutBufferSize = sizeof(OutBuffer);
   OutTagSize = sizeof(gcm_tag);
   Status = AeadAesGcmEncrypt(
@@ -224,24 +224,24 @@ ValidateCryptAeadCipher (
 	           &OutBufferSize
              );
   if (!Status) {
-	  Print(L"[Fail]");
+	  Print ("[Fail]");
 	  return EFI_ABORTED;
   }
   if (OutBufferSize != sizeof(gcm_ct)) {
-	  Print(L"[Fail]");
+	  Print ("[Fail]");
 	  return EFI_ABORTED;
   }
   if (CompareMem(OutBuffer, gcm_ct, sizeof(gcm_ct)) != 0) {
-	  Print(L"[Fail]");
+	  Print ("[Fail]");
 	  return EFI_ABORTED;
   }
   if (CompareMem(OutTag, gcm_tag, sizeof(gcm_tag)) != 0) {
-	  Print(L"[Fail]");
+	  Print ("[Fail]");
 	  return EFI_ABORTED;
   }
-  Print(L"[Pass]");
+  Print ("[Pass]");
 
-  Print(L"\n- AES-GCM Decryption: ");
+  Print ("\n- AES-GCM Decryption: ");
   Status = AeadAesGcmDecrypt(
 	           gcm_key,
 	           sizeof(gcm_key),
@@ -257,22 +257,22 @@ ValidateCryptAeadCipher (
 	           &OutBufferSize
              );
   if (!Status) {
-	  Print(L"[Fail]");
+	  Print ("[Fail]");
 	  return EFI_ABORTED;
   }
   if (OutBufferSize != sizeof(gcm_pt)) {
-	  Print(L"[Fail]");
+	  Print ("[Fail]");
 	  return EFI_ABORTED;
   }
   if (CompareMem(OutBuffer, gcm_pt, sizeof(gcm_pt)) != 0) {
-	  Print(L"[Fail]");
+	  Print ("[Fail]");
 	  return EFI_ABORTED;
   }
 
-  Print(L"[Pass]");
+  Print ("[Pass]");
 
 
-  Print(L"\n- ChaCha20Poly1305 Encryption: ");
+  Print ("\n- ChaCha20Poly1305 Encryption: ");
   OutBufferSize = sizeof(OutBuffer);
   OutTagSize = sizeof(ChaCha20Poly1305_tag);
   Status = AeadChaCha20Poly1305Encrypt (
@@ -290,24 +290,24 @@ ValidateCryptAeadCipher (
              &OutBufferSize
              );
   if (!Status) {
-    Print(L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (OutBufferSize != sizeof(ChaCha20Poly1305_ct)) {
-    Print(L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (CompareMem(OutBuffer, ChaCha20Poly1305_ct, sizeof(ChaCha20Poly1305_ct)) != 0) {
-    Print(L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (CompareMem(OutTag, ChaCha20Poly1305_tag, sizeof(ChaCha20Poly1305_tag)) != 0) {
-    Print(L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
-  Print(L"[Pass]");
+  Print ("[Pass]");
 
-  Print(L"\n- ChaCha20Poly1305 Decryption: ");
+  Print ("\n- ChaCha20Poly1305 Decryption: ");
   Status = AeadChaCha20Poly1305Decrypt(
              ChaCha20Poly1305_key,
              sizeof(ChaCha20Poly1305_key),
@@ -323,21 +323,21 @@ ValidateCryptAeadCipher (
              &OutBufferSize
            );
   if (!Status) {
-    Print(L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (OutBufferSize != sizeof(ChaCha20Poly1305_pt)) {
-    Print(L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
   if (CompareMem(OutBuffer, ChaCha20Poly1305_pt, sizeof(ChaCha20Poly1305_pt)) != 0) {
-    Print(L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print(L"[Pass]");
+  Print ("[Pass]");
 
-  Print (L"\n");
+  Print ("\n");
 
   return EFI_SUCCESS;
 }

@@ -50,9 +50,9 @@ ValidateCryptHmac (
   UINT8    Digest[MAX_DIGEST_SIZE];
   BOOLEAN  Status;
 
-  Print (L" \nUEFI-OpenSSL HMAC Engine Testing:\n");
+  Print (" \nUEFI-OpenSSL HMAC Engine Testing:\n");
 
-  Print (L"- HMAC-SHA256: ");
+  Print ("- HMAC-SHA256: ");
   //
   // HMAC-SHA-256 Digest Validation
   //
@@ -61,33 +61,33 @@ ValidateCryptHmac (
 
   Status = HmacSha256SetKey (HmacCtx, HmacSha256Key, 20);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Update... ");
+  Print ("Update... ");
   Status  = HmacSha256Update (HmacCtx, HmacData, 8);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"Finalize... ");
+  Print ("Finalize... ");
   Status  = HmacSha256Final (HmacCtx, Digest);
   if (!Status) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
   FreePool (HmacCtx);
 
-  Print (L"Check Value... ");
+  Print ("Check Value... ");
   if (CompareMem (Digest, HmacSha256Digest, SHA256_DIGEST_SIZE) != 0) {
-    Print (L"[Fail]");
+    Print ("[Fail]");
     return EFI_ABORTED;
   }
 
-  Print (L"[Pass]\n");
+  Print ("[Pass]\n");
 
   return EFI_SUCCESS;
 }

@@ -49,6 +49,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/CryptRsaBasic.o \
     $(OUTPUT_DIR)/CryptRsaExt.o \
     $(OUTPUT_DIR)/CryptX509.o \
+    $(OUTPUT_DIR)/CryptPkcs7.o \
     $(OUTPUT_DIR)/CryptRand.o \
     $(OUTPUT_DIR)/BaseMemAllocation.o \
     $(OUTPUT_DIR)/CrtWrapperHost.o \
@@ -135,6 +136,9 @@ $(OUTPUT_DIR)/CryptRsaExt.o : $(SOURCE_DIR)/Pk/CryptRsaExt.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptX509.o : $(SOURCE_DIR)/Pk/CryptX509.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/CryptPkcs7.o : $(SOURCE_DIR)/Pk/CryptPkcs7.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptRand.o : $(SOURCE_DIR)/Rand/CryptRand.c

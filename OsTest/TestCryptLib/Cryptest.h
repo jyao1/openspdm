@@ -35,30 +35,16 @@ ReadInputFile (
   OUT UINTN   *FileSize
   );
 
-STATIC
 UINTN
 EFIAPI
 AsciiStrLen (
   IN      CONST CHAR8               *String
-  )
-{
-  UINTN                             Length;
+  );
 
-  ASSERT (String != NULL);
-
-  for (Length = 0; *String != '\0'; String++, Length++) {
-    ;
-  }
-  return Length;
-}
-
-
-#define Print(Msg) do{ \
-char lpszBuf[512] = {0}; \
-int nLen = (int)wcslen(Msg) + 1; \
-WideCharToMultiByte(CP_ACP, 0, Msg, nLen, lpszBuf, 2*nLen, NULL, NULL); \
-DebugPrint(DEBUG_INFO, "%s", lpszBuf); \
-}while(0)
+VOID
+Print (
+  IN CHAR8 *Message
+  );
 
 // /**
 //   Validate UEFI-OpenSSL Digest Interfaces.
