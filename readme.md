@@ -4,9 +4,9 @@
 
 1) Specification
 
-   DSP0274	Security Protocol and Data Model (SPDM) Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.0.0.pdf) and version [1.1.0c](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.1.0.pdf))
+   DSP0274	Security Protocol and Data Model (SPDM) Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.0.0.pdf) and version [1.1.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.1.0.pdf))
 
-   DSP0276	Secured MCTP Messages over MCTP Binding Specification (version [1.0.0a](https://www.dmtf.org/sites/default/files/standards/documents/DSP0276_1.0.0a.pdf))
+   DSP0277	Secured Messages using SPDM Specification (version [1.0.0a](https://www.dmtf.org/sites/default/files/standards/documents/DSP0277_1.0.0a.pdf))
 
 2) Both SPDM requester and SPDM responder.
 

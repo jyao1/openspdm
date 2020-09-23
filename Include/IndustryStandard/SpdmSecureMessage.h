@@ -20,7 +20,7 @@
 //                                                                        V
 // +--------------------------------+---------------------------------+-------+------+---+
 // |SPDM_SECURE_MESSAGE_ADATA_HEADER|SPDM_SECURE_MESSAGE_CIPHER_HEADER|Payload|Random|MAC|
-// |  SessionId  |    Length        |           TrueLength (O)        |       |  (O) |   |
+// |  SessionId  |    Length        |    ApplicationDataLength (O)    |       |  (O) |   |
 // +--------------------------------+---------------------------------+-------+------+---+
 // |                                |                                                |   |
 //  -------------------------------- ------------------------------------------------ ---
@@ -49,11 +49,11 @@
 
 typedef struct {
   UINT32   SessionId;
-  UINT16   Length; // The length of the remaining data, including TrueLength(O), Payload, Random(O) and MAC.
+  UINT16   Length; // The length of the remaining data, including ApplicationDataLength(O), Payload, Random(O) and MAC.
 } SPDM_SECURE_MESSAGE_ADATA_HEADER;
 
 typedef struct {
-  UINT16   TrueLength; // The length of the Payload
+  UINT16   ApplicationDataLength; // The length of the Payload
 } SPDM_SECURE_MESSAGE_CIPHER_HEADER;
 
 #pragma pack()

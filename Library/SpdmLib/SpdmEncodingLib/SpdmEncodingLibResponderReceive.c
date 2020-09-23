@@ -105,7 +105,7 @@ SpdmDecryptRequest (
     if (!Result) {
       return RETURN_DEVICE_ERROR;
     }
-    PlainTextSize = EncMsgHeader->TrueLength;
+    PlainTextSize = EncMsgHeader->ApplicationDataLength;
     if (PlainTextSize > CipherTextSize) {
       return RETURN_DEVICE_ERROR;      
     }

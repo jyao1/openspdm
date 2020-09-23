@@ -94,7 +94,7 @@ SpdmEncryptRequest (
     RecordHeader->SessionId = SessionId;
     RecordHeader->Length = (UINT16)(CipherTextSize + AeadTagSize);
     EncMsgHeader = (VOID *)(RecordHeader + 1);
-    EncMsgHeader->TrueLength = (UINT16)RequestSize;
+    EncMsgHeader->ApplicationDataLength = (UINT16)RequestSize;
     CopyMem (EncMsgHeader + 1, Request, RequestSize);
     RandomBytes ((UINT8 *)EncMsgHeader + sizeof(SPDM_SECURE_MESSAGE_CIPHER_HEADER) + RequestSize, RandCount);
 
