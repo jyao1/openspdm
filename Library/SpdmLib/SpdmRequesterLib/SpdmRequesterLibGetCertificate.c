@@ -89,8 +89,7 @@ SpdmRequesterVerifyCertificateChain (
   Get CertificateChain in one slot returned from device.
 */
 RETURN_STATUS
-EFIAPI
-SpdmGetCertificate (
+TrySpdmGetCertificate (
   IN     VOID                 *Context,
   IN     UINT8                SlotNum,
   IN OUT UINTN                *CertChainSize,
@@ -106,7 +105,8 @@ SpdmGetCertificate (
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
 
   SpdmContext = Context;
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) {
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0)) {
     return RETURN_DEVICE_ERROR;
   }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) == 0) {
@@ -146,15 +146,20 @@ SpdmGetCertificate (
       Status = RETURN_DEVICE_ERROR;
       goto Done;
     }
+    if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+      Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageB, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_CERTIFICATE, SPDM_CERTIFICATE, sizeof(SPDM_CERTIFICATE_RESPONSE_MAX));
+      if (RETURN_ERROR(Status)) {
+        goto Done;
+      }
+    } else if (SpdmResponse.Header.RequestResponseCode != SPDM_CERTIFICATE) {
+      Status = RETURN_DEVICE_ERROR;
+      goto Done;
+    }
     if (SpdmResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
       Status = RETURN_DEVICE_ERROR;
       goto Done;
     }
     if (SpdmResponseSize > sizeof(SpdmResponse)) {
-      Status = RETURN_DEVICE_ERROR;
-      goto Done;
-    }
-    if (SpdmResponse.Header.RequestResponseCode != SPDM_CERTIFICATE) {
       Status = RETURN_DEVICE_ERROR;
       goto Done;
     }
@@ -211,3 +216,28 @@ SpdmGetCertificate (
 Done:
   return Status;
 }
+
+RETURN_STATUS
+EFIAPI
+SpdmGetCertificate (
+  IN     VOID                 *Context,
+  IN     UINT8                SlotNum,
+  IN OUT UINTN                *CertChainSize,
+     OUT VOID                 *CertChain
+  )
+{
+  SPDM_DEVICE_CONTEXT    *SpdmContext;
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+  
+  SpdmContext = Context;
+  Retry = SpdmContext->RetryTimes;
+  while(Retry-- != 0) {
+    Status = TrySpdmGetCertificate(SpdmContext, SlotNum, CertChainSize, CertChain);
+    if (RETURN_NO_RESPONSE != Status)
+      return Status;
+  }
+
+  return Status;
+}
+
