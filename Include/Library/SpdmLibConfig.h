@@ -26,4 +26,27 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define MAX_SPDM_REQUEST_RETRY_TIMES      3
 
+//
+// Crypto Configuation
+// In each category, at least one should be selected.
+//
+#define OPENSPDM_RSA_SSA_SUPPORT                 1
+#define OPENSPDM_RSA_PSS_SUPPORT                 1
+#define OPENSPDM_ECDSA_SUPPORT                   1
+
+#define OPENSPDM_DHE_SUPPORT                     1
+#define OPENSPDM_ECDHE_SUPPORT                   1
+
+#define OPENSPDM_AEAD_GCM_SUPPORT                1
+#define OPENSPDM_AEAD_CHACHA20_POLY1305_SUPPORT  1
+
+#define OPENSPDM_SHA256_SUPPORT      1
+#define OPENSPDM_SHA384_SUPPORT      1
+#define OPENSPDM_SHA512_SUPPORT      1
+
+#define OPENSPDM_HMAC_SHA256_SUPPORT 1
+
+#define OPENSPDM_HKDF_SHA256_SUPPORT 1
+
+
 #endif
