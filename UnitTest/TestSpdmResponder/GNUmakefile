@@ -38,7 +38,10 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/TestSpdmResponderCapability.o \
     $(OUTPUT_DIR)/TestSpdmResponderAlgorithm.o \
     $(OUTPUT_DIR)/TestSpdmResponderDigest.o \
+    $(OUTPUT_DIR)/TestSpdmResponderCertificate.o \
     $(OUTPUT_DIR)/SpdmUnitTestCommon.o \
+    $(OUTPUT_DIR)/SpdmTestKey.o \
+    $(OUTPUT_DIR)/SpdmTestSupport.o \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -139,7 +142,16 @@ $(OUTPUT_DIR)/TestSpdmResponderAlgorithm.o : $(SOURCE_DIR)/TestSpdmResponderAlgo
 $(OUTPUT_DIR)/TestSpdmResponderDigest.o : $(SOURCE_DIR)/TestSpdmResponderDigest.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
+$(OUTPUT_DIR)/TestSpdmResponderCertificate.o : $(SOURCE_DIR)/TestSpdmResponderCertificate.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
 $(OUTPUT_DIR)/SpdmUnitTestCommon.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmUnitTestCommon.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmTestKey.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmTestSupport.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

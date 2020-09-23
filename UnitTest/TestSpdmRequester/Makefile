@@ -38,7 +38,10 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmRequesterGetCapability.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterNegotiateAlgorithm.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterGetDigest.obj \
+    $(OUTPUT_DIR)\TestSpdmRequesterGetCertificate.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
+    $(OUTPUT_DIR)\SpdmTestKey.obj \
+    $(OUTPUT_DIR)\SpdmTestSupport.obj \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -139,8 +142,17 @@ $(OUTPUT_DIR)\TestSpdmRequesterNegotiateAlgorithm.obj : $(SOURCE_DIR)\TestSpdmRe
 $(OUTPUT_DIR)\TestSpdmRequesterGetDigest.obj : $(SOURCE_DIR)\TestSpdmRequesterGetDigest.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterGetDigest.c
 
+$(OUTPUT_DIR)\TestSpdmRequesterGetCertificate.obj : $(SOURCE_DIR)\TestSpdmRequesterGetCertificate.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterGetCertificate.c
+
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
+
+$(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestKey.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestKey.c
+	
+$(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestSupport.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestSupport.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

@@ -38,7 +38,10 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmResponderCapability.obj \
     $(OUTPUT_DIR)\TestSpdmResponderAlgorithm.obj \
     $(OUTPUT_DIR)\TestSpdmResponderDigest.obj \
+    $(OUTPUT_DIR)\TestSpdmResponderCertificate.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
+    $(OUTPUT_DIR)\SpdmTestKey.obj \
+    $(OUTPUT_DIR)\SpdmTestSupport.obj \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -139,8 +142,17 @@ $(OUTPUT_DIR)\TestSpdmResponderAlgorithm.obj : $(SOURCE_DIR)\TestSpdmResponderAl
 $(OUTPUT_DIR)\TestSpdmResponderDigest.obj : $(SOURCE_DIR)\TestSpdmResponderDigest.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderDigest.c
 
+$(OUTPUT_DIR)\TestSpdmResponderCertificate.obj : $(SOURCE_DIR)\TestSpdmResponderCertificate.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderCertificate.c
+
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
+
+$(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestKey.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestKey.c
+
+$(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestSupport.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestSupport.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@
