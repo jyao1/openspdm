@@ -54,8 +54,7 @@ OBJECT_FILES =  \
 STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\BaseMemoryLib\BaseMemoryLib.lib \
     $(BIN_DIR)\OsStub\DebugLibNull\DebugLibNull.lib \
-    $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\BaseCryptLib$(CRYPTO).lib \
-    $(BIN_DIR)\OsStub\$(CRYPTO)Lib\$(CRYPTO)Lib.lib \
+    $(BIN_DIR)\OsStub\BaseCryptLibDummy\BaseCryptLibDummy.lib \
     $(BIN_DIR)\OsStub\MemoryAllocationLibNull\MemoryAllocationLibNull.lib \
     $(BIN_DIR)\OsStub\IntrinsicLib\IntrinsicLib.lib \
     $(BIN_DIR)\OsStub\BaseCryptStubLibDummy\BaseCryptStubLibDummy.lib \
@@ -69,8 +68,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(OBJECT_FILES) \
     $(BIN_DIR)\OsStub\BaseMemoryLib\*.obj \
     $(BIN_DIR)\OsStub\DebugLibNull\*.obj \
-    $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\*.obj \
-    $(BIN_DIR)\OsStub\$(CRYPTO)Lib\*.obj \
+    $(BIN_DIR)\OsStub\BaseCryptLibDummy\*.obj \
     $(BIN_DIR)\OsStub\MemoryAllocationLibNull\*.obj \
     $(BIN_DIR)\OsStub\IntrinsicLib\*.obj \
     $(BIN_DIR)\OsStub\BaseCryptStubLibDummy\*.obj \
@@ -116,8 +114,7 @@ init:
 gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseMemoryLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\DebugLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLib$(CRYPTO)\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\$(CRYPTO)Lib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLibDummy\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\IntrinsicLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptStubLibDummy\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
