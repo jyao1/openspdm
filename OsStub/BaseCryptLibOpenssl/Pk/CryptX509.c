@@ -8,6 +8,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalCryptLib.h"
 #include <openssl/x509.h>
+#include <openssl/x509v3.h>
+#include <crypto/asn1.h>
+#include <openssl/asn1.h>
 #include <openssl/rsa.h>
 
 /**
@@ -324,8 +327,7 @@ _Exit:
 /**
   Retrieve a string from one X.509 certificate base on the Request_NID.
 
-  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
-  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[in]      X509Name         X509 Name
   @param[in]      Request_NID      NID of string to obtain
   @param[out]     CommonName       Buffer to contain the retrieved certificate common
                                    name string (UTF8). At most CommonNameSize bytes will be
@@ -351,17 +353,13 @@ _Exit:
 STATIC
 RETURN_STATUS
 InternalX509GetNIDName (
-  IN      CONST UINT8   *Cert,
-  IN      UINTN         CertSize,
+  IN      X509_NAME     *X509Name,
   IN      INT32         Request_NID,
   OUT     CHAR8         *CommonName,  OPTIONAL
   IN OUT  UINTN         *CommonNameSize
   )
 {
   RETURN_STATUS    ReturnStatus;
-  BOOLEAN          Status;
-  X509             *X509Cert;
-  X509_NAME        *X509Name;
   INT32            Index;
   INTN             Length;
   X509_NAME_ENTRY  *Entry;
@@ -374,36 +372,11 @@ InternalX509GetNIDName (
   //
   // Check input parameters.
   //
-  if ((Cert == NULL) || (CertSize > INT_MAX) || (CommonNameSize == NULL)) {
+  if (X509Name == NULL || (CommonNameSize == NULL)) {
     return ReturnStatus;
   }
   if ((CommonName != NULL) && (*CommonNameSize == 0)) {
     return ReturnStatus;
-  }
-
-  X509Cert = NULL;
-  //
-  // Read DER-encoded X509 Certificate and Construct X509 object.
-  //
-  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
-  if ((X509Cert == NULL) || (!Status)) {
-    //
-    // Invalid X.509 Certificate
-    //
-    goto _Exit;
-  }
-
-  Status = FALSE;
-
-  //
-  // Retrieve subject name from certificate object.
-  //
-  X509Name = X509_get_subject_name (X509Cert);
-  if (X509Name == NULL) {
-    //
-    // Fail to retrieve subject name content
-    //
-    goto _Exit;
   }
 
   //
@@ -455,13 +428,180 @@ _Exit:
   //
   // Release Resources.
   //
-  if (X509Cert != NULL) {
-    X509_free (X509Cert);
-  }
   if (UTF8Name != NULL) {
     OPENSSL_free (UTF8Name);
   }
 
+  return ReturnStatus;
+}
+
+/**
+  Retrieve a string from one X.509 certificate base on the Request_NID.
+
+  @param[in]      X509Name         X509Name Struct
+  @param[in]      Request_NID      NID of string to obtain
+  @param[out]     CommonName       Buffer to contain the retrieved certificate common
+                                   name string (UTF8). At most CommonNameSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,
+                                   and the size of buffer returned CommonName on output.
+                                   If CommonName is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate CommonName retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If CommonNameSize is NULL.
+                                   If CommonName is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no NID Name entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the CommonName is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+STATIC
+RETURN_STATUS
+InternalX509GetSubjectNIDName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN         CertSize,
+  IN      INT32         Request_NID,
+  OUT     CHAR8         *CommonName,  OPTIONAL
+  IN OUT  UINTN         *CommonNameSize
+  )
+{
+  RETURN_STATUS    ReturnStatus;
+  BOOLEAN          Status;
+  X509             *X509Cert;
+  X509_NAME        *X509Name;
+
+
+  ReturnStatus = RETURN_INVALID_PARAMETER;
+  X509Cert = NULL;
+
+  if (Cert == NULL || CertSize == 0) {
+    goto _Exit;
+  }
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    //
+    // Invalid X.509 Certificate
+    //
+    goto _Exit;
+  }
+
+  Status = FALSE;
+
+  //
+  // Retrieve subject name from certificate object.
+  //
+  X509Name = X509_get_subject_name (X509Cert);
+  if (X509Name == NULL) {
+    //
+    // Fail to retrieve subject name content
+    //
+    goto _Exit;
+  }
+
+  ReturnStatus = InternalX509GetNIDName (X509Name, Request_NID, CommonName, CommonNameSize);
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+  return ReturnStatus;
+}
+
+/**
+  Retrieve a string from one X.509 certificate base on the Request_NID.
+
+  @param[in]      X509Name         X509 Struct
+  @param[in]      Request_NID      NID of string to obtain
+  @param[out]     CommonName       Buffer to contain the retrieved certificate common
+                                   name string (UTF8). At most CommonNameSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,
+                                   and the size of buffer returned CommonName on output.
+                                   If CommonName is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate CommonName retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If CommonNameSize is NULL.
+                                   If CommonName is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no NID Name entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the CommonName is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+STATIC
+RETURN_STATUS
+InternalX509GetIssuerNIDName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN         CertSize,
+  IN      INT32         Request_NID,
+  OUT     CHAR8         *CommonName,  OPTIONAL
+  IN OUT  UINTN         *CommonNameSize
+  )
+{
+  RETURN_STATUS    ReturnStatus;
+  BOOLEAN          Status;
+  X509             *X509Cert;
+  X509_NAME        *X509Name;
+
+
+  ReturnStatus = RETURN_INVALID_PARAMETER;
+  X509Cert = NULL;
+
+  if (Cert == NULL || CertSize == 0) {
+    goto _Exit;
+  }
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    //
+    // Invalid X.509 Certificate
+    //
+    goto _Exit;
+  }
+
+  Status = FALSE;
+
+  //
+  // Retrieve subject name from certificate object.
+  //
+  X509Name = X509_get_issuer_name (X509Cert);
+  if (X509Name == NULL) {
+    //
+    // Fail to retrieve subject name content
+    //
+    goto _Exit;
+  }
+
+  ReturnStatus = InternalX509GetNIDName (X509Name, Request_NID, CommonName, CommonNameSize);
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
   return ReturnStatus;
 }
 
@@ -500,7 +640,7 @@ X509GetCommonName (
   IN OUT  UINTN        *CommonNameSize
   )
 {
-  return InternalX509GetNIDName (Cert, CertSize, NID_commonName, CommonName, CommonNameSize);
+  return InternalX509GetSubjectNIDName(Cert, CertSize, NID_commonName, CommonName, CommonNameSize);
 }
 
 /**
@@ -538,7 +678,523 @@ X509GetOrganizationName (
   IN OUT  UINTN         *NameBufferSize
   )
 {
-  return InternalX509GetNIDName (Cert, CertSize, NID_organizationName, NameBuffer, NameBufferSize);
+  return InternalX509GetSubjectNIDName (Cert, CertSize, NID_organizationName, NameBuffer, NameBufferSize);
+}
+
+/**
+  Retrieve the version from one X.509 certificate.
+
+  If Cert is NULL, then return FALSE.
+  If CertSize is 0, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     Version      Pointer to the retrieved version integer.
+
+  @retval RETURN_SUCCESS           The certificate version retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If  Cert is NULL or CertSize is Zero.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetVersion (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  OUT     UINTN          *Version
+  )
+{
+  RETURN_STATUS    ReturnStatus;
+  BOOLEAN          Status;
+  X509             *X509Cert;
+
+  X509Cert = NULL;
+  ReturnStatus = RETURN_SUCCESS;
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    //
+    // Invalid X.509 Certificate
+    //
+    ReturnStatus = RETURN_INVALID_PARAMETER;
+  }
+
+  if (!RETURN_ERROR (ReturnStatus)) {
+    *Version  = X509_get_version(X509Cert);
+  }
+
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+  return ReturnStatus;
+}
+
+/**
+  Retrieve the serialNumber from one X.509 certificate.
+
+  If Cert is NULL, then return FALSE.
+  If CertSize is 0, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     SerialNumber  Pointer to the retrieved certificate SerialNumber bytes.
+  @param[in, out] SerialNumberSize  The size in bytes of the SerialNumber buffer on input,
+                               and the size of buffer returned SerialNumber on output.
+
+  @retval RETURN_SUCCESS           The certificate serialNumber retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL or CertSize is Zero.
+                                   If SerialNumberSize is NULL.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no SerialNumber exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the SerialNumber is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   SerialNumberSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+EFIAPI
+X509GetSerialNumber (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  OUT     UINT8         *SerialNumber,  OPTIONAL
+  IN OUT  UINTN         *SerialNumberSize
+  )
+{
+  BOOLEAN    Status;
+  X509       *X509Cert;
+  ASN1_INTEGER *Asn1Integer;
+  RETURN_STATUS    ReturnStatus;
+
+  ReturnStatus = RETURN_INVALID_PARAMETER;
+
+  //
+  // Check input parameters.
+  //
+  if (Cert == NULL || SerialNumberSize == NULL) {
+    return ReturnStatus;
+  }
+
+  X509Cert = NULL;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    goto _Exit;
+  }
+
+  //
+  // Retrieve subject name from certificate object.
+  //
+  Asn1Integer = X509_get_serialNumber (X509Cert);
+  if (Asn1Integer == NULL) {
+    ReturnStatus = RETURN_NOT_FOUND;
+    goto _Exit;
+  }
+
+  if (*SerialNumberSize < Asn1Integer->length) {
+    *SerialNumberSize = Asn1Integer->length;
+    ReturnStatus = RETURN_BUFFER_TOO_SMALL;
+    goto _Exit;
+  }
+  *SerialNumberSize = (UINTN)Asn1Integer->length;
+  if (SerialNumber != NULL) {
+    CopyMem(SerialNumber, Asn1Integer->data, *SerialNumberSize);
+    ReturnStatus = RETURN_SUCCESS;
+  }
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return ReturnStatus;
+}
+
+/**
+  Retrieve the issuer bytes from one X.509 certificate.
+
+  If Cert is NULL, then return FALSE.
+  If CertIssuerSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     CertIssuer  Pointer to the retrieved certificate subject bytes.
+  @param[in, out] CertIssuerSize  The size in bytes of the CertIssuer buffer on input,
+                               and the size of buffer returned CertSubject on output.
+
+  @retval  TRUE   The certificate issuer retrieved successfully.
+  @retval  FALSE  Invalid certificate, or the CertIssuerSize is too small for the result.
+                  The CertIssuerSize will be updated with the required size.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+X509GetIssuerName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     UINT8        *CertIssuer,
+  IN OUT  UINTN        *CertIssuerSize
+  )
+{
+  BOOLEAN    Status;
+  X509       *X509Cert;
+  X509_NAME  *X509Name;
+  UINTN      X509NameSize;
+
+  //
+  // Check input parameters.
+  //
+  if (Cert == NULL || CertIssuerSize == NULL) {
+    return FALSE;
+  }
+
+  X509Cert = NULL;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  Status = FALSE;
+
+  //
+  // Retrieve subject name from certificate object.
+  //
+  X509Name = X509_get_subject_name (X509Cert);
+  if (X509Name == NULL) {
+    goto _Exit;
+  }
+
+  X509NameSize = i2d_X509_NAME(X509Name, NULL);
+  if (*CertIssuerSize < X509NameSize) {
+    *CertIssuerSize = X509NameSize;
+    goto _Exit;
+  }
+  *CertIssuerSize = X509NameSize;
+  if (CertIssuer != NULL) {
+    i2d_X509_NAME(X509Name, &CertIssuer);
+    Status = TRUE;
+  }
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve the issuer common name (CN) string from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     CommonName       Buffer to contain the retrieved certificate issuer common
+                                   name string. At most CommonNameSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,
+                                   and the size of buffer returned CommonName on output.
+                                   If CommonName is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate Issuer CommonName retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If CommonNameSize is NULL.
+                                   If CommonName is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no CommonName entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the CommonName is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetIssuerCommonName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     CHAR8        *CommonName,  OPTIONAL
+  IN OUT  UINTN        *CommonNameSize
+  )
+{
+  return InternalX509GetIssuerNIDName(Cert, CertSize, NID_commonName, CommonName, CommonNameSize);
+}
+
+/**
+  Retrieve the issuer organization name (O) string from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     NameBuffer       Buffer to contain the retrieved certificate issuer organization
+                                   name string. At most NameBufferSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
+                                   and the size of buffer returned Name on output.
+                                   If NameBuffer is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate issuer Organization Name retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If NameBufferSize is NULL.
+                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no Organization Name entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetIssuerOrganizationName (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize
+  )
+{
+  return InternalX509GetIssuerNIDName (Cert, CertSize, NID_organizationName, NameBuffer, NameBufferSize);
+}
+
+/**
+  Retrieve the Signature Algorithm from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Nid              signature algorithm
+
+  @retval  TRUE   The certificate Nid retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Nid is NULL
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetSignatureType (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN        CertSize,
+  OUT   INTN         *Nid
+  )
+{
+  BOOLEAN    Status;
+  X509       *X509Cert;
+
+  //
+  // Check input parameters.
+  //
+  if (Cert == NULL || Nid == NULL) {
+    return FALSE;
+  }
+
+  X509Cert = NULL;
+  Status = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    goto _Exit;
+  }
+
+  //
+  // Retrieve subject name from certificate object.
+  //
+  *Nid = X509_get_signature_nid (X509Cert);
+  if (Nid == NID_undef) {
+    goto _Exit;
+  }
+  Status = TRUE;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieve the SubjectAltName from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     NameBuffer       Buffer to contain the retrieved certificate
+                                   SubjectAltName. At most NameBufferSize bytes will be
+                                   written. Maybe NULL in order to determine the size
+                                   buffer needed.
+  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
+                                   and the size of buffer returned Name on output.
+                                   If NameBuffer is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+  @param[out]     Oid              OID of otherName
+  @param[in,out]  OidSize          the buffersize for required OID
+
+  @retval RETURN_SUCCESS           The certificate Organization Name retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If NameBufferSize is NULL.
+                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no SubjectAltName exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   NameBufferSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetDMTFSubjectAltName (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize,
+  OUT     UINT8         *Oid,         OPTIONAL
+  IN OUT  UINTN         *OidSize
+  )
+{
+  RETURN_STATUS ReturnStatus;
+  INTN        i;
+  BOOLEAN     Status;
+  X509        *X509Cert;
+  CONST STACK_OF(X509_EXTENSION) *Extensions;
+  ASN1_OBJECT *Asn1Obj;
+  X509_EXTENSION *Ext;
+  const UINT8 *OtherNamePtr;
+  const UINT8 *Ptr;
+  int         Length;
+  long        ObjLen;
+  int         ObjTag;
+  int         ObjClass;
+
+  ReturnStatus = RETURN_INVALID_PARAMETER;
+
+  //
+  // Check input parameters.
+  //
+  if (Cert == NULL || CertSize == 0) {
+    return ReturnStatus;
+  }
+
+  X509Cert = NULL;
+  Status = FALSE;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    goto _Exit;
+  }
+
+  //
+  // Retrieve Extensions from certificate object.
+  //
+  ReturnStatus = RETURN_NOT_FOUND;
+  Extensions = X509_get0_extensions(X509Cert);
+  if (sk_X509_EXTENSION_num(Extensions) <= 0) {
+    goto _Exit;
+  }
+
+  //
+  // Traverse Extensions
+  //
+  for (i = 0; i < sk_X509_EXTENSION_num(Extensions); i++) {
+      Ext = sk_X509_EXTENSION_value(Extensions, (int)i);
+      ASN1_OCTET_STRING *OctStr;
+
+      Asn1Obj = (ASN1_OBJECT*)X509_EXTENSION_get_object(Ext);
+
+      if (Asn1Obj->nid == NID_subject_alt_name) {
+        // subjectAltName
+        OctStr = X509_EXTENSION_get_data(Ext);
+        OtherNamePtr = ASN1_STRING_get0_data(OctStr);
+        Length = ASN1_STRING_length(OctStr);
+
+        Ptr = OtherNamePtr;
+        ASN1_get_object(&Ptr, &ObjLen, &ObjTag, &ObjClass, Length);
+        if (ObjTag != V_ASN1_SEQUENCE) {
+          break;
+        }
+
+        // TBD: Not clear.  OpenSSL generate otherName will contains
+        //      this element
+        ASN1_get_object(&Ptr, &ObjLen, &ObjTag, &ObjClass, ObjLen);
+
+        // Object Identifier
+        ASN1_get_object(&Ptr, &ObjLen, &ObjTag, &ObjClass, ObjLen);
+        if (ObjTag != V_ASN1_OBJECT) {
+          break;
+        }
+        if (*OidSize < ObjLen) {
+          *OidSize = ObjLen;
+          ReturnStatus = RETURN_BUFFER_TOO_SMALL;
+          goto _Exit;
+        }
+        if (Oid != NULL) {
+          CopyMem(Oid, Ptr, ObjLen);
+          *OidSize = ObjLen;
+        }
+
+        // Move to next element
+        Ptr += ObjLen;
+
+        // TBD: Not clear.  OpenSSL generate otherName will contains
+        //      this element
+        ASN1_get_object(&Ptr, &ObjLen, &ObjTag, &ObjClass, (long)(OtherNamePtr + Length - Ptr));
+
+        // Get Utf8String
+        ASN1_get_object(&Ptr, &ObjLen, &ObjTag, &ObjClass, ObjLen);
+        if (ObjTag != V_ASN1_UTF8STRING) {
+          break;
+        }
+
+        if (*NameBufferSize < ObjLen) {
+          *NameBufferSize = ObjLen;
+          ReturnStatus = RETURN_BUFFER_TOO_SMALL;
+          goto _Exit;
+        }
+
+        if (NameBuffer != NULL) {
+          CopyMem(NameBuffer, Ptr, ObjLen);
+          *NameBufferSize = ObjLen;
+        }
+        ReturnStatus = RETURN_SUCCESS;
+        break;
+      }
+  }
+
+_Exit:
+  //
+  // Release Resources.
+  //
+
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return ReturnStatus;
 }
 
 /**
