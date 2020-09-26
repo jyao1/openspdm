@@ -74,6 +74,8 @@ SpdmGetResponsePskExchange (
   SPDM_DEVICE_CONTEXT           *SpdmContext;
   UINT16                        ReqSessionId;
   UINT16                        RspSessionId;
+  RETURN_STATUS                 Status;
+  UINTN                         OpaquePskExchangeRspSize;
 
   SpdmContext = Context;
 
@@ -104,10 +106,18 @@ SpdmGetResponsePskExchange (
                 SpdmRequest->RequesterContextLength +
                 SpdmRequest->OpaqueLength;
 
+  Ptr = (UINT8 *)Request + sizeof(SPDM_PSK_EXCHANGE_REQUEST) + SpdmRequest->PSKHintLength + SpdmRequest->RequesterContextLength;
+  Status = SpdmProcessOpaqueDataSupportedVersionData (SpdmContext, SpdmRequest->OpaqueLength, Ptr);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
+  OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
   TotalSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
-              SpdmContext->LocalContext.OpaquePskExchangeRspSize +
+              OpaquePskExchangeRspSize +
               HmacSize;
 
   ASSERT (*ResponseSize >= TotalSize);
@@ -129,9 +139,10 @@ SpdmGetResponsePskExchange (
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
 
   SpdmResponse->RspSessionID = RspSessionId;
+  SpdmResponse->Reserved = 0;
 
   SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
-  SpdmResponse->OpaqueLength = (UINT16)SpdmContext->LocalContext.OpaquePskExchangeRspSize;
+  SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
 
   Ptr = (VOID *)(SpdmResponse + 1);
   
@@ -146,8 +157,9 @@ SpdmGetResponsePskExchange (
   GetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += DEFAULT_CONTEXT_LENGTH;
 
-  CopyMem (Ptr, SpdmContext->LocalContext.OpaquePskExchangeRsp, SpdmContext->LocalContext.OpaquePskExchangeRspSize);
-  Ptr += SpdmContext->LocalContext.OpaquePskExchangeRspSize;
+  Status = SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
+  ASSERT_RETURN_ERROR(Status);
+  Ptr += OpaquePskExchangeRspSize;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);

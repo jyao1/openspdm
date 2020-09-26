@@ -32,6 +32,7 @@ SOURCE_DIR = $(WORKSPACE)/Library/SpdmLib/$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
+    $(OUTPUT_DIR)/SpdmEncodingLibOpaqueData.o \
     $(OUTPUT_DIR)/SpdmEncodingLibRequestReceive.o \
     $(OUTPUT_DIR)/SpdmEncodingLibRequestSend.o \
     $(OUTPUT_DIR)/SpdmEncodingLibResponderReceive.o \
@@ -72,6 +73,9 @@ init:
 #
 # Individual Object Build Targets
 #
+$(OUTPUT_DIR)/SpdmEncodingLibOpaqueData.o : $(SOURCE_DIR)/SpdmEncodingLibOpaqueData.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
 $(OUTPUT_DIR)/SpdmEncodingLibRequestReceive.o : $(SOURCE_DIR)/SpdmEncodingLibRequestReceive.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 

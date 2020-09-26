@@ -106,6 +106,7 @@ SpdmSendReceivePskExchange (
   UINT16                                    ReqSessionId;
   UINT16                                    RspSessionId;
   SPDM_SESSION_INFO                         *SessionInfo;
+  UINTN                                     OpaquePskExchangeReqSize;
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
@@ -119,7 +120,8 @@ SpdmSendReceivePskExchange (
   SpdmRequest.Header.Param2 = 0;
   SpdmRequest.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   SpdmRequest.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  SpdmRequest.OpaqueLength = (UINT16)SpdmContext->LocalContext.OpaquePskExchangeReqSize;
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  SpdmRequest.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
 
   ReqSessionId = SpdmAllocateReqSessionId (SpdmContext);
   SpdmRequest.ReqSessionID = ReqSessionId;
@@ -137,8 +139,9 @@ SpdmSendReceivePskExchange (
   DEBUG((DEBUG_INFO, "\n"));
   Ptr += SpdmRequest.RequesterContextLength;
 
-  CopyMem (Ptr, SpdmContext->LocalContext.OpaquePskExchangeReq, SpdmContext->LocalContext.OpaquePskExchangeReqSize);
-  Ptr += SpdmContext->LocalContext.OpaquePskExchangeReqSize;
+  Status = SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
+  ASSERT_RETURN_ERROR(Status);
+  Ptr += OpaquePskExchangeReqSize;
 
   SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
   Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
@@ -180,6 +183,14 @@ SpdmSendReceivePskExchange (
     SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_DEVICE_ERROR;
   }
+
+  Ptr = (UINT8 *)&SpdmResponse + sizeof(SPDM_PSK_EXCHANGE_RESPONSE) + HashSize + SpdmResponse.ResponderContextLength;
+  Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmContext, SpdmResponse.OpaqueLength, Ptr);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_UNSUPPORTED;
+  }
+
   SpdmResponseSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
                      SpdmResponse.ResponderContextLength +
                      SpdmResponse.OpaqueLength +

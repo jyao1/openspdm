@@ -163,6 +163,8 @@ SpdmGetResponseKeyExchange (
   SPDM_DEVICE_CONTEXT           *SpdmContext;
   UINT16                        ReqSessionId;
   UINT16                        RspSessionId;
+  RETURN_STATUS                 Status;
+  UINTN                         OpaqueKeyExchangeRspSize;
 
   SpdmContext = Context;
 
@@ -198,11 +200,19 @@ SpdmGetResponseKeyExchange (
                 sizeof(UINT16) +
                 OpaqueDataLength;
 
+  Ptr = (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DHEKeySize + sizeof(UINT16);
+  Status = SpdmProcessOpaqueDataSupportedVersionData (SpdmContext, OpaqueDataLength, Ptr);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
+  OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
   TotalSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DHEKeySize +
               HashSize +
               sizeof(UINT16) +
-              SpdmContext->LocalContext.OpaqueKeyExchangeRspSize +
+              OpaqueKeyExchangeRspSize +
               SignatureSize +
               HmacSize;
 
@@ -258,10 +268,11 @@ SpdmGetResponseKeyExchange (
   }
   Ptr += HashSize;
 
-  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueKeyExchangeRspSize;
+  *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
   Ptr += sizeof(UINT16);
-  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueKeyExchangeRsp, SpdmContext->LocalContext.OpaqueKeyExchangeRspSize);
-  Ptr += SpdmContext->LocalContext.OpaqueKeyExchangeRspSize;
+  Status = SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
+  ASSERT_RETURN_ERROR(Status);
+  Ptr += OpaqueKeyExchangeRspSize;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
   Result = SpdmResponderGenerateKeyExchangeSignature (SpdmContext, SessionInfo, SlotNum, Ptr);

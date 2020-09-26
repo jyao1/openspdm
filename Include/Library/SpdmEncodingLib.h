@@ -56,4 +56,50 @@ SpdmEncodeResponse (
      OUT VOID                 *Message
   );
 
+
+
+UINTN
+EFIAPI
+SpdmGetOpaqueDataSupportedVersionDataSize (
+  IN     VOID                 *SpdmContext
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmBuildOpaqueDataSupportedVersionData (
+  IN     VOID                 *SpdmContext,
+  IN OUT UINTN                *DataOutSize,
+     OUT VOID                 *DataOut
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmProcessOpaqueDataVersionSelectionData (
+  IN     VOID                 *SpdmContext,
+  IN     UINTN                DataInSize,
+  IN     VOID                 *DataIn
+  );
+
+UINTN
+EFIAPI
+SpdmGetOpaqueDataVersionSelectionDataSize (
+  IN     VOID                 *SpdmContext
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmBuildOpaqueDataVersionSelectionData (
+  IN     VOID                 *SpdmContext,
+  IN OUT UINTN                *DataOutSize,
+     OUT VOID                 *DataOut
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmProcessOpaqueDataSupportedVersionData (
+  IN     VOID                 *SpdmContext,
+  IN     UINTN                DataInSize,
+  IN     VOID                 *DataIn
+  );
+
 #endif

@@ -219,6 +219,7 @@ SpdmSendReceiveKeyExchange (
   UINT16                                    ReqSessionId;
   UINT16                                    RspSessionId;
   SPDM_SESSION_INFO                         *SessionInfo;
+  UINTN                                     OpaqueKeyExchangeReqSize;
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
@@ -237,6 +238,7 @@ SpdmSendReceiveKeyExchange (
 
   ReqSessionId = SpdmAllocateReqSessionId (SpdmContext);
   SpdmRequest.ReqSessionID = ReqSessionId;
+  SpdmRequest.Reserved = 0;
 
   Ptr = SpdmRequest.ExchangeData;
   DHEKeySize = GetSpdmDHEKeySize (SpdmContext);
@@ -245,10 +247,12 @@ SpdmSendReceiveKeyExchange (
   InternalDumpHex (Ptr, DHEKeySize);
   Ptr += DHEKeySize;
 
-  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueKeyExchangeReqSize;
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueKeyExchangeReq, SpdmContext->LocalContext.OpaqueKeyExchangeReqSize);
-  Ptr += SpdmContext->LocalContext.OpaqueKeyExchangeReqSize;
+  Status = SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr);
+  ASSERT_RETURN_ERROR(Status);
+  Ptr += OpaqueKeyExchangeReqSize;
 
   SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
   Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
@@ -317,7 +321,6 @@ SpdmSendReceiveKeyExchange (
 
   OpaqueLength = *(UINT16 *)Ptr;
   Ptr += sizeof(UINT16);
-  Ptr += OpaqueLength;
   if (SpdmResponseSize < sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
                          DHEKeySize +
                          HashSize +
@@ -328,6 +331,13 @@ SpdmSendReceiveKeyExchange (
     SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_DEVICE_ERROR;
   }
+  Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmContext, OpaqueLength, Ptr);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_UNSUPPORTED;
+  }
+
+  Ptr += OpaqueLength;
 
   SpdmResponseSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
                      DHEKeySize +
