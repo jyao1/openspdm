@@ -7,6 +7,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Cryptest.h"
 
+CONST UINT8 DMTF_OID[] = {
+  0x2B, 0x06, 0x01, 0x4, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01
+};
+
 /**
   Validate UEFI-Crypto  X509 certificate Verify
 
@@ -19,36 +23,49 @@ ValidateCryptX509 (
   VOID
   )
 {
-  INT32 Status;
-  UINT8 *LeafCert;
-  UINTN LeafCertLen;
-  UINT8 *TestCert;
-  UINTN TestCertLen;
-  UINT8 *TestCACert;
-  UINTN TestCACertLen;
-  UINT8 *TestBundleCert;
-  UINTN TestBundleCertLen;
-  UINT8 *TestEndCert;
-  UINTN TestEndCertLen;
-  UINTN SubjectSize;
-  UINT8 *Subject;
-  UINTN CommonNameSize;
-  CHAR8 CommonName[64];
+  BOOLEAN       Status;
+  UINT8         *LeafCert;
+  UINTN         LeafCertLen;
+  UINT8         *TestCert;
+  UINTN         TestCertLen;
+  UINT8         *TestCACert;
+  UINTN         TestCACertLen;
+  UINT8         *TestBundleCert;
+  UINTN         TestBundleCertLen;
+  UINT8         *TestEndCert;
+  UINTN         TestEndCertLen;
+  UINTN         SubjectSize;
+  UINT8         *Subject;
+  UINTN         CommonNameSize;
+  CHAR8         CommonName[64];
   RETURN_STATUS Ret;
-  UINTN CertVersion;
-  UINT8  Asn1Buffer[1024];
-  UINTN  Asn1BufferLen;
-  UINTN DMTFOidSize;
-  UINT8 DMTFOid[64];
-  CONST UINT8 DMTF_OID[] = {
-    0x2B, 0x06, 0x01, 0x4, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01
-  };
+  UINTN         CertVersion;
+  UINT8         Asn1Buffer[1024];
+  UINTN         Asn1BufferLen;
+  UINTN         DMTFOidSize;
+  UINT8         DMTFOid[64];
 
+  TestCert = NULL;
+  TestCACert = NULL;
+  TestBundleCert = NULL;
+  TestEndCert = NULL;
 
   Status = ReadInputFile ("test/inter.cert.der", (VOID **)&TestCert, &TestCertLen);
+  if (!Status) {
+    goto Cleanup;
+  }
   Status = ReadInputFile ("test/ca.cert.der", (VOID **)&TestCACert, &TestCACertLen);
+  if (!Status) {
+    goto Cleanup;
+  }
   Status = ReadInputFile ("test/bundle_requester.certchain.der", (VOID **)&TestBundleCert, &TestBundleCertLen);
+  if (!Status) {
+    goto Cleanup;
+  }
   Status = ReadInputFile ("test/end_requester.cert.der", (VOID **)&TestEndCert, &TestEndCertLen);
+  if (!Status) {
+    goto Cleanup;
+  }
 
   //
   // X509 Certificate Verification.
@@ -57,7 +74,7 @@ ValidateCryptX509 (
   Status = X509VerifyCert (TestCert, TestCertLen, TestCACert, TestCACertLen);
   if (!Status) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     Print ("[Pass]\n");
   }
@@ -69,7 +86,7 @@ ValidateCryptX509 (
   Status = X509VerifyCertChain((UINT8 *)TestCACert, TestCACertLen, (UINT8 *)TestBundleCert, TestBundleCertLen);
   if (!Status) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     Print ("[Pass]\n");
   }
@@ -81,15 +98,15 @@ ValidateCryptX509 (
   Status = X509GetCertFromCertChain(TestBundleCert, TestBundleCertLen, -1, &LeafCert, &LeafCertLen);
   if (!Status) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   }
   if (LeafCertLen != TestEndCertLen) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   }
   if (CompareMem (LeafCert, TestEndCert, LeafCertLen) != 0) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     Print ("[Pass]\n");
   }
@@ -101,15 +118,15 @@ ValidateCryptX509 (
   Status = X509GetCertFromCertChain(TestBundleCert, TestBundleCertLen, 2, &LeafCert, &LeafCertLen);
   if (!Status) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   }
   if (LeafCertLen != TestEndCertLen) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   }
   if (CompareMem (LeafCert, TestEndCert, LeafCertLen) != 0) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     Print ("[Pass]\n");
   }
@@ -121,15 +138,15 @@ ValidateCryptX509 (
   Status = X509GetCertFromCertChain(TestBundleCert, TestBundleCertLen, 0, &LeafCert, &LeafCertLen);
   if (!Status) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   }
   if (LeafCertLen != TestCACertLen) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   }
   if (CompareMem (LeafCert, TestCACert, LeafCertLen) != 0) {
     Print ("[Fail]\n");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     Print ("[Pass]\n");
   }
@@ -146,7 +163,7 @@ ValidateCryptX509 (
   FreePool(Subject);
   if (!Status) {
     Print ("[Fail]");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     Print ("[Pass]");
   }
@@ -160,7 +177,7 @@ ValidateCryptX509 (
   Ret = X509GetCommonName (TestCert, TestCertLen, CommonName, &CommonNameSize);
   if (RETURN_ERROR (Ret)) {
     Print ("\n  - Retrieving Common Name - [Fail]");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     DEBUG((DEBUG_INFO, "\n  - Retrieving Common Name = \"%s\" (Size = %d)", CommonName, CommonNameSize));
     Print(" - [PASS]");
@@ -174,7 +191,7 @@ ValidateCryptX509 (
   Ret = X509GetOrganizationName (TestCert, TestCertLen, CommonName, &CommonNameSize);
   if (Ret != RETURN_NOT_FOUND) {
     Print ("\n  - Retrieving Oraganization Name - [Fail]");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     Print ("\n  - Retrieving Oraganization Name - [PASS]");
   }
@@ -186,7 +203,7 @@ ValidateCryptX509 (
   Ret = X509GetVersion(TestCert, TestCertLen, &CertVersion);
   if (RETURN_ERROR (Ret)) {
     Print ("\n  - Retrieving Version - [Fail]");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     DEBUG((DEBUG_INFO, "\n  - Retrieving Version = %d - ", CertVersion));
     Print ("[Pass]");
@@ -200,7 +217,7 @@ ValidateCryptX509 (
   Ret = X509GetSerialNumber(TestCert, TestCertLen, Asn1Buffer, &Asn1BufferLen);
   if (RETURN_ERROR (Ret)) {
     Print ("\n  - Retrieving SerialNumber - [Fail]");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     DEBUG((DEBUG_INFO, "\n  - Retrieving SerialNumber = %d - ", *((UINT64*)Asn1Buffer)));
     Print ("[Pass]");
@@ -217,7 +234,7 @@ ValidateCryptX509 (
   FreePool(Subject);
   if (!Status) {
     Print ("[Fail]");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     Print (" - [Pass]");
   }
@@ -230,7 +247,7 @@ ValidateCryptX509 (
   Ret = X509GetIssuerCommonName (TestCert, TestCertLen, CommonName, &CommonNameSize);
   if (RETURN_ERROR (Ret)) {
     Print ("\n  - Retrieving Issuer Common Name - [Fail]");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     DEBUG((DEBUG_INFO, "\n  - Retrieving Issuer Common Name = \"%s\" (Size = %d) - ", CommonName, CommonNameSize));
     Print ("[Pass]");
@@ -244,7 +261,7 @@ ValidateCryptX509 (
   Ret = X509GetIssuerOrganizationName (TestCert, TestCertLen, CommonName, &CommonNameSize);
   if (Ret != RETURN_NOT_FOUND) {
     Print ("\n  - Retrieving Issuer Oraganization Name - [Fail]");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     Print ("\n  - Retrieving Issuer Oraganization Name - [Pass]");
   }
@@ -259,7 +276,7 @@ ValidateCryptX509 (
   Ret = X509GetDMTFSubjectAltName(TestEndCert, TestEndCertLen, CommonName, &CommonNameSize, DMTFOid, &DMTFOidSize);
   if (RETURN_ERROR(Ret) || CompareMem(DMTFOid, DMTF_OID, sizeof (DMTF_OID)) != 0) {
     Print ("\n  - Retrieving  SubjectAltName otherName - [Fail]");
-    return EFI_ABORTED;
+    goto Cleanup;
   } else {
     DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName otherName = \"%s\" (Size = %d) ", CommonName, CommonNameSize));
     Print ("- [Pass]");
@@ -267,4 +284,19 @@ ValidateCryptX509 (
 
   Print ("\n");
   return EFI_SUCCESS;
+
+Cleanup:
+  if (TestCert != NULL) {
+    free (TestCert);
+  }
+  if (TestCACert != NULL) {
+    free (TestCACert);
+  }
+  if (TestBundleCert != NULL) {
+    free (TestBundleCert);
+  }
+  if (TestEndCert != NULL) {
+    free (TestEndCert);
+  }
+  return EFI_ABORTED;
 }

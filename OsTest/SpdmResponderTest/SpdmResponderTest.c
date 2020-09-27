@@ -66,6 +66,7 @@ CreateSocket(
       errno
 #endif
       );
+    closesocket(*ListenSocket);
     return FALSE;
   }
 
@@ -78,6 +79,7 @@ CreateSocket(
       errno
 #endif
       );
+    closesocket(*ListenSocket);
     return FALSE;
   }
   return TRUE;
@@ -184,6 +186,7 @@ PlatformServerRoutine (
 #ifdef _MSC_VER
       WSACleanup();
 #endif
+      closesocket(ListenSocket);
       return FALSE;
     }
     printf ("Client accepted\n");
@@ -195,6 +198,7 @@ PlatformServerRoutine (
 #ifdef _MSC_VER
   WSACleanup();
 #endif
+  closesocket(ListenSocket);
   return TRUE;
 }
 

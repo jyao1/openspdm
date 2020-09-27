@@ -119,6 +119,7 @@ ValidateCryptRsa (
   Status = RsaSetKey (Rsa, RsaKeyN, RsaN, sizeof (RsaN));
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -126,6 +127,7 @@ ValidateCryptRsa (
   Status = RsaGetKey (Rsa, RsaKeyN, NULL, &KeySize);
   if (Status || KeySize != sizeof (RsaN)) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -133,11 +135,15 @@ ValidateCryptRsa (
   Status = RsaGetKey (Rsa, RsaKeyN, KeyBuffer, &KeySize);
   if (!Status || KeySize != sizeof (RsaN)) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   if (CompareMem (KeyBuffer, RsaN, KeySize) != 0) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -149,6 +155,7 @@ ValidateCryptRsa (
   Status = RsaSetKey (Rsa, RsaKeyE, RsaE, sizeof (RsaE));
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -156,6 +163,7 @@ ValidateCryptRsa (
   Status = RsaGetKey (Rsa, RsaKeyE, NULL, &KeySize);
   if (Status || KeySize != sizeof (RsaE)) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -163,11 +171,15 @@ ValidateCryptRsa (
   Status = RsaGetKey (Rsa, RsaKeyE, KeyBuffer, &KeySize);
   if (!Status || KeySize != sizeof (RsaE)) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   if (CompareMem (KeyBuffer, RsaE, KeySize) != 0) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -184,6 +196,7 @@ ValidateCryptRsa (
   Status = RsaSetKey (Rsa, RsaKeyN, NULL, 0);
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -191,6 +204,7 @@ ValidateCryptRsa (
   Status = RsaGetKey (Rsa, RsaKeyN, NULL, &KeySize);
   if (!Status || KeySize != 0) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -200,6 +214,7 @@ ValidateCryptRsa (
   Status = RsaSetKey (Rsa, RsaKeyE, NULL, 0);
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -207,6 +222,7 @@ ValidateCryptRsa (
   Status = RsaGetKey (Rsa, RsaKeyE, NULL, &KeySize);
   if (!Status || KeySize != 0) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -218,6 +234,7 @@ ValidateCryptRsa (
   Status = RsaGenerateKey (Rsa, RSA_MODULUS_LENGTH, NULL, 0);
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -226,12 +243,16 @@ ValidateCryptRsa (
   Status = RsaGetKey (Rsa, RsaKeyE, KeyBuffer, &KeySize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   if (KeySize != 3 ||
       CompareMem (KeyBuffer, DefaultPublicKey, 3) != 0) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -239,16 +260,22 @@ ValidateCryptRsa (
   Status = RsaGetKey (Rsa, RsaKeyN, KeyBuffer, &KeySize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   if (KeySize != RSA_MODULUS_LENGTH / 8) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   if (!RsaCheckKey (Rsa)) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -260,33 +287,45 @@ ValidateCryptRsa (
   Status = RsaSetKey (Rsa, RsaKeyN, RsaN, sizeof (RsaN));
   if (!Status) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   if (RsaCheckKey (Rsa)) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   Status = RsaSetKey (Rsa, RsaKeyN, KeyBuffer, KeySize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   if (!RsaCheckKey (Rsa)) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   Status = RsaSetKey (Rsa, RsaKeyE, RsaE, sizeof (RsaE));
   if (!Status) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   if (RsaCheckKey (Rsa)) {
     Print ("[Fail]");
+    FreePool (KeyBuffer);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -304,18 +343,24 @@ ValidateCryptRsa (
   Status  = Sha256Init (Sha1Ctx);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (Sha1Ctx);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   Status  = Sha256Update (Sha1Ctx, RsaSignData, AsciiStrLen (RsaSignData));
   if (!Status) {
     Print ("[Fail]");
+    FreePool (Sha1Ctx);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   Status  = Sha256Final (Sha1Ctx, HashValue);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (Sha1Ctx);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -337,18 +382,21 @@ ValidateCryptRsa (
   Status = RsaSetKey (Rsa, RsaKeyN, RsaN, sizeof (RsaN));
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   Status = RsaSetKey (Rsa, RsaKeyE, RsaE, sizeof (RsaE));
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   Status = RsaSetKey (Rsa, RsaKeyD, RsaD, sizeof (RsaD));
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -356,6 +404,7 @@ ValidateCryptRsa (
   Status  = RsaPkcs1Sign (Rsa, HashValue, HashSize, NULL, &SigSize);
   if (Status || SigSize == 0) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -363,11 +412,15 @@ ValidateCryptRsa (
   Status  = RsaPkcs1Sign (Rsa, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (Signature);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   if (SigSize != sizeof (RsaPkcs1Signature)) {
     Print ("[Fail]");
+    FreePool (Signature);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -380,8 +433,12 @@ ValidateCryptRsa (
   Status = RsaPkcs1Verify (Rsa, HashValue, HashSize, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
+    FreePool (Signature);
     return EFI_ABORTED;
   }
+
+  FreePool (Signature);
 
   //
   // Sign RSA PSS-encoded Signature
@@ -399,18 +456,21 @@ ValidateCryptRsa (
   Status = RsaSetKey (Rsa, RsaKeyN, RsaN, sizeof (RsaN));
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   Status = RsaSetKey (Rsa, RsaKeyE, RsaE, sizeof (RsaE));
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
   Status = RsaSetKey (Rsa, RsaKeyD, RsaD, sizeof (RsaD));
   if (!Status) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -418,6 +478,7 @@ ValidateCryptRsa (
   Status  = RsaPssSign (Rsa, HashValue, HashSize, NULL, &SigSize);
   if (Status || SigSize == 0) {
     Print ("[Fail]");
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -425,6 +486,8 @@ ValidateCryptRsa (
   Status  = RsaPssSign (Rsa, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (Signature);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
@@ -437,9 +500,12 @@ ValidateCryptRsa (
   Status = RsaPssVerify (Rsa, HashValue, HashSize, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (Signature);
+    RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
+  FreePool (Signature);
   //
   // Release Resources
   //

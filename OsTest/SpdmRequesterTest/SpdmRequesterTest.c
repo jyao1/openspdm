@@ -89,6 +89,7 @@ InitClient (
       errno
 #endif
       );
+    closesocket(ClientSocket);
     return FALSE;
   }
 
@@ -138,7 +139,7 @@ PlatformClientRoutine (
              mReceiveBuffer
              );
   if (!Result) {
-    return FALSE;
+    goto Done;
   }
 
   // Do test - begin

@@ -212,7 +212,7 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
    kwadmin create-project %KW_PROJECT_NAME%
    kwadmin import-config %KW_PROJECT_NAME% %KW_CONFIG%
    kwbuildproject --project %KW_PROJECT_NAME% --tables-directory %KW_TABLE_ROOT%\%KW_PROJECT_NAME% %KW_ROOT%\%KW_PROJECT_NAME%.out --force
-   kwadmin load %KW_PROJECT_NAME% %KW_TABLE_ROOT%\%KW_PROJECT_NAME%`
+   kwadmin load %KW_PROJECT_NAME% %KW_TABLE_ROOT%\%KW_PROJECT_NAME%
    ```
 
    View report at http://localhost:8080/.

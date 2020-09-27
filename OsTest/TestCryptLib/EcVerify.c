@@ -60,6 +60,7 @@ ValidateCryptEc (
   Ec2 = EcNewByNid (CRYPTO_NID_SECP256R1);
   if (Ec2 == NULL) {
     Print ("[Fail]");
+    EcFree (Ec1);
     return EFI_ABORTED;
   }
 
@@ -70,11 +71,15 @@ ValidateCryptEc (
   Status = EcGenerateKey (Ec1);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
   Status = EcGetPublicKey (Ec1, Public1, &Public1Length);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
 
@@ -82,11 +87,15 @@ ValidateCryptEc (
   Status = EcGenerateKey (Ec2);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
   Status = EcGetPublicKey (Ec2, Public2, &Public2Length);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
 
@@ -94,6 +103,8 @@ ValidateCryptEc (
   Status = EcComputeKey (Ec1, Public2, Public2Length, Key1, &Key1Length);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
 
@@ -101,17 +112,23 @@ ValidateCryptEc (
   Status = EcComputeKey (Ec2, Public1, Public1Length, Key2, &Key2Length);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
 
   Print ("Compare Keys ... ");
   if (Key1Length != Key2Length) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
 
   if (CompareMem (Key1, Key2, Key1Length) != 0) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]\n");
@@ -133,6 +150,7 @@ ValidateCryptEc (
   Ec2 = EcNewByNid (CRYPTO_NID_SECP521R1);
   if (Ec2 == NULL) {
     Print ("[Fail]");
+    EcFree (Ec1);
     return EFI_ABORTED;
   }
 
@@ -140,6 +158,8 @@ ValidateCryptEc (
   Status = EcGenerateKey (Ec1);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
 
@@ -147,6 +167,8 @@ ValidateCryptEc (
   Status = EcGenerateKey (Ec2);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
 
@@ -159,6 +181,8 @@ ValidateCryptEc (
   Status  = EcDsaSign (Ec1, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   }
 
@@ -166,6 +190,8 @@ ValidateCryptEc (
   Status = EcDsaVerify (Ec1, HashValue, HashSize, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]\n");
@@ -177,6 +203,8 @@ ValidateCryptEc (
   // Status  = EcDsaSign (Ec2, HashValue, HashSize, Signature, &SigSize);
   // if (!Status) {
   //   Print ("[Fail]");
+  //   EcFree (Ec1);
+  //   EcFree (Ec2);
   //   return EFI_ABORTED;
   // }
 
@@ -184,10 +212,15 @@ ValidateCryptEc (
   // Status = EcDsaVerify (Ec2, HashValue, HashSize, Signature, SigSize);
   // if (!Status) {
   //   Print ("[Fail]");
+  //   EcFree (Ec1);
+  //   EcFree (Ec2);
   //   return EFI_ABORTED;
   // } else {
   //   Print ("[Pass]\n");
   // }
+
+  EcFree (Ec1);
+  EcFree (Ec2);
 
   return EFI_SUCCESS;
 }

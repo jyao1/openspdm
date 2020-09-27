@@ -21,6 +21,7 @@ ReadInputFile (
 
   if ((FpIn = fopen (FileName, "rb")) == NULL) {
     printf ("Unable to open file %s\n", FileName);
+    *FileData = NULL;
     return FALSE;
   }
 

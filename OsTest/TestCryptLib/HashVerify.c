@@ -79,6 +79,7 @@ ValidateCryptDigest (
   Status  = Sha256Init (HashCtx);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
@@ -86,6 +87,7 @@ ValidateCryptDigest (
   Status  = Sha256Update (HashCtx, HashData, DataSize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
@@ -93,6 +95,7 @@ ValidateCryptDigest (
   Status  = Sha256Final (HashCtx, Digest);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
@@ -131,6 +134,7 @@ ValidateCryptDigest (
   Status  = Sha384Init (HashCtx);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
@@ -138,6 +142,7 @@ ValidateCryptDigest (
   Status  = Sha384Update (HashCtx, HashData, DataSize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
@@ -145,6 +150,7 @@ ValidateCryptDigest (
   Status  = Sha384Final (HashCtx, Digest);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
@@ -183,6 +189,7 @@ ValidateCryptDigest (
   Status  = Sha512Init (HashCtx);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
@@ -190,6 +197,7 @@ ValidateCryptDigest (
   Status  = Sha512Update (HashCtx, HashData, DataSize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
@@ -197,6 +205,7 @@ ValidateCryptDigest (
   Status  = Sha512Final (HashCtx, Digest);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 

@@ -68,6 +68,7 @@ GetSpdmHashFunc (
     ASSERT (FALSE);
     break;
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -104,6 +105,7 @@ GetSpdmMeasurementHashFunc (
     ASSERT (FALSE);
     break;
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -128,6 +130,7 @@ GetSpdmHmacFunc (
     ASSERT (FALSE);
     break;
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -152,6 +155,7 @@ GetSpdmHkdfExpandFunc (
     ASSERT (FALSE);
     break;
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -440,6 +444,7 @@ GetSpdmAeadEncFunc (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -471,6 +476,7 @@ GetSpdmAeadDecFunc (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -502,6 +508,7 @@ GetSpdmAsymGetPublicKeyFromX509 (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -533,6 +540,7 @@ GetSpdmAsymGetPrivateKeyFromPem (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -564,6 +572,7 @@ GetSpdmAsymFree (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -601,6 +610,7 @@ GetSpdmAsymSign (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -638,6 +648,7 @@ GetSpdmAsymVerify (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -669,6 +680,7 @@ GetSpdmReqAsymGetPublicKeyFromX509 (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -700,6 +712,7 @@ GetSpdmReqAsymGetPrivateKeyFromPem (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -731,6 +744,7 @@ GetSpdmReqAsymFree (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -768,6 +782,7 @@ GetSpdmReqAsymSign (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -805,6 +820,7 @@ GetSpdmReqAsymVerify (
     break;
 #endif
   }
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -876,8 +892,6 @@ ComputeDHEFinalKey (
 #if OPENSPDM_DHE_SUPPORT == 1
     Result = DhComputeKey (Context, PeerPubKey, PeerKeySize, FinalKey, FinalKeySize);
     ASSERT (Result);
-
-    DhFree (Context);
 #else
     ASSERT (FALSE);
 #endif
@@ -885,7 +899,32 @@ ComputeDHEFinalKey (
 #if OPENSPDM_ECDHE_SUPPORT == 1
     Result = EcComputeKey (Context, PeerPubKey, PeerKeySize, FinalKey, FinalKeySize);
     ASSERT (Result);
+#else
+    ASSERT (FALSE);
+#endif
+  }
+}
 
+VOID
+FreeDHEContext (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *Context
+  )
+{
+  BOOLEAN Result;
+  BOOLEAN IsEcDhe;
+  
+  IsEcDhe = IsSpdmECDHE (SpdmContext);
+  Result = FALSE;
+
+  if (!IsEcDhe) {
+#if OPENSPDM_DHE_SUPPORT == 1
+    DhFree (Context);
+#else
+    ASSERT (FALSE);
+#endif
+  } else {
+#if OPENSPDM_ECDHE_SUPPORT == 1
     EcFree (Context);
 #else
     ASSERT (FALSE);

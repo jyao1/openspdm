@@ -404,6 +404,7 @@ ValidateCryptRsa2 (
   Status    = RsaGetPublicKeyFromX509 (TestCert, sizeof (TestCert), &RsaPubKey);
   if (!Status) {
     Print ("[Fail]");
+    RsaFree  (RsaPrivKey);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]");
@@ -417,6 +418,8 @@ ValidateCryptRsa2 (
   Status  = RsaPkcs1Sign (RsaPrivKey, MsgHash, SHA256_DIGEST_SIZE, NULL, &SigSize);
   if (Status || SigSize == 0) {
     Print ("[Fail]");
+    RsaFree  (RsaPubKey);
+    RsaFree  (RsaPrivKey);
     return EFI_ABORTED;
   }
 
@@ -424,6 +427,9 @@ ValidateCryptRsa2 (
   Status    = RsaPkcs1Sign (RsaPrivKey, MsgHash, SHA256_DIGEST_SIZE, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (Signature);
+    RsaFree  (RsaPubKey);
+    RsaFree  (RsaPrivKey);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]");
@@ -436,10 +442,15 @@ ValidateCryptRsa2 (
   Status = RsaPkcs1Verify (RsaPubKey, MsgHash, SHA256_DIGEST_SIZE, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (Signature);
+    RsaFree  (RsaPubKey);
+    RsaFree  (RsaPrivKey);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]");
   }
+
+  FreePool (Signature);
 
   // //
   // // X509 Certificate Subject Retrieving.
@@ -451,6 +462,8 @@ ValidateCryptRsa2 (
   // Status  = X509GetSubjectName (TestCert, sizeof (TestCert), Subject, &SubjectSize);
   // if (!Status) {
   //   Print ("[Fail]");
+  //   RsaFree  (RsaPubKey);
+  //   RsaFree  (RsaPrivKey);
   //   return EFI_ABORTED;
   // } else {
   //   Print ("[Pass]");
@@ -464,6 +477,8 @@ ValidateCryptRsa2 (
   // ReturnStatus = X509GetCommonName (TestCert, sizeof (TestCert), CommonName, &CommonNameSize);
   // if (RETURN_ERROR (ReturnStatus)) {
   //   Print ("\n  - Retrieving Common Name - [Fail]");
+  //   RsaFree  (RsaPubKey);
+  //   RsaFree  (RsaPrivKey);
   //   return EFI_ABORTED;
   // } else {
   //   AsciiStrToUnicodeStrS (CommonName, CommonNameUnicode, CommonNameSize);
@@ -475,7 +490,6 @@ ValidateCryptRsa2 (
   //
   RsaFree  (RsaPubKey);
   RsaFree  (RsaPrivKey);
-  FreePool (Signature);
   // FreePool (Subject);
 
   return EFI_SUCCESS;

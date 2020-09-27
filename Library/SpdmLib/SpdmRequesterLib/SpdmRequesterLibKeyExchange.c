@@ -257,6 +257,7 @@ SpdmSendReceiveKeyExchange (
   SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
   Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
+    FreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -264,15 +265,19 @@ SpdmSendReceiveKeyExchange (
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
+    FreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize < sizeof(SPDM_KEY_EXCHANGE_RESPONSE)) {
+    FreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
+    FreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_EXCHANGE_RSP) {
+    FreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -299,6 +304,7 @@ SpdmSendReceiveKeyExchange (
                           SignatureSize +
                           HmacSize) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
+    FreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -329,11 +335,13 @@ SpdmSendReceiveKeyExchange (
                          SignatureSize +
                          HmacSize) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
+    FreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmContext, OpaqueLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
+    FreeDHEContext (SpdmContext, DHEContext);
     return RETURN_UNSUPPORTED;
   }
 
@@ -356,6 +364,7 @@ SpdmSendReceiveKeyExchange (
   Result = SpdmRequesterVerifyKeyExchangeSignature (SpdmContext, SessionInfo, Signature, SignatureSize);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
+    FreeDHEContext (SpdmContext, DHEContext);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
@@ -367,6 +376,7 @@ SpdmSendReceiveKeyExchange (
   //
   FinalKeySize = sizeof(FinalKey);
   ComputeDHEFinalKey (SpdmContext, DHEContext, DHEKeySize, SpdmResponse.ExchangeData, &FinalKeySize, FinalKey);
+  FreeDHEContext (SpdmContext, DHEContext);
   DEBUG((DEBUG_INFO, "FinalKey (0x%x):\n", FinalKeySize));
   InternalDumpHex (FinalKey, FinalKeySize);
 

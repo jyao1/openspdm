@@ -94,6 +94,7 @@ ValidateCryptMac (
   Status  = CmacAesInit (CmacCtx, CmacKey, sizeof (CmacKey));
   if (!Status) {
     Print ("[Fail]");
+    CmacAesFree (CmacCtx);
     return EFI_ABORTED;
   }
 
@@ -101,6 +102,7 @@ ValidateCryptMac (
   Status  = CmacAesUpdate (CmacCtx, CmacData, sizeof(CmacData));
   if (!Status) {
     Print ("[Fail]");
+    CmacAesFree (CmacCtx);
     return EFI_ABORTED;
   }
 
@@ -108,6 +110,7 @@ ValidateCryptMac (
   Status  = CmacAesFinal (CmacCtx, MacResult);
   if (!Status) {
     Print ("[Fail]");
+    CmacAesFree (CmacCtx);
     return EFI_ABORTED;
   }
 
@@ -129,6 +132,7 @@ ValidateCryptMac (
   Status  = GmacAesInit (GmacCtx, GmacKey, sizeof (GmacKey));
   if (!Status) {
     Print ("[Fail]");
+    GmacAesFree (GmacCtx);
     return EFI_ABORTED;
   }
   
@@ -136,6 +140,7 @@ ValidateCryptMac (
   Status  = GmacAesSetIv (GmacCtx, GmacIv, sizeof (GmacIv));
   if (!Status) {
     Print ("[Fail]");
+    GmacAesFree (GmacCtx);
     return EFI_ABORTED;
   }
 
@@ -143,6 +148,7 @@ ValidateCryptMac (
   Status  = GmacAesUpdate (GmacCtx, GmacData, sizeof(GmacData));
   if (!Status) {
     Print ("[Fail]");
+    GmacAesFree (GmacCtx);
     return EFI_ABORTED;
   }
 
@@ -150,6 +156,7 @@ ValidateCryptMac (
   Status  = GmacAesFinal (GmacCtx, MacResult);
   if (!Status) {
     Print ("[Fail]");
+    GmacAesFree (GmacCtx);
     return EFI_ABORTED;
   }
 

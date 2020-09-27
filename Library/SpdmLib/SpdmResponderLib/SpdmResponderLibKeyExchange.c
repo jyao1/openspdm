@@ -251,6 +251,7 @@ SpdmGetResponseKeyExchange (
 
   FinalKeySize = sizeof(FinalKey);
   ComputeDHEFinalKey (SpdmContext, DHEContext, DHEKeySize, (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), &FinalKeySize, FinalKey);
+  FreeDHEContext (SpdmContext, DHEContext);
   DEBUG((DEBUG_INFO, "Calc FinalKey (0x%x):\n", FinalKeySize));
   InternalDumpHex (FinalKey, FinalKeySize);
 

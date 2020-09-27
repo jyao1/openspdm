@@ -799,6 +799,12 @@ ComputeDHEFinalKey (
   OUT VOID                        *FinalKey
   );
 
+VOID
+FreeDHEContext (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *Context
+  );
+
 SPDM_SESSION_INFO *
 SpdmGetSessionInfoViaSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,

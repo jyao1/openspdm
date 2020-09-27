@@ -115,6 +115,7 @@ ValidateCryptEc2 (
   Status    = EcGetPublicKeyFromX509 (EccTestRootCer, sizeof (EccTestRootCer), &EcPubKey);
   if (!Status) {
     Print ("[Fail]");
+    EcDsaFree (EcPrivKey);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]");
@@ -129,6 +130,8 @@ ValidateCryptEc2 (
   Status  = EcDsaSign (EcPrivKey, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
+    EcDsaFree (EcPrivKey);
+    EcDsaFree (EcPubKey);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]");
@@ -138,11 +141,15 @@ ValidateCryptEc2 (
   Status = EcDsaVerify (EcPubKey, HashValue, HashSize, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
+    EcDsaFree (EcPrivKey);
+    EcDsaFree (EcPubKey);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]\n");
   }
-  
+
+  EcDsaFree (EcPrivKey);
+  EcDsaFree (EcPubKey);
   return EFI_SUCCESS;
 }
 

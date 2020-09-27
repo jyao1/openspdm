@@ -148,12 +148,12 @@ _Exit:
   @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
   @param[in]  PemSize      Size of the PEM key data in bytes.
   @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
-  @param[out] EcContext    Pointer to new-generated EC context which contain the retrieved
-                           EC private key component. Use EcFree() function to free the
+  @param[out] EcDsaContext Pointer to new-generated EC DSA context which contain the retrieved
+                           EC private key component. Use EcDsaFree() function to free the
                            resource.
 
   If PemData is NULL, then return FALSE.
-  If EcContext is NULL, then return FALSE.
+  If EcDsaContext is NULL, then return FALSE.
 
   @retval  TRUE   EC Private Key was retrieved successfully.
   @retval  FALSE  Invalid PEM key data or incorrect password.
@@ -165,7 +165,7 @@ EcGetPrivateKeyFromPem (
   IN   CONST UINT8  *PemData,
   IN   UINTN        PemSize,
   IN   CONST CHAR8  *Password,
-  OUT  VOID         **EcContext
+  OUT  VOID         **EcDsaContext
   )
 {
   BOOLEAN  Status;
@@ -174,7 +174,7 @@ EcGetPrivateKeyFromPem (
   //
   // Check input parameters.
   //
-  if (PemData == NULL || EcContext == NULL || PemSize > INT_MAX) {
+  if (PemData == NULL || EcDsaContext == NULL || PemSize > INT_MAX) {
     return FALSE;
   }
 
@@ -209,8 +209,8 @@ EcGetPrivateKeyFromPem (
   //
   // Retrieve EC Private Key from encrypted PEM data.
   //
-  *EcContext = PEM_read_bio_ECPrivateKey (PemBio, NULL, (pem_password_cb *) &PasswordCallback, (void *) Password);
-  if (*EcContext != NULL) {
+  *EcDsaContext = PEM_read_bio_ECPrivateKey (PemBio, NULL, (pem_password_cb *) &PasswordCallback, (void *) Password);
+  if (*EcDsaContext != NULL) {
     Status = TRUE;
   }
 

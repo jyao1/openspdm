@@ -66,6 +66,7 @@ if (0) {
   Dh2 = DhNew ();
   if (Dh2 == NULL) {
     Print ("[Fail]");
+    DhFree (Dh1);
     return EFI_ABORTED;
   }
 
@@ -73,6 +74,8 @@ if (0) {
   Status = DhGenerateParameter (Dh1, 2, 64, Prime);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
@@ -80,6 +83,8 @@ if (0) {
   Status = DhSetParameter (Dh2, 2, 64, Prime);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
@@ -87,6 +92,8 @@ if (0) {
   Status = DhGenerateKey (Dh1, PublicKey1, &PublicKey1Length);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
@@ -94,6 +101,8 @@ if (0) {
   Status = DhGenerateKey (Dh2, PublicKey2, &PublicKey2Length);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
@@ -101,6 +110,8 @@ if (0) {
   Status = DhComputeKey (Dh1, PublicKey2, PublicKey2Length, Key1, &Key1Length);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
@@ -108,21 +119,29 @@ if (0) {
   Status = DhComputeKey (Dh2, PublicKey1, PublicKey1Length, Key2, &Key2Length);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
   Print ("Compare Keys ... ");
   if (Key1Length != Key2Length) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
   if (CompareMem (Key1, Key2, Key1Length) != 0) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
   Print ("[Pass]\n");
+  DhFree (Dh1);
+  DhFree (Dh2);
 }
 
   //
@@ -143,6 +162,7 @@ if (0) {
   Dh2 = DhNewByNid (CRYPTO_NID_FFDHE2048);
   if (Dh2 == NULL) {
     Print ("[Fail]");
+    DhFree (Dh1);
     return EFI_ABORTED;
   }
 
@@ -150,6 +170,8 @@ if (0) {
   Status = DhGenerateKey (Dh1, FFPublicKey1, &FFPublicKey1Length);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
@@ -157,6 +179,8 @@ if (0) {
   Status = DhGenerateKey (Dh2, FFPublicKey2, &FFPublicKey2Length);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
@@ -164,6 +188,8 @@ if (0) {
   Status = DhComputeKey (Dh1, FFPublicKey2, FFPublicKey2Length, FFKey1, &FFKey1Length);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
@@ -171,21 +197,29 @@ if (0) {
   Status = DhComputeKey (Dh2, FFPublicKey1, FFPublicKey1Length, FFKey2, &FFKey2Length);
   if (!Status) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
   Print ("Compare Keys ... ");
   if (FFKey1Length != FFKey2Length) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
   if (CompareMem (FFKey1, FFKey2, FFKey1Length) != 0) {
     Print ("[Fail]");
+    DhFree (Dh1);
+    DhFree (Dh2);
     return EFI_ABORTED;
   }
 
   Print ("[Pass]\n");
+  DhFree (Dh1);
+  DhFree (Dh2);
 
   return EFI_SUCCESS;
 }

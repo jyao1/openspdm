@@ -161,6 +161,7 @@ ReadResponderRootPublicCertificate (
   CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
   if (CertChain == NULL) {
+    free (FileData);
     return FALSE;
   }
   CertChain->Length = (UINT16)CertChainSize;
@@ -182,6 +183,7 @@ ReadResponderRootPublicCertificate (
     *HashSize = SHA256_HASH_SIZE;
   }
 
+  free (FileData);
   return TRUE;
 }
 
@@ -227,6 +229,7 @@ ReadRequesterRootPublicCertificate (
   CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
   if (CertChain == NULL) {
+    free (FileData);
     return FALSE;
   }
   CertChain->Length = (UINT16)CertChainSize;
@@ -247,6 +250,7 @@ ReadRequesterRootPublicCertificate (
     *HashSize = SHA256_HASH_SIZE;
   }
 
+  free (FileData);
   return TRUE;
 }
 
@@ -295,6 +299,7 @@ ReadResponderPublicCertificateChain (
   CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
   if (CertChain == NULL) {
+    free (FileData);
     return FALSE;
   }
   CertChain->Length = (UINT16)CertChainSize;
@@ -305,6 +310,8 @@ ReadResponderPublicCertificateChain (
   //
   Res = X509GetCertFromCertChain(FileData, FileSize, 0, &RootCert, &RootCertLen);
   if (!Res) {
+    free (FileData);
+    free (CertChain);
     return Res;
   }
 
@@ -324,6 +331,7 @@ ReadResponderPublicCertificateChain (
     *HashSize = SHA256_HASH_SIZE;
   }
 
+  free (FileData);
   return TRUE;
 }
 
@@ -370,6 +378,7 @@ ReadRequesterPublicCertificateChain (
   CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
   if (CertChain == NULL) {
+    free (FileData);
     return FALSE;
   }
   CertChain->Length = (UINT16)CertChainSize;
@@ -380,6 +389,8 @@ ReadRequesterPublicCertificateChain (
   //
   Res = X509GetCertFromCertChain(FileData, FileSize, 0, &RootCert, &RootCertLen);
   if (!Res) {
+    free (FileData);
+    free (CertChain);
     return Res;
   }
 
@@ -399,6 +410,7 @@ ReadRequesterPublicCertificateChain (
     *HashSize = SHA256_HASH_SIZE;
   }
 
+  free (FileData);
   return TRUE;
 }
 
