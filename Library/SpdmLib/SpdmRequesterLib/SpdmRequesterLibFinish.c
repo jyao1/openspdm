@@ -37,7 +37,9 @@ SpdmRequesterGenerateFinishSignature (
   BOOLEAN                       Result;
   UINTN                         SignatureSize;
   UINT32                        HashSize;
-  LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER          THCurr;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   if (SpdmContext->LocalContext.SpdmDataSignFunc == NULL) {
     return FALSE;
@@ -115,7 +117,9 @@ SpdmRequesterGenerateFinishHmac (
   UINT8                                     *MutCertBuffer;
   UINTN                                     MutCertBufferSize;
   UINT8                                     MutCertBufferHash[MAX_HASH_SIZE];
-  LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER                      THCurr;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   HashSize = GetSpdmHashSize (SpdmContext);
 

@@ -52,9 +52,11 @@ SpdmRequesterVerifyKeyExchangeSignature (
   UINTN                                     CertBufferSize;
   UINT8                                     CertBufferHash[MAX_HASH_SIZE];
   VOID                                      *Context;
-  LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER                      THCurr;
   UINT8                                     *CertChainBuffer;
   UINTN                                     CertChainBufferSize;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   HashSize = GetSpdmHashSize (SpdmContext);
 
@@ -129,7 +131,9 @@ SpdmRequesterVerifyKeyExchangeHmac (
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   UINT8                                     CertBufferHash[MAX_HASH_SIZE];
-  LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER                      THCurr;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   HashSize = GetSpdmHashSize (SpdmContext);
   ASSERT(HashSize == HmacDataSize);

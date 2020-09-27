@@ -101,8 +101,10 @@ TrySpdmGetCertificate (
   SPDM_GET_CERTIFICATE_REQUEST              SpdmRequest;
   SPDM_CERTIFICATE_RESPONSE_MAX             SpdmResponse;
   UINTN                                     SpdmResponseSize;
-  LARGE_MANAGED_BUFFER                      CertificateChainBuffer = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER                      CertificateChainBuffer;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
+
+  InitManagedBuffer (&CertificateChainBuffer, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   SpdmContext = Context;
   if (((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0) ||

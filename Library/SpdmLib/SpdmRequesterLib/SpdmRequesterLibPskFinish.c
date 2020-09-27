@@ -27,7 +27,9 @@ SpdmRequesterGeneratePskFinishHmac (
 {
   UINTN                                     HashSize;
   UINT8                                     CalcHmacData[MAX_HASH_SIZE];
-  LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER                      THCurr;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   HashSize = GetSpdmHashSize (SpdmContext);
 

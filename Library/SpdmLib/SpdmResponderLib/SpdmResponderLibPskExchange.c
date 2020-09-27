@@ -25,7 +25,9 @@ SpdmResponderGeneratePskExchangeHmac (
 {
   UINT8                         HmacData[MAX_HASH_SIZE];
   UINT32                        HashSize;
-  LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER          THCurr;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   HashSize = GetSpdmHashSize (SpdmContext);
 

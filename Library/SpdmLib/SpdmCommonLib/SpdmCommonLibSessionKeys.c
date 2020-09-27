@@ -159,11 +159,13 @@ SpdmGenerateSessionHandshakeKey (
   UINT8                          *CertBuffer;
   UINTN                          CertBufferSize;
   UINT8                          CertBufferHash[MAX_HASH_SIZE];
-  LARGE_MANAGED_BUFFER           TH1 = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER           TH1;
   UINT8                          SlotNum;
   SPDM_SESSION_INFO              *SessionInfo;
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", SessionId));
+
+  InitManagedBuffer (&TH1, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
@@ -314,11 +316,13 @@ SpdmGenerateSessionDataKey (
   UINT8                          *MutCertBuffer;
   UINTN                          MutCertBufferSize;
   UINT8                          MutCertBufferHash[MAX_HASH_SIZE];
-  LARGE_MANAGED_BUFFER           TH2 = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER           TH2;
   UINT8                          SlotNum;
   SPDM_SESSION_INFO              *SessionInfo;
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
+
+  InitManagedBuffer (&TH2, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {

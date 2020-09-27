@@ -32,7 +32,7 @@ GetSpdmHashSize (
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512:
     return 64;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 HASH_ALL
@@ -257,7 +257,7 @@ GetSpdmAsymSize (
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
     return 66 * 2;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 /**
@@ -289,7 +289,7 @@ GetSpdmReqAsymSize (
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
     return 66 * 2;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 /**
@@ -317,7 +317,7 @@ GetSpdmMeasurementHashSize (
   case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_RAW_BIT_STREAM_ONLY:
     return 0;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 /**
@@ -346,7 +346,7 @@ GetSpdmDHEKeySize (
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1:
     return 66 * 2;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 UINTN
@@ -368,7 +368,7 @@ GetSpdmDHENid (
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1:
     return CRYPTO_NID_SECP521R1;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 BOOLEAN
@@ -413,7 +413,7 @@ GetSpdmAeadKeySize (
   case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
     return 32;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 /**
@@ -436,7 +436,7 @@ GetSpdmAeadIvSize (
   case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
     return 12;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 /**
@@ -459,7 +459,7 @@ GetSpdmAeadTagSize (
   case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
     return 16;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 /**
@@ -482,7 +482,7 @@ GetSpdmAeadBlockSize (
   case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
     return 16;
   }
-  return 0xFFFFFFFF;
+  return 0;
 }
 
 AEAD_ENCRYPT

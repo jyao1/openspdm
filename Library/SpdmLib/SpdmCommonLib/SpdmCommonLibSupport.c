@@ -86,6 +86,9 @@ AppendManagedBuffer (
   ASSERT ((ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_BUFFER_SIZE) ||
           (ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
   ASSERT (ManagedBuffer->MaxBufferSize >= ManagedBuffer->BufferSize);
+  if (BufferSize > ManagedBuffer->MaxBufferSize - ManagedBuffer->BufferSize) {
+    return RETURN_BUFFER_TOO_SMALL;
+  }
   ASSERT (BufferSize <= ManagedBuffer->MaxBufferSize - ManagedBuffer->BufferSize);
 
   CopyMem ((UINT8 *)(ManagedBuffer + 1) + ManagedBuffer->BufferSize, Buffer, BufferSize);
@@ -113,6 +116,9 @@ ShrinkManagedBuffer (
   ASSERT ((ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_BUFFER_SIZE) ||
           (ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
   ASSERT (ManagedBuffer->MaxBufferSize >= ManagedBuffer->BufferSize);
+  if (BufferSize > ManagedBuffer->BufferSize) {
+    return RETURN_BUFFER_TOO_SMALL;
+  }
   ASSERT (BufferSize <= ManagedBuffer->BufferSize);
 
   ManagedBuffer->BufferSize -= BufferSize;
@@ -125,7 +131,7 @@ ShrinkManagedBuffer (
   The MaxBufferSize is unchanged.
   The Buffer is not freed.
 **/
-RETURN_STATUS
+VOID
 ResetManagedBuffer (
   IN OUT VOID            *MBuffer
   )
@@ -138,7 +144,6 @@ ResetManagedBuffer (
           (ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
   ManagedBuffer->BufferSize = 0;
   ZeroMem (ManagedBuffer + 1, ManagedBuffer->MaxBufferSize);
-  return RETURN_SUCCESS;
 }
 
 /**
@@ -173,4 +178,24 @@ GetManagedBuffer (
   ASSERT ((ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_BUFFER_SIZE) ||
           (ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
   return (ManagedBuffer + 1);
+}
+
+/**
+  Init the buffer
+**/
+VOID
+InitManagedBuffer (
+  IN OUT VOID            *MBuffer,
+  IN UINTN               MaxBufferSize
+  )
+{
+  MANAGED_BUFFER  *ManagedBuffer;
+
+  ManagedBuffer = MBuffer;
+
+  ASSERT ((MaxBufferSize == MAX_SPDM_MESSAGE_BUFFER_SIZE) ||
+          (MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
+
+  ManagedBuffer->MaxBufferSize = MaxBufferSize;
+  ResetManagedBuffer (MBuffer);
 }

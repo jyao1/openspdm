@@ -31,7 +31,9 @@ SpdmResponderGenerateKeyExchangeSignature (
   BOOLEAN                       Result;
   UINTN                         SignatureSize;
   UINT32                        HashSize;
-  LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER          THCurr;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   if (SpdmContext->LocalContext.SpdmDataSignFunc == NULL) {
     return FALSE;
@@ -92,7 +94,9 @@ SpdmResponderGenerateKeyExchangeHmac (
   UINTN                         CertBufferSize;
   UINT8                         CertBufferHash[MAX_HASH_SIZE];
   UINT32                        HashSize;
-  LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER          THCurr;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
     return FALSE;

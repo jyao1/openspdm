@@ -734,7 +734,7 @@ ShrinkManagedBuffer (
   The MaxBufferSize is unchanged.
   The Buffer is not freed.
 **/
-RETURN_STATUS
+VOID
 ResetManagedBuffer (
   IN OUT VOID            *ManagedBuffer
   );
@@ -753,6 +753,15 @@ GetManagedBufferSize (
 VOID *
 GetManagedBuffer (
   IN VOID                *ManagedBuffer
+  );
+
+/**
+  Init the buffer
+**/
+VOID
+InitManagedBuffer (
+  IN OUT VOID            *MBuffer,
+  IN UINTN               MaxBufferSize
   );
 
 /**

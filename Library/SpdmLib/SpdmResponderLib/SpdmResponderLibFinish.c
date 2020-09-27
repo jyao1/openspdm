@@ -30,7 +30,9 @@ SpdmResponderVerifyFinishSignature (
   UINTN                                     MutCertChainBufferSize;
   UINT8                                     MutCertBufferHash[MAX_HASH_SIZE];
   VOID                                      *Context;
-  LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER                      THCurr;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   HashSize = GetSpdmHashSize (SpdmContext);
 
@@ -122,7 +124,9 @@ SpdmVerifyFinishHmac (
   UINTN                         MutCertBufferSize;
   UINT8                         MutCertBufferHash[MAX_HASH_SIZE];
   UINTN                         HashSize;
-  LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
+  LARGE_MANAGED_BUFFER          THCurr;
+
+  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   HashSize = GetSpdmHashSize (SpdmContext);
 
