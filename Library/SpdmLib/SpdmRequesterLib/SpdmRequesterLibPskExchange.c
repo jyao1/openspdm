@@ -170,6 +170,9 @@ SpdmSendReceivePskExchange (
   RspSessionId = SpdmResponse.RspSessionID;
   *SessionId = (ReqSessionId << 16) | RspSessionId;
   SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId);
+  if (SessionInfo == NULL) {
+    return RETURN_DEVICE_ERROR;
+  }
   SessionInfo->UsePsk = TRUE;
 
   HashSize = GetSpdmHashSize (SpdmContext);

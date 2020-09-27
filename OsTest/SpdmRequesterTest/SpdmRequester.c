@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 VOID                          *mSpdmContext;
 SOCKET                        mSocket;
+UINT32                        mSession;
 
 BOOLEAN
 CommunicatePlatformData (
@@ -170,12 +171,13 @@ SpdmDeviceReceiveMessage (
   if (Command == SOCKET_SPDM_COMMAND_NORMAL) {
     *SessionId = NULL;
   } else {
-    *SessionId = &Session;
+    mSession = Session;
+    *SessionId = &mSession;
   }
   return RETURN_SUCCESS;
 }
 
-VOID
+VOID *
 SpdmClientInit (
   VOID
   )
@@ -197,6 +199,9 @@ SpdmClientInit (
   UINTN                        HashSize;
 
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
+  if (mSpdmContext == NULL) {
+    return NULL;
+  }
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
@@ -290,7 +295,9 @@ SpdmClientInit (
   Status = SpdmInitConnection (SpdmContext);
   if (RETURN_ERROR(Status)) {
     printf ("SpdmInitConnection - 0x%x\n", (UINT32)Status);
+    free (mSpdmContext);
+    mSpdmContext = NULL;
   }
 
-  return ;
+  return mSpdmContext;
 }

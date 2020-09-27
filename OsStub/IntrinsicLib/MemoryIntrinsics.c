@@ -85,6 +85,9 @@ AsciiStrLen (
 {
   UINTN                             Length;
 
+  if (String == NULL) {
+    return 0;
+  }
   for (Length = 0; *String != '\0'; String++, Length++) {
   }
   return Length;

@@ -20,7 +20,9 @@ UINT8  mReceiveBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
 extern SOCKET                       mSocket;
 
-VOID
+extern VOID          *mSpdmContext;
+
+VOID *
 SpdmClientInit (
   VOID
   );
@@ -124,7 +126,10 @@ PlatformClientRoutine (
   }
   
   mSocket = PlatformSocket;
-  SpdmClientInit ();
+  mSpdmContext = SpdmClientInit ();
+  if (mSpdmContext == NULL) {
+    goto Done;
+  }
 
   ResponseSize = sizeof(mReceiveBuffer);
   Result = CommunicatePlatformData (
@@ -178,6 +183,10 @@ Done:
              NULL
              );
 
+  if (mSpdmContext != NULL) {
+    free (mSpdmContext);
+  }
+
   closesocket (PlatformSocket);
   
 #ifdef _MSC_VER
@@ -192,4 +201,5 @@ int main (void)
 {
   PlatformClientRoutine (DEFAULT_SPDM_PLATFORM_PORT);
   printf ("Client stopped\n");
+  return 0;
 }

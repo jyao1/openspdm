@@ -24,57 +24,62 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <klee/klee.h>
 #endif
 
-VOID
+BOOLEAN
 InitTestBuffer (
-  int argc,
-  char **argv,
-  IN UINTN MaxBufferSize,
-  IN VOID  **TestBuffer,
+  IN CHAR8  *FileName,
+  IN UINTN  MaxBufferSize,
+  IN VOID   **TestBuffer,
   OUT UINTN *BufferSize
   )
 {
+  VOID  *Buffer;
+  FILE  *File;
+  UINTN FileSize;
+  UINTN BytesRead;
+
   // 1. Allocate buffer
-  VOID  *Buffer = malloc (MaxBufferSize);
+  Buffer = malloc (MaxBufferSize);
+  if (Buffer == NULL) {
+    return FALSE;
+  }
 
   // 2. Assign to TestBuffer and BufferSize
   *TestBuffer = Buffer;
-  *BufferSize = MaxBufferSize;
+  if (BufferSize != NULL) {
+    *BufferSize = MaxBufferSize;
+  }
 
   // 3. Initialize TestBuffer
 #ifdef TEST_WITH_KLEE
   // 3.1 For test with KLEE: write symbolic values to TestBuffer
   klee_make_symbolic((UINT8 *)Buffer, MaxBufferSize, "Buffer");
-  return;
+  return TRUE;
 #endif
 
-  // 3.2 For other tests: read values from file to TestBuffer
-  //     (may also update the value of BufferSize)
-  if (argc == 1) {
-    printf ("error - missing input file\n");
-    exit(1);
-  }
-  CHAR8 *FileName = argv[1];
-
-  FILE *f = fopen(FileName, "rb");
-  if (f==NULL) {
-    fputs ("File error",stderr);
+  File = fopen(FileName, "rb");
+  if (File == NULL) {
+    fputs ("File error", stderr);
+    free (Buffer);
     exit (1);
   }
-  fseek(f, 0, SEEK_END);
+  fseek(File, 0, SEEK_END);
 
-  UINTN fsize = ftell(f);
-  rewind(f);
+  FileSize = ftell (File);
+  rewind (File);
 
-  fsize = fsize > MaxBufferSize ? MaxBufferSize : fsize;
-  size_t bytes_read = fread((void *)Buffer, 1, fsize, f);
-  if ((UINTN)bytes_read!=fsize) {
+  FileSize = FileSize > MaxBufferSize ? MaxBufferSize : FileSize;
+  BytesRead = fread((void *)Buffer, 1, FileSize, File);
+  if (BytesRead != FileSize) {
     fputs ("File error",stderr);
+    free (Buffer);
     exit (1);
   }
-  fclose(f);
+  fclose (File);
+
   if (BufferSize != NULL) {
-    *BufferSize = fsize;
+    *BufferSize = FileSize;
   }
+  return TRUE;
 }
 
 #ifdef TEST_WITH_LIBFUZZER
@@ -90,6 +95,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
   // 1. Initialize TestBuffer
   MaxBufferSize = GetMaxBufferSize();
   TestBuffer = AllocateZeroPool (MaxBufferSize);
+  if (TestBuffer == NULL) {
+    return 0;
+  }
   if (Size > MaxBufferSize) {
     Size = MaxBufferSize;
   }
@@ -103,13 +111,26 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 #else
 int main(int argc, char **argv)
 {
+  BOOLEAN                Res;
   VOID                   *TestBuffer;
   UINTN                  TestBufferSize;
+  CHAR8                  *FileName;
+
+  if (argc <= 1) {
+    printf ("error - missing input file\n");
+    exit(1);
+  }
+
+  FileName = argv[1];
 
   // 1. Initialize TestBuffer
-  InitTestBuffer (argc, argv, GetMaxBufferSize(), &TestBuffer, &TestBufferSize);
+  Res = InitTestBuffer (FileName, GetMaxBufferSize(), &TestBuffer, &TestBufferSize);
+  if (!Res) {
+    printf ("error - fail to init test buffer\n");
+    return 0;
+  }
   // 2. Run test
-  RunTestHarness(TestBuffer, TestBufferSize);
+  RunTestHarness (TestBuffer, TestBufferSize);
   // 3. Clean up
   free (TestBuffer);
   return 0;

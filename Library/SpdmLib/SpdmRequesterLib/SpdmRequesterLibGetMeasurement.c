@@ -213,8 +213,12 @@ SpdmGetMeasurement (
     if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurementRecordDataLength) {
       return RETURN_DEVICE_ERROR;
     }
+    if (MeasurementRecordDataLength >= sizeof(SpdmResponse.MeasurementRecord)) {
+      return RETURN_DEVICE_ERROR;
+    }
     DEBUG((DEBUG_INFO, "MeasurementRecordLength - 0x%06x\n", MeasurementRecordDataLength));
   }
+
   MeasurementRecordData = SpdmResponse.MeasurementRecord;
 
   if (RequestAttribute == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {

@@ -17,7 +17,7 @@ SOCKET mServerSocket;
 
 extern VOID *mSpdmContext;
 
-VOID
+VOID *
 SpdmServerInit (
   VOID
   );
@@ -204,9 +204,14 @@ PlatformServerRoutine (
 
 int main (void)
 {
-  SpdmServerInit ();
+  mSpdmContext = SpdmServerInit ();
+  if (mSpdmContext == NULL) {
+    return 0;
+  }
 
   PlatformServerRoutine (DEFAULT_SPDM_PLATFORM_PORT);
+
+  free (mSpdmContext);
 
   printf ("Server stopped\n");
   return 0;

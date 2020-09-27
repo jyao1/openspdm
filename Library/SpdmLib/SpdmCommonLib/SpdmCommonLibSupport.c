@@ -81,6 +81,9 @@ AppendManagedBuffer (
   if (BufferSize == 0) {
     return RETURN_SUCCESS;
   }
+  if (Buffer == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
   ASSERT (Buffer != NULL);
   ASSERT (BufferSize != 0);
   ASSERT ((ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_BUFFER_SIZE) ||

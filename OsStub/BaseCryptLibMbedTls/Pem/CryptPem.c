@@ -21,6 +21,9 @@ AsciiStrLen (
   UINTN                             Length;
 
   ASSERT (String != NULL);
+  if (String == NULL) {
+    return 0;
+  }
 
   for (Length = 0; *String != '\0'; String++, Length++) {
     ;

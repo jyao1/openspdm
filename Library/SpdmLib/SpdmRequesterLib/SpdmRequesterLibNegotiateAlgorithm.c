@@ -201,14 +201,16 @@ SpdmNegotiateAlgorithms (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
 {
-  UINTN Retry = SpdmContext->RetryTimes;
+  UINTN         Retry;
   RETURN_STATUS Status;
 
-  while(Retry-- != 0) {
+  Retry = SpdmContext->RetryTimes;
+  do {
     Status = TrySpdmNegotiateAlgorithms(SpdmContext);
-    if (RETURN_NO_RESPONSE != Status)
+    if (RETURN_NO_RESPONSE != Status) {
       return Status;
-  }
+    }
+  } while (Retry-- != 0);
 
   return Status;
 }

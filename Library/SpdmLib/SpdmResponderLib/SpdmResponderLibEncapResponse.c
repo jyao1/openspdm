@@ -79,6 +79,9 @@ SpdmProcessEncapsulatedResponse (
 
   EncapResponseStruct = SpdmGetEncapStructViaState (SpdmContext, SpdmContext->EncapContext.EncapState);
   ASSERT (EncapResponseStruct != NULL);
+  if (EncapResponseStruct == NULL) {
+    return RETURN_UNSUPPORTED;
+  }
  
   Continue = FALSE;
   if (EncapResponseStruct->ProcessEncapResponse != NULL) {
@@ -90,7 +93,11 @@ SpdmProcessEncapsulatedResponse (
 
   if (Continue) {
     ASSERT (EncapResponseStruct->ContinueGetEncapRequest != NULL);
-    Status = EncapResponseStruct->ContinueGetEncapRequest (SpdmContext, EncapRequestSize, EncapRequest);
+    if (EncapResponseStruct->ContinueGetEncapRequest) {
+      Status = EncapResponseStruct->ContinueGetEncapRequest (SpdmContext, EncapRequestSize, EncapRequest);
+    } else {
+      Status = RETURN_UNSUPPORTED;
+    }
   } else {
     if (EncapResponseStruct->NextGetEncapRequest != NULL) {
       Status = EncapResponseStruct->NextGetEncapRequest (SpdmContext, EncapRequestSize, EncapRequest);

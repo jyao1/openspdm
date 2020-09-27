@@ -33,6 +33,8 @@ extern UINT8  mReceiveBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
 extern SOCKET mServerSocket;
 
+UINT32 mSession;
+
 BOOLEAN
 RegisterMeasurement (
   OUT VOID                            **DeviceMeasurement,
@@ -227,7 +229,8 @@ SpdmDeviceReceiveMessage (
   if (mCommand == SOCKET_SPDM_COMMAND_NORMAL) {
     *SessionId = NULL;
   } else if (mCommand == SOCKET_SPDM_COMMAND_SECURE) {
-    *SessionId = &Session;
+    mSession = Session;
+    *SessionId = &mSession;
   } else {
     //
     // Cache the message
@@ -243,7 +246,7 @@ SpdmDeviceReceiveMessage (
   return RETURN_SUCCESS;
 }
 
-VOID
+VOID *
 SpdmServerInit (
   VOID
   )
@@ -265,6 +268,9 @@ SpdmServerInit (
   UINTN                        HashSize;
 
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
+  if (mSpdmContext == NULL) {
+    return NULL;
+  }
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
@@ -384,13 +390,11 @@ SpdmServerInit (
   Status = SpdmSetData (SpdmContext, SpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);
-    return ;
   }
   Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, "TestPskHint", sizeof("TestPskHint"));
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);
-    return ;
   }
 
-  return ;
+  return mSpdmContext;
 }

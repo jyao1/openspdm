@@ -175,11 +175,12 @@ SpdmGetDigest (
   
   SpdmContext = Context;
   Retry = SpdmContext->RetryTimes;
-  while(Retry-- != 0) {
+  do {
     Status = TrySpdmGetDigest(SpdmContext, SlotMask, TotalDigestBuffer);
-    if (RETURN_NO_RESPONSE != Status)
+    if (RETURN_NO_RESPONSE != Status) {
       return Status;
-  }
+    }
+  } while (Retry-- != 0);
 
   return Status;
 }

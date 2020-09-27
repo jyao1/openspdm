@@ -109,6 +109,9 @@ SpdmServerInit (
   BOOLEAN                      HasReqPubCert;
 
   SpdmContext = (VOID *)AllocatePool (SpdmGetContextSize());
+  if (SpdmContext == NULL) {
+    return NULL;
+  }
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmResponderSendMessage, SpdmResponderReceiveMessage);
   SpdmSetAlignment (SpdmContext, 4);

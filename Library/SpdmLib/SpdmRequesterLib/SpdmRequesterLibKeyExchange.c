@@ -278,6 +278,10 @@ SpdmSendReceiveKeyExchange (
   RspSessionId = SpdmResponse.RspSessionID;
   *SessionId = (ReqSessionId << 16) | RspSessionId;
   SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId);
+  if (SessionInfo == NULL) {
+    FreeDHEContext (SpdmContext, DHEContext);
+    return RETURN_DEVICE_ERROR;
+  }
   SessionInfo->UsePsk = FALSE;
 
   //

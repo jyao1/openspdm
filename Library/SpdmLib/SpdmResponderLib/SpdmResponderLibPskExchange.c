@@ -133,7 +133,10 @@ SpdmGetResponsePskExchange (
   RspSessionId = SpdmAllocateRspSessionId (SpdmContext);
   SessionId = (ReqSessionId << 16) | RspSessionId;
   SessionInfo = SpdmAssignSessionId (SpdmContext, SessionId);
-  ASSERT(SessionInfo != NULL);
+  if (SessionInfo == NULL) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   SessionInfo->UsePsk = TRUE;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
