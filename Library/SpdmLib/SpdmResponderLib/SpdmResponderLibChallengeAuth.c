@@ -16,11 +16,7 @@ SpdmResponderCalculateCertChainHash (
   OUT UINT8                *CertChainHash
   )
 {
-  HASH_ALL                      HashFunc;
-
-  HashFunc = GetSpdmHashFunc (SpdmContext);
-
-  HashFunc (SpdmContext->LocalContext.CertificateChain[SlotNum], SpdmContext->LocalContext.CertificateChainSize[SlotNum], CertChainHash);
+  HashFunc (SpdmContext, SpdmContext->LocalContext.CertificateChain[SlotNum], SpdmContext->LocalContext.CertificateChainSize[SlotNum], CertChainHash);
   return TRUE;
 }
 
@@ -35,12 +31,10 @@ SpdmResponderCalculateMeasurementSummaryHash (
   UINTN                         Index;
   UINTN                         LocalIndex;
   UINT32                        HashSize;
-  HASH_ALL                      HashFunc;
   UINTN                         MeasurmentBlockSize;
   SPDM_MEASUREMENT_BLOCK_DMTF   *CachedMeasurmentBlock;
   
   HashSize = GetSpdmMeasurementHashSize (SpdmContext);
-  HashFunc = GetSpdmMeasurementHashFunc (SpdmContext);
   
   MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize;
 
@@ -68,7 +62,7 @@ SpdmResponderCalculateMeasurementSummaryHash (
       }
       CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
     }
-    HashFunc (MeasurementData, HashSize * LocalIndex, MeasurementSummaryHash);
+    HashFunc (SpdmContext, MeasurementData, HashSize * LocalIndex, MeasurementSummaryHash);
     break;
   case SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH:
     CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
@@ -80,7 +74,7 @@ SpdmResponderCalculateMeasurementSummaryHash (
         );
       CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
     }
-    HashFunc (MeasurementData, HashSize * SpdmContext->LocalContext.DeviceMeasurementCount, MeasurementSummaryHash);
+    HashFunc (SpdmContext, MeasurementData, HashSize * SpdmContext->LocalContext.DeviceMeasurementCount, MeasurementSummaryHash);
     break;
   default:
     return FALSE;
@@ -101,7 +95,6 @@ SpdmResponderGenerateChallengeSignature (
   BOOLEAN                       Result;
   UINTN                         SignatureSize;
   UINT32                        HashSize;
-  HASH_ALL                      HashFunc;
   
   if (SpdmContext->LocalContext.SpdmDataSignFunc == NULL) {
     return FALSE;
@@ -109,7 +102,6 @@ SpdmResponderGenerateChallengeSignature (
 
   SignatureSize = GetSpdmAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
-  HashFunc = GetSpdmHashFunc (SpdmContext);
 
   AppendManagedBuffer (&SpdmContext->Transcript.MessageC, ResponseMessage, ResponseMessageSize);
   AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -125,7 +117,7 @@ SpdmResponderGenerateChallengeSignature (
   DEBUG((DEBUG_INFO, "Calc MessageC Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
 
-  HashFunc (GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
+  HashFunc (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
   DEBUG((DEBUG_INFO, "Calc M1M2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));

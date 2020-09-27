@@ -72,6 +72,22 @@ GetSpdmHashFunc (
   return NULL;
 }
 
+BOOLEAN
+HashFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HashValue
+  )
+{
+  HASH_ALL   HashFunction;
+  HashFunction = GetSpdmHashFunc (SpdmContext);
+  if (HashFunction == NULL) {
+    return FALSE;
+  }
+  return HashFunction (Data, DataSize, HashValue);
+}
+
 HASH_ALL
 GetSpdmMeasurementHashFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -109,6 +125,22 @@ GetSpdmMeasurementHashFunc (
   return NULL;
 }
 
+BOOLEAN
+MeasurementHashFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HashValue
+  )
+{
+  HASH_ALL   HashFunction;
+  HashFunction = GetSpdmMeasurementHashFunc (SpdmContext);
+  if (HashFunction == NULL) {
+    return FALSE;
+  }
+  return HashFunction (Data, DataSize, HashValue);
+}
+
 HMAC_ALL
 GetSpdmHmacFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -134,6 +166,24 @@ GetSpdmHmacFunc (
   return NULL;
 }
 
+BOOLEAN
+HmacFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  IN   CONST UINT8                  *Key,
+  IN   UINTN                        KeySize,
+  OUT  UINT8                        *HmacValue
+  )
+{
+  HMAC_ALL   HmacFunction;
+  HmacFunction = GetSpdmHmacFunc (SpdmContext);
+  if (HmacFunction == NULL) {
+    return FALSE;
+  }
+  return HmacFunction (Data, DataSize, Key, KeySize, HmacValue);
+}
+
 HKDF_EXPAND
 GetSpdmHkdfExpandFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -157,6 +207,25 @@ GetSpdmHkdfExpandFunc (
   }
   ASSERT (FALSE);
   return NULL;
+}
+
+BOOLEAN
+HkdfExpandFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8                  *Prk,
+  IN   UINTN                        PrkSize,
+  IN   CONST UINT8                  *Info,
+  IN   UINTN                        InfoSize,
+  OUT  UINT8                        *Out,
+  IN   UINTN                        OutSize
+  )
+{
+  HKDF_EXPAND   HkdfExpandFunction;
+  HkdfExpandFunction = GetSpdmHkdfExpandFunc (SpdmContext);
+  if (HkdfExpandFunction == NULL) {
+    return FALSE;
+  }
+  return HkdfExpandFunction (Prk, PrkSize, Info, InfoSize, Out, OutSize);
 }
 
 /**
@@ -448,6 +517,31 @@ GetSpdmAeadEncFunc (
   return NULL;
 }
 
+BOOLEAN
+AeadEncFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8*                 Key,
+  IN   UINTN                        KeySize,
+  IN   CONST UINT8*                 Iv,
+  IN   UINTN                        IvSize,
+  IN   CONST UINT8*                 AData,
+  IN   UINTN                        ADataSize,
+  IN   CONST UINT8*                 DataIn,
+  IN   UINTN                        DataInSize,
+  OUT  UINT8*                       TagOut,
+  IN   UINTN                        TagSize,
+  OUT  UINT8*                       DataOut,
+  OUT  UINTN*                       DataOutSize
+  )
+{
+  AEAD_ENCRYPT   AeadEncFunction;
+  AeadEncFunction = GetSpdmAeadEncFunc (SpdmContext);
+  if (AeadEncFunction == NULL) {
+    return FALSE;
+  }
+  return AeadEncFunction (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, TagOut, TagSize, DataOut, DataOutSize);
+}
+
 AEAD_DECRYPT
 GetSpdmAeadDecFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -478,6 +572,31 @@ GetSpdmAeadDecFunc (
   }
   ASSERT (FALSE);
   return NULL;
+}
+
+BOOLEAN
+AeadDecFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8*                 Key,
+  IN   UINTN                        KeySize,
+  IN   CONST UINT8*                 Iv,
+  IN   UINTN                        IvSize,
+  IN   CONST UINT8*                 AData,
+  IN   UINTN                        ADataSize,
+  IN   CONST UINT8*                 DataIn,
+  IN   UINTN                        DataInSize,
+  IN   CONST UINT8*                 Tag,
+  IN   UINTN                        TagSize,
+  OUT  UINT8*                       DataOut,
+  OUT  UINTN*                       DataOutSize
+  )
+{
+  AEAD_DECRYPT   AeadDecFunction;
+  AeadDecFunction = GetSpdmAeadDecFunc (SpdmContext);
+  if (AeadDecFunction == NULL) {
+    return FALSE;
+  }
+  return AeadDecFunction (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, Tag, TagSize, DataOut, DataOutSize);
 }
 
 ASYM_GET_PUBLIC_KEY_FROM_X509
@@ -512,36 +631,20 @@ GetSpdmAsymGetPublicKeyFromX509 (
   return NULL;
 }
 
-ASYM_GET_PRIVATE_KEY_FROM_PEM
-GetSpdmAsymGetPrivateKeyFromPem (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+GetPublicKeyFromX509Func (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8                  *Cert,
+  IN   UINTN                        CertSize,
+  OUT  VOID                         **Context
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if (OPENSPDM_RSA_SSA_SUPPORT == 1) || (OPENSPDM_RSA_PSS_SUPPORT == 1)
-    return RsaGetPrivateKeyFromPem;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcGetPrivateKeyFromPem;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
+  ASYM_GET_PUBLIC_KEY_FROM_X509   GetPublicKeyFromX509Function;
+  GetPublicKeyFromX509Function = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
+  if (GetPublicKeyFromX509Function == NULL) {
+    return FALSE;
   }
-  ASSERT (FALSE);
-  return NULL;
+  return GetPublicKeyFromX509Function (Cert, CertSize, Context);
 }
 
 ASYM_FREE
@@ -576,42 +679,18 @@ GetSpdmAsymFree (
   return NULL;
 }
 
-ASYM_SIGN
-GetSpdmAsymSign (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+VOID
+FreeFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-#if OPENSPDM_RSA_SSA_SUPPORT == 1
-    return RsaPkcs1Sign;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if OPENSPDM_RSA_PSS_SUPPORT == 1
-    return RsaPssSign;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcDsaSign;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
+  ASYM_FREE   FreeFunction;
+  FreeFunction = GetSpdmAsymFree (SpdmContext);
+  if (FreeFunction == NULL) {
+    return ;
   }
-  ASSERT (FALSE);
-  return NULL;
+  FreeFunction (Context);
 }
 
 ASYM_VERIFY
@@ -652,6 +731,24 @@ GetSpdmAsymVerify (
   return NULL;
 }
 
+BOOLEAN
+VerifyFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context,
+  IN   CONST UINT8                  *MessageHash,
+  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Signature,
+  IN   UINTN                        SigSize
+  )
+{
+  ASYM_VERIFY   VerifyFunction;
+  VerifyFunction = GetSpdmAsymVerify (SpdmContext);
+  if (VerifyFunction == NULL) {
+    return FALSE;
+  }
+  return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
+}
+
 ASYM_GET_PUBLIC_KEY_FROM_X509
 GetSpdmReqAsymGetPublicKeyFromX509 (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -684,36 +781,20 @@ GetSpdmReqAsymGetPublicKeyFromX509 (
   return NULL;
 }
 
-ASYM_GET_PRIVATE_KEY_FROM_PEM
-GetSpdmReqAsymGetPrivateKeyFromPem (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+ReqGetPublicKeyFromX509Func (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8                  *Cert,
+  IN   UINTN                        CertSize,
+  OUT  VOID                         **Context
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if (OPENSPDM_RSA_SSA_SUPPORT == 1) || (OPENSPDM_RSA_PSS_SUPPORT == 1)
-    return RsaGetPrivateKeyFromPem;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcGetPrivateKeyFromPem;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
+  ASYM_GET_PUBLIC_KEY_FROM_X509   GetPublicKeyFromX509Function;
+  GetPublicKeyFromX509Function = GetSpdmReqAsymGetPublicKeyFromX509 (SpdmContext);
+  if (GetPublicKeyFromX509Function == NULL) {
+    return FALSE;
   }
-  ASSERT (FALSE);
-  return NULL;
+  return GetPublicKeyFromX509Function (Cert, CertSize, Context);
 }
 
 ASYM_FREE
@@ -748,42 +829,18 @@ GetSpdmReqAsymFree (
   return NULL;
 }
 
-ASYM_SIGN
-GetSpdmReqAsymSign (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+VOID
+ReqFreeFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-#if OPENSPDM_RSA_SSA_SUPPORT == 1
-    return RsaPkcs1Sign;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if OPENSPDM_RSA_PSS_SUPPORT == 1
-    return RsaPssSign;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcDsaSign;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
+  ASYM_FREE   FreeFunction;
+  FreeFunction = GetSpdmReqAsymFree (SpdmContext);
+  if (FreeFunction == NULL) {
+    return ;
   }
-  ASSERT (FALSE);
-  return NULL;
+  FreeFunction (Context);
 }
 
 ASYM_VERIFY
@@ -822,6 +879,24 @@ GetSpdmReqAsymVerify (
   }
   ASSERT (FALSE);
   return NULL;
+}
+
+BOOLEAN
+ReqVerifyFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context,
+  IN   CONST UINT8                  *MessageHash,
+  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Signature,
+  IN   UINTN                        SigSize
+  )
+{
+  ASYM_VERIFY   VerifyFunction;
+  VerifyFunction = GetSpdmReqAsymVerify (SpdmContext);
+  if (VerifyFunction == NULL) {
+    return FALSE;
+  }
+  return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
 }
 
 VOID

@@ -17,11 +17,9 @@ SpdmResponderVerifyPskFinishHmac (
   )
 {
   UINT8                         HmacData[MAX_HASH_SIZE];
-  HMAC_ALL                      HmacFunc;
   UINT32                        HashSize;
   LARGE_MANAGED_BUFFER          THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
-  
-  HmacFunc = GetSpdmHmacFunc (SpdmContext);
+
   HashSize = GetSpdmHashSize (SpdmContext);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
@@ -38,7 +36,7 @@ SpdmResponderVerifyPskFinishHmac (
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.RequestFinishedKey, SessionInfo->HashSize, HmacData);
+  HmacFunc (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.RequestFinishedKey, SessionInfo->HashSize, HmacData);
   DEBUG((DEBUG_INFO, "Calc THCurr Hmac - "));
   InternalDumpData (HmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));

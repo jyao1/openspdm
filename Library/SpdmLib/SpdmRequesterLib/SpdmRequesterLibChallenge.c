@@ -30,7 +30,6 @@ SpdmRequesterVerifyCertificateChainHash (
   UINTN                           CertificateChainHashSize
   )
 {
-  HASH_ALL                                  HashFunc;
   UINTN                                     HashSize;
   UINT8                                     CertBufferHash[MAX_HASH_SIZE];
   UINT8                                     *CertBuffer;
@@ -42,11 +41,9 @@ SpdmRequesterVerifyCertificateChainHash (
     return FALSE;
   }
 
-  HashFunc = GetSpdmHashFunc (SpdmContext);
-  ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
+  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (HashSize != CertificateChainHashSize) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - FAIL !!!\n"));
@@ -67,21 +64,15 @@ SpdmRequesterVerifyChallengeSignature (
   UINTN                           SignDataSize
   )
 {
-  HASH_ALL                                  HashFunc;
   UINTN                                     HashSize;
   UINT8                                     HashData[MAX_HASH_SIZE];
   BOOLEAN                                   Result;
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   VOID                                      *Context;
-  ASYM_GET_PUBLIC_KEY_FROM_X509             GetPublicKeyFromX509Func;
-  ASYM_FREE                                 FreeFunc;
-  ASYM_VERIFY                               VerifyFunc;
   UINT8                                     *CertChainBuffer;
   UINTN                                     CertChainBufferSize;
 
-  HashFunc = GetSpdmHashFunc (SpdmContext);
-  ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
@@ -93,7 +84,7 @@ SpdmRequesterVerifyChallengeSignature (
   DEBUG((DEBUG_INFO, "MessageC Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
 
-  HashFunc (GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
+  HashFunc (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
   DEBUG((DEBUG_INFO, "M1M2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -113,22 +104,20 @@ SpdmRequesterVerifyChallengeSignature (
     return FALSE;
   }
 
-  GetPublicKeyFromX509Func = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
-  FreeFunc = GetSpdmAsymFree (SpdmContext);
-  VerifyFunc = GetSpdmAsymVerify (SpdmContext);
-  Result = GetPublicKeyFromX509Func (CertBuffer, CertBufferSize, &Context);
+  Result = GetPublicKeyFromX509Func (SpdmContext, CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return FALSE;
   }
 
   Result = VerifyFunc (
+             SpdmContext,
              Context,
              HashData,
              HashSize,
              SignData,
              SignDataSize
              );
-  FreeFunc (Context);
+  FreeFunc (SpdmContext, Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyChallengeSignature - FAIL !!!\n"));
     return FALSE;

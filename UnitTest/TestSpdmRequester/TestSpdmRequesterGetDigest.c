@@ -73,8 +73,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
   case 0x2:
   {
     SPDM_DIGESTS_RESPONSE    *SpdmResponse;
-    HASH_ALL                  HashFunc;
-	UINT8                    *Digest;
+    UINT8                    *Digest;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
     *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
@@ -86,9 +85,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
     SpdmResponse->Header.Param2 = 0;
     SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
-    HashFunc = GetSpdmHashFunc (SpdmContext);
+
     Digest = (VOID *)(SpdmResponse + 1);
-    HashFunc (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    HashFunc (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
   }
     return RETURN_SUCCESS;
@@ -96,8 +95,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
   case 0x3:
   {
     SPDM_DIGESTS_RESPONSE    *SpdmResponse;
-    HASH_ALL                  HashFunc;
-	UINT8                    *Digest;
+    UINT8                    *Digest;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
     *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
@@ -109,9 +107,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
     SpdmResponse->Header.Param2 = 0;
     SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
-    HashFunc = GetSpdmHashFunc (SpdmContext);
+
     Digest = (VOID *)(SpdmResponse + 1);
-    HashFunc (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    HashFunc (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
   }
     return RETURN_SUCCESS;
@@ -162,8 +160,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SpdmResponse->Header.Param2 = 0;
     } else if (SubIndex1 == 1) {
       SPDM_DIGESTS_RESPONSE    *SpdmResponse;
-      HASH_ALL                  HashFunc;
-	  UINT8                    *Digest;
+      UINT8                    *Digest;
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
       *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
@@ -175,9 +172,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
       SpdmResponse->Header.Param2 = 0;
       SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
-      HashFunc = GetSpdmHashFunc (SpdmContext);
+
       Digest = (VOID *)(SpdmResponse + 1);
-      HashFunc (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+      HashFunc (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
     }
     SubIndex1 ++;
@@ -242,8 +239,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       ExtendErrorData->Token = 1;
     } else if (SubIndex2 == 1) {
       SPDM_DIGESTS_RESPONSE    *SpdmResponse;
-      HASH_ALL                  HashFunc;
-	  UINT8                    *Digest;
+      UINT8                    *Digest;
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
       *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
@@ -255,9 +251,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
       SpdmResponse->Header.Param2 = 0;
       SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
-      HashFunc = GetSpdmHashFunc (SpdmContext);
+
       Digest = (VOID *)(SpdmResponse + 1);
-      HashFunc (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+      HashFunc (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
     }
     SubIndex2 ++;

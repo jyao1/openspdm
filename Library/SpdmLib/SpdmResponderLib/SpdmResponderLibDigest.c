@@ -24,7 +24,6 @@ SpdmGetResponseDigest (
   SPDM_DIGESTS_RESPONSE         *SpdmResponse;
   UINTN                         Index;
   UINT32                        HashSize;
-  HASH_ALL                      HashFunc;
   UINT8                         *Digest;
   SPDM_DEVICE_CONTEXT           *SpdmContext;
 
@@ -54,7 +53,6 @@ SpdmGetResponseDigest (
   }
 
   HashSize = GetSpdmHashSize (SpdmContext);
-  HashFunc = GetSpdmHashFunc (SpdmContext);
 
   ASSERT (*ResponseSize >= sizeof(SPDM_DIGESTS_RESPONSE) + HashSize * SpdmContext->LocalContext.SlotCount);
   *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + HashSize * SpdmContext->LocalContext.SlotCount;
@@ -73,7 +71,7 @@ SpdmGetResponseDigest (
   Digest = (VOID *)(SpdmResponse + 1);
   for (Index = 0; Index < SpdmContext->LocalContext.SlotCount; Index++) {
     SpdmResponse->Header.Param2 |= (1 << Index);
-    HashFunc (SpdmContext->LocalContext.CertificateChain[Index], SpdmContext->LocalContext.CertificateChainSize[Index], &Digest[HashSize * Index]);
+    HashFunc (SpdmContext, SpdmContext->LocalContext.CertificateChain[Index], SpdmContext->LocalContext.CertificateChainSize[Index], &Digest[HashSize * Index]);
   }
   //
   // Cache

@@ -25,7 +25,6 @@ SpdmRequesterVerifyDigest (
   UINTN                           DigestSize
   )
 {
-  HASH_ALL                                  HashFunc;
   UINTN                                     HashSize;
   UINT8                                     CertBufferHash[MAX_HASH_SIZE];
   UINT8                                     *CertBuffer;
@@ -36,12 +35,10 @@ SpdmRequesterVerifyDigest (
   if ((CertBuffer == NULL) || (CertBufferSize == 0)) {
     return TRUE;
   }
-  
-  HashFunc = GetSpdmHashFunc (SpdmContext);
-  ASSERT(HashFunc != NULL);
+
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
+  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
   
   if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
     DEBUG((DEBUG_INFO, "!!! VerifyDigest - FAIL !!!\n"));

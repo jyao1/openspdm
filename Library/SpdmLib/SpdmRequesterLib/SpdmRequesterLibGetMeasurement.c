@@ -29,27 +29,21 @@ SpdmRequesterVerifyMeasurementSignature (
   UINTN                           SignDataSize
   )
 {
-  HASH_ALL                                  HashFunc;
   UINTN                                     HashSize;
   UINT8                                     HashData[MAX_HASH_SIZE];
   BOOLEAN                                   Result;
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   VOID                                      *Context;
-  ASYM_GET_PUBLIC_KEY_FROM_X509             GetPublicKeyFromX509Func;
-  ASYM_FREE                                 FreeFunc;
-  ASYM_VERIFY                               VerifyFunc;
   UINT8                                     *CertChainBuffer;
   UINTN                                     CertChainBufferSize;
 
-  HashFunc = GetSpdmHashFunc (SpdmContext);
-  ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
 
   DEBUG((DEBUG_INFO, "L1L2 Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
 
-  HashFunc (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
+  HashFunc (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
   DEBUG((DEBUG_INFO, "L1L2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -69,22 +63,20 @@ SpdmRequesterVerifyMeasurementSignature (
     return FALSE;
   }
 
-  GetPublicKeyFromX509Func = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
-  FreeFunc = GetSpdmAsymFree (SpdmContext);
-  VerifyFunc = GetSpdmAsymVerify (SpdmContext);
-  Result = GetPublicKeyFromX509Func (CertBuffer, CertBufferSize, &Context);
+  Result = GetPublicKeyFromX509Func (SpdmContext, CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return FALSE;
   }
 
   Result = VerifyFunc (
+             SpdmContext,
              Context,
              HashData,
              HashSize,
              SignData,
              SignDataSize
              );
-  FreeFunc (Context);
+  FreeFunc (SpdmContext, Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - FAIL !!!\n"));
     return FALSE;

@@ -30,7 +30,6 @@ SpdmEncryptRequest (
   UINT8                             *Tag;
   SPDM_SECURE_MESSAGE_ADATA_HEADER  *RecordHeader;
   SPDM_SECURE_MESSAGE_CIPHER_HEADER *EncMsgHeader;
-  AEAD_ENCRYPT                      AeadEncFunc;
   BOOLEAN                           Result;
   VOID                              *Key;
   UINT8                             Salt[MAX_AEAD_IV_SIZE];
@@ -69,7 +68,6 @@ SpdmEncryptRequest (
     break;
   }
 
-  AeadEncFunc = GetSpdmAeadEncFunc (SpdmContext);
   AeadBlockSize = GetSpdmAeadBlockSize (SpdmContext);
   AeadTagSize = GetSpdmAeadTagSize (SpdmContext);
 
@@ -104,6 +102,7 @@ SpdmEncryptRequest (
     Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + CipherTextSize;
 
     Result = AeadEncFunc (
+              SpdmContext,
               Key,
               SessionInfo->AeadKeySize,
               Salt,
@@ -137,6 +136,7 @@ SpdmEncryptRequest (
     Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + RequestSize;
 
     Result = AeadEncFunc (
+              SpdmContext,
               Key,
               SessionInfo->AeadKeySize,
               Salt,

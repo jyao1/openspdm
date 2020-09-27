@@ -45,7 +45,6 @@ SpdmRequesterVerifyKeyExchangeSignature (
   IN INTN                         SignDataSize
   )
 {
-  HASH_ALL                                  HashFunc;
   UINTN                                     HashSize;
   UINT8                                     HashData[MAX_HASH_SIZE];
   BOOLEAN                                   Result;
@@ -53,15 +52,10 @@ SpdmRequesterVerifyKeyExchangeSignature (
   UINTN                                     CertBufferSize;
   UINT8                                     CertBufferHash[MAX_HASH_SIZE];
   VOID                                      *Context;
-  ASYM_GET_PUBLIC_KEY_FROM_X509             GetPublicKeyFromX509Func;
-  ASYM_FREE                                 FreeFunc;
-  ASYM_VERIFY                               VerifyFunc;
   LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
   UINT8                                     *CertChainBuffer;
   UINTN                                     CertChainBufferSize;
 
-  HashFunc = GetSpdmHashFunc (SpdmContext);
-  ASSERT(HashFunc != NULL);
   HashSize = GetSpdmHashSize (SpdmContext);
 
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
@@ -71,7 +65,7 @@ SpdmRequesterVerifyKeyExchangeSignature (
   CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
 
-  HashFunc (CertChainBuffer, CertChainBufferSize, CertBufferHash);
+  HashFunc (SpdmContext, CertChainBuffer, CertChainBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -86,14 +80,10 @@ SpdmRequesterVerifyKeyExchangeSignature (
   AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
-  HashFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+  HashFunc (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
-
-  GetPublicKeyFromX509Func = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
-  FreeFunc = GetSpdmAsymFree (SpdmContext);
-  VerifyFunc = GetSpdmAsymVerify (SpdmContext);
 
   //
   // Get leaf cert from cert chain
@@ -103,19 +93,20 @@ SpdmRequesterVerifyKeyExchangeSignature (
     return FALSE;
   }
 
-  Result = GetPublicKeyFromX509Func (CertBuffer, CertBufferSize, &Context);
+  Result = GetPublicKeyFromX509Func (SpdmContext, CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return FALSE;
   }
 
   Result = VerifyFunc (
+             SpdmContext,
              Context,
              HashData,
              HashSize,
              SignData,
              SignDataSize
              );
-  FreeFunc (Context);
+  FreeFunc (SpdmContext, Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyKeyExchangeSignature - FAIL !!!\n"));
     return FALSE;
@@ -133,8 +124,6 @@ SpdmRequesterVerifyKeyExchangeHmac (
   IN     UINTN                HmacDataSize
   )
 {
-  HASH_ALL                                  HashFunc;
-  HMAC_ALL                                  HmacFunc;
   UINTN                                     HashSize;
   UINT8                                     CalcHmacData[MAX_HASH_SIZE];
   UINT8                                     *CertBuffer;
@@ -142,8 +131,6 @@ SpdmRequesterVerifyKeyExchangeHmac (
   UINT8                                     CertBufferHash[MAX_HASH_SIZE];
   LARGE_MANAGED_BUFFER                      THCurr = {MAX_SPDM_MESSAGE_BUFFER_SIZE};
 
-  HmacFunc = GetSpdmHmacFunc (SpdmContext);
-  HashFunc = GetSpdmHashFunc (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
   ASSERT(HashSize == HmacDataSize);
 
@@ -152,7 +139,7 @@ SpdmRequesterVerifyKeyExchangeHmac (
   }
   CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  HashFunc (CertBuffer, CertBufferSize, CertBufferHash);
+  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -168,7 +155,7 @@ SpdmRequesterVerifyKeyExchangeHmac (
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacFunc (GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
+  HmacFunc (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
   DEBUG((DEBUG_INFO, "THCurr Hmac - "));
   InternalDumpData (CalcHmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));

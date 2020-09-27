@@ -524,24 +524,41 @@ GetSpdmMeasurementHashSize (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
-HASH_ALL
-GetSpdmHashFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+HashFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HashValue
   );
 
-HASH_ALL
-GetSpdmMeasurementHashFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+MeasurementHashFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HashValue
   );
 
-HMAC_ALL
-GetSpdmHmacFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+HmacFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  IN   CONST UINT8                  *Key,
+  IN   UINTN                        KeySize,
+  OUT  UINT8                        *HmacValue
   );
 
-HKDF_EXPAND
-GetSpdmHkdfExpandFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+HkdfExpandFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8                  *Prk,
+  IN   UINTN                        PrkSize,
+  IN   CONST UINT8                  *Info,
+  IN   UINTN                        InfoSize,
+  OUT  UINT8                        *Out,
+  IN   UINTN                        OutSize
   );
 
 /**
@@ -553,16 +570,6 @@ GetSpdmHkdfExpandFunc (
 **/
 UINT32
 GetSpdmDHEKeySize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  );
-
-UINTN
-GetSpdmDHENid (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  );
-
-BOOLEAN
-IsSpdmECDHE (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
@@ -614,64 +621,86 @@ GetSpdmAeadBlockSize (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
-AEAD_ENCRYPT
-GetSpdmAeadEncFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+AeadEncFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8*                 Key,
+  IN   UINTN                        KeySize,
+  IN   CONST UINT8*                 Iv,
+  IN   UINTN                        IvSize,
+  IN   CONST UINT8*                 AData,
+  IN   UINTN                        ADataSize,
+  IN   CONST UINT8*                 DataIn,
+  IN   UINTN                        DataInSize,
+  OUT  UINT8*                       TagOut,
+  IN   UINTN                        TagSize,
+  OUT  UINT8*                       DataOut,
+  OUT  UINTN*                       DataOutSize
   );
 
-AEAD_DECRYPT
-GetSpdmAeadDecFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+AeadDecFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8*                 Key,
+  IN   UINTN                        KeySize,
+  IN   CONST UINT8*                 Iv,
+  IN   UINTN                        IvSize,
+  IN   CONST UINT8*                 AData,
+  IN   UINTN                        ADataSize,
+  IN   CONST UINT8*                 DataIn,
+  IN   UINTN                        DataInSize,
+  IN   CONST UINT8*                 Tag,
+  IN   UINTN                        TagSize,
+  OUT  UINT8*                       DataOut,
+  OUT  UINTN*                       DataOutSize
   );
 
-ASYM_GET_PUBLIC_KEY_FROM_X509
-GetSpdmAsymGetPublicKeyFromX509 (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+GetPublicKeyFromX509Func (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8                  *Cert,
+  IN   UINTN                        CertSize,
+  OUT  VOID                         **Context
   );
 
-ASYM_GET_PRIVATE_KEY_FROM_PEM
-GetSpdmAsymGetPrivateKeyFromPem (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+VOID
+FreeFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context
   );
 
-ASYM_FREE
-GetSpdmAsymFree (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+VerifyFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context,
+  IN   CONST UINT8                  *MessageHash,
+  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Signature,
+  IN   UINTN                        SigSize
   );
 
-ASYM_SIGN
-GetSpdmAsymSign (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+ReqGetPublicKeyFromX509Func (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   CONST UINT8                  *Cert,
+  IN   UINTN                        CertSize,
+  OUT  VOID                         **Context
   );
 
-ASYM_VERIFY
-GetSpdmAsymVerify (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+VOID
+ReqFreeFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context
   );
 
-ASYM_GET_PUBLIC_KEY_FROM_X509
-GetSpdmReqAsymGetPublicKeyFromX509 (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  );
-
-ASYM_GET_PRIVATE_KEY_FROM_PEM
-GetSpdmReqAsymGetPrivateKeyFromPem (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  );
-
-ASYM_FREE
-GetSpdmReqAsymFree (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  );
-
-ASYM_SIGN
-GetSpdmReqAsymSign (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  );
-
-ASYM_VERIFY
-GetSpdmReqAsymVerify (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+BOOLEAN
+ReqVerifyFunc (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context,
+  IN   CONST UINT8                  *MessageHash,
+  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Signature,
+  IN   UINTN                        SigSize
   );
 
 VOID

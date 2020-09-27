@@ -21,7 +21,6 @@ SpdmResponderGenerateSpdmMeasurementSignature (
   BOOLEAN                       Result;
   UINTN                         SignatureSize;
   UINT32                        HashSize;
-  HASH_ALL                      HashFunc;
 
   if (SpdmContext->LocalContext.SpdmDataSignFunc == NULL) {
     return FALSE;
@@ -29,14 +28,13 @@ SpdmResponderGenerateSpdmMeasurementSignature (
 
   SignatureSize = GetSpdmAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
-  HashFunc = GetSpdmHashFunc (SpdmContext);
 
   AppendManagedBuffer (&SpdmContext->Transcript.L1L2, ResponseMessage, ResponseMessageSize);
   
   DEBUG((DEBUG_INFO, "Calc L1L2 Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
 
-  HashFunc (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
+  HashFunc (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
   DEBUG((DEBUG_INFO, "Calc L1L2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
