@@ -67,7 +67,7 @@ SpdmRequesterVerifyKeyExchangeSignature (
   CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
 
-  HashFunc (SpdmContext, CertChainBuffer, CertChainBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext, CertChainBuffer, CertChainBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -82,7 +82,7 @@ SpdmRequesterVerifyKeyExchangeSignature (
   AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
-  HashFunc (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+  SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -95,12 +95,12 @@ SpdmRequesterVerifyKeyExchangeSignature (
     return FALSE;
   }
 
-  Result = GetPublicKeyFromX509Func (SpdmContext, CertBuffer, CertBufferSize, &Context);
+  Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return FALSE;
   }
 
-  Result = VerifyFunc (
+  Result = SpdmAsymVerify (
              SpdmContext,
              Context,
              HashData,
@@ -108,7 +108,7 @@ SpdmRequesterVerifyKeyExchangeSignature (
              SignData,
              SignDataSize
              );
-  FreeFunc (SpdmContext, Context);
+  SpdmAsymFree (SpdmContext, Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyKeyExchangeSignature - FAIL !!!\n"));
     return FALSE;
@@ -143,7 +143,7 @@ SpdmRequesterVerifyKeyExchangeHmac (
   }
   CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -159,7 +159,7 @@ SpdmRequesterVerifyKeyExchangeHmac (
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacFunc (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
+  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
   DEBUG((DEBUG_INFO, "THCurr Hmac - "));
   InternalDumpData (CalcHmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -222,7 +222,7 @@ SpdmSendReceiveKeyExchange (
   SpdmRequest.Header.RequestResponseCode = SPDM_KEY_EXCHANGE;
   SpdmRequest.Header.Param1 = MeasurementHashType;
   SpdmRequest.Header.Param2 = SlotNum;
-  GetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmRequest.RandomData);
+  SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmRequest.RandomData);
   DEBUG((DEBUG_INFO, "ClientRandomData (0x%x) - ", SPDM_RANDOM_DATA_SIZE));
   InternalDumpData (SpdmRequest.RandomData, SPDM_RANDOM_DATA_SIZE);
   DEBUG((DEBUG_INFO, "\n"));
@@ -233,7 +233,7 @@ SpdmSendReceiveKeyExchange (
 
   Ptr = SpdmRequest.ExchangeData;
   DHEKeySize = GetSpdmDHEKeySize (SpdmContext);
-  GenerateDHESelfKey (SpdmContext, DHEKeySize, Ptr, &DHEContext);
+  SpdmGenerateDHESelfKey (SpdmContext, DHEKeySize, Ptr, &DHEContext);
   DEBUG((DEBUG_INFO, "ClientKey (0x%x):\n", DHEKeySize));
   InternalDumpHex (Ptr, DHEKeySize);
   Ptr += DHEKeySize;
@@ -248,7 +248,7 @@ SpdmSendReceiveKeyExchange (
   SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
   Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -256,19 +256,19 @@ SpdmSendReceiveKeyExchange (
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize < sizeof(SPDM_KEY_EXCHANGE_RESPONSE)) {
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_EXCHANGE_RSP) {
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -279,7 +279,7 @@ SpdmSendReceiveKeyExchange (
   *SessionId = (ReqSessionId << 16) | RspSessionId;
   SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId);
   if (SessionInfo == NULL) {
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   SessionInfo->UsePsk = FALSE;
@@ -299,7 +299,7 @@ SpdmSendReceiveKeyExchange (
                           SignatureSize +
                           HmacSize) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -330,13 +330,13 @@ SpdmSendReceiveKeyExchange (
                          SignatureSize +
                          HmacSize) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmContext, OpaqueLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_UNSUPPORTED;
   }
 
@@ -359,7 +359,7 @@ SpdmSendReceiveKeyExchange (
   Result = SpdmRequesterVerifyKeyExchangeSignature (SpdmContext, SessionInfo, Signature, SignatureSize);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
-    FreeDHEContext (SpdmContext, DHEContext);
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
@@ -370,8 +370,8 @@ SpdmSendReceiveKeyExchange (
   // Fill data to calc Secret for HMAC verification
   //
   FinalKeySize = sizeof(FinalKey);
-  ComputeDHEFinalKey (SpdmContext, DHEContext, DHEKeySize, SpdmResponse.ExchangeData, &FinalKeySize, FinalKey);
-  FreeDHEContext (SpdmContext, DHEContext);
+  SpdmComputeDHEFinalKey (SpdmContext, DHEContext, DHEKeySize, SpdmResponse.ExchangeData, &FinalKeySize, FinalKey);
+  SpdmFreeDHEContext (SpdmContext, DHEContext);
   DEBUG((DEBUG_INFO, "FinalKey (0x%x):\n", FinalKeySize));
   InternalDumpHex (FinalKey, FinalKeySize);
 

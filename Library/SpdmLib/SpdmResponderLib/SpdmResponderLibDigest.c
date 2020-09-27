@@ -71,7 +71,7 @@ SpdmGetResponseDigest (
   Digest = (VOID *)(SpdmResponse + 1);
   for (Index = 0; Index < SpdmContext->LocalContext.SlotCount; Index++) {
     SpdmResponse->Header.Param2 |= (1 << Index);
-    HashFunc (SpdmContext, SpdmContext->LocalContext.CertificateChain[Index], SpdmContext->LocalContext.CertificateChainSize[Index], &Digest[HashSize * Index]);
+    SpdmHashAll (SpdmContext, SpdmContext->LocalContext.CertificateChain[Index], SpdmContext->LocalContext.CertificateChainSize[Index], &Digest[HashSize * Index]);
   }
   //
   // Cache

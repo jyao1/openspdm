@@ -48,7 +48,7 @@ SpdmResponderGenerateKeyExchangeSignature (
   CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
 
-  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -63,7 +63,7 @@ SpdmResponderGenerateKeyExchangeSignature (
   AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
-  HashFunc (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+  SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
   DEBUG((DEBUG_INFO, "Calc THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -106,7 +106,7 @@ SpdmResponderGenerateKeyExchangeHmac (
 
   CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -122,7 +122,7 @@ SpdmResponderGenerateKeyExchangeHmac (
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacFunc (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseHandshakeSecret, SessionInfo->HashSize, HmacData);
+  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseHandshakeSecret, SessionInfo->HashSize, HmacData);
   DEBUG((DEBUG_INFO, "Calc THCurr Hmac - "));
   InternalDumpData (HmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -240,10 +240,10 @@ SpdmGetResponseKeyExchange (
   SpdmResponse->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
   SpdmResponse->SlotIDParam = 0;
 
-  GetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
+  SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
 
   Ptr = (VOID *)(SpdmResponse + 1);
-  GenerateDHESelfKey (SpdmContext, DHEKeySize, Ptr, &DHEContext);
+  SpdmGenerateDHESelfKey (SpdmContext, DHEKeySize, Ptr, &DHEContext);
   DEBUG((DEBUG_INFO, "Calc SelfKey (0x%x):\n", DHEKeySize));
   InternalDumpHex (Ptr, DHEKeySize);
 
@@ -251,8 +251,8 @@ SpdmGetResponseKeyExchange (
   InternalDumpHex ((UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DHEKeySize);
 
   FinalKeySize = sizeof(FinalKey);
-  ComputeDHEFinalKey (SpdmContext, DHEContext, DHEKeySize, (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), &FinalKeySize, FinalKey);
-  FreeDHEContext (SpdmContext, DHEContext);
+  SpdmComputeDHEFinalKey (SpdmContext, DHEContext, DHEKeySize, (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), &FinalKeySize, FinalKey);
+  SpdmFreeDHEContext (SpdmContext, DHEContext);
   DEBUG((DEBUG_INFO, "Calc FinalKey (0x%x):\n", FinalKeySize));
   InternalDumpHex (FinalKey, FinalKeySize);
 

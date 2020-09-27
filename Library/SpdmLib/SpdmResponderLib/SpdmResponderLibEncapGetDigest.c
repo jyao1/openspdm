@@ -23,19 +23,16 @@ SpemEncapRequesterVerifyDigest (
   
   CertBuffer = SpdmContext->LocalContext.PeerCertChainVarBuffer;
   CertBufferSize = SpdmContext->LocalContext.PeerCertChainVarBufferSize;
-  if ((CertBuffer == NULL) || (CertBufferSize == 0)) {
-    return TRUE;
-  }
-  
-  HashSize = GetSpdmHashSize (SpdmContext);
+  if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
+    HashSize = GetSpdmHashSize (SpdmContext);
+    SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
-  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
-  
-  if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
-    DEBUG((DEBUG_INFO, "!!! EncapVerifyDigest - FAIL !!!\n"));
-    return FALSE;
+    if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
+      DEBUG((DEBUG_INFO, "!!! EncapVerifyDigest - FAIL !!!\n"));
+      return FALSE;
+    }
   }
-  
+
   DEBUG((DEBUG_INFO, "!!! EncapVerifyDigest - PASS !!!\n"));
 
   return TRUE;

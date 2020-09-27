@@ -34,7 +34,7 @@ SpdmResponderGenerateSpdmMeasurementSignature (
   DEBUG((DEBUG_INFO, "Calc L1L2 Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
 
-  HashFunc (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
+  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
   DEBUG((DEBUG_INFO, "Calc L1L2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -72,7 +72,7 @@ SpdmResponderCreateMeasurementSig (
   ASSERT (ResponseMessageSize > MeasurmentSigSize);
   Ptr = (VOID *)((UINT8 *)ResponseMessage + ResponseMessageSize - MeasurmentSigSize);
   
-  GetRandomNumber (SPDM_NONCE_SIZE, Ptr);
+  SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
   Ptr += SPDM_NONCE_SIZE;
 
   *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueMeasurementRspSize;

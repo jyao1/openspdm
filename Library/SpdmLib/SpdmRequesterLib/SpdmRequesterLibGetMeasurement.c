@@ -43,7 +43,7 @@ SpdmRequesterVerifyMeasurementSignature (
   DEBUG((DEBUG_INFO, "L1L2 Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
 
-  HashFunc (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
+  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
   DEBUG((DEBUG_INFO, "L1L2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -63,12 +63,12 @@ SpdmRequesterVerifyMeasurementSignature (
     return FALSE;
   }
 
-  Result = GetPublicKeyFromX509Func (SpdmContext, CertBuffer, CertBufferSize, &Context);
+  Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return FALSE;
   }
 
-  Result = VerifyFunc (
+  Result = SpdmAsymVerify (
              SpdmContext,
              Context,
              HashData,
@@ -76,7 +76,7 @@ SpdmRequesterVerifyMeasurementSignature (
              SignData,
              SignDataSize
              );
-  FreeFunc (SpdmContext, Context);
+  SpdmAsymFree (SpdmContext, Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - FAIL !!!\n"));
     return FALSE;
@@ -155,7 +155,7 @@ SpdmGetMeasurement (
       SpdmRequestSize = sizeof(SpdmRequest) - sizeof(SpdmRequest.SlotIDParam);
     }
 
-    GetRandomNumber (SPDM_NONCE_SIZE, SpdmRequest.Nonce);
+    SpdmGetRandomNumber (SPDM_NONCE_SIZE, SpdmRequest.Nonce);
     DEBUG((DEBUG_INFO, "ClientNonce - "));
     InternalDumpData (SpdmRequest.Nonce, SPDM_NONCE_SIZE);
     DEBUG((DEBUG_INFO, "\n"));

@@ -193,7 +193,7 @@ ReadRequesterRootPublicCertificate (
   OUT UINTN   *Size,
   OUT VOID    **Hash,
   OUT UINTN   *HashSize
- )
+  )
 {
   BOOLEAN             Res;
   VOID                *FileData;
@@ -201,7 +201,6 @@ ReadRequesterRootPublicCertificate (
   SPDM_CERT_CHAIN     *CertChain;
   UINTN               CertChainSize;
   CHAR8               *File;
-
 
   switch (USE_REQ_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
@@ -253,8 +252,6 @@ ReadRequesterRootPublicCertificate (
   free (FileData);
   return TRUE;
 }
-
-
 
 BOOLEAN
 ReadResponderPublicCertificateChain (
@@ -435,6 +432,23 @@ TestGetSpdmAsymGetPrivateKeyFromPem (
   return NULL;
 }
 
+BOOLEAN
+TestSpdmAsymGetPrivateKeyFromPem (
+  IN      UINT32       AsymAlgo,
+  IN      CONST UINT8  *PemData,
+  IN      UINTN        PemSize,
+  IN      CONST CHAR8  *Password,
+  OUT     VOID         **Context
+  )
+{
+  ASYM_GET_PRIVATE_KEY_FROM_PEM   AsymGetPrivateKeyFromPem;
+  AsymGetPrivateKeyFromPem = TestGetSpdmAsymGetPrivateKeyFromPem (AsymAlgo);
+  if (AsymGetPrivateKeyFromPem == NULL) {
+    return FALSE;
+  }
+  return AsymGetPrivateKeyFromPem (PemData, PemSize, Password, Context);
+}
+
 ASYM_FREE
 TestGetSpdmAsymFree (
   IN      UINT32       AsymAlgo
@@ -454,6 +468,20 @@ TestGetSpdmAsymFree (
     return EcDsaFree;
   }
   return NULL;
+}
+
+VOID
+TestSpdmAsymFree (
+  IN      UINT32       AsymAlgo,
+  IN      VOID         *Context
+  )
+{
+  ASYM_FREE   AsymFree;
+  AsymFree = TestGetSpdmAsymFree (AsymAlgo);
+  if (AsymFree == NULL) {
+    return ;
+  }
+  AsymFree (Context);
 }
 
 ASYM_SIGN
@@ -479,6 +507,24 @@ TestGetSpdmAsymSign (
 }
 
 BOOLEAN
+TestSpdmAsymSign (
+  IN      UINT32       AsymAlgo,
+  IN      VOID         *Context,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  ASYM_SIGN   AsymSign;
+  AsymSign = TestGetSpdmAsymSign (AsymAlgo);
+  if (AsymSign == NULL) {
+    return FALSE;
+  }
+  return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
+}
+
+BOOLEAN
 EFIAPI
 SpdmDataSignFunc (
   IN      VOID         *SpdmContext,
@@ -491,9 +537,6 @@ SpdmDataSignFunc (
   )
 {
   VOID                          *Context;
-  ASYM_GET_PRIVATE_KEY_FROM_PEM GetPrivateKeyFromPemFunc;
-  ASYM_FREE                     FreeFunc;
-  ASYM_SIGN                     SignFunc;
   VOID                          *PrivatePem;
   UINTN                         PrivatePemSize;
   BOOLEAN                       Result;
@@ -508,9 +551,6 @@ SpdmDataSignFunc (
     }
   }
 
-  GetPrivateKeyFromPemFunc = TestGetSpdmAsymGetPrivateKeyFromPem (AsymAlgo);
-  FreeFunc = TestGetSpdmAsymFree (AsymAlgo);
-  SignFunc = TestGetSpdmAsymSign (AsymAlgo);
   if (IsResponder) {
     PrivatePem = mResponderPrivateCertData;
     PrivatePemSize = mResponderPrivateCertDataSize;
@@ -519,18 +559,19 @@ SpdmDataSignFunc (
     PrivatePemSize = mRequesterPrivateCertDataSize;
   }
 
-  Result = GetPrivateKeyFromPemFunc (PrivatePem, PrivatePemSize, NULL, &Context);
+  Result = TestSpdmAsymGetPrivateKeyFromPem (AsymAlgo, PrivatePem, PrivatePemSize, NULL, &Context);
   if (!Result) {
     return FALSE;
   }
-  Result = SignFunc (
+  Result = TestSpdmAsymSign (
+             AsymAlgo,
              Context,
              MessageHash,
              HashSize,
              Signature,
              SigSize
              );
-  FreeFunc (Context);
+  TestSpdmAsymFree (AsymAlgo, Context);
 
   return Result;
 }

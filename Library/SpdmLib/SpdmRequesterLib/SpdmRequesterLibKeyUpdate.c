@@ -46,7 +46,7 @@ SpdmKeyUpdate (
   } else {
     SpdmRequest.Header.Param1 = SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS;
   }
-  GetRandomNumber (sizeof(SpdmRequest.Header.Param2), &SpdmRequest.Header.Param2);
+  SpdmGetRandomNumber (sizeof(SpdmRequest.Header.Param2), &SpdmRequest.Header.Param2);
 
   Status = SpdmSendRequestSession (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
@@ -88,7 +88,7 @@ SpdmKeyUpdate (
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmRequest.Header.RequestResponseCode = SPDM_KEY_UPDATE;
   SpdmRequest.Header.Param1 = SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY;
-  GetRandomNumber (sizeof(SpdmRequest.Header.Param2), &SpdmRequest.Header.Param2);
+  SpdmGetRandomNumber (sizeof(SpdmRequest.Header.Param2), &SpdmRequest.Header.Param2);
 
   Status = SpdmSendRequestSession (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {

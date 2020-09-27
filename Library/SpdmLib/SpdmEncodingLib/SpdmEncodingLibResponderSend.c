@@ -101,7 +101,7 @@ SpdmEncryptResponse (
     DecMsg = (UINT8 *)EncMsgHeader;
     Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + CipherTextSize;
 
-    Result = AeadEncFunc (
+    Result = SpdmAeadEncryption (
               SpdmContext,
               Key,
               SessionInfo->AeadKeySize,
@@ -135,7 +135,7 @@ SpdmEncryptResponse (
     AData = (UINT8 *)RecordHeader;
     Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + ResponseSize;
 
-    Result = AeadEncFunc (
+    Result = SpdmAeadEncryption (
               SpdmContext,
               Key,
               SessionInfo->AeadKeySize,

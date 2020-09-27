@@ -63,7 +63,7 @@ SpdmRequesterVerifyPskExchangeHmac (
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
   ASSERT(SessionInfo->HashSize != 0);
-  HmacFunc (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseFinishedKey, SessionInfo->HashSize, CalcHmacData);
+  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseFinishedKey, SessionInfo->HashSize, CalcHmacData);
   DEBUG((DEBUG_INFO, "THCurr Hmac - "));
   InternalDumpData (CalcHmacData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -133,7 +133,7 @@ SpdmSendReceivePskExchange (
   DEBUG((DEBUG_INFO, "\n"));
   Ptr += SpdmRequest.PSKHintLength;
 
-  GetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
+  SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   DEBUG((DEBUG_INFO, "ClientRandomData (0x%x) - ", SpdmRequest.RequesterContextLength));
   InternalDumpData (Ptr, SpdmRequest.RequesterContextLength);
   DEBUG((DEBUG_INFO, "\n"));

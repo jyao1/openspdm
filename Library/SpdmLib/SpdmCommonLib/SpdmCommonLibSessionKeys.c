@@ -83,7 +83,7 @@ SpdmGenerateAeadKeyAndIv (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr5 (0x%x):\n", BinStr5Size));
   InternalDumpHex (BinStr5, BinStr5Size);
-  RetVal = HkdfExpandFunc (SpdmContext, MajorSecret, HashSize, BinStr5, BinStr5Size, Key, KeyLength);
+  RetVal = SpdmHkdfExpand (SpdmContext, MajorSecret, HashSize, BinStr5, BinStr5Size, Key, KeyLength);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "Key (0x%x) - ", KeyLength));
   InternalDumpData (Key, KeyLength);
@@ -94,7 +94,7 @@ SpdmGenerateAeadKeyAndIv (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr6 (0x%x):\n", BinStr6Size));
   InternalDumpHex (BinStr6, BinStr6Size);
-  RetVal = HkdfExpandFunc (SpdmContext, MajorSecret, HashSize, BinStr6, BinStr6Size, Iv, IvLength);
+  RetVal = SpdmHkdfExpand (SpdmContext, MajorSecret, HashSize, BinStr6, BinStr6Size, Iv, IvLength);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "Iv (0x%x) - ", IvLength));
   InternalDumpData (Iv, IvLength);
@@ -123,7 +123,7 @@ SpdmGenerateFinalKey (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr7 (0x%x):\n", BinStr7Size));
   InternalDumpHex (BinStr7, BinStr7Size);
-  RetVal = HkdfExpandFunc (SpdmContext, HandshakeSecret, HashSize, BinStr7, BinStr7Size, FinishedKey, HashSize);
+  RetVal = SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr7, BinStr7Size, FinishedKey, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "FinishedKey (0x%x) - ", HashSize));
   InternalDumpData (FinishedKey, HashSize);
@@ -193,7 +193,7 @@ SpdmGenerateSessionHandshakeKey (
     CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   }
-  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SessionInfo->UsePsk) {
     AppendManagedBuffer (&TH1, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -204,12 +204,12 @@ SpdmGenerateSessionHandshakeKey (
     AppendManagedBuffer (&TH1, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
   }
   
-  HashFunc (SpdmContext, GetManagedBuffer(&TH1), GetManagedBufferSize(&TH1), TH1HashData);
+  SpdmHashAll (SpdmContext, GetManagedBuffer(&TH1), GetManagedBufferSize(&TH1), TH1HashData);
   DEBUG((DEBUG_INFO, "TH1 Hash - "));
   InternalDumpData (TH1HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   
-  RetVal = HmacFunc (SpdmContext, mZeroFilledBuffer, HashSize, mZeroFilledBuffer, HashSize, Secret0);
+  RetVal = SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, mZeroFilledBuffer, HashSize, Secret0);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "Secret0 (0x%x) - ", HashSize));
   InternalDumpData (Secret0, HashSize);
@@ -219,16 +219,16 @@ SpdmGenerateSessionHandshakeKey (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr0 (0x%x):\n", BinStr0Size));
   InternalDumpHex (BinStr0, BinStr0Size);
-  RetVal = HkdfExpandFunc (SpdmContext, Secret0, HashSize, BinStr0, BinStr0Size, Salt0, HashSize);
+  RetVal = SpdmHkdfExpand (SpdmContext, Secret0, HashSize, BinStr0, BinStr0Size, Salt0, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "Salt0 (0x%x) - ", HashSize));
   InternalDumpData (Salt0, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   if (SessionInfo->UsePsk) {
-    RetVal = HmacFunc (SpdmContext, SpdmContext->LocalContext.Psk, SpdmContext->LocalContext.PskSize, Salt0, HashSize, SessionInfo->HandshakeSecret.HandshakeSecret);
+    RetVal = SpdmHmacAll (SpdmContext, SpdmContext->LocalContext.Psk, SpdmContext->LocalContext.PskSize, Salt0, HashSize, SessionInfo->HandshakeSecret.HandshakeSecret);
   } else {
-    RetVal = HmacFunc (SpdmContext, SessionInfo->HandshakeSecret.DheSecret, SessionInfo->DheKeySize, Salt0, HashSize, SessionInfo->HandshakeSecret.HandshakeSecret);
+    RetVal = SpdmHmacAll (SpdmContext, SessionInfo->HandshakeSecret.DheSecret, SessionInfo->DheKeySize, Salt0, HashSize, SessionInfo->HandshakeSecret.HandshakeSecret);
   }
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "HandshakeSecret (0x%x) - ", HashSize));
@@ -240,7 +240,7 @@ SpdmGenerateSessionHandshakeKey (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr1 (0x%x):\n", BinStr1Size));
   InternalDumpHex (BinStr1, BinStr1Size);
-  RetVal = HkdfExpandFunc (SpdmContext, SessionInfo->HandshakeSecret.HandshakeSecret, HashSize, BinStr1, BinStr1Size, SessionInfo->HandshakeSecret.RequestHandshakeSecret, HashSize);
+  RetVal = SpdmHkdfExpand (SpdmContext, SessionInfo->HandshakeSecret.HandshakeSecret, HashSize, BinStr1, BinStr1Size, SessionInfo->HandshakeSecret.RequestHandshakeSecret, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "RequestHandshakeSecret (0x%x) - ", HashSize));
   InternalDumpData (SessionInfo->HandshakeSecret.RequestHandshakeSecret, HashSize);
@@ -250,7 +250,7 @@ SpdmGenerateSessionHandshakeKey (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr2 (0x%x):\n", BinStr2Size));
   InternalDumpHex (BinStr2, BinStr2Size);
-  RetVal = HkdfExpandFunc (SpdmContext, SessionInfo->HandshakeSecret.HandshakeSecret, HashSize, BinStr2, BinStr2Size, SessionInfo->HandshakeSecret.ResponseHandshakeSecret, HashSize);
+  RetVal = SpdmHkdfExpand (SpdmContext, SessionInfo->HandshakeSecret.HandshakeSecret, HashSize, BinStr2, BinStr2Size, SessionInfo->HandshakeSecret.ResponseHandshakeSecret, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "ResponseHandshakeSecret (0x%x) - ", HashSize));
   InternalDumpData (SessionInfo->HandshakeSecret.ResponseHandshakeSecret, HashSize);
@@ -347,7 +347,7 @@ SpdmGenerateSessionDataKey (
     CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   }
-  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
   if (SessionInfo->MutAuthRequested) {
     if (IsRequester) {
       ASSERT ((SpdmContext->LocalContext.CertificateChain[SlotNum] != NULL) && (SpdmContext->LocalContext.CertificateChainSize[SlotNum] != 0));
@@ -358,7 +358,7 @@ SpdmGenerateSessionDataKey (
       MutCertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
       MutCertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
     }
-    HashFunc (SpdmContext, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
+    SpdmHashAll (SpdmContext, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
   }
 
   if (SessionInfo->UsePsk) {
@@ -374,7 +374,7 @@ SpdmGenerateSessionDataKey (
     }
     AppendManagedBuffer (&TH2, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
   }
-  HashFunc (SpdmContext, GetManagedBuffer(&TH2), GetManagedBufferSize(&TH2), TH2HashData);
+  SpdmHashAll (SpdmContext, GetManagedBuffer(&TH2), GetManagedBufferSize(&TH2), TH2HashData);
   DEBUG((DEBUG_INFO, "TH2 Hash - "));
   InternalDumpData (TH2HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -382,13 +382,13 @@ SpdmGenerateSessionDataKey (
   BinStr0Size = sizeof(BinStr0);
   Status = BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
   ASSERT_RETURN_ERROR (Status);
-  RetVal = HkdfExpandFunc (SpdmContext, SessionInfo->HandshakeSecret.HandshakeSecret, HashSize, BinStr0, BinStr0Size, Salt1, HashSize);
+  RetVal = SpdmHkdfExpand (SpdmContext, SessionInfo->HandshakeSecret.HandshakeSecret, HashSize, BinStr0, BinStr0Size, Salt1, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "Salt1 (0x%x) - ", HashSize));
   InternalDumpData (Salt1, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  RetVal = HmacFunc (SpdmContext, mZeroFilledBuffer, HashSize, Salt1, HashSize, SessionInfo->HandshakeSecret.MasterSecret);
+  RetVal = SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, Salt1, HashSize, SessionInfo->HandshakeSecret.MasterSecret);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "MasterSecret (0x%x) - ", HashSize));
   InternalDumpData (SessionInfo->HandshakeSecret.MasterSecret, HashSize);
@@ -399,7 +399,7 @@ SpdmGenerateSessionDataKey (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr3 (0x%x):\n", BinStr3Size));
   InternalDumpHex (BinStr3, BinStr3Size);
-  RetVal = HkdfExpandFunc (SpdmContext, SessionInfo->HandshakeSecret.MasterSecret, HashSize, BinStr3, BinStr3Size, SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
+  RetVal = SpdmHkdfExpand (SpdmContext, SessionInfo->HandshakeSecret.MasterSecret, HashSize, BinStr3, BinStr3Size, SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "RequestDataSecret (0x%x) - ", HashSize));
   InternalDumpData (SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
@@ -409,7 +409,7 @@ SpdmGenerateSessionDataKey (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr4 (0x%x):\n", BinStr4Size));
   InternalDumpHex (BinStr4, BinStr4Size);
-  RetVal = HkdfExpandFunc (SpdmContext, SessionInfo->HandshakeSecret.MasterSecret, HashSize, BinStr4, BinStr4Size, SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);
+  RetVal = SpdmHkdfExpand (SpdmContext, SessionInfo->HandshakeSecret.MasterSecret, HashSize, BinStr4, BinStr4Size, SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "ResponseDataSecret (0x%x) - ", HashSize));
   InternalDumpData (SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);
@@ -478,7 +478,7 @@ SpdmCreateUpdateSessionDataKey (
     CopyMem (&SessionInfo->ApplicationSecretBackup.RequestDataSalt, &SessionInfo->ApplicationSecret.RequestDataSalt, MAX_AEAD_IV_SIZE);
     SessionInfo->ApplicationSecretBackup.RequestDataSequenceNumber = SessionInfo->ApplicationSecret.RequestDataSequenceNumber;
 
-    RetVal = HkdfExpandFunc (SpdmContext, SessionInfo->ApplicationSecret.RequestDataSecret, HashSize, BinStr8, BinStr8Size, SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
+    RetVal = SpdmHkdfExpand (SpdmContext, SessionInfo->ApplicationSecret.RequestDataSecret, HashSize, BinStr8, BinStr8Size, SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
     ASSERT (RetVal);
     DEBUG((DEBUG_INFO, "RequestDataSecretUpdate (0x%x) - ", HashSize));
     InternalDumpData (SessionInfo->ApplicationSecret.RequestDataSecret, HashSize);
@@ -499,7 +499,7 @@ SpdmCreateUpdateSessionDataKey (
     CopyMem (&SessionInfo->ApplicationSecretBackup.ResponseDataSalt, &SessionInfo->ApplicationSecret.ResponseDataSalt, MAX_AEAD_IV_SIZE);
     SessionInfo->ApplicationSecretBackup.ResponseDataSequenceNumber = SessionInfo->ApplicationSecret.ResponseDataSequenceNumber;
 
-    RetVal = HkdfExpandFunc (SpdmContext, SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize, BinStr8, BinStr8Size, SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);
+    RetVal = SpdmHkdfExpand (SpdmContext, SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize, BinStr8, BinStr8Size, SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);
     ASSERT (RetVal);
     DEBUG((DEBUG_INFO, "ResponseDataSecretUpdate (0x%x) - ", HashSize));
     InternalDumpData (SessionInfo->ApplicationSecret.ResponseDataSecret, HashSize);

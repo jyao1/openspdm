@@ -43,7 +43,7 @@ SpdmRequesterVerifyCertificateChainHash (
 
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (HashSize != CertificateChainHashSize) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - FAIL !!!\n"));
@@ -84,7 +84,7 @@ SpdmRequesterVerifyChallengeSignature (
   DEBUG((DEBUG_INFO, "MessageC Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
 
-  HashFunc (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
+  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
   DEBUG((DEBUG_INFO, "M1M2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -104,12 +104,12 @@ SpdmRequesterVerifyChallengeSignature (
     return FALSE;
   }
 
-  Result = GetPublicKeyFromX509Func (SpdmContext, CertBuffer, CertBufferSize, &Context);
+  Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return FALSE;
   }
 
-  Result = VerifyFunc (
+  Result = SpdmAsymVerify (
              SpdmContext,
              Context,
              HashData,
@@ -117,7 +117,7 @@ SpdmRequesterVerifyChallengeSignature (
              SignData,
              SignDataSize
              );
-  FreeFunc (SpdmContext, Context);
+  SpdmAsymFree (SpdmContext, Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyChallengeSignature - FAIL !!!\n"));
     return FALSE;
@@ -175,7 +175,7 @@ SpdmChallenge (
   SpdmRequest.Header.RequestResponseCode = SPDM_CHALLENGE;
   SpdmRequest.Header.Param1 = SlotNum;
   SpdmRequest.Header.Param2 = MeasurementHashType;
-  GetRandomNumber (SPDM_NONCE_SIZE, SpdmRequest.Nonce);
+  SpdmGetRandomNumber (SPDM_NONCE_SIZE, SpdmRequest.Nonce);
   DEBUG((DEBUG_INFO, "ClientNonce - "));
   InternalDumpData (SpdmRequest.Nonce, SPDM_NONCE_SIZE);
   DEBUG((DEBUG_INFO, "\n"));

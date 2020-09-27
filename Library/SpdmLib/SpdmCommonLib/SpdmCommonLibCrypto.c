@@ -9,6 +9,93 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmCommonLibInternal.h"
 
+typedef
+BOOLEAN
+(EFIAPI *HASH_ALL) (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *HMAC_ALL) (
+  IN   CONST VOID   *Data,
+  IN   UINTN        DataSize,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  OUT  UINT8        *HmacValue
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *HKDF_EXPAND) (
+  IN   CONST UINT8  *Prk,
+  IN   UINTN        PrkSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *AEAD_ENCRYPT) (
+  IN   CONST UINT8* Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8* Iv,
+  IN   UINTN        IvSize,
+  IN   CONST UINT8* AData,
+  IN   UINTN        ADataSize,
+  IN   CONST UINT8* DataIn,
+  IN   UINTN        DataInSize,
+  OUT  UINT8*       TagOut,
+  IN   UINTN        TagSize,
+  OUT  UINT8*       DataOut,
+  OUT  UINTN*       DataOutSize
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *AEAD_DECRYPT) (
+  IN   CONST UINT8* Key,
+  IN   UINTN        KeySize,
+  IN   CONST UINT8* Iv,
+  IN   UINTN        IvSize,
+  IN   CONST UINT8* AData,
+  IN   UINTN        ADataSize,
+  IN   CONST UINT8* DataIn,
+  IN   UINTN        DataInSize,
+  IN   CONST UINT8* Tag,
+  IN   UINTN        TagSize,
+  OUT  UINT8*       DataOut,
+  OUT  UINTN*       DataOutSize
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *ASYM_GET_PUBLIC_KEY_FROM_X509) (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **Context
+  );
+
+typedef
+VOID
+(EFIAPI *ASYM_FREE) (
+  IN  VOID         *Context
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *ASYM_VERIFY) (
+  IN  VOID         *Context,
+  IN  CONST UINT8  *MessageHash,
+  IN  UINTN        HashSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  );
+
 /**
   This function returns the SPDM hash size.
 
@@ -73,7 +160,7 @@ GetSpdmHashFunc (
 }
 
 BOOLEAN
-HashFunc (
+SpdmHashAll (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   CONST VOID                   *Data,
   IN   UINTN                        DataSize,
@@ -126,7 +213,7 @@ GetSpdmMeasurementHashFunc (
 }
 
 BOOLEAN
-MeasurementHashFunc (
+SpdmMeasurementHashAll (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   CONST VOID                   *Data,
   IN   UINTN                        DataSize,
@@ -167,7 +254,7 @@ GetSpdmHmacFunc (
 }
 
 BOOLEAN
-HmacFunc (
+SpdmHmacAll (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   CONST VOID                   *Data,
   IN   UINTN                        DataSize,
@@ -210,7 +297,7 @@ GetSpdmHkdfExpandFunc (
 }
 
 BOOLEAN
-HkdfExpandFunc (
+SpdmHkdfExpand (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   CONST UINT8                  *Prk,
   IN   UINTN                        PrkSize,
@@ -518,7 +605,7 @@ GetSpdmAeadEncFunc (
 }
 
 BOOLEAN
-AeadEncFunc (
+SpdmAeadEncryption (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   CONST UINT8*                 Key,
   IN   UINTN                        KeySize,
@@ -575,7 +662,7 @@ GetSpdmAeadDecFunc (
 }
 
 BOOLEAN
-AeadDecFunc (
+SpdmAeadDecryption (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   CONST UINT8*                 Key,
   IN   UINTN                        KeySize,
@@ -632,7 +719,7 @@ GetSpdmAsymGetPublicKeyFromX509 (
 }
 
 BOOLEAN
-GetPublicKeyFromX509Func (
+SpdmAsymGetPublicKeyFromX509 (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   CONST UINT8                  *Cert,
   IN   UINTN                        CertSize,
@@ -680,7 +767,7 @@ GetSpdmAsymFree (
 }
 
 VOID
-FreeFunc (
+SpdmAsymFree (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   VOID                         *Context
   )
@@ -732,7 +819,7 @@ GetSpdmAsymVerify (
 }
 
 BOOLEAN
-VerifyFunc (
+SpdmAsymVerify (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   VOID                         *Context,
   IN   CONST UINT8                  *MessageHash,
@@ -782,7 +869,7 @@ GetSpdmReqAsymGetPublicKeyFromX509 (
 }
 
 BOOLEAN
-ReqGetPublicKeyFromX509Func (
+SpdmReqAsymGetPublicKeyFromX509 (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   CONST UINT8                  *Cert,
   IN   UINTN                        CertSize,
@@ -830,7 +917,7 @@ GetSpdmReqAsymFree (
 }
 
 VOID
-ReqFreeFunc (
+SpdmReqAsymFree (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   VOID                         *Context
   )
@@ -882,7 +969,7 @@ GetSpdmReqAsymVerify (
 }
 
 BOOLEAN
-ReqVerifyFunc (
+SpdmReqAsymVerify (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   VOID                         *Context,
   IN   CONST UINT8                  *MessageHash,
@@ -900,7 +987,7 @@ ReqVerifyFunc (
 }
 
 VOID
-GenerateDHESelfKey (
+SpdmGenerateDHESelfKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN UINTN                        SelfKeySize,
   OUT VOID                        *SelfPubKey,
@@ -948,7 +1035,7 @@ GenerateDHESelfKey (
 }
 
 VOID
-ComputeDHEFinalKey (
+SpdmComputeDHEFinalKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *Context,
   IN UINTN                        PeerKeySize,
@@ -981,7 +1068,7 @@ ComputeDHEFinalKey (
 }
 
 VOID
-FreeDHEContext (
+SpdmFreeDHEContext (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *Context
   )
@@ -1008,7 +1095,7 @@ FreeDHEContext (
 }
 
 VOID
-GetRandomNumber (
+SpdmGetRandomNumber (
   IN  UINTN                     Size,
   OUT UINT8                     *Rand
   )

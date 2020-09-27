@@ -16,7 +16,7 @@ SpdmResponderCalculateCertChainHash (
   OUT UINT8                *CertChainHash
   )
 {
-  HashFunc (SpdmContext, SpdmContext->LocalContext.CertificateChain[SlotNum], SpdmContext->LocalContext.CertificateChainSize[SlotNum], CertChainHash);
+  SpdmHashAll (SpdmContext, SpdmContext->LocalContext.CertificateChain[SlotNum], SpdmContext->LocalContext.CertificateChainSize[SlotNum], CertChainHash);
   return TRUE;
 }
 
@@ -62,7 +62,7 @@ SpdmResponderCalculateMeasurementSummaryHash (
       }
       CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
     }
-    HashFunc (SpdmContext, MeasurementData, HashSize * LocalIndex, MeasurementSummaryHash);
+    SpdmHashAll (SpdmContext, MeasurementData, HashSize * LocalIndex, MeasurementSummaryHash);
     break;
   case SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH:
     CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
@@ -74,7 +74,7 @@ SpdmResponderCalculateMeasurementSummaryHash (
         );
       CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
     }
-    HashFunc (SpdmContext, MeasurementData, HashSize * SpdmContext->LocalContext.DeviceMeasurementCount, MeasurementSummaryHash);
+    SpdmHashAll (SpdmContext, MeasurementData, HashSize * SpdmContext->LocalContext.DeviceMeasurementCount, MeasurementSummaryHash);
     break;
   default:
     return FALSE;
@@ -117,7 +117,7 @@ SpdmResponderGenerateChallengeSignature (
   DEBUG((DEBUG_INFO, "Calc MessageC Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
 
-  HashFunc (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
+  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
   DEBUG((DEBUG_INFO, "Calc M1M2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -210,7 +210,7 @@ SpdmGetResponseChallenge (
   SpdmResponderCalculateCertChainHash (SpdmContext, SlotNum, Ptr);
   Ptr += HashSize;
 
-  GetRandomNumber (SPDM_NONCE_SIZE, Ptr);
+  SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
   Ptr += SPDM_NONCE_SIZE;
 
   Result = SpdmResponderCalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param2, Ptr);

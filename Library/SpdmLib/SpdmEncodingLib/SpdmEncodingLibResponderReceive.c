@@ -86,7 +86,7 @@ SpdmDecryptRequest (
     EncMsg = (UINT8 *)EncMsgHeader;
     DecMsg = (UINT8 *)EncMsgHeader;
     Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + CipherTextSize;
-    Result = AeadDecFunc (
+    Result = SpdmAeadDecryption (
               SpdmContext,
               Key,
               SessionInfo->AeadKeySize,
@@ -132,7 +132,7 @@ SpdmDecryptRequest (
     }
     AData = (UINT8 *)RecordHeader;
     Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURE_MESSAGE_ADATA_HEADER) + RecordHeader->Length - AeadTagSize;
-    Result = AeadDecFunc (
+    Result = SpdmAeadDecryption (
               SpdmContext,
               Key,
               SessionInfo->AeadKeySize,

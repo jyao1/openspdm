@@ -9,6 +9,54 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmResponderLibInternal.h"
 
+
+BOOLEAN
+SpdmEncapRequesterVerifyCertificateChainData (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *CertificateChain,
+  UINTN                           CertificateChainSize
+  )
+{
+  UINT8                                     *CertBuffer;
+  UINTN                                     CertBufferSize;
+  UINT8                                     *RootCertBuffer;
+  UINTN                                     RootCertBufferSize;
+  UINTN                                     HashSize;
+  UINT8                                     CalcRootCertHash[MAX_HASH_SIZE];
+
+  HashSize = GetSpdmHashSize (SpdmContext);
+
+  if (CertificateChainSize > MAX_SPDM_MESSAGE_BUFFER_SIZE) {
+    DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (buffer too large) !!!\n"));
+    return FALSE;
+  }
+
+  if (CertificateChainSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
+    DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (buffer too small) !!!\n"));
+    return FALSE;
+  }
+
+  CertBuffer = (UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertBufferSize = CertificateChainSize - sizeof(SPDM_CERT_CHAIN) - HashSize;
+  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get root certificate failed)!!!\n"));
+    return FALSE;
+  }
+
+  SpdmHashAll (SpdmContext, RootCertBuffer, RootCertBufferSize, CalcRootCertHash);
+  if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), CalcRootCertHash, HashSize) != 0) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert root hash mismatch) !!!\n"));
+    return FALSE;
+  }
+
+  if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertBuffer, CertBufferSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert chain verify failed)!!!\n"));
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
 BOOLEAN
 SpdmEncapRequesterVerifyCertificateChain (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -21,11 +69,10 @@ SpdmEncapRequesterVerifyCertificateChain (
   UINTN                                     HashSize;
   UINT8                                     *RootCertHash;
   UINTN                                     RootCertHashSize;
-  UINT8                                     *RootCertBuffer;
-  UINTN                                     RootCertBufferSize;
+  BOOLEAN                                   Result;
 
-  if (CertificateChainSize > MAX_SPDM_MESSAGE_BUFFER_SIZE) {
-    DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (buffer too large) !!!\n"));
+  Result = SpdmEncapRequesterVerifyCertificateChainData(SpdmContext, CertificateChain, CertificateChainSize);
+  if (!Result) {
     return FALSE;
   }
 
@@ -36,24 +83,12 @@ SpdmEncapRequesterVerifyCertificateChain (
 
   if ((RootCertHash != NULL) && (RootCertHashSize != 0)) {
     HashSize = GetSpdmHashSize (SpdmContext);
-    ASSERT (RootCertHashSize == HashSize);
-    if (CertificateChainSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
-      DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (buffer too small) !!!\n"));
+    if (RootCertHashSize != HashSize) {
+      DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (hash size mismatch) !!!\n"));
       return FALSE;
     }
     if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), RootCertHash, HashSize) != 0) {
       DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (root hash mismatch) !!!\n"));
-      return FALSE;
-    }
-    // verify the CertChain
-    CertBuffer = (UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN) + HashSize;
-    CertBufferSize = CertificateChainSize - sizeof(SPDM_CERT_CHAIN) - HashSize;
-    if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get root certificate failed)!!!\n"));
-      return FALSE;
-    }
-    if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertBuffer, CertBufferSize)) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert chain verify failed)!!!\n"));
       return FALSE;
     }
   } else if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
@@ -66,6 +101,7 @@ SpdmEncapRequesterVerifyCertificateChain (
       return FALSE;
     }
   }
+
   DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - PASS !!!\n"));
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = CertificateChainSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, CertificateChain, CertificateChainSize);

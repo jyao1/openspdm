@@ -87,7 +87,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
 
     Digest = (VOID *)(SpdmResponse + 1);
-    HashFunc (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
   }
     return RETURN_SUCCESS;
@@ -109,7 +109,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
 
     Digest = (VOID *)(SpdmResponse + 1);
-    HashFunc (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
   }
     return RETURN_SUCCESS;
@@ -174,7 +174,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
 
       Digest = (VOID *)(SpdmResponse + 1);
-      HashFunc (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+      SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
     }
     SubIndex1 ++;
@@ -253,7 +253,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
 
       Digest = (VOID *)(SpdmResponse + 1);
-      HashFunc (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+      SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
     }
     SubIndex2 ++;

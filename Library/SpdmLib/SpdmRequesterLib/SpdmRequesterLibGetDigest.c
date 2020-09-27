@@ -32,19 +32,16 @@ SpdmRequesterVerifyDigest (
   
   CertBuffer = SpdmContext->LocalContext.PeerCertChainVarBuffer;
   CertBufferSize = SpdmContext->LocalContext.PeerCertChainVarBufferSize;
-  if ((CertBuffer == NULL) || (CertBufferSize == 0)) {
-    return TRUE;
+  if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
+    HashSize = GetSpdmHashSize (SpdmContext);
+    SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+
+    if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
+      DEBUG((DEBUG_INFO, "!!! VerifyDigest - FAIL !!!\n"));
+      return FALSE;
+    }
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  HashFunc (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
-  
-  if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
-    DEBUG((DEBUG_INFO, "!!! VerifyDigest - FAIL !!!\n"));
-    return FALSE;
-  }
-  
   DEBUG((DEBUG_INFO, "!!! VerifyDigest - PASS !!!\n"));
 
   return TRUE;
