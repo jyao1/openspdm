@@ -38,6 +38,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmResponderLibChallengeAuth.obj \
     $(OUTPUT_DIR)\SpdmResponderLibCommunication.obj \
     $(OUTPUT_DIR)\SpdmResponderLibDigest.obj \
+    $(OUTPUT_DIR)\SpdmResponderLibEncapChallenge.obj \
     $(OUTPUT_DIR)\SpdmResponderLibEncapGetCertificate.obj \
     $(OUTPUT_DIR)\SpdmResponderLibEncapGetDigest.obj \
     $(OUTPUT_DIR)\SpdmResponderLibEncapResponse.obj \
@@ -107,6 +108,9 @@ $(OUTPUT_DIR)\SpdmResponderLibCommunication.obj : $(SOURCE_DIR)\SpdmResponderLib
 
 $(OUTPUT_DIR)\SpdmResponderLibDigest.obj : $(SOURCE_DIR)\SpdmResponderLibDigest.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibDigest.c
+
+$(OUTPUT_DIR)\SpdmResponderLibEncapChallenge.obj : $(SOURCE_DIR)\SpdmResponderLibEncapChallenge.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEncapChallenge.c
 
 $(OUTPUT_DIR)\SpdmResponderLibEncapGetCertificate.obj : $(SOURCE_DIR)\SpdmResponderLibEncapGetCertificate.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderLibEncapGetCertificate.c

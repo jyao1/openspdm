@@ -164,6 +164,16 @@ SpdmGetEncapResponseCertificate (
      OUT VOID                 *Response
   );
 
+RETURN_STATUS
+EFIAPI
+SpdmGetEncapResponseChallengeAuth (
+  IN     VOID                 *Context,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
 /**
   Send a SPDM request command to a device.
   

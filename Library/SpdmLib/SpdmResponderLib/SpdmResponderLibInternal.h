@@ -85,7 +85,7 @@ SpdmGetResponseCertificate (
 
 RETURN_STATUS
 EFIAPI
-SpdmGetResponseChallenge (
+SpdmGetResponseChallengeAuth (
   IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
@@ -228,6 +228,23 @@ SpdmGetEncapReqestGetCertificate (
 RETURN_STATUS
 EFIAPI
 SpdmProcessEncapResponseCertificate (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINTN                EncapLastResponseSize,
+  IN     VOID                 *EncapLastResponse,
+  OUT    BOOLEAN              *Continue
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetEncapReqestChallenge (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT UINTN                *EncapRequestSize,
+     OUT VOID                 *EncapRequest
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmProcessEncapResponseChallengeAuth (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINTN                EncapLastResponseSize,
   IN     VOID                 *EncapLastResponse,

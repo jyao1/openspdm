@@ -25,7 +25,7 @@ SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
   {SPDM_NEGOTIATE_ALGORITHMS,   SpdmGetResponseAlgorithm},
   {SPDM_GET_DIGESTS,            SpdmGetResponseDigest},
   {SPDM_GET_CERTIFICATE,        SpdmGetResponseCertificate},
-  {SPDM_CHALLENGE,              SpdmGetResponseChallenge},
+  {SPDM_CHALLENGE,              SpdmGetResponseChallengeAuth},
   {SPDM_GET_MEASUREMENTS,       SpdmGetResponseMeasurement},
   {SPDM_KEY_EXCHANGE,           SpdmGetResponseKeyExchange},
   {SPDM_PSK_EXCHANGE,           SpdmGetResponsePskExchange},

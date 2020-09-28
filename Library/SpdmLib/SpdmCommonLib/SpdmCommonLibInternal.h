@@ -136,17 +136,23 @@ typedef struct {
 
 typedef struct {
   //
-  // Responder: Signature = Sign(SK, Hash(M1))
-  // Requester: Verify(PK, Hash(M2), Signature)
+  // Signature = Sign(SK, Hash(M1))
+  // Verify(PK, Hash(M2), Signature)
   //
   // M1/M2 = Concatenate (A, B, C)
   // A = Concatenate (GET_VERSION, VERSION, GET_CAPABILITIES, CAPABILITIES, NEGOTIATE_ALGORITHMS, ALGORITHMS)
   // B = Concatenate (GET_DIGEST, DIGEST, GET_CERTFICATE, CERTIFICATE)
   // C = Concatenate (CHALLENGE, CHALLENGE_AUTH\Signature)
   //
+  // Mut M1/M2 = Concatenate (MutB, MutC)
+  // MutB = Concatenate (GET_DIGEST, DIGEST, GET_CERTFICATE, CERTIFICATE)
+  // MutC = Concatenate (CHALLENGE, CHALLENGE_AUTH\Signature)
+  //
   SMALL_MANAGED_BUFFER            MessageA;
   LARGE_MANAGED_BUFFER            MessageB;
   SMALL_MANAGED_BUFFER            MessageC;
+  LARGE_MANAGED_BUFFER            MessageMutB;
+  SMALL_MANAGED_BUFFER            MessageMutC;
   LARGE_MANAGED_BUFFER            M1M2;
   //
   // Signature = Sign(SK, Hash(L1))
@@ -260,6 +266,7 @@ typedef struct {
 typedef struct {
   UINT32                               EncapState;
   UINT8                                SlotNum;
+  UINT8                                MeasurementHashType;
   LARGE_MANAGED_BUFFER                 CertificateChainBuffer;
 } SPDM_ENCAP_CONTEXT;
 

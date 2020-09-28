@@ -21,10 +21,11 @@ SpdmGenerateEncapErrorResponse (
 {
   SPDM_ERROR_RESPONSE     *SpdmResponse;
 
-  ASSERT (*ResponseSize >= sizeof(SPDM_ERROR_RESPONSE) - 1);
-  *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) - 1;
-  SpdmResponse = (VOID *)((UINT8 *)Response - 1);
+  ASSERT (*ResponseSize >= sizeof(SPDM_ERROR_RESPONSE));
+  *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
+  SpdmResponse = Response;
 
+  SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
   SpdmResponse->Header.Param1 = ErrorCode;
   SpdmResponse->Header.Param2 = ErrorData;
@@ -46,10 +47,11 @@ SpdmGenerateEncapExtendedErrorResponse (
 {
   SPDM_ERROR_RESPONSE     *SpdmResponse;
 
-  ASSERT (*ResponseSize >= sizeof(SPDM_ERROR_RESPONSE) + ExtendedErrorDataSize - 1);
-  *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + ExtendedErrorDataSize - 1;
-  SpdmResponse = (VOID *)((UINT8 *)Response - 1);
+  ASSERT (*ResponseSize >= sizeof(SPDM_ERROR_RESPONSE) + ExtendedErrorDataSize);
+  *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + ExtendedErrorDataSize;
+  SpdmResponse = Response;
 
+  SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
   SpdmResponse->Header.Param1 = ErrorCode;
   SpdmResponse->Header.Param2 = ErrorData;

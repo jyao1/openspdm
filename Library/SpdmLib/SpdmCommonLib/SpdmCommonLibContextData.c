@@ -588,14 +588,16 @@ SpdmInitContext (
   ZeroMem (SpdmContext, sizeof(SPDM_DEVICE_CONTEXT));
   SpdmContext->Version = SPDM_DEVICE_CONTEXT_VERSION;
   SpdmContext->Alignment = 1;
-  SpdmContext->Transcript.MessageA.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
-  SpdmContext->Transcript.MessageB.MaxBufferSize  = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SpdmContext->Transcript.MessageC.MaxBufferSize  = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
-  SpdmContext->Transcript.M1M2.MaxBufferSize      = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SpdmContext->Transcript.L1L2.MaxBufferSize      = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
-  SpdmContext->RetryTimes                         = MAX_SPDM_REQUEST_RETRY_TIMES;
-  SpdmContext->ResponseState                      = SpdmResponseStateNormal;
-  SpdmContext->CurrentToken                       = 0;
+  SpdmContext->Transcript.MessageA.MaxBufferSize    = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
+  SpdmContext->Transcript.MessageB.MaxBufferSize    = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SpdmContext->Transcript.MessageC.MaxBufferSize    = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
+  SpdmContext->Transcript.MessageMutB.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SpdmContext->Transcript.MessageMutC.MaxBufferSize = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
+  SpdmContext->Transcript.M1M2.MaxBufferSize        = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SpdmContext->Transcript.L1L2.MaxBufferSize        = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
+  SpdmContext->RetryTimes                           = MAX_SPDM_REQUEST_RETRY_TIMES;
+  SpdmContext->ResponseState                        = SpdmResponseStateNormal;
+  SpdmContext->CurrentToken                         = 0;
 
   RandomSeed (NULL, 0);
   return RETURN_SUCCESS;

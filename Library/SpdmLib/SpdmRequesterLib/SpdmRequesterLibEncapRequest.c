@@ -18,6 +18,7 @@ typedef struct {
 SPDM_GET_ENCAP_RESPONSE_STRUCT  mSpdmGetEncapResponseStruct[] = {
   {SPDM_GET_DIGESTS,            SpdmGetEncapResponseDigest},
   {SPDM_GET_CERTIFICATE,        SpdmGetEncapResponseCertificate},
+  {SPDM_CHALLENGE,              SpdmGetEncapResponseChallengeAuth},
 };
 
 RETURN_STATUS
@@ -62,8 +63,14 @@ SpdmProcessEncapsulatedRequest (
 {
   SPDM_GET_ENCAP_RESPONSE_FUNC    GetEncapResponseFunc;
   RETURN_STATUS                   Status;
+  SPDM_MESSAGE_HEADER             *SpdmRequester;
 
-  GetEncapResponseFunc = SpdmGetEncapResponseFunc (SpdmContext, *(UINT8 *)EncapRequest);
+  SpdmRequester = EncapRequest;
+  if (EncapRequestSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, *(UINT8 *)EncapRequest, EncapResponseSize, EncapResponse);
+  }
+
+  GetEncapResponseFunc = SpdmGetEncapResponseFunc (SpdmContext, SpdmRequester->RequestResponseCode);
   if (GetEncapResponseFunc == NULL) {
     GetEncapResponseFunc = (SPDM_GET_ENCAP_RESPONSE_FUNC)SpdmContext->GetEncapResponseFunc;
   }

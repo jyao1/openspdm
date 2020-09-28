@@ -119,17 +119,27 @@ SpdmGetEncapReqestGetCertificate (
 {
   SPDM_GET_CERTIFICATE_REQUEST                  *SpdmRequest;
 
-  ASSERT (*EncapRequestSize >= sizeof(SPDM_GET_CERTIFICATE_REQUEST) - 1);
-  *EncapRequestSize = sizeof(SPDM_GET_CERTIFICATE_REQUEST) - 1;
+  ASSERT (*EncapRequestSize >= sizeof(SPDM_GET_CERTIFICATE_REQUEST));
+  *EncapRequestSize = sizeof(SPDM_GET_CERTIFICATE_REQUEST);
 
-  SpdmRequest = (VOID *)((UINT8 *)EncapRequest - 1);
+  SpdmRequest = EncapRequest;
 
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmRequest->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmRequest->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
   SpdmRequest->Header.RequestResponseCode = SPDM_GET_CERTIFICATE;
   SpdmRequest->Header.Param1 = SpdmContext->EncapContext.SlotNum;
   SpdmRequest->Header.Param2 = 0;
   SpdmRequest->Offset = (UINT16)GetManagedBufferSize (&SpdmContext->EncapContext.CertificateChainBuffer);
   SpdmRequest->Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   DEBUG((DEBUG_INFO, "Request (Offset 0x%x, Size 0x%x):\n", SpdmRequest->Offset, SpdmRequest->Length));
+
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, *EncapRequestSize);
 
   return RETURN_SUCCESS;
 }
@@ -144,12 +154,14 @@ SpdmProcessEncapResponseCertificate (
   )
 {
   SPDM_CERTIFICATE_RESPONSE             *SpdmResponse;
+  UINTN                                 SpdmResponseSize;
   BOOLEAN                               Result;
 
-  if (EncapLastResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE) - 1) {
+  SpdmResponse = EncapLastResponse;
+  SpdmResponseSize = EncapLastResponseSize;
+  if (EncapLastResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
-  SpdmResponse = (VOID *)((UINT8 *)EncapLastResponse - 1);
 
   if (SpdmResponse->Header.RequestResponseCode != SPDM_CERTIFICATE) {
     return RETURN_DEVICE_ERROR;
@@ -160,10 +172,14 @@ SpdmProcessEncapResponseCertificate (
   if (SpdmResponse->Header.Param1 != SpdmContext->EncapContext.SlotNum) {
     return RETURN_DEVICE_ERROR;
   }
-  if (EncapLastResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE) - 1 + SpdmResponse->PortionLength) {
+  if (SpdmResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE) + SpdmResponse->PortionLength) {
     return RETURN_DEVICE_ERROR;
   }
-  EncapLastResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) - 1 + SpdmResponse->PortionLength;
+  SpdmResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + SpdmResponse->PortionLength;
+  //
+  // Cache data
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, SpdmResponseSize);
 
   DEBUG((DEBUG_INFO, "Certificate (Offset 0x%x, Size 0x%x):\n", GetManagedBufferSize (&SpdmContext->EncapContext.CertificateChainBuffer), SpdmResponse->PortionLength));
   InternalDumpHex ((VOID *)(SpdmResponse + 1), SpdmResponse->PortionLength);

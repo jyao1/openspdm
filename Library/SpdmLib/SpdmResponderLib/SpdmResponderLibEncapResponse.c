@@ -30,6 +30,7 @@ typedef enum {
   SpdmEncapResponseStateNotStarted,
   SpdmEncapResponseStateWaitForDigest,
   SpdmEncapResponseStateWaitForCertificate,
+  SpdmEncapResponseStateWaitForChallengeAuth,
   SpdmEncapResponseStateMax,
 } SPDM_ENCAP_RESPONSE_STATE;
 
@@ -41,10 +42,11 @@ typedef struct {
 } SPDM_ENCAP_RESPONSE_STRUCT;
 
 SPDM_ENCAP_RESPONSE_STRUCT  mSpdmEncapStruct[] = {
-  {SpdmEncapResponseStateNotStarted,         NULL,                                NULL,                             SpdmGetEncapReqestGetDigest     },
-  {SpdmEncapResponseStateWaitForDigest,      SpdmProcessEncapResponseDigest,      NULL,                             SpdmGetEncapReqestGetCertificate},
-  {SpdmEncapResponseStateWaitForCertificate, SpdmProcessEncapResponseCertificate, SpdmGetEncapReqestGetCertificate, NULL                            },
-  {SpdmEncapResponseStateMax,                NULL,                                NULL,                             NULL                            },
+  {SpdmEncapResponseStateNotStarted,           NULL,                                  NULL,                             SpdmGetEncapReqestGetDigest     },
+  {SpdmEncapResponseStateWaitForDigest,        SpdmProcessEncapResponseDigest,        NULL,                             SpdmGetEncapReqestGetCertificate},
+  {SpdmEncapResponseStateWaitForCertificate,   SpdmProcessEncapResponseCertificate,   SpdmGetEncapReqestGetCertificate, SpdmGetEncapReqestChallenge     },
+  {SpdmEncapResponseStateWaitForChallengeAuth, SpdmProcessEncapResponseChallengeAuth, NULL,                             NULL                            },
+  {SpdmEncapResponseStateMax,                  NULL,                                  NULL,                             NULL                            },
 };
 
 SPDM_ENCAP_RESPONSE_STRUCT *
@@ -129,6 +131,7 @@ InitEncapEnv (
 {
   SpdmContext->EncapContext.EncapState = 0;
   SpdmContext->EncapContext.SlotNum = 0;
+  SpdmContext->EncapContext.MeasurementHashType = SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH;
   SpdmContext->EncapContext.CertificateChainBuffer.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 }
 

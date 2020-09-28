@@ -7,10 +7,10 @@
 
 **/
 
-#include "SpdmResponderLibInternal.h"
+#include "SpdmRequesterLibInternal.h"
 
 BOOLEAN
-SpdmResponderCalculateCertChainHash (
+SpdmEncapResponderCalculateCertChainHash (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN  UINT8                SlotNum,
   OUT UINT8                *CertChainHash
@@ -21,7 +21,7 @@ SpdmResponderCalculateCertChainHash (
 }
 
 BOOLEAN
-SpdmResponderCalculateMeasurementSummaryHash (
+SpdmEncapResponderCalculateMeasurementSummaryHash (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN  UINT8                MeasurementSummaryHashType,
   OUT UINT8                *MeasurementSummaryHash
@@ -84,7 +84,7 @@ SpdmResponderCalculateMeasurementSummaryHash (
 }
 
 BOOLEAN
-SpdmResponderGenerateChallengeSignature (
+SpdmEncapResponderGenerateChallengeSignature (
   IN  SPDM_DEVICE_CONTEXT        *SpdmContext,
   IN  VOID                       *ResponseMessage,
   IN  UINTN                      ResponseMessageSize,
@@ -100,32 +100,28 @@ SpdmResponderGenerateChallengeSignature (
     return FALSE;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
+  SignatureSize = GetSpdmReqAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, ResponseMessage, ResponseMessageSize);
-  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageB), GetManagedBufferSize(&SpdmContext->Transcript.MessageB));
-  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, ResponseMessage, ResponseMessageSize);
+  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutB), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutB));
+  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
 
-  DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
+  DEBUG((DEBUG_INFO, "Encap Calc MessageMutB Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageMutB), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutB));
 
-  DEBUG((DEBUG_INFO, "Calc MessageB Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageB), GetManagedBufferSize(&SpdmContext->Transcript.MessageB));
-
-  DEBUG((DEBUG_INFO, "Calc MessageC Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
+  DEBUG((DEBUG_INFO, "Encap Calc MessageMutC Data :\n"));
+  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
 
   SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
-  DEBUG((DEBUG_INFO, "Calc M1M2 Hash - "));
+  DEBUG((DEBUG_INFO, "Encap Calc M1M2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   
   Result = SpdmContext->LocalContext.SpdmDataSignFunc (
              SpdmContext,
-             TRUE,
-             SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
+             FALSE,
+             SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
              HashData,
              HashSize,
              Signature,
@@ -137,7 +133,7 @@ SpdmResponderGenerateChallengeSignature (
 
 RETURN_STATUS
 EFIAPI
-SpdmGetResponseChallengeAuth (
+SpdmGetEncapResponseChallengeAuth (
   IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
@@ -146,7 +142,6 @@ SpdmGetResponseChallengeAuth (
   )
 {
   SPDM_CHALLENGE_REQUEST            *SpdmRequest;
-  UINTN                             SpdmRequestSize;
   SPDM_CHALLENGE_AUTH_RESPONSE      *SpdmResponse;
   BOOLEAN                           Result;
   UINTN                             SignatureSize;
@@ -159,29 +154,22 @@ SpdmGetResponseChallengeAuth (
   SpdmContext = Context;
   SpdmRequest = Request;
   if (RequestSize != sizeof(SPDM_CHALLENGE_REQUEST)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CERTIFICATE_RECEIVE_FLAG) == 0)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
-  SpdmRequestSize = RequestSize;
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, SpdmRequest, SpdmRequestSize);
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, SpdmRequest, RequestSize);
 
   SlotNum = SpdmRequest->Header.Param1;
 
   if (SlotNum > SpdmContext->LocalContext.SlotCount) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
+  SignatureSize = GetSpdmReqAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
 
   TotalSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
@@ -207,15 +195,15 @@ SpdmGetResponseChallengeAuth (
   SpdmResponse->Header.Param2 = (1 << SlotNum);
 
   Ptr = (VOID *)(SpdmResponse + 1);
-  SpdmResponderCalculateCertChainHash (SpdmContext, SlotNum, Ptr);
+  SpdmEncapResponderCalculateCertChainHash (SpdmContext, SlotNum, Ptr);
   Ptr += HashSize;
 
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
   Ptr += SPDM_NONCE_SIZE;
 
-  Result = SpdmResponderCalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param2, Ptr);
+  Result = SpdmEncapResponderCalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param2, Ptr);
   if (!Result) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   Ptr += HashSize;
@@ -228,9 +216,9 @@ SpdmGetResponseChallengeAuth (
   //
   // Calc Sign
   //
-  Result = SpdmResponderGenerateChallengeSignature (SpdmContext, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse, Ptr);
+  Result = SpdmEncapResponderGenerateChallengeSignature (SpdmContext, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse, Ptr);
   if (!Result) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE_AUTH, ResponseSize, Response);
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE_AUTH, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   Ptr += SignatureSize;
@@ -239,7 +227,6 @@ SpdmGetResponseChallengeAuth (
   // Reset
   //
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;
 }

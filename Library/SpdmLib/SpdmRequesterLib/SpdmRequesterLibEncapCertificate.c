@@ -20,6 +20,7 @@ SpdmGetEncapResponseCertificate (
   )
 {
   SPDM_GET_CERTIFICATE_REQUEST  *SpdmRequest;
+  UINTN                         SpdmRequestSize;
   SPDM_CERTIFICATE_RESPONSE     *SpdmResponse;
   UINT16                        Offset;
   UINT16                        Length;
@@ -28,11 +29,16 @@ SpdmGetEncapResponseCertificate (
   SPDM_DEVICE_CONTEXT           *SpdmContext;
 
   SpdmContext = Context;
-  SpdmRequest = (VOID *)((UINT8 *)Request - 1);
-  if (RequestSize != sizeof(SPDM_GET_CERTIFICATE_REQUEST) - 1) {
+  SpdmRequest = Request;
+  if (RequestSize != sizeof(SPDM_GET_CERTIFICATE_REQUEST)) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
+  SpdmRequestSize = RequestSize;
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, SpdmRequestSize);
 
   if (SpdmContext->LocalContext.CertificateChain == NULL) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_CERTIFICATE, ResponseSize, Response);
@@ -62,17 +68,26 @@ SpdmGetEncapResponseCertificate (
   }
   RemainderLength = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (Length + Offset);
 
-  ASSERT (*ResponseSize >= sizeof(SPDM_CERTIFICATE_RESPONSE) - 1 + Length);
+  ASSERT (*ResponseSize >= sizeof(SPDM_CERTIFICATE_RESPONSE) + Length);
   *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + Length;
   ZeroMem (Response, *ResponseSize);
-  SpdmResponse = (VOID *)((UINT8 *)Response - 1);
+  SpdmResponse = Response;
 
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
   SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
   SpdmResponse->Header.Param1 = SlotNum;
   SpdmResponse->Header.Param2 = 0;
   SpdmResponse->PortionLength = Length;
   SpdmResponse->RemainderLength = (UINT16)RemainderLength;
   CopyMem (SpdmResponse + 1, (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + Offset, Length);
+  //
+  // Cache
+  //
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, *ResponseSize);
 
   return RETURN_SUCCESS;
 }
