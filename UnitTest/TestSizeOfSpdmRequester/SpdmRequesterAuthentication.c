@@ -21,34 +21,26 @@ DoAuthenticationViaSpdm (
   )
 {
   RETURN_STATUS         Status;
-  UINT32                CapabilityFlags;
-  UINTN                 DataSize;
   UINT8                 SlotMask;
   UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
   UINT8                 MeasurementHash[MAX_HASH_SIZE];
   UINTN                 CertChainSize;
   UINT8                 CertChain[MAX_SPDM_CERT_CHAIN_SIZE];
 
-  DataSize = sizeof(CapabilityFlags);
-  SpdmGetData (SpdmContext, SpdmDataCapabilityFlags, NULL, &CapabilityFlags, &DataSize);
-
-  if ((CapabilityFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) != 0) {
-    ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
-    Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
-    if (RETURN_ERROR(Status)) {
-      return Status;
-    }
-
-    CertChainSize = sizeof(CertChain);
-    ZeroMem (CertChain, sizeof(CertChain));
-    Status = SpdmGetCertificate (SpdmContext, 0, &CertChainSize, CertChain);
-    if (RETURN_ERROR(Status)) {
-      return Status;
-    }
-  }
-  
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  CertChainSize = sizeof(CertChain);
+  ZeroMem (CertChain, sizeof(CertChain));
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
-  Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
+  Status = SpdmAuthentication (
+             SpdmContext,
+             &SlotMask,
+             &TotalDigestBuffer,
+             0,
+             &CertChainSize,
+             CertChain,
+             SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH,
+             MeasurementHash
+             );
   if (RETURN_ERROR(Status)) {
     return Status;
   }

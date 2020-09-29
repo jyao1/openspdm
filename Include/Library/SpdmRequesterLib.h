@@ -61,6 +61,22 @@ SpdmChallenge (
   );
 
 /*
+  GET_DIGEST, GET_CERTIFICATE, CHALLENGE.
+*/
+RETURN_STATUS
+EFIAPI
+SpdmAuthentication (
+  IN     VOID                 *SpdmContext,
+     OUT UINT8                *SlotMask,
+     OUT VOID                 *TotalDigestBuffer,
+  IN     UINT8                SlotNum,
+  IN OUT UINTN                *CertChainSize,
+     OUT VOID                 *CertChain,
+  IN     UINT8                MeasurementHashType,
+     OUT VOID                 *MeasurementHash
+  );
+
+/*
   Get measurement
 */
 RETURN_STATUS

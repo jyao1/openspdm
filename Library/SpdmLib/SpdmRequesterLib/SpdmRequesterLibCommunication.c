@@ -52,6 +52,48 @@ SpdmInitConnection (
   return RETURN_SUCCESS;
 }
 
+/*
+  GET_DIGEST, GET_CERTIFICATE, CHALLENGE.
+*/
+RETURN_STATUS
+EFIAPI
+SpdmAuthentication (
+  IN     VOID                 *SpdmContext,
+     OUT UINT8                *SlotMask,
+     OUT VOID                 *TotalDigestBuffer,
+  IN     UINT8                SlotNum,
+  IN OUT UINTN                *CertChainSize,
+     OUT VOID                 *CertChain,
+  IN     UINT8                MeasurementHashType,
+     OUT VOID                 *MeasurementHash
+  )
+{
+  RETURN_STATUS         Status;
+  UINT32                CapabilityFlags;
+  UINTN                 DataSize;
+
+  DataSize = sizeof(CapabilityFlags);
+  SpdmGetData (SpdmContext, SpdmDataCapabilityFlags, NULL, &CapabilityFlags, &DataSize);
+
+  if ((CapabilityFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) != 0) {
+    Status = SpdmGetDigest (SpdmContext, SlotMask, TotalDigestBuffer);
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+
+    Status = SpdmGetCertificate (SpdmContext, SlotNum, CertChainSize, CertChain);
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  }
+
+  Status = SpdmChallenge (SpdmContext, SlotNum, MeasurementHashType, MeasurementHash);
+  if (RETURN_ERROR(Status)) {
+    return Status;
+  }
+  return RETURN_SUCCESS;
+}
+
 /**
   Start a SPDM Session.
 
