@@ -287,11 +287,6 @@ SpdmChallenge (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  if (AuthAttribute.BasicMutAuthReq == 1) {
-    DEBUG((DEBUG_INFO, "BasicMutAuth :\n"));
-    SpdmEncapsulatedRequest (SpdmContext, NULL);
-  }
-
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
 
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
@@ -299,6 +294,18 @@ SpdmChallenge (
   if (MeasurementHash != NULL) {
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);
   }
+
+  if (AuthAttribute.BasicMutAuthReq == 1) {
+    DEBUG((DEBUG_INFO, "BasicMutAuth :\n"));
+    Status = SpdmEncapsulatedRequest (SpdmContext, NULL);
+    DEBUG ((DEBUG_INFO, "SpdmChallenge - SpdmEncapsulatedRequest - %p\n", Status));
+    if (RETURN_ERROR(Status)) {
+      SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
+      return RETURN_SECURITY_VIOLATION;
+    }
+  }
+
   SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
+
   return RETURN_SUCCESS;
 }

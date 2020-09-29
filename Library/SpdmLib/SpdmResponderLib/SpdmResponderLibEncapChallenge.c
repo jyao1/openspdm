@@ -172,6 +172,8 @@ SpdmProcessEncapResponseChallengeAuth (
   VOID                                      *Signature;
   UINTN                                     SignatureSize;
 
+  SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
+
   SpdmResponse = EncapLastResponse;
   SpdmResponseSize = EncapLastResponseSize;
   if (SpdmResponseSize < sizeof(SPDM_CHALLENGE_AUTH_RESPONSE)) {
@@ -204,6 +206,7 @@ SpdmProcessEncapResponseChallengeAuth (
   DEBUG((DEBUG_INFO, "\n"));
   Result = SpdmEncapRequesterVerifyCertificateChainHash (SpdmContext, CertChainHash, HashSize);
   if (!Result) {
+    SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
 
@@ -252,8 +255,11 @@ SpdmProcessEncapResponseChallengeAuth (
   InternalDumpHex (Signature, SignatureSize);
   Result = SpdmEncapRequesterVerifyChallengeSignature (SpdmContext, Signature, SignatureSize);
   if (!Result) {
+    SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
+
+  SpdmContext->EncapContext.ErrorState = SPDM_STATUS_SUCCESS;
 
   *Continue = FALSE;
 

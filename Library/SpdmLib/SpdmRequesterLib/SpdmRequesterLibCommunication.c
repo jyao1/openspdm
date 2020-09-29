@@ -95,7 +95,11 @@ SpdmStartSession (
       break;
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST:
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS:
-      SpdmEncapsulatedRequest (SpdmContext, SessionId);
+      Status = SpdmEncapsulatedRequest (SpdmContext, SessionId);
+      DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmEncapsulatedRequest - %p\n", Status));
+      if (RETURN_ERROR(Status)) {
+        return Status;
+      }
       break;
     default:
       DEBUG ((DEBUG_INFO, "SpdmStartSession - unknown MutAuthRequested - 0x%x\n", SessionInfo->MutAuthRequested));

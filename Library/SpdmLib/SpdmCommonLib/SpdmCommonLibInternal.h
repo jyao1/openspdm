@@ -264,6 +264,7 @@ typedef struct {
 } SPDM_SESSION_INFO;
 
 typedef struct {
+  UINT32                               ErrorState;
   UINT32                               EncapState;
   UINT8                                SlotNum;
   UINT8                                MeasurementHashType;

@@ -157,6 +157,8 @@ SpdmProcessEncapResponseCertificate (
   UINTN                                 SpdmResponseSize;
   BOOLEAN                               Result;
 
+  SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
+
   SpdmResponse = EncapLastResponse;
   SpdmResponseSize = EncapLastResponseSize;
   if (EncapLastResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
@@ -194,8 +196,11 @@ SpdmProcessEncapResponseCertificate (
   *Continue = FALSE;
   Result = SpdmEncapRequesterVerifyCertificateChain (SpdmContext, GetManagedBuffer(&SpdmContext->EncapContext.CertificateChainBuffer), GetManagedBufferSize(&SpdmContext->EncapContext.CertificateChainBuffer));
   if (!Result) {
+    SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
+
+  SpdmContext->EncapContext.ErrorState = SPDM_STATUS_SUCCESS;
 
   return RETURN_SUCCESS;
 }

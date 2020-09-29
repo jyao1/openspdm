@@ -67,7 +67,7 @@ SpdmProcessEncapsulatedRequest (
 
   SpdmRequester = EncapRequest;
   if (EncapRequestSize < sizeof(SPDM_MESSAGE_HEADER)) {
-    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, *(UINT8 *)EncapRequest, EncapResponseSize, EncapResponse);
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SpdmRequester->RequestResponseCode, EncapResponseSize, EncapResponse);
   }
 
   GetEncapResponseFunc = SpdmGetEncapResponseFunc (SpdmContext, SpdmRequester->RequestResponseCode);
@@ -80,7 +80,7 @@ SpdmProcessEncapsulatedRequest (
     Status = RETURN_NOT_FOUND;
   }
   if (Status != RETURN_SUCCESS) {
-    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, *(UINT8 *)EncapRequest, EncapResponseSize, EncapResponse);
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SpdmRequester->RequestResponseCode, EncapResponseSize, EncapResponse);
   }
 
   return RETURN_SUCCESS;

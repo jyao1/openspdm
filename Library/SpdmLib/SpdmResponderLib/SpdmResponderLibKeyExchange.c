@@ -165,10 +165,16 @@ SpdmGetResponseKeyExchange (
   UINTN                         OpaqueKeyExchangeRspSize;
 
   SpdmContext = Context;
-
   SpdmRequest = Request;
-  SlotNum = SpdmRequest->Header.Param2;
 
+  if (((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) &&
+      (SpdmContext->EncapContext.ErrorState != SPDM_STATUS_SUCCESS)) {
+    DEBUG((DEBUG_INFO, "SpdmGetResponseKeyExchange fail due to Mutual Auth fail\n"));
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
+  SlotNum = SpdmRequest->Header.Param2;
   if (SlotNum > SpdmContext->LocalContext.SlotCount) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

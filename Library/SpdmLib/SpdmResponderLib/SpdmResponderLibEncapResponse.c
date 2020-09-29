@@ -129,10 +129,12 @@ InitEncapEnv (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
 {
+  SpdmContext->EncapContext.ErrorState = 0;
   SpdmContext->EncapContext.EncapState = 0;
   SpdmContext->EncapContext.SlotNum = 0;
   SpdmContext->EncapContext.MeasurementHashType = SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH;
   SpdmContext->EncapContext.CertificateChainBuffer.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
 }
 
 RETURN_STATUS
