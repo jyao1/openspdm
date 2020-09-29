@@ -41,6 +41,9 @@ typedef struct {
   SPDM_GET_ENCAP_REQUEST          NextGetEncapRequest;
 } SPDM_ENCAP_RESPONSE_STRUCT;
 
+//
+// Basic Mutual Auth
+//
 SPDM_ENCAP_RESPONSE_STRUCT  mSpdmEncapStruct[] = {
   {SpdmEncapResponseStateNotStarted,           NULL,                                  NULL,                             SpdmGetEncapReqestGetDigest     },
   {SpdmEncapResponseStateWaitForDigest,        SpdmProcessEncapResponseDigest,        NULL,                             SpdmGetEncapReqestGetCertificate},
@@ -49,17 +52,36 @@ SPDM_ENCAP_RESPONSE_STRUCT  mSpdmEncapStruct[] = {
   {SpdmEncapResponseStateMax,                  NULL,                                  NULL,                             NULL                            },
 };
 
+//
+// Session Mutual Auth
+//
+SPDM_ENCAP_RESPONSE_STRUCT  mSpdmEncapSessionStruct[] = {
+  {SpdmEncapResponseStateNotStarted,           NULL,                                  NULL,                             SpdmGetEncapReqestGetDigest     },
+  {SpdmEncapResponseStateWaitForDigest,        SpdmProcessEncapResponseDigest,        NULL,                             SpdmGetEncapReqestGetCertificate},
+  {SpdmEncapResponseStateWaitForCertificate,   SpdmProcessEncapResponseCertificate,   SpdmGetEncapReqestGetCertificate, NULL                            },
+  {SpdmEncapResponseStateMax,                  NULL,                                  NULL,                             NULL                            },
+};
+
 SPDM_ENCAP_RESPONSE_STRUCT *
 SpdmGetEncapStructViaState (
   IN     SPDM_DEVICE_CONTEXT             *SpdmContext,
+  IN     BOOLEAN                         IsSession,
   IN     SPDM_ENCAP_RESPONSE_STATE       EncapState
   )
 {
   UINTN                Index;
 
-  for (Index = 0; Index < sizeof(mSpdmEncapStruct)/sizeof(mSpdmEncapStruct[0]); Index++) {
-    if (EncapState == mSpdmEncapStruct[Index].EncapState) {
-      return &mSpdmEncapStruct[Index];
+  if (IsSession) {
+    for (Index = 0; Index < sizeof(mSpdmEncapSessionStruct)/sizeof(mSpdmEncapSessionStruct[0]); Index++) {
+      if (EncapState == mSpdmEncapSessionStruct[Index].EncapState) {
+        return &mSpdmEncapSessionStruct[Index];
+      }
+    }
+  } else {
+    for (Index = 0; Index < sizeof(mSpdmEncapStruct)/sizeof(mSpdmEncapStruct[0]); Index++) {
+      if (EncapState == mSpdmEncapStruct[Index].EncapState) {
+        return &mSpdmEncapStruct[Index];
+      }
     }
   }
   return NULL;
@@ -68,6 +90,7 @@ SpdmGetEncapStructViaState (
 RETURN_STATUS
 SpdmProcessEncapsulatedResponse (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     BOOLEAN              IsSession,
   IN OUT UINT8                *RequestId,
   IN     UINTN                EncapLastResponseSize,
   IN     VOID                 *EncapLastResponse,
@@ -79,7 +102,7 @@ SpdmProcessEncapsulatedResponse (
   BOOLEAN                     Continue;
   SPDM_ENCAP_RESPONSE_STRUCT  *EncapResponseStruct;
 
-  EncapResponseStruct = SpdmGetEncapStructViaState (SpdmContext, SpdmContext->EncapContext.EncapState);
+  EncapResponseStruct = SpdmGetEncapStructViaState (SpdmContext, IsSession, SpdmContext->EncapContext.EncapState);
   ASSERT (EncapResponseStruct != NULL);
   if (EncapResponseStruct == NULL) {
     return RETURN_UNSUPPORTED;
@@ -139,8 +162,9 @@ InitEncapEnv (
 
 RETURN_STATUS
 EFIAPI
-SpdmGetResponseEncapsulatedRequest (
+SpdmGetResponseEncapsulatedRequestEx (
   IN     VOID                 *Context,
+  IN     BOOLEAN              IsSession,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -181,7 +205,7 @@ SpdmGetResponseEncapsulatedRequest (
 
   RequestId = 0;
   InitEncapEnv (Context);
-  Status = SpdmProcessEncapsulatedResponse (Context, &RequestId, 0, NULL, &EncapRequestSize, EncapRequest);
+  Status = SpdmProcessEncapsulatedResponse (Context, IsSession, &RequestId, 0, NULL, &EncapRequestSize, EncapRequest);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -194,8 +218,9 @@ SpdmGetResponseEncapsulatedRequest (
 
 RETURN_STATUS
 EFIAPI
-SpdmGetResponseEncapsulatedResponseAck (
+SpdmGetResponseEncapsulatedResponseAckEx (
   IN     VOID                 *Context,
+  IN     BOOLEAN              IsSession,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -238,7 +263,7 @@ SpdmGetResponseEncapsulatedResponseAck (
   EncapRequest = SpdmResponse + 1;
 
   RequestId = 0;
-  Status = SpdmProcessEncapsulatedResponse (Context, &RequestId, EncapLastResponseSize, EncapLastResponse, &EncapRequestSize, EncapRequest);
+  Status = SpdmProcessEncapsulatedResponse (Context, IsSession, &RequestId, EncapLastResponseSize, EncapLastResponse, &EncapRequestSize, EncapRequest);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -256,6 +281,46 @@ SpdmGetResponseEncapsulatedResponseAck (
 
 RETURN_STATUS
 EFIAPI
+SpdmGetResponseEncapsulatedRequest (
+  IN     VOID                 *Context,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  )
+{
+  return SpdmGetResponseEncapsulatedRequestEx (
+           Context,
+           FALSE,
+           RequestSize,
+           Request,
+           ResponseSize,
+           Response
+           );
+}
+
+RETURN_STATUS
+EFIAPI
+SpdmGetResponseEncapsulatedResponseAck (
+  IN     VOID                 *Context,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  )
+{
+  return SpdmGetResponseEncapsulatedResponseAckEx (
+           Context,
+           FALSE,
+           RequestSize,
+           Request,
+           ResponseSize,
+           Response
+           );
+}
+
+RETURN_STATUS
+EFIAPI
 SpdmGetResponseEncapsulatedRequestSession (
   IN     VOID                 *Context,
   IN     UINT32               SessionId,
@@ -265,15 +330,15 @@ SpdmGetResponseEncapsulatedRequestSession (
      OUT VOID                 *Response
   )
 {
-  return SpdmGetResponseEncapsulatedRequest (
+  return SpdmGetResponseEncapsulatedRequestEx (
            Context,
+           TRUE,
            RequestSize,
            Request,
            ResponseSize,
            Response
            );
 }
-
 
 RETURN_STATUS
 EFIAPI
@@ -286,8 +351,9 @@ SpdmGetResponseEncapsulatedResponseAckSession (
      OUT VOID                 *Response
   )
 {
-  return SpdmGetResponseEncapsulatedResponseAck (
+  return SpdmGetResponseEncapsulatedResponseAckEx (
            Context,
+           TRUE,
            RequestSize,
            Request,
            ResponseSize,

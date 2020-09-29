@@ -219,12 +219,25 @@ SpdmEncapsulatedRequest (
     if (SpdmResponseSize < sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE)) {
       return RETURN_DEVICE_ERROR;
     }
-    if ((SpdmEncapsulatedResponseAckResponse->Header.Param2 == SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_ABSENT) &&
-        (SpdmResponseSize == sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE))) {
-      //
-      // Done
-      //
+    switch (SpdmEncapsulatedResponseAckResponse->Header.Param2) {
+    case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_ABSENT:
+      if (SpdmResponseSize == sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE)) {
+        return RETURN_SUCCESS;
+      } else {
+        return RETURN_DEVICE_ERROR;
+      }
       break;
+    case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_PRESENT:
+      break;
+    case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER:
+      if (SpdmResponseSize == sizeof(UINT8)) {
+        // TBD - how to handle it???
+      } else {
+        return RETURN_DEVICE_ERROR;
+      }
+      break;
+    default:
+      return RETURN_DEVICE_ERROR;
     }
     RequestId = SpdmEncapsulatedResponseAckResponse->Header.Param1;
 
