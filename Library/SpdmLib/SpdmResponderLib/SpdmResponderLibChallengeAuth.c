@@ -145,16 +145,17 @@ SpdmGetResponseChallengeAuth (
      OUT VOID                 *Response
   )
 {
-  SPDM_CHALLENGE_REQUEST            *SpdmRequest;
-  UINTN                             SpdmRequestSize;
-  SPDM_CHALLENGE_AUTH_RESPONSE      *SpdmResponse;
-  BOOLEAN                           Result;
-  UINTN                             SignatureSize;
-  UINT8                             SlotNum;
-  UINT32                            HashSize;
-  UINT8                             *Ptr;
-  UINTN                             TotalSize;
-  SPDM_DEVICE_CONTEXT               *SpdmContext;
+  SPDM_CHALLENGE_REQUEST                    *SpdmRequest;
+  UINTN                                     SpdmRequestSize;
+  SPDM_CHALLENGE_AUTH_RESPONSE              *SpdmResponse;
+  BOOLEAN                                   Result;
+  UINTN                                     SignatureSize;
+  UINT8                                     SlotNum;
+  UINT32                                    HashSize;
+  UINT8                                     *Ptr;
+  UINTN                                     TotalSize;
+  SPDM_DEVICE_CONTEXT                       *SpdmContext;
+  SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE    AuthAttribute;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -203,7 +204,13 @@ SpdmGetResponseChallengeAuth (
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   }
   SpdmResponse->Header.RequestResponseCode = SPDM_CHALLENGE_AUTH;
-  SpdmResponse->Header.Param1 = SlotNum;
+  AuthAttribute.SlotNum = SlotNum;
+  AuthAttribute.Reserved = 0;
+  AuthAttribute.BasicMutAuthReq = 0;
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
+    AuthAttribute.BasicMutAuthReq = 1;
+  }
+  SpdmResponse->Header.Param1 = *(UINT8 *)&AuthAttribute;
   SpdmResponse->Header.Param2 = (1 << SlotNum);
 
   Ptr = (VOID *)(SpdmResponse + 1);

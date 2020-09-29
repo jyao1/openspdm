@@ -92,12 +92,14 @@ SpdmStartSession (
 
     switch (SessionInfo->MutAuthRequested) {
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED:
-    case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST:
-    case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS:
-      SpdmEncapsulatedRequest (SpdmContext, *SessionId);
+      break;
+    case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST:
+    case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS:
+      SpdmEncapsulatedRequest (SpdmContext, SessionId);
       break;
     default:
-      break;
+      DEBUG ((DEBUG_INFO, "SpdmStartSession - unknown MutAuthRequested - 0x%x\n", SessionInfo->MutAuthRequested));
+      return RETURN_UNSUPPORTED;
     }
 
     Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, SlotNum);

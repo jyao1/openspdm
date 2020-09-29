@@ -154,6 +154,7 @@ SpdmChallenge (
   VOID                                      *Signature;
   UINTN                                     SignatureSize;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
+  SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE    AuthAttribute;
 
   SpdmContext = Context;
   if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
@@ -204,7 +205,12 @@ SpdmChallenge (
   if (SpdmResponse.Header.RequestResponseCode != SPDM_CHALLENGE_AUTH) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse.Header.Param1 != SlotNum) {
+  *(UINT8 *)&AuthAttribute = SpdmResponse.Header.Param1;
+  if (AuthAttribute.SlotNum != SlotNum) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) &&
+      (AuthAttribute.BasicMutAuthReq != 1)) {
     return RETURN_DEVICE_ERROR;
   }
   HashSize = GetSpdmHashSize (SpdmContext);
@@ -279,6 +285,11 @@ SpdmChallenge (
   if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
+  }
+
+  if (AuthAttribute.BasicMutAuthReq == 1) {
+    DEBUG((DEBUG_INFO, "BasicMutAuth :\n"));
+    SpdmEncapsulatedRequest (SpdmContext, NULL);
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;

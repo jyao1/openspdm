@@ -139,7 +139,6 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedRequest (
   IN     VOID                 *Context,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -158,7 +157,14 @@ SpdmGetResponseEncapsulatedRequest (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
- 
+
+  //
+  // Cache
+  //
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
+  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
+
   ASSERT (*ResponseSize > sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE));
   ZeroMem (Response, *ResponseSize);
 
@@ -188,7 +194,6 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedResponseAck (
   IN     VOID                 *Context,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -244,5 +249,47 @@ SpdmGetResponseEncapsulatedResponseAck (
   }
 
   return RETURN_SUCCESS;
+}
+
+
+RETURN_STATUS
+EFIAPI
+SpdmGetResponseEncapsulatedRequestSession (
+  IN     VOID                 *Context,
+  IN     UINT32               SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  )
+{
+  return SpdmGetResponseEncapsulatedRequest (
+           Context,
+           RequestSize,
+           Request,
+           ResponseSize,
+           Response
+           );
+}
+
+
+RETURN_STATUS
+EFIAPI
+SpdmGetResponseEncapsulatedResponseAckSession (
+  IN     VOID                 *Context,
+  IN     UINT32               SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  )
+{
+  return SpdmGetResponseEncapsulatedResponseAck (
+           Context,
+           RequestSize,
+           Request,
+           ResponseSize,
+           Response
+           );
 }
 

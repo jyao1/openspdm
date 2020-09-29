@@ -182,7 +182,6 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedRequest (
   IN     VOID                 *Context,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -192,6 +191,27 @@ SpdmGetResponseEncapsulatedRequest (
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedResponseAck (
+  IN     VOID                 *Context,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetResponseEncapsulatedRequestSession (
+  IN     VOID                 *Context,
+  IN     UINT32               SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetResponseEncapsulatedResponseAckSession (
   IN     VOID                 *Context,
   IN     UINT32               SessionId,
   IN     UINTN                RequestSize,

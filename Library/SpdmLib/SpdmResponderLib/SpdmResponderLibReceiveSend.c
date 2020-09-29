@@ -20,16 +20,18 @@ typedef struct {
 } SPDM_GET_RESPONSE_SESSION_STRUCT;
 
 SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
-  {SPDM_GET_VERSION,            SpdmGetResponseVersion},
-  {SPDM_GET_CAPABILITIES,       SpdmGetResponseCapability},
-  {SPDM_NEGOTIATE_ALGORITHMS,   SpdmGetResponseAlgorithm},
-  {SPDM_GET_DIGESTS,            SpdmGetResponseDigest},
-  {SPDM_GET_CERTIFICATE,        SpdmGetResponseCertificate},
-  {SPDM_CHALLENGE,              SpdmGetResponseChallengeAuth},
-  {SPDM_GET_MEASUREMENTS,       SpdmGetResponseMeasurement},
-  {SPDM_KEY_EXCHANGE,           SpdmGetResponseKeyExchange},
-  {SPDM_PSK_EXCHANGE,           SpdmGetResponsePskExchange},
-  {SPDM_RESPOND_IF_READY,       SpdmGetResponseRespondIfReady},
+  {SPDM_GET_VERSION,                    SpdmGetResponseVersion},
+  {SPDM_GET_CAPABILITIES,               SpdmGetResponseCapability},
+  {SPDM_NEGOTIATE_ALGORITHMS,           SpdmGetResponseAlgorithm},
+  {SPDM_GET_DIGESTS,                    SpdmGetResponseDigest},
+  {SPDM_GET_CERTIFICATE,                SpdmGetResponseCertificate},
+  {SPDM_CHALLENGE,                      SpdmGetResponseChallengeAuth},
+  {SPDM_GET_MEASUREMENTS,               SpdmGetResponseMeasurement},
+  {SPDM_KEY_EXCHANGE,                   SpdmGetResponseKeyExchange},
+  {SPDM_PSK_EXCHANGE,                   SpdmGetResponsePskExchange},
+  {SPDM_GET_ENCAPSULATED_REQUEST,       SpdmGetResponseEncapsulatedRequest},
+  {SPDM_DELIVER_ENCAPSULATED_RESPONSE,  SpdmGetResponseEncapsulatedResponseAck},
+  {SPDM_RESPOND_IF_READY,               SpdmGetResponseRespondIfReady},
 };
 
 SPDM_GET_RESPONSE_SESSION_STRUCT  mSpdmGetResponseSessionStruct[] = {
@@ -38,8 +40,8 @@ SPDM_GET_RESPONSE_SESSION_STRUCT  mSpdmGetResponseSessionStruct[] = {
   {SPDM_END_SESSION,                    SpdmGetResponseEndSession},
   {SPDM_HEARTBEAT,                      SpdmGetResponseHeartbeat},
   {SPDM_KEY_UPDATE,                     SpdmGetResponseKeyUpdate},
-  {SPDM_GET_ENCAPSULATED_REQUEST,       SpdmGetResponseEncapsulatedRequest},
-  {SPDM_DELIVER_ENCAPSULATED_RESPONSE,  SpdmGetResponseEncapsulatedResponseAck},
+  {SPDM_GET_ENCAPSULATED_REQUEST,       SpdmGetResponseEncapsulatedRequestSession},
+  {SPDM_DELIVER_ENCAPSULATED_RESPONSE,  SpdmGetResponseEncapsulatedResponseAckSession},
 };
 
 SPDM_GET_RESPONSE_FUNC

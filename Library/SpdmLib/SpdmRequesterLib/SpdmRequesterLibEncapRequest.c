@@ -94,7 +94,7 @@ SpdmProcessEncapsulatedRequest (
 RETURN_STATUS
 SpdmEncapsulatedRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT32               SessionId
+  IN     UINT32               *SessionId
   )
 {
   RETURN_STATUS                               Status;
@@ -117,10 +117,12 @@ SpdmEncapsulatedRequest (
     return RETURN_DEVICE_ERROR;
   }
 
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return RETURN_UNSUPPORTED;
+  if (SessionId != NULL) {
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);
+    if (SessionInfo == NULL) {
+      ASSERT (FALSE);
+      return RETURN_UNSUPPORTED;
+    }
   }
 
   SpdmGetEncapsulatedRequestRequest = (VOID *)Request;
@@ -129,15 +131,30 @@ SpdmEncapsulatedRequest (
   SpdmGetEncapsulatedRequestRequest->Header.Param1 = 0;
   SpdmGetEncapsulatedRequestRequest->Header.Param2 = 0;
   SpdmRequestSize = sizeof(SPDM_GET_ENCAPSULATED_REQUEST_REQUEST);
-  Status = SpdmSendRequestSession (SpdmContext, SessionId, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
+  if (SessionId != NULL) {
+    Status = SpdmSendRequestSession (SpdmContext, *SessionId, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
+  } else {
+    Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
+  }
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
+  //
+  // Cache
+  //
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
+  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
+
   SpdmEncapsulatedRequestResponse = (VOID *)Response;
   SpdmResponseSize = sizeof(Response);
   ZeroMem (&Response, sizeof(Response));
-  Status = SpdmReceiveResponseSession (SpdmContext, SessionId, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
+  if (SessionId != NULL) {
+    Status = SpdmReceiveResponseSession (SpdmContext, *SessionId, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
+  } else {
+    Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
+  }
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -176,7 +193,11 @@ SpdmEncapsulatedRequest (
     }
 
     SpdmRequestSize = sizeof(SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST) + EncapsulatedResponseSize;
-    Status = SpdmSendRequestSession (SpdmContext, SessionId, SpdmRequestSize, SpdmDeliverEncapsulatedResponseRequest);
+    if (SessionId != NULL) {
+      Status = SpdmSendRequestSession (SpdmContext, *SessionId, SpdmRequestSize, SpdmDeliverEncapsulatedResponseRequest);
+    } else {
+      Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, SpdmDeliverEncapsulatedResponseRequest);
+    }
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }
@@ -184,7 +205,11 @@ SpdmEncapsulatedRequest (
     SpdmEncapsulatedResponseAckResponse = (VOID *)Response;
     SpdmResponseSize = sizeof(Response);
     ZeroMem (&Response, sizeof(Response));
-    Status = SpdmReceiveResponseSession (SpdmContext, SessionId, &SpdmResponseSize, SpdmEncapsulatedResponseAckResponse);
+    if (SessionId != NULL) {
+      Status = SpdmReceiveResponseSession (SpdmContext, *SessionId, &SpdmResponseSize, SpdmEncapsulatedResponseAckResponse);
+    } else {
+      Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, SpdmEncapsulatedResponseAckResponse);
+    }
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }
