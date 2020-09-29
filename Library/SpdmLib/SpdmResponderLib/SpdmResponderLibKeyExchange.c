@@ -303,6 +303,7 @@ SpdmGetResponseKeyExchange (
   Ptr += HmacSize;
 
   SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
+  SpdmInitEncapEnv (Context, SessionInfo->MutAuthRequested);
 
   SessionInfo->SessionState = SpdmStateHandshaking;
 

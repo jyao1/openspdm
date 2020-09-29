@@ -297,7 +297,7 @@ SpdmChallenge (
 
   if (AuthAttribute.BasicMutAuthReq == 1) {
     DEBUG((DEBUG_INFO, "BasicMutAuth :\n"));
-    Status = SpdmEncapsulatedRequest (SpdmContext, NULL);
+    Status = SpdmEncapsulatedRequest (SpdmContext, NULL, 0);
     DEBUG ((DEBUG_INFO, "SpdmChallenge - SpdmEncapsulatedRequest - %p\n", Status));
     if (RETURN_ERROR(Status)) {
       SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;

@@ -137,7 +137,7 @@ SpdmStartSession (
       break;
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST:
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS:
-      Status = SpdmEncapsulatedRequest (SpdmContext, SessionId);
+      Status = SpdmEncapsulatedRequest (SpdmContext, SessionId, SessionInfo->MutAuthRequested);
       DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmEncapsulatedRequest - %p\n", Status));
       if (RETURN_ERROR(Status)) {
         return Status;

@@ -94,7 +94,8 @@ SpdmProcessEncapsulatedRequest (
 RETURN_STATUS
 SpdmEncapsulatedRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT32               *SessionId
+  IN     UINT32               *SessionId,
+  IN     UINT8                MutAuthRequested
   )
 {
   RETURN_STATUS                               Status;
@@ -112,6 +113,7 @@ SpdmEncapsulatedRequest (
   UINTN                                       EncapsulatedRequestSize;
   VOID                                        *EncapsulatedResponse;
   UINTN                                       EncapsulatedResponseSize;
+  SPDM_GET_DIGESTS_REQUEST                    GetDigests;
   
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
@@ -123,21 +125,10 @@ SpdmEncapsulatedRequest (
       ASSERT (FALSE);
       return RETURN_UNSUPPORTED;
     }
-  }
-
-  SpdmGetEncapsulatedRequestRequest = (VOID *)Request;
-  SpdmGetEncapsulatedRequestRequest->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
-  SpdmGetEncapsulatedRequestRequest->Header.RequestResponseCode = SPDM_GET_ENCAPSULATED_REQUEST;
-  SpdmGetEncapsulatedRequestRequest->Header.Param1 = 0;
-  SpdmGetEncapsulatedRequestRequest->Header.Param2 = 0;
-  SpdmRequestSize = sizeof(SPDM_GET_ENCAPSULATED_REQUEST_REQUEST);
-  if (SessionId != NULL) {
-    Status = SpdmSendRequestSession (SpdmContext, *SessionId, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
+    ASSERT ((MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST)) ||
+            (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)));
   } else {
-    Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
-  }
-  if (RETURN_ERROR(Status)) {
-    return RETURN_DEVICE_ERROR;
+    ASSERT (MutAuthRequested == 0);
   }
 
   //
@@ -147,33 +138,59 @@ SpdmEncapsulatedRequest (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
 
-  SpdmEncapsulatedRequestResponse = (VOID *)Response;
-  SpdmResponseSize = sizeof(Response);
-  ZeroMem (&Response, sizeof(Response));
-  if (SessionId != NULL) {
-    Status = SpdmReceiveResponseSession (SpdmContext, *SessionId, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
-  } else {
-    Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
-  }
-  if (RETURN_ERROR(Status)) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmEncapsulatedRequestResponse->Header.RequestResponseCode != SPDM_ENCAPSULATED_REQUEST) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponseSize < sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE)) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponseSize == sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE)) {
-    //
-    // Done
-    //
-    return RETURN_SUCCESS;
-  }
-  RequestId = SpdmEncapsulatedRequestResponse->Header.Param1;
+  if (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)) {
+    GetDigests.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+    GetDigests.Header.RequestResponseCode = SPDM_GET_DIGESTS;
+    GetDigests.Header.Param1 = 0;
+    GetDigests.Header.Param2 = 0;
+    EncapsulatedRequest = (VOID *)&GetDigests;
+    EncapsulatedRequestSize = sizeof(GetDigests);
 
-  EncapsulatedRequest = (VOID *)(SpdmEncapsulatedRequestResponse + 1);
-  EncapsulatedRequestSize = SpdmResponseSize - sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE);
+    RequestId = 0; // TBD
+  } else {
+    SpdmGetEncapsulatedRequestRequest = (VOID *)Request;
+    SpdmGetEncapsulatedRequestRequest->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+    SpdmGetEncapsulatedRequestRequest->Header.RequestResponseCode = SPDM_GET_ENCAPSULATED_REQUEST;
+    SpdmGetEncapsulatedRequestRequest->Header.Param1 = 0;
+    SpdmGetEncapsulatedRequestRequest->Header.Param2 = 0;
+    SpdmRequestSize = sizeof(SPDM_GET_ENCAPSULATED_REQUEST_REQUEST);
+    if (SessionId != NULL) {
+      Status = SpdmSendRequestSession (SpdmContext, *SessionId, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
+    } else {
+      Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
+    }
+    if (RETURN_ERROR(Status)) {
+      return RETURN_DEVICE_ERROR;
+    }
+
+    SpdmEncapsulatedRequestResponse = (VOID *)Response;
+    SpdmResponseSize = sizeof(Response);
+    ZeroMem (&Response, sizeof(Response));
+    if (SessionId != NULL) {
+      Status = SpdmReceiveResponseSession (SpdmContext, *SessionId, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
+    } else {
+      Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
+    }
+    if (RETURN_ERROR(Status)) {
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmEncapsulatedRequestResponse->Header.RequestResponseCode != SPDM_ENCAPSULATED_REQUEST) {
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmResponseSize < sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE)) {
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmResponseSize == sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE)) {
+      //
+      // Done
+      //
+      return RETURN_SUCCESS;
+    }
+    RequestId = SpdmEncapsulatedRequestResponse->Header.Param1;
+
+    EncapsulatedRequest = (VOID *)(SpdmEncapsulatedRequestResponse + 1);
+    EncapsulatedRequestSize = SpdmResponseSize - sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE);
+  }
 
   while (TRUE) {
     //

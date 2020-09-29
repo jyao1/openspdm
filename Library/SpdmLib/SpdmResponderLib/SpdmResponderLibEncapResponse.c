@@ -148,16 +148,23 @@ SpdmProcessEncapsulatedResponse (
 }
 
 VOID
-InitEncapEnv (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
+SpdmInitEncapEnv (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                MutAuthRequested
   )
 {
+  ASSERT ((MutAuthRequested == 0) ||
+          (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST)) ||
+          (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)));
   SpdmContext->EncapContext.ErrorState = 0;
   SpdmContext->EncapContext.EncapState = 0;
   SpdmContext->EncapContext.SlotNum = 0;
   SpdmContext->EncapContext.MeasurementHashType = SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH;
   SpdmContext->EncapContext.CertificateChainBuffer.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
+  if (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)) {
+    SpdmContext->EncapContext.EncapState = 1;
+  }
 }
 
 RETURN_STATUS
@@ -204,7 +211,7 @@ SpdmGetResponseEncapsulatedRequestEx (
   EncapRequest = SpdmResponse + 1;
 
   RequestId = 0;
-  InitEncapEnv (Context);
+  SpdmInitEncapEnv (Context, 0);
   Status = SpdmProcessEncapsulatedResponse (Context, IsSession, &RequestId, 0, NULL, &EncapRequestSize, EncapRequest);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);

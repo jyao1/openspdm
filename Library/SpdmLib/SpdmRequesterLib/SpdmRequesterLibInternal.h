@@ -141,7 +141,8 @@ SpdmSendReceiveEndSession (
 RETURN_STATUS
 SpdmEncapsulatedRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT32               *SessionId
+  IN     UINT32               *SessionId,
+  IN     UINT8                MutAuthRequested
   );
 
 RETURN_STATUS
