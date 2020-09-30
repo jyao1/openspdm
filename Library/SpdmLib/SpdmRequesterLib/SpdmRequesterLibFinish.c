@@ -330,14 +330,22 @@ SpdmSendReceiveFinish (
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Ptr, HmacSize);
   
-  Status = SpdmSendRequestSession (SpdmContext, SessionId, SpdmRequestSize, &SpdmRequest);
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+    Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
+  } else {
+    Status = SpdmSendRequestSession (SpdmContext, SessionId, SpdmRequestSize, &SpdmRequest);
+  }
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponseSession (SpdmContext, SessionId, &SpdmResponseSize, &SpdmResponse);
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+    Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
+  } else {
+    Status = SpdmReceiveResponseSession (SpdmContext, SessionId, &SpdmResponseSize, &SpdmResponse);
+  }
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

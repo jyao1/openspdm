@@ -29,6 +29,8 @@ SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
   {SPDM_GET_MEASUREMENTS,               SpdmGetResponseMeasurement},
   {SPDM_KEY_EXCHANGE,                   SpdmGetResponseKeyExchange},
   {SPDM_PSK_EXCHANGE,                   SpdmGetResponsePskExchange},
+  {SPDM_FINISH,                         SpdmGetResponseFinishInClear},
+  {SPDM_PSK_FINISH,                     SpdmGetResponsePskFinishInClear},
   {SPDM_GET_ENCAPSULATED_REQUEST,       SpdmGetResponseEncapsulatedRequest},
   {SPDM_DELIVER_ENCAPSULATED_RESPONSE,  SpdmGetResponseEncapsulatedResponseAck},
   {SPDM_RESPOND_IF_READY,               SpdmGetResponseRespondIfReady},
@@ -228,8 +230,6 @@ SpdmSendResponseSession (
   SpdmResponse = (VOID *)MyResponse;
   switch (SpdmResponse->RequestResponseCode) {
   case SPDM_FINISH_RSP:
-    SessionInfo->SessionState = SpdmStateEstablished;
-    break;
   case SPDM_PSK_FINISH_RSP:
     SessionInfo->SessionState = SpdmStateEstablished;
     break;
@@ -253,7 +253,9 @@ SpdmSendResponse (
   UINTN                     MyResponseSize;
   RETURN_STATUS             Status;
   SPDM_GET_RESPONSE_FUNC    GetResponseFunc;
+  SPDM_SESSION_INFO         *SessionInfo;
   SPDM_MESSAGE_HEADER       *SpdmRequest;
+  SPDM_MESSAGE_HEADER       *SpdmResponse;
 
   DEBUG((DEBUG_INFO, "SpdmSendResponse ...\n"));
 
@@ -296,6 +298,19 @@ SpdmSendResponse (
   DEBUG((DEBUG_INFO, "SpdmSendResponse (0x%x): \n", *ResponseSize));
   InternalDumpHex (Response, *ResponseSize);
 
+  SpdmResponse = (VOID *)MyResponse;
+  switch (SpdmResponse->RequestResponseCode) {
+  case SPDM_FINISH_RSP:
+  case SPDM_PSK_FINISH_RSP:  
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SpdmContext->LatestSessionId);
+    if (SessionInfo == NULL) {
+      ASSERT(FALSE);
+      return RETURN_SUCCESS;
+    }
+    SessionInfo->SessionState = SpdmStateEstablished;
+    break;
+  }
+  
   return RETURN_SUCCESS;
 }
 

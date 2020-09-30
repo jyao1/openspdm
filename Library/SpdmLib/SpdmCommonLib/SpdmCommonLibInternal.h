@@ -330,6 +330,10 @@ typedef struct {
 
   SPDM_SESSION_INFO               SessionInfo[MAX_SPDM_SESSION_COUNT];
   //
+  // Cache lastest session ID for HANDSHAKE_IN_THE_CLEAR
+  //
+  UINT32                          LatestSessionId;
+  //
   // Register Spdm request command receive Status (responder only)
   //
   UINT64                          SpdmCmdReceiveState;

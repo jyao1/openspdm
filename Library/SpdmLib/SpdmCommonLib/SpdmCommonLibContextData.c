@@ -76,6 +76,7 @@ SpdmAssignSessionId (
   for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
     if (SessionInfo[Index].SessionId == INVALID_SESSION_ID) {
       SpdmSessionInfoInit (&SessionInfo[Index], SessionId);
+      SpdmContext->LatestSessionId = SessionId;
       return &SessionInfo[Index];
     }
   }

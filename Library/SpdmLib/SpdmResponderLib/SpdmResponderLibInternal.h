@@ -126,6 +126,16 @@ SpdmGetResponseFinish (
 
 RETURN_STATUS
 EFIAPI
+SpdmGetResponseFinishInClear (
+  IN     VOID                 *SpdmContext,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
 SpdmGetResponsePskExchange (
   IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
@@ -139,6 +149,16 @@ EFIAPI
 SpdmGetResponsePskFinish (
   IN     VOID                 *SpdmContext,
   IN     UINT32               SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetResponsePskFinishInClear (
+  IN     VOID                 *SpdmContext,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,

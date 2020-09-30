@@ -351,3 +351,25 @@ SpdmGetResponseFinish (
   return RETURN_SUCCESS;
 }
 
+RETURN_STATUS
+EFIAPI
+SpdmGetResponseFinishInClear (
+  IN     VOID                 *Context,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  )
+{
+  SPDM_DEVICE_CONTEXT          *SpdmContext;
+
+  SpdmContext = Context;
+  return SpdmGetResponseFinish (
+           Context,
+           SpdmContext->LatestSessionId,
+           RequestSize,
+           Request,
+           ResponseSize,
+           Response
+           );
+}
