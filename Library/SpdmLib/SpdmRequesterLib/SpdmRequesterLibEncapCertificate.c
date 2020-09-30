@@ -47,7 +47,7 @@ SpdmGetEncapResponseCertificate (
 
   SlotNum = SpdmRequest->Header.Param1;
 
-  if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+  if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }

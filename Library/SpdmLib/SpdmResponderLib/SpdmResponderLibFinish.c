@@ -232,7 +232,7 @@ SpdmGetResponseFinish (
     return RETURN_SUCCESS;
   }
 
-  SlotNum = 0;
+  SlotNum = SpdmContext->EncapContext.SlotNum;
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Request, sizeof(SPDM_FINISH_REQUEST));
   if (SessionInfo->MutAuthRequested) {
     Result = SpdmResponderVerifyFinishSignature (SpdmContext, SessionInfo, SlotNum, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST), SignatureSize);

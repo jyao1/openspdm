@@ -289,7 +289,7 @@ SpdmSetData (
     break;
   case SpdmDataPublicCertChains:
     SlotNum = Parameter->AdditionalData[0];
-    if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+    if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.CertificateChainSize[SlotNum] = DataSize;

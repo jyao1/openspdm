@@ -77,6 +77,7 @@ SpdmSendReceiveKeyExchange (
   IN     UINT8                SlotNum,
      OUT UINT8                *HeartbeatPeriod,
      OUT UINT32               *SessionId,
+     OUT UINT8                *SlotIdParam,
      OUT VOID                 *MeasurementHash
   );
 
@@ -90,7 +91,8 @@ RETURN_STATUS
 SpdmSendReceiveFinish (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               SessionId,
-  IN     UINT8                SlotNum
+  IN     UINT8                SlotNum,
+  IN     UINT8                SlotIdParam
   );
 
 /**
@@ -142,7 +144,8 @@ RETURN_STATUS
 SpdmEncapsulatedRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
-  IN     UINT8                MutAuthRequested
+  IN     UINT8                MutAuthRequested,
+  IN OUT UINT8                *SlotIdParam
   );
 
 RETURN_STATUS

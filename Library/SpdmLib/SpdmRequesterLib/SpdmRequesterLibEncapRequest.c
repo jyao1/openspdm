@@ -95,7 +95,8 @@ RETURN_STATUS
 SpdmEncapsulatedRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
-  IN     UINT8                MutAuthRequested
+  IN     UINT8                MutAuthRequested,
+  IN OUT UINT8                *SlotIdParam
   )
 {
   RETURN_STATUS                               Status;
@@ -247,8 +248,14 @@ SpdmEncapsulatedRequest (
     case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_PRESENT:
       break;
     case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER:
-      if (SpdmResponseSize == sizeof(UINT8)) {
-        // TBD - how to handle it???
+      if (SpdmResponseSize >= sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE) + sizeof(UINT8)) {
+        if ((SlotIdParam != NULL) && (*SlotIdParam == 0)) {
+          *SlotIdParam = *(UINT8 *)(SpdmEncapsulatedResponseAckResponse + 1);
+          if (*SlotIdParam >= SpdmContext->LocalContext.SlotCount) {
+            return RETURN_DEVICE_ERROR;
+          }
+        }
+        return RETURN_SUCCESS;
       } else {
         return RETURN_DEVICE_ERROR;
       }

@@ -180,7 +180,7 @@ SpdmGetResponseMeasurement (
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
       if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
         SlotNum = SpdmRequest->SlotIDParam;
-        if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+        if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
           return RETURN_SUCCESS;
         }
@@ -222,7 +222,7 @@ SpdmGetResponseMeasurement (
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
       if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
         SlotNum = SpdmRequest->SlotIDParam;
-        if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+        if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
           return RETURN_SUCCESS;
         }
@@ -262,7 +262,7 @@ SpdmGetResponseMeasurement (
       if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
         if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
           SlotNum = SpdmRequest->SlotIDParam;
-          if (SlotNum > SpdmContext->LocalContext.SlotCount) {
+          if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
             SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
             return RETURN_SUCCESS;
           }

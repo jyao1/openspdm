@@ -185,7 +185,8 @@ RETURN_STATUS
 SpdmSendReceiveFinish (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               SessionId,
-  IN     UINT8                SlotNum
+  IN     UINT8                SlotNum,
+  IN     UINT8                SlotIdParam
   )
 {
   RETURN_STATUS                             Status;
@@ -215,12 +216,13 @@ SpdmSendReceiveFinish (
   SpdmRequest.Header.RequestResponseCode = SPDM_FINISH;
   if (SessionInfo->MutAuthRequested) {
     SpdmRequest.Header.Param1 = SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED;
+    SpdmRequest.Header.Param2 = SlotNum;
     SignatureSize = GetSpdmReqAsymSize (SpdmContext);
   } else {
     SpdmRequest.Header.Param1 = 0;
+    SpdmRequest.Header.Param2 = 0;
     SignatureSize = 0;
   }
-  SpdmRequest.Header.Param2 = SlotNum;
   
   HmacSize = GetSpdmHashSize (SpdmContext);
   SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + SignatureSize + HmacSize;
@@ -228,7 +230,7 @@ SpdmSendReceiveFinish (
   
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, sizeof(SPDM_FINISH_REQUEST));
   if (SessionInfo->MutAuthRequested) {
-    Result = SpdmRequesterGenerateFinishSignature (SpdmContext, SessionInfo, SlotNum, Ptr);
+    Result = SpdmRequesterGenerateFinishSignature (SpdmContext, SessionInfo, SlotIdParam, Ptr);
     if (!Result) {
       return RETURN_SECURITY_VIOLATION;
     }
@@ -236,7 +238,7 @@ SpdmSendReceiveFinish (
     Ptr += SignatureSize;
   }
 
-  Result = SpdmRequesterGenerateFinishHmac (SpdmContext, SessionInfo, SlotNum, Ptr);
+  Result = SpdmRequesterGenerateFinishHmac (SpdmContext, SessionInfo, SlotIdParam, Ptr);
   if (!Result) {
     return RETURN_SECURITY_VIOLATION;
   }

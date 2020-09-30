@@ -280,6 +280,11 @@ SpdmGetResponseEncapsulatedResponseAckEx (
   SpdmResponse->Header.Param1 = RequestId;
   if (EncapRequestSize == 0) {
     SpdmResponse->Header.Param2 = SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_ABSENT;
+    if (SpdmContext->EncapContext.SlotNum != 0) {
+      SpdmResponse->Header.Param2 = SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER;
+      *ResponseSize = sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE) + 1;
+      *(UINT8 *)(SpdmResponse + 1) = SpdmContext->EncapContext.SlotNum;
+    }
   }
 
   return RETURN_SUCCESS;

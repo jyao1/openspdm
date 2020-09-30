@@ -298,7 +298,7 @@ SpdmGenerateSessionDataKey (
   IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester
   )
-{  
+{
   RETURN_STATUS                  Status;
   BOOLEAN                        RetVal;
   UINTN                          HashSize;

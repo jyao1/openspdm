@@ -186,6 +186,7 @@ SpdmSendReceiveKeyExchange (
   IN     UINT8                SlotNum,
      OUT UINT8                *HeartbeatPeriod,
      OUT UINT32               *SessionId,
+     OUT UINT8                *SlotIdParam,
      OUT VOID                 *MeasurementHash
   )
 {
@@ -274,6 +275,11 @@ SpdmSendReceiveKeyExchange (
 
   if (HeartbeatPeriod != NULL) {
     *HeartbeatPeriod = SpdmResponse.Header.Param1;
+  }
+  *SlotIdParam = SpdmResponse.SlotIDParam;
+  if (*SlotIdParam >= SpdmContext->LocalContext.SlotCount) {
+    SpdmFreeDHEContext (SpdmContext, DHEContext);
+    return RETURN_DEVICE_ERROR;
   }
   RspSessionId = SpdmResponse.RspSessionID;
   *SessionId = (ReqSessionId << 16) | RspSessionId;
