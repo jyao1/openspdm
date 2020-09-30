@@ -175,6 +175,11 @@ SpdmSendReceivePskExchange (
   }
   SessionInfo->UsePsk = TRUE;
 
+  //
+  // Cache session data
+  //
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
+
   HashSize = GetSpdmHashSize (SpdmContext);
   HmacSize = GetSpdmHashSize (SpdmContext);
 
@@ -200,15 +205,6 @@ SpdmSendReceivePskExchange (
                      HashSize +
                      HmacSize;
 
-  //
-  // Cache session data
-  //
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
-  // Need remove HMAC.
-  if (SpdmResponseSize > HmacSize) {
-    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - HmacSize);
-  }
-
   Ptr = (UINT8 *)(SpdmResponse.MeasurementSummaryHash);
   MeasurementSummaryHash = Ptr;
   DEBUG((DEBUG_INFO, "MeasurementSummaryHash (0x%x) - ", HashSize));
@@ -224,6 +220,8 @@ SpdmSendReceivePskExchange (
   Ptr += SpdmResponse.ResponderContextLength;
 
   Ptr += SpdmResponse.OpaqueLength;
+
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - HmacSize);
 
   Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId, TRUE);
   if (RETURN_ERROR(Status)) {
@@ -241,6 +239,8 @@ SpdmSendReceivePskExchange (
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
+
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, (UINT8 *)&SpdmResponse + SpdmResponseSize - HmacSize, HmacSize);
 
   if (MeasurementHash != NULL) {
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);

@@ -179,6 +179,7 @@ SpdmGetResponsePskExchange (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_PSK_EXCHANGE_RSP, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, HmacSize);
   Ptr += HmacSize;
 
   SessionInfo->SessionState = SpdmStateHandshaking;

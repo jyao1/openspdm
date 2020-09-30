@@ -98,11 +98,11 @@ SpdmSendReceivePskFinish (
   SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + HmacSize;
   
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
-  
-  // Need regenerate the finishedkey
-  SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, TRUE);
+
   SpdmRequesterGeneratePskFinishHmac (SpdmContext, SessionInfo, SpdmRequest.VerifyData);
-  
+
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest + SpdmRequestSize - HmacSize, HmacSize);
+
   Status = SpdmSendRequestSession (SpdmContext, SessionId, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;

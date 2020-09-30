@@ -294,7 +294,7 @@ SpdmSendReceiveKeyExchange (
   // Cache session data
   //
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
-  // Need remove HMAC.
+
   SignatureSize = GetSpdmAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
   HmacSize = GetSpdmHashSize (SpdmContext);
@@ -401,6 +401,8 @@ SpdmSendReceiveKeyExchange (
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
+
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, (UINT8 *)&SpdmResponse + SpdmResponseSize - HmacSize, HmacSize);
 
   if (MeasurementHash != NULL) {
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);

@@ -104,7 +104,7 @@ SpdmGenerateAeadKeyAndIv (
 }
 
 RETURN_STATUS
-SpdmGenerateFinalKey (
+SpdmGenerateFinishedKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN UINT8                        *HandshakeSecret,
   OUT UINT8                       *FinishedKey
@@ -256,13 +256,13 @@ SpdmGenerateSessionHandshakeKey (
   InternalDumpData (SessionInfo->HandshakeSecret.ResponseHandshakeSecret, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  SpdmGenerateFinalKey (
+  SpdmGenerateFinishedKey (
     SpdmContext,
     SessionInfo->HandshakeSecret.RequestHandshakeSecret,
     SessionInfo->HandshakeSecret.RequestFinishedKey
     );
 
-  SpdmGenerateFinalKey (
+  SpdmGenerateFinishedKey (
     SpdmContext,
     SessionInfo->HandshakeSecret.ResponseHandshakeSecret,
     SessionInfo->HandshakeSecret.ResponseFinishedKey

@@ -96,13 +96,12 @@ SpdmGetResponsePskFinish (
   SpdmResponse->Header.Param1 = 0;
   SpdmResponse->Header.Param2 = 0;
 
-  // Need regenerate the finishedkey
-  SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);
   Result = SpdmResponderVerifyPskFinishHmac (SpdmContext, SessionInfo, (UINT8 *)Request + sizeof(SPDM_PSK_FINISH_REQUEST));
   if (!Result) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)Request + RequestSize - HmacSize, HmacSize);
   
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, *ResponseSize);
   SpdmGenerateSessionDataKey (SpdmContext, SessionId, FALSE);
