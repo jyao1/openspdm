@@ -374,6 +374,11 @@ SpdmSendReceiveFinish (
     AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmResponse + sizeof(SPDM_FINISH_RESPONSE), HmacSize);
   }
 
+  if (SessionInfo->MutAuthRequested) {
+    SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = SpdmContext->LocalContext.CertificateChain[SlotIdParam];
+    SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotIdParam];
+  }
+
   Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId, TRUE);
   if (RETURN_ERROR(Status)) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;

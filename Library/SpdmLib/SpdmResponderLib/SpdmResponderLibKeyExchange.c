@@ -295,6 +295,9 @@ SpdmGetResponseKeyExchange (
     return RETURN_SUCCESS;
   }
 
+  SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = SpdmContext->LocalContext.CertificateChain[SlotNum];
+  SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum];
+
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, SignatureSize);
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);
   Ptr += SignatureSize;
