@@ -68,13 +68,13 @@ typedef struct {
   //
   // Peer Root Certificate Hash
   //
-  VOID                            *PeerRootCertHashVarBuffer;
-  UINTN                           PeerRootCertHashVarBufferSize;
+  VOID                            *PeerRootCertHashProvision;
+  UINTN                           PeerRootCertHashProvisionSize;
   //
   // Peer CertificateChain
   //
-  VOID                            *PeerCertChainVarBuffer;
-  UINTN                           PeerCertChainVarBufferSize;
+  VOID                            *PeerCertChainProvision;
+  UINTN                           PeerCertChainProvisionSize;
   //
   // measurement collected in the responder
   // SPDM_MEASUREMENT_BLOCK + Hash

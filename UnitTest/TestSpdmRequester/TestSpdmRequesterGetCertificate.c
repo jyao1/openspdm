@@ -404,10 +404,10 @@ void TestSpdmRequesterGetCertificateCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = HashSize;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Hash;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = NULL;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
 
@@ -437,10 +437,10 @@ void TestSpdmRequesterGetCertificateCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = HashSize;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Hash;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = NULL;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
 
@@ -469,10 +469,10 @@ void TestSpdmRequesterGetCertificateCase3(void **state) {
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = HashSize;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Hash;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = NULL;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
 
@@ -502,10 +502,10 @@ void TestSpdmRequesterGetCertificateCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = HashSize;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Hash;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = NULL;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
 
@@ -535,10 +535,10 @@ void TestSpdmRequesterGetCertificateCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = HashSize;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Hash;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = NULL;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
   
@@ -568,10 +568,10 @@ void TestSpdmRequesterGetCertificateCase6(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = HashSize;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Hash;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = NULL;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
 
@@ -601,10 +601,10 @@ void TestSpdmRequesterGetCertificateCase7(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = HashSize;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Hash;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = NULL;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
 
@@ -635,10 +635,10 @@ void TestSpdmRequesterGetCertificateCase8(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = HashSize;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Hash;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = NULL;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
 
@@ -667,10 +667,10 @@ void TestSpdmRequesterGetCertificateCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = HashSize;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = Hash;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = NULL;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
 
@@ -700,10 +700,10 @@ void TestSpdmRequesterGetCertificateCase10(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->LocalContext.PeerRootCertHashVarBufferSize = 0;
-  SpdmContext->LocalContext.PeerRootCertHashVarBuffer = NULL;   
-  SpdmContext->LocalContext.PeerCertChainVarBuffer = Data;
-  SpdmContext->LocalContext.PeerCertChainVarBufferSize = DataSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = 0;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = NULL;   
+  SpdmContext->LocalContext.PeerCertChainProvision = Data;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = DataSize;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
 

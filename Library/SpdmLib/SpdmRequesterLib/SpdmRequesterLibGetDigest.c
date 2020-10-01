@@ -30,8 +30,8 @@ SpdmRequesterVerifyDigest (
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   
-  CertBuffer = SpdmContext->LocalContext.PeerCertChainVarBuffer;
-  CertBufferSize = SpdmContext->LocalContext.PeerCertChainVarBufferSize;
+  CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
+  CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
   if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
     HashSize = GetSpdmHashSize (SpdmContext);
     SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);

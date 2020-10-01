@@ -86,10 +86,10 @@ SpdmRequesterVerifyCertificateChain (
     return FALSE;
   }
 
-  RootCertHash = SpdmContext->LocalContext.PeerRootCertHashVarBuffer;
-  RootCertHashSize = SpdmContext->LocalContext.PeerRootCertHashVarBufferSize;
-  CertBuffer = SpdmContext->LocalContext.PeerCertChainVarBuffer;
-  CertBufferSize = SpdmContext->LocalContext.PeerCertChainVarBufferSize;
+  RootCertHash = SpdmContext->LocalContext.PeerRootCertHashProvision;
+  RootCertHashSize = SpdmContext->LocalContext.PeerRootCertHashProvisionSize;
+  CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
+  CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
 
   if ((RootCertHash != NULL) && (RootCertHashSize != 0)) {
     HashSize = GetSpdmHashSize (SpdmContext);
