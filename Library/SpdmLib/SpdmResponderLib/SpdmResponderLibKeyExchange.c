@@ -20,7 +20,6 @@ BOOLEAN
 SpdmResponderGenerateKeyExchangeSignature (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN  SPDM_SESSION_INFO         *SessionInfo,
-  IN  UINT8                     SlotNum,
   OUT UINT8                     *Signature
   )
 {
@@ -42,11 +41,11 @@ SpdmResponderGenerateKeyExchangeSignature (
   SignatureSize = GetSpdmAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
+  if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
     return FALSE;
   }
-  CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
 
   SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
@@ -85,7 +84,6 @@ BOOLEAN
 SpdmResponderGenerateKeyExchangeHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN  SPDM_SESSION_INFO         *SessionInfo,
-  IN  UINT8                     SlotNum,
   OUT UINT8                     *Hmac
   )
 {
@@ -98,14 +96,14 @@ SpdmResponderGenerateKeyExchangeHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
+  if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
     return FALSE;
   }
 
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
@@ -175,9 +173,13 @@ SpdmGetResponseKeyExchange (
   }
 
   SlotNum = SpdmRequest->Header.Param2;
-  if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
+  if ((SlotNum != 0xFF) && (SlotNum >= SpdmContext->LocalContext.SlotCount)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
+  }
+
+  if (SlotNum == 0xFF) {
+    SlotNum = SpdmContext->LocalContext.ProvisionedSlotNum;
   }
 
   SignatureSize = GetSpdmAsymSize (SpdmContext);
@@ -287,23 +289,23 @@ SpdmGetResponseKeyExchange (
   ASSERT_RETURN_ERROR(Status);
   Ptr += OpaqueKeyExchangeRspSize;
 
+  SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = SpdmContext->LocalContext.CertificateChain[SlotNum];
+  SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum];
+
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
-  Result = SpdmResponderGenerateKeyExchangeSignature (SpdmContext, SessionInfo, SlotNum, Ptr);
+  Result = SpdmResponderGenerateKeyExchangeSignature (SpdmContext, SessionInfo, Ptr);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE_RSP, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = SpdmContext->LocalContext.CertificateChain[SlotNum];
-  SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum];
-
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, SignatureSize);
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);
   Ptr += SignatureSize;
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
-    Result = SpdmResponderGenerateKeyExchangeHmac (SpdmContext, SessionInfo, SlotNum, Ptr);
+    Result = SpdmResponderGenerateKeyExchangeHmac (SpdmContext, SessionInfo, Ptr);
     if (!Result) {
       SpdmFreeSessionId (SpdmContext, SessionId);
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE_RSP, ResponseSize, Response);

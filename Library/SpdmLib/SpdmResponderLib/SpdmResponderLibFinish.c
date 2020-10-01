@@ -13,7 +13,6 @@ BOOLEAN
 SpdmResponderVerifyFinishSignature (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN SPDM_SESSION_INFO            *SessionInfo,
-  IN UINT8                        SlotNum,
   IN VOID                         *SignData,
   IN INTN                         SignDataSize
   )
@@ -36,14 +35,14 @@ SpdmResponderVerifyFinishSignature (
 
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
+  if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
     return FALSE;
   }
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
     return FALSE;
   }
-  CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   MutCertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
@@ -112,7 +111,6 @@ BOOLEAN
 SpdmVerifyFinishHmac (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN  SPDM_SESSION_INFO    *SessionInfo,
-  IN  UINT8                SlotNum,
   OUT UINT8                *Hmac
   )
 {
@@ -130,11 +128,11 @@ SpdmVerifyFinishHmac (
 
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
+  if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
     return FALSE;
   }
-  CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SessionInfo->MutAuthRequested) {
@@ -189,7 +187,6 @@ BOOLEAN
 SpdmResponderGenerateFinishHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN  SPDM_SESSION_INFO         *SessionInfo,
-  IN  UINT8                     SlotNum,
   OUT UINT8                     *Hmac
   )
 {
@@ -205,14 +202,14 @@ SpdmResponderGenerateFinishHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  if ((SpdmContext->LocalContext.CertificateChain[SlotNum] == NULL) || (SpdmContext->LocalContext.CertificateChainSize[SlotNum] == 0)) {
+  if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
     return FALSE;
   }
 
   HashSize = GetSpdmHashSize (SpdmContext);
 
-  CertBuffer = (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SessionInfo->MutAuthRequested) {
@@ -307,10 +304,22 @@ SpdmGetResponseFinish (
     return RETURN_SUCCESS;
   }
 
-  SlotNum = SpdmContext->EncapContext.SlotNum;
+  SlotNum = SpdmRequest->Header.Param2;
+  if ((SlotNum != 0xFF) && (SlotNum >= SpdmContext->LocalContext.SlotCount)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  if (SlotNum == 0xFF) {
+    SlotNum = SpdmContext->EncapContext.SlotNum;
+  }
+  if (SlotNum != SpdmContext->EncapContext.SlotNum) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Request, sizeof(SPDM_FINISH_REQUEST));
   if (SessionInfo->MutAuthRequested) {
-    Result = SpdmResponderVerifyFinishSignature (SpdmContext, SessionInfo, SlotNum, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST), SignatureSize);
+    Result = SpdmResponderVerifyFinishSignature (SpdmContext, SessionInfo, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST), SignatureSize);
     if (!Result) {
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
       return RETURN_SUCCESS;
@@ -318,7 +327,7 @@ SpdmGetResponseFinish (
     AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST), SignatureSize);
   }
 
-  Result = SpdmVerifyFinishHmac (SpdmContext, SessionInfo, SlotNum, (UINT8 *)Request + SignatureSize + sizeof(SPDM_FINISH_REQUEST));
+  Result = SpdmVerifyFinishHmac (SpdmContext, SessionInfo, (UINT8 *)Request + SignatureSize + sizeof(SPDM_FINISH_REQUEST));
   if (!Result) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -343,7 +352,7 @@ SpdmGetResponseFinish (
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, sizeof(SPDM_FINISH_RESPONSE));
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
-    Result = SpdmResponderGenerateFinishHmac (SpdmContext, SessionInfo, SlotNum, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST));
+    Result = SpdmResponderGenerateFinishHmac (SpdmContext, SessionInfo, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST));
     if (!Result) {
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_FINISH_RSP, ResponseSize, Response);
       return RETURN_SUCCESS;

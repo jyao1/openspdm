@@ -217,6 +217,13 @@ SpdmSendReceiveKeyExchange (
     return RETURN_DEVICE_ERROR;
   }
 
+  if ((SlotNum >= MAX_SPDM_SLOT_COUNT) && (SlotNum != 0xFF)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+  if ((SlotNum == 0xFF) && (SpdmContext->LocalContext.PeerCertChainProvisionSize == 0)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -277,7 +284,7 @@ SpdmSendReceiveKeyExchange (
     *HeartbeatPeriod = SpdmResponse.Header.Param1;
   }
   *SlotIdParam = SpdmResponse.SlotIDParam;
-  if (*SlotIdParam >= SpdmContext->LocalContext.SlotCount) {
+  if ((*SlotIdParam != 0xF) && (*SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
     SpdmFreeDHEContext (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }

@@ -166,6 +166,13 @@ SpdmChallenge (
     return RETURN_DEVICE_ERROR;
   }
 
+  if ((SlotNum >= MAX_SPDM_SLOT_COUNT) && (SlotNum != 0xFF)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+  if ((SlotNum == 0xFF) && (SpdmContext->LocalContext.PeerCertChainProvisionSize == 0)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
   if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
@@ -206,8 +213,20 @@ SpdmChallenge (
     return RETURN_DEVICE_ERROR;
   }
   *(UINT8 *)&AuthAttribute = SpdmResponse.Header.Param1;
-  if (AuthAttribute.SlotNum != SlotNum) {
-    return RETURN_DEVICE_ERROR;
+  if (SlotNum == 0xFF) {
+    if (AuthAttribute.SlotNum != 0xF) {
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmResponse.Header.Param2 != 0) {
+      return RETURN_DEVICE_ERROR;
+    }
+  } else {
+    if (AuthAttribute.SlotNum != SlotNum) {
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmResponse.Header.Param2 != (1 << SlotNum)) {
+      return RETURN_DEVICE_ERROR;
+    }
   }
   if (((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) &&
       (AuthAttribute.BasicMutAuthReq != 1)) {

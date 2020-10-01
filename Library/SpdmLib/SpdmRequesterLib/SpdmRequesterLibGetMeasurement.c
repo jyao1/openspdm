@@ -96,7 +96,7 @@ SpdmGetMeasurement (
   IN     VOID                 *Context,
   IN     UINT8                RequestAttribute,
   IN     UINT8                MeasurementOperation,
-  IN     UINT8                SlotNum,
+  IN     UINT8                SlotIdParam,
      OUT UINT8                *NumberOfBlocks,
   IN OUT UINT32               *MeasurementRecordLength,
      OUT VOID                 *MeasurementRecord
@@ -126,6 +126,13 @@ SpdmGetMeasurement (
   }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
+  }
+
+  if ((SlotIdParam >= MAX_SPDM_SLOT_COUNT) && (SlotIdParam != 0xF)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+  if ((SlotIdParam == 0xF) && (SpdmContext->LocalContext.PeerCertChainProvisionSize == 0)) {
+    return RETURN_INVALID_PARAMETER;
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
@@ -159,7 +166,7 @@ SpdmGetMeasurement (
     DEBUG((DEBUG_INFO, "ClientNonce - "));
     InternalDumpData (SpdmRequest.Nonce, SPDM_NONCE_SIZE);
     DEBUG((DEBUG_INFO, "\n"));
-    SpdmRequest.SlotIDParam = SlotNum;
+    SpdmRequest.SlotIDParam = SlotIdParam;
   } else {
     SpdmRequestSize = sizeof(SpdmRequest.Header);
   }

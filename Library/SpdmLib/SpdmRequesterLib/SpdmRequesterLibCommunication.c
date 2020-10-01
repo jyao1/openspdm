@@ -149,7 +149,7 @@ SpdmStartSession (
       return RETURN_UNSUPPORTED;
     }
 
-    Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, SlotNum, SlotIdParam);
+    Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, SlotIdParam);
     DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceiveFinish - %p\n", Status));
   } else {
     Status = SpdmSendReceivePskExchange (SpdmContext, MeasurementHashType, HeartbeatPeriod, SessionId, MeasurementHash);

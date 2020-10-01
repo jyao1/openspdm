@@ -106,7 +106,7 @@ SpdmGetResponseMeasurement (
   SPDM_MEASUREMENT_BLOCK_DMTF    *MeasurmentBlock;
   SPDM_MEASUREMENT_BLOCK_DMTF    *CachedMeasurmentBlock;
   SPDM_DEVICE_CONTEXT            *SpdmContext;
-  UINT8                          SlotNum;
+  UINT8                          SlotIdParam;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -179,8 +179,8 @@ SpdmGetResponseMeasurement (
 
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
       if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
-        SlotNum = SpdmRequest->SlotIDParam;
-        if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
+        SlotIdParam = SpdmRequest->SlotIDParam;
+        if ((SlotIdParam != 0xF) && (SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
           return RETURN_SUCCESS;
         }
@@ -221,8 +221,8 @@ SpdmGetResponseMeasurement (
 
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
       if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
-        SlotNum = SpdmRequest->SlotIDParam;
-        if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
+        SlotIdParam = SpdmRequest->SlotIDParam;
+        if ((SlotIdParam != 0xF) && (SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
           return RETURN_SUCCESS;
         }
@@ -261,8 +261,8 @@ SpdmGetResponseMeasurement (
 
       if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
         if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
-          SlotNum = SpdmRequest->SlotIDParam;
-          if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
+          SlotIdParam = SpdmRequest->SlotIDParam;
+          if ((SlotIdParam != 0xF) && (SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
             SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
             return RETURN_SUCCESS;
           }

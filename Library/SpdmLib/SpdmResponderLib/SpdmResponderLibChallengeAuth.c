@@ -177,7 +177,7 @@ SpdmGetResponseChallengeAuth (
 
   SlotNum = SpdmRequest->Header.Param1;
 
-  if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
+  if ((SlotNum != 0xFF) && (SlotNum >= SpdmContext->LocalContext.SlotCount)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
@@ -204,7 +204,7 @@ SpdmGetResponseChallengeAuth (
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   }
   SpdmResponse->Header.RequestResponseCode = SPDM_CHALLENGE_AUTH;
-  AuthAttribute.SlotNum = SlotNum;
+  AuthAttribute.SlotNum = (UINT8)(SlotNum & 0xF);
   AuthAttribute.Reserved = 0;
   AuthAttribute.BasicMutAuthReq = 0;
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
@@ -212,6 +212,11 @@ SpdmGetResponseChallengeAuth (
   }
   SpdmResponse->Header.Param1 = *(UINT8 *)&AuthAttribute;
   SpdmResponse->Header.Param2 = (1 << SlotNum);
+  if (SlotNum == 0xFF) {
+    SpdmResponse->Header.Param2 = 0;
+
+    SlotNum = SpdmContext->LocalContext.ProvisionedSlotNum;
+  }
 
   Ptr = (VOID *)(SpdmResponse + 1);
   SpdmResponderCalculateCertChainHash (SpdmContext, SlotNum, Ptr);

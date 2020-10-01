@@ -149,6 +149,10 @@ TrySpdmGetCertificate (
     return RETURN_DEVICE_ERROR;
   }
 
+  if (SlotNum >= MAX_SPDM_SLOT_COUNT) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
   do {

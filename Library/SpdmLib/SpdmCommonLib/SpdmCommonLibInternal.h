@@ -61,6 +61,8 @@ typedef struct {
   VOID                            *CertificateChain[MAX_SPDM_SLOT_COUNT];
   UINTN                           CertificateChainSize[MAX_SPDM_SLOT_COUNT];
   UINT8                           SlotCount;
+  // My provisioned certificate (for SlotNum - 0xFF, default 0)
+  UINT8                           ProvisionedSlotNum;
   //
   // My Private Certificate
   //

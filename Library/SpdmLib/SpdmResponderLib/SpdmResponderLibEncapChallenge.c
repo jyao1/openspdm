@@ -171,6 +171,7 @@ SpdmProcessEncapResponseChallengeAuth (
   VOID                                      *Opaque;
   VOID                                      *Signature;
   UINTN                                     SignatureSize;
+  SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE    AuthAttribute;
 
   SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
@@ -183,8 +184,21 @@ SpdmProcessEncapResponseChallengeAuth (
   if (SpdmResponse->Header.RequestResponseCode != SPDM_CHALLENGE_AUTH) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse->Header.Param1 != SpdmContext->EncapContext.SlotNum) {
-    return RETURN_DEVICE_ERROR;
+  *(UINT8 *)&AuthAttribute = SpdmResponse->Header.Param1;
+  if (SpdmContext->EncapContext.SlotNum == 0xFF) {
+    if (AuthAttribute.SlotNum != 0xF) {
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmResponse->Header.Param2 != 0) {
+      return RETURN_DEVICE_ERROR;
+    }
+  } else {
+    if (AuthAttribute.SlotNum != SpdmContext->EncapContext.SlotNum) {
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmResponse->Header.Param2 != (1 << SpdmContext->EncapContext.SlotNum)) {
+      return RETURN_DEVICE_ERROR;
+    }
   }
   HashSize = GetSpdmHashSize (SpdmContext);
   SignatureSize = GetSpdmReqAsymSize (SpdmContext);

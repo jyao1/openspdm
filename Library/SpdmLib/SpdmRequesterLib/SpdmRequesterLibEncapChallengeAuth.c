@@ -141,15 +141,16 @@ SpdmGetEncapResponseChallengeAuth (
      OUT VOID                 *Response
   )
 {
-  SPDM_CHALLENGE_REQUEST            *SpdmRequest;
-  SPDM_CHALLENGE_AUTH_RESPONSE      *SpdmResponse;
-  BOOLEAN                           Result;
-  UINTN                             SignatureSize;
-  UINT8                             SlotNum;
-  UINT32                            HashSize;
-  UINT8                             *Ptr;
-  UINTN                             TotalSize;
-  SPDM_DEVICE_CONTEXT               *SpdmContext;
+  SPDM_CHALLENGE_REQUEST                    *SpdmRequest;
+  SPDM_CHALLENGE_AUTH_RESPONSE              *SpdmResponse;
+  BOOLEAN                                   Result;
+  UINTN                                     SignatureSize;
+  UINT8                                     SlotNum;
+  UINT32                                    HashSize;
+  UINT8                                     *Ptr;
+  UINTN                                     TotalSize;
+  SPDM_DEVICE_CONTEXT                       *SpdmContext;
+  SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE    AuthAttribute;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -164,7 +165,7 @@ SpdmGetEncapResponseChallengeAuth (
 
   SlotNum = SpdmRequest->Header.Param1;
 
-  if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
+  if ((SlotNum != 0xFF) && (SlotNum >= SpdmContext->LocalContext.SlotCount)) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
@@ -191,8 +192,16 @@ SpdmGetEncapResponseChallengeAuth (
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   }
   SpdmResponse->Header.RequestResponseCode = SPDM_CHALLENGE_AUTH;
-  SpdmResponse->Header.Param1 = SlotNum;
+  AuthAttribute.SlotNum = (UINT8)(SlotNum & 0xF);
+  AuthAttribute.Reserved = 0;
+  AuthAttribute.BasicMutAuthReq = 0;
+  SpdmResponse->Header.Param1 = *(UINT8 *)&AuthAttribute;
   SpdmResponse->Header.Param2 = (1 << SlotNum);
+  if (SlotNum == 0xFF) {
+    SpdmResponse->Header.Param2 = 0;
+
+    SlotNum = SpdmContext->LocalContext.ProvisionedSlotNum;
+  }
 
   Ptr = (VOID *)(SpdmResponse + 1);
   SpdmEncapResponderCalculateCertChainHash (SpdmContext, SlotNum, Ptr);
