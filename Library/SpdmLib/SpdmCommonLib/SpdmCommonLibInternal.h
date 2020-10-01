@@ -232,6 +232,7 @@ typedef struct {
   UINT8                RequestHandshakeSecret[MAX_HASH_SIZE];
   UINT8                ResponseHandshakeSecret[MAX_HASH_SIZE];
   UINT8                MasterSecret[MAX_HASH_SIZE];
+  UINT8                ExportMasterSecret[MAX_HASH_SIZE];
   UINT8                RequestFinishedKey[MAX_HASH_SIZE];
   UINT8                ResponseFinishedKey[MAX_HASH_SIZE];
   UINT8                RequestHandshakeEncryptionKey[MAX_AEAD_KEY_SIZE];

@@ -93,6 +93,10 @@ typedef enum {
   SpdmDataPsk,
   SpdmDataPskHint,
   //
+  // Export Master Secret
+  //
+  SpdmDataExportMasterSecret,
+  //
   // OpaqueData
   //
   SpdmDataOpaqueChallengeAuthRsp,

@@ -167,6 +167,7 @@ NeedSessionInfoForData (
   case SpdmDataDheSecret:
   case SpdmDataHandshakeSecret:
   case SpdmDataMasterSecret:
+  case SpdmDataExportMasterSecret:
   case SpdmDataRequestHandshakeSecret:
   case SpdmDataResponseHandshakeSecret:
   case SpdmDataRequestDataSecret:
@@ -396,6 +397,10 @@ SpdmGetData (
   case SpdmDataMasterSecret:
     TargetDataSize = SessionInfo->HashSize;
     TargetData = SessionInfo->HandshakeSecret.MasterSecret;
+    break;
+  case SpdmDataExportMasterSecret:
+    TargetDataSize = SessionInfo->HashSize;
+    TargetData = SessionInfo->HandshakeSecret.ExportMasterSecret;
     break;
   case SpdmDataRequestHandshakeSecret:
     TargetDataSize = SessionInfo->HashSize;
