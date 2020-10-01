@@ -326,6 +326,10 @@ SpdmGetResponseFinish (
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)Request + SignatureSize + sizeof(SPDM_FINISH_REQUEST), HmacSize);
 
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+    HmacSize = 0;
+  }
+
   ASSERT (*ResponseSize >= sizeof(SPDM_FINISH_RESPONSE) + HmacSize);
   *ResponseSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
   ZeroMem (Response, *ResponseSize);
@@ -338,13 +342,15 @@ SpdmGetResponseFinish (
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, sizeof(SPDM_FINISH_RESPONSE));
 
-  Result = SpdmResponderGenerateFinishHmac (SpdmContext, SessionInfo, SlotNum, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST));
-  if (!Result) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_FINISH_RSP, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+    Result = SpdmResponderGenerateFinishHmac (SpdmContext, SessionInfo, SlotNum, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST));
+    if (!Result) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_FINISH_RSP, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST), HmacSize);
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST), HmacSize);
+  }
 
   SpdmGenerateSessionDataKey (SpdmContext, SessionId, FALSE);
 

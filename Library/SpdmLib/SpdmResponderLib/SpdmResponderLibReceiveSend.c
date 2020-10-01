@@ -30,7 +30,6 @@ SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
   {SPDM_KEY_EXCHANGE,                   SpdmGetResponseKeyExchange},
   {SPDM_PSK_EXCHANGE,                   SpdmGetResponsePskExchange},
   {SPDM_FINISH,                         SpdmGetResponseFinishInClear},
-  {SPDM_PSK_FINISH,                     SpdmGetResponsePskFinishInClear},
   {SPDM_GET_ENCAPSULATED_REQUEST,       SpdmGetResponseEncapsulatedRequest},
   {SPDM_DELIVER_ENCAPSULATED_RESPONSE,  SpdmGetResponseEncapsulatedResponseAck},
   {SPDM_RESPOND_IF_READY,               SpdmGetResponseRespondIfReady},
@@ -230,6 +229,10 @@ SpdmSendResponseSession (
   SpdmResponse = (VOID *)MyResponse;
   switch (SpdmResponse->RequestResponseCode) {
   case SPDM_FINISH_RSP:
+    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+      SessionInfo->SessionState = SpdmStateEstablished;
+    }
+    break;
   case SPDM_PSK_FINISH_RSP:
     SessionInfo->SessionState = SpdmStateEstablished;
     break;
@@ -301,13 +304,14 @@ SpdmSendResponse (
   SpdmResponse = (VOID *)MyResponse;
   switch (SpdmResponse->RequestResponseCode) {
   case SPDM_FINISH_RSP:
-  case SPDM_PSK_FINISH_RSP:  
-    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SpdmContext->LatestSessionId);
-    if (SessionInfo == NULL) {
-      ASSERT(FALSE);
-      return RETURN_SUCCESS;
+    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+      SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SpdmContext->LatestSessionId);
+      if (SessionInfo == NULL) {
+        ASSERT(FALSE);
+        return RETURN_SUCCESS;
+      }
+      SessionInfo->SessionState = SpdmStateEstablished;
     }
-    SessionInfo->SessionState = SpdmStateEstablished;
     break;
   }
   

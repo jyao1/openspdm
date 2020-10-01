@@ -212,6 +212,11 @@ SpdmGetResponseKeyExchange (
   }
 
   OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+    HmacSize = 0;
+  }
+
   TotalSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DHEKeySize +
               HashSize +
@@ -294,14 +299,16 @@ SpdmGetResponseKeyExchange (
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);
   Ptr += SignatureSize;
 
-  Result = SpdmResponderGenerateKeyExchangeHmac (SpdmContext, SessionInfo, SlotNum, Ptr);
-  if (!Result) {
-    SpdmFreeSessionId (SpdmContext, SessionId);
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE_RSP, ResponseSize, Response);
-    return RETURN_SUCCESS;
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+    Result = SpdmResponderGenerateKeyExchangeHmac (SpdmContext, SessionInfo, SlotNum, Ptr);
+    if (!Result) {
+      SpdmFreeSessionId (SpdmContext, SessionId);
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE_RSP, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, HmacSize);
+    Ptr += HmacSize;
   }
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, HmacSize);
-  Ptr += HmacSize;
 
   SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
   SpdmInitEncapEnv (Context, SessionInfo->MutAuthRequested);

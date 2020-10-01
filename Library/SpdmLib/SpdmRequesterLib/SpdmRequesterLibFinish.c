@@ -349,6 +349,11 @@ SpdmSendReceiveFinish (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+    HmacSize = 0;
+  }
+
   if (SpdmResponseSize != sizeof(SPDM_FINISH_RESPONSE) + HmacSize) {
     return RETURN_DEVICE_ERROR;
   }
@@ -358,14 +363,16 @@ SpdmSendReceiveFinish (
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, &SpdmResponse, sizeof(SPDM_FINISH_RESPONSE));
 
-  DEBUG((DEBUG_INFO, "VerifyData (0x%x):\n", HmacSize));
-  InternalDumpHex (SpdmResponse.VerifyData, HmacSize);
-  Result = SpdmRequesterVerifyFinishHmac (SpdmContext, SessionInfo, SlotNum, SpdmResponse.VerifyData, HmacSize);
-  if (!Result) {
-    return RETURN_SECURITY_VIOLATION;
-  }
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+    DEBUG((DEBUG_INFO, "VerifyData (0x%x):\n", HmacSize));
+    InternalDumpHex (SpdmResponse.VerifyData, HmacSize);
+    Result = SpdmRequesterVerifyFinishHmac (SpdmContext, SessionInfo, SlotNum, SpdmResponse.VerifyData, HmacSize);
+    if (!Result) {
+      return RETURN_SECURITY_VIOLATION;
+    }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmResponse + sizeof(SPDM_FINISH_RESPONSE), HmacSize);
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmResponse + sizeof(SPDM_FINISH_RESPONSE), HmacSize);
+  }
 
   Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId, TRUE);
   if (RETURN_ERROR(Status)) {

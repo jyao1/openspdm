@@ -1073,11 +1073,9 @@ SpdmFreeDHEContext (
   IN VOID                         *Context
   )
 {
-  BOOLEAN Result;
   BOOLEAN IsEcDhe;
   
   IsEcDhe = IsSpdmECDHE (SpdmContext);
-  Result = FALSE;
 
   if (!IsEcDhe) {
 #if OPENSPDM_DHE_SUPPORT == 1

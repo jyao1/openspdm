@@ -298,6 +298,11 @@ SpdmSendReceiveKeyExchange (
   SignatureSize = GetSpdmAsymSize (SpdmContext);
   HashSize = GetSpdmHashSize (SpdmContext);
   HmacSize = GetSpdmHashSize (SpdmContext);
+
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+    HmacSize = 0;
+  }
+
   if (SpdmResponseSize <  sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
                           DHEKeySize +
                           HashSize +
@@ -392,17 +397,20 @@ SpdmSendReceiveKeyExchange (
     return Status;
   }
 
-  VerifyData = Ptr;
-  DEBUG((DEBUG_INFO, "VerifyData (0x%x):\n", HmacSize));
-  InternalDumpHex (VerifyData, HmacSize);
-  Result = SpdmRequesterVerifyKeyExchangeHmac (SpdmContext, SessionInfo, VerifyData, HmacSize);
-  if (!Result) {
-    SpdmFreeSessionId (SpdmContext, *SessionId);
-    SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
-    return RETURN_SECURITY_VIOLATION;
-  }
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+    VerifyData = Ptr;
+    DEBUG((DEBUG_INFO, "VerifyData (0x%x):\n", HmacSize));
+    InternalDumpHex (VerifyData, HmacSize);
+    Result = SpdmRequesterVerifyKeyExchangeHmac (SpdmContext, SessionInfo, VerifyData, HmacSize);
+    if (!Result) {
+      SpdmFreeSessionId (SpdmContext, *SessionId);
+      SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
+      return RETURN_SECURITY_VIOLATION;
+    }
+    Ptr += HmacSize;
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, (UINT8 *)&SpdmResponse + SpdmResponseSize - HmacSize, HmacSize);
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, (UINT8 *)&SpdmResponse + SpdmResponseSize - HmacSize, HmacSize);
+  }
 
   if (MeasurementHash != NULL) {
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);
