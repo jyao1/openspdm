@@ -106,43 +106,9 @@ VOID
 EFIAPI
 EcDsaFree(
   IN  VOID* EcDsaContext
-)
-{
-  EC_KEY_free((EC_KEY*)EcDsaContext);
-}
-
-/**
-  Generates EC key.
-
-  If EcContext is NULL, then return FALSE.
-
-  @param[in, out]  EcContext      Pointer to the EC context.
-
-  @retval TRUE   EC Key generation succeeded.
-  @retval FALSE  EC Key generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-EcGenerateKey (
-  IN OUT  VOID   *EcContext
   )
 {
-  EC_KEY     *EcKey;
-  BOOLEAN    RetVal;
-  
-  if (EcContext == NULL) {
-    return FALSE;
-  }
-
-  EcKey = (EC_KEY *)EcContext;
-
-  RetVal = (BOOLEAN) EC_KEY_generate_key (EcKey);
-  if (!RetVal) {
-    return FALSE;
-  }
-  
-  return RetVal;
+  EC_KEY_free((EC_KEY*)EcDsaContext);
 }
 
 /**
@@ -182,7 +148,7 @@ EcCheckKey (
 }
 
 /**
-  Gets EC public key (X, Y).
+  Generates EC key and returns EC public key (X, Y).
 
   This function generates random secret, and computes the public key (X, Y), which is
   returned via parameter Public, PublicSize.
@@ -212,7 +178,7 @@ EcCheckKey (
 **/
 BOOLEAN
 EFIAPI
-EcGetPublicKey (
+EcGenerateKey (
   IN OUT  VOID   *EcContext,
   OUT     UINT8  *Public,
   IN OUT  UINTN  *PublicSize
@@ -238,6 +204,10 @@ EcGetPublicKey (
   }
   
   EcKey = (EC_KEY *)EcContext;
+  RetVal = (BOOLEAN) EC_KEY_generate_key (EcKey);
+  if (!RetVal) {
+    return FALSE;
+  }
   OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
   switch (OpenSslNid) {
   case NID_X9_62_prime256v1:

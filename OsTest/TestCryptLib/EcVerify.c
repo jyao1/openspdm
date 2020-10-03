@@ -68,14 +68,7 @@ ValidateCryptEc (
   // Verify EC-DH
   //
   Print ("Generate key1 ... ");
-  Status = EcGenerateKey (Ec1);
-  if (!Status) {
-    Print ("[Fail]");
-    EcFree (Ec1);
-    EcFree (Ec2);
-    return EFI_ABORTED;
-  }
-  Status = EcGetPublicKey (Ec1, Public1, &Public1Length);
+  Status = EcGenerateKey (Ec1, Public1, &Public1Length);
   if (!Status) {
     Print ("[Fail]");
     EcFree (Ec1);
@@ -84,14 +77,7 @@ ValidateCryptEc (
   }
 
   Print ("Generate key2 ... ");
-  Status = EcGenerateKey (Ec2);
-  if (!Status) {
-    Print ("[Fail]");
-    EcFree (Ec1);
-    EcFree (Ec2);
-    return EFI_ABORTED;
-  }
-  Status = EcGetPublicKey (Ec2, Public2, &Public2Length);
+  Status = EcGenerateKey (Ec2, Public2, &Public2Length);
   if (!Status) {
     Print ("[Fail]");
     EcFree (Ec1);
@@ -139,6 +125,9 @@ ValidateCryptEc (
 
   Print ("\nUEFI-OpenSSL EC-DSA Signing Verification Testing:\n");
 
+  Public1Length  = sizeof (Public1);
+  Public2Length  = sizeof (Public2);
+
   Print ("- Context1 ... ");
   Ec1 = EcNewByNid (CRYPTO_NID_SECP256R1);
   if (Ec1 == NULL) {
@@ -155,7 +144,7 @@ ValidateCryptEc (
   }
 
   Print ("Compute key1 ... ");
-  Status = EcGenerateKey (Ec1);
+  Status = EcGenerateKey (Ec1, Public1, &Public1Length);
   if (!Status) {
     Print ("[Fail]");
     EcFree (Ec1);
@@ -164,7 +153,7 @@ ValidateCryptEc (
   }
 
   Print ("Compute key2 ... ");
-  Status = EcGenerateKey (Ec2);
+  Status = EcGenerateKey (Ec2, Public2, &Public2Length);
   if (!Status) {
     Print ("[Fail]");
     EcFree (Ec1);

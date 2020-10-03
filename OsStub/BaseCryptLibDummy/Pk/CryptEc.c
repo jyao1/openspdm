@@ -62,28 +62,7 @@ EcDsaFree (
 }
 
 /**
-  Generates EC key.
-
-  If EcContext is NULL, then return FALSE.
-
-  @param[in, out]  EcContext      Pointer to the EC context.
-
-  @retval TRUE   EC Key generation succeeded.
-  @retval FALSE  EC Key generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-EcGenerateKey (
-  IN OUT  VOID   *EcContext
-  )
-{
-  ASSERT(FALSE);
-  return FALSE;
-}
-
-/**
-  Gets EC public key (X, Y).
+  Generates EC key and returns EC public key (X, Y).
 
   This function generates random secret, and computes the public key (X, Y), which is
   returned via parameter Public, PublicSize.
@@ -113,7 +92,7 @@ EcGenerateKey (
 **/
 BOOLEAN
 EFIAPI
-EcGetPublicKey (
+EcGenerateKey (
   IN OUT  VOID   *EcContext,
   OUT     UINT8  *Public,
   IN OUT  UINTN  *PublicSize

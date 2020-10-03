@@ -2760,23 +2760,6 @@ EcDsaFree (
   );
 
 /**
-  Generates EC key.
-
-  If EcContext is NULL, then return FALSE.
-
-  @param[in, out]  EcContext      Pointer to the EC context.
-
-  @retval TRUE   EC Key generation succeeded.
-  @retval FALSE  EC Key generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-EcGenerateKey (
-  IN OUT  VOID   *EcContext
-  );
-
-/**
   Validates key components of EC context.
   NOTE: This function performs integrity checks on all the EC key material, so
         the EC key structure must contain all the private key data.
@@ -2796,7 +2779,7 @@ EcCheckKey (
   );
 
 /**
-  Gets EC public key (X, Y).
+  Generates EC key and returns EC public key (X, Y).
 
   This function generates random secret, and computes the public key (X, Y), which is
   returned via parameter Public, PublicSize.
@@ -2826,10 +2809,10 @@ EcCheckKey (
 **/
 BOOLEAN
 EFIAPI
-EcGetPublicKey (
+EcGenerateKey (
   IN OUT  VOID   *EcContext,
-  OUT     UINT8  *Public,
-  IN OUT  UINTN  *PublicSize
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
   );
 
 /**

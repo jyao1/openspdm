@@ -483,7 +483,7 @@ SpdmHkdfExpand (
   @return TCG SPDM DHENamedGroup size
 **/
 UINT32
-GetSpdmDHEKeySize (
+GetSpdmDheKeySize (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
@@ -617,28 +617,33 @@ SpdmReqAsymVerify (
   IN   UINTN                        SigSize
   );
 
-VOID
-SpdmGenerateDHESelfKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINTN                        SelfKeySize,
-  OUT VOID                        *SelfPubKey,
-  OUT VOID                        **Context
+VOID *
+SpdmDheNew (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
 VOID
-SpdmComputeDHEFinalKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *Context,
-  IN UINTN                        PeerKeySize,
-  IN VOID                         *PeerPubKey,
-  IN OUT UINTN                    *FinalKeySize,
-  OUT VOID                        *FinalKey
+SpdmDheFree (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context
   );
 
-VOID
-SpdmFreeDHEContext (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *Context
+BOOLEAN
+SpdmDheGenerateKey (
+  IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN OUT  VOID                         *Context,
+  OUT     UINT8                        *PublicKey,
+  IN OUT  UINTN                        *PublicKeySize
+  );
+
+BOOLEAN
+SpdmDheComputeKey (
+  IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN OUT  VOID                         *Context,
+  IN      CONST UINT8                  *PeerPublic,
+  IN      UINTN                        PeerPublicSize,
+  OUT     UINT8                        *Key,
+  IN OUT  UINTN                        *KeySize
   );
 
 VOID

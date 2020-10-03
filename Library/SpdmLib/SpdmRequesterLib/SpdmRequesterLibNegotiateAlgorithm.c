@@ -176,7 +176,7 @@ TrySpdmNegotiateAlgorithms (
       }
     }
 
-    AlgoSize = GetSpdmDHEKeySize (SpdmContext);
+    AlgoSize = GetSpdmDheKeySize (SpdmContext);
     if (AlgoSize == 0) {
       return RETURN_SECURITY_VIOLATION;
     }

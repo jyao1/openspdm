@@ -96,6 +96,36 @@ BOOLEAN
   IN  UINTN        SigSize
   );
 
+typedef
+VOID *
+(EFIAPI *DHE_NEW_BY_NID) (
+  IN UINTN  Nid
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *DHE_GENERATE_KEY) (
+  IN OUT  VOID   *Context,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *DHE_COMPUTE_KEY) (
+  IN OUT  VOID         *Context,
+  IN      CONST UINT8  *PeerPublic,
+  IN      UINTN        PeerPublicSize,
+  OUT     UINT8        *Key,
+  IN OUT  UINTN        *KeySize
+  );
+
+typedef
+VOID
+(EFIAPI *DHE_FREE) (
+  IN  VOID  *Context
+  );
+
 /**
   This function returns the SPDM hash size.
 
@@ -408,14 +438,14 @@ GetSpdmMeasurementHashSize (
 }
 
 /**
-  This function returns the SPDM DHEKey size.
+  This function returns the SPDM DheKey size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
   
-  @return TCG SPDM DHEKey size
+  @return TCG SPDM DheKey size
 **/
 UINT32
-GetSpdmDHEKeySize (
+GetSpdmDheKeySize (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   )
 {
@@ -437,7 +467,7 @@ GetSpdmDHEKeySize (
 }
 
 UINTN
-GetSpdmDHENid (
+GetSpdmDheNid (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   )
 {
@@ -456,28 +486,6 @@ GetSpdmDHENid (
     return CRYPTO_NID_SECP521R1;
   }
   return 0;
-}
-
-BOOLEAN
-IsSpdmECDHE (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
-    return FALSE;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
-    return FALSE;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
-    return FALSE;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1:
-    return TRUE;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1:
-    return TRUE;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1:
-    return TRUE;
-  }
-  return FALSE;
 }
 
 /**
@@ -986,110 +994,187 @@ SpdmReqAsymVerify (
   return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
 }
 
-VOID
-SpdmGenerateDHESelfKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINTN                        SelfKeySize,
-  OUT VOID                        *SelfPubKey,
-  OUT VOID                        **Context
+DHE_NEW_BY_NID
+GetSpdmDheNew (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext
   )
 {
-  UINTN   Nid;
-  BOOLEAN Result;
-  BOOLEAN IsEcDhe;
-  UINTN   OutKeySize;
-
-  IsEcDhe = FALSE;
-  Nid = GetSpdmDHENid (SpdmContext);
-  IsEcDhe = IsSpdmECDHE (SpdmContext);
-  Result = FALSE;
-
-  if (!IsEcDhe) {
+  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
 #if OPENSPDM_DHE_SUPPORT == 1
-    *Context = DhNewByNid (Nid);
-    ASSERT (*Context != NULL);
-
-    OutKeySize = SelfKeySize;
-    Result = DhGenerateKey (*Context, SelfPubKey, &OutKeySize);
-    ASSERT (Result);
-    ASSERT (OutKeySize == SelfKeySize);
+    return DhNewByNid;
 #else
     ASSERT (FALSE);
+    break;
 #endif
-  } else {
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1:
 #if OPENSPDM_ECDHE_SUPPORT == 1
-    *Context = EcNewByNid (Nid);
-    ASSERT (*Context != NULL);
-
-    Result = EcGenerateKey (*Context);
-    ASSERT (Result);
-
-    OutKeySize = SelfKeySize;
-    Result = EcGetPublicKey (*Context, SelfPubKey, &OutKeySize);
-    ASSERT (Result);
-    ASSERT (OutKeySize == SelfKeySize);
+    return EcNewByNid;
 #else
     ASSERT (FALSE);
+    break;
 #endif
   }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+VOID *
+SpdmDheNew (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext
+  )
+{
+  DHE_NEW_BY_NID   NewFunction;
+  UINTN            Nid;
+
+  NewFunction = GetSpdmDheNew (SpdmContext);
+  if (NewFunction == NULL) {
+    return NULL;
+  }
+  Nid = GetSpdmDheNid (SpdmContext);
+  if (Nid == 0) {
+    return NULL;
+  }
+  return NewFunction (Nid);
+}
+
+DHE_FREE
+GetSpdmDheFree (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  )
+{
+  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
+#if OPENSPDM_DHE_SUPPORT == 1
+    return DhFree;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1:
+#if OPENSPDM_ECDHE_SUPPORT == 1
+    return EcFree;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  }
+  ASSERT (FALSE);
+  return NULL;
 }
 
 VOID
-SpdmComputeDHEFinalKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *Context,
-  IN UINTN                        PeerKeySize,
-  IN VOID                         *PeerPubKey,
-  IN OUT UINTN                    *FinalKeySize,
-  OUT VOID                        *FinalKey
+SpdmDheFree (
+  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   VOID                         *Context
   )
 {
-  BOOLEAN Result;
-  BOOLEAN IsEcDhe;
-  
-  IsEcDhe = IsSpdmECDHE (SpdmContext);
-  Result = FALSE;
-
-  if (!IsEcDhe) {
-#if OPENSPDM_DHE_SUPPORT == 1
-    Result = DhComputeKey (Context, PeerPubKey, PeerKeySize, FinalKey, FinalKeySize);
-    ASSERT (Result);
-#else
-    ASSERT (FALSE);
-#endif
-  } else {
-#if OPENSPDM_ECDHE_SUPPORT == 1
-    Result = EcComputeKey (Context, PeerPubKey, PeerKeySize, FinalKey, FinalKeySize);
-    ASSERT (Result);
-#else
-    ASSERT (FALSE);
-#endif
+  DHE_FREE   FreeFunction;
+  FreeFunction = GetSpdmDheFree (SpdmContext);
+  if (FreeFunction == NULL) {
+    return ;
   }
+  FreeFunction (Context);
 }
 
-VOID
-SpdmFreeDHEContext (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *Context
+DHE_GENERATE_KEY
+GetSpdmDheGenerateKey (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
   )
 {
-  BOOLEAN IsEcDhe;
-  
-  IsEcDhe = IsSpdmECDHE (SpdmContext);
-
-  if (!IsEcDhe) {
+  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
 #if OPENSPDM_DHE_SUPPORT == 1
-    DhFree (Context);
+    return DhGenerateKey;
 #else
     ASSERT (FALSE);
+    break;
 #endif
-  } else {
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1:
 #if OPENSPDM_ECDHE_SUPPORT == 1
-    EcFree (Context);
+    return EcGenerateKey;
 #else
     ASSERT (FALSE);
+    break;
 #endif
   }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+BOOLEAN
+SpdmDheGenerateKey (
+  IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN OUT  VOID                         *Context,
+  OUT     UINT8                        *PublicKey,
+  IN OUT  UINTN                        *PublicKeySize
+  )
+{
+  DHE_GENERATE_KEY   GenerateKeyFunction;
+  GenerateKeyFunction = GetSpdmDheGenerateKey (SpdmContext);
+  if (GenerateKeyFunction == NULL) {
+    return FALSE;
+  }
+  return GenerateKeyFunction (Context, PublicKey, PublicKeySize);
+}
+
+DHE_COMPUTE_KEY
+GetSpdmDheComputeKey (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  )
+{
+  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
+#if OPENSPDM_DHE_SUPPORT == 1
+    return DhComputeKey;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1:
+  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1:
+#if OPENSPDM_ECDHE_SUPPORT == 1
+    return EcComputeKey;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+BOOLEAN
+SpdmDheComputeKey (
+  IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN OUT  VOID                         *Context,
+  IN      CONST UINT8                  *PeerPublic,
+  IN      UINTN                        PeerPublicSize,
+  OUT     UINT8                        *Key,
+  IN OUT  UINTN                        *KeySize
+  )
+{
+  DHE_COMPUTE_KEY   ComputeKeyFunction;
+  ComputeKeyFunction = GetSpdmDheComputeKey (SpdmContext);
+  if (ComputeKeyFunction == NULL) {
+    return FALSE;
+  }
+  return ComputeKeyFunction (Context, PeerPublic, PeerPublicSize, Key, KeySize);
 }
 
 VOID

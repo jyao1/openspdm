@@ -96,40 +96,7 @@ EcDsaFree (
 }
 
 /**
-  Generates EC key.
-
-  If EcContext is NULL, then return FALSE.
-
-  @param[in, out]  EcContext      Pointer to the EC context.
-
-  @retval TRUE   EC Key generation succeeded.
-  @retval FALSE  EC Key generation failed.
-
-**/
-BOOLEAN
-EFIAPI
-EcGenerateKey (
-  IN OUT  VOID   *EcContext
-  )
-{
-  mbedtls_ecdh_context *ctx;
-  INT32                Ret;
-  
-  if (EcContext == NULL) {
-    return FALSE;
-  }
-
-  ctx = EcContext;
-  Ret = mbedtls_ecdh_gen_public (&ctx->grp, &ctx->d, &ctx->Q, myrand, NULL);
-  if (Ret != 0) {
-    return FALSE;
-  }
-  
-  return TRUE;
-}
-
-/**
-  Gets EC public key (X, Y).
+  Generates EC key and returns EC public key (X, Y).
 
   This function generates random secret, and computes the public key (X, Y), which is
   returned via parameter Public, PublicSize.
@@ -159,7 +126,7 @@ EcGenerateKey (
 **/
 BOOLEAN
 EFIAPI
-EcGetPublicKey (
+EcGenerateKey (
   IN OUT  VOID   *EcContext,
   OUT     UINT8  *Public,
   IN OUT  UINTN  *PublicSize
@@ -180,6 +147,11 @@ EcGetPublicKey (
   }
   
   ctx = EcContext;
+  Ret = mbedtls_ecdh_gen_public (&ctx->grp, &ctx->d, &ctx->Q, myrand, NULL);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
   switch (ctx->grp.id) {
   case MBEDTLS_ECP_DP_SECP256R1:
     HalfSize = 32;
