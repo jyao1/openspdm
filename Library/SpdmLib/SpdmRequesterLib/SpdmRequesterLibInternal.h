@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define __SPDM_REQUESTER_LIB_INTERNAL_H__
 
 #include <Library/SpdmRequesterLib.h>
-#include <Library/SpdmEncodingLib.h>
+#include <Library/SpdmSecuredMessageLib.h>
 #include "SpdmCommonLibInternal.h"
 
 RETURN_STATUS

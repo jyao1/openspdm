@@ -1,5 +1,5 @@
 /** @file
-  SPDM transport library.
+  SPDM Secured Message library.
   It follows the SPDM Specification.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SPDM_TRANSPORT_LIB_H__
-#define __SPDM_TRANSPORT_LIB_H__
+#ifndef __SPDM_SECURED_MESSAGE_LIB_H__
+#define __SPDM_SECURED_MESSAGE_LIB_H__
 
 #include <Library/SpdmCommonLib.h>
 

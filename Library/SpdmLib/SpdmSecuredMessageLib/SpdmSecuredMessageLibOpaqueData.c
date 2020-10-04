@@ -7,7 +7,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "SpdmEncodingLibInternal.h"
+#include <Library/SpdmSecuredMessageLib.h>
+
+#include <IndustryStandard/SpdmSecureMessage.h>
+#include "SpdmCommonLibInternal.h"
 
 UINTN
 EFIAPI

@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmEncodingLib
+MODULE_NAME = SpdmSecuredMessageLib
 
 #
 # Build Directory Macro Definition
@@ -32,11 +32,9 @@ SOURCE_DIR = $(WORKSPACE)/Library/SpdmLib/$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)/SpdmEncodingLibOpaqueData.o \
-    $(OUTPUT_DIR)/SpdmEncodingLibRequestReceive.o \
-    $(OUTPUT_DIR)/SpdmEncodingLibRequestSend.o \
-    $(OUTPUT_DIR)/SpdmEncodingLibResponderReceive.o \
-    $(OUTPUT_DIR)/SpdmEncodingLibResponderSend.o \
+    $(OUTPUT_DIR)/SpdmSecuredMessageLibOpaqueData.o \
+    $(OUTPUT_DIR)/SpdmSecuredMessageLibReceive.o \
+    $(OUTPUT_DIR)/SpdmSecuredMessageLibSend.o \
 
 
 INC =  \
@@ -73,19 +71,13 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)/SpdmEncodingLibOpaqueData.o : $(SOURCE_DIR)/SpdmEncodingLibOpaqueData.c
+$(OUTPUT_DIR)/SpdmSecuredMessageLibOpaqueData.o : $(SOURCE_DIR)/SpdmSecuredMessageLibOpaqueData.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmEncodingLibRequestReceive.o : $(SOURCE_DIR)/SpdmEncodingLibRequestReceive.c
+$(OUTPUT_DIR)/SpdmSecuredMessageLibReceive.o : $(SOURCE_DIR)/SpdmSecuredMessageLibReceive.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmEncodingLibRequestSend.o : $(SOURCE_DIR)/SpdmEncodingLibRequestSend.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/SpdmEncodingLibResponderReceive.o : $(SOURCE_DIR)/SpdmEncodingLibResponderReceive.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/SpdmEncodingLibResponderSend.o : $(SOURCE_DIR)/SpdmEncodingLibResponderSend.c
+$(OUTPUT_DIR)/SpdmSecuredMessageLibSend.o : $(SOURCE_DIR)/SpdmSecuredMessageLibSend.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

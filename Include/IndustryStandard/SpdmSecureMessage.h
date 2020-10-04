@@ -1,8 +1,9 @@
 /** @file
-  SPDM Session Record definition
+  Definitions of DSP0277 Secured Messages using SPDM Specification
+  version 1.0.0 in Distributed Management Task Force (DMTF).
 
-  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
-  SPDX-License-Identifier: BSD-2-Clause-Patent
+Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -14,12 +15,12 @@
 //
 // ENC+AUTH session:
 //
-// +---------+
-// | Payload |------------------------------------------------------------
-// +---------+                                                            |
+// +-----------------+
+// | ApplicationData |----------------------------------------------------
+// +-----------------+                                                    |
 //                                                                        V
 // +--------------------------------+---------------------------------+-------+------+---+
-// |SPDM_SECURE_MESSAGE_ADATA_HEADER|SPDM_SECURE_MESSAGE_CIPHER_HEADER|Payload|Random|MAC|
+// |SPDM_SECURE_MESSAGE_ADATA_HEADER|SPDM_SECURE_MESSAGE_CIPHER_HEADER|AppData|Random|MAC|
 // |  SessionId  |    Length        |    ApplicationDataLength (O)    |       |  (O) |   |
 // +--------------------------------+---------------------------------+-------+------+---+
 // |                                |                                                |   |
@@ -32,12 +33,12 @@
 //
 // AUTH session:
 //
-// +---------+
-// | Payload |--------------------------
-// +---------+                          |
+// +-----------------+
+// | ApplicationData |------------------
+// +-----------------+                  |
 //                                      V
 // +--------------------------------+-------+---+
-// |SPDM_SECURE_MESSAGE_ADATA_HEADER|Payload|MAC|
+// |SPDM_SECURE_MESSAGE_ADATA_HEADER|AppData|MAC|
 // |  SessionId  |    Length        |       |   |
 // +--------------------------------+-------+---+
 // |                                        |   |

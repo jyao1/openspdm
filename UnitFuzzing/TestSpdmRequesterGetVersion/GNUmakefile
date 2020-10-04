@@ -47,7 +47,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a \
     $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/SpdmRequesterLib.a \
     $(BIN_DIR)/Library/SpdmLib/SpdmResponderLib/SpdmResponderLib.a \
-    $(BIN_DIR)/Library/SpdmLib/SpdmEncodingLib/SpdmEncodingLib.a \
+    $(BIN_DIR)/Library/SpdmLib/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
 
 
@@ -60,7 +60,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/*.o \
     $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/*.o \
     $(BIN_DIR)/Library/SpdmLib/SpdmResponderLib/*.o \
-    $(BIN_DIR)/Library/SpdmLib/SpdmEncodingLib/*.o \
+    $(BIN_DIR)/Library/SpdmLib/SpdmSecuredMessageLib/*.o \
     $(OUTPUT_DIR)/*.o \
 
 
@@ -115,7 +115,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmCommonLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmRequesterLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmResponderLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmEncodingLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmSecuredMessageLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
@@ -142,7 +142,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmRequesterLib/SpdmRequesterLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmLib/SpdmResponderLib/SpdmResponderLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/Library/SpdmLib/SpdmEncodingLib/SpdmEncodingLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/Library/SpdmLib/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
 ifeq ("$(TOOLCHAIN)", "KLEE")
 	$(DLINK) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS)	

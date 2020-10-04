@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmEncodingLib
+MODULE_NAME = SpdmSecuredMessageLib
 
 #
 # Build Directory Macro Definition
@@ -32,11 +32,9 @@ SOURCE_DIR = $(WORKSPACE)\Library\SpdmLib\$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\SpdmEncodingLibOpaqueData.obj \
-    $(OUTPUT_DIR)\SpdmEncodingLibRequestReceive.obj \
-    $(OUTPUT_DIR)\SpdmEncodingLibRequestSend.obj \
-    $(OUTPUT_DIR)\SpdmEncodingLibResponderReceive.obj \
-    $(OUTPUT_DIR)\SpdmEncodingLibResponderSend.obj \
+    $(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj \
+    $(OUTPUT_DIR)\SpdmSecuredMessageLibReceive.obj \
+    $(OUTPUT_DIR)\SpdmSecuredMessageLibSend.obj \
 
 
 INC =  \
@@ -73,20 +71,14 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\SpdmEncodingLibOpaqueData.obj : $(SOURCE_DIR)\SpdmEncodingLibOpaqueData.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmEncodingLibOpaqueData.c
+$(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
 
-$(OUTPUT_DIR)\SpdmEncodingLibRequestReceive.obj : $(SOURCE_DIR)\SpdmEncodingLibRequestReceive.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmEncodingLibRequestReceive.c
+$(OUTPUT_DIR)\SpdmSecuredMessageLibReceive.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibReceive.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibReceive.c
 
-$(OUTPUT_DIR)\SpdmEncodingLibRequestSend.obj : $(SOURCE_DIR)\SpdmEncodingLibRequestSend.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmEncodingLibRequestSend.c
-
-$(OUTPUT_DIR)\SpdmEncodingLibResponderReceive.obj : $(SOURCE_DIR)\SpdmEncodingLibResponderReceive.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmEncodingLibResponderReceive.c
-
-$(OUTPUT_DIR)\SpdmEncodingLibResponderSend.obj : $(SOURCE_DIR)\SpdmEncodingLibResponderSend.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmEncodingLibResponderSend.c
+$(OUTPUT_DIR)\SpdmSecuredMessageLibSend.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibSend.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibSend.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

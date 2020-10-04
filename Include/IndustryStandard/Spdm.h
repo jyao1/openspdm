@@ -1,5 +1,5 @@
 /** @file
-  Definitions of Security Protocol & Data Model Specification (SPDM)
+  Definitions of DSP0274 Security Protocol & Data Model Specification (SPDM)
   version 1.1.0 in Distributed Management Task Force (DMTF).
 
 Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
