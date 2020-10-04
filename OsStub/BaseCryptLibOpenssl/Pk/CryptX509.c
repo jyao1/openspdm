@@ -761,9 +761,9 @@ X509GetSerialNumber (
   IN OUT  UINTN         *SerialNumberSize
   )
 {
-  BOOLEAN    Status;
-  X509       *X509Cert;
-  ASN1_INTEGER *Asn1Integer;
+  BOOLEAN          Status;
+  X509             *X509Cert;
+  ASN1_INTEGER     *Asn1Integer;
   RETURN_STATUS    ReturnStatus;
 
   ReturnStatus = RETURN_INVALID_PARAMETER;
@@ -794,8 +794,8 @@ X509GetSerialNumber (
     goto _Exit;
   }
 
-  if (*SerialNumberSize < Asn1Integer->length) {
-    *SerialNumberSize = Asn1Integer->length;
+  if (*SerialNumberSize < (UINTN)Asn1Integer->length) {
+    *SerialNumberSize = (UINTN)Asn1Integer->length;
     ReturnStatus = RETURN_BUFFER_TOO_SMALL;
     goto _Exit;
   }
@@ -1147,8 +1147,8 @@ X509GetDMTFSubjectAltName (
         if (ObjTag != V_ASN1_OBJECT) {
           break;
         }
-        if (*OidSize < ObjLen) {
-          *OidSize = ObjLen;
+        if (*OidSize < (UINTN)ObjLen) {
+          *OidSize = (UINTN)ObjLen;
           ReturnStatus = RETURN_BUFFER_TOO_SMALL;
           goto _Exit;
         }
@@ -1170,8 +1170,8 @@ X509GetDMTFSubjectAltName (
           break;
         }
 
-        if (*NameBufferSize < ObjLen) {
-          *NameBufferSize = ObjLen;
+        if (*NameBufferSize < (UINTN)ObjLen) {
+          *NameBufferSize = (UINTN)ObjLen;
           ReturnStatus = RETURN_BUFFER_TOO_SMALL;
           goto _Exit;
         }

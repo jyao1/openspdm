@@ -144,12 +144,16 @@ endif
 
 ifeq ("$(ARCH)","X64")
     CC_FLAGS += -m64 -DNO_MSABI_VA_FUNCS -mcmodel=small
+    DLINK_FLAGS += -m64
 else ifeq ("$(ARCH)","Ia32")
     CC_FLAGS += -m32
+    DLINK_FLAGS += -m32
 endif
 ifeq ("$(TARGET)","DEBUG")
     CC_FLAGS += -O0
+    DLINK_FLAGS += -O0
 else ifeq ("$(TARGET)","RELEASE")
     CC_FLAGS += -Os
+    DLINK_FLAGS += -Os
 endif
 
