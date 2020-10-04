@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <mbedtls/pem.h>
 #include <mbedtls/pk.h>
 #include <mbedtls/rsa.h>
+#include <mbedtls/ecp.h>
+#include <mbedtls/ecdh.h>
+#include <mbedtls/ecdsa.h>
 
 STATIC
 UINTN
@@ -126,12 +129,12 @@ RsaGetPrivateKeyFromPem (
   @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
   @param[in]  PemSize      Size of the PEM key data in bytes.
   @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
-  @param[out] EcDsaContext Pointer to new-generated EC DSA context which contain the retrieved
-                           EC private key component. Use EcDsaFree() function to free the
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC private key component. Use EcFree() function to free the
                            resource.
 
   If PemData is NULL, then return FALSE.
-  If EcDsaContext is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
 
   @retval  TRUE   EC Private Key was retrieved successfully.
   @retval  FALSE  Invalid PEM key data or incorrect password.
@@ -143,16 +146,16 @@ EcGetPrivateKeyFromPem (
   IN   CONST UINT8  *PemData,
   IN   UINTN        PemSize,
   IN   CONST CHAR8  *Password,
-  OUT  VOID         **EcDsaContext
+  OUT  VOID         **EcContext
   )
 {
   INT32                 Ret;
   mbedtls_pk_context    pk;
-  mbedtls_ecdsa_context *ecdsa;
+  mbedtls_ecdh_context  *ecdh;
   UINT8                 *NewPemData;
   UINTN                 PasswordLen;
 
-  if (PemData == NULL || EcDsaContext == NULL || PemSize > INT_MAX) {
+  if (PemData == NULL || EcContext == NULL || PemSize > INT_MAX) {
     return FALSE;
   }
 
@@ -193,23 +196,23 @@ EcGetPrivateKeyFromPem (
     return FALSE;
   }
 
-  ecdsa = AllocateZeroPool(sizeof(mbedtls_ecdsa_context));
-  if (ecdsa == NULL) {
+  ecdh = AllocateZeroPool (sizeof(mbedtls_ecdh_context));
+  if (ecdh == NULL) {
     mbedtls_pk_free(&pk);
     return FALSE;
   }
-  mbedtls_ecdsa_init (ecdsa);
+  mbedtls_ecdh_init (ecdh);
 
-  Ret = mbedtls_ecdsa_from_keypair (ecdsa, mbedtls_pk_ec(pk));
+  Ret = mbedtls_ecdh_get_params (ecdh, mbedtls_pk_ec(pk), MBEDTLS_ECDH_OURS);
   if (Ret != 0) {
-    mbedtls_ecdsa_free (ecdsa);
-    FreePool (ecdsa);
+    mbedtls_ecdh_free (ecdh);
+    FreePool (ecdh);
     mbedtls_pk_free(&pk);
     return FALSE;
   }
   mbedtls_pk_free(&pk);
 
-  *EcDsaContext = ecdsa;
+  *EcContext = ecdh;
   return TRUE;
 }
 

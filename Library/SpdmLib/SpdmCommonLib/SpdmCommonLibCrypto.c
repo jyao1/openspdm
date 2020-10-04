@@ -764,7 +764,7 @@ GetSpdmAsymFree (
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
 #if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcDsaFree;
+    return EcFree;
 #else
     ASSERT (FALSE);
     break;
@@ -914,7 +914,7 @@ GetSpdmReqAsymFree (
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
 #if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcDsaFree;
+    return EcFree;
 #else
     ASSERT (FALSE);
     break;

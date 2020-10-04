@@ -1679,12 +1679,12 @@ RsaGetPublicKeyFromX509 (
   @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
   @param[in]  PemSize      Size of the PEM key data in bytes.
   @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
-  @param[out] EcDsaContext Pointer to new-generated EC DSA context which contain the retrieved
-                           EC private key component. Use EcDsaFree() function to free the
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC private key component. Use EcFree() function to free the
                            resource.
 
   If PemData is NULL, then return FALSE.
-  If EcDsaContext is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
 
   @retval  TRUE   EC Private Key was retrieved successfully.
   @retval  FALSE  Invalid PEM key data or incorrect password.
@@ -1696,7 +1696,7 @@ EcGetPrivateKeyFromPem (
   IN   CONST UINT8  *PemData,
   IN   UINTN        PemSize,
   IN   CONST CHAR8  *Password,
-  OUT  VOID         **EcDsaContext
+  OUT  VOID         **EcContext
   );
 
 /**
@@ -1704,12 +1704,12 @@ EcGetPrivateKeyFromPem (
 
   @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
   @param[in]  CertSize     Size of the X509 certificate in bytes.
-  @param[out] EcDsaContext Pointer to new-generated EC DSA context which contain the retrieved
-                           EC public key component. Use EcDsaFree() function to free the
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC public key component. Use EcFree() function to free the
                            resource.
 
   If Cert is NULL, then return FALSE.
-  If EcDsaContext is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
 
   @retval  TRUE   EC Public Key was retrieved successfully.
   @retval  FALSE  Fail to retrieve EC public key from X509 certificate.
@@ -1720,7 +1720,7 @@ EFIAPI
 EcGetPublicKeyFromX509 (
   IN   CONST UINT8  *Cert,
   IN   UINTN        CertSize,
-  OUT  VOID         **EcDsaContext
+  OUT  VOID         **EcContext
   );
 
 /**
@@ -2748,18 +2748,6 @@ EcFree (
   );
 
 /**
-  Release the specified EC context.
-
-  @param[in]  EcDsaContext  Pointer to the EC context to be released.
-
-**/
-VOID
-EFIAPI
-EcDsaFree (
-  IN  VOID  *EcDsaContext
-  );
-
-/**
   Validates key components of EC context.
   NOTE: This function performs integrity checks on all the EC key material, so
         the EC key structure must contain all the private key data.
@@ -2886,7 +2874,7 @@ EcComputeKey (
 BOOLEAN
 EFIAPI
 EcDsaSign (
-  IN      VOID         *EcDsaContext,
+  IN      VOID         *EcContext,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
@@ -2918,7 +2906,7 @@ EcDsaSign (
 BOOLEAN
 EFIAPI
 EcDsaVerify (
-  IN  VOID         *EcDsaContext,
+  IN  VOID         *EcContext,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,

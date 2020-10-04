@@ -1281,12 +1281,12 @@ _Exit:
 
   @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
   @param[in]  CertSize     Size of the X509 certificate in bytes.
-  @param[out] EcDsaContext Pointer to new-generated EC DSA context which contain the retrieved
-                           EC public key component. Use EcDsaFree() function to free the
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC public key component. Use EcFree() function to free the
                            resource.
 
   If Cert is NULL, then return FALSE.
-  If EcDsaContext is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
 
   @retval  TRUE   EC Public Key was retrieved successfully.
   @retval  FALSE  Fail to retrieve EC public key from X509 certificate.
@@ -1297,7 +1297,7 @@ EFIAPI
 EcGetPublicKeyFromX509 (
   IN   CONST UINT8  *Cert,
   IN   UINTN        CertSize,
-  OUT  VOID         **EcDsaContext
+  OUT  VOID         **EcContext
   )
 {
   BOOLEAN   Status;
@@ -1307,7 +1307,7 @@ EcGetPublicKeyFromX509 (
   //
   // Check input parameters.
   //
-  if (Cert == NULL || EcDsaContext == NULL) {
+  if (Cert == NULL || EcContext == NULL) {
     return FALSE;
   }
 
@@ -1336,7 +1336,7 @@ EcGetPublicKeyFromX509 (
   //
   // Duplicate EC Context from the retrieved EVP_PKEY.
   //
-  if ((*EcDsaContext = EC_KEY_dup (EVP_PKEY_get0_EC_KEY (Pkey))) != NULL) {
+  if ((*EcContext = EC_KEY_dup (EVP_PKEY_get0_EC_KEY (Pkey))) != NULL) {
     Status = TRUE;
   }
 

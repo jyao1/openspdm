@@ -47,21 +47,6 @@ EcFree (
 }
 
 /**
-  Release the specified ECDSA context.
-  
-  @param[in]  EcDsaContext  Pointer to the EC context to be released.
-
-**/
-VOID
-EFIAPI
-EcDsaFree (
-  IN  VOID  *EcDsaContext
-  )
-{
-  ASSERT(FALSE);
-}
-
-/**
   Generates EC key and returns EC public key (X, Y).
 
   This function generates random secret, and computes the public key (X, Y), which is
@@ -177,7 +162,7 @@ EcComputeKey (
 BOOLEAN
 EFIAPI
 EcDsaSign (
-  IN      VOID         *EcDsaContext,
+  IN      VOID         *EcContext,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
@@ -213,7 +198,7 @@ EcDsaSign (
 BOOLEAN
 EFIAPI
 EcDsaVerify (
-  IN  VOID         *EcDsaContext,
+  IN  VOID         *EcContext,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,

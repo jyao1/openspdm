@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_crt.h>
 #include <mbedtls/rsa.h>
+#include <mbedtls/ecp.h>
+#include <mbedtls/ecdh.h>
+#include <mbedtls/ecdsa.h>
 
 /**
   Construct a X509 object from DER-encoded certificate data.
@@ -321,12 +324,12 @@ RsaGetPublicKeyFromX509 (
 
   @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
   @param[in]  CertSize     Size of the X509 certificate in bytes.
-  @param[out] EcDsaContext Pointer to new-generated EC DSA context which contain the retrieved
-                           EC public key component. Use EcDsaFree() function to free the
+  @param[out] EcContext    Pointer to new-generated EC DSA context which contain the retrieved
+                           EC public key component. Use EcFree() function to free the
                            resource.
 
   If Cert is NULL, then return FALSE.
-  If EcDsaContext is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
 
   @retval  TRUE   EC Public Key was retrieved successfully.
   @retval  FALSE  Fail to retrieve EC public key from X509 certificate.
@@ -337,11 +340,11 @@ EFIAPI
 EcGetPublicKeyFromX509 (
   IN   CONST UINT8  *Cert,
   IN   UINTN        CertSize,
-  OUT  VOID         **EcDsaContext
+  OUT  VOID         **EcContext
   )
 {
   mbedtls_x509_crt       crt;
-  mbedtls_ecdsa_context* ecdsa;
+  mbedtls_ecdh_context   *ecdh;
   INT32                  Ret;
 
   mbedtls_x509_crt_init(&crt);
@@ -355,23 +358,23 @@ EcGetPublicKeyFromX509 (
     return FALSE;
   }
 
-  ecdsa = AllocateZeroPool(sizeof(mbedtls_ecdsa_context));
-  if (ecdsa == NULL) {
+  ecdh = AllocateZeroPool(sizeof(mbedtls_ecdh_context));
+  if (ecdh == NULL) {
     mbedtls_x509_crt_free(&crt);
     return FALSE;
   }
-  mbedtls_ecdsa_init(ecdsa);
+  mbedtls_ecdh_init(ecdh);
 
-  Ret = mbedtls_ecdsa_from_keypair (ecdsa, mbedtls_pk_ec(crt.pk));
+  Ret = mbedtls_ecdh_get_params (ecdh, mbedtls_pk_ec(crt.pk), MBEDTLS_ECDH_OURS);
   if (Ret != 0) {
-    mbedtls_ecdsa_free(ecdsa);
-    FreePool(ecdsa);
+    mbedtls_ecdh_free(ecdh);
+    FreePool(ecdh);
     mbedtls_x509_crt_free(&crt);
     return FALSE;
   }
   mbedtls_x509_crt_free(&crt);
 
-  *EcDsaContext = ecdsa;
+  *EcContext = ecdh;
   return TRUE;
 }
 

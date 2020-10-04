@@ -97,21 +97,6 @@ EcFree (
 }
 
 /**
-  Release the specified EC context.
-
-  @param[in]  EcContext  Pointer to the EC context to be released.
-
-**/
-VOID
-EFIAPI
-EcDsaFree(
-  IN  VOID* EcDsaContext
-  )
-{
-  EC_KEY_free((EC_KEY*)EcDsaContext);
-}
-
-/**
   Validates key components of EC context.
   NOTE: This function performs integrity checks on all the EC key material, so
         the EC key structure must contain all the private key data.
@@ -395,53 +380,6 @@ Done:
   return RetVal;
 }
 
-STATIC
-VOID
-EccSignatureDerToBin (
-  IN      UINT8        *DerSignature,
-  IN      UINTN        DerSigSize,
-  OUT     UINT8        *Signature,
-  IN      UINTN        SigSize
-  )
-{
-  UINT8                 DerRSize;
-  UINT8                 DerSSize;
-  UINT8                 *R;
-  UINT8                 *S;
-  UINT8                 RSize;
-  UINT8                 SSize;
-  UINT8                 HalfSize;
-
-  HalfSize = (UINT8)(SigSize / 2);
-
-  ASSERT (DerSignature[0] == 0x30);
-  ASSERT ((UINTN)(DerSignature[1] + 2) == DerSigSize);
-  ASSERT (DerSignature[2] == 0x02);
-  DerRSize = DerSignature[3];
-  ASSERT (DerSignature[4 + DerRSize] == 0x02);
-  DerSSize = DerSignature[5 + DerRSize];
-  ASSERT (DerSigSize == (UINTN)(DerRSize + DerSSize + 6));
-
-  if (DerSignature[4] != 0) {
-    RSize = DerRSize;
-    R = &DerSignature[4];
-  } else {
-    RSize = DerRSize - 1;
-    R = &DerSignature[5];
-  }
-  if (DerSignature[6 + DerRSize] != 0) {
-    SSize = DerSSize;
-    S = &DerSignature[6 + DerRSize];
-  } else {
-    SSize = DerSSize - 1;
-    S = &DerSignature[7 + DerRSize];
-  }
-  ASSERT (RSize <= HalfSize && SSize <= HalfSize);
-  ZeroMem (Signature, SigSize);
-  CopyMem (&Signature[0 + HalfSize - RSize], R, RSize);
-  CopyMem (&Signature[HalfSize + HalfSize - SSize], S, SSize);
-}
-
 /**
   Carries out the EC-DSA signature.
 
@@ -473,22 +411,23 @@ EccSignatureDerToBin (
 BOOLEAN
 EFIAPI
 EcDsaSign (
-  IN      VOID         *EcDsaContext,
+  IN      VOID         *EcContext,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
   )
 {
-  BOOLEAN    Result;
   EC_KEY     *EcKey;
-  INT32      DigestType;
+  ECDSA_SIG  *EcDsaSig;
   INT32      OpenSslNid;
-  UINT8      DerSignature[66 * 2 + 8];
-  UINTN      DerSigSize;
   UINT8      HalfSize;
+  BIGNUM     *R;
+  BIGNUM     *S;
+  INTN       RSize;
+  INTN       SSize;
 
-  if (EcDsaContext == NULL || MessageHash == NULL) {
+  if (EcContext == NULL || MessageHash == NULL) {
     return FALSE;
   }
 
@@ -496,7 +435,7 @@ EcDsaSign (
     return FALSE;
   }
 
-  EcKey = (EC_KEY *) EcDsaContext;
+  EcKey = (EC_KEY *) EcContext;
   OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
   switch (OpenSslNid) {
   case NID_X9_62_prime256v1:
@@ -516,115 +455,45 @@ EcDsaSign (
     return FALSE;
   }
   *SigSize = HalfSize * 2;
+  ZeroMem (Signature, *SigSize);
   
   //
   // Determine the message digest algorithm according to digest size.
   //
   switch (HashSize) {
   case SHA256_DIGEST_SIZE:
-    DigestType = NID_sha256;
-    break;
-    
   case SHA384_DIGEST_SIZE:
-    DigestType = NID_sha384;
-    break;
-
   case SHA512_DIGEST_SIZE:
-    DigestType = NID_sha512;
     break;
-
   default:
     return FALSE;
   }
 
-  DerSigSize = sizeof(DerSignature);
-  ZeroMem (DerSignature, sizeof(DerSignature));
-  Result = (BOOLEAN) ECDSA_sign (
-                     DigestType,
-                     MessageHash,
-                     (UINT32) HashSize,
-                     DerSignature,
-                     (UINT32 *) &DerSigSize,
-                     (EC_KEY *) EcDsaContext
-                     );
-  if (!Result) {
+  EcDsaSig = ECDSA_do_sign (
+               MessageHash,
+               (UINT32) HashSize,
+               (EC_KEY *) EcContext
+               );
+  if (EcDsaSig == NULL) {
     return FALSE;
   }
-  
-  EccSignatureDerToBin (DerSignature, DerSigSize, Signature, *SigSize);
+
+  ECDSA_SIG_get0 (EcDsaSig, (CONST BIGNUM **)&R, (CONST BIGNUM **)&S);
+
+  RSize = BN_num_bytes (R);
+  SSize = BN_num_bytes (S);
+  if (RSize <= 0 || SSize <= 0) {
+    ECDSA_SIG_free(EcDsaSig);
+    return FALSE;
+  }
+  ASSERT ((UINTN)RSize <= HalfSize && (UINTN)SSize <= HalfSize);
+
+  BN_bn2bin (R, &Signature[0 + HalfSize - RSize]);
+  BN_bn2bin (S, &Signature[HalfSize + HalfSize - SSize]);
+
+  ECDSA_SIG_free(EcDsaSig);
 
   return TRUE;
-}
-
-STATIC
-VOID
-EccSignatureBinToDer (
-  IN      UINT8        *Signature,
-  IN      UINTN        SigSize,
-  OUT     UINT8        *DerSignature,
-  IN OUT  UINTN        *DerSigSizeInOut
-  )
-{
-  UINTN                 DerSigSize;
-  UINT8                 DerRSize;
-  UINT8                 DerSSize;
-  UINT8                 *R;
-  UINT8                 *S;
-  UINT8                 RSize;
-  UINT8                 SSize;
-  UINT8                 HalfSize;
-  UINT8                 Index;
-
-  HalfSize = (UINT8)(SigSize / 2);
-
-  for (Index = 0; Index < HalfSize; Index++) {
-    if (Signature[Index] != 0) {
-      break;
-    }
-  }
-  RSize = (UINT8)(HalfSize - Index);
-  R = &Signature[Index];
-  for (Index = 0; Index < HalfSize; Index++) {
-    if (Signature[HalfSize + Index] != 0) {
-      break;
-    }
-  }
-  SSize = (UINT8)(HalfSize - Index);
-  S = &Signature[HalfSize + Index];
-  if (RSize == 0 || SSize == 0) {
-    *DerSigSizeInOut = 0;
-    return ;
-  }
-  if (R[0] < 0x80) {
-    DerRSize = RSize;
-  } else {
-    DerRSize = RSize + 1;
-  }
-  if (S[0] < 0x80) {
-    DerSSize = SSize;
-  } else {
-    DerSSize = SSize + 1;
-  }
-  DerSigSize = DerRSize + DerSSize + 6;
-  ASSERT (DerSigSize <= *DerSigSizeInOut);
-  *DerSigSizeInOut = DerSigSize;
-  ZeroMem (DerSignature, DerSigSize);
-  DerSignature[0] = 0x30;
-  DerSignature[1] = (UINT8)(DerSigSize - 2);
-  DerSignature[2] = 0x02;
-  DerSignature[3] = DerRSize;
-  if (R[0] < 0x80) {
-    CopyMem (&DerSignature[4], R, RSize);
-  } else {
-    CopyMem (&DerSignature[5], R, RSize);
-  }
-  DerSignature[4 + DerRSize] = 0x02;
-  DerSignature[5 + DerRSize] = DerSSize;
-  if (S[0] < 0x80) {
-    CopyMem (&DerSignature[6 + DerRSize], S, SSize);
-  } else {
-    CopyMem (&DerSignature[7 + DerRSize], S, SSize);
-  }
 }
 
 /**
@@ -652,21 +521,22 @@ EccSignatureBinToDer (
 BOOLEAN
 EFIAPI
 EcDsaVerify (
-  IN  VOID         *EcDsaContext,
+  IN  VOID         *EcContext,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   )
 {
+  INT32      Result;
   EC_KEY     *EcKey;
-  INT32      DigestType;
+  ECDSA_SIG  *EcDsaSig;
   INT32      OpenSslNid;
-  UINT8      DerSignature[66 * 2 + 8];
-  UINTN      DerSigSize;
   UINT8      HalfSize;
+  BIGNUM     *R;
+  BIGNUM     *S;
 
-  if (EcDsaContext == NULL || MessageHash == NULL || Signature == NULL) {
+  if (EcContext == NULL || MessageHash == NULL || Signature == NULL) {
     return FALSE;
   }
 
@@ -674,7 +544,7 @@ EcDsaVerify (
     return FALSE;
   }
 
-  EcKey = (EC_KEY *) EcDsaContext;
+  EcKey = (EC_KEY *) EcContext;
   OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
   switch (OpenSslNid) {
   case NID_X9_62_prime256v1:
@@ -698,30 +568,35 @@ EcDsaVerify (
   //
   switch (HashSize) {
   case SHA256_DIGEST_SIZE:
-    DigestType = NID_sha256;
-    break;
-    
   case SHA384_DIGEST_SIZE:
-    DigestType = NID_sha384;
-    break;
-
   case SHA512_DIGEST_SIZE:
-    DigestType = NID_sha512;
     break;
-
   default:
     return FALSE;
   }
 
-  DerSigSize = sizeof(DerSignature);
-  EccSignatureBinToDer ((UINT8 *)Signature, SigSize, DerSignature, &DerSigSize);
+  EcDsaSig = ECDSA_SIG_new ();
+  if (EcDsaSig == NULL) {
+    ECDSA_SIG_free(EcDsaSig);
+    return FALSE;
+  }
 
-  return (BOOLEAN) ECDSA_verify (
-                     DigestType,
-                     MessageHash,
-                     (UINT32) HashSize,
-                     DerSignature,
-                     (UINT32) DerSigSize,
-                     (EC_KEY *) EcDsaContext
-                     );
+  R = BN_bin2bn (Signature, (UINT32) HalfSize, NULL);
+  S = BN_bin2bn (Signature + HalfSize, (UINT32) HalfSize, NULL);
+  if (R == NULL || S == NULL) {
+    ECDSA_SIG_free(EcDsaSig);
+    return FALSE;
+  }
+  ECDSA_SIG_set0 (EcDsaSig, R, S);
+
+  Result = ECDSA_do_verify (
+             MessageHash,
+             (UINT32) HashSize,
+             EcDsaSig,
+             (EC_KEY *) EcContext
+             );
+
+  ECDSA_SIG_free(EcDsaSig);
+
+  return (Result == 1);
 }

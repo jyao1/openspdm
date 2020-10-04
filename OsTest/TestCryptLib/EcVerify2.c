@@ -91,7 +91,7 @@ ValidateCryptEc2 (
   VOID    *EcPubKey;
   UINT8   HashValue[SHA256_DIGEST_SIZE];
   UINTN   HashSize;
-  UINT8   Signature[512]; // 0x48/72, 0x68/104, 0x8A/138
+  UINT8   Signature[66 * 2];
   UINTN   SigSize;
 
   Print ("\nUEFI-OpenSSL EC Key Retrieving Testing: ");
@@ -115,7 +115,7 @@ ValidateCryptEc2 (
   Status    = EcGetPublicKeyFromX509 (EccTestRootCer, sizeof (EccTestRootCer), &EcPubKey);
   if (!Status) {
     Print ("[Fail]");
-    EcDsaFree (EcPrivKey);
+    EcFree (EcPrivKey);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]");
@@ -130,8 +130,8 @@ ValidateCryptEc2 (
   Status  = EcDsaSign (EcPrivKey, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
-    EcDsaFree (EcPrivKey);
-    EcDsaFree (EcPubKey);
+    EcFree (EcPrivKey);
+    EcFree (EcPubKey);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]");
@@ -141,15 +141,15 @@ ValidateCryptEc2 (
   Status = EcDsaVerify (EcPubKey, HashValue, HashSize, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
-    EcDsaFree (EcPrivKey);
-    EcDsaFree (EcPubKey);
+    EcFree (EcPrivKey);
+    EcFree (EcPubKey);
     return EFI_ABORTED;
   } else {
     Print ("[Pass]\n");
   }
 
-  EcDsaFree (EcPrivKey);
-  EcDsaFree (EcPubKey);
+  EcFree (EcPrivKey);
+  EcFree (EcPubKey);
   return EFI_SUCCESS;
 }
 

@@ -80,22 +80,6 @@ EcFree (
 }
 
 /**
-  Release the specified ECDSA context.
-  
-  @param[in]  EcDsaContext  Pointer to the EC context to be released.
-
-**/
-VOID
-EFIAPI
-EcDsaFree (
-  IN  VOID  *EcDsaContext
-  )
-{
-  mbedtls_ecdsa_free (EcDsaContext);
-  FreePool (EcDsaContext);
-}
-
-/**
   Generates EC key and returns EC public key (X, Y).
 
   This function generates random secret, and computes the public key (X, Y), which is
@@ -290,53 +274,6 @@ EcComputeKey (
   return TRUE;
 }
 
-STATIC
-VOID
-EccSignatureDerToBin (
-  IN      UINT8        *DerSignature,
-  IN      UINTN        DerSigSize,
-  OUT     UINT8        *Signature,
-  IN      UINTN        SigSize
-  )
-{
-  UINT8                 DerRSize;
-  UINT8                 DerSSize;
-  UINT8                 *R;
-  UINT8                 *S;
-  UINT8                 RSize;
-  UINT8                 SSize;
-  UINT8                 HalfSize;
-
-  HalfSize = (UINT8)(SigSize / 2);
-
-  ASSERT (DerSignature[0] == 0x30);
-  ASSERT ((UINTN)(DerSignature[1] + 2) == DerSigSize);
-  ASSERT (DerSignature[2] == 0x02);
-  DerRSize = DerSignature[3];
-  ASSERT (DerSignature[4 + DerRSize] == 0x02);
-  DerSSize = DerSignature[5 + DerRSize];
-  ASSERT (DerSigSize == (UINTN)(DerRSize + DerSSize + 6));
-
-  if (DerSignature[4] != 0) {
-    RSize = DerRSize;
-    R = &DerSignature[4];
-  } else {
-    RSize = DerRSize - 1;
-    R = &DerSignature[5];
-  }
-  if (DerSignature[6 + DerRSize] != 0) {
-    SSize = DerSSize;
-    S = &DerSignature[6 + DerRSize];
-  } else {
-    SSize = DerSSize - 1;
-    S = &DerSignature[7 + DerRSize];
-  }
-  ASSERT (RSize <= HalfSize && SSize <= HalfSize);
-  ZeroMem (Signature, SigSize);
-  CopyMem (&Signature[0 + HalfSize - RSize], R, RSize);
-  CopyMem (&Signature[HalfSize + HalfSize - SSize], S, SSize);
-}
-
 /**
   Carries out the EC-DSA signature.
 
@@ -368,7 +305,7 @@ EccSignatureDerToBin (
 BOOLEAN
 EFIAPI
 EcDsaSign (
-  IN      VOID         *EcDsaContext,
+  IN      VOID         *EcContext,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
@@ -376,13 +313,14 @@ EcDsaSign (
   )
 {
   INT32                 Ret;
-  mbedtls_md_type_t     md_alg;
-  mbedtls_ecdsa_context *ecdsa;
-  UINT8                 DerSignature[66 * 2 + 8];
-  UINTN                 DerSigSize;
-  UINT8                 HalfSize;
+  mbedtls_ecdh_context  *ctx;
+  mbedtls_mpi           R;
+  mbedtls_mpi           S;
+  UINTN                 RSize;
+  UINTN                 SSize;
+  UINTN                 HalfSize;
 
-  if (EcDsaContext == NULL || MessageHash == NULL) {
+  if (EcContext == NULL || MessageHash == NULL) {
     return FALSE;
   }
   
@@ -390,8 +328,8 @@ EcDsaSign (
     return FALSE;
   }
 
-  ecdsa = EcDsaContext;
-  switch (ecdsa->grp.id) {
+  ctx = EcContext;
+  switch (ctx->grp.id) {
   case MBEDTLS_ECP_DP_SECP256R1:
     HalfSize = 32;
     break;
@@ -409,106 +347,47 @@ EcDsaSign (
     return FALSE;
   }
   *SigSize = HalfSize * 2;
+  ZeroMem (Signature, *SigSize);
 
   switch (HashSize) {
   case SHA256_DIGEST_SIZE:
-    md_alg = MBEDTLS_MD_SHA256;
-    break;
-    
   case SHA384_DIGEST_SIZE:
-    md_alg = MBEDTLS_MD_SHA384;
-    break;
-
   case SHA512_DIGEST_SIZE:
-    md_alg = MBEDTLS_MD_SHA512;
     break;
-
   default:
     return FALSE;
   }
 
-  DerSigSize = sizeof(DerSignature);
-  ZeroMem (DerSignature, sizeof(DerSignature));
-  Ret = mbedtls_ecdsa_write_signature (EcDsaContext, md_alg, MessageHash, HashSize,
-                            DerSignature, &DerSigSize, myrand, NULL );
+  mbedtls_mpi_init (&R);
+  mbedtls_mpi_init (&S);
+
+  Ret = mbedtls_ecdsa_sign (&ctx->grp, &R, &S, &ctx->d,
+                            MessageHash, HashSize, myrand, NULL );
   if (Ret != 0) {
-      return FALSE;
+    return FALSE;
   }
 
-  EccSignatureDerToBin (DerSignature, DerSigSize, Signature, *SigSize);
+  RSize = mbedtls_mpi_size (&R);
+  SSize = mbedtls_mpi_size (&S);
+  ASSERT (RSize <= HalfSize && SSize <= HalfSize);
+
+  Ret = mbedtls_mpi_write_binary (&R, &Signature[0 + HalfSize - RSize], RSize);
+  if (Ret != 0) {
+    mbedtls_mpi_free (&R);
+    mbedtls_mpi_free (&S);
+    return FALSE;
+  }
+  Ret = mbedtls_mpi_write_binary (&S, &Signature[HalfSize + HalfSize - SSize], SSize);
+  if (Ret != 0) {
+    mbedtls_mpi_free (&R);
+    mbedtls_mpi_free (&S);
+    return FALSE;
+  }
+
+  mbedtls_mpi_free (&R);
+  mbedtls_mpi_free (&S);
 
   return TRUE;
-}
-
-STATIC
-VOID
-EccSignatureBinToDer (
-  IN      UINT8        *Signature,
-  IN      UINTN        SigSize,
-  OUT     UINT8        *DerSignature,
-  IN OUT  UINTN        *DerSigSizeInOut
-  )
-{
-  UINTN                 DerSigSize;
-  UINT8                 DerRSize;
-  UINT8                 DerSSize;
-  UINT8                 *R;
-  UINT8                 *S;
-  UINT8                 RSize;
-  UINT8                 SSize;
-  UINT8                 HalfSize;
-  UINT8                 Index;
-
-  HalfSize = (UINT8)(SigSize / 2);
-
-  for (Index = 0; Index < HalfSize; Index++) {
-    if (Signature[Index] != 0) {
-      break;
-    }
-  }
-  RSize = (UINT8)(HalfSize - Index);
-  R = &Signature[Index];
-  for (Index = 0; Index < HalfSize; Index++) {
-    if (Signature[HalfSize + Index] != 0) {
-      break;
-    }
-  }
-  SSize = (UINT8)(HalfSize - Index);
-  S = &Signature[HalfSize + Index];
-  if (RSize == 0 || SSize == 0) {
-    *DerSigSizeInOut = 0;
-    return ;
-  }
-  if (R[0] < 0x80) {
-    DerRSize = RSize;
-  } else {
-    DerRSize = RSize + 1;
-  }
-  if (S[0] < 0x80) {
-    DerSSize = SSize;
-  } else {
-    DerSSize = SSize + 1;
-  }
-  DerSigSize = DerRSize + DerSSize + 6;
-  ASSERT (DerSigSize <= *DerSigSizeInOut);
-  *DerSigSizeInOut = DerSigSize;
-  ZeroMem (DerSignature, DerSigSize);
-  DerSignature[0] = 0x30;
-  DerSignature[1] = (UINT8)(DerSigSize - 2);
-  DerSignature[2] = 0x02;
-  DerSignature[3] = DerRSize;
-  if (R[0] < 0x80) {
-    CopyMem (&DerSignature[4], R, RSize);
-  } else {
-    CopyMem (&DerSignature[5], R, RSize);
-  }
-  DerSignature[4 + DerRSize] = 0x02;
-  DerSignature[5 + DerRSize] = DerSSize;
-  if (S[0] < 0x80) {
-    CopyMem (&DerSignature[6 + DerRSize], S, SSize);
-  } else {
-    CopyMem (&DerSignature[7 + DerRSize], S, SSize);
-  }
 }
 
 /**
@@ -536,7 +415,7 @@ EccSignatureBinToDer (
 BOOLEAN
 EFIAPI
 EcDsaVerify (
-  IN  VOID         *EcDsaContext,
+  IN  VOID         *EcContext,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
@@ -544,12 +423,12 @@ EcDsaVerify (
   )
 {
   INT32                 Ret;
-  mbedtls_ecdsa_context *ecdsa;
-  UINT8                 DerSignature[66 * 2 + 8];
-  UINTN                 DerSigSize;
-  UINT8                 HalfSize;
+  mbedtls_ecdh_context  *ctx;
+  mbedtls_mpi           R;
+  mbedtls_mpi           S;
+  UINTN                 HalfSize;
 
-  if (EcDsaContext == NULL || MessageHash == NULL || Signature == NULL) {
+  if (EcContext == NULL || MessageHash == NULL || Signature == NULL) {
     return FALSE;
   }
 
@@ -557,8 +436,8 @@ EcDsaVerify (
     return FALSE;
   }
 
-  ecdsa = EcDsaContext;
-  switch (ecdsa->grp.id) {
+  ctx = EcContext;
+  switch (ctx->grp.id) {
   case MBEDTLS_ECP_DP_SECP256R1:
     HalfSize = 32;
     break;
@@ -575,11 +454,36 @@ EcDsaVerify (
     return FALSE;
   }
 
-  DerSigSize = sizeof(DerSignature);
-  EccSignatureBinToDer ((UINT8 *)Signature, SigSize, DerSignature, &DerSigSize);
+  switch (HashSize) {
+  case SHA256_DIGEST_SIZE:
+  case SHA384_DIGEST_SIZE:
+  case SHA512_DIGEST_SIZE:
+    break;
+  default:
+    return FALSE;
+  }
 
-  Ret = mbedtls_ecdsa_read_signature (EcDsaContext, MessageHash, HashSize,
-                              DerSignature, DerSigSize);
+  mbedtls_mpi_init (&R);
+  mbedtls_mpi_init (&S);
+
+  Ret = mbedtls_mpi_read_binary (&R, Signature, HalfSize);
+  if (Ret != 0) {
+    mbedtls_mpi_free (&R);
+    mbedtls_mpi_free (&S);
+    return FALSE;
+  }
+  Ret = mbedtls_mpi_read_binary (&S, Signature + HalfSize, HalfSize);
+  if (Ret != 0) {
+    mbedtls_mpi_free (&R);
+    mbedtls_mpi_free (&S);
+    return FALSE;
+  }
+
+  Ret = mbedtls_ecdsa_verify (&ctx->grp, MessageHash, HashSize,
+                              &ctx->Q, &R, &S);
+  mbedtls_mpi_free (&R);
+  mbedtls_mpi_free (&S);
+
   if (Ret != 0) {
     return FALSE;
   }
