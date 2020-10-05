@@ -56,6 +56,9 @@ TrySpdmGetCapabilities (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
     Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageA, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_CAPABILITIES, SPDM_CAPABILITIES, sizeof(SPDM_CAPABILITIES_RESPONSE));
     if (RETURN_ERROR(Status)) {

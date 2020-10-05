@@ -186,18 +186,20 @@ TrySpdmGetCertificate (
       Status = RETURN_DEVICE_ERROR;
       goto Done;
     }
-
-    if (SpdmResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
+    if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
       Status = RETURN_DEVICE_ERROR;
       goto Done;
     }
-
     if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
       Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageB, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_CERTIFICATE, SPDM_CERTIFICATE, sizeof(SPDM_CERTIFICATE_RESPONSE_MAX));
       if (RETURN_ERROR(Status)) {
         goto Done;
       }
     } else if (SpdmResponse.Header.RequestResponseCode != SPDM_CERTIFICATE) {
+      Status = RETURN_DEVICE_ERROR;
+      goto Done;
+    }
+    if (SpdmResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
       Status = RETURN_DEVICE_ERROR;
       goto Done;
     }

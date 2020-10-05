@@ -55,6 +55,9 @@ TrySpdmGetVersion (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
     Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageA, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_VERSION, SPDM_VERSION, sizeof(SPDM_VERSION_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {
