@@ -76,7 +76,7 @@ TestSpdmProcessPacketCallback (
 {
   SPDM_VENDOR_DEFINED_REQUEST_MINE   *SpmdRequest;
   SpmdRequest = Request;
-  ASSERT (RequestSize == sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE));
+  ASSERT ((RequestSize >= sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE)) && (RequestSize < sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE) + 4));
   ASSERT (SpmdRequest->Header.RequestResponseCode == SPDM_VENDOR_DEFINED_REQUEST);
   ASSERT (SpmdRequest->StandardID == SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_PCISIG);
   ASSERT (SpmdRequest->VendorID == 0x8086);
@@ -274,6 +274,7 @@ SpdmServerInit (
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
+  SpdmRegisterTransportLayerFunc (SpdmContext, SpdmMctpEncodeMessage, SpdmMctpDecodeMessage);
   SpdmSetAlignment (SpdmContext, 4);
 
   Res = ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);

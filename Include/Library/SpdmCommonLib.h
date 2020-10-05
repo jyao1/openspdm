@@ -370,4 +370,69 @@ SpdmRegisterDeviceIoFunc (
   IN     SPDM_DEVICE_RECEIVE_MESSAGE_FUNC  ReceiveMessage
   );
 
+/**
+  Encode a SPDM message to a transport layer message.
+
+  @param  This                         Indicates a pointer to the calling context.
+  @param  IsSecuredMessage             Indicates if it is a secured message protected via SPDM session.
+  @param  SpdmMessageSize              Size in bytes of the SPDM message data buffer.
+  @param  SpdmMessage                  A pointer to a source buffer to store the SPDM message.
+  @param  TransportMessageSize         Size in bytes of the SPDM message data buffer.
+  @param  TransportMessage             A pointer to a destination buffer to store the SPDM message.
+
+  @retval RETURN_SUCCESS               The SPDM message is encoded successfully.
+  @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
+**/
+typedef
+RETURN_STATUS
+(EFIAPI *SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC) (
+  IN     VOID                 *SpdmContext,
+  IN     BOOLEAN              IsSecuredMessage,
+  IN     UINTN                SpdmMessageSize,
+  IN     VOID                 *SpdmMessage,
+  IN OUT UINTN                *TransportMessageSize,
+     OUT VOID                 *TransportMessage
+  );
+
+/**
+  Decode a SPDM message from a transport layer message.
+
+  @param  This                         Indicates a pointer to the calling context.
+  @param  IsSecuredMessage             Indicates if it is a secured message protected via SPDM session.
+  @param  TransportMessageSize         Size in bytes of the SPDM message data buffer.
+  @param  TransportMessage             A pointer to a source buffer to store the SPDM message.
+  @param  SpdmMessageSize              Size in bytes of the SPDM message data buffer.
+  @param  SpdmMessage                  A pointer to a destination buffer to store the SPDM message.
+
+  @retval RETURN_SUCCESS               The SPDM message is decoded successfully.
+  @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
+  @retval RETURN_UNSUPPORTED           The TransportMessage is unsupported.
+**/
+typedef
+RETURN_STATUS
+(EFIAPI *SPDM_TRANSPORT_DECODE_MESSAGE_FUNC) (
+  IN     VOID                 *SpdmContext,
+     OUT BOOLEAN              *IsSecuredMessage,
+  IN     UINTN                TransportMessageSize,
+  IN     VOID                 *TransportMessage,
+  IN OUT UINTN                *SpdmMessageSize,
+     OUT VOID                 *SpdmMessage
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmRegisterTransportLayerFunc (
+  IN     VOID                                *SpdmContext,
+  IN     SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC  TransportEncodeMessage,
+  IN     SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  TransportDecodeMessage
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmGetTransportLayerFunc (
+  IN     VOID                                *SpdmContext,
+     OUT SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC  *TransportEncodeMessage,
+     OUT SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  *TransportDecodeMessage
+  );
+
 #endif

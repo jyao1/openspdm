@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmSecuredMessageLib
+MODULE_NAME = SpdmTransportMctpLib
 
 #
 # Build Directory Macro Definition
@@ -32,9 +32,7 @@ SOURCE_DIR = $(WORKSPACE)/Library/SpdmLib/$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)/SpdmSecuredMessageLibDecode.o \
-    $(OUTPUT_DIR)/SpdmSecuredMessageLibEncode.o \
-    $(OUTPUT_DIR)/SpdmSecuredMessageLibOpaqueData.o \
+    $(OUTPUT_DIR)/SpdmTransportMctpLib.o \
 
 
 INC =  \
@@ -71,13 +69,7 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)/SpdmSecuredMessageLibDecode.o : $(SOURCE_DIR)/SpdmSecuredMessageLibDecode.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/SpdmSecuredMessageLibEncode.o : $(SOURCE_DIR)/SpdmSecuredMessageLibEncode.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/SpdmSecuredMessageLibOpaqueData.o : $(SOURCE_DIR)/SpdmSecuredMessageLibOpaqueData.c
+$(OUTPUT_DIR)/SpdmTransportMctpLib.o : $(SOURCE_DIR)/SpdmTransportMctpLib.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

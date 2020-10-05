@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmSecuredMessageLib
+MODULE_NAME = SpdmTransportMctpLib
 
 #
 # Build Directory Macro Definition
@@ -32,9 +32,7 @@ SOURCE_DIR = $(WORKSPACE)\Library\SpdmLib\$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\SpdmSecuredMessageLibDecode.obj \
-    $(OUTPUT_DIR)\SpdmSecuredMessageLibEncode.obj \
-    $(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj \
+    $(OUTPUT_DIR)\SpdmTransportMctpLib.obj \
 
 
 INC =  \
@@ -71,14 +69,8 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\SpdmSecuredMessageLibDecode.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibDecode.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibDecode.c
-
-$(OUTPUT_DIR)\SpdmSecuredMessageLibEncode.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibEncode.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibEncode.c
-
-$(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
+$(OUTPUT_DIR)\SpdmTransportMctpLib.obj : $(SOURCE_DIR)\SpdmTransportMctpLib.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmTransportMctpLib.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

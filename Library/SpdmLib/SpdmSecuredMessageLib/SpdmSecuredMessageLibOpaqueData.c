@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/SpdmSecuredMessageLib.h>
 
-#include <IndustryStandard/SpdmSecureMessage.h>
+#include <IndustryStandard/SpdmSecuredMessage.h>
 #include "SpdmCommonLibInternal.h"
 
 UINTN
@@ -19,9 +19,9 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
   )
 {
   UINTN  Size;
-  Size = sizeof(SECURE_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER) +
-         sizeof(SECURE_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) +
-         sizeof(SECURE_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION);
+  Size = sizeof(SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER) +
+         sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) +
+         sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION);
   return (Size + 3) & ~3;
 }
 
@@ -32,9 +32,9 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
   )
 {
   UINTN  Size;
-  Size = sizeof(SECURE_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER) +
-         sizeof(SECURE_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) +
-         sizeof(SECURE_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) +
+  Size = sizeof(SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER) +
+         sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) +
+         sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) +
          sizeof(SPDM_VERSION_NUMBER);
   return (Size + 3) & ~3;
 }
@@ -47,11 +47,11 @@ SpdmBuildOpaqueDataSupportedVersionData (
      OUT VOID                 *DataOut
   )
 {
-  UINTN                                             FinalDataSize;
-  SECURE_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
-  SECURE_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
-  SECURE_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION   *OpaqueElementSupportVersion;
-  SPDM_VERSION_NUMBER                               *VersionsList;
+  UINTN                                              FinalDataSize;
+  SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION   *OpaqueElementSupportVersion;
+  SPDM_VERSION_NUMBER                                *VersionsList;
 
   FinalDataSize = SpdmGetOpaqueDataSupportedVersionDataSize(SpdmContext);
   if (*DataOutSize < FinalDataSize) {
@@ -60,19 +60,19 @@ SpdmBuildOpaqueDataSupportedVersionData (
   }
 
   GeneralOpaqueDataTableHeader = DataOut;
-  GeneralOpaqueDataTableHeader->SpecId = SECURE_MESSAGE_OPAQUE_DATA_SPEC_ID;
-  GeneralOpaqueDataTableHeader->OpaqueVersion = SECURE_MESSAGE_OPAQUE_VERSION;
+  GeneralOpaqueDataTableHeader->SpecId = SECURED_MESSAGE_OPAQUE_DATA_SPEC_ID;
+  GeneralOpaqueDataTableHeader->OpaqueVersion = SECURED_MESSAGE_OPAQUE_VERSION;
   GeneralOpaqueDataTableHeader->TotalElements = 1;
   GeneralOpaqueDataTableHeader->Reserved = 0;
 
   OpaqueElementTableHeader = (VOID *)(GeneralOpaqueDataTableHeader + 1);
   OpaqueElementTableHeader->Id = SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_DMTF;
   OpaqueElementTableHeader->VendorLen = 0;
-  OpaqueElementTableHeader->OpaqueElementDataLen = sizeof(SECURE_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) + sizeof(SPDM_VERSION_NUMBER);
+  OpaqueElementTableHeader->OpaqueElementDataLen = sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) + sizeof(SPDM_VERSION_NUMBER);
 
   OpaqueElementSupportVersion = (VOID *)(OpaqueElementTableHeader + 1);
-  OpaqueElementSupportVersion->SMDataVersion = SECURE_MESSAGE_OPAQUE_ELEMENT_SMDATA_DATA_VERSION;
-  OpaqueElementSupportVersion->SMDataID = SECURE_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_SUPPORTED_VERSION;
+  OpaqueElementSupportVersion->SMDataVersion = SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_DATA_VERSION;
+  OpaqueElementSupportVersion->SMDataID = SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_SUPPORTED_VERSION;
   OpaqueElementSupportVersion->VersionCount = 1;
 
   VersionsList = (VOID *)(OpaqueElementSupportVersion + 1);
@@ -92,17 +92,17 @@ SpdmProcessOpaqueDataSupportedVersionData (
   IN     VOID                 *DataIn
   )
 {
-  SECURE_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
-  SECURE_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
-  SECURE_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION   *OpaqueElementSupportVersion;
-  SPDM_VERSION_NUMBER                               *VersionsList;
+  SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION   *OpaqueElementSupportVersion;
+  SPDM_VERSION_NUMBER                                *VersionsList;
 
   if (DataInSize != SpdmGetOpaqueDataSupportedVersionDataSize(SpdmContext)) {
     return RETURN_UNSUPPORTED;
   }
   GeneralOpaqueDataTableHeader = DataIn;
-  if ((GeneralOpaqueDataTableHeader->SpecId != SECURE_MESSAGE_OPAQUE_DATA_SPEC_ID) ||
-      (GeneralOpaqueDataTableHeader->OpaqueVersion != SECURE_MESSAGE_OPAQUE_VERSION) ||
+  if ((GeneralOpaqueDataTableHeader->SpecId != SECURED_MESSAGE_OPAQUE_DATA_SPEC_ID) ||
+      (GeneralOpaqueDataTableHeader->OpaqueVersion != SECURED_MESSAGE_OPAQUE_VERSION) ||
       (GeneralOpaqueDataTableHeader->TotalElements != 1) ||
       (GeneralOpaqueDataTableHeader->Reserved != 0) ) {
     return RETURN_UNSUPPORTED;
@@ -110,12 +110,12 @@ SpdmProcessOpaqueDataSupportedVersionData (
   OpaqueElementTableHeader = (VOID *)(GeneralOpaqueDataTableHeader + 1);
   if ((OpaqueElementTableHeader->Id != SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_DMTF) ||
       (OpaqueElementTableHeader->VendorLen != 0) ||
-      (OpaqueElementTableHeader->OpaqueElementDataLen != sizeof(SECURE_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) + sizeof(SPDM_VERSION_NUMBER)) ) {
+      (OpaqueElementTableHeader->OpaqueElementDataLen != sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) + sizeof(SPDM_VERSION_NUMBER)) ) {
     return RETURN_UNSUPPORTED;
   }
   OpaqueElementSupportVersion = (VOID *)(OpaqueElementTableHeader + 1);
-  if ((OpaqueElementSupportVersion->SMDataVersion != SECURE_MESSAGE_OPAQUE_ELEMENT_SMDATA_DATA_VERSION) ||
-      (OpaqueElementSupportVersion->SMDataID != SECURE_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_SUPPORTED_VERSION) ||
+  if ((OpaqueElementSupportVersion->SMDataVersion != SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_DATA_VERSION) ||
+      (OpaqueElementSupportVersion->SMDataID != SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_SUPPORTED_VERSION) ||
       (OpaqueElementSupportVersion->VersionCount != 1) ) {
     return RETURN_UNSUPPORTED;
   }
@@ -136,10 +136,10 @@ SpdmBuildOpaqueDataVersionSelectionData (
      OUT VOID                 *DataOut
   )
 {
-  UINTN                                             FinalDataSize;
-  SECURE_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
-  SECURE_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
-  SECURE_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
+  UINTN                                              FinalDataSize;
+  SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
 
   FinalDataSize = SpdmGetOpaqueDataVersionSelectionDataSize(SpdmContext);
   if (*DataOutSize < FinalDataSize) {
@@ -148,19 +148,19 @@ SpdmBuildOpaqueDataVersionSelectionData (
   }
 
   GeneralOpaqueDataTableHeader = DataOut;
-  GeneralOpaqueDataTableHeader->SpecId = SECURE_MESSAGE_OPAQUE_DATA_SPEC_ID;
-  GeneralOpaqueDataTableHeader->OpaqueVersion = SECURE_MESSAGE_OPAQUE_VERSION;
+  GeneralOpaqueDataTableHeader->SpecId = SECURED_MESSAGE_OPAQUE_DATA_SPEC_ID;
+  GeneralOpaqueDataTableHeader->OpaqueVersion = SECURED_MESSAGE_OPAQUE_VERSION;
   GeneralOpaqueDataTableHeader->TotalElements = 1;
   GeneralOpaqueDataTableHeader->Reserved = 0;
 
   OpaqueElementTableHeader = (VOID *)(GeneralOpaqueDataTableHeader + 1);
   OpaqueElementTableHeader->Id = SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_DMTF;
   OpaqueElementTableHeader->VendorLen = 0;
-  OpaqueElementTableHeader->OpaqueElementDataLen = sizeof(SECURE_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION);
+  OpaqueElementTableHeader->OpaqueElementDataLen = sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION);
 
   OpaqueElementVersionSection = (VOID *)(OpaqueElementTableHeader + 1);
-  OpaqueElementVersionSection->SMDataVersion = SECURE_MESSAGE_OPAQUE_ELEMENT_SMDATA_DATA_VERSION;
-  OpaqueElementVersionSection->SMDataID = SECURE_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_VERSION_SELECTION;
+  OpaqueElementVersionSection->SMDataVersion = SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_DATA_VERSION;
+  OpaqueElementVersionSection->SMDataID = SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_VERSION_SELECTION;
   OpaqueElementVersionSection->SelectedVersion.Alpha = 0;
   OpaqueElementVersionSection->SelectedVersion.UpdateVersionNumber = 0;
   OpaqueElementVersionSection->SelectedVersion.MinorVersion = 1;
@@ -177,16 +177,16 @@ SpdmProcessOpaqueDataVersionSelectionData (
   IN     VOID                 *DataIn
   )
 {
-  SECURE_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
-  SECURE_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
-  SECURE_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
+  SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
 
   if (DataInSize != SpdmGetOpaqueDataVersionSelectionDataSize(SpdmContext)) {
     return RETURN_UNSUPPORTED;
   }
   GeneralOpaqueDataTableHeader = DataIn;
-  if ((GeneralOpaqueDataTableHeader->SpecId != SECURE_MESSAGE_OPAQUE_DATA_SPEC_ID) ||
-      (GeneralOpaqueDataTableHeader->OpaqueVersion != SECURE_MESSAGE_OPAQUE_VERSION) ||
+  if ((GeneralOpaqueDataTableHeader->SpecId != SECURED_MESSAGE_OPAQUE_DATA_SPEC_ID) ||
+      (GeneralOpaqueDataTableHeader->OpaqueVersion != SECURED_MESSAGE_OPAQUE_VERSION) ||
       (GeneralOpaqueDataTableHeader->TotalElements != 1) ||
       (GeneralOpaqueDataTableHeader->Reserved != 0) ) {
     return RETURN_UNSUPPORTED;
@@ -194,12 +194,12 @@ SpdmProcessOpaqueDataVersionSelectionData (
   OpaqueElementTableHeader = (VOID *)(GeneralOpaqueDataTableHeader + 1);
   if ((OpaqueElementTableHeader->Id != SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_DMTF) ||
       (OpaqueElementTableHeader->VendorLen != 0) ||
-      (OpaqueElementTableHeader->OpaqueElementDataLen != sizeof(SECURE_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION)) ) {
+      (OpaqueElementTableHeader->OpaqueElementDataLen != sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION)) ) {
     return RETURN_UNSUPPORTED;
   }
   OpaqueElementVersionSection = (VOID *)(OpaqueElementTableHeader + 1);
-  if ((OpaqueElementVersionSection->SMDataVersion != SECURE_MESSAGE_OPAQUE_ELEMENT_SMDATA_DATA_VERSION) ||
-      (OpaqueElementVersionSection->SMDataID != SECURE_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_VERSION_SELECTION) ||
+  if ((OpaqueElementVersionSection->SMDataVersion != SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_DATA_VERSION) ||
+      (OpaqueElementVersionSection->SMDataID != SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_VERSION_SELECTION) ||
       (OpaqueElementVersionSection->SelectedVersion.MinorVersion != 1) ||
       (OpaqueElementVersionSection->SelectedVersion.MajorVersion != 1) ) {
     return RETURN_UNSUPPORTED;

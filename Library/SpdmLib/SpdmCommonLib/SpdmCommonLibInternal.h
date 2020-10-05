@@ -308,6 +308,11 @@ typedef struct {
   SPDM_DEVICE_SEND_MESSAGE_FUNC     SendMessage;
   SPDM_DEVICE_RECEIVE_MESSAGE_FUNC  ReceiveMessage;
   UINT32                            Alignment;
+  //
+  // Transport Layer infomration
+  //
+  SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC  TransportEncodeMessage;
+  SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  TransportDecodeMessage;
 
   //
   // Command Status

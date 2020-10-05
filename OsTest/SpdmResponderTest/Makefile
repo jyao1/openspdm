@@ -50,6 +50,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\Library\SpdmLib\SpdmCommonLib\SpdmCommonLib.lib \
     $(BIN_DIR)\Library\SpdmLib\SpdmResponderLib\SpdmResponderLib.lib \
     $(BIN_DIR)\Library\SpdmLib\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
+    $(BIN_DIR)\Library\SpdmLib\SpdmTransportMctpLib\SpdmTransportMctpLib.lib \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
 
 
@@ -63,6 +64,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\Library\SpdmLib\SpdmCommonLib\*.obj \
     $(BIN_DIR)\Library\SpdmLib\SpdmResponderLib\*.obj \
     $(BIN_DIR)\Library\SpdmLib\SpdmSecuredMessageLib\*.obj \
+    $(BIN_DIR)\Library\SpdmLib\SpdmTransportMctpLib\*.obj \
 
 
 INC =  \
@@ -108,6 +110,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmCommonLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmResponderLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmTransportMctpLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
