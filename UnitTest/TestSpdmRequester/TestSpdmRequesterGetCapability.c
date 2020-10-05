@@ -72,8 +72,9 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
   {
     SPDM_CAPABILITIES_RESPONSE    *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_CAPABILITIES_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_CAPABILITIES;
@@ -88,8 +89,9 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
   {
     SPDM_CAPABILITIES_RESPONSE    *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_CAPABILITIES_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_CAPABILITIES;
@@ -104,8 +106,9 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE    *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -118,8 +121,9 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -134,8 +138,9 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     if (SubIndex1 == 0) {
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
-      *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -144,8 +149,9 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     } else if (SubIndex1 == 1) {
       SPDM_CAPABILITIES_RESPONSE    *SpdmResponse;
 
-      *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_CAPABILITIES_RESPONSE);
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CAPABILITIES;
@@ -162,8 +168,9 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE  *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -177,9 +184,10 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SPDM_ERROR_RESPONSE                  *SpdmResponse;
     SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
 
-    SpdmResponse = Response;
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
     ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -199,9 +207,10 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
       SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
 
-      SpdmResponse = Response;
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
       ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-      *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -214,8 +223,9 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     } else if (SubIndex2 == 1) {
       SPDM_CAPABILITIES_RESPONSE    *SpdmResponse;
 
-      *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_CAPABILITIES_RESPONSE);
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CAPABILITIES;

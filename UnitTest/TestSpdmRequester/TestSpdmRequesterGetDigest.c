@@ -76,8 +76,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
     UINT8                    *Digest;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
-    *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.Param1 = 0;
@@ -97,8 +98,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
     UINT8                    *Digest;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
-    *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.Param1 = 0;
@@ -116,8 +118,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE    *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -130,8 +133,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -146,8 +150,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
     if (SubIndex1 == 0) {
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
-      *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -158,8 +163,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
       UINT8                    *Digest;
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
-      *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.Param1 = 0;
@@ -179,8 +185,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE  *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -194,9 +201,10 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SPDM_ERROR_RESPONSE                  *SpdmResponse;
     SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
 
-    SpdmResponse = Response;
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
     ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -216,9 +224,10 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
       SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
 
-      SpdmResponse = Response;
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
       ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-      *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -233,8 +242,9 @@ SpdmRequesterGetDigestTestReceiveMessage (
       UINT8                    *Digest;
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
-      *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.Param1 = 0;

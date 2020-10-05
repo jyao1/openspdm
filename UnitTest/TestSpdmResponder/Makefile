@@ -54,6 +54,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\Library\SpdmLib\SpdmRequesterLib\SpdmRequesterLib.lib \
     $(BIN_DIR)\Library\SpdmLib\SpdmResponderLib\SpdmResponderLib.lib \
     $(BIN_DIR)\Library\SpdmLib\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
+    $(BIN_DIR)\Library\SpdmLib\SpdmTransportTestLib\SpdmTransportTestLib.lib \
     $(BIN_DIR)\UnitTest\CmockaLib\CmockaLib.lib \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
 
@@ -69,6 +70,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\Library\SpdmLib\SpdmRequesterLib\*.obj \
     $(BIN_DIR)\Library\SpdmLib\SpdmResponderLib\*.obj \
     $(BIN_DIR)\Library\SpdmLib\SpdmSecuredMessageLib\*.obj \
+    $(BIN_DIR)\Library\SpdmLib\SpdmTransportTestLib\*.obj \
     $(BIN_DIR)\UnitTest\CmockaLib\*.obj \
 
 
@@ -78,6 +80,7 @@ INC =  \
     -I$(WORKSPACE)\Include \
     -I$(WORKSPACE)\Include\Hal \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \
+    -I$(WORKSPACE)\OsStub\Include \
     -I$(WORKSPACE)\Library\SpdmLib\SpdmCommonLib \
     -I$(WORKSPACE)\Library\SpdmLib\SpdmRequesterLib \
     -I$(WORKSPACE)\Library\SpdmLib\SpdmResponderLib \
@@ -122,6 +125,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmRequesterLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmResponderLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmTransportTestLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\CmockaLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #

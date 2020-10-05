@@ -114,6 +114,7 @@ SpdmServerInit (
   }
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmResponderSendMessage, SpdmResponderReceiveMessage);
+  SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTestEncodeMessage, SpdmTestDecodeMessage);
 
   HasRspPubCert = FALSE;
   HasRspPrivKey = FALSE;

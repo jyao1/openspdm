@@ -84,8 +84,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
       CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
       free(Data);
-      *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
@@ -98,8 +99,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     } else {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-      *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
@@ -123,8 +125,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
       CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
       free(Data);
-      *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
@@ -137,8 +140,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     } else {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-      *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
@@ -156,8 +160,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE    *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -170,8 +175,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -186,8 +192,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     if (SubIndex1 == 0) {
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
-      *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -203,8 +210,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
         CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
         free(Data);
-        *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-        SpdmResponse = Response;
+        *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+        *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+        SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
         SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
         SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
@@ -217,8 +225,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       } else {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-        *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-        SpdmResponse = Response;
+        *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
+        *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+        SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
         SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
         SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
@@ -237,8 +246,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE  *SpdmResponse;
 
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    SpdmResponse = Response;
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -252,9 +262,10 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     SPDM_ERROR_RESPONSE                  *SpdmResponse;
     SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
 
-    SpdmResponse = Response;
+    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
     ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-    *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -274,9 +285,10 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
       SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
 
-      SpdmResponse = Response;
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
       ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-      *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -296,8 +308,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
         CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
         free(Data);
-        *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-        SpdmResponse = Response;
+        *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+        *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+        SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
         SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
         SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
@@ -310,8 +323,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       } else {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-        *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-        SpdmResponse = Response;
+        *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
+        *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+        SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
         SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
         SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
@@ -336,8 +350,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
       CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
       free(Data);
-      *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
@@ -350,8 +365,9 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     } else {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-      *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-      SpdmResponse = Response;
+      *ResponseSize = 1 + sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
+      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
+      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;

@@ -38,6 +38,7 @@ int SpdmUnitTestGroupSetup(void **state)
 
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmTestContext->SendMessage, SpdmTestContext->ReceiveMessage);
+  SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTestEncodeMessage, SpdmTestDecodeMessage);
 
   *state = SpdmTestContext;
   return 0;

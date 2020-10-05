@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/SpdmRequesterLib.h>
 #include <Library/SpdmResponderLib.h>
+#include <Library/SpdmTransportTestLib.h>
 #include <SpdmCommonLibInternal.h>
 
 #define SPDM_TEST_CONTEXT_SIGNATURE  SIGNATURE_32 ('S', 'T', 'C', 'S')
