@@ -567,35 +567,6 @@ SpdmGetLastError (
   return SpdmContext->ErrorState;
 }
 
-RETURN_STATUS
-EFIAPI
-SpdmSetAlignment (
-  IN     VOID                      *Context,
-  IN     UINT32                    Alignment
-  )
-{
-  SPDM_DEVICE_CONTEXT       *SpdmContext;
-
-  SpdmContext = Context;
-  SpdmContext->Alignment = Alignment;
-  return RETURN_SUCCESS;
-}
-
-UINT32
-EFIAPI
-SpdmGetAlignment (
-  IN     VOID                      *Context
-  )
-{
-  SPDM_DEVICE_CONTEXT       *SpdmContext;
-
-  SpdmContext = Context;
-  if (SpdmContext->Alignment == 0) {
-    SpdmContext->Alignment = 1;
-  }
-  return SpdmContext->Alignment;
-}
-
 SPDM_SESSION_TYPE
 EFIAPI
 SpdmGetSessionType (
@@ -629,7 +600,6 @@ SpdmInitContext (
   SpdmContext = Context;
   ZeroMem (SpdmContext, sizeof(SPDM_DEVICE_CONTEXT));
   SpdmContext->Version = SPDM_DEVICE_CONTEXT_VERSION;
-  SpdmContext->Alignment = 1;
   SpdmContext->Transcript.MessageA.MaxBufferSize    = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;
   SpdmContext->Transcript.MessageB.MaxBufferSize    = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SpdmContext->Transcript.MessageC.MaxBufferSize    = MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE;

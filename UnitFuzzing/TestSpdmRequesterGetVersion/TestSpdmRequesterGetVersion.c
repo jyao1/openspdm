@@ -48,7 +48,6 @@ SpdmDeviceReceiveMessage (
   SpdmTestContext = GetSpdmTestContext ();
   *SessionId = NULL;
   *ResponseSize = SpdmTestContext->TestBufferSize;
-  *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
   CopyMem (Response, SpdmTestContext->TestBuffer, SpdmTestContext->TestBufferSize);
 
   return RETURN_SUCCESS;

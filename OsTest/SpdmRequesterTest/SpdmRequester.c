@@ -206,7 +206,6 @@ SpdmClientInit (
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
   SpdmRegisterTransportLayerFunc (SpdmContext, SpdmMctpEncodeMessage, SpdmMctpDecodeMessage);
-  SpdmSetAlignment (SpdmContext, 4);
 
   Res = ReadResponderRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
   if (Res) {

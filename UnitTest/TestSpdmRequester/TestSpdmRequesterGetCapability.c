@@ -73,7 +73,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SPDM_CAPABILITIES_RESPONSE    *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -90,7 +89,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SPDM_CAPABILITIES_RESPONSE    *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -107,7 +105,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SPDM_ERROR_RESPONSE    *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -122,7 +119,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -139,7 +135,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
       *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -150,7 +145,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
       SPDM_CAPABILITIES_RESPONSE    *SpdmResponse;
 
       *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -169,7 +163,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SPDM_ERROR_RESPONSE  *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -187,7 +180,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SpdmResponse = Response;
     ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -210,7 +202,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
       SpdmResponse = Response;
       ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
       *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -224,7 +215,6 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
       SPDM_CAPABILITIES_RESPONSE    *SpdmResponse;
 
       *ResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;

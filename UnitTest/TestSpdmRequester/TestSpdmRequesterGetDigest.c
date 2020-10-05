@@ -77,7 +77,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
     *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -99,7 +98,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
     *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -119,7 +117,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SPDM_ERROR_RESPONSE    *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -134,7 +131,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -151,7 +147,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
       *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -164,7 +159,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
       *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -186,7 +180,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SPDM_ERROR_RESPONSE  *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -204,7 +197,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmResponse = Response;
     ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -227,7 +219,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SpdmResponse = Response;
       ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
       *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -243,7 +234,6 @@ SpdmRequesterGetDigestTestReceiveMessage (
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
       *ResponseSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;

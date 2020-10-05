@@ -81,7 +81,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SPDM_ALGORITHMS_RESPONSE    *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -103,7 +102,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SPDM_ALGORITHMS_RESPONSE    *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -125,7 +123,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SPDM_ERROR_RESPONSE    *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -140,7 +137,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -157,7 +153,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
       *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -168,7 +163,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SPDM_ALGORITHMS_RESPONSE    *SpdmResponse;
 
       *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -192,7 +186,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SPDM_ERROR_RESPONSE  *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -210,7 +203,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse = Response;
     ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -233,7 +225,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SpdmResponse = Response;
       ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
       *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -247,7 +238,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SPDM_ALGORITHMS_RESPONSE    *SpdmResponse;
 
       *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -271,7 +261,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SPDM_ALGORITHMS_RESPONSE	  *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -293,7 +282,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SPDM_ALGORITHMS_RESPONSE	  *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -315,7 +303,6 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SPDM_ALGORITHMS_RESPONSE	  *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;

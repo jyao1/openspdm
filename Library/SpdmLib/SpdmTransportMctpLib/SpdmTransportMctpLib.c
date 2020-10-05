@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmTransportMctpLib.h>
 #include <IndustryStandard/MctpBinding.h>
 
-UINTN Alignment = 1;
+#define MCTP_ALIGNMENT 1
 
 RETURN_STATUS
 EFIAPI
@@ -24,6 +24,7 @@ SpdmMctpEncodeMessage (
   )
 {
   UINTN                       AlignedSpdmMessageSize;
+  UINTN                       Alignment = MCTP_ALIGNMENT;
 
   AlignedSpdmMessageSize = (SpdmMessageSize + (Alignment - 1)) & ~(Alignment - 1);
 
@@ -54,6 +55,8 @@ SpdmMctpDecodeMessage (
      OUT VOID                 *SpdmMessage
   )
 {
+  UINTN                       Alignment = MCTP_ALIGNMENT;
+
   ASSERT (MctpMessageSize > 1);
   if (MctpMessageSize <= 1) {
     return RETURN_UNSUPPORTED;

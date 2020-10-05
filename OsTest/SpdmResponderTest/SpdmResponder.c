@@ -275,7 +275,6 @@ SpdmServerInit (
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
   SpdmRegisterTransportLayerFunc (SpdmContext, SpdmMctpEncodeMessage, SpdmMctpDecodeMessage);
-  SpdmSetAlignment (SpdmContext, 4);
 
   Res = ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
   if (Res) {

@@ -114,7 +114,6 @@ SpdmServerInit (
   }
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmResponderSendMessage, SpdmResponderReceiveMessage);
-  SpdmSetAlignment (SpdmContext, 4);
 
   HasRspPubCert = FALSE;
   HasRspPrivKey = FALSE;

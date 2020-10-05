@@ -85,7 +85,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
       free(Data);
       *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -99,8 +98,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     } else {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-	  *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
+      *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -126,7 +124,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
       free(Data);
       *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -140,8 +137,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     } else {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-	  *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
+      *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -161,7 +157,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     SPDM_ERROR_RESPONSE    *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -176,7 +171,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -193,14 +187,13 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       SPDM_ERROR_RESPONSE	 *SpdmResponse;
 
       *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
       SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_BUSY;
       SpdmResponse->Header.Param2 = 0;
-	  SubIndex1 ++;
+      SubIndex1 ++;
     } else if (SubIndex1 == 1) {
       if (RemainderLength == 0) {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
@@ -211,7 +204,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
         free(Data);
         *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-        *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
         SpdmResponse = Response;
 
         SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -225,8 +217,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       } else {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-	    *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-        *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
+        *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
         SpdmResponse = Response;
 
         SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -247,7 +238,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     SPDM_ERROR_RESPONSE  *SpdmResponse;
 
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
     SpdmResponse = Response;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -265,7 +255,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     SpdmResponse = Response;
     ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
     *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
-    *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -288,7 +277,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       SpdmResponse = Response;
       ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
       *ResponseSize = sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
@@ -298,7 +286,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       ExtendErrorData->RDTM = 1;
       ExtendErrorData->RequestCode = SPDM_GET_CERTIFICATE;
       ExtendErrorData->Token = 1;
-	  SubIndex2 ++;
+      SubIndex2 ++;
     } else if (SubIndex2 == 1) {
       if (RemainderLength == 0) {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
@@ -309,7 +297,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
         free(Data);
         *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-        *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
         SpdmResponse = Response;
 
         SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -323,8 +310,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       } else {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-	    *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-        *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
+        *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
         SpdmResponse = Response;
 
         SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -351,7 +337,6 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
       free(Data);
       *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -365,8 +350,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     } else {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
 
-	  *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-      *ResponseSize = ALIGN_VALUE (*ResponseSize, SpdmTestContext->SpdmContext.Alignment);
+      *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
       SpdmResponse = Response;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;

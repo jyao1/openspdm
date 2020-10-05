@@ -110,7 +110,6 @@ SpdmClientInit (
   SpdmContext = (VOID *)AllocatePool (SpdmGetContextSize());
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmRequesterSendMessage, SpdmRequesterReceiveMessage);
-  SpdmSetAlignment (SpdmContext, 4);
 
   HasRspPubCert = FALSE;
 

@@ -232,19 +232,6 @@ SpdmGetLastError (
   IN     VOID                      *SpdmContext
   );
 
-RETURN_STATUS
-EFIAPI
-SpdmSetAlignment (
-  IN     VOID                      *SpdmContext,
-  IN     UINT32                    Alignment
-  );
-
-UINT32
-EFIAPI
-SpdmGetAlignment (
-  IN     VOID                      *SpdmContext
-  );
-
 SPDM_SESSION_TYPE
 EFIAPI
 SpdmGetSessionType (
