@@ -96,9 +96,9 @@ SpdmGetResponseSessionFuncViaLastRequest (
 }
 
 RETURN_STATUS
-SpdmReceiveRequestSession (
+SpdmReceiveRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT32                  SessionId,
+     OUT UINT32                  **SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request
   )
@@ -107,12 +107,6 @@ SpdmReceiveRequestSession (
   SPDM_SESSION_INFO         *SessionInfo;
   UINT32                    *MessageSessionId;
 
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return RETURN_UNSUPPORTED;
-  }
-
   if (Request == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
@@ -120,9 +114,9 @@ SpdmReceiveRequestSession (
     return RETURN_INVALID_PARAMETER;
   }
 
-  DEBUG((DEBUG_INFO, "SpdmReceiveRequestSession[%x] ...\n", SessionId));
+  DEBUG((DEBUG_INFO, "SpdmReceiveRequest[.] ...\n"));
 
-  MessageSessionId = &SessionId;
+  MessageSessionId = NULL;
   SpdmContext->LastSpdmRequestSize = sizeof(SpdmContext->LastSpdmRequest);
   Status = SpdmContext->TransportDecodeMessage (SpdmContext, &MessageSessionId, TRUE, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
   if (RETURN_ERROR(Status)) {
@@ -130,45 +124,25 @@ SpdmReceiveRequestSession (
     return Status;
   }
 
-  DEBUG((DEBUG_INFO, "SpdmReceiveRequestSession[%x] (0x%x): \n", SessionId, SpdmContext->LastSpdmRequestSize));
+  *SessionId = MessageSessionId;
+
+  if (MessageSessionId != NULL) {
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *MessageSessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_UNSUPPORTED;
+    }
+  } 
+
+  DEBUG((DEBUG_INFO, "SpdmReceiveRequest[%x] (0x%x): \n", (MessageSessionId != NULL) ? *MessageSessionId : 0, SpdmContext->LastSpdmRequestSize));
   InternalDumpHex ((UINT8 *)SpdmContext->LastSpdmRequest, SpdmContext->LastSpdmRequestSize);
 
   return RETURN_SUCCESS;
 }
 
 RETURN_STATUS
-SpdmReceiveRequest (
+SpdmSendResponse (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINTN                   RequestSize,
-  IN     VOID                    *Request
-  )
-{
-  RETURN_STATUS             Status;
-
-  if (Request == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
-  if (RequestSize == 0) {
-    return RETURN_INVALID_PARAMETER;
-  }
-
-  SpdmContext->LastSpdmRequestSize = sizeof(SpdmContext->LastSpdmRequest);
-  Status = SpdmContext->TransportDecodeMessage (SpdmContext, NULL, TRUE, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
-  if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "TransportDecodeMessage : %p\n", Status));
-    return Status;
-  }
-
-  DEBUG((DEBUG_INFO, "SpdmReceiveRequest (0x%x): \n", SpdmContext->LastSpdmRequestSize));
-  InternalDumpHex (SpdmContext->LastSpdmRequest, SpdmContext->LastSpdmRequestSize);
-
-  return Status;
-}
-
-RETURN_STATUS
-SpdmSendResponseSession (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT32                  SessionId,
+  IN     UINT32                  *SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response
   )
@@ -176,15 +150,18 @@ SpdmSendResponseSession (
   UINT8                             MyResponse[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                             MyResponseSize;
   RETURN_STATUS                     Status;
+  SPDM_GET_RESPONSE_FUNC            GetResponseFunc;
   SPDM_GET_RESPONSE_SESSION_FUNC    GetResponseSessionFunc;
   SPDM_SESSION_INFO                 *SessionInfo;
   SPDM_MESSAGE_HEADER               *SpdmRequest;
   SPDM_MESSAGE_HEADER               *SpdmResponse;
 
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
-    ASSERT (FALSE);
-    return RETURN_UNSUPPORTED;
+  if (SessionId != NULL) {
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);
+    if (SessionInfo == NULL) {
+      ASSERT (FALSE);
+      return RETURN_UNSUPPORTED;
+    }
   }
 
   if (Response == NULL) {
@@ -197,7 +174,7 @@ SpdmSendResponseSession (
     return RETURN_INVALID_PARAMETER;
   }
 
-  DEBUG((DEBUG_INFO, "SpdmSendResponseSession[%x] ...\n", SessionId));
+  DEBUG((DEBUG_INFO, "SpdmSendResponse[%x] ...\n", (SessionId != NULL) ? *SessionId : 0));
 
   SpdmRequest = (VOID *)SpdmContext->LastSpdmRequest;
   if (SpdmContext->LastSpdmRequestSize == 0) {
@@ -206,115 +183,69 @@ SpdmSendResponseSession (
 
   MyResponseSize = sizeof(MyResponse);
   ZeroMem (MyResponse, sizeof(MyResponse));
-  GetResponseSessionFunc = SpdmGetResponseSessionFuncViaLastRequest (SpdmContext);
-  if (GetResponseSessionFunc == NULL) {
-    GetResponseSessionFunc = (SPDM_GET_RESPONSE_SESSION_FUNC)SpdmContext->GetResponseSessionFunc;
-  }
-  if (GetResponseSessionFunc != NULL) {
-    Status = GetResponseSessionFunc (SpdmContext, SessionId, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
+  if (SessionId != NULL) {
+    GetResponseSessionFunc = SpdmGetResponseSessionFuncViaLastRequest (SpdmContext);
+    if (GetResponseSessionFunc == NULL) {
+      GetResponseSessionFunc = (SPDM_GET_RESPONSE_SESSION_FUNC)SpdmContext->GetResponseSessionFunc;
+    }
+    if (GetResponseSessionFunc != NULL) {
+      Status = GetResponseSessionFunc (SpdmContext, *SessionId, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
+    } else {
+      Status = RETURN_NOT_FOUND;
+    }
   } else {
-    Status = RETURN_NOT_FOUND;
+    GetResponseFunc = SpdmGetResponseFuncViaLastRequest (SpdmContext);
+    if (GetResponseFunc == NULL) {
+      GetResponseFunc = (SPDM_GET_RESPONSE_FUNC)SpdmContext->GetResponseFunc;
+    }
+    if (GetResponseFunc != NULL) {
+      Status = GetResponseFunc (SpdmContext, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
+    } else {
+      Status = RETURN_NOT_FOUND;
+    }
   }
   if (Status != RETURN_SUCCESS) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SpdmRequest->RequestResponseCode, &MyResponseSize, MyResponse);
   }
 
-  DEBUG((DEBUG_INFO, "SpdmSendResponseSession[%x] (0x%x): \n", SessionId, MyResponseSize));
+  DEBUG((DEBUG_INFO, "SpdmSendResponse[%x] (0x%x): \n", (SessionId != NULL) ? *SessionId : 0, MyResponseSize));
   InternalDumpHex (MyResponse, MyResponseSize);
 
-  Status = SpdmContext->TransportEncodeMessage (SpdmContext, &SessionId, FALSE, MyResponseSize, MyResponse, ResponseSize, Response);
+  Status = SpdmContext->TransportEncodeMessage (SpdmContext, SessionId, FALSE, MyResponseSize, MyResponse, ResponseSize, Response);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "TransportEncodeMessage : %p\n", Status));
     return Status;
   }
 
   SpdmResponse = (VOID *)MyResponse;
-  switch (SpdmResponse->RequestResponseCode) {
-  case SPDM_FINISH_RSP:
-    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
-      SessionInfo->SessionState = SpdmStateEstablished;
-    }
-    break;
-  case SPDM_PSK_FINISH_RSP:
-    SessionInfo->SessionState = SpdmStateEstablished;
-    break;
-  case SPDM_END_SESSION_ACK:
-    SessionInfo->SessionState = SpdmStateNotStarted;
-    SpdmFreeSessionId(SpdmContext, SessionId);
-    break;
-  }
-  
-  return RETURN_SUCCESS;
-}
-
-RETURN_STATUS
-SpdmSendResponse (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN OUT UINTN                   *ResponseSize,
-  IN OUT VOID                    *Response
-  )
-{
-  UINT8                     MyResponse[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-  UINTN                     MyResponseSize;
-  RETURN_STATUS             Status;
-  SPDM_GET_RESPONSE_FUNC    GetResponseFunc;
-  SPDM_SESSION_INFO         *SessionInfo;
-  SPDM_MESSAGE_HEADER       *SpdmRequest;
-  SPDM_MESSAGE_HEADER       *SpdmResponse;
-
-  DEBUG((DEBUG_INFO, "SpdmSendResponse ...\n"));
-
-  if (Response == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
-  if (ResponseSize == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
-  if (*ResponseSize == 0) {
-    return RETURN_INVALID_PARAMETER;
-  }
-
-  SpdmRequest = (VOID *)SpdmContext->LastSpdmRequest;
-  if (SpdmContext->LastSpdmRequestSize == 0) {
-    return RETURN_NOT_READY;
-  }
-
-  MyResponseSize = sizeof(MyResponse);
-  ZeroMem (MyResponse, sizeof(MyResponse));
-  GetResponseFunc = SpdmGetResponseFuncViaLastRequest (SpdmContext);
-  if (GetResponseFunc == NULL) {
-    GetResponseFunc = (SPDM_GET_RESPONSE_FUNC)SpdmContext->GetResponseFunc;
-  }
-  if (GetResponseFunc != NULL) {
-    Status = GetResponseFunc (SpdmContext, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
-  } else {
-    Status = RETURN_NOT_FOUND;
-  }
-  if (Status != RETURN_SUCCESS) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SpdmRequest->RequestResponseCode, &MyResponseSize, MyResponse);
-  }
-
-  Status = SpdmContext->TransportEncodeMessage (SpdmContext, NULL, FALSE, MyResponseSize, MyResponse, ResponseSize, Response);
-  if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "TransportEncodeMessage : %p\n", Status));
-    return Status;
-  }
-
-  DEBUG((DEBUG_INFO, "SpdmSendResponse (0x%x): \n", *ResponseSize));
-  InternalDumpHex (Response, *ResponseSize);
-
-  SpdmResponse = (VOID *)MyResponse;
-  switch (SpdmResponse->RequestResponseCode) {
-  case SPDM_FINISH_RSP:
-    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
-      SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SpdmContext->LatestSessionId);
-      if (SessionInfo == NULL) {
-        ASSERT(FALSE);
-        return RETURN_SUCCESS;
+  if (SessionId != NULL) {
+    switch (SpdmResponse->RequestResponseCode) {
+    case SPDM_FINISH_RSP:
+      if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+        SessionInfo->SessionState = SpdmStateEstablished;
       }
+      break;
+    case SPDM_PSK_FINISH_RSP:
       SessionInfo->SessionState = SpdmStateEstablished;
+      break;
+    case SPDM_END_SESSION_ACK:
+      SessionInfo->SessionState = SpdmStateNotStarted;
+      SpdmFreeSessionId(SpdmContext, *SessionId);
+      break;
     }
-    break;
+  } else {
+    switch (SpdmResponse->RequestResponseCode) {
+    case SPDM_FINISH_RSP:
+      if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+        SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SpdmContext->LatestSessionId);
+        if (SessionInfo == NULL) {
+          ASSERT(FALSE);
+          return RETURN_SUCCESS;
+        }
+        SessionInfo->SessionState = SpdmStateEstablished;
+      }
+      break;
+    }
   }
   
   return RETURN_SUCCESS;

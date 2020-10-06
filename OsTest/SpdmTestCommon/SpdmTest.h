@@ -42,7 +42,6 @@ BOOLEAN
 SendPlatformData (
   IN SOCKET           Socket,
   IN UINT32           Command,
-  IN UINT32           Session,
   IN UINT8            *SendBuffer,
   IN UINTN            BytesToSend
   );
@@ -51,7 +50,6 @@ BOOLEAN
 ReceivePlatformData (
   IN  SOCKET           Socket,
   OUT UINT32           *Command,
-  OUT UINT32           *Session,
   OUT UINT8            *ReceiveBuffer,
   IN OUT UINTN         *BytesToReceive
   );

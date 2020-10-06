@@ -187,7 +187,7 @@ SpdmChallenge (
   DEBUG((DEBUG_INFO, "ClientNonce - "));
   InternalDumpData (SpdmRequest.Nonce, SPDM_NONCE_SIZE);
   DEBUG((DEBUG_INFO, "\n"));
-  Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -199,7 +199,7 @@ SpdmChallenge (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

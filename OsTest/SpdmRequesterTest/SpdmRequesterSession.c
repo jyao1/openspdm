@@ -68,7 +68,7 @@ DoAppSessionViaSpdm (
 
   RequestSize = sizeof(Request);
   ResponseSize = sizeof(Response);
-  Status = SpdmSendReceiveSessionData (SpdmContext, SessionId, &Request, RequestSize, &Response, &ResponseSize);
+  Status = SpdmSendReceiveData (SpdmContext, &SessionId, &Request, RequestSize, &Response, &ResponseSize);
   if (RETURN_ERROR(Status)) {
     return Status;
   }

@@ -16,7 +16,6 @@ RETURN_STATUS
 EFIAPI
 SpdmRequesterGetCapabilityTestSendMessage (
   IN     VOID                    *SpdmContext,
-  IN     UINT32                  *SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
   IN     UINT64                  Timeout
@@ -53,15 +52,12 @@ RETURN_STATUS
 EFIAPI
 SpdmRequesterGetCapabilityTestReceiveMessage (
   IN     VOID                    *SpdmContext,
-     OUT UINT32                  **SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,
   IN     UINT64                  Timeout
   )
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
-
-  *SessionId = NULL;
 
   SpdmTestContext = GetSpdmTestContext ();
   switch (SpdmTestContext->CaseId) {

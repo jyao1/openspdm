@@ -48,7 +48,7 @@ SpdmKeyUpdate (
   }
   SpdmGetRandomNumber (sizeof(SpdmRequest.Header.Param2), &SpdmRequest.Header.Param2);
 
-  Status = SpdmSendRequestSession (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, &SessionId, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -58,7 +58,7 @@ SpdmKeyUpdate (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponseSession (SpdmContext, SessionId, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     SpdmFinalizeUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
     return RETURN_DEVICE_ERROR;
@@ -90,14 +90,14 @@ SpdmKeyUpdate (
   SpdmRequest.Header.Param1 = SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY;
   SpdmGetRandomNumber (sizeof(SpdmRequest.Header.Param2), &SpdmRequest.Header.Param2);
 
-  Status = SpdmSendRequestSession (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, &SessionId, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponseSession (SpdmContext, SessionId, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

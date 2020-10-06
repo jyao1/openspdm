@@ -57,17 +57,7 @@ RETURN_STATUS
 EFIAPI
 SpdmReceiveSendData (
   IN     VOID                 *SpdmContext,
-  IN     VOID                 *RequestBuffer,
-  IN     UINTN                RequestBufferSize,
-     OUT VOID                 *ResponseBuffer,
-  IN OUT UINTN                *ResponseBufferSize
-  );
-
-RETURN_STATUS
-EFIAPI
-SpdmReceiveSendSessionData (
-  IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
+  IN OUT UINT32               *SessionId,
   IN     VOID                 *RequestBuffer,
   IN     UINTN                RequestBufferSize,
      OUT VOID                 *ResponseBuffer,

@@ -91,19 +91,6 @@ SpdmGetMeasurement (
      OUT VOID                 *MeasurementRecord
   );
 
-/*
-  Send receive SPDM data (non session data).
-*/
-RETURN_STATUS
-EFIAPI
-SpdmSendReceiveData (
-  IN     VOID                 *SpdmContext,
-  IN     VOID                 *Request,
-  IN     UINTN                RequestSize,
-  IN OUT VOID                 *Response,
-  IN OUT UINTN                *ResponseSize
-  );
-
 /**
   Start a SPDM Session.
 
@@ -161,9 +148,9 @@ SpdmStopSession (
 **/
 RETURN_STATUS
 EFIAPI
-SpdmSendReceiveSessionData (
+SpdmSendReceiveData (
   IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
+  IN     UINT32               *SessionId,
   IN     VOID                 *Request,
   IN     UINTN                RequestSize,
   IN OUT VOID                 *Response,

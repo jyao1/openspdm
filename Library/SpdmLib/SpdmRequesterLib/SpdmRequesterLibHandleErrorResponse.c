@@ -34,14 +34,14 @@ SpdmRequesterRespondIfReady (
   SpdmRequest.Header.RequestResponseCode = SPDM_RESPOND_IF_READY;
   SpdmRequest.Header.Param1 = SpdmContext->ErrorData.RequestCode;
   SpdmRequest.Header.Param2 = SpdmContext->ErrorData.Token;
-  Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   *ResponseSize = ExpectResponseSize;
   ZeroMem (Response, ExpectResponseSize);
-  Status = SpdmReceiveResponse (SpdmContext, ResponseSize, Response);
+  Status = SpdmReceiveResponse (SpdmContext, NULL, ResponseSize, Response);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

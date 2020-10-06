@@ -170,7 +170,7 @@ SpdmTransportTestDecodeMessage (
     }
   }
 
-  // Expect secured message
+  // Detect received message
   Status = TransportDecodeMessage (
               &SecuredMessageSessionId,
               TransportMessageSize,
@@ -215,13 +215,25 @@ SpdmTransportTestDecodeMessage (
     if (SecuredMessageSessionId == NULL) {
       return RETURN_SUCCESS;
     } else {
-      // but get encapsulated secured message - cannot handle it.
+      // get encapsulated secured message - cannot handle it.
       DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - expect encapsulated normal but got session (%08x)\n", *SecuredMessageSessionId));
       return RETURN_UNSUPPORTED;
     }
   } else {
-    // but get non-secured message - cannot handle it.
-    DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - expect session but got normal\n"));
-    return RETURN_UNSUPPORTED;
+    // get non-secured message
+    Status = TransportDecodeMessage (
+                &SecuredMessageSessionId,
+                TransportMessageSize,
+                TransportMessage,
+                SpdmMessageSize,
+                SpdmMessage
+                );
+    if (RETURN_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - %p\n", Status));
+      return RETURN_UNSUPPORTED;
+    }
+    ASSERT (SecuredMessageSessionId == NULL);
+    *SessionId = NULL;
+    return RETURN_SUCCESS;
   }
 }

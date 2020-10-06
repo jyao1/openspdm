@@ -127,7 +127,6 @@ BOOLEAN
 ReceivePlatformData (
   IN  SOCKET           Socket,
   OUT UINT32           *Command,
-  OUT UINT32           *Session,
   OUT UINT8            *ReceiveBuffer,
   IN OUT UINTN         *BytesToReceive
   )
@@ -142,15 +141,6 @@ ReceivePlatformData (
   }
   *Command = Response;
   printf ("Platform Port Receive Command: ");
-  Response = ntohl(Response);
-  DumpData ((UINT8 *)&Response, sizeof(UINT32));
-
-  Result = ReadData32 (Socket, &Response);
-  if (!Result) {
-    return Result;
-  }
-  *Session = Response;
-  printf ("Platform Port Receive Session: ");
   Response = ntohl(Response);
   DumpData ((UINT8 *)&Response, sizeof(UINT32));
 
@@ -252,7 +242,6 @@ BOOLEAN
 SendPlatformData (
   IN SOCKET           Socket,
   IN UINT32           Command,
-  IN UINT32           Session,
   IN UINT8            *SendBuffer,
   IN UINTN            BytesToSend
   )
@@ -266,14 +255,6 @@ SendPlatformData (
   printf ("Platform Port Transmit Command: ");
   Command = htonl(Command);
   DumpData ((UINT8 *)&Command, sizeof(UINT32));
-
-  Result = WriteData32 (Socket, Session);
-  if (!Result) {
-    return Result;
-  }
-  printf ("Platform Port Transmit Session: ");
-  Session = htonl(Session);
-  DumpData ((UINT8 *)&Session, sizeof(UINT32));
 
   Result = WriteMultipleBytes (Socket, SendBuffer, (UINT32)BytesToSend);
   if (!Result) {

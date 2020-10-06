@@ -281,9 +281,15 @@ SpdmProcessEncapResponseChallengeAuth (
   OUT    BOOLEAN              *Continue
   );
 
+SPDM_GET_RESPONSE_FUNC
+SpdmGetResponseFuncViaRequestCode (
+  IN     UINT8                    RequestCode
+  );
+
 RETURN_STATUS
 SpdmReceiveRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
+     OUT UINT32                  **SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request
   );
@@ -291,27 +297,7 @@ SpdmReceiveRequest (
 RETURN_STATUS
 SpdmSendResponse (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN OUT UINTN                   *ResponseSize,
-  IN OUT VOID                    *Response
-  );
-
-SPDM_GET_RESPONSE_FUNC
-SpdmGetResponseFuncViaRequestCode (
-  IN     UINT8                    RequestCode
-  );
-
-RETURN_STATUS
-SpdmReceiveRequestSession (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT32                  SessionId,
-  IN     UINTN                   RequestSize,
-  IN     VOID                    *Request
-  );
-
-RETURN_STATUS
-SpdmSendResponseSession (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
-  IN     UINT32                  SessionId,
+  IN     UINT32                  *SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response
   );

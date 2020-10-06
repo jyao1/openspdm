@@ -195,14 +195,7 @@ SpdmGetEncapResponseChallengeAuth (
 RETURN_STATUS
 SpdmSendRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINTN                RequestSize,
-  IN     VOID                 *Request
-  );
-
-RETURN_STATUS
-SpdmSendRequestSession (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT32               SessionId,
+  IN     UINT32               *SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request
   );
@@ -226,14 +219,7 @@ SpdmSendRequestSession (
 RETURN_STATUS
 SpdmReceiveResponse (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN OUT UINTN                *ResponseSize,
-  IN OUT VOID                 *Response
-  );
-
-RETURN_STATUS
-SpdmReceiveResponseSession (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT32               SessionId,
+  IN     UINT32               *SessionId,
   IN OUT UINTN                *ResponseSize,
   IN OUT VOID                 *Response
   );

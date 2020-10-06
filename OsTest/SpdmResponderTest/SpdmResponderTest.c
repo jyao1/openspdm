@@ -86,7 +86,7 @@ CreateSocket(
 }
 
 BOOLEAN
-PlatformServer(
+PlatformServer (
   IN SOCKET           Socket
   )
 {
@@ -103,7 +103,6 @@ PlatformServer(
       Result = SendPlatformData (
                  Socket,
                  SOCKET_SPDM_COMMAND_TEST,
-                 0,
                  (UINT8 *)"Server Hello!",
                  sizeof("Server Hello!")
                  );
@@ -119,7 +118,7 @@ PlatformServer(
       }
       break;
     case SOCKET_SPDM_COMMAND_STOP:
-      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_STOP, 0, NULL, 0);
+      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_STOP, NULL, 0);
       if (!Result) {
         printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -133,11 +132,10 @@ PlatformServer(
       return FALSE;
       break;
     case SOCKET_SPDM_COMMAND_NORMAL:
-    case SOCKET_SPDM_COMMAND_SECURE:
       assert (0);
     default:
       printf ("Unrecognized platform interface command %x\n", mCommand);
-      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_UNKOWN, 0, NULL, 0);
+      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_UNKOWN, NULL, 0);
       if (!Result) {
         printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER

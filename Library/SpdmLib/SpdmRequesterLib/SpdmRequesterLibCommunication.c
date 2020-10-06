@@ -220,40 +220,9 @@ SpdmStopSession (
 **/
 RETURN_STATUS
 EFIAPI
-SpdmSendReceiveSessionData (
-  IN     VOID                 *Context,
-  IN     UINT32               SessionId,
-  IN     VOID                 *Request,
-  IN     UINTN                RequestSize,
-  IN OUT VOID                 *Response,
-  IN OUT UINTN                *ResponseSize
-  )
-{
-  RETURN_STATUS                 Status;
-  SPDM_DEVICE_CONTEXT           *SpdmContext;
-
-  SpdmContext = Context;
-
-  Status = SpdmSendRequestSession (SpdmContext, SessionId, RequestSize, Request);
-  if (RETURN_ERROR(Status)) {
-    return RETURN_DEVICE_ERROR;
-  }
-
-  Status = SpdmReceiveResponseSession (SpdmContext, SessionId, ResponseSize, Response);
-  if (RETURN_ERROR(Status)) {
-    return RETURN_DEVICE_ERROR;
-  }
-
-  return RETURN_SUCCESS;
-}
-
-/*
-  Send receive SPDM data (non session data).
-*/
-RETURN_STATUS
-EFIAPI
 SpdmSendReceiveData (
   IN     VOID                 *Context,
+  IN     UINT32               *SessionId,
   IN     VOID                 *Request,
   IN     UINTN                RequestSize,
   IN OUT VOID                 *Response,
@@ -265,12 +234,12 @@ SpdmSendReceiveData (
 
   SpdmContext = Context;
 
-  Status = SpdmSendRequest (SpdmContext, RequestSize, Request);
+  Status = SpdmSendRequest (SpdmContext, SessionId, RequestSize, Request);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
-  Status = SpdmReceiveResponse (SpdmContext, ResponseSize, Response);
+  Status = SpdmReceiveResponse (SpdmContext, SessionId, ResponseSize, Response);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

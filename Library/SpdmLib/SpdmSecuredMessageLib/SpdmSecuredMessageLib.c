@@ -197,7 +197,6 @@ SpdmDecodeSecuredMessage (
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
-    DEBUG ((DEBUG_ERROR, "SpdmGetSessionInfoViaSessionId (%08x) - ERROR\n", SessionId));
     return RETURN_UNSUPPORTED;
   }
 

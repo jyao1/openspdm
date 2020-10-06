@@ -32,14 +32,14 @@ SpdmHeartbeat (
   SpdmRequest.Header.RequestResponseCode = SPDM_HEARTBEAT;
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;
-  Status = SpdmSendRequestSession (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, &SessionId, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponseSession (SpdmContext, SessionId, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

@@ -43,8 +43,7 @@ SpdmGetSessionInfoViaSessionId (
     }
   }
 
-  DEBUG ((DEBUG_ERROR, "SpdmGetSessionInfoViaSessionId - MAX SessionId\n"));
-  ASSERT(FALSE);
+  DEBUG ((DEBUG_ERROR, "SpdmGetSessionInfoViaSessionId - not found SessionId\n"));
   return NULL;
 }
 

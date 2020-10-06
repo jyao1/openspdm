@@ -24,7 +24,6 @@ RETURN_STATUS
 EFIAPI
 SpdmDeviceSendMessage (
   IN     VOID                    *SpdmContext,
-  IN     UINT32                  *SessionId,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request,
   IN     UINT64                  Timeout
@@ -37,7 +36,6 @@ RETURN_STATUS
 EFIAPI
 SpdmDeviceReceiveMessage (
   IN     VOID                    *SpdmContext,
-     OUT UINT32                  **SessionId,
   IN OUT UINTN                   *ResponseSize,
   IN OUT VOID                    *Response,
   IN     UINT64                  Timeout
@@ -46,7 +44,6 @@ SpdmDeviceReceiveMessage (
   SPDM_TEST_CONTEXT       *SpdmTestContext;
 
   SpdmTestContext = GetSpdmTestContext ();
-  *SessionId = NULL;
   *ResponseSize = SpdmTestContext->TestBufferSize;
   CopyMem (Response, SpdmTestContext->TestBuffer, SpdmTestContext->TestBufferSize);
 

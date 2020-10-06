@@ -31,11 +31,9 @@ BOOLEAN
 CommunicatePlatformData (
   IN SOCKET           Socket,
   IN UINT32           Command,
-  IN UINT32           Session,
   IN UINT8            *SendBuffer,
   IN UINTN            BytesToSend,
   OUT UINT32          *Response,
-  OUT UINT32          *RspSession,
   IN OUT UINTN        *BytesToReceive,
   OUT UINT8           *ReceiveBuffer
   );
@@ -104,13 +102,12 @@ InitClient (
 BOOLEAN
 PlatformClientRoutine (
   IN UINT16 PortNumber
-)
+  )
 {
-  SOCKET  PlatformSocket;
-  BOOLEAN Result;
-  UINT32  Response;
-  UINTN   ResponseSize;
-  UINT32  Session;
+  SOCKET         PlatformSocket;
+  BOOLEAN        Result;
+  UINT32         Response;
+  UINTN          ResponseSize;
   RETURN_STATUS  Status;
   
 #ifdef _MSC_VER
@@ -135,11 +132,9 @@ PlatformClientRoutine (
   Result = CommunicatePlatformData (
              PlatformSocket,
              SOCKET_SPDM_COMMAND_TEST,
-             0,
              (UINT8 *)"Client Hello!",
              sizeof("Client Hello!"),
              &Response,
-             &Session,
              &ResponseSize,
              mReceiveBuffer
              );
@@ -174,11 +169,9 @@ Done:
   Result = CommunicatePlatformData (
              PlatformSocket,
              SOCKET_SPDM_COMMAND_STOP,
-             0,
              NULL,
              0,
              &Response,
-             &Session,
              &ResponseSize,
              NULL
              );

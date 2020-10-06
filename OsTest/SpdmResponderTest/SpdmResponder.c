@@ -33,8 +33,6 @@ extern UINT8  mReceiveBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
 extern SOCKET mServerSocket;
 
-UINT32 mSession;
-
 BOOLEAN
 RegisterMeasurement (
   OUT VOID                            **DeviceMeasurement,
@@ -114,39 +112,10 @@ SpdmGetResponseVendorDefinedRequest (
   return RETURN_SUCCESS;
 }
 
-/**
-  Send a SPDM message to a device.
-
-  For requester, the message is an SPDM request.
-  For responder, the message is an SPDM response.
-
-  @param  This                         Indicates a pointer to the calling context.
-  @param  SessionId                    The SessionId of a SPDM message.
-                                       If SessionId is NULL, it is a normal message.
-                                       If SessionId is NOT NULL, it is a secure message.
-  @param  MessageSize                  Size in bytes of the message data buffer.
-  @param  Message                      A pointer to a destination buffer to store the message.
-                                       The caller is responsible for having
-                                       either implicit or explicit ownership of the buffer.
-  @param  Timeout                      The timeout, in 100ns units, to use for the execution
-                                       of the message. A Timeout value of 0
-                                       means that this function will wait indefinitely for the
-                                       message to execute. If Timeout is greater
-                                       than zero, then this function will return RETURN_TIMEOUT if the
-                                       time required to execute the message is greater
-                                       than Timeout.
-
-  @retval RETURN_SUCCESS               The SPDM message is sent successfully.
-  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is sent to the device.
-  @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
-  @retval RETURN_TIMEOUT               A timeout occurred while waiting for the SPDM message
-                                       to execute.
-**/
 RETURN_STATUS
 EFIAPI
 SpdmDeviceSendMessage (
   IN     VOID                                   *SpdmContext,
-  IN     UINT32                                 *SessionId,
   IN     UINTN                                  RequestSize,
   IN     VOID                                   *Request,
   IN     UINT64                                 Timeout
@@ -154,11 +123,7 @@ SpdmDeviceSendMessage (
 {
   BOOLEAN Result;
 
-  if (SessionId == NULL) {
-    Result = SendPlatformData (mServerSocket, SOCKET_SPDM_COMMAND_NORMAL, 0, Request, (UINT32)RequestSize);
-  } else {
-    Result = SendPlatformData (mServerSocket, SOCKET_SPDM_COMMAND_SECURE, *SessionId, Request, (UINT32)RequestSize);
-  }
+  Result = SendPlatformData (mServerSocket, SOCKET_SPDM_COMMAND_NORMAL, Request, (UINT32)RequestSize);
   if (!Result) {
     printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -172,50 +137,19 @@ SpdmDeviceSendMessage (
   return RETURN_SUCCESS;
 }
 
-/**
-  Receive a SPDM message from a device.
-
-  For requester, the message is an SPDM response.
-  For responder, the message is an SPDM request.
-
-  @param  This                         Indicates a pointer to the calling context.
-  @param  SessionId                    The SessionId of a SPDM message.
-                                       If *SessionId is NULL, it is a normal message.
-                                       If *SessionId is NOT NULL, it is a secure message.
-  @param  MessageSize                  Size in bytes of the message data buffer.
-  @param  Message                      A pointer to a destination buffer to store the message.
-                                       The caller is responsible for having
-                                       either implicit or explicit ownership of the buffer.
-  @param  Timeout                      The timeout, in 100ns units, to use for the execution
-                                       of the message. A Timeout value of 0
-                                       means that this function will wait indefinitely for the
-                                       message to execute. If Timeout is greater
-                                       than zero, then this function will return RETURN_TIMEOUT if the
-                                       time required to execute the message is greater
-                                       than Timeout.
-
-  @retval RETURN_SUCCESS               The SPDM message is received successfully.
-  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is received from the device.
-  @retval RETURN_INVALID_PARAMETER     The Message is NULL, MessageSize is NULL or
-                                       the *MessageSize is zero.
-  @retval RETURN_TIMEOUT               A timeout occurred while waiting for the SPDM message
-                                       to execute.
-**/
 RETURN_STATUS
 EFIAPI
 SpdmDeviceReceiveMessage (
   IN     VOID                                   *SpdmContext,
-     OUT UINT32                                 **SessionId,
   IN OUT UINTN                                  *ResponseSize,
   IN OUT VOID                                   *Response,
   IN     UINT64                                 Timeout
   )
 {
   BOOLEAN Result;
-  UINT32  Session;
 
   mReceiveBufferSize = sizeof(mReceiveBuffer);
-  Result = ReceivePlatformData (mServerSocket, &mCommand, &Session, mReceiveBuffer, &mReceiveBufferSize);
+  Result = ReceivePlatformData (mServerSocket, &mCommand, mReceiveBuffer, &mReceiveBufferSize);
   if (!Result) {
     printf ("ReceivePlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -227,10 +161,6 @@ SpdmDeviceReceiveMessage (
     return RETURN_DEVICE_ERROR;
   }
   if (mCommand == SOCKET_SPDM_COMMAND_NORMAL) {
-    *SessionId = NULL;
-  } else if (mCommand == SOCKET_SPDM_COMMAND_SECURE) {
-    mSession = Session;
-    *SessionId = &mSession;
   } else {
     //
     // Cache the message

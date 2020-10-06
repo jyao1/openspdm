@@ -255,7 +255,7 @@ SpdmSendReceiveKeyExchange (
   Ptr += OpaqueKeyExchangeReqSize;
 
   SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
-  Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     SpdmDheFree (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
@@ -263,7 +263,7 @@ SpdmSendReceiveKeyExchange (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     SpdmDheFree (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;

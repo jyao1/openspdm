@@ -89,7 +89,7 @@ TrySpdmGetDigest (
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;
 
-  Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -101,7 +101,7 @@ TrySpdmGetDigest (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

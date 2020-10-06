@@ -275,13 +275,10 @@ SpdmRegisterDataSignFunc (
 /**
   Send a SPDM message to a device.
 
-  For requester, the message is an SPDM request.
-  For responder, the message is an SPDM response.
+  For requester, the message is a transport layer SPDM request.
+  For responder, the message is a transport layer SPDM response.
 
   @param  This                         Indicates a pointer to the calling context.
-  @param  SessionId                    The SessionId of a SPDM message.
-                                       If SessionId is NULL, it is a normal message.
-                                       If SessionId is NOT NULL, it is a secure message.
   @param  MessageSize                  Size in bytes of the message data buffer.
   @param  Message                      A pointer to a destination buffer to store the message.
                                        The caller is responsible for having
@@ -304,7 +301,6 @@ typedef
 RETURN_STATUS
 (EFIAPI *SPDM_DEVICE_SEND_MESSAGE_FUNC) (
   IN     VOID                                   *SpdmContext,
-  IN     UINT32                                 *SessionId,
   IN     UINTN                                  MessageSize,
   IN     VOID                                   *Message,
   IN     UINT64                                 Timeout
@@ -313,13 +309,10 @@ RETURN_STATUS
 /**
   Receive a SPDM message from a device.
 
-  For requester, the message is an SPDM response.
-  For responder, the message is an SPDM request.
+  For requester, the message is a transport layer SPDM response.
+  For responder, the message is a transport layer SPDM request.
 
   @param  This                         Indicates a pointer to the calling context.
-  @param  SessionId                    The SessionId of a SPDM message.
-                                       If *SessionId is NULL, it is a normal message.
-                                       If *SessionId is NOT NULL, it is a secure message.
   @param  MessageSize                  Size in bytes of the message data buffer.
   @param  Message                      A pointer to a destination buffer to store the message.
                                        The caller is responsible for having
@@ -343,7 +336,6 @@ typedef
 RETURN_STATUS
 (EFIAPI *SPDM_DEVICE_RECEIVE_MESSAGE_FUNC) (
   IN     VOID                                   *SpdmContext,
-     OUT UINT32                                 **SessionId,
   IN OUT UINTN                                  *MessageSize,
   IN OUT VOID                                   *Message,
   IN     UINT64                                 Timeout
@@ -362,6 +354,8 @@ SpdmRegisterDeviceIoFunc (
 
   @param  This                         Indicates a pointer to the calling context.
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  SpdmMessageSize              Size in bytes of the SPDM message data buffer.
   @param  SpdmMessage                  A pointer to a source buffer to store the SPDM message.
@@ -388,6 +382,8 @@ RETURN_STATUS
 
   @param  This                         Indicates a pointer to the calling context.
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+                                       If *SessionId is NULL, it is a normal message.
+                                       If *SessionId is NOT NULL, it is a secured message.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  TransportMessageSize         Size in bytes of the SPDM message data buffer.
   @param  TransportMessage             A pointer to a source buffer to store the SPDM message.

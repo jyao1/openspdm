@@ -28,24 +28,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define SPDM_TEST_CONTEXT_SIGNATURE  SIGNATURE_32 ('S', 'T', 'C', 'S')
 
-typedef
-RETURN_STATUS
-(EFIAPI *SPDM_DEVICE_SEND_MESSAGE) (
-  IN     UINT32                  *SessionId,
-  IN     UINTN                   RequestSize,
-  IN     VOID                    *Request,
-  IN     UINT64                  Timeout
-  );
-
-typedef
-RETURN_STATUS
-(EFIAPI *SPDM_DEVICE_RECEIVE_MESSAGE) (
-     OUT UINT32                  **SessionId,
-  IN OUT UINTN                   *ResponseSize,
-  IN OUT VOID                    *Response,
-  IN     UINT64                  Timeout
-  );
-
 typedef struct {
   UINT32                            Signature;
   BOOLEAN                           IsRequester;

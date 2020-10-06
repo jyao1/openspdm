@@ -155,11 +155,7 @@ SpdmEncapsulatedRequest (
     SpdmGetEncapsulatedRequestRequest->Header.Param1 = 0;
     SpdmGetEncapsulatedRequestRequest->Header.Param2 = 0;
     SpdmRequestSize = sizeof(SPDM_GET_ENCAPSULATED_REQUEST_REQUEST);
-    if (SessionId != NULL) {
-      Status = SpdmSendRequestSession (SpdmContext, *SessionId, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
-    } else {
-      Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
-    }
+    Status = SpdmSendRequest (SpdmContext, SessionId, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }
@@ -167,11 +163,7 @@ SpdmEncapsulatedRequest (
     SpdmEncapsulatedRequestResponse = (VOID *)Response;
     SpdmResponseSize = sizeof(Response);
     ZeroMem (&Response, sizeof(Response));
-    if (SessionId != NULL) {
-      Status = SpdmReceiveResponseSession (SpdmContext, *SessionId, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
-    } else {
-      Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
-    }
+    Status = SpdmReceiveResponse (SpdmContext, SessionId, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }
@@ -211,11 +203,7 @@ SpdmEncapsulatedRequest (
     }
 
     SpdmRequestSize = sizeof(SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST) + EncapsulatedResponseSize;
-    if (SessionId != NULL) {
-      Status = SpdmSendRequestSession (SpdmContext, *SessionId, SpdmRequestSize, SpdmDeliverEncapsulatedResponseRequest);
-    } else {
-      Status = SpdmSendRequest (SpdmContext, SpdmRequestSize, SpdmDeliverEncapsulatedResponseRequest);
-    }
+    Status = SpdmSendRequest (SpdmContext, SessionId, SpdmRequestSize, SpdmDeliverEncapsulatedResponseRequest);
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }
@@ -223,11 +211,7 @@ SpdmEncapsulatedRequest (
     SpdmEncapsulatedResponseAckResponse = (VOID *)Response;
     SpdmResponseSize = sizeof(Response);
     ZeroMem (&Response, sizeof(Response));
-    if (SessionId != NULL) {
-      Status = SpdmReceiveResponseSession (SpdmContext, *SessionId, &SpdmResponseSize, SpdmEncapsulatedResponseAckResponse);
-    } else {
-      Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, SpdmEncapsulatedResponseAckResponse);
-    }
+    Status = SpdmReceiveResponse (SpdmContext, SessionId, &SpdmResponseSize, SpdmEncapsulatedResponseAckResponse);
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }

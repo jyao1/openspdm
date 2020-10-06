@@ -168,7 +168,7 @@ TrySpdmGetCertificate (
     SpdmRequest.Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
     DEBUG((DEBUG_INFO, "Request (Offset 0x%x, Size 0x%x):\n", SpdmRequest.Offset, SpdmRequest.Length));
 
-    Status = SpdmSendRequest (SpdmContext, sizeof(SpdmRequest), &SpdmRequest);
+    Status = SpdmSendRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
     if (RETURN_ERROR(Status)) {
       Status = RETURN_DEVICE_ERROR;
       goto Done;
@@ -181,7 +181,7 @@ TrySpdmGetCertificate (
 
     SpdmResponseSize = sizeof(SpdmResponse);
     ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-    Status = SpdmReceiveResponse (SpdmContext, &SpdmResponseSize, &SpdmResponse);
+    Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
     if (RETURN_ERROR(Status)) {
       Status = RETURN_DEVICE_ERROR;
       goto Done;
