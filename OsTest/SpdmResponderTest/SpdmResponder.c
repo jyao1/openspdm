@@ -65,7 +65,6 @@ RegisterMeasurement (
 RETURN_STATUS
 EFIAPI
 TestSpdmProcessPacketCallback (
-  IN     UINT32                       SessionId,
   IN     VOID                         *Request,
   IN     UINTN                        RequestSize,
      OUT VOID                         *Response,
@@ -90,7 +89,6 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseVendorDefinedRequest (
   IN     VOID                *SpdmContext,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -100,7 +98,6 @@ SpdmGetResponseVendorDefinedRequest (
   RETURN_STATUS  Status;
 
   Status = TestSpdmProcessPacketCallback (
-             SessionId,
              Request,
              RequestSize,
              Response,
@@ -313,7 +310,7 @@ SpdmServerInit (
     // do not free it
   }
 
-  Status = SpdmRegisterGetResponseSessionFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
+  Status = SpdmRegisterGetResponseFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
   if (RETURN_ERROR(Status)) {
   }
 

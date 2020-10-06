@@ -13,15 +13,24 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseKeyUpdate (
   IN     VOID                 *Context,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
      OUT VOID                 *Response
   )
 {
+  UINT32                       SessionId;
   SPDM_KEY_UPDATE_RESPONSE     *SpdmResponse;
   SPDM_KEY_UPDATE_REQUEST      *SpdmRequest;
+  SPDM_DEVICE_CONTEXT          *SpdmContext;
+
+  SpdmContext = Context;
+  ASSERT (SpdmContext->LastSpdmRequestSessionIdValid);
+  if (!SpdmContext->LastSpdmRequestSessionIdValid) {
+    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SessionId = SpdmContext->LastSpdmRequestSessionId;
 
   SpdmRequest = Request;
   if (RequestSize != sizeof(SPDM_KEY_UPDATE_REQUEST)) {

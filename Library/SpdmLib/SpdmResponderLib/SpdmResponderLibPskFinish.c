@@ -55,13 +55,13 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponsePskFinish (
   IN     VOID                 *Context,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
      OUT VOID                 *Response
   )
 {
+  UINT32                       SessionId;
   BOOLEAN                      Result;
   UINT32                       HmacSize;
   SPDM_PSK_FINISH_RESPONSE     *SpdmResponse;
@@ -69,6 +69,13 @@ SpdmGetResponsePskFinish (
   SPDM_SESSION_INFO            *SessionInfo;
 
   SpdmContext = Context;
+
+  ASSERT (SpdmContext->LastSpdmRequestSessionIdValid);
+  if (!SpdmContext->LastSpdmRequestSessionIdValid) {
+    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SessionId = SpdmContext->LastSpdmRequestSessionId;
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {

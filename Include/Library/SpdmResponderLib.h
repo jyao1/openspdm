@@ -22,29 +22,11 @@ RETURN_STATUS
      OUT VOID                 *Response
   );
 
-typedef
-RETURN_STATUS
-(EFIAPI *SPDM_GET_RESPONSE_SESSION_FUNC) (
-  IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
-  IN     UINTN                RequestSize,
-  IN     VOID                 *Request,
-  IN OUT UINTN                *ResponseSize,
-     OUT VOID                 *Response
-  );
-
 RETURN_STATUS
 EFIAPI
 SpdmRegisterGetResponseFunc (
   IN  VOID                    *SpdmContext,
   IN  SPDM_GET_RESPONSE_FUNC  GetResponseFunc
-  );
-
-RETURN_STATUS
-EFIAPI
-SpdmRegisterGetResponseSessionFunc (
-  IN  VOID                            *SpdmContext,
-  IN  SPDM_GET_RESPONSE_SESSION_FUNC  GetResponseFunc
   );
 
 RETURN_STATUS

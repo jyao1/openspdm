@@ -117,7 +117,6 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseFinish (
   IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -148,7 +147,6 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponsePskFinish (
   IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -159,7 +157,6 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseEndSession (
   IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -170,7 +167,6 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseHeartbeat (
   IN     VOID                 *Context,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -181,7 +177,6 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseKeyUpdate (
   IN     VOID                 *Context,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,

@@ -323,12 +323,16 @@ typedef struct {
   //
   UINT8                           LastSpdmRequest[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                           LastSpdmRequestSize;
+  //
+  // Cache SessionId in this SpdmMessage, only valid for secured message.
+  //
+  UINT32                          LastSpdmRequestSessionId;
+  BOOLEAN                         LastSpdmRequestSessionIdValid;
 
   //
   // Register GetResponse function (responder only)
   //
   UINTN                           GetResponseFunc;
-  UINTN                           GetResponseSessionFunc;
   //
   // Register GetEncapResponse function (requester only)
   //

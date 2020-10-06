@@ -14,11 +14,6 @@ typedef struct {
   SPDM_GET_RESPONSE_FUNC   GetResponseFunc;
 } SPDM_GET_RESPONSE_STRUCT;
 
-typedef struct {
-  UINT8                            RequestResponseCode;
-  SPDM_GET_RESPONSE_SESSION_FUNC   GetResponseSessionFunc;
-} SPDM_GET_RESPONSE_SESSION_STRUCT;
-
 SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
   {SPDM_GET_VERSION,                    SpdmGetResponseVersion},
   {SPDM_GET_CAPABILITIES,               SpdmGetResponseCapability},
@@ -29,20 +24,15 @@ SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
   {SPDM_GET_MEASUREMENTS,               SpdmGetResponseMeasurement},
   {SPDM_KEY_EXCHANGE,                   SpdmGetResponseKeyExchange},
   {SPDM_PSK_EXCHANGE,                   SpdmGetResponsePskExchange},
-  {SPDM_FINISH,                         SpdmGetResponseFinishInClear},
   {SPDM_GET_ENCAPSULATED_REQUEST,       SpdmGetResponseEncapsulatedRequest},
   {SPDM_DELIVER_ENCAPSULATED_RESPONSE,  SpdmGetResponseEncapsulatedResponseAck},
   {SPDM_RESPOND_IF_READY,               SpdmGetResponseRespondIfReady},
-};
 
-SPDM_GET_RESPONSE_SESSION_STRUCT  mSpdmGetResponseSessionStruct[] = {
   {SPDM_FINISH,                         SpdmGetResponseFinish},
   {SPDM_PSK_FINISH,                     SpdmGetResponsePskFinish},
   {SPDM_END_SESSION,                    SpdmGetResponseEndSession},
   {SPDM_HEARTBEAT,                      SpdmGetResponseHeartbeat},
   {SPDM_KEY_UPDATE,                     SpdmGetResponseKeyUpdate},
-  {SPDM_GET_ENCAPSULATED_REQUEST,       SpdmGetResponseEncapsulatedRequestSession},
-  {SPDM_DELIVER_ENCAPSULATED_RESPONSE,  SpdmGetResponseEncapsulatedResponseAckSession},
 };
 
 SPDM_GET_RESPONSE_FUNC
@@ -78,23 +68,6 @@ SpdmGetResponseFuncViaRequestCode (
   return NULL;
 }
 
-SPDM_GET_RESPONSE_SESSION_FUNC
-SpdmGetResponseSessionFuncViaLastRequest (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext
-  )
-{
-  UINTN                Index;
-  SPDM_MESSAGE_HEADER  *SpdmRequest;
-
-  SpdmRequest = (VOID *)SpdmContext->LastSpdmRequest;
-  for (Index = 0; Index < sizeof(mSpdmGetResponseSessionStruct)/sizeof(mSpdmGetResponseSessionStruct[0]); Index++) {
-    if (SpdmRequest->RequestResponseCode == mSpdmGetResponseSessionStruct[Index].RequestResponseCode) {
-      return mSpdmGetResponseSessionStruct[Index].GetResponseSessionFunc;
-    }
-  }
-  return NULL;
-}
-
 RETURN_STATUS
 SpdmReceiveRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
@@ -117,6 +90,7 @@ SpdmReceiveRequest (
   DEBUG((DEBUG_INFO, "SpdmReceiveRequest[.] ...\n"));
 
   MessageSessionId = NULL;
+  SpdmContext->LastSpdmRequestSessionIdValid = FALSE;
   SpdmContext->LastSpdmRequestSize = sizeof(SpdmContext->LastSpdmRequest);
   Status = SpdmContext->TransportDecodeMessage (SpdmContext, &MessageSessionId, TRUE, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
   if (RETURN_ERROR(Status)) {
@@ -131,6 +105,8 @@ SpdmReceiveRequest (
     if (SessionInfo == NULL) {
       return RETURN_UNSUPPORTED;
     }
+    SpdmContext->LastSpdmRequestSessionId = *MessageSessionId;
+    SpdmContext->LastSpdmRequestSessionIdValid = TRUE;
   } 
 
   DEBUG((DEBUG_INFO, "SpdmReceiveRequest[%x] (0x%x): \n", (MessageSessionId != NULL) ? *MessageSessionId : 0, SpdmContext->LastSpdmRequestSize));
@@ -151,7 +127,6 @@ SpdmSendResponse (
   UINTN                             MyResponseSize;
   RETURN_STATUS                     Status;
   SPDM_GET_RESPONSE_FUNC            GetResponseFunc;
-  SPDM_GET_RESPONSE_SESSION_FUNC    GetResponseSessionFunc;
   SPDM_SESSION_INFO                 *SessionInfo;
   SPDM_MESSAGE_HEADER               *SpdmRequest;
   SPDM_MESSAGE_HEADER               *SpdmResponse;
@@ -183,26 +158,14 @@ SpdmSendResponse (
 
   MyResponseSize = sizeof(MyResponse);
   ZeroMem (MyResponse, sizeof(MyResponse));
-  if (SessionId != NULL) {
-    GetResponseSessionFunc = SpdmGetResponseSessionFuncViaLastRequest (SpdmContext);
-    if (GetResponseSessionFunc == NULL) {
-      GetResponseSessionFunc = (SPDM_GET_RESPONSE_SESSION_FUNC)SpdmContext->GetResponseSessionFunc;
-    }
-    if (GetResponseSessionFunc != NULL) {
-      Status = GetResponseSessionFunc (SpdmContext, *SessionId, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
-    } else {
-      Status = RETURN_NOT_FOUND;
-    }
+  GetResponseFunc = SpdmGetResponseFuncViaLastRequest (SpdmContext);
+  if (GetResponseFunc == NULL) {
+    GetResponseFunc = (SPDM_GET_RESPONSE_FUNC)SpdmContext->GetResponseFunc;
+  }
+  if (GetResponseFunc != NULL) {
+    Status = GetResponseFunc (SpdmContext, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
   } else {
-    GetResponseFunc = SpdmGetResponseFuncViaLastRequest (SpdmContext);
-    if (GetResponseFunc == NULL) {
-      GetResponseFunc = (SPDM_GET_RESPONSE_FUNC)SpdmContext->GetResponseFunc;
-    }
-    if (GetResponseFunc != NULL) {
-      Status = GetResponseFunc (SpdmContext, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
-    } else {
-      Status = RETURN_NOT_FOUND;
-    }
+    Status = RETURN_NOT_FOUND;
   }
   if (Status != RETURN_SUCCESS) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SpdmRequest->RequestResponseCode, &MyResponseSize, MyResponse);
@@ -262,21 +225,6 @@ SpdmRegisterGetResponseFunc (
 
   SpdmContext = Context;
   SpdmContext->GetResponseFunc = (UINTN)GetResponseFunc;
-
-  return RETURN_SUCCESS;
-}
-
-RETURN_STATUS
-EFIAPI
-SpdmRegisterGetResponseSessionFunc (
-  IN  VOID                            *Context,
-  IN  SPDM_GET_RESPONSE_SESSION_FUNC  GetResponseSessionFunc
-  )
-{
-  SPDM_DEVICE_CONTEXT      *SpdmContext;
-
-  SpdmContext = Context;
-  SpdmContext->GetResponseSessionFunc = (UINTN)GetResponseSessionFunc;
 
   return RETURN_SUCCESS;
 }

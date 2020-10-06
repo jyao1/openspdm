@@ -261,13 +261,13 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseFinish (
   IN     VOID                 *Context,
-  IN     UINT32               SessionId,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
      OUT VOID                 *Response
   )
 {
+  UINT32                   SessionId;
   BOOLEAN                  Result;
   UINT32                   HmacSize;
   UINT32                   SignatureSize;
@@ -278,7 +278,11 @@ SpdmGetResponseFinish (
   SPDM_SESSION_INFO        *SessionInfo;
 
   SpdmContext = Context;
-  SpdmRequest = Request;
+  if (SpdmContext->LastSpdmRequestSessionIdValid) {
+    SessionId = SpdmContext->LastSpdmRequestSessionId;
+  } else {
+    SessionId = SpdmContext->LatestSessionId;
+  }
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
@@ -286,6 +290,7 @@ SpdmGetResponseFinish (
     return RETURN_SUCCESS;
   }
 
+  SpdmRequest = Request;
   if (((SessionInfo->MutAuthRequested == 0) && (SpdmRequest->Header.Param1 != 0)) ||
       ((SessionInfo->MutAuthRequested != 0) && (SpdmRequest->Header.Param1 == 0)) ) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
@@ -364,27 +369,4 @@ SpdmGetResponseFinish (
   SpdmGenerateSessionDataKey (SpdmContext, SessionId, FALSE);
 
   return RETURN_SUCCESS;
-}
-
-RETURN_STATUS
-EFIAPI
-SpdmGetResponseFinishInClear (
-  IN     VOID                 *Context,
-  IN     UINTN                RequestSize,
-  IN     VOID                 *Request,
-  IN OUT UINTN                *ResponseSize,
-     OUT VOID                 *Response
-  )
-{
-  SPDM_DEVICE_CONTEXT          *SpdmContext;
-
-  SpdmContext = Context;
-  return SpdmGetResponseFinish (
-           Context,
-           SpdmContext->LatestSessionId,
-           RequestSize,
-           Request,
-           ResponseSize,
-           Response
-           );
 }
