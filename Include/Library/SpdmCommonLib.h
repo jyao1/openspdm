@@ -362,6 +362,7 @@ SpdmRegisterDeviceIoFunc (
 
   @param  This                         Indicates a pointer to the calling context.
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+  @param  IsRequester                  Indicates if it is a requester message.
   @param  SpdmMessageSize              Size in bytes of the SPDM message data buffer.
   @param  SpdmMessage                  A pointer to a source buffer to store the SPDM message.
   @param  TransportMessageSize         Size in bytes of the SPDM message data buffer.
@@ -375,6 +376,7 @@ RETURN_STATUS
 (EFIAPI *SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC) (
   IN     VOID                 *SpdmContext,
   IN     UINT32               *SessionId,
+  IN     BOOLEAN              IsRequester,
   IN     UINTN                SpdmMessageSize,
   IN     VOID                 *SpdmMessage,
   IN OUT UINTN                *TransportMessageSize,
@@ -386,6 +388,7 @@ RETURN_STATUS
 
   @param  This                         Indicates a pointer to the calling context.
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+  @param  IsRequester                  Indicates if it is a requester message.
   @param  TransportMessageSize         Size in bytes of the SPDM message data buffer.
   @param  TransportMessage             A pointer to a source buffer to store the SPDM message.
   @param  SpdmMessageSize              Size in bytes of the SPDM message data buffer.
@@ -400,6 +403,7 @@ RETURN_STATUS
 (EFIAPI *SPDM_TRANSPORT_DECODE_MESSAGE_FUNC) (
   IN     VOID                 *SpdmContext,
      OUT UINT32               **SessionId,
+  IN     BOOLEAN              IsRequester,
   IN     UINTN                TransportMessageSize,
   IN     VOID                 *TransportMessage,
   IN OUT UINTN                *SpdmMessageSize,
@@ -412,14 +416,6 @@ SpdmRegisterTransportLayerFunc (
   IN     VOID                                *SpdmContext,
   IN     SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC  TransportEncodeMessage,
   IN     SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  TransportDecodeMessage
-  );
-
-RETURN_STATUS
-EFIAPI
-SpdmGetTransportLayerFunc (
-  IN     VOID                                *SpdmContext,
-     OUT SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC  *TransportEncodeMessage,
-     OUT SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  *TransportDecodeMessage
   );
 
 #endif

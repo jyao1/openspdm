@@ -12,50 +12,46 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define TEST_ALIGNMENT 1
 
 RETURN_STATUS
-EFIAPI
-SpdmTestEncodeMessage (
-  IN     VOID                 *SpdmContext,
+TestEncodeMessage (
   IN     UINT32               *SessionId,
-  IN     UINTN                SpdmMessageSize,
-  IN     VOID                 *SpdmMessage,
+  IN     UINTN                MessageSize,
+  IN     VOID                 *Message,
   IN OUT UINTN                *MctpMessageSize,
      OUT VOID                 *MctpMessage
   )
 {
-  UINTN                       AlignedSpdmMessageSize;
+  UINTN                       AlignedMessageSize;
   UINTN                       Alignment = TEST_ALIGNMENT;
 
-  AlignedSpdmMessageSize = (SpdmMessageSize + (Alignment - 1)) & ~(Alignment - 1);
+  AlignedMessageSize = (MessageSize + (Alignment - 1)) & ~(Alignment - 1);
 
-  ASSERT (*MctpMessageSize >= AlignedSpdmMessageSize + 1);
-  if (*MctpMessageSize < AlignedSpdmMessageSize + 1) {
-    *MctpMessageSize = AlignedSpdmMessageSize + 1;
+  ASSERT (*MctpMessageSize >= AlignedMessageSize + 1);
+  if (*MctpMessageSize < AlignedMessageSize + 1) {
+    *MctpMessageSize = AlignedMessageSize + 1;
     return RETURN_BUFFER_TOO_SMALL;
   }
-  *MctpMessageSize = AlignedSpdmMessageSize + 1;
+  *MctpMessageSize = AlignedMessageSize + 1;
   if (SessionId != NULL) {
     *(UINT8 *)MctpMessage = TEST_MESSAGE_TYPE_SECURED_TEST;
-    ASSERT (*SessionId == *(UINT32 *)(SpdmMessage));
-    if (*SessionId != *(UINT32 *)(SpdmMessage)) {
+    ASSERT (*SessionId == *(UINT32 *)(Message));
+    if (*SessionId != *(UINT32 *)(Message)) {
       return RETURN_UNSUPPORTED;
     }
   } else {
     *(UINT8 *)MctpMessage = TEST_MESSAGE_TYPE_SPDM;
   }
-  CopyMem ((UINT8 *)MctpMessage + 1, SpdmMessage, SpdmMessageSize);
-  ZeroMem ((UINT8 *)MctpMessage + 1 + SpdmMessageSize, *MctpMessageSize - 1 - SpdmMessageSize);
+  CopyMem ((UINT8 *)MctpMessage + 1, Message, MessageSize);
+  ZeroMem ((UINT8 *)MctpMessage + 1 + MessageSize, *MctpMessageSize - 1 - MessageSize);
   return RETURN_SUCCESS;
 }
 
 RETURN_STATUS
-EFIAPI
-SpdmTestDecodeMessage (
-  IN     VOID                 *SpdmContext,
+TestDecodeMessage (
      OUT UINT32               **SessionId,
   IN     UINTN                MctpMessageSize,
   IN     VOID                 *MctpMessage,
-  IN OUT UINTN                *SpdmMessageSize,
-     OUT VOID                 *SpdmMessage
+  IN OUT UINTN                *MessageSize,
+     OUT VOID                 *Message
   )
 {
   UINTN                       Alignment = TEST_ALIGNMENT;
@@ -86,22 +82,22 @@ SpdmTestDecodeMessage (
 
   ASSERT (((MctpMessageSize - 1) & (Alignment - 1)) == 0);
 
-  if (*SpdmMessageSize < MctpMessageSize - 1) {
+  if (*MessageSize < MctpMessageSize - 1) {
     //
     // Handle special case for the side effect of alignment
     // Caller may allocate a good enough buffer without considering alignment.
     // Here we will not copy all the message and ignore the the last padding bytes.
     //
-    if (*SpdmMessageSize + Alignment - 1 >= MctpMessageSize - 1) {
-      CopyMem (SpdmMessage, (UINT8 *)MctpMessage + 1, *SpdmMessageSize);
+    if (*MessageSize + Alignment - 1 >= MctpMessageSize - 1) {
+      CopyMem (Message, (UINT8 *)MctpMessage + 1, *MessageSize);
       return RETURN_SUCCESS;
     }
-    ASSERT (*SpdmMessageSize >= MctpMessageSize - 1);
-    *SpdmMessageSize = MctpMessageSize - 1;
+    ASSERT (*MessageSize >= MctpMessageSize - 1);
+    *MessageSize = MctpMessageSize - 1;
     return RETURN_BUFFER_TOO_SMALL;
   }
-  *SpdmMessageSize = MctpMessageSize - 1;
-  CopyMem (SpdmMessage, (UINT8 *)MctpMessage + 1, *SpdmMessageSize);
+  *MessageSize = MctpMessageSize - 1;
+  CopyMem (Message, (UINT8 *)MctpMessage + 1, *MessageSize);
   return RETURN_SUCCESS;
 }
 

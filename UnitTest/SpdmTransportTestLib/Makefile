@@ -32,6 +32,7 @@ SOURCE_DIR = $(WORKSPACE)\UnitTest\$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
+    $(OUTPUT_DIR)\SpdmTransportCommonLib.obj \
     $(OUTPUT_DIR)\SpdmTransportTestLib.obj \
 
 
@@ -70,6 +71,9 @@ init:
 #
 # Individual Object Build Targets
 #
+$(OUTPUT_DIR)\SpdmTransportCommonLib.obj : $(SOURCE_DIR)\SpdmTransportCommonLib.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmTransportCommonLib.c
+
 $(OUTPUT_DIR)\SpdmTransportTestLib.obj : $(SOURCE_DIR)\SpdmTransportTestLib.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmTransportTestLib.c
 

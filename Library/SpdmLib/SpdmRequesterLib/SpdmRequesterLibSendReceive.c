@@ -25,9 +25,9 @@ SpdmSendRequestSession (
   InternalDumpHex (Request, RequestSize);
 
   MessageSize = sizeof(Message);
-  Status = SpdmEncodeMessage (SpdmContext, &SessionId, TRUE, RequestSize, Request, &MessageSize, Message);
+  Status = SpdmContext->TransportEncodeMessage (SpdmContext, &SessionId, TRUE, RequestSize, Request, &MessageSize, Message);
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "SpdmEncodeMessage Status - %p\n", Status));
+    DEBUG((DEBUG_INFO, "TransportEncodeMessage Status - %p\n", Status));
     return Status;
   }
 
@@ -71,9 +71,9 @@ SpdmSendRequest (
   InternalDumpHex (Request, RequestSize);
 
   MessageSize = sizeof(Message);
-  Status = SpdmEncodeMessage (SpdmContext, NULL, TRUE, RequestSize, Request, &MessageSize, Message);
+  Status = SpdmContext->TransportEncodeMessage (SpdmContext, NULL, TRUE, RequestSize, Request, &MessageSize, Message);
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "SpdmEncodeMessage Status - %p\n", Status));
+    DEBUG((DEBUG_INFO, "TransportEncodeMessage Status - %p\n", Status));
     return Status;
   }
 
@@ -117,7 +117,7 @@ SpdmReceiveResponseSession (
     return RETURN_DEVICE_ERROR;
   }
 
-  Status = SpdmDecodeMessage (SpdmContext, &MessageSessionId, FALSE, MessageSize, Message, ResponseSize, Response);
+  Status = SpdmContext->TransportDecodeMessage (SpdmContext, &MessageSessionId, FALSE, MessageSize, Message, ResponseSize, Response);
 
   DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] (0x%x): \n", SessionId, *ResponseSize));
   if (RETURN_ERROR(Status)) {
@@ -171,7 +171,7 @@ SpdmReceiveResponse (
     return RETURN_DEVICE_ERROR;
   }
 
-  Status = SpdmDecodeMessage (SpdmContext, NULL, FALSE, MessageSize, Message, ResponseSize, Response);
+  Status = SpdmContext->TransportDecodeMessage (SpdmContext, NULL, FALSE, MessageSize, Message, ResponseSize, Response);
 
   DEBUG((DEBUG_INFO, "SpdmReceiveResponse (0x%x): \n", *ResponseSize));
   if (RETURN_ERROR(Status)) {

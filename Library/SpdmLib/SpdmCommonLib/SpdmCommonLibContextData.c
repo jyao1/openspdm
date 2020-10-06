@@ -535,26 +535,6 @@ SpdmRegisterTransportLayerFunc (
   return RETURN_SUCCESS;
 }
 
-RETURN_STATUS
-EFIAPI
-SpdmGetTransportLayerFunc (
-  IN     VOID                                *Context,
-     OUT SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC  *TransportEncodeMessage,
-     OUT SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  *TransportDecodeMessage
-  )
-{
-  SPDM_DEVICE_CONTEXT       *SpdmContext;
-
-  SpdmContext = Context;
-  if (TransportEncodeMessage != NULL) {
-    *TransportEncodeMessage = SpdmContext->TransportEncodeMessage;
-  }
-  if (TransportDecodeMessage != NULL) {
-    *TransportDecodeMessage = SpdmContext->TransportDecodeMessage;
-  }
-  return RETURN_SUCCESS;
-}
-
 UINT32
 EFIAPI
 SpdmGetLastError (

@@ -37,7 +37,7 @@ UINTN SpdmUnitTestGroupSetup(VOID **State)
 
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmTestContext->SendMessage, SpdmTestContext->ReceiveMessage);
-  SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTestEncodeMessage, SpdmTestDecodeMessage);
+  SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTransportTestEncodeMessage, SpdmTransportTestDecodeMessage);
 
   *State = SpdmTestContext;
   return 0;

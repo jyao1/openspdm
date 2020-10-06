@@ -14,28 +14,27 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 RETURN_STATUS
 EFIAPI
-SpdmEncodeMessage (
+SpdmEncodeSecuredMessage (
   IN     VOID                 *SpdmContext,
-  IN     UINT32               *SessionId,
+  IN     UINT32               SessionId,
   IN     BOOLEAN              IsRequester,
-  IN     UINTN                SpdmMessageSize,
-  IN     VOID                 *SpdmMessage,
-  IN OUT UINTN                *TransportMessageSize,
-     OUT VOID                 *TransportMessage
+  IN     UINTN                AppMessageSize,
+  IN     VOID                 *AppMessage,
+  IN OUT UINTN                *SecuredMessageSize,
+     OUT VOID                 *SecuredMessage
   );
 
 RETURN_STATUS
 EFIAPI
-SpdmDecodeMessage (
+SpdmDecodeSecuredMessage (
   IN     VOID                 *SpdmContext,
-     OUT UINT32               **SessionId,
+  IN     UINT32               SessionId,
   IN     BOOLEAN              IsRequester,
-  IN     UINTN                TransportMessageSize,
-  IN     VOID                 *TransportMessage,
-  IN OUT UINTN                *SpdmMessageSize,
-     OUT VOID                 *SpdmMessage
+  IN     UINTN                SecuredMessageSize,
+  IN     VOID                 *SecuredMessage,
+  IN OUT UINTN                *AppMessageSize,
+     OUT VOID                 *AppMessage
   );
-
 
 
 UINTN

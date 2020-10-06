@@ -32,6 +32,7 @@ SOURCE_DIR = $(WORKSPACE)\Library\SpdmLib\$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
+    $(OUTPUT_DIR)\SpdmTransportCommonLib.obj \
     $(OUTPUT_DIR)\SpdmTransportMctpLib.obj \
 
 
@@ -69,6 +70,9 @@ init:
 #
 # Individual Object Build Targets
 #
+$(OUTPUT_DIR)\SpdmTransportCommonLib.obj : $(SOURCE_DIR)\SpdmTransportCommonLib.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmTransportCommonLib.c
+
 $(OUTPUT_DIR)\SpdmTransportMctpLib.obj : $(SOURCE_DIR)\SpdmTransportMctpLib.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmTransportMctpLib.c
 
