@@ -23,9 +23,9 @@ MODULE_NAME = MemoryAllocationLibNull
 #
 BUILD_DIR = $(WORKSPACE)\Build
 BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)\OsStub\$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)\UnitTest\TestSize\$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)\OsStub\$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)\UnitTest\TestSize\$(MODULE_NAME)
 
 #
 # Build Macro

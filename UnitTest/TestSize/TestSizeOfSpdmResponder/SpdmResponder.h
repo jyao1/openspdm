@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Base.h>
 #include <Library/SpdmResponderLib.h>
-#include <Library/SpdmTransportTestLib.h>
+#include <Library/SpdmTransportMctpLib.h>
 #include <Library/MemoryAllocationLib.h>
 
 VOID *

@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = TestSizeOfSpdmRequester
+MODULE_NAME = TestSizeOfSpdmResponder
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -24,15 +24,16 @@ BASE_NAME = $(MODULE_NAME)
 #
 BUILD_DIR = $(WORKSPACE)\Build
 BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)\UnitTest\$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)\UnitTest\TestSize\$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)\UnitTest\$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)\UnitTest\TestSize\$(MODULE_NAME)
 
+CC_FLAGS = $(CC_FLAGS) /GL-
 DLINK_FLAGS = /out:"$(BIN_DIR)\$(BASE_NAME).dll" /DLL /ENTRY:ModuleEntryPoint /base:0 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb" /NOLOGO /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF
 !IF "$(TARGET)" == "DEBUG"
 DLINK_FLAGS = $(DLINK_FLAGS) /DEBUG
 !ELSEIF "$(TARGET)" == "RELEASE"
-DLINK_FLAGS = $(DLINK_FLAGS) /LTCG
+DLINK_FLAGS = $(DLINK_FLAGS)
 !ENDIF
 
 !IF "$(ARCH)" == "X64"
@@ -46,11 +47,8 @@ DLINK_FLAGS = $(DLINK_FLAGS) /MACHINE:I386
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\SpdmRequesterMain.obj \
-    $(OUTPUT_DIR)\SpdmRequesterAuthentication.obj \
-    $(OUTPUT_DIR)\SpdmRequesterInit.obj \
-    $(OUTPUT_DIR)\SpdmRequesterMain.obj \
-    $(OUTPUT_DIR)\SpdmRequesterSession.obj \
+    $(OUTPUT_DIR)\SpdmResponderInit.obj \
+    $(OUTPUT_DIR)\SpdmResponderMain.obj \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -58,13 +56,13 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\DebugLibNull\DebugLibNull.lib \
     $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\BaseCryptLib$(CRYPTO).lib \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\$(CRYPTO)Lib.lib \
-    $(BIN_DIR)\OsStub\MemoryAllocationLibNull\MemoryAllocationLibNull.lib \
-    $(BIN_DIR)\OsStub\IntrinsicLib\IntrinsicLib.lib \
-    $(BIN_DIR)\OsStub\BaseCryptStubLibDummy\BaseCryptStubLibDummy.lib \
+    $(BIN_DIR)\UnitTest\TestSize\MemoryAllocationLibNull\MemoryAllocationLibNull.lib \
+    $(BIN_DIR)\UnitTest\TestSize\IntrinsicLib\IntrinsicLib.lib \
+    $(BIN_DIR)\UnitTest\TestSize\BaseCryptStubLibDummy\BaseCryptStubLibDummy.lib \
     $(BIN_DIR)\Library\SpdmLib\SpdmCommonLib\SpdmCommonLib.lib \
-    $(BIN_DIR)\Library\SpdmLib\SpdmRequesterLib\SpdmRequesterLib.lib \
+    $(BIN_DIR)\Library\SpdmLib\SpdmResponderLib\SpdmResponderLib.lib \
     $(BIN_DIR)\Library\SpdmLib\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
-    $(BIN_DIR)\Library\SpdmLib\SpdmTransportTestLib\SpdmTransportTestLib.lib \
+    $(BIN_DIR)\Library\SpdmLib\SpdmTransportMctpLib\SpdmTransportMctpLib.lib \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
 
 
@@ -74,13 +72,13 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\OsStub\DebugLibNull\*.obj \
     $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\*.obj \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\*.obj \
-    $(BIN_DIR)\OsStub\MemoryAllocationLibNull\*.obj \
-    $(BIN_DIR)\OsStub\IntrinsicLib\*.obj \
-    $(BIN_DIR)\OsStub\BaseCryptStubLibDummy\*.obj \
+    $(BIN_DIR)\UnitTest\TestSize\MemoryAllocationLibNull\*.obj \
+    $(BIN_DIR)\UnitTest\TestSize\IntrinsicLib\*.obj \
+    $(BIN_DIR)\UnitTest\TestSize\BaseCryptStubLibDummy\*.obj \
     $(BIN_DIR)\Library\SpdmLib\SpdmCommonLib\*.obj \
-    $(BIN_DIR)\Library\SpdmLib\SpdmRequesterLib\*.obj \
+    $(BIN_DIR)\Library\SpdmLib\SpdmResponderLib\*.obj \
     $(BIN_DIR)\Library\SpdmLib\SpdmSecuredMessageLib\*.obj \
-    $(BIN_DIR)\Library\SpdmLib\SpdmTransportTestLib\*.obj \
+    $(BIN_DIR)\Library\SpdmLib\SpdmTransportMctpLib\*.obj \
 
 
 INC =  \
@@ -122,28 +120,22 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\DebugLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLib$(CRYPTO)\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\$(CRYPTO)Lib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\IntrinsicLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptStubLibDummy\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\MemoryAllocationLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\IntrinsicLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\BaseCryptStubLibDummy\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmCommonLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmRequesterLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmResponderLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmTransportTestLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmTransportMctpLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\SpdmRequesterAuthentication.obj : $(SOURCE_DIR)\SpdmRequesterAuthentication.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterAuthentication.c
+$(OUTPUT_DIR)\SpdmResponderInit.obj : $(SOURCE_DIR)\SpdmResponderInit.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderInit.c
 
-$(OUTPUT_DIR)\SpdmRequesterInit.obj : $(SOURCE_DIR)\SpdmRequesterInit.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterInit.c
-
-$(OUTPUT_DIR)\SpdmRequesterMain.obj : $(SOURCE_DIR)\SpdmRequesterMain.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterMain.c
-
-$(OUTPUT_DIR)\SpdmRequesterSession.obj : $(SOURCE_DIR)\SpdmRequesterSession.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterSession.c
+$(OUTPUT_DIR)\SpdmResponderMain.obj : $(SOURCE_DIR)\SpdmResponderMain.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderMain.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

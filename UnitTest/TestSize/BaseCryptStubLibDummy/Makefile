@@ -16,28 +16,28 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmTransportTestLib
+MODULE_NAME = BaseCryptStubLibDummy
 
 #
 # Build Directory Macro Definition
 #
 BUILD_DIR = $(WORKSPACE)\Build
 BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)\Library\SpdmLib\$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)\UnitTest\TestSize\$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)\Library\SpdmLib\$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)\UnitTest\TestSize\$(MODULE_NAME)
 
 #
 # Build Macro
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\SpdmTransportTestLib.obj \
+    $(OUTPUT_DIR)\RandDummy.obj \
+    $(OUTPUT_DIR)\TimeClockDummy.obj \
+
 
 
 INC =  \
-    -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)\Library\SpdmLib\SpdmCommonLib \
     -I$(WORKSPACE)\Include \
     -I$(WORKSPACE)\Include\Hal \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \
@@ -70,8 +70,11 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\SpdmTransportTestLib.obj : $(SOURCE_DIR)\SpdmTransportTestLib.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmTransportTestLib.c
+$(OUTPUT_DIR)\RandDummy.obj : $(SOURCE_DIR)\RandDummy.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\RandDummy.c
+
+$(OUTPUT_DIR)\TimeClockDummy.obj : $(SOURCE_DIR)\TimeClockDummy.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TimeClockDummy.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

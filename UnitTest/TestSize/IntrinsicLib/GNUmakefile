@@ -16,33 +16,31 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = BaseCryptStubLibDummy
+MODULE_NAME = IntrinsicLib
 
 #
 # Build Directory Macro Definition
 #
 BUILD_DIR = $(WORKSPACE)/Build
 BIN_DIR = $(BUILD_DIR)/$(TARGET)_$(TOOLCHAIN)/$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)/OsStub/$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)/UnitTest/TestSize/$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)/OsStub/$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)/UnitTest/TestSize/$(MODULE_NAME)
 
-CC_FLAGS += -Wno-incompatible-pointer-types -Wno-pointer-sign
 
 #
 # Build Macro
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)/RandDummy.o \
-    $(OUTPUT_DIR)/TimeClockDummy.o \
-
+    $(OUTPUT_DIR)/CopyMem.o \
+    $(OUTPUT_DIR)/MemoryIntrinsics.o \
 
 INC =  \
+    -I$(SOURCE_DIR)\
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
-    -I$(WORKSPACE)/Include/Hal/$(ARCH) \
-    -I$(WORKSPACE)/OsStub/Include \
+    -I$(WORKSPACE)/Include/Hal/$(ARCH)
 
 #
 # Overridable Target Macro Definitions
@@ -71,10 +69,10 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)/RandDummy.o : $(SOURCE_DIR)/RandDummy.c
+$(OUTPUT_DIR)/CopyMem.o : $(SOURCE_DIR)/CopyMem.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/TimeClockDummy.o : $(SOURCE_DIR)/TimeClockDummy.c
+$(OUTPUT_DIR)/MemoryIntrinsics.o : $(SOURCE_DIR)/MemoryIntrinsics.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

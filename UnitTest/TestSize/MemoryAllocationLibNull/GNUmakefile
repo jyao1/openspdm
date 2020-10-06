@@ -16,32 +16,29 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmTransportTestLib
+MODULE_NAME = MemoryAllocationLibNull
 
 #
 # Build Directory Macro Definition
 #
 BUILD_DIR = $(WORKSPACE)/Build
 BIN_DIR = $(BUILD_DIR)/$(TARGET)_$(TOOLCHAIN)/$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)/Library/SpdmLib/$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)/UnitTest/TestSize/$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)/Library/SpdmLib/$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)/UnitTest/TestSize/$(MODULE_NAME)
 
 #
 # Build Macro
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)/SpdmTransportTestLib.o \
+    $(OUTPUT_DIR)/MemoryAllocationLib.o \
 
 
 INC =  \
-    -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)/Library/SpdmLib/SpdmCommonLib \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
-    -I$(WORKSPACE)/Include/Hal/$(ARCH) \
-    -I$(WORKSPACE)/OsStub/Include \
+    -I$(WORKSPACE)/Include/Hal/$(ARCH)
 
 #
 # Overridable Target Macro Definitions
@@ -70,7 +67,7 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)/SpdmTransportTestLib.o : $(SOURCE_DIR)/SpdmTransportTestLib.c
+$(OUTPUT_DIR)/MemoryAllocationLib.o : $(SOURCE_DIR)/MemoryAllocationLib.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
