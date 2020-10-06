@@ -361,7 +361,7 @@ SpdmRegisterDeviceIoFunc (
   Encode a SPDM message to a transport layer message.
 
   @param  This                         Indicates a pointer to the calling context.
-  @param  IsSecuredMessage             Indicates if it is a secured message protected via SPDM session.
+  @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
   @param  SpdmMessageSize              Size in bytes of the SPDM message data buffer.
   @param  SpdmMessage                  A pointer to a source buffer to store the SPDM message.
   @param  TransportMessageSize         Size in bytes of the SPDM message data buffer.
@@ -374,7 +374,7 @@ typedef
 RETURN_STATUS
 (EFIAPI *SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC) (
   IN     VOID                 *SpdmContext,
-  IN     BOOLEAN              IsSecuredMessage,
+  IN     UINT32               *SessionId,
   IN     UINTN                SpdmMessageSize,
   IN     VOID                 *SpdmMessage,
   IN OUT UINTN                *TransportMessageSize,
@@ -385,7 +385,7 @@ RETURN_STATUS
   Decode a SPDM message from a transport layer message.
 
   @param  This                         Indicates a pointer to the calling context.
-  @param  IsSecuredMessage             Indicates if it is a secured message protected via SPDM session.
+  @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
   @param  TransportMessageSize         Size in bytes of the SPDM message data buffer.
   @param  TransportMessage             A pointer to a source buffer to store the SPDM message.
   @param  SpdmMessageSize              Size in bytes of the SPDM message data buffer.
@@ -399,7 +399,7 @@ typedef
 RETURN_STATUS
 (EFIAPI *SPDM_TRANSPORT_DECODE_MESSAGE_FUNC) (
   IN     VOID                 *SpdmContext,
-     OUT BOOLEAN              *IsSecuredMessage,
+     OUT UINT32               **SessionId,
   IN     UINTN                TransportMessageSize,
   IN     VOID                 *TransportMessage,
   IN OUT UINTN                *SpdmMessageSize,

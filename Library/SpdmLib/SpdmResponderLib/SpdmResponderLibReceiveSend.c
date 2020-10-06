@@ -105,6 +105,7 @@ SpdmReceiveRequestSession (
 {
   RETURN_STATUS             Status;
   SPDM_SESSION_INFO         *SessionInfo;
+  UINT32                    *MessageSessionId;
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
@@ -121,8 +122,9 @@ SpdmReceiveRequestSession (
 
   DEBUG((DEBUG_INFO, "SpdmReceiveRequestSession[%x] ...\n", SessionId));
 
+  MessageSessionId = &SessionId;
   SpdmContext->LastSpdmRequestSize = sizeof(SpdmContext->LastSpdmRequest);
-  Status = SpdmDecodeMessage (SpdmContext, &SessionId, TRUE, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
+  Status = SpdmDecodeMessage (SpdmContext, &MessageSessionId, TRUE, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmDecodeMessage : %p\n", Status));
     return Status;

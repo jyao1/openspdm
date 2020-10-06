@@ -19,7 +19,7 @@ RETURN_STATUS
 EFIAPI
 SpdmTestEncodeMessage (
   IN     VOID                 *SpdmContext,
-  IN     BOOLEAN              IsSecuredMessage,
+  IN     UINT32               *SessionId,
   IN     UINTN                SpdmMessageSize,
   IN     VOID                 *SpdmMessage,
   IN OUT UINTN                *TestMessageSize,
@@ -30,7 +30,7 @@ RETURN_STATUS
 EFIAPI
 SpdmTestDecodeMessage (
   IN     VOID                 *SpdmContext,
-     OUT BOOLEAN              *IsSecuredMessage,
+     OUT UINT32               **SessionId,
   IN     UINTN                TestMessageSize,
   IN     VOID                 *TestMessage,
   IN OUT UINTN                *SpdmMessageSize,

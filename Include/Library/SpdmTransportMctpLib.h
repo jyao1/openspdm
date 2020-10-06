@@ -16,7 +16,7 @@ RETURN_STATUS
 EFIAPI
 SpdmMctpEncodeMessage (
   IN     VOID                 *SpdmContext,
-  IN     BOOLEAN              IsSecuredMessage,
+  IN     UINT32               *SessionId,
   IN     UINTN                SpdmMessageSize,
   IN     VOID                 *SpdmMessage,
   IN OUT UINTN                *MctpMessageSize,
@@ -27,7 +27,7 @@ RETURN_STATUS
 EFIAPI
 SpdmMctpDecodeMessage (
   IN     VOID                 *SpdmContext,
-     OUT BOOLEAN              *IsSecuredMessage,
+     OUT UINT32               **SessionId,
   IN     UINTN                MctpMessageSize,
   IN     VOID                 *MctpMessage,
   IN OUT UINTN                *SpdmMessageSize,

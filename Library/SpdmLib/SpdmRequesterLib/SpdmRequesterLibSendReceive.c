@@ -117,7 +117,7 @@ SpdmReceiveResponseSession (
     return RETURN_DEVICE_ERROR;
   }
 
-  Status = SpdmDecodeMessage (SpdmContext, &SessionId, FALSE, MessageSize, Message, ResponseSize, Response);
+  Status = SpdmDecodeMessage (SpdmContext, &MessageSessionId, FALSE, MessageSize, Message, ResponseSize, Response);
 
   DEBUG((DEBUG_INFO, "SpdmReceiveResponseSession[%x] (0x%x): \n", SessionId, *ResponseSize));
   if (RETURN_ERROR(Status)) {

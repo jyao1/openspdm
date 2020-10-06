@@ -16,7 +16,7 @@ RETURN_STATUS
 EFIAPI
 SpdmMctpEncodeMessage (
   IN     VOID                 *SpdmContext,
-  IN     BOOLEAN              IsSecuredMessage,
+  IN     UINT32               *SessionId,
   IN     UINTN                SpdmMessageSize,
   IN     VOID                 *SpdmMessage,
   IN OUT UINTN                *MctpMessageSize,
@@ -34,8 +34,12 @@ SpdmMctpEncodeMessage (
     return RETURN_BUFFER_TOO_SMALL;
   }
   *MctpMessageSize = AlignedSpdmMessageSize + 1;
-  if (IsSecuredMessage) {
+  if (SessionId != NULL) {
     *(UINT8 *)MctpMessage = MCTP_MESSAGE_TYPE_SECURED_MCTP;
+    ASSERT (*SessionId == *(UINT32 *)(SpdmMessage));
+    if (*SessionId != *(UINT32 *)(SpdmMessage)) {
+      return RETURN_UNSUPPORTED;
+    }
   } else {
     *(UINT8 *)MctpMessage = MCTP_MESSAGE_TYPE_SPDM;
   }
@@ -48,7 +52,7 @@ RETURN_STATUS
 EFIAPI
 SpdmMctpDecodeMessage (
   IN     VOID                 *SpdmContext,
-     OUT BOOLEAN              *IsSecuredMessage,
+     OUT UINT32               **SessionId,
   IN     UINTN                MctpMessageSize,
   IN     VOID                 *MctpMessage,
   IN OUT UINTN                *SpdmMessageSize,
@@ -63,10 +67,19 @@ SpdmMctpDecodeMessage (
   }
   switch (*(UINT8 *)MctpMessage) {
   case MCTP_MESSAGE_TYPE_SECURED_MCTP:
-    *IsSecuredMessage = TRUE;
+    ASSERT (SessionId != NULL);
+    if (SessionId == NULL) {
+      return RETURN_UNSUPPORTED;
+    }
+    if (MctpMessageSize <= 1 + sizeof(UINT32)) {
+      return RETURN_UNSUPPORTED;
+    }
+    *SessionId = (UINT32 *)((UINT8 *)MctpMessage + 1);
     break;
   case MCTP_MESSAGE_TYPE_SPDM:
-    *IsSecuredMessage = FALSE;
+    if (SessionId != NULL) {
+      *SessionId = NULL;
+    }
     break;
   default:
     return RETURN_UNSUPPORTED;

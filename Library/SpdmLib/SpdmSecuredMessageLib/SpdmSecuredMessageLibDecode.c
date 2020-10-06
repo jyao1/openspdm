@@ -187,7 +187,7 @@ RETURN_STATUS
 EFIAPI
 SpdmDecodeMessage (
   IN     VOID                 *SpdmContext,
-  IN     UINT32               *SessionId,
+     OUT UINT32               **SessionId,
   IN     BOOLEAN              IsRequester,
   IN     UINTN                TransportMessageSize,
   IN     VOID                 *TransportMessage,
@@ -197,7 +197,7 @@ SpdmDecodeMessage (
 {
   RETURN_STATUS                       Status;
   SPDM_SESSION_INFO                   *SessionInfo;
-  BOOLEAN                             IsSecuredMessage;
+  UINT32                              *SecuredMessageSessionId;
   SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  TransportDecodeMessage;
   UINT8                               SecuredMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               SecuredMessageSize;
@@ -210,29 +210,57 @@ SpdmDecodeMessage (
     return RETURN_UNSUPPORTED;
   }
 
-  if (SessionId != NULL) {
-    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);
-    if (SessionInfo == NULL) {
-      ASSERT (FALSE);
-      return RETURN_UNSUPPORTED;
-    }
-    
-    IsSecuredMessage = TRUE;
-    SecuredMessageSize = sizeof(SecuredMessage);
+  SecuredMessageSessionId = NULL;
+  SecuredMessageSize = sizeof(SecuredMessage);
+  if (SessionId == NULL) {
+    // Expect normal message
     Status = TransportDecodeMessage (
                 SpdmContext,
-                &IsSecuredMessage,
+                &SecuredMessageSessionId,
                 TransportMessageSize,
                 TransportMessage,
-                &SecuredMessageSize,
-                SecuredMessage
+                SpdmMessageSize,
+                SpdmMessage
                 );
-    ASSERT_RETURN_ERROR(Status);
+    if (RETURN_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - %p\n", Status));
+      return RETURN_UNSUPPORTED;
+    }
+    if (SecuredMessageSessionId == NULL) {
+      return RETURN_SUCCESS;
+    } else {
+      // but get secured message - cannot handle it.
+      DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - expect normal but got session (%08x)\n", *SecuredMessageSessionId));
+      return RETURN_UNSUPPORTED;
+    }
+  }
+
+  // Expect secured message
+  Status = TransportDecodeMessage (
+              SpdmContext,
+              &SecuredMessageSessionId,
+              TransportMessageSize,
+              TransportMessage,
+              &SecuredMessageSize,
+              SecuredMessage
+              );
+  if (RETURN_ERROR(Status)) {
+    DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - %p\n", Status));
+    return RETURN_UNSUPPORTED;
+  }
+
+  if (SecuredMessageSessionId != NULL) {
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SecuredMessageSessionId);
+    if (SessionInfo == NULL) {
+      DEBUG ((DEBUG_ERROR, "SpdmGetSessionInfoViaSessionId (%08x) - ERROR\n", *SecuredMessageSessionId));
+      return RETURN_UNSUPPORTED;
+    }
+    *SessionId = SecuredMessageSessionId;
 
     AppMessageSize = sizeof(AppMessage);
     Status = SpdmDecodeSecuredMessage (
                SpdmContext,
-               *SessionId,
+               *SecuredMessageSessionId,
                IsRequester,
                SecuredMessageSize,
                SecuredMessage,
@@ -241,32 +269,32 @@ SpdmDecodeMessage (
                );
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_ERROR, "SpdmDecodeSecuredMessage - %p\n", Status));
-      return Status;
+      return RETURN_UNSUPPORTED;
     }
 
-    IsSecuredMessage = FALSE;
     Status = TransportDecodeMessage (
                 SpdmContext,
-                &IsSecuredMessage,
+                &SecuredMessageSessionId,
                 AppMessageSize,
                 AppMessage,
                 SpdmMessageSize,
                 SpdmMessage
                 );
-    ASSERT_RETURN_ERROR(Status);
+    if (RETURN_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - %p\n", Status));
+      return RETURN_UNSUPPORTED;
+    }
+    if (SecuredMessageSessionId == NULL) {
+      return RETURN_SUCCESS;
+    } else {
+      // but get encapsulated secured message - cannot handle it.
+      DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - expect encapsulated normal but got session (%08x)\n", *SecuredMessageSessionId));
+      return RETURN_UNSUPPORTED;
+    }
   } else {
-    IsSecuredMessage = FALSE;
-    Status = TransportDecodeMessage (
-                SpdmContext,
-                &IsSecuredMessage,
-                TransportMessageSize,
-                TransportMessage,
-                SpdmMessageSize,
-                SpdmMessage
-                );
-    ASSERT_RETURN_ERROR(Status);
+    // but get non-secured message - cannot handle it.
+    DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - expect session but got normal\n"));
+    return RETURN_UNSUPPORTED;
   }
-
-  return RETURN_SUCCESS;
 }
 

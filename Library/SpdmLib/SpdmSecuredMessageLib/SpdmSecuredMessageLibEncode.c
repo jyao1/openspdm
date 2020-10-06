@@ -203,7 +203,7 @@ SpdmEncodeMessage (
     AppMessageSize = sizeof(AppMessage);
     Status = TransportEncodeMessage (
                 SpdmContext,
-                FALSE,
+                NULL,
                 SpdmMessageSize,
                 SpdmMessage,
                 &AppMessageSize,
@@ -228,7 +228,7 @@ SpdmEncodeMessage (
     
     Status = TransportEncodeMessage (
                 SpdmContext,
-                TRUE,
+                SessionId,
                 SecuredMessageSize,
                 SecuredMessage,
                 TransportMessageSize,
@@ -238,7 +238,7 @@ SpdmEncodeMessage (
   } else {
     Status = TransportEncodeMessage (
                 SpdmContext,
-                FALSE,
+                NULL,
                 SpdmMessageSize,
                 SpdmMessage,
                 TransportMessageSize,

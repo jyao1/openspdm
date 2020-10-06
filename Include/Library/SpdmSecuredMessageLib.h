@@ -28,7 +28,7 @@ RETURN_STATUS
 EFIAPI
 SpdmDecodeMessage (
   IN     VOID                 *SpdmContext,
-  IN     UINT32               *SessionId,
+     OUT UINT32               **SessionId,
   IN     BOOLEAN              IsRequester,
   IN     UINTN                TransportMessageSize,
   IN     VOID                 *TransportMessage,
