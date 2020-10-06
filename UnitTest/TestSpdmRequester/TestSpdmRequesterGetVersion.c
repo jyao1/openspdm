@@ -73,67 +73,59 @@ SpdmRequesterGetVersionTestReceiveMessage (
 
   case 0x2:
   {
-    MY_SPDM_VERSION_RESPONSE    *SpdmResponse;
-        
-    *ResponseSize = 1+ sizeof(MY_SPDM_VERSION_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    MY_SPDM_VERSION_RESPONSE    SpdmResponse;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_VERSION;
-    SpdmResponse->Header.Param1 = 0;
-    SpdmResponse->Header.Param2 = 0;
-    SpdmResponse->VersionNumberEntryCount = 2;
-    SpdmResponse->VersionNumberEntry[0].MajorVersion = 1;
-    SpdmResponse->VersionNumberEntry[0].MinorVersion = 0;
-    SpdmResponse->VersionNumberEntry[1].MajorVersion = 1;
-    SpdmResponse->VersionNumberEntry[1].MinorVersion = 1;
-  }    
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_VERSION;
+    SpdmResponse.Header.Param1 = 0;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.VersionNumberEntryCount = 2;
+    SpdmResponse.VersionNumberEntry[0].MajorVersion = 1;
+    SpdmResponse.VersionNumberEntry[0].MinorVersion = 0;
+    SpdmResponse.VersionNumberEntry[1].MajorVersion = 1;
+    SpdmResponse.VersionNumberEntry[1].MinorVersion = 1;
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+  }
     return RETURN_SUCCESS;
     
   case 0x3:
   {
-    SPDM_VERSION_RESPONSE    *SpdmResponse;
-        
-    *ResponseSize = 1 + sizeof(SPDM_VERSION_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SPDM_VERSION_RESPONSE    SpdmResponse;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_VERSION;
-    SpdmResponse->Header.Param1 = 0;
-    SpdmResponse->Header.Param2 = 0;
-    SpdmResponse->VersionNumberEntryCount = 0;
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_VERSION;
+    SpdmResponse.Header.Param1 = 0;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.VersionNumberEntryCount = 0;
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x4:
   {
-    SPDM_ERROR_RESPONSE    *SpdmResponse;
+    SPDM_ERROR_RESPONSE    SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
+    SpdmResponse.Header.Param2 = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
-    SpdmResponse->Header.Param2 = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x5:
   {
-    SPDM_ERROR_RESPONSE	 *SpdmResponse;
+    SPDM_ERROR_RESPONSE	 SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
+    SpdmResponse.Header.Param2 = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_BUSY;
-    SpdmResponse->Header.Param2 = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -141,32 +133,28 @@ SpdmRequesterGetVersionTestReceiveMessage (
   {
     STATIC UINTN SubIndex1 = 0;
     if (SubIndex1 == 0) {
-      SPDM_ERROR_RESPONSE	 *SpdmResponse;
+      SPDM_ERROR_RESPONSE	 SpdmResponse;
 
-      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
+      SpdmResponse.Header.Param2 = 0;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-      SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_BUSY;
-      SpdmResponse->Header.Param2 = 0;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex1 == 1) {
-      MY_SPDM_VERSION_RESPONSE    *SpdmResponse;
+      MY_SPDM_VERSION_RESPONSE    SpdmResponse;
 
-      *ResponseSize = 1 + sizeof(MY_SPDM_VERSION_RESPONSE);
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.RequestResponseCode = SPDM_VERSION;
+      SpdmResponse.Header.Param1 = 0;
+      SpdmResponse.Header.Param2 = 0;
+      SpdmResponse.VersionNumberEntryCount = 2;
+      SpdmResponse.VersionNumberEntry[0].MajorVersion = 1;
+      SpdmResponse.VersionNumberEntry[0].MinorVersion = 0;
+      SpdmResponse.VersionNumberEntry[1].MajorVersion = 1;
+      SpdmResponse.VersionNumberEntry[1].MinorVersion = 1;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_VERSION;
-      SpdmResponse->Header.Param1 = 0;
-      SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->VersionNumberEntryCount = 2;
-      SpdmResponse->VersionNumberEntry[0].MajorVersion = 1;
-      SpdmResponse->VersionNumberEntry[0].MinorVersion = 0;
-      SpdmResponse->VersionNumberEntry[1].MajorVersion = 1;
-      SpdmResponse->VersionNumberEntry[1].MinorVersion = 1;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex1 ++;
   }
@@ -174,37 +162,31 @@ SpdmRequesterGetVersionTestReceiveMessage (
 
   case 0x7:
   {
-    SPDM_ERROR_RESPONSE  *SpdmResponse;
+    SPDM_ERROR_RESPONSE  SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
+    SpdmResponse.Header.Param2 = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
-    SpdmResponse->Header.Param2 = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x8:
   {
-    SPDM_ERROR_RESPONSE                  *SpdmResponse;
-    SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
+    SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
 
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
-    ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.ExtendErrorData.RDTExponent = 1;
+    SpdmResponse.ExtendErrorData.RDTM = 1;
+    SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_VERSION;
+    SpdmResponse.ExtendErrorData.Token = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
-    SpdmResponse->Header.Param2 = 0;
-    ExtendErrorData->RDTExponent = 1;
-    ExtendErrorData->RDTM = 1;
-    ExtendErrorData->RequestCode = SPDM_GET_VERSION;
-    ExtendErrorData->Token = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -212,38 +194,32 @@ SpdmRequesterGetVersionTestReceiveMessage (
   {
     STATIC UINTN SubIndex2 = 0;
     if (SubIndex2 == 0) {
-      SPDM_ERROR_RESPONSE	 *SpdmResponse;
-      SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
+      SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
 
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
-      ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
+      SpdmResponse.Header.Param2 = 0;
+      SpdmResponse.ExtendErrorData.RDTExponent = 1;
+      SpdmResponse.ExtendErrorData.RDTM = 1;
+      SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_VERSION;
+      SpdmResponse.ExtendErrorData.Token = 1;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-      SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
-      SpdmResponse->Header.Param2 = 0;
-      ExtendErrorData->RDTExponent = 1;
-      ExtendErrorData->RDTM = 1;
-      ExtendErrorData->RequestCode = SPDM_GET_VERSION;
-      ExtendErrorData->Token = 1;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex2 == 1) {
-      MY_SPDM_VERSION_RESPONSE    *SpdmResponse;
+      MY_SPDM_VERSION_RESPONSE    SpdmResponse;
 
-      *ResponseSize = 1 + sizeof(MY_SPDM_VERSION_RESPONSE);
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.RequestResponseCode = SPDM_VERSION;
+      SpdmResponse.Header.Param1 = 0;
+      SpdmResponse.Header.Param2 = 0;
+      SpdmResponse.VersionNumberEntryCount = 2;
+      SpdmResponse.VersionNumberEntry[0].MajorVersion = 1;
+      SpdmResponse.VersionNumberEntry[0].MinorVersion = 0;
+      SpdmResponse.VersionNumberEntry[1].MajorVersion = 1;
+      SpdmResponse.VersionNumberEntry[1].MinorVersion = 1;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_VERSION;
-      SpdmResponse->Header.Param1 = 0;
-      SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->VersionNumberEntryCount = 2;
-      SpdmResponse->VersionNumberEntry[0].MajorVersion = 1;
-      SpdmResponse->VersionNumberEntry[0].MinorVersion = 0;
-      SpdmResponse->VersionNumberEntry[1].MajorVersion = 1;
-      SpdmResponse->VersionNumberEntry[1].MinorVersion = 1;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex2 ++;
   }

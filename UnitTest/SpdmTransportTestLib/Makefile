@@ -42,7 +42,7 @@ INC =  \
     -I$(WORKSPACE)\Include \
     -I$(WORKSPACE)\Include\Hal \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \
-    -I$(WORKSPACE)\OsStub\Include \
+    -I$(WORKSPACE)\UnitTest\Include \
 
 #
 # Overridable Target Macro Definitions

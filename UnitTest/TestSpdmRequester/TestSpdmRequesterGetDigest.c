@@ -70,11 +70,12 @@ SpdmRequesterGetDigestTestReceiveMessage (
   {
     SPDM_DIGESTS_RESPONSE    *SpdmResponse;
     UINT8                    *Digest;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
-    *ResponseSize = 1 + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+    SpdmResponse = (VOID *)TempBuf;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.Param1 = 0;
@@ -85,6 +86,8 @@ SpdmRequesterGetDigestTestReceiveMessage (
     Digest = (VOID *)(SpdmResponse + 1);
     SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -92,11 +95,12 @@ SpdmRequesterGetDigestTestReceiveMessage (
   {
     SPDM_DIGESTS_RESPONSE    *SpdmResponse;
     UINT8                    *Digest;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
-    *ResponseSize = 1 + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+    SpdmResponse = (VOID *)TempBuf;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.Param1 = 0;
@@ -107,36 +111,34 @@ SpdmRequesterGetDigestTestReceiveMessage (
     Digest = (VOID *)(SpdmResponse + 1);
     SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x4:
   {
-    SPDM_ERROR_RESPONSE    *SpdmResponse;
+    SPDM_ERROR_RESPONSE    SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
+    SpdmResponse.Header.Param2 = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
-    SpdmResponse->Header.Param2 = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x5:
   {
-    SPDM_ERROR_RESPONSE	 *SpdmResponse;
+    SPDM_ERROR_RESPONSE	 SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
+    SpdmResponse.Header.Param2 = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_BUSY;
-    SpdmResponse->Header.Param2 = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -144,24 +146,23 @@ SpdmRequesterGetDigestTestReceiveMessage (
   {
     STATIC UINTN SubIndex1 = 0;
     if (SubIndex1 == 0) {
-      SPDM_ERROR_RESPONSE	 *SpdmResponse;
+      SPDM_ERROR_RESPONSE	 SpdmResponse;
 
-      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
+      SpdmResponse.Header.Param2 = 0;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-      SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_BUSY;
-      SpdmResponse->Header.Param2 = 0;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex1 == 1) {
       SPDM_DIGESTS_RESPONSE    *SpdmResponse;
       UINT8                    *Digest;
+      UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+      UINTN                    TempBufSize;
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
-      *ResponseSize = 1 + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+      TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+      SpdmResponse = (VOID *)TempBuf;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.Param1 = 0;
@@ -172,6 +173,8 @@ SpdmRequesterGetDigestTestReceiveMessage (
       Digest = (VOID *)(SpdmResponse + 1);
       SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
     SubIndex1 ++;
   }
@@ -179,37 +182,31 @@ SpdmRequesterGetDigestTestReceiveMessage (
 
   case 0x7:
   {
-    SPDM_ERROR_RESPONSE  *SpdmResponse;
+    SPDM_ERROR_RESPONSE  SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
+    SpdmResponse.Header.Param2 = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
-    SpdmResponse->Header.Param2 = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x8:
   {
-    SPDM_ERROR_RESPONSE                  *SpdmResponse;
-    SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
+    SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
 
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
-    ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.ExtendErrorData.RDTExponent = 1;
+    SpdmResponse.ExtendErrorData.RDTM = 1;
+    SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_DIGESTS;
+    SpdmResponse.ExtendErrorData.Token = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
-    SpdmResponse->Header.Param2 = 0;
-    ExtendErrorData->RDTExponent = 1;
-    ExtendErrorData->RDTM = 1;
-    ExtendErrorData->RequestCode = SPDM_GET_DIGESTS;
-    ExtendErrorData->Token = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -217,30 +214,27 @@ SpdmRequesterGetDigestTestReceiveMessage (
   {
     STATIC UINTN SubIndex2 = 0;
     if (SubIndex2 == 0) {
-      SPDM_ERROR_RESPONSE	 *SpdmResponse;
-      SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
+      SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
 
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
-      ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
+      SpdmResponse.Header.Param2 = 0;
+      SpdmResponse.ExtendErrorData.RDTExponent = 1;
+      SpdmResponse.ExtendErrorData.RDTM = 1;
+      SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_DIGESTS;
+      SpdmResponse.ExtendErrorData.Token = 1;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-      SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
-      SpdmResponse->Header.Param2 = 0;
-      ExtendErrorData->RDTExponent = 1;
-      ExtendErrorData->RDTM = 1;
-      ExtendErrorData->RequestCode = SPDM_GET_DIGESTS;
-      ExtendErrorData->Token = 1;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex2 == 1) {
       SPDM_DIGESTS_RESPONSE    *SpdmResponse;
       UINT8                    *Digest;
+      UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+      UINTN                    TempBufSize;
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
-      *ResponseSize = 1 + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+      TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+      SpdmResponse = (VOID *)TempBuf;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.Param1 = 0;
@@ -251,6 +245,8 @@ SpdmRequesterGetDigestTestReceiveMessage (
       Digest = (VOID *)(SpdmResponse + 1);
       SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
     SubIndex2 ++;
   }

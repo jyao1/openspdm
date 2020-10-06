@@ -74,75 +74,67 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
 
   case 0x2:
   {
-    SPDM_ALGORITHMS_RESPONSE    *SpdmResponse;
+    SPDM_ALGORITHMS_RESPONSE    SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.Param1 = 0;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
+    SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
+    SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
+    SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
+    SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
+    SpdmResponse.ExtAsymSelCount = 0;
+    SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.Param1 = 0;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ALGORITHMS;
-    SpdmResponse->Header.Param2 = 0;
-    SpdmResponse->Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
-    SpdmResponse->MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
-    SpdmResponse->BaseAsymSel = DEFAULT_ASYM_ALGO;
-    SpdmResponse->BaseHashSel = DEFAULT_HASH_ALGO;
-    SpdmResponse->ExtAsymSelCount = 0;
-    SpdmResponse->ExtHashSelCount = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x3:
   {
-    SPDM_ALGORITHMS_RESPONSE    *SpdmResponse;
+    SPDM_ALGORITHMS_RESPONSE    SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.Param1 = 0;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
+    SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
+    SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
+    SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
+    SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
+    SpdmResponse.ExtAsymSelCount = 0;
+    SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.Param1 = 0;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ALGORITHMS;
-    SpdmResponse->Header.Param2 = 0;
-    SpdmResponse->Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
-    SpdmResponse->MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
-    SpdmResponse->BaseAsymSel = DEFAULT_ASYM_ALGO;
-    SpdmResponse->BaseHashSel = DEFAULT_HASH_ALGO;
-    SpdmResponse->ExtAsymSelCount = 0;
-    SpdmResponse->ExtHashSelCount = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x4:
   {
-    SPDM_ERROR_RESPONSE    *SpdmResponse;
+    SPDM_ERROR_RESPONSE    SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
+    SpdmResponse.Header.Param2 = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
-    SpdmResponse->Header.Param2 = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x5:
   {
-    SPDM_ERROR_RESPONSE	 *SpdmResponse;
+    SPDM_ERROR_RESPONSE	 SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
+    SpdmResponse.Header.Param2 = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_BUSY;
-    SpdmResponse->Header.Param2 = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -150,34 +142,30 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
   {
     STATIC UINTN SubIndex1 = 0;
     if (SubIndex1 == 0) {
-      SPDM_ERROR_RESPONSE	 *SpdmResponse;
+      SPDM_ERROR_RESPONSE	 SpdmResponse;
 
-      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
+      SpdmResponse.Header.Param2 = 0;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-      SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_BUSY;
-      SpdmResponse->Header.Param2 = 0;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex1 == 1) {
-      SPDM_ALGORITHMS_RESPONSE    *SpdmResponse;
+      SPDM_ALGORITHMS_RESPONSE    SpdmResponse;
 
-      *ResponseSize = 1 + sizeof(SPDM_ALGORITHMS_RESPONSE);
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.Param1 = 0;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
+      SpdmResponse.Header.Param2 = 0;
+      SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
+      SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
+      SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
+      SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
+      SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
+      SpdmResponse.ExtAsymSelCount = 0;
+      SpdmResponse.ExtHashSelCount = 0;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.Param1 = 0;
-      SpdmResponse->Header.RequestResponseCode = SPDM_ALGORITHMS;
-      SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-      SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
-      SpdmResponse->MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
-      SpdmResponse->BaseAsymSel = DEFAULT_ASYM_ALGO;
-      SpdmResponse->BaseHashSel = DEFAULT_HASH_ALGO;
-      SpdmResponse->ExtAsymSelCount = 0;
-      SpdmResponse->ExtHashSelCount = 0;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex1 ++;
   }
@@ -185,37 +173,31 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
 
   case 0x7:
   {
-    SPDM_ERROR_RESPONSE  *SpdmResponse;
+    SPDM_ERROR_RESPONSE  SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
+    SpdmResponse.Header.Param2 = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
-    SpdmResponse->Header.Param2 = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0x8:
   {
-    SPDM_ERROR_RESPONSE                  *SpdmResponse;
-    SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
+    SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
 
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
-    ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-    *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+    SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.ExtendErrorData.RDTExponent = 1;
+    SpdmResponse.ExtendErrorData.RDTM = 1;
+    SpdmResponse.ExtendErrorData.RequestCode = SPDM_NEGOTIATE_ALGORITHMS;
+    SpdmResponse.ExtendErrorData.Token = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-    SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
-    SpdmResponse->Header.Param2 = 0;
-    ExtendErrorData->RDTExponent = 1;
-    ExtendErrorData->RDTM = 1;
-    ExtendErrorData->RequestCode = SPDM_NEGOTIATE_ALGORITHMS;
-    ExtendErrorData->Token = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -223,40 +205,34 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
   {
     STATIC UINTN SubIndex2 = 0;
     if (SubIndex2 == 0) {
-      SPDM_ERROR_RESPONSE	 *SpdmResponse;
-      SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
+      SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
 
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
-      ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-      *ResponseSize = 1 + sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
+      SpdmResponse.Header.Param2 = 0;
+      SpdmResponse.ExtendErrorData.RDTExponent = 1;
+      SpdmResponse.ExtendErrorData.RDTM = 1;
+      SpdmResponse.ExtendErrorData.RequestCode = SPDM_NEGOTIATE_ALGORITHMS;
+      SpdmResponse.ExtendErrorData.Token = 1;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_ERROR;
-      SpdmResponse->Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
-      SpdmResponse->Header.Param2 = 0;
-      ExtendErrorData->RDTExponent = 1;
-      ExtendErrorData->RDTM = 1;
-      ExtendErrorData->RequestCode = SPDM_NEGOTIATE_ALGORITHMS;
-      ExtendErrorData->Token = 1;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex2 == 1) {
-      SPDM_ALGORITHMS_RESPONSE    *SpdmResponse;
+      SPDM_ALGORITHMS_RESPONSE    SpdmResponse;
 
-      *ResponseSize = 1 + sizeof(SPDM_ALGORITHMS_RESPONSE);
-      *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-      SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse.Header.Param1 = 0;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
+      SpdmResponse.Header.Param2 = 0;
+      SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
+      SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
+      SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
+      SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
+      SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
+      SpdmResponse.ExtAsymSelCount = 0;
+      SpdmResponse.ExtHashSelCount = 0;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.Param1 = 0;
-      SpdmResponse->Header.RequestResponseCode = SPDM_ALGORITHMS;
-      SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-      SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
-      SpdmResponse->MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
-      SpdmResponse->BaseAsymSel = DEFAULT_ASYM_ALGO;
-      SpdmResponse->BaseHashSel = DEFAULT_HASH_ALGO;
-      SpdmResponse->ExtAsymSelCount = 0;
-      SpdmResponse->ExtHashSelCount = 0;
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex2 ++;
   }
@@ -264,67 +240,61 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
 
   case 0xA:
   {
-    SPDM_ALGORITHMS_RESPONSE	  *SpdmResponse;
+    SPDM_ALGORITHMS_RESPONSE	  SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.Param1 = 0;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
+    SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;   
+    SpdmResponse.MeasurementHashAlgo = 0;
+    SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
+    SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
+    SpdmResponse.ExtAsymSelCount = 0;
+    SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.Param1 = 0;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ALGORITHMS;
-    SpdmResponse->Header.Param2 = 0;
-    SpdmResponse->Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;   
-    SpdmResponse->MeasurementHashAlgo = 0;
-    SpdmResponse->BaseAsymSel = DEFAULT_ASYM_ALGO;
-    SpdmResponse->BaseHashSel = DEFAULT_HASH_ALGO;
-    SpdmResponse->ExtAsymSelCount = 0;
-    SpdmResponse->ExtHashSelCount = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0xB:
   {
-    SPDM_ALGORITHMS_RESPONSE	  *SpdmResponse;
+    SPDM_ALGORITHMS_RESPONSE	  SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.Param1 = 0;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
+    SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;   
+    SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
+    SpdmResponse.BaseAsymSel = 0;
+    SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
+    SpdmResponse.ExtAsymSelCount = 0;
+    SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.Param1 = 0;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ALGORITHMS;
-    SpdmResponse->Header.Param2 = 0;
-    SpdmResponse->Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;   
-    SpdmResponse->MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
-    SpdmResponse->BaseAsymSel = 0;
-    SpdmResponse->BaseHashSel = DEFAULT_HASH_ALGO;
-    SpdmResponse->ExtAsymSelCount = 0;
-    SpdmResponse->ExtHashSelCount = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
   case 0xC:
   {
-    SPDM_ALGORITHMS_RESPONSE	  *SpdmResponse;
+    SPDM_ALGORITHMS_RESPONSE	  SpdmResponse;
 
-    *ResponseSize = 1 + sizeof(SPDM_ALGORITHMS_RESPONSE);
-    *(UINT8 *)Response = TEST_MESSAGE_TYPE_SPDM;
-    SpdmResponse = (VOID *)((UINT8 *)Response + 1);
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.Param1 = 0;
+    SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
+    SpdmResponse.Header.Param2 = 0;
+    SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
+    SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;   
+    SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
+    SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
+    SpdmResponse.BaseHashSel = 0;
+    SpdmResponse.ExtAsymSelCount = 0;
+    SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-    SpdmResponse->Header.Param1 = 0;
-    SpdmResponse->Header.RequestResponseCode = SPDM_ALGORITHMS;
-    SpdmResponse->Header.Param2 = 0;
-    SpdmResponse->Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;   
-    SpdmResponse->MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
-    SpdmResponse->BaseAsymSel = DEFAULT_ASYM_ALGO;
-    SpdmResponse->BaseHashSel = 0;
-    SpdmResponse->ExtAsymSelCount = 0;
-    SpdmResponse->ExtHashSelCount = 0;
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 

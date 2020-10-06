@@ -12,9 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/SpdmCommonLib.h>
 
-#define TEST_MESSAGE_TYPE_SPDM                0x01
-#define TEST_MESSAGE_TYPE_SECURED_TEST        0x02
-
 RETURN_STATUS
 EFIAPI
 SpdmTransportTestEncodeMessage (

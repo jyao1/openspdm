@@ -557,6 +557,13 @@ typedef struct {
   UINT8                RDTM;
 } SPDM_ERROR_DATA_RESPONSE_NOT_READY;
 
+typedef struct {
+  SPDM_MESSAGE_HEADER  Header;
+  // Param1 == Error Code
+  // Param2 == Error Data
+  SPDM_ERROR_DATA_RESPONSE_NOT_READY  ExtendErrorData;
+} SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY;
+
 ///
 /// SPDM RESPONSE_IF_READY request
 ///
