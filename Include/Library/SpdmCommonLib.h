@@ -175,18 +175,19 @@ typedef enum {
 } SPDM_SESSION_TYPE;
 
 /**
-  Set a SPDM Session Data.
+  Set an SPDM context data.
 
-  @param  This                         Indicates a pointer to the calling context.
-  @param  DataType                     Type of the session data.
-  @param  Data                         A pointer to the session data.
-  @param  DataSize                     Size of the session data.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DataType                     Type of the SPDM context data.
+  @param  Parameter                    Type specific parameter of the SPDM context data.
+  @param  Data                         A pointer to the SPDM context data.
+  @param  DataSize                     Size in bytes of the SPDM context data.
 
-  @retval RETURN_SUCCESS                  The SPDM session data is set successfully.
-  @retval RETURN_INVALID_PARAMETER        The Data is NULL or the DataType is zero.
-  @retval RETURN_UNSUPPORTED              The DataType is unsupported.
-  @retval RETURN_ACCESS_DENIED            The DataType cannot be set.
-  @retval RETURN_NOT_READY                Current session is not started.
+  @retval RETURN_SUCCESS               The SPDM context data is set successfully.
+  @retval RETURN_INVALID_PARAMETER     The Data is NULL or the DataType is zero.
+  @retval RETURN_UNSUPPORTED           The DataType is unsupported.
+  @retval RETURN_ACCESS_DENIED         The DataType cannot be set.
+  @retval RETURN_NOT_READY             Data is not ready to set.
 **/
 RETURN_STATUS
 EFIAPI
@@ -199,22 +200,23 @@ SpdmSetData (
   );
 
 /**
-  Get a SPDM Session Data.
+  Get an SPDM context data.
 
-  @param  This                         Indicates a pointer to the calling context.
-  @param  DataType                     Type of the session data.
-  @param  Data                         A pointer to the session data.
-  @param  DataSize                     Size of the session data. On input, it means the size of Data
-                                       buffer. On output, it means the size of copied Data buffer if
-                                       RETURN_SUCCESS, and means the size of desired Data buffer if
-                                       RETURN_BUFFER_TOO_SMALL.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DataType                     Type of the SPDM context data.
+  @param  Parameter                    Type specific parameter of the SPDM context data.
+  @param  Data                         A pointer to the SPDM context data.
+  @param  DataSize                     Size in bytes of the SPDM context data.
+                                       On input, it means the size in bytes of Data buffer.
+                                       On output, it means the size in bytes of copied Data buffer if RETURN_SUCCESS,
+                                       and means the size in bytes of desired Data buffer if RETURN_BUFFER_TOO_SMALL.
 
-  @retval RETURN_SUCCESS                  The SPDM session data is set successfully.
-  @retval RETURN_INVALID_PARAMETER        The DataSize is NULL or the Data is NULL and *DataSize is not zero.
-  @retval RETURN_UNSUPPORTED              The DataType is unsupported.
-  @retval RETURN_NOT_FOUND                The DataType cannot be found.
-  @retval RETURN_NOT_READY                The DataType is not ready to return.
-  @retval RETURN_BUFFER_TOO_SMALL         The buffer is too small to hold the data.
+  @retval RETURN_SUCCESS               The SPDM context data is set successfully.
+  @retval RETURN_INVALID_PARAMETER     The DataSize is NULL or the Data is NULL and *DataSize is not zero.
+  @retval RETURN_UNSUPPORTED           The DataType is unsupported.
+  @retval RETURN_NOT_FOUND             The DataType cannot be found.
+  @retval RETURN_NOT_READY             The Data is not ready to return.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
 **/
 RETURN_STATUS
 EFIAPI
@@ -226,24 +228,50 @@ SpdmGetData (
   IN OUT UINTN                     *DataSize
   );
 
+/**
+  Get the last error of an SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return Last error of an SPDM context.
+*/
 UINT32
 EFIAPI
 SpdmGetLastError (
   IN     VOID                      *SpdmContext
   );
 
+/**
+  Get the session type of an SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return session type of an SPDM context.
+*/
 SPDM_SESSION_TYPE
 EFIAPI
 SpdmGetSessionType (
   IN     VOID                      *SpdmContext
   );
 
-RETURN_STATUS
+/**
+  Initialize an SPDM context.
+
+  The size in bytes of the SpdmContext can be returned by SpdmGetContextSize.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+*/
+VOID
 EFIAPI
 SpdmInitContext (
   IN     VOID                      *SpdmContext
   );
 
+/**
+  Return the size in bytes of the SPDM context.
+
+  @return the size in bytes of the SPDM context.
+**/
 UINTN
 EFIAPI
 SpdmGetContextSize (
@@ -251,7 +279,21 @@ SpdmGetContextSize (
   );
 
 /**
-  The asym algo is aligned with SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*
+  Sign an SPDM message data.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsResponder                  Indicates if it is a responder message.
+  @param  AsymAlgo                     Indicates the signing algorithm.
+                                       For responder, it must align with BaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
+                                       For requester, it must align with ReqBaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
+  @param  MessageHash                  A pointer to a message hash to be signed.
+  @param  HashSize                     The size in bytes of the message hash to be signed.
+  @param  Signature                    A pointer to a destination buffer to store the signature.
+  @param  SigSize                      On input, indicates the size in bytes of the destination buffer to store the signature.
+                                       On output, indicates the size in bytes of the signature in the buffer.
+
+  @retval TRUE  signing success.
+  @retval FALSE signing fail.
 **/
 typedef
 BOOLEAN
@@ -261,11 +303,17 @@ BOOLEAN
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
-  OUT     UINT8        *Signature,
+     OUT  UINT8        *Signature,
   IN OUT  UINTN        *SigSize
   );
 
-RETURN_STATUS
+/**
+  Register SPDM data signing function.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SpdmDataSignFunc             The fuction to sign the SPDM data.
+**/
+VOID
 EFIAPI
 SpdmRegisterDataSignFunc (
   IN     VOID                      *SpdmContext,
@@ -273,12 +321,15 @@ SpdmRegisterDataSignFunc (
   );
 
 /**
-  Send a SPDM message to a device.
+  Send an SPDM transport layer message to a device.
+
+  The message is an SPDM message with transport layer wrapper,
+  or a secured SPDM message with transport layer wrapper.
 
   For requester, the message is a transport layer SPDM request.
   For responder, the message is a transport layer SPDM response.
 
-  @param  This                         Indicates a pointer to the calling context.
+  @param  SpdmContext                  A pointer to the SPDM context.
   @param  MessageSize                  Size in bytes of the message data buffer.
   @param  Message                      A pointer to a destination buffer to store the message.
                                        The caller is responsible for having
@@ -307,12 +358,15 @@ RETURN_STATUS
   );
 
 /**
-  Receive a SPDM message from a device.
+  Receive an SPDM transport layer message from a device.
+
+  The message is an SPDM message with transport layer wrapper,
+  or a secured SPDM message with transport layer wrapper.
 
   For requester, the message is a transport layer SPDM response.
   For responder, the message is a transport layer SPDM request.
 
-  @param  This                         Indicates a pointer to the calling context.
+  @param  SpdmContext                  A pointer to the SPDM context.
   @param  MessageSize                  Size in bytes of the message data buffer.
   @param  Message                      A pointer to a destination buffer to store the message.
                                        The caller is responsible for having
@@ -341,7 +395,16 @@ RETURN_STATUS
   IN     UINT64                                 Timeout
   );
 
-RETURN_STATUS
+/**
+  Register SPDM device input/output functions.
+
+  This function must be called after SpdmInitContext, and before any SPDM communication.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SendMessage                  The fuction to send an SPDM transport layer message.
+  @param  ReceiveMessage               The fuction to receive an SPDM transport layer message.
+**/
+VOID
 EFIAPI
 SpdmRegisterDeviceIoFunc (
   IN     VOID                              *SpdmContext,
@@ -350,17 +413,20 @@ SpdmRegisterDeviceIoFunc (
   );
 
 /**
-  Encode a SPDM message to a transport layer message.
+  Encode an SPDM message to a transport layer message.
 
-  @param  This                         Indicates a pointer to the calling context.
+  For normal SPDM message, it adds the transport layer wrapper.
+  For secured SPDM message, it encrypts a secured message then adds the transport layer wrapper.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
                                        If SessionId is NULL, it is a normal message.
                                        If SessionId is NOT NULL, it is a secured message.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  SpdmMessageSize              Size in bytes of the SPDM message data buffer.
   @param  SpdmMessage                  A pointer to a source buffer to store the SPDM message.
-  @param  TransportMessageSize         Size in bytes of the SPDM message data buffer.
-  @param  TransportMessage             A pointer to a destination buffer to store the SPDM message.
+  @param  TransportMessageSize         Size in bytes of the transport message data buffer.
+  @param  TransportMessage             A pointer to a destination buffer to store the transport message.
 
   @retval RETURN_SUCCESS               The SPDM message is encoded successfully.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -378,15 +444,18 @@ RETURN_STATUS
   );
 
 /**
-  Decode a SPDM message from a transport layer message.
+  Decode an SPDM message from a transport layer message.
 
-  @param  This                         Indicates a pointer to the calling context.
+  For normal SPDM message, it removes the transport layer wrapper,
+  For secured SPDM message, it decrypt and verify a secured message, then removes the transport layer wrapper.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
                                        If *SessionId is NULL, it is a normal message.
                                        If *SessionId is NOT NULL, it is a secured message.
   @param  IsRequester                  Indicates if it is a requester message.
-  @param  TransportMessageSize         Size in bytes of the SPDM message data buffer.
-  @param  TransportMessage             A pointer to a source buffer to store the SPDM message.
+  @param  TransportMessageSize         Size in bytes of the transport message data buffer.
+  @param  TransportMessage             A pointer to a source buffer to store the transport message.
   @param  SpdmMessageSize              Size in bytes of the SPDM message data buffer.
   @param  SpdmMessage                  A pointer to a destination buffer to store the SPDM message.
 
@@ -406,7 +475,16 @@ RETURN_STATUS
      OUT VOID                 *SpdmMessage
   );
 
-RETURN_STATUS
+/**
+  Register SPDM transport layer encode/decode functions.
+
+  This function must be called after SpdmInitContext, and before any SPDM communication.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  TransportEncodeMessage       The fuction to encode an SPDM message to a transport layer message.
+  @param  ReceiveMessage               The fuction to decode an SPDM message from a transport layer message.
+**/
+VOID
 EFIAPI
 SpdmRegisterTransportLayerFunc (
   IN     VOID                                *SpdmContext,

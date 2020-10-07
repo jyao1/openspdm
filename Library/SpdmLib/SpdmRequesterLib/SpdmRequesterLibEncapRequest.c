@@ -21,7 +21,7 @@ SPDM_GET_ENCAP_RESPONSE_STRUCT  mSpdmGetEncapResponseStruct[] = {
   {SPDM_CHALLENGE,              SpdmGetEncapResponseChallengeAuth},
 };
 
-RETURN_STATUS
+VOID
 EFIAPI
 SpdmRegisterGetEncapResponseFunc (
   IN  VOID                          *Context,
@@ -33,7 +33,7 @@ SpdmRegisterGetEncapResponseFunc (
   SpdmContext = Context;
   SpdmContext->GetEncapResponseFunc = (UINTN)GetEncapResponseFunc;
 
-  return RETURN_SUCCESS;
+  return ;
 }
 
 SPDM_GET_ENCAP_RESPONSE_FUNC

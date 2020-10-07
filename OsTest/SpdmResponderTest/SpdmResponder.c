@@ -310,9 +310,7 @@ SpdmServerInit (
     // do not free it
   }
 
-  Status = SpdmRegisterGetResponseFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
-  if (RETURN_ERROR(Status)) {
-  }
+  SpdmRegisterGetResponseFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
 
   Status = SpdmSetData (SpdmContext, SpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
   if (RETURN_ERROR(Status)) {

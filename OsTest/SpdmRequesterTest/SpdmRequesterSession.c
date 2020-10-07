@@ -119,8 +119,8 @@ DoSessionViaSpdm (
              FALSE, // KeyExchange
              SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH,
              0,
-             &HeartbeatPeriod,
              &SessionId,
+             &HeartbeatPeriod,
              MeasurementHash
              );
   if (RETURN_ERROR(Status)) {
@@ -135,8 +135,8 @@ DoSessionViaSpdm (
              TRUE, // PSK
              SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH,
              0,
-             &HeartbeatPeriod,
              &SessionId2,
+             &HeartbeatPeriod,
              MeasurementHash
              );
   if (RETURN_ERROR(Status)) {

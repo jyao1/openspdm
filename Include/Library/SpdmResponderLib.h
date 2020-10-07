@@ -12,50 +12,151 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/SpdmCommonLib.h>
 
+/**
+  Process the request and return the response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SpdmRequestSize              Size in bytes of the request data.
+  @param  SpdmRequest                  A pointer to the request data.
+  @param  SpdmResponseSize             Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  SpdmResponse                 A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The request is processed and the response is returned.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 typedef
 RETURN_STATUS
 (EFIAPI *SPDM_GET_RESPONSE_FUNC) (
   IN     VOID                 *SpdmContext,
-  IN     UINTN                RequestSize,
-  IN     VOID                 *Request,
-  IN OUT UINTN                *ResponseSize,
-     OUT VOID                 *Response
+  IN     UINTN                SpdmRequestSize,
+  IN     VOID                 *SpdmRequest,
+  IN OUT UINTN                *SpdmResponseSize,
+     OUT VOID                 *SpdmResponse
   );
 
-RETURN_STATUS
+/**
+  Register an SPDM message process function.
+
+  If the default message process function cannot handle the message,
+  this function will be invoked.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  GetEncapResponseFunc         The function to process the encapsuled message.
+**/
+VOID
 EFIAPI
 SpdmRegisterGetResponseFunc (
   IN  VOID                    *SpdmContext,
   IN  SPDM_GET_RESPONSE_FUNC  GetResponseFunc
   );
 
+/**
+  This is the main dispatch function in SPDM responder.
+
+  It receives one request message, processes it and sends the response message.
+
+  It should be called in a while loop or an timer/interrupt handler.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @retval RETURN_SUCCESS               One SPDM request message is processed.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_UNSUPPORTED           One request message is not supported.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmResponderDispatchMessage (
   IN     VOID                 *SpdmContext
   );
 
+/**
+  Receive and send an SPDM message.
+
+  The SPDM message can be a normal message or a secured message in SPDM session.
+
+  This function is called in SpdmResponderDispatchMessage to process the message.
+  The alternative is: an SPDM responder may receive the request message directly
+  and call this function to process it, then send the response message.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+                                       If *SessionId is NULL, it is a normal message.
+                                       If *SessionId is NOT NULL, it is a secured message.
+  @param  SpdmRequest                  A pointer to the request data.
+  @param  SpdmRequestSize              Size in bytes of the request data.
+  @param  SpdmResponse                 A pointer to the response data.
+  @param  SpdmResponseSize             Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+
+  @retval RETURN_SUCCESS               The SPDM request is set successfully.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmReceiveSendData (
   IN     VOID                 *SpdmContext,
-  IN OUT UINT32               *SessionId,
-  IN     VOID                 *RequestBuffer,
-  IN     UINTN                RequestBufferSize,
-     OUT VOID                 *ResponseBuffer,
-  IN OUT UINTN                *ResponseBufferSize
+     OUT UINT32               **SessionId,
+  IN     VOID                 *SpdmRequest,
+  IN     UINTN                SpdmRequestSize,
+     OUT VOID                 *SpdmResponse,
+  IN OUT UINTN                *SpdmResponseSize
   );
 
+/**
+  Generate ERROR message.
+
+  This function can be called in SPDM_GET_RESPONSE_FUNC.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ErrorCode                    The error code of the message.
+  @param  ErrorData                    The error data of the message.
+  @param  SpdmResponseSize             Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  SpdmResponse                 A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The error message is generated.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGenerateErrorResponse (
   IN     VOID                 *SpdmContext,
   IN     UINT8                ErrorCode,
   IN     UINT8                ErrorData,
-  IN OUT UINTN                *ResponseSize,
-     OUT VOID                 *Response
+  IN OUT UINTN                *SpdmResponseSize,
+     OUT VOID                 *SpdmResponse
   );
 
+/**
+  Generate ERROR message with extended error data.
+
+  This function can be called in SPDM_GET_RESPONSE_FUNC.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ErrorCode                    The error code of the message.
+  @param  ErrorData                    The error data of the message.
+  @param  ExtendedErrorDataSize        The size in bytes of the extended error data.
+  @param  ExtendedErrorData            A pointer to the extended error data.
+  @param  SpdmResponseSize             Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  SpdmResponse                 A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The error message is generated.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGenerateExtendedErrorResponse (
@@ -64,8 +165,8 @@ SpdmGenerateExtendedErrorResponse (
   IN     UINT8                ErrorData,
   IN     UINTN                ExtendedErrorDataSize,
   IN     UINT8                *ExtendedErrorData,
-  IN OUT UINTN                *ResponseSize,
-     OUT VOID                 *Response
+  IN OUT UINTN                *SpdmResponseSize,
+     OUT VOID                 *SpdmResponse
   );
 
 #endif

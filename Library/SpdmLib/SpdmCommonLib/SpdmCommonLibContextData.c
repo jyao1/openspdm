@@ -488,7 +488,7 @@ SpdmIsVersionSupported (
   return FALSE;
 }
 
-RETURN_STATUS
+VOID
 EFIAPI
 SpdmRegisterDataSignFunc (
   IN     VOID                      *Context,
@@ -499,10 +499,10 @@ SpdmRegisterDataSignFunc (
 
   SpdmContext = Context;
   SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
-  return RETURN_SUCCESS;
+  return ;
 }
 
-RETURN_STATUS
+VOID
 EFIAPI
 SpdmRegisterDeviceIoFunc (
   IN     VOID                              *Context,
@@ -515,10 +515,10 @@ SpdmRegisterDeviceIoFunc (
   SpdmContext = Context;
   SpdmContext->SendMessage = SendMessage;
   SpdmContext->ReceiveMessage = ReceiveMessage;
-  return RETURN_SUCCESS;
+  return ;
 }
 
-RETURN_STATUS
+VOID
 EFIAPI
 SpdmRegisterTransportLayerFunc (
   IN     VOID                                *Context,
@@ -531,7 +531,7 @@ SpdmRegisterTransportLayerFunc (
   SpdmContext = Context;
   SpdmContext->TransportEncodeMessage = TransportEncodeMessage;
   SpdmContext->TransportDecodeMessage = TransportDecodeMessage;
-  return RETURN_SUCCESS;
+  return ;
 }
 
 UINT32
@@ -568,7 +568,7 @@ SpdmGetSessionType (
   }
 }
 
-RETURN_STATUS
+VOID
 EFIAPI
 SpdmInitContext (
   IN     VOID                      *Context
@@ -591,7 +591,7 @@ SpdmInitContext (
   SpdmContext->CurrentToken                         = 0;
 
   RandomSeed (NULL, 0);
-  return RETURN_SUCCESS;
+  return ;
 }
 
 UINTN

@@ -214,7 +214,7 @@ SpdmSendResponse (
   return RETURN_SUCCESS;
 }
 
-RETURN_STATUS
+VOID
 EFIAPI
 SpdmRegisterGetResponseFunc (
   IN  VOID                    *Context,
@@ -226,5 +226,5 @@ SpdmRegisterGetResponseFunc (
   SpdmContext = Context;
   SpdmContext->GetResponseFunc = (UINTN)GetResponseFunc;
 
-  return RETURN_SUCCESS;
+  return ;
 }

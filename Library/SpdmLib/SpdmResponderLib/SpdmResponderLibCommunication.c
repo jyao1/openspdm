@@ -13,11 +13,11 @@ RETURN_STATUS
 EFIAPI
 SpdmReceiveSendData (
   IN     VOID                 *Context,
-  IN OUT UINT32               *SessionId,
-  IN     VOID                 *RequestBuffer,
-  IN     UINTN                RequestBufferSize,
-     OUT VOID                 *ResponseBuffer,
-  IN OUT UINTN                *ResponseBufferSize
+  IN OUT UINT32               **SessionId,
+  IN     VOID                 *Request,
+  IN     UINTN                RequestSize,
+     OUT VOID                 *Response,
+  IN OUT UINTN                *ResponseSize
   )
 {
   RETURN_STATUS            Status;
@@ -25,12 +25,12 @@ SpdmReceiveSendData (
 
   SpdmContext = Context;
 
-  Status = SpdmReceiveRequest (SpdmContext, &SessionId, RequestBufferSize, RequestBuffer);
+  Status = SpdmReceiveRequest (SpdmContext, SessionId, RequestSize, Request);
   if (RETURN_ERROR(Status)) {
     return Status;
   }
 
-  Status = SpdmSendResponse (SpdmContext, SessionId, ResponseBufferSize, ResponseBuffer);
+  Status = SpdmSendResponse (SpdmContext, *SessionId, ResponseSize, Response);
   if (RETURN_ERROR(Status)) {
     return Status;
   }
@@ -49,7 +49,7 @@ SpdmResponderDispatchMessage (
   UINTN                     RequestSize;
   UINT8                     Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                     ResponseSize;
-  UINT32                    SessionId;
+  UINT32                    *SessionId;
 
   SpdmContext = Context;
 
