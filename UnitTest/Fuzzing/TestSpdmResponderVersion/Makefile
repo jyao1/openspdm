@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = TestSpdmRequesterGetVersion
+MODULE_NAME = TestSpdmResponderVersion
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -24,16 +24,16 @@ BASE_NAME = $(MODULE_NAME)
 #
 BUILD_DIR = $(WORKSPACE)\Build
 BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)\UnitFuzzing\$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)\UnitTest\Fuzzing\$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)\UnitFuzzing\$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)\UnitTest\Fuzzing\$(MODULE_NAME)
 
 #
 # Build Macro
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\TestSpdmRequesterGetVersion.obj \
+    $(OUTPUT_DIR)\TestSpdmResponderVersion.obj \
     $(OUTPUT_DIR)\SpdmUnitFuzzingCommon.obj \
     $(OUTPUT_DIR)\ToolChainHarness.obj \
 
@@ -76,7 +76,7 @@ INC =  \
     -I$(WORKSPACE)\Library\SpdmLib\SpdmCommonLib \
     -I$(WORKSPACE)\Library\SpdmLib\SpdmRequesterLib \
     -I$(WORKSPACE)\Library\SpdmLib\SpdmResponderLib \
-    -I$(WORKSPACE)\UnitFuzzing\SpdmUnitFuzzingCommon \
+    -I$(WORKSPACE)\UnitTest\Fuzzing\SpdmUnitFuzzingCommon \
 
 #
 # Overridable Target Macro Definitions
@@ -120,8 +120,8 @@ gen_libs:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\TestSpdmRequesterGetVersion.obj : $(SOURCE_DIR)\TestSpdmRequesterGetVersion.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterGetVersion.c
+$(OUTPUT_DIR)\TestSpdmResponderVersion.obj : $(SOURCE_DIR)\TestSpdmResponderVersion.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderVersion.c
 
 $(OUTPUT_DIR)\SpdmUnitFuzzingCommon.obj : $(SOURCE_DIR)\..\SpdmUnitFuzzingCommon\SpdmUnitFuzzingCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitFuzzingCommon\SpdmUnitFuzzingCommon.c

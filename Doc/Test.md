@@ -155,7 +155,7 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
    `klee --only-output-states-covering-new <test_app>`
 
    Transfer .ktest to seed file, which can be used for AFL-fuzzer.
-   `python UnitFuzzing/Tools/TransferKtestToSeed.py <Arguments>`
+   `python UnitTest/Fuzzing/Tools/TransferKtestToSeed.py <Arguments>`
 
    Arguments:
    <KtestFile>                          the path of .ktest file.

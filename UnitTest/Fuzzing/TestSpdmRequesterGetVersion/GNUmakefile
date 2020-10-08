@@ -24,9 +24,9 @@ BASE_NAME = $(MODULE_NAME)
 #
 BUILD_DIR = $(WORKSPACE)/Build
 BIN_DIR = $(BUILD_DIR)/$(TARGET)_$(TOOLCHAIN)/$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)/UnitFuzzing/$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)/UnitTest/Fuzzing/$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)/UnitFuzzing/$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)/UnitTest/Fuzzing/$(MODULE_NAME)
 
 #
 # Build Macro
@@ -76,7 +76,7 @@ INC =  \
     -I$(WORKSPACE)/Library/SpdmLib/SpdmCommonLib \
     -I$(WORKSPACE)/Library/SpdmLib/SpdmRequesterLib \
     -I$(WORKSPACE)/Library/SpdmLib/SpdmResponderLib \
-    -I$(WORKSPACE)/UnitFuzzing/SpdmUnitFuzzingCommon \
+    -I$(WORKSPACE)/UnitTest/Fuzzing/SpdmUnitFuzzingCommon \
 
 ifeq ("$(TOOLCHAIN)", "KLEE")
 	INC+=-I$(KLEE_SRC_PATH)/include
