@@ -47,7 +47,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\CryptRsaBasic.obj \
     $(OUTPUT_DIR)\CryptRsaExt.obj \
     $(OUTPUT_DIR)\CryptX509.obj \
-    $(OUTPUT_DIR)\CryptPkcs7.obj \
+    $(OUTPUT_DIR)\CryptPkcs7Sign.obj \
+    $(OUTPUT_DIR)\CryptPkcs7VerifyCommon.obj \
     $(OUTPUT_DIR)\CryptRand.obj \
     $(OUTPUT_DIR)\BaseMemAllocation.obj \
     $(OUTPUT_DIR)\CrtWrapperHost.obj \
@@ -136,8 +137,11 @@ $(OUTPUT_DIR)\CryptRsaExt.obj : $(SOURCE_DIR)\Pk/CryptRsaExt.c
 $(OUTPUT_DIR)\CryptX509.obj : $(SOURCE_DIR)\Pk/CryptX509.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptX509.c
 
-$(OUTPUT_DIR)\CryptPkcs7.obj : $(SOURCE_DIR)\Pk/CryptPkcs7.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptPkcs7.c
+$(OUTPUT_DIR)\CryptPkcs7Sign.obj : $(SOURCE_DIR)\Pk/CryptPkcs7Sign.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptPkcs7Sign.c
+
+$(OUTPUT_DIR)\CryptPkcs7VerifyCommon.obj : $(SOURCE_DIR)\Pk/CryptPkcs7VerifyCommon.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptPkcs7VerifyCommon.c
 
 $(OUTPUT_DIR)\CryptRand.obj : $(SOURCE_DIR)\Rand/CryptRand.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Rand/CryptRand.c

@@ -49,7 +49,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/CryptRsaBasic.o \
     $(OUTPUT_DIR)/CryptRsaExt.o \
     $(OUTPUT_DIR)/CryptX509.o \
-    $(OUTPUT_DIR)/CryptPkcs7.o \
+    $(OUTPUT_DIR)/CryptPkcs7Sign.o \
+    $(OUTPUT_DIR)/CryptPkcs7VerifyCommon.o \
     $(OUTPUT_DIR)/CryptRand.o \
 
 INC =  \
@@ -131,7 +132,10 @@ $(OUTPUT_DIR)/CryptRsaExt.o : $(SOURCE_DIR)/Pk/CryptRsaExt.c
 $(OUTPUT_DIR)/CryptX509.o : $(SOURCE_DIR)/Pk/CryptX509.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/CryptPkcs7.o : $(SOURCE_DIR)/Pk/CryptPkcs7.c
+$(OUTPUT_DIR)/CryptPkcs7Sign.o : $(SOURCE_DIR)/Pk/CryptPkcs7Sign.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/CryptPkcs7VerifyCommon.o : $(SOURCE_DIR)/Pk/CryptPkcs7VerifyCommon.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptRand.o : $(SOURCE_DIR)/Rand/CryptRand.c

@@ -73,7 +73,7 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
    Known issue: Above command cannot run in Windows Linux Subsystem.
 
    Build cases with AFL toolchain:
-   `make -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> TOOLCHAIN=AFL CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
+   `make Fuzzing -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> TOOLCHAIN=AFL CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
 
    Run cases:
    ```
@@ -105,7 +105,8 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
    Copy all binary under [build32|build64]/bin/Release to [bin32|bin64]. `robocopy /E /is /it [build32|build64]/bin/Release [bin32|bin64]`.
 
-   Build cases with VS2019 toolchain. (non AFL toolchain in Windows)
+   Build cases with VS2019 toolchain. (non AFL toolchain in Windows):
+   `nmake Fuzzing ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> TOOLCHAIN=VS2019 CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
 
    Run cases:
    ```
