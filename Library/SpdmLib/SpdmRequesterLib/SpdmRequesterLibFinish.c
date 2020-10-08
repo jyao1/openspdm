@@ -285,14 +285,20 @@ SpdmSendReceiveFinish (
     return RETURN_DEVICE_ERROR;
   }
 
-  if ((SlotIdParam >= SpdmContext->LocalContext.SlotCount) && (SlotIdParam != 0xF)) {
-    return RETURN_INVALID_PARAMETER;
-  }
-
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     ASSERT (FALSE);
     return RETURN_UNSUPPORTED;
+  }
+
+  if (SessionInfo->MutAuthRequested != 0) {
+    if ((SlotIdParam >= SpdmContext->LocalContext.SlotCount) && (SlotIdParam != 0xF)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+  } else {
+    if (SlotIdParam != 0) {
+      return RETURN_INVALID_PARAMETER;
+    }
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;

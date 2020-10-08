@@ -285,9 +285,16 @@ SpdmSendReceiveKeyExchange (
     *HeartbeatPeriod = SpdmResponse.Header.Param1;
   }
   *SlotIdParam = SpdmResponse.SlotIDParam;
-  if ((*SlotIdParam != 0xF) && (*SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
-    SpdmDheFree (SpdmContext, DHEContext);
-    return RETURN_DEVICE_ERROR;
+  if (SpdmResponse.MutAuthRequested != 0) {
+    if ((*SlotIdParam != 0xF) && (*SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
+      SpdmDheFree (SpdmContext, DHEContext);
+      return RETURN_DEVICE_ERROR;
+    }
+  } else {
+    if (*SlotIdParam != 0) {
+      SpdmDheFree (SpdmContext, DHEContext);
+      return RETURN_DEVICE_ERROR;
+    }
   }
   RspSessionId = SpdmResponse.RspSessionID;
   *SessionId = (ReqSessionId << 16) | RspSessionId;

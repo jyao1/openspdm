@@ -134,6 +134,8 @@ SpdmStartSession (
     }
 
     switch (SessionInfo->MutAuthRequested) {
+    case 0:
+      break;
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED:
       break;
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST:
