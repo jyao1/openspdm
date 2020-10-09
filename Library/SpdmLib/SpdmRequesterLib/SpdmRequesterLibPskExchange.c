@@ -240,7 +240,7 @@ SpdmSendReceivePskExchange (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, (UINT8 *)&SpdmResponse + SpdmResponseSize - HmacSize, HmacSize);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, VerifyData, HmacSize);
 
   if (MeasurementHash != NULL) {
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);

@@ -390,7 +390,7 @@ SpdmSendReceiveKeyExchange (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, (UINT8 *)&SpdmResponse + SpdmResponseSize - SignatureSize - HmacSize, SignatureSize);
+  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Signature, SignatureSize);
 
   //
   // Fill data to calc Secret for HMAC verification
@@ -424,7 +424,7 @@ SpdmSendReceiveKeyExchange (
     }
     Ptr += HmacSize;
 
-    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, (UINT8 *)&SpdmResponse + SpdmResponseSize - HmacSize, HmacSize);
+    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, VerifyData, HmacSize);
   }
 
   if (MeasurementHash != NULL) {
