@@ -1,6 +1,10 @@
-# SPDM requester and responder writers guide
+# SPDM requester and responder user guide
 
-## SPDM requester writers guide
+This document provides the general information on how to write an SPDM requester or an SPDM responder.
+
+## SPDM requester user guide
+
+Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmRequesterTest/SpdmRequester.c)
 
 1. Initialize SPDM context
 
@@ -154,7 +158,9 @@
    SpdmKeyUpdate (SpdmContext, SessionId, SingleDirection);
    ```
 
-## SPDM responder writers guide
+## SPDM responder user guide
+
+Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmResponderTest/SpdmResponder.c)
 
 1. Initialize SPDM context (similar to SPDM requester)
 

@@ -4,9 +4,17 @@
 
 1) Specification
 
+   The SPDM and secured message follow :
+
    DSP0274	Security Protocol and Data Model (SPDM) Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.0.0.pdf) and version [1.1.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.1.0.pdf))
 
    DSP0277	Secured Messages using SPDM Specification (version [1.0.0a](https://www.dmtf.org/sites/default/files/standards/documents/DSP0277_1.0.0a.pdf))
+
+   The MCTP and secured MCTP follow :
+
+   DSP0275	Security Protocol and Data Model (SPDM) over MCTP Binding Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0275_1.0.0.pdf))
+
+   DSP0276	Secured MCTP Messages over MCTP Binding Specification (version [1.0.0a](https://www.dmtf.org/sites/default/files/standards/documents/DSP0276_1.0.0a.pdf))
 
 2) Both SPDM requester and SPDM responder.
 
@@ -40,6 +48,10 @@
 7) openspdm library design:
 
    The detailed design can be found at [Design](https://github.com/jyao1/openspdm/blob/master/Doc/Design.md)
+
+8) openspdm user guide:
+
+   The user guide can be found at [UserGuide](https://github.com/jyao1/openspdm/blob/master/Doc/UserGuide.md)
 
 ## Prerequisit
 

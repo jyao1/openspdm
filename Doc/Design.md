@@ -36,23 +36,23 @@
                         +----------------+                       // PCI DOE - PCI DOE message over PCI DOE mailbox.
    ```
 
-1) SpdmRequesterLib (follows DSP0274)
+1) [SpdmRequesterLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmRequesterLib.h) (follows DSP0274)
 
    This library is linked for a SPDM requester.
 
-2) SpdmResponderLib (follows DSP0274)
+2) [SpdmResponderLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmResponderLib.h) (follows DSP0274)
 
    This library is linked for a SPDM responder.
 
-3) SpdmCommonLib (follows DSP0274)
+3) [SpdmCommonLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmCommonLib.h) (follows DSP0274)
 
    This library provides common services for SpdmRequesterLib and SpdmResponderLib.
 
-4) SpdmSecuredMessageLib (follows DSP0277)
+4) [SpdmSecuredMessageLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmSecuredMessageLib.h) (follows DSP0277)
 
    This library encrypts and decrypts secured messages.
 
-5) SpdmTransportMctpLib (follows DSP0275 and DSP0276)
+5) [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) (follows DSP0275 and DSP0276)
 
    This library encodes and decodes MCTP message header.
 
@@ -67,3 +67,15 @@
    and SPDM_DEVICE_RECEIVE_MESSAGE_FUNC to the SpdmRequesterLib/SpdmResponderLib.
 
    These APIs send and receive transport layer messages to or from a SPDM device.
+
+7) [SpdmLibConfig.h](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmLibConfig.h) provides the configuration to the openspdm library.
+
+8) SPDM library depends upon the [HAL library](https://github.com/jyao1/openspdm/tree/master/Include/Hal).
+
+   The sample implementation can be found at [OsStub](https://github.com/jyao1/openspdm/tree/master/OsStub)
+
+   8.1) [BaseCryptLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h) provides crypto functions.
+
+   8.2) [BaseMemoryLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseMemoryLib.h) provides memory operation.
+
+   8.3) [DebugLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/DebugLib.h) provides debug functions.
