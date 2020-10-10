@@ -139,7 +139,8 @@ ValidateCryptRsa2 (
 **/
 EFI_STATUS
 ValidateCryptX509 (
-  VOID
+  CHAR8 *Path,
+  UINTN Len
   );
 
 // /**

@@ -7,6 +7,38 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Cryptest.h"
 
+RETURN_STATUS
+EFIAPI
+GetDMTFSubjectAltNameFromBytes (
+  IN      CONST UINT8   *Buffer,
+  IN      INTN          Len,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize,
+  OUT     UINT8         *Oid,         OPTIONAL
+  IN OUT  UINTN         *OidSize
+);
+
+// https://lapo.it/asn1js/#MCQGCisGAQQBgxyCEgEMFkFDTUU6V0lER0VUOjEyMzQ1Njc4OTA
+CONST UINT8 SubjectAltNameBuffer1[] = {
+0x30, 0x24, 0x06, 0x0A, 0x2B, 0x06, 0x01, 0x04, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01, 0x0C, 0x16,
+0x41, 0x43, 0x4D, 0x45, 0x3A, 0x57, 0x49, 0x44, 0x47, 0x45, 0x54, 0x3A, 0x31, 0x32, 0x33, 0x34,
+0x35, 0x36, 0x37, 0x38, 0x39, 0x30
+};
+
+// https://lapo.it/asn1js/#MCYGCisGAQQBgxyCEgGgGAwWQUNNRTpXSURHRVQ6MTIzNDU2Nzg5MA
+CONST UINT8 SubjectAltNameBuffer2[] = {
+0x30, 0x26, 0x06, 0x0A, 0x2B, 0x06, 0x01, 0x04, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01, 0xA0, 0x18,
+0x0C, 0x16, 0x41, 0x43, 0x4D, 0x45, 0x3A, 0x57, 0x49, 0x44, 0x47, 0x45, 0x54, 0x3A, 0x31, 0x32,
+0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30
+};
+
+// https://lapo.it/asn1js/#MCigJgYKKwYBBAGDHIISAaAYDBZBQ01FOldJREdFVDoxMjM0NTY3ODkw
+CONST UINT8 SubjectAltNameBuffer3[] = {
+0x30, 0x28, 0xA0, 0x26, 0x06, 0x0A, 0x2B, 0x06, 0x01, 0x04, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01,
+0xA0, 0x18, 0x0C, 0x16, 0x41, 0x43, 0x4D, 0x45, 0x3A, 0x57, 0x49, 0x44, 0x47, 0x45, 0x54, 0x3A,
+0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30
+};
+
 CONST UINT8 DMTF_OID[] = {
   0x2B, 0x06, 0x01, 0x4, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01
 };
@@ -20,7 +52,8 @@ CONST UINT8 DMTF_OID[] = {
 **/
 EFI_STATUS
 ValidateCryptX509 (
-  VOID
+  CHAR8 *Path,
+  UINTN Len
   )
 {
   BOOLEAN       Status;
@@ -44,25 +77,45 @@ ValidateCryptX509 (
   UINTN         Asn1BufferLen;
   UINTN         DMTFOidSize;
   UINT8         DMTFOid[64];
+  UINT8         EndCertFrom[64];
+  UINTN         EndCertFromLen;
+  UINT8         EndCertTo[64];
+  UINTN         EndCertToLen;
 
   TestCert = NULL;
   TestCACert = NULL;
   TestBundleCert = NULL;
   TestEndCert = NULL;
+  CHAR8         FileNameBuffer[1024];
 
-  Status = ReadInputFile ("test/inter.cert.der", (VOID **)&TestCert, &TestCertLen);
+  ZeroMem(FileNameBuffer, 1024);
+  CopyMem(FileNameBuffer, Path, Len);
+  CopyMem(FileNameBuffer+Len - 1, "/inter.cert.der", sizeof("/inter.cert.der"));
+  Status = ReadInputFile (FileNameBuffer, (VOID **)&TestCert, &TestCertLen);
   if (!Status) {
     goto Cleanup;
   }
-  Status = ReadInputFile ("test/ca.cert.der", (VOID **)&TestCACert, &TestCACertLen);
+
+  ZeroMem(FileNameBuffer, 1024);
+  CopyMem(FileNameBuffer, Path, Len);
+  CopyMem(FileNameBuffer+Len - 1, "/ca.cert.der", sizeof("/ca.cert.der"));
+  Status = ReadInputFile (FileNameBuffer, (VOID **)&TestCACert, &TestCACertLen);
   if (!Status) {
     goto Cleanup;
   }
-  Status = ReadInputFile ("test/bundle_requester.certchain.der", (VOID **)&TestBundleCert, &TestBundleCertLen);
+
+  ZeroMem(FileNameBuffer, 1024);
+  CopyMem(FileNameBuffer, Path, Len);
+  CopyMem(FileNameBuffer+Len - 1, "/bundle_requester.certchain.der", sizeof("/bundle_requester.certchain.der"));
+  Status = ReadInputFile (FileNameBuffer, (VOID **)&TestBundleCert, &TestBundleCertLen);
   if (!Status) {
     goto Cleanup;
   }
-  Status = ReadInputFile ("test/end_requester.cert.der", (VOID **)&TestEndCert, &TestEndCertLen);
+
+  ZeroMem(FileNameBuffer, 1024);
+  CopyMem(FileNameBuffer, Path, Len);
+  CopyMem(FileNameBuffer+Len - 1, "/end_requester.cert.der", sizeof("/end_requester.cert.der"));
+  Status = ReadInputFile (FileNameBuffer, (VOID **)&TestEndCert, &TestEndCertLen);
   if (!Status) {
     goto Cleanup;
   }
@@ -267,6 +320,48 @@ ValidateCryptX509 (
   }
 
   //
+  // Test Three SubjectAltName format
+  //
+  CommonNameSize = 64;
+  DMTFOidSize = 64;
+  ZeroMem (CommonName, CommonNameSize);
+  ZeroMem (DMTFOid, DMTFOidSize);
+  Ret = GetDMTFSubjectAltNameFromBytes(SubjectAltNameBuffer1, sizeof (SubjectAltNameBuffer1), CommonName, &CommonNameSize, DMTFOid, &DMTFOidSize);
+  if (RETURN_ERROR(Ret) || CompareMem(DMTFOid, DMTF_OID, sizeof (DMTF_OID)) != 0) {
+    Print ("\n  - Retrieving  SubjectAltName1 otherName - [Fail]");
+    goto Cleanup;
+  } else {
+    DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName1 otherName = \"%s\" (Size = %d) ", CommonName, CommonNameSize));
+    Print ("- [Pass]");
+  }
+
+  CommonNameSize = 64;
+  DMTFOidSize = 64;
+  ZeroMem (CommonName, CommonNameSize);
+  ZeroMem (DMTFOid, DMTFOidSize);
+  Ret = GetDMTFSubjectAltNameFromBytes(SubjectAltNameBuffer2, sizeof (SubjectAltNameBuffer2), CommonName, &CommonNameSize, DMTFOid, &DMTFOidSize);
+  if (RETURN_ERROR(Ret) || CompareMem(DMTFOid, DMTF_OID, sizeof (DMTF_OID)) != 0) {
+    Print ("\n  - Retrieving  SubjectAltName2 otherName - [Fail]");
+    goto Cleanup;
+  } else {
+    DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName2 otherName = \"%s\" (Size = %d) ", CommonName, CommonNameSize));
+    Print ("- [Pass]");
+  }
+
+  CommonNameSize = 64;
+  DMTFOidSize = 64;
+  ZeroMem (CommonName, CommonNameSize);
+  ZeroMem (DMTFOid, DMTFOidSize);
+  Ret = GetDMTFSubjectAltNameFromBytes(SubjectAltNameBuffer3, sizeof (SubjectAltNameBuffer3), CommonName, &CommonNameSize, DMTFOid, &DMTFOidSize);
+  if (RETURN_ERROR(Ret) || CompareMem(DMTFOid, DMTF_OID, sizeof (DMTF_OID)) != 0) {
+    Print ("\n  - Retrieving  SubjectAltName3 otherName - [Fail]");
+    goto Cleanup;
+  } else {
+    DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName3 otherName = \"%s\" (Size = %d) ", CommonName, CommonNameSize));
+    Print ("- [Pass]");
+  }
+
+  //
   // Get X509GetSubjectAltName
   //
   CommonNameSize = 64;
@@ -280,6 +375,30 @@ ValidateCryptX509 (
   } else {
     DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName otherName = \"%s\" (Size = %d) ", CommonName, CommonNameSize));
     Print ("- [Pass]");
+  }
+
+  //
+  // Get X509 Validity
+  //
+  EndCertFromLen = 64;
+  EndCertToLen = 64;
+  Status = X509GetValidity (TestEndCert, TestEndCertLen, EndCertFrom, &EndCertFromLen, EndCertTo, &EndCertToLen);
+  if (!Status) {
+    Print ("\n  - Retrieving Validity - [Fail]");
+    goto Cleanup;
+  } else {
+    Print ("\n  - Retrieving Validity - [Pass]");
+  }
+
+  //
+  // Check X509 Validity
+  //
+  Status = X509SPDMCertificateCheck(TestEndCert, TestEndCertLen);
+  if (!Status) {
+    Print ("\n- X509 Check SPDM Certificate - [Fail]");
+    goto Cleanup;
+  } else {
+    Print ("\n- X509 Check SPDM Certificate - [Pass]");
   }
 
   Print ("\n");

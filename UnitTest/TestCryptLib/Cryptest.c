@@ -94,7 +94,22 @@ CryptestMain (
     return Status;
   }
 
-  Status = ValidateCryptX509 ();
+  Status = ValidateCryptX509 ("EcP256", sizeof("EcP256"));
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ValidateCryptX509 ("EcP384", sizeof("EcP384"));
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ValidateCryptX509 ("Rsa2048", sizeof("Rsa2048"));
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ValidateCryptX509 ("Rsa3072", sizeof("Rsa3072"));
   if (EFI_ERROR (Status)) {
     return Status;
   }
