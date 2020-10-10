@@ -2034,6 +2034,89 @@ X509GetDMTFSubjectAltName (
   );
 
 /**
+  Retrieve the Validity from one X.509 certificate
+
+  If Cert is NULL, then return FALSE.
+  If CertIssuerSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[in,out]  From         notBefore field bytes.
+  @param[in,out]  FromSize     notBefore field bytes size.
+  @param[in,out]  To           notAfter field bytes.
+  @param[in,out]  ToSize       notAfter field bytes size.
+
+  @retval  TRUE   The certificate Validity retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Validity retrieve failed.
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetValidity  (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN        CertSize,
+  IN OUT UINT8 *From,
+  IN OUT UINTN *FromSize,
+  IN OUT UINT8 *To,
+  IN OUT UINTN *ToSize
+  );
+
+/**
+  Retrieve the Key Usage from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Usage            Key Usage
+
+  @retval  TRUE   The certificate Key Usage retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Usage is NULL
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetKeyUsage (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN        CertSize,
+  OUT   UINTN        *Usage
+  );
+
+/**
+  Retrieve the Extended Key Usage from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Usage            Key Usage
+
+  @retval  TRUE   The certificate Extended Key Usage retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Usage is NULL
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetExtendedKeyUsage (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN        CertSize,
+  OUT   UINTN         *Usage
+  );
+
+/**
+  Certificate Check for SPDM leaf cert.
+
+  @param[in]  Cert            Pointer to the DER-encoded certificate data.
+  @param[in]  CertSize        The size of certificate data in bytes.
+
+  @retval  TRUE   Success.
+  @retval  FALSE  Certificate is not valid
+**/
+BOOLEAN
+EFIAPI
+X509SPDMCertificateCheck(
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize
+);
+
+/**
   Verify one X509 certificate was issued by the trusted CA.
 
   If Cert is NULL, then return FALSE.

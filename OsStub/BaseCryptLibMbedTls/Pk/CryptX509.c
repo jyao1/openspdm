@@ -14,6 +14,39 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
 
+CONST UINT8 OID_commonName[] = {
+  0x55, 0x04, 0x03
+};
+
+CONST UINT8 OID_organizationName[] = {
+  0x55, 0x04, 0x0A
+};
+
+CONST UINT8 OID_subjectAltName[] = {
+  0x55, 0x1D, 0x11
+};
+
+CONST UINT8 OID_keyUsage[] = {
+  0x55, 0x1D, 0x0F
+};
+
+CONST UINT8 OID_extKeyUsage[] = {
+  0x55, 0x1D, 0x25
+};
+
+CONST UINT8 OID_serverAuth[] = {
+  0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x01
+};
+CONST UINT8 OID_clientAuth[] = {
+  0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x02
+};
+CONST UINT8 OID_codeSigning[] = {
+  0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x03
+};
+CONST UINT8 OID_OCSPSigning[] = {
+  0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x09
+};
+
 /**
   Construct a X509 object from DER-encoded certificate data.
 
@@ -36,7 +69,24 @@ X509ConstructCertificate (
   OUT  UINT8        **SingleX509Cert
   )
 {
-  return FALSE;
+  mbedtls_x509_crt  *MbedTlsCert;
+  INT32            Ret;
+
+  if (Cert == NULL || SingleX509Cert == NULL || CertSize == 0) {
+    return FALSE;
+  }
+
+  MbedTlsCert = AllocatePool (sizeof(mbedtls_x509_crt));
+  if (MbedTlsCert == NULL) {
+    return FALSE;
+  }
+
+  mbedtls_x509_crt_init(MbedTlsCert);
+
+  *SingleX509Cert = (UINT8 *)(VOID *)MbedTlsCert;
+  Ret = mbedtls_x509_crt_parse_der(MbedTlsCert, Cert, CertSize);
+
+  return Ret == 0;
 }
 
 STATIC
@@ -156,6 +206,11 @@ X509StackFree (
   IN  VOID  *X509Stack
   )
 {
+  if (X509Stack == NULL) {
+    return ;
+  }
+
+  mbedtls_x509_crt_free(X509Stack);
 }
 
 /**
@@ -184,8 +239,128 @@ X509GetSubjectName (
   IN OUT  UINTN        *SubjectSize
   )
 {
-  return FALSE;
+  mbedtls_x509_crt Crt;
+  INT32 Ret;
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    if (CertSubject != NULL) {
+      CopyMem(CertSubject, Crt.subject_raw.p, Crt.subject_raw.len);
+    }
+    *SubjectSize = Crt.subject_raw.len;
+  }
+  mbedtls_x509_crt_free(&Crt);
+
+  return Ret == 0;
 }
+
+RETURN_STATUS
+EFIAPI
+InternalX509GetNIDName (
+  IN      mbedtls_x509_name     *Name,
+  IN      UINT8         *Oid,
+  IN      UINTN         OidSize,
+  IN OUT  CHAR8         *CommonName,  OPTIONAL
+  IN OUT  UINTN         *CommonNameSize)
+{
+  mbedtls_asn1_named_data *data;
+  data = mbedtls_asn1_find_named_data(Name, Oid, OidSize);
+  if (data != NULL) {
+
+    if (*CommonNameSize <= data->val.len) {
+      *CommonNameSize = data->val.len + 1;
+      return RETURN_BUFFER_TOO_SMALL;
+    }
+    if (CommonName != NULL) {
+      CopyMem(CommonName, data->val.p, data->val.len);
+      CommonName[data->val.len] = '\0';
+    }
+    *CommonNameSize = data->val.len + 1;
+    return RETURN_SUCCESS;
+  } else {
+    return RETURN_NOT_FOUND;
+  }
+}
+
+RETURN_STATUS
+EFIAPI
+InternalX509GetSubjectNIDName (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  IN      UINT8         *Oid,
+  IN      UINTN         OidSize,
+  OUT     CHAR8         *CommonName,  OPTIONAL
+  IN OUT  UINTN         *CommonNameSize
+  )
+{
+  mbedtls_x509_crt Crt;
+  INT32 Ret;
+  mbedtls_x509_name *Name;
+  RETURN_STATUS ReturnStatus;
+
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+  ReturnStatus = RETURN_INVALID_PARAMETER;
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    Name = &(Crt.subject);
+    ReturnStatus = InternalX509GetNIDName(Name, Oid, OidSize, CommonName, CommonNameSize);
+  }
+
+  mbedtls_x509_crt_free(&Crt);
+
+  return ReturnStatus;
+}
+
+RETURN_STATUS
+EFIAPI
+InternalX509GetIssuerNIDName (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  IN      UINT8         *Oid,
+  IN      UINTN         OidSize,
+  OUT     CHAR8         *CommonName,  OPTIONAL
+  IN OUT  UINTN         *CommonNameSize
+  )
+{
+  mbedtls_x509_crt Crt;
+  INT32 Ret;
+  mbedtls_x509_name *Name;
+  RETURN_STATUS ReturnStatus;
+
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+  ReturnStatus = RETURN_INVALID_PARAMETER;
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    Name = &(Crt.issuer);
+    ReturnStatus = InternalX509GetNIDName(Name, Oid, OidSize, CommonName, CommonNameSize);
+  }
+
+  mbedtls_x509_crt_free(&Crt);
+
+  return ReturnStatus;
+}
+
 
 /**
   Retrieve the common name (CN) string from one X.509 certificate.
@@ -222,7 +397,7 @@ X509GetCommonName (
   IN OUT  UINTN        *CommonNameSize
   )
 {
-  return RETURN_UNSUPPORTED;
+  return InternalX509GetSubjectNIDName (Cert, CertSize, (UINT8 *)OID_commonName, sizeof (OID_commonName), CommonName, CommonNameSize);
 }
 
 /**
@@ -260,7 +435,7 @@ X509GetOrganizationName (
   IN OUT  UINTN         *NameBufferSize
   )
 {
-  return RETURN_UNSUPPORTED;
+  return InternalX509GetSubjectNIDName (Cert, CertSize, (UINT8 *)OID_organizationName, sizeof (OID_organizationName), NameBuffer, NameBufferSize);
 }
 
 /**
@@ -596,6 +771,79 @@ X509GetCertFromCertChain (
   return FALSE;
 }
 
+RETURN_STATUS
+EFIAPI
+GetDMTFSubjectAltNameFromBytes (
+  IN      CONST UINT8   *Buffer,
+  IN      INTN          Len,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize,
+  OUT     UINT8         *Oid,         OPTIONAL
+  IN OUT  UINTN         *OidSize
+)
+{
+  UINT8       *Ptr;
+  int         Length;
+  size_t      ObjLen;
+  int         Ret;
+
+  Length = (int)Len;
+  Ptr = (UINT8 *)Buffer;
+
+  // Sequence
+  Ret = mbedtls_asn1_get_tag (
+    &Ptr, Ptr + Length, &ObjLen,
+    MBEDTLS_ASN1_SEQUENCE | MBEDTLS_ASN1_CONSTRUCTED);
+  if (Ret != 0) {
+    return RETURN_NOT_FOUND;
+  }
+
+  Ret = mbedtls_asn1_get_tag (
+    &Ptr, Ptr + ObjLen, &ObjLen,
+    MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED);
+
+  Ret = mbedtls_asn1_get_tag (&Ptr, Ptr + ObjLen, &ObjLen, MBEDTLS_ASN1_OID);
+  if (Ret != 0) {
+    return RETURN_NOT_FOUND;
+  }
+  // CopyData to OID
+  if (*OidSize < (UINTN)ObjLen) {
+    *OidSize = (UINTN)ObjLen;
+    return RETURN_BUFFER_TOO_SMALL;
+
+  }
+  if (Oid != NULL) {
+    CopyMem (Oid, Ptr, ObjLen);
+    *OidSize = ObjLen;
+  }
+
+  // Move to next element
+  Ptr += ObjLen;
+
+  Ret = mbedtls_asn1_get_tag (
+    &Ptr, (CONST UINT8 *)(Buffer + Length),
+    &ObjLen,
+    MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED
+    );
+  Ret = mbedtls_asn1_get_tag (
+    &Ptr, (CONST UINT8 *)(Buffer + Length),
+    &ObjLen,
+    MBEDTLS_ASN1_UTF8_STRING);
+  if (Ret != 0) {
+    return RETURN_NOT_FOUND;
+  }
+
+  if (*NameBufferSize < (UINTN)ObjLen) {
+    *NameBufferSize = (UINTN)ObjLen;
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  if (NameBuffer != NULL) {
+    CopyMem (NameBuffer, Ptr, ObjLen);
+    *NameBufferSize = ObjLen;
+  }
+  return RETURN_SUCCESS;
+}
 
 /**
   Retrieve the TBSCertificate from one given X.509 certificate.
@@ -650,8 +898,28 @@ X509GetVersion (
   OUT     UINTN          *Version
   )
 {
-  // TBD
-  return RETURN_SUCCESS;
+  mbedtls_x509_crt Crt;
+  INT32 Ret;
+  RETURN_STATUS ReturnStatus;
+
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+  ReturnStatus = RETURN_INVALID_PARAMETER;
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    *Version = Crt.version - 1;
+    ReturnStatus = RETURN_SUCCESS;
+  }
+
+  mbedtls_x509_crt_free(&Crt);
+
+  return ReturnStatus;
 }
 
 /**
@@ -686,8 +954,37 @@ X509GetSerialNumber (
   IN OUT  UINTN         *SerialNumberSize
   )
 {
-  // TBD
-  return RETURN_SUCCESS;
+  mbedtls_x509_crt Crt;
+  INT32 Ret;
+  RETURN_STATUS ReturnStatus;
+
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+  ReturnStatus = RETURN_INVALID_PARAMETER;
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    if (*SerialNumberSize <= Crt.serial.len) {
+      *SerialNumberSize = Crt.serial.len + 1;
+      ReturnStatus = RETURN_BUFFER_TOO_SMALL;
+      goto Cleanup;
+    }
+    if (SerialNumber != NULL) {
+      CopyMem(SerialNumber, Crt.serial.p, Crt.serial.len);
+      SerialNumber[Crt.serial.len] = '\0';
+    }
+    *SerialNumberSize = Crt.serial.len + 1;
+    ReturnStatus = RETURN_SUCCESS;
+  }
+Cleanup:
+  mbedtls_x509_crt_free(&Crt);
+
+  return ReturnStatus;
 }
 
 /**
@@ -718,8 +1015,37 @@ X509GetIssuerName (
   IN OUT  UINTN        *CertIssuerSize
   )
 {
-  // TBD
-  return RETURN_SUCCESS;
+  mbedtls_x509_crt Crt;
+  INT32 Ret;
+  BOOLEAN Status;
+
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+  Status = FALSE;
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    if (*CertIssuerSize < Crt.serial.len) {
+      *CertIssuerSize = Crt.serial.len;
+      Status = FALSE;
+      goto Cleanup;
+    }
+    if (CertIssuer != NULL) {
+      CopyMem(CertIssuer, Crt.serial.p, Crt.serial.len);
+    }
+    *CertIssuerSize = Crt.serial.len;
+    Status = TRUE;
+  }
+
+Cleanup:
+  mbedtls_x509_crt_free(&Crt);
+
+  return Status;
 }
 
 /**
@@ -757,8 +1083,7 @@ X509GetIssuerCommonName (
   IN OUT  UINTN        *CommonNameSize
   )
 {
-  // TBD
-  return RETURN_SUCCESS;
+  return InternalX509GetIssuerNIDName (Cert, CertSize, (UINT8 *)OID_commonName, sizeof (OID_commonName), CommonName, CommonNameSize);
 }
 
 /**
@@ -796,8 +1121,7 @@ X509GetIssuerOrganizationName (
   IN OUT  UINTN         *NameBufferSize
   )
 {
-  // TBD
-  return RETURN_SUCCESS;
+return InternalX509GetIssuerNIDName (Cert, CertSize, (UINT8 *)OID_organizationName, sizeof (OID_organizationName), NameBuffer, NameBufferSize);
 }
 /**
   Retrieve the Signature Algorithm (NID) from one X.509 certificate.
@@ -818,8 +1142,114 @@ X509GetSignatureType (
   OUT   INTN         *Nid
 )
 {
-  // TBD
-  return TRUE;
+  mbedtls_x509_crt Crt;
+  INT32 Ret;
+  BOOLEAN Status;
+
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+  Status = FALSE;
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    //
+    // MbedTls doesn't contains convert OID to NID
+    //
+    if(Crt.sig_oid.len > 0) {
+      Status = TRUE;
+    }
+  }
+
+  mbedtls_x509_crt_free(&Crt);
+
+  return Status;
+}
+
+
+/**
+ Find first Extension data match with given OID
+
+  @param[in]      Start             Pointer to the DER-encoded Extensions Data
+  @param[in]      End               Extensions Data size in bytes
+  @param[in ]     Oid               OID for match
+  @param[in ]     OidSize           OID size in bytes
+  @param[out]     FindExtensionData output matched extension data.
+  @param[out]     FindExtensionDataLen matched extension data size.
+
+ **/
+STATIC
+RETURN_STATUS
+X509FindExtensionData (
+  UINT8 *Start,
+  UINT8 *End,
+  UINT8 *Oid,
+  UINTN OidSize,
+  UINT8 **FindExtensionData,
+  UINTN *FindExtensionDataLen
+  )
+{
+  UINT8   *Ptr;
+  UINT8   *ExtensionPtr;
+  size_t  ObjLen;
+  INT32   Ret;
+  RETURN_STATUS ReturnStatus;
+  size_t FindExtensionLen;
+  size_t HeaderLen;
+
+  ReturnStatus = RETURN_INVALID_PARAMETER;
+  Ptr = Start;
+
+  Ret = 0;
+
+  while (TRUE) {
+    /*
+    * Extension  ::=  SEQUENCE  {
+    *      extnID      OBJECT IDENTIFIER,
+    *      critical    BOOLEAN DEFAULT FALSE,
+    *      extnValue   OCTET STRING  }
+    */
+    ExtensionPtr = Ptr;
+    Ret = mbedtls_asn1_get_tag(&Ptr, End, &ObjLen, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+    if (Ret == 0) {
+      HeaderLen = (size_t)(Ptr - ExtensionPtr);
+      FindExtensionLen = ObjLen;
+      // Get Object Identifier
+      Ret = mbedtls_asn1_get_tag(&Ptr, End, &ObjLen, MBEDTLS_ASN1_OID);
+    } else {
+      break;
+    }
+
+    if (Ret == 0 && CompareMem(Ptr, Oid, OidSize) == 0) {
+      Ptr += ObjLen;
+
+      Ret = mbedtls_asn1_get_tag(&Ptr, End, &ObjLen, MBEDTLS_ASN1_BOOLEAN);
+      if (Ret == 0) {
+        Ptr += ObjLen;
+      }
+
+      Ret = mbedtls_asn1_get_tag(&Ptr, End, &ObjLen, MBEDTLS_ASN1_OCTET_STRING);
+    } else {
+      Ret = 1;
+    }
+
+    if (Ret == 0) {
+      *FindExtensionData = Ptr;
+      *FindExtensionDataLen = ObjLen;
+      ReturnStatus = RETURN_SUCCESS;
+      break;
+    }
+
+    // move to next
+    Ptr = ExtensionPtr + HeaderLen + FindExtensionLen;
+    Ret = 0;
+  }
+
+  return ReturnStatus;
 }
 
 /**
@@ -861,6 +1291,488 @@ X509GetDMTFSubjectAltName (
   IN OUT  UINTN         *OidSize
   )
 {
-  // TBD
-  return FALSE;
+  mbedtls_x509_crt Crt;
+  INT32 Ret;
+  RETURN_STATUS ReturnStatus;
+  UINT8         *Ptr;
+  UINT8         *End;
+  size_t        ObjLen;
+
+  if (Cert == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  ReturnStatus = RETURN_NOT_FOUND;
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    Ptr = Crt.v3_ext.p;
+    End = Crt.v3_ext.p + Crt.v3_ext.len;
+    Ret = mbedtls_asn1_get_tag(&Ptr, End, &ObjLen, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+    if (Ret == 0) {
+      ReturnStatus = X509FindExtensionData(Ptr, End, (UINT8*)OID_subjectAltName, sizeof (OID_subjectAltName), &Ptr, &ObjLen);
+      if (ReturnStatus == RETURN_SUCCESS) {
+        ReturnStatus = GetDMTFSubjectAltNameFromBytes(Ptr, ObjLen, NameBuffer, NameBufferSize, Oid, OidSize);
+      }
+    }
+  }
+  mbedtls_x509_crt_free(&Crt);
+
+  return ReturnStatus;
+}
+
+/**
+  Retrieve the Validity from one X.509 certificate
+
+  If Cert is NULL, then return FALSE.
+  If CertIssuerSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[in,out]  From         notBefore field bytes.
+  @param[in,out]  FromSize     notBefore field bytes size.
+  @param[in,out]  To           notAfter field bytes.
+  @param[in,out]  ToSize       notAfter field bytes size.
+
+  @retval  TRUE   The certificate Validity retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Validity retrieve failed.
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetValidity  (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN        CertSize,
+  IN OUT UINT8 *From,
+  IN OUT UINTN *FromSize,
+  IN OUT UINT8 *To,
+  IN OUT UINTN *ToSize
+  )
+{
+  mbedtls_x509_crt Crt;
+  INT32      Ret;
+  BOOLEAN    Status;
+  UINTN      TSize;
+  UINTN      FSize;
+
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+  Status = FALSE;
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+
+    FSize = sizeof (mbedtls_x509_time);
+    if (*FromSize < FSize) {
+      *FromSize = FSize;
+      goto _Exit;
+    }
+    *FromSize = FSize;
+    if (From != NULL) {
+      CopyMem(From, &(Crt.valid_from), FSize);
+    }
+
+    TSize = sizeof (mbedtls_x509_time);
+    if (*ToSize < TSize) {
+      *ToSize = TSize;
+      goto _Exit;
+    }
+    *ToSize = TSize;
+    if (To != NULL) {
+      CopyMem(To, &(Crt.valid_to), sizeof (mbedtls_x509_time));
+    }
+    Status = TRUE;
+  }
+
+_Exit:
+  mbedtls_x509_crt_free(&Crt);
+
+  return Status;
+}
+
+/**
+  Retrieve the Key Usage from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Usage            Key Usage
+
+  @retval  TRUE   The certificate Extended Key Usage retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Usage is NULL
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetKeyUsage (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN        CertSize,
+  OUT   UINTN        *Usage
+  )
+{
+  mbedtls_x509_crt Crt;
+  INT32         Ret;
+  BOOLEAN       Status;
+
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+  Status = FALSE;
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    *Usage = Crt.key_usage;
+    Status = TRUE;
+  }
+  mbedtls_x509_crt_free(&Crt);
+
+  return Status;
+}
+
+/**
+  Retrieve the Extended Key Usage from ExtendedKeyUsageSyntax
+
+  @param[in]      Buffer           Pointer to the DER-encoded extKeyUsage
+  @param[in]      Len              Size of the extKeyUsage
+  @param[out]     Usage            Key Usage
+**/
+STATIC
+RETURN_STATUS
+InternalGetExtendedKeyUsage (
+  IN    UINT8         *Buffer,
+  IN    UINTN         Len,
+  OUT   UINTN         *Usage
+  )
+{
+  //ExtKeyUsageSyntax ::= SEQUENCE SIZE (1..MAX) OF KeyPurposeId
+  UINT8       *Ptr;
+  size_t      ObjLen;
+  int         Ret;
+  RETURN_STATUS ReturnStatus;
+
+  Ptr = (UINT8 *)Buffer;
+  ReturnStatus = RETURN_NOT_FOUND;
+
+  // Sequence
+  Ret = mbedtls_asn1_get_tag (
+    &Ptr, Buffer + Len, &ObjLen,
+    MBEDTLS_ASN1_SEQUENCE | MBEDTLS_ASN1_CONSTRUCTED);
+  if (Ret != 0) {
+    return RETURN_NOT_FOUND;
+  }
+
+  Ret = mbedtls_asn1_get_tag (&Ptr, Buffer + Len, &ObjLen, MBEDTLS_ASN1_OID);
+  *Usage = 0;
+  while (Ret == 0) {
+    if (Ret == MBEDTLS_ERR_ASN1_OUT_OF_DATA) {
+      break;
+    }
+    //
+    // same value as openssl\include\openssl\x509v3.h:389
+    //
+    if (ObjLen == sizeof(OID_serverAuth) && CompareMem (Ptr, OID_serverAuth, ObjLen) == 0) {
+      *Usage |= 0x1;
+    }
+    if (ObjLen == sizeof(OID_clientAuth) && CompareMem (Ptr, OID_clientAuth, ObjLen) == 0) {
+      *Usage |= 0x2;
+    }
+    if (ObjLen == sizeof(OID_codeSigning) && CompareMem (Ptr, OID_codeSigning, ObjLen) == 0) {
+      *Usage |= 0x8;
+    }
+    if (ObjLen == sizeof(OID_OCSPSigning) && CompareMem (Ptr, OID_OCSPSigning, ObjLen) == 0) {
+      *Usage |= 0x20;
+    }
+    // Move to next element
+    Ptr += ObjLen;
+    Ret = mbedtls_asn1_get_tag (&Ptr, Buffer + Len, &ObjLen, MBEDTLS_ASN1_OID);
+  }
+  if (*Usage != 0) {
+    ReturnStatus = RETURN_SUCCESS;
+  }
+  return ReturnStatus;
+}
+
+/**
+  Retrieve the Extended Key Usage from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Usage            Key Usage
+
+  @retval  TRUE   The certificate Extended Key Usage retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Usage is NULL
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetExtendedKeyUsage (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN        CertSize,
+  OUT   UINTN         *Usage
+  )
+{
+  mbedtls_x509_crt Crt;
+  INT32         Ret;
+  UINT8         *Ptr;
+  UINT8         *End;
+  size_t        ObjLen;
+  RETURN_STATUS ReturnStatus;
+
+  if (Cert == NULL) {
+    return FALSE;
+  }
+
+  mbedtls_x509_crt_init(&Crt);
+
+  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
+
+  if (Ret == 0) {
+    Ptr = Crt.v3_ext.p;
+    End = Crt.v3_ext.p + Crt.v3_ext.len;
+    Ret = mbedtls_asn1_get_tag(&Ptr, End, &ObjLen, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+    if (Ret == 0) {
+      ReturnStatus = X509FindExtensionData(Ptr, End, (UINT8*)OID_extKeyUsage, sizeof (OID_extKeyUsage), &Ptr, &ObjLen);
+      if (ReturnStatus == RETURN_SUCCESS) {
+          ReturnStatus = InternalGetExtendedKeyUsage(Ptr, ObjLen, Usage);
+      }
+    }
+  }
+  mbedtls_x509_crt_free(&Crt);
+
+  return ReturnStatus == RETURN_SUCCESS;
+}
+
+/**
+  Return 0 if before <= after, 1 otherwise
+**/
+STATIC
+INTN
+InternalX509CheckTime (
+  CONST mbedtls_x509_time *Before,
+  const mbedtls_x509_time *After
+  )
+{
+  if( Before->year  > After->year )
+    return( 1 );
+
+  if( Before->year == After->year &&
+    Before->mon   > After->mon )
+    return( 1 );
+
+  if( Before->year == After->year &&
+    Before->mon  == After->mon  &&
+    Before->day   > After->day )
+    return( 1 );
+
+  if( Before->year == After->year &&
+    Before->mon  == After->mon  &&
+    Before->day  == After->day  &&
+    Before->hour  > After->hour )
+    return( 1 );
+
+  if( Before->year == After->year &&
+    Before->mon  == After->mon  &&
+    Before->day  == After->day  &&
+    Before->hour == After->hour &&
+    Before->min   > After->min  )
+    return( 1 );
+
+  if( Before->year == After->year &&
+    Before->mon  == After->mon  &&
+    Before->day  == After->day  &&
+    Before->hour == After->hour &&
+    Before->min  == After->min  &&
+    Before->sec   > After->sec  )
+    return( 1 );
+
+  return( 0 );
+}
+
+STATIC
+BOOLEAN X509DateTimeCheck(
+  IN UINT8 *From,
+  IN OUT UINTN FromSize,
+  IN OUT UINT8 *To,
+  IN OUT UINTN ToSize)
+{
+  INTN Ret;
+  mbedtls_x509_time F0;
+  mbedtls_x509_time T0;
+  mbedtls_x509_time *F1;
+  mbedtls_x509_time *T1;
+
+  F0.year = 1970;
+  F0.mon = 1;
+  F0.day = 1;
+  F0.hour = 0;
+  F0.min = 0;
+  F0.sec = 0;
+  T0.year = 9999;
+  T0.mon = 12;
+  T0.day = 31;
+  T0.hour = 23;
+  T0.min = 59;
+  T0.sec = 59;
+
+  F1 = (mbedtls_x509_time*)From;
+  T1 = (mbedtls_x509_time*)To;
+
+  // F0 <= F1
+  Ret = InternalX509CheckTime(&F0, F1);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  // T1 <= T0
+  Ret = InternalX509CheckTime(T1, &T0);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Certificate Check for SPDM leaf cert.
+
+  @param[in]  Cert            Pointer to the DER-encoded certificate data.
+  @param[in]  CertSize        The size of certificate data in bytes.
+
+  @retval  TRUE   Success.
+  @retval  FALSE  Certificate is not valid
+**/
+BOOLEAN
+EFIAPI
+X509SPDMCertificateCheck(
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize
+)
+{
+  UINT8         EndCertFrom[64];
+  UINTN         EndCertFromLen;
+  UINT8         EndCertTo[64];
+  UINTN         EndCertToLen;
+  UINTN         Asn1BufferLen;
+  BOOLEAN       Status;
+  UINTN         CertVersion;
+  RETURN_STATUS Ret;
+  UINTN         Value;
+  VOID          *RsaContext;
+  VOID          *EcContext;
+
+  if (Cert == NULL || CertSize == 0) {
+    return FALSE;
+  }
+
+  Status = TRUE;
+  RsaContext = NULL;
+  EcContext = NULL;
+  EndCertFromLen = 64;
+  EndCertToLen = 64;
+
+  // 1. Version
+  CertVersion = 0;
+  Ret = X509GetVersion (Cert, CertSize, &CertVersion);
+  if (RETURN_ERROR (Ret)) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+  if (CertVersion != 2) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  // 2. SerialNumber
+  Asn1BufferLen = 0;
+  Ret = X509GetSerialNumber(Cert, CertSize, NULL, &Asn1BufferLen);
+  if (Ret != RETURN_BUFFER_TOO_SMALL) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  // 3. SinatureAlgorithem
+  Status = X509GetSignatureType (Cert, CertSize, &Value);
+  if (!Status) {
+    goto Cleanup;
+  }
+
+  // 4. Issuer
+  Asn1BufferLen = 0;
+  Status  = X509GetIssuerName (Cert, CertSize, NULL, &Asn1BufferLen);
+  if (Status && Asn1BufferLen == 0) {
+    goto Cleanup;
+  }
+  if (Asn1BufferLen <= 0) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  // 5. SubjectName
+  Asn1BufferLen = 0;
+  Status  = X509GetSubjectName (Cert, CertSize, NULL, &Asn1BufferLen);
+  if (Status && Asn1BufferLen == 0) {
+    goto Cleanup;
+  }
+  if (Asn1BufferLen <= 0) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  // 6. Validaity
+  Status = X509GetValidity (Cert, CertSize, EndCertFrom, &EndCertFromLen, EndCertTo, &EndCertToLen);
+  if (!Status) {
+    goto Cleanup;
+  }
+
+  Status = X509DateTimeCheck(EndCertFrom, EndCertFromLen, EndCertTo, EndCertToLen);
+  if (!Status) {
+    goto Cleanup;
+  }
+
+  // 7. SubjectPublic KeyInfo
+  Status = RsaGetPublicKeyFromX509(Cert, CertSize, &RsaContext);
+  if (!Status) {
+    Status = EcGetPublicKeyFromX509(Cert, CertSize, &EcContext);
+  }
+  if (!Status) {
+    goto Cleanup;
+  }
+
+  // 8. Extended Key Usage
+  Status = X509GetExtendedKeyUsage (Cert, CertSize, &Value);
+  if (!Status) {
+    goto Cleanup;
+  }
+
+  // 9. Key Usage
+  Status = X509GetKeyUsage (Cert, CertSize, &Value);
+  if (!Status) {
+    goto Cleanup;
+  }
+  if (MBEDTLS_X509_KU_DIGITAL_SIGNATURE & Value) {
+    Status = TRUE;
+  } else {
+    Status = FALSE;
+  }
+
+Cleanup:
+  if (RsaContext != NULL) {
+    RsaFree(RsaContext);
+  }
+  if (EcContext != NULL) {
+    EcFree(EcContext);
+  }
+  return Status;
 }
