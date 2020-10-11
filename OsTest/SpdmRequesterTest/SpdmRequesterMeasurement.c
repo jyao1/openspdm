@@ -28,13 +28,15 @@ SpdmSendReceiveGetMeasurement (
   UINT32                                    MeasurementRecordLength;
   UINT8                                     MeasurementRecord[MAX_SPDM_MEASUREMENT_RECORD_SIZE];
   UINT8                                     Index;
+  UINT8                                     RequestAttribute;
 
+  RequestAttribute = 0;
   //
   // 1. Query the total number of measurements available.
   //
   Status = SpdmGetMeasurement (
              SpdmContext,
-             SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE,
+             RequestAttribute,
              SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS,
              0,
              &NumberOfBlocks,
@@ -49,12 +51,15 @@ SpdmSendReceiveGetMeasurement (
     DEBUG((DEBUG_INFO, "Index - 0x%x\n", Index));
     //
     // 2. query measurement one by one
-    // TBD get signature in last message only.
+    // get signature in last message only.
     //
+    if (Index == NumberOfBlocks) {
+      RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
+    }
     MeasurementRecordLength = sizeof(MeasurementRecord);
     Status = SpdmGetMeasurement (
               SpdmContext,
-              SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE,
+              RequestAttribute,
               Index,
               0,
               &NumberOfBlock,

@@ -90,6 +90,7 @@ AppendManagedBuffer (
           (ManagedBuffer->MaxBufferSize == MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE));
   ASSERT (ManagedBuffer->MaxBufferSize >= ManagedBuffer->BufferSize);
   if (BufferSize > ManagedBuffer->MaxBufferSize - ManagedBuffer->BufferSize) {
+    ASSERT (FALSE);
     return RETURN_BUFFER_TOO_SMALL;
   }
   ASSERT (BufferSize <= ManagedBuffer->MaxBufferSize - ManagedBuffer->BufferSize);

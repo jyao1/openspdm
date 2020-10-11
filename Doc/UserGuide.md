@@ -86,7 +86,7 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    ```
    SpdmGetMeasurement (
        SpdmContext,
-       SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE,
+       RequestAttribute,
        SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS,
        SlotNum,
        &NumberOfBlocks,
@@ -98,9 +98,12 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    4.2, Send GET_MEASUREMENT to get measurement one by one.
    ```
    for (Index = 1; Index <= NumberOfBlocks; Index++) {
+     if (Index == NumberOfBlocks) {
+       RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
+     }
      SpdmGetMeasurement (
        SpdmContext,
-       SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE,
+       RequestAttribute,
        Index,
        SlotNum,
        &NumberOfBlock,

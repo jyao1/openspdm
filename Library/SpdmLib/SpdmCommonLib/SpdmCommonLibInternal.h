@@ -167,8 +167,7 @@ typedef struct {
   //
   // L1/L2 = Concatenate (GET_MEASUREMENT, MEASUREMENT\Signature)
   //
-  BOOLEAN                         GetMeasurementWithSign;
-  SMALL_MANAGED_BUFFER            L1L2;
+  LARGE_MANAGED_BUFFER            L1L2;
 } SPDM_TRANSCRIPT;
 
 typedef struct {
