@@ -23,6 +23,8 @@ SpdmEncapRequesterVerifyCertificateChainData (
   UINTN                                     RootCertBufferSize;
   UINTN                                     HashSize;
   UINT8                                     CalcRootCertHash[MAX_HASH_SIZE];
+  UINT8                                     *LeafCertBuffer;
+  UINTN                                     LeafCertBufferSize;
 
   HashSize = GetSpdmHashSize (SpdmContext);
 
@@ -51,6 +53,16 @@ SpdmEncapRequesterVerifyCertificateChainData (
 
   if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertBuffer, CertBufferSize)) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert chain verify failed)!!!\n"));
+    return FALSE;
+  }
+
+  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, -1, &LeafCertBuffer, &LeafCertBufferSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get leaf certificate failed)!!!\n"));
+    return FALSE;
+  }
+
+  if(!X509SPDMCertificateCheck (LeafCertBuffer, LeafCertBufferSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (leaf certificate check failed)!!!\n"));
     return FALSE;
   }
 
