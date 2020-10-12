@@ -61,17 +61,16 @@ ReadResponderPrivateCertificate (
 
   switch (USE_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-    File = "test/end_responder.key";
+    File = "Rsa2048/end_responder.key";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-    File = "ResRsa3072TestRoot.pem";
+    File = "Rsa3072/end_responder.key";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-    File = "ResEccP256TestRoot.pem";
-    File = "test/ec256/end_responder.key";
+    File = "EcP256/end_responder.key";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-    File = "ResEccP384TestRoot.pem";
+    File = "EcP384/end_responder.key";
     break;
   default:
     assert (0);
@@ -96,17 +95,16 @@ ReadRequesterPrivateCertificate (
 
   switch (USE_REQ_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-    File = "test/end_requester.key";
+    File = "Rsa2048/end_requester.key";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-    File = "ReqRsa3072TestRoot.pem";
+    File = "Rsa3072/end_requester.key";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-    File = "ReqEccP256TestRoot.pem";
-    File = "test/ec256/end_requester.key";
+    File = "EcP256/end_requester.key";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-    File = "ReqEccP384TestRoot.pem";
+    File = "EcP384/end_requester.key";
     break;
   default:
     assert (0);
@@ -138,16 +136,16 @@ ReadResponderRootPublicCertificate (
 
   switch (USE_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-    File = "test/ca.cert.der";
+    File = "Rsa2048/ca.cert.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-    File = "ResRsa3072TestRoot.cer";
+    File = "Rsa3072/ca.cert.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-    File = "test/ec256/ca.cert.der";
+    File = "EcP256/ca.cert.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-    File = "ResEccP384TestRoot.cer";
+    File = "EcP384/ca.cert.der";
     break;
   default:
     assert (0);
@@ -204,16 +202,16 @@ ReadRequesterRootPublicCertificate (
 
   switch (USE_REQ_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-    File = "test/ca.cert.der";
+    File = "Rsa2048/ca.cert.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-    File = "ResRsa3072TestRoot.cer";
+    File = "Rsa3072/ca.cert.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-    File = "test/ec256/ca.cert.der";
+    File = "EcP256/ca.cert.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-    File = "ResEccP384TestRoot.cer";
+    File = "EcP384/ca.cert.der";
     break;
   default:
     assert (0);
@@ -272,17 +270,16 @@ ReadResponderPublicCertificateChain (
 
   switch (USE_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-    File = "test/bundle_responder.certchain.der";
+    File = "Rsa2048/bundle_responder.certchain.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-    File = "ResRsa3072TestRoot.cer";
+    File = "Rsa3072/bundle_responder.certchain.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-    File = "ResEccP256TestRoot.cer";
-    File = "test/ec256/bundle_responder.certchain.der";
+    File = "EcP256/bundle_responder.certchain.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-    File = "ResEccP384TestRoot.cer";
+    File = "EcP384/bundle_responder.certchain.der";
     break;
   default:
     assert (0);
@@ -351,17 +348,16 @@ ReadRequesterPublicCertificateChain (
 
   switch (USE_REQ_ASYM_ALGO) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-    File = "test/bundle_requester.certchain.der";
+    File = "Rsa2048/bundle_requester.certchain.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-    File = "ReqRsa3072TestRoot.cer";
+    File = "Rsa3072/bundle_requester.certchain.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-    File = "ReqEccP256TestRoot.cer";
-    File = "test/ec256/bundle_requester.certchain.der";
+    File = "EcP256/bundle_requester.certchain.der";
     break;
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-    File = "ReqEccP384TestRoot.cer";
+    File = "EcP384/bundle_requester.certchain.der";
     break;
   default:
     assert (0);
