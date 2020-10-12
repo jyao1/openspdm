@@ -28,26 +28,6 @@ typedef struct {
   UINT16               KeySchedule;
 } SPDM_DEVICE_ALGORITHM;
 
-typedef enum {
-  //
-  // Before send KEY_EXCHANGE/PSK_EXCHANGE
-  // or after END_SESSION
-  //
-  SpdmStateNotStarted,
-  //
-  // After send KEY_EXHCNAGE, before send FINISH
-  //
-  SpdmStateHandshaking,
-  //
-  // After send FINISH, before END_SESSION
-  //
-  SpdmStateEstablished,
-  //
-  // MAX
-  //
-  SpdmStateMax,
-} SPDM_STATE;
-
 typedef struct {
   //
   // Local device info
@@ -259,7 +239,7 @@ typedef struct {
   UINT32                               SessionId;
   BOOLEAN                              UsePsk;
   UINT8                                MutAuthRequested;
-  SPDM_STATE                           SessionState;
+  SPDM_SESSION_STATE                   SessionState;
   UINTN                                DheKeySize;
   UINTN                                HashSize;
   UINTN                                AeadKeySize;

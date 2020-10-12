@@ -93,9 +93,35 @@ typedef enum {
   SpdmDataPsk,
   SpdmDataPskHint,
   //
+  // Session Type
+  //
+  SpdmDataSessionType,
+  //
+  // Session State
+  //
+  SpdmDataSessionState,
+  //
   // Export Master Secret
   //
   SpdmDataExportMasterSecret,
+  //
+  // Derived Key & Salt
+  //
+  SpdmDataRequestHandshakeEncryptionKey,
+  SpdmDataRequestHandshakeSalt,
+  SpdmDataResponseHandshakeEncryptionKey,
+  SpdmDataResponseHandshakeSalt,
+  SpdmDataRequestDataEncryptionKey,
+  SpdmDataRequestDataSalt,
+  SpdmDataResponseDataEncryptionKey,
+  SpdmDataResponseDataSalt,
+  //
+  // Sequence Number
+  //
+  SpdmDataRequestHandshakeSequenceNumber,
+  SpdmDataResponseHandshakeSequenceNumber,
+  SpdmDataRequestDataSequenceNumber,
+  SpdmDataResponseDataSequenceNumber,
   //
   // OpaqueData
   //
@@ -115,7 +141,7 @@ typedef enum {
 typedef enum {
   //
   // Below per session data is defined for debug purpose
-  // GET-only in debug mode.
+  // GET-only for debug purpose.
   //
   // NOTE: This is persession data. Need input SessionId in the input buffer
   //
@@ -136,17 +162,6 @@ typedef enum {
   SpdmDataRequestFinishedKey,
   SpdmDataResponseFinishedKey,
   //
-  // Derived Key & Salt
-  //
-  SpdmDataRequestHandshakeEncryptionKey,
-  SpdmDataRequestHandshakeSalt,
-  SpdmDataResponseHandshakeEncryptionKey,
-  SpdmDataResponseHandshakeSalt,
-  SpdmDataRequestDataEncryptionKey,
-  SpdmDataRequestDataSalt,
-  SpdmDataResponseDataEncryptionKey,
-  SpdmDataResponseDataSalt,
-  //
   // MAX
   //
   SpdmDataDebugDataMax,
@@ -164,6 +179,7 @@ typedef struct {
   // DataType specific:
   //   SessionId for the negoatiated key.
   //   SlotId for the certificate.
+  //   SlotNum + MeasurementHashType for SpdmDataMutAuthRequested
   UINT8                AdditionalData[4];
 } SPDM_DATA_PARAMETER;
 
@@ -173,6 +189,26 @@ typedef enum {
   SpdmSessionTypeEncMac,
   SpdmSessionTypeMax,
 } SPDM_SESSION_TYPE;
+
+typedef enum {
+  //
+  // Before send KEY_EXCHANGE/PSK_EXCHANGE
+  // or after END_SESSION
+  //
+  SpdmStateNotStarted,
+  //
+  // After send KEY_EXHCNAGE, before send FINISH
+  //
+  SpdmStateHandshaking,
+  //
+  // After send FINISH, before END_SESSION
+  //
+  SpdmStateEstablished,
+  //
+  // MAX
+  //
+  SpdmStateMax,
+} SPDM_SESSION_STATE;
 
 /**
   Set an SPDM context data.
@@ -238,19 +274,6 @@ SpdmGetData (
 UINT32
 EFIAPI
 SpdmGetLastError (
-  IN     VOID                      *SpdmContext
-  );
-
-/**
-  Get the session type of an SPDM context.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return session type of an SPDM context.
-*/
-SPDM_SESSION_TYPE
-EFIAPI
-SpdmGetSessionType (
   IN     VOID                      *SpdmContext
   );
 

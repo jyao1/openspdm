@@ -303,7 +303,7 @@ SpdmAllocateRspSessionId (
   );
 
 VOID
-SpdmInitEncapEnv (
+SpdmInitEncapState (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MutAuthRequested
   );

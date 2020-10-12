@@ -58,7 +58,7 @@ SpdmInitConnection (
 RETURN_STATUS
 EFIAPI
 SpdmAuthentication (
-  IN     VOID                 *SpdmContext,
+  IN     VOID                 *Context,
      OUT UINT8                *SlotMask,
      OUT VOID                 *TotalDigestBuffer,
   IN     UINT8                SlotNum,
@@ -69,13 +69,11 @@ SpdmAuthentication (
   )
 {
   RETURN_STATUS         Status;
-  UINT32                CapabilityFlags;
-  UINTN                 DataSize;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
 
-  DataSize = sizeof(CapabilityFlags);
-  SpdmGetData (SpdmContext, SpdmDataCapabilityFlags, NULL, &CapabilityFlags, &DataSize);
+  SpdmContext = Context;
 
-  if ((CapabilityFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) != 0) {
+  if ((SpdmContext->LocalContext.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) != 0) {
     Status = SpdmGetDigest (SpdmContext, SlotMask, TotalDigestBuffer);
     if (RETURN_ERROR(Status)) {
       return Status;

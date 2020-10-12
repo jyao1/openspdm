@@ -317,7 +317,7 @@ SpdmGetResponseKeyExchange (
   }
 
   SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
-  SpdmInitEncapEnv (Context, SessionInfo->MutAuthRequested);
+  SpdmInitEncapState (Context, SessionInfo->MutAuthRequested);
 
   SessionInfo->SessionState = SpdmStateHandshaking;
 

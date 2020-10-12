@@ -157,6 +157,31 @@ SpdmFreeSessionId (
   return NULL;
 }
 
+VOID
+SpdmInitEncapEnv (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                MutAuthRequested,
+  IN     UINT8                SlotNum,
+  IN     UINT8                MeasurementHashType
+  )
+{
+  SpdmContext->EncapContext.ErrorState = 0;
+  SpdmContext->EncapContext.SlotNum = SlotNum;
+  SpdmContext->EncapContext.MeasurementHashType = MeasurementHashType;
+}
+
+BOOLEAN
+IsDebugOnlyData (
+  IN     SPDM_DATA_TYPE      DataType
+  )
+{
+  if ((UINT32)DataType >= 0x80000000) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
 BOOLEAN
 NeedSessionInfoForData (
   IN     SPDM_DATA_TYPE      DataType
@@ -166,11 +191,16 @@ NeedSessionInfoForData (
   case SpdmDataDheSecret:
   case SpdmDataHandshakeSecret:
   case SpdmDataMasterSecret:
-  case SpdmDataExportMasterSecret:
   case SpdmDataRequestHandshakeSecret:
   case SpdmDataResponseHandshakeSecret:
   case SpdmDataRequestDataSecret:
   case SpdmDataResponseDataSecret:
+  case SpdmDataRequestFinishedKey:
+  case SpdmDataResponseFinishedKey:
+    return TRUE;
+
+  case SpdmDataSessionState:
+  case SpdmDataExportMasterSecret:
   case SpdmDataRequestHandshakeEncryptionKey:
   case SpdmDataRequestHandshakeSalt:
   case SpdmDataResponseHandshakeEncryptionKey:
@@ -179,8 +209,10 @@ NeedSessionInfoForData (
   case SpdmDataRequestDataSalt:
   case SpdmDataResponseDataEncryptionKey:
   case SpdmDataResponseDataSalt:
-  case SpdmDataRequestFinishedKey:
-  case SpdmDataResponseFinishedKey:
+  case SpdmDataRequestHandshakeSequenceNumber:
+  case SpdmDataResponseHandshakeSequenceNumber:
+  case SpdmDataRequestDataSequenceNumber:
+  case SpdmDataResponseDataSequenceNumber:
     return TRUE;
   }
   return FALSE;
@@ -210,10 +242,28 @@ SpdmSetData (
   IN     UINTN                     DataSize
   )
 {
-  SPDM_DEVICE_CONTEXT       *SpdmContext;
-  UINT8                     SlotNum;
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
+  UINT32                     SessionId;
+  SPDM_SESSION_INFO          *SessionInfo;
+  UINT8                      SlotNum;
+  UINT8                      MutAuthRequested;
+
+  if (IsDebugOnlyData (DataType)) {
+    return RETURN_UNSUPPORTED;
+  }
 
   SpdmContext = Context;
+
+  if (NeedSessionInfoForData (DataType)) {
+    if (Parameter->Location != SpdmDataLocationSession) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SessionId = *(UINT32 *)Parameter->AdditionalData;
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_INVALID_PARAMETER;
+    }
+  }
 
   switch (DataType) {
   case SpdmDataCapabilityFlags:
@@ -304,7 +354,14 @@ SpdmSetData (
     if (DataSize != sizeof(UINT8)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.MutAuthRequested = *(UINT8 *)Data;
+    MutAuthRequested = *(UINT8 *)Data;
+    if (!((MutAuthRequested == 0) ||
+          (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST)) ||
+          (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS))) ) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->LocalContext.MutAuthRequested = MutAuthRequested;
+    SpdmInitEncapEnv (Context, MutAuthRequested, Parameter->AdditionalData[0], Parameter->AdditionalData[1]);
     break;
   case SpdmDataPsk:
     SpdmContext->LocalContext.PskSize = DataSize;
@@ -316,6 +373,30 @@ SpdmSetData (
     }
     SpdmContext->LocalContext.PskHintSize = DataSize;
     SpdmContext->LocalContext.PskHint = Data;
+    break;
+  case SpdmDataRequestHandshakeSequenceNumber:
+    if (DataSize != sizeof(SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber = *(UINT64 *)Data;
+    break;
+  case SpdmDataResponseHandshakeSequenceNumber:
+    if (DataSize != sizeof(SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber = *(UINT64 *)Data;
+    break;
+  case SpdmDataRequestDataSequenceNumber:
+    if (DataSize != sizeof(SessionInfo->ApplicationSecret.RequestDataSequenceNumber)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SessionInfo->ApplicationSecret.RequestDataSequenceNumber = *(UINT64 *)Data;
+    break;
+  case SpdmDataResponseDataSequenceNumber:
+    if (DataSize != sizeof(SessionInfo->ApplicationSecret.ResponseDataSequenceNumber)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SessionInfo->ApplicationSecret.ResponseDataSequenceNumber = *(UINT64 *)Data;
     break;
   default:
     return RETURN_UNSUPPORTED;
@@ -358,6 +439,11 @@ SpdmGetData (
   VOID                       *TargetData;
   UINT32                     SessionId;
   SPDM_SESSION_INFO          *SessionInfo;
+  SPDM_SESSION_TYPE          SessionType;
+
+  if (IsDebugOnlyData (DataType)) {
+    return RETURN_UNSUPPORTED;
+  }
 
   SpdmContext = Context;
 
@@ -374,48 +460,99 @@ SpdmGetData (
 
   switch (DataType) {
   case SpdmDataCapabilityFlags:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
     TargetDataSize = sizeof(UINT32);
-    TargetData = &SpdmContext->LocalContext.Capability.Flags;
+    TargetData = &SpdmContext->ConnectionInfo.Capability.Flags;
     break;
   case SpdmDataCapabilityCTExponent:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
     TargetDataSize = sizeof(UINT8);
-    TargetData = &SpdmContext->LocalContext.Capability.CTExponent;
+    TargetData = &SpdmContext->ConnectionInfo.Capability.CTExponent;
     break;
   case SpdmDataMeasurementHashAlgo:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
     TargetDataSize = sizeof(UINT32);
-    TargetData = &SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo;
+    TargetData = &SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo;
     break;
-  case SpdmDataDheSecret:
-    TargetDataSize = SessionInfo->DheKeySize;
-    TargetData = SessionInfo->HandshakeSecret.DheSecret;
+  case SpdmDataBaseAsymAlgo:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    TargetDataSize = sizeof(UINT32);
+    TargetData = &SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo;
     break;
-  case SpdmDataHandshakeSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.HandshakeSecret;
+  case SpdmDataBaseHashAlgo:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    TargetDataSize = sizeof(UINT32);
+    TargetData = &SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo;
     break;
-  case SpdmDataMasterSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.MasterSecret;
+  case SpdmDataDHENamedGroup:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    TargetDataSize = sizeof(UINT16);
+    TargetData = &SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup;
+    break;
+  case SpdmDataAEADCipherSuite:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    TargetDataSize = sizeof(UINT16);
+    TargetData = &SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite;
+    break;
+  case SpdmDataReqBaseAsymAlg:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    TargetDataSize = sizeof(UINT16);
+    TargetData = &SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg;
+    break;
+  case SpdmDataKeySchedule:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    TargetDataSize = sizeof(UINT16);
+    TargetData = &SpdmContext->ConnectionInfo.Algorithm.KeySchedule;
+    break;
+
+  case SpdmDataSessionType:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    switch (SpdmContext->ConnectionInfo.Capability.Flags &
+            (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP)) {
+    case 0:
+      SessionType = SpdmSessionTypeNone;
+      break;
+    case (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP) :
+      SessionType = SpdmSessionTypeEncMac;
+      break;
+    case SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP :
+      SessionType = SpdmSessionTypeMacOnly;
+      break;
+    default:
+      ASSERT(FALSE);
+      SessionType = SpdmSessionTypeMax;
+      break;
+    }
+    TargetDataSize = sizeof(UINT32);
+    TargetData = &SessionType;
+    break;
+  case SpdmDataSessionState:
+    TargetDataSize = sizeof(UINT32);
+    TargetData = &SessionInfo->SessionState;
     break;
   case SpdmDataExportMasterSecret:
     TargetDataSize = SessionInfo->HashSize;
     TargetData = SessionInfo->HandshakeSecret.ExportMasterSecret;
-    break;
-  case SpdmDataRequestHandshakeSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.RequestHandshakeSecret;
-    break;
-  case SpdmDataResponseHandshakeSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.ResponseHandshakeSecret;
-    break;
-  case SpdmDataRequestDataSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->ApplicationSecret.RequestDataSecret;
-    break;
-  case SpdmDataResponseDataSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->ApplicationSecret.ResponseDataSecret;
     break;
   case SpdmDataRequestHandshakeEncryptionKey:
     TargetDataSize = SessionInfo->AeadKeySize;
@@ -448,6 +585,53 @@ SpdmGetData (
   case SpdmDataResponseDataSalt:
     TargetDataSize = SessionInfo->AeadIvSize;
     TargetData = SessionInfo->ApplicationSecret.ResponseDataSalt;
+    break;
+  case SpdmDataRequestHandshakeSequenceNumber:
+    TargetDataSize = sizeof(SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber);
+    TargetData = &SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber;
+    break;
+  case SpdmDataResponseHandshakeSequenceNumber:
+    TargetDataSize = sizeof(SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber);
+    TargetData = &SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber;
+    break;
+  case SpdmDataRequestDataSequenceNumber:
+    TargetDataSize = sizeof(SessionInfo->ApplicationSecret.RequestDataSequenceNumber);
+    TargetData = &SessionInfo->ApplicationSecret.RequestDataSequenceNumber;
+    break;
+  case SpdmDataResponseDataSequenceNumber:
+    TargetDataSize = sizeof(SessionInfo->ApplicationSecret.ResponseDataSequenceNumber);
+    TargetData = &SessionInfo->ApplicationSecret.ResponseDataSequenceNumber;
+    break;
+  //
+  // Debug Data only
+  //
+  case SpdmDataDheSecret:
+    TargetDataSize = SessionInfo->DheKeySize;
+    TargetData = SessionInfo->HandshakeSecret.DheSecret;
+    break;
+  case SpdmDataHandshakeSecret:
+    TargetDataSize = SessionInfo->HashSize;
+    TargetData = SessionInfo->HandshakeSecret.HandshakeSecret;
+    break;
+  case SpdmDataMasterSecret:
+    TargetDataSize = SessionInfo->HashSize;
+    TargetData = SessionInfo->HandshakeSecret.MasterSecret;
+    break;
+  case SpdmDataRequestHandshakeSecret:
+    TargetDataSize = SessionInfo->HashSize;
+    TargetData = SessionInfo->HandshakeSecret.RequestHandshakeSecret;
+    break;
+  case SpdmDataResponseHandshakeSecret:
+    TargetDataSize = SessionInfo->HashSize;
+    TargetData = SessionInfo->HandshakeSecret.ResponseHandshakeSecret;
+    break;
+  case SpdmDataRequestDataSecret:
+    TargetDataSize = SessionInfo->HashSize;
+    TargetData = SessionInfo->ApplicationSecret.RequestDataSecret;
+    break;
+  case SpdmDataResponseDataSecret:
+    TargetDataSize = SessionInfo->HashSize;
+    TargetData = SessionInfo->ApplicationSecret.ResponseDataSecret;
     break;
   case SpdmDataRequestFinishedKey:
     TargetDataSize = SessionInfo->HashSize;
@@ -546,28 +730,6 @@ SpdmGetLastError (
   return SpdmContext->ErrorState;
 }
 
-SPDM_SESSION_TYPE
-EFIAPI
-SpdmGetSessionType (
-  IN     VOID                      *Context
-  )
-{
-  SPDM_DEVICE_CONTEXT       *SpdmContext;
-
-  SpdmContext = Context;
-  switch (SpdmContext->ConnectionInfo.Capability.Flags &
-          (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP)) {
-  case 0:
-    return SpdmSessionTypeNone;
-  case (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP) :
-    return SpdmSessionTypeEncMac;
-  case SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP :
-    return SpdmSessionTypeMacOnly;
-  default:
-    return SpdmSessionTypeMax;
-  }
-}
-
 VOID
 EFIAPI
 SpdmInitContext (
@@ -589,6 +751,7 @@ SpdmInitContext (
   SpdmContext->RetryTimes                           = MAX_SPDM_REQUEST_RETRY_TIMES;
   SpdmContext->ResponseState                        = SpdmResponseStateNormal;
   SpdmContext->CurrentToken                         = 0;
+  SpdmContext->EncapContext.CertificateChainBuffer.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 
   RandomSeed (NULL, 0);
   return ;

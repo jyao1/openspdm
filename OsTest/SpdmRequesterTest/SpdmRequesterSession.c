@@ -17,23 +17,30 @@ typedef struct {
 } DATA_TYPE_STRING;
 
 DATA_TYPE_STRING  mDataTypeString[] = {
-  {SpdmDataDheSecret,        "DheSecret"},
-  {SpdmDataHandshakeSecret,  "HandshakeSecret"},
-  {SpdmDataMasterSecret,     "MasterSecret"},
-  {SpdmDataRequestHandshakeSecret,   "RequestHandshakeSecret"},
-  {SpdmDataResponseHandshakeSecret,  "ResponseHandshakeSecret"},
-  {SpdmDataRequestDataSecret,        "RequestDataSecret"},
-  {SpdmDataResponseDataSecret,       "ResponseDataSecret"},
-  {SpdmDataRequestFinishedKey,       "RequestFinishedKey"},
-  {SpdmDataResponseFinishedKey,      "ResponseFinishedKey"},
-  {SpdmDataRequestHandshakeEncryptionKey,  "RequestHandshakeEncryptionKey"},
-  {SpdmDataRequestHandshakeSalt,           "RequestHandshakeSalt"},
-  {SpdmDataResponseHandshakeEncryptionKey, "ResponseHandshakeEncryptionKey"},
-  {SpdmDataResponseHandshakeSalt,          "ResponseHandshakeSalt"},
-  {SpdmDataRequestDataEncryptionKey,       "RequestDataEncryptionKey"},
-  {SpdmDataRequestDataSalt,                "RequestDataSalt"},
-  {SpdmDataResponseDataEncryptionKey,      "ResponseDataEncryptionKey"},
-  {SpdmDataResponseDataSalt,               "ResponseDataSalt"},
+#if 0
+  {SpdmDataDheSecret,                       "DheSecret"},
+  {SpdmDataHandshakeSecret,                 "HandshakeSecret"},
+  {SpdmDataMasterSecret,                    "MasterSecret"},
+  {SpdmDataRequestHandshakeSecret,          "RequestHandshakeSecret"},
+  {SpdmDataResponseHandshakeSecret,         "ResponseHandshakeSecret"},
+  {SpdmDataRequestDataSecret,               "RequestDataSecret"},
+  {SpdmDataResponseDataSecret,              "ResponseDataSecret"},
+  {SpdmDataRequestFinishedKey,              "RequestFinishedKey"},
+  {SpdmDataResponseFinishedKey,             "ResponseFinishedKey"},
+#endif
+  {SpdmDataExportMasterSecret,              "ExportMasterSecret"},
+  {SpdmDataRequestHandshakeEncryptionKey,   "RequestHandshakeEncryptionKey"},
+  {SpdmDataRequestHandshakeSalt,            "RequestHandshakeSalt"},
+  {SpdmDataResponseHandshakeEncryptionKey,  "ResponseHandshakeEncryptionKey"},
+  {SpdmDataResponseHandshakeSalt,           "ResponseHandshakeSalt"},
+  {SpdmDataRequestDataEncryptionKey,        "RequestDataEncryptionKey"},
+  {SpdmDataRequestDataSalt,                 "RequestDataSalt"},
+  {SpdmDataResponseDataEncryptionKey,       "ResponseDataEncryptionKey"},
+  {SpdmDataResponseDataSalt,                "ResponseDataSalt"},
+  {SpdmDataRequestHandshakeSequenceNumber,  "RequestHandshakeSequenceNumber"},
+  {SpdmDataResponseHandshakeSequenceNumber, "ResponseHandshakeSequenceNumber"},
+  {SpdmDataRequestDataSequenceNumber,       "RequestDataSequenceNumber"},
+  {SpdmDataResponseDataSequenceNumber,      "ResponseDataSequenceNumber"},
 };
 
 SPDM_VENDOR_DEFINED_REQUEST_MINE  mVendorDefinedRequest = {
