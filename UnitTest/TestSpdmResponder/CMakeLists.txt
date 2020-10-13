@@ -7,7 +7,6 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/TestSpdmResponder
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH} 
                     ${PROJECT_SOURCE_DIR}/UnitTest/Include                      
                     ${PROJECT_SOURCE_DIR}/Library/SpdmLib/SpdmCommonLib
-                    ${PROJECT_SOURCE_DIR}/Library/SpdmLib/SpdmRequesterLib
                     ${PROJECT_SOURCE_DIR}/Library/SpdmLib/SpdmResponderLib
                     ${PROJECT_SOURCE_DIR}/UnitTest/CmockaLib/cmocka/include
                     ${PROJECT_SOURCE_DIR}/UnitTest/CmockaLib/cmocka/include/cmockery
@@ -29,7 +28,6 @@ SET(src_TestSpdmResponder
 SET(TestSpdmResponder_LIBRARY
     ${LIBRARY_OUTPUT_PATH}/libBaseMemoryLib.a
     ${LIBRARY_OUTPUT_PATH}/libDebugLib.a  
-    ${LIBRARY_OUTPUT_PATH}/libSpdmRequesterLib.a
     ${LIBRARY_OUTPUT_PATH}/libSpdmResponderLib.a
     ${LIBRARY_OUTPUT_PATH}/libSpdmCommonLib.a
     ${LIBRARY_OUTPUT_PATH}/lib${CRYPTO}Lib.a
