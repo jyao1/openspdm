@@ -65,6 +65,8 @@
 
    Download and install [LLVM9](http://releases.llvm.org/download.html#9.0.0). Ensure LLVM9 executable directory is in PATH environment variable.
 
+4) [cmake](https://cmake.org/). It will be used to replace makefile.
+
 ### Crypto library
 
 1) [MbedTls](https://tls.mbed.org) as Crypto library
@@ -117,6 +119,34 @@
    Tool : LLVM (TOOLCHAIN=CLANG)
 
    Open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=<X64|Ia32> TOOLCHAIN=CLANG TARGET=<DEBUG|RELEASE> CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`.
+
+### Build with CMake
+
+   We will use CMake to replace makefile in the future, after all features are enabled.
+   Currently, only OsTest and UnitTest are enabled with VS2019 and GCC.
+
+1) Use CMake in Linux (Toolchain=GCC)
+
+   ```
+   cd openspdm
+   mkdir build
+   cd build
+   cmake -DARCH=<X64|Ia32> -DTOOLCHAIN=<Toolchain> -DTARGET=<Debug|Release> -DCRYPTO=<MbedTls|Openssl> -DTESTTYPE=<OsTest|UnitTest> ..
+   make CopyTestKey
+   make
+   ```
+
+2) Use CMake in Windows (Toolchain=VS2019|VS2015)
+
+   Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64.
+   ```
+   cd openspdm
+   mkdir build
+   cd build
+   cmake -G"NMake Makefiles" -DARCH=<X64|Ia32> -DTOOLCHAIN=<Toolchain> -DTARGET=<Debug|Release> -DCRYPTO=<MbedTls|Openssl> -DTESTTYPE=<OsTest|UnitTest> ..
+   nmake CopyTestKey
+   nmake
+   ```
 
 ## Run Test
 
