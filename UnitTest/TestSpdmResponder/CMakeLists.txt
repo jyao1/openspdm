@@ -20,6 +20,7 @@ SET(src_TestSpdmResponder
     TestSpdmResponderAlgorithm.c
     TestSpdmResponderDigest.c
     TestSpdmResponderCertificate.c
+    TestSpdmResponderChallengeAuth.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmUnitTestCommon.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestKey.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestSupport.c

@@ -20,6 +20,7 @@ SET(src_TestSpdmRequester
     TestSpdmRequesterNegotiateAlgorithm.c
     TestSpdmRequesterGetDigest.c
     TestSpdmRequesterGetCertificate.c
+    TestSpdmRequesterChallenge.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmUnitTestCommon.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestKey.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestSupport.c
