@@ -187,13 +187,17 @@ SpdmGetMeasurement (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponse.Header.RequestResponseCode != SPDM_MEASUREMENTS) {
+    return RETURN_DEVICE_ERROR;
+  }
+
   if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_MEASUREMENTS) {
     return RETURN_DEVICE_ERROR;
   }
 

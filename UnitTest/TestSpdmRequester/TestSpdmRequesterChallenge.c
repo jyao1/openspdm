@@ -72,7 +72,7 @@ SpdmRequesterChallengeTestSendMessage (
       LocalBufferSize = 0;
       CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
       LocalBufferSize += (RequestSize - 1);
-	  SubIndex ++;
+      SubIndex ++;
     }
     return RETURN_SUCCESS;
   default:
@@ -144,7 +144,7 @@ SpdmRequesterChallengeTestReceiveMessage (
     InternalDumpHex (HashData, GetSpdmHashSize(SpdmContext));
     SigSize = GetSpdmAsymSize (SpdmContext);
     ReadResponderPrivateCertificate (&Data, &DataSize);
-	TestSpdmAsymGetPrivateKeyFromPem (USE_ASYM_ALGO, Data, DataSize, NULL, &Context);
+    TestSpdmAsymGetPrivateKeyFromPem (USE_ASYM_ALGO, Data, DataSize, NULL, &Context);
     TestSpdmAsymSign (USE_ASYM_ALGO, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
     TestSpdmAsymFree (USE_ASYM_ALGO, Context);
     Ptr += SigSize;
@@ -165,7 +165,7 @@ SpdmRequesterChallengeTestReceiveMessage (
     UINTN                         SigSize;
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
-	
+
     ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
@@ -198,7 +198,7 @@ SpdmRequesterChallengeTestReceiveMessage (
     SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
     SigSize = GetSpdmAsymSize (SpdmContext);
     ReadResponderPrivateCertificate (&Data, &DataSize);
-	TestSpdmAsymGetPrivateKeyFromPem (USE_ASYM_ALGO, Data, DataSize, NULL, &Context);
+    TestSpdmAsymGetPrivateKeyFromPem (USE_ASYM_ALGO, Data, DataSize, NULL, &Context);
     TestSpdmAsymSign (USE_ASYM_ALGO, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
     TestSpdmAsymFree (USE_ASYM_ALGO, Context);
     Ptr += SigSize;
@@ -223,7 +223,7 @@ SpdmRequesterChallengeTestReceiveMessage (
 
   case 0x5:
   {
-    SPDM_ERROR_RESPONSE	 SpdmResponse;
+    SPDM_ERROR_RESPONSE  SpdmResponse;
 
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
@@ -238,7 +238,7 @@ SpdmRequesterChallengeTestReceiveMessage (
   {
     STATIC UINTN SubIndex1 = 0;
     if (SubIndex1 == 0) {
-      SPDM_ERROR_RESPONSE	 SpdmResponse;
+      SPDM_ERROR_RESPONSE  SpdmResponse;
 
       SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
@@ -246,7 +246,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       SpdmResponse.Header.Param2 = 0;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
-	  SubIndex1 ++;
+      SubIndex1 ++;
     } else if (SubIndex1 == 1) {
       SPDM_CHALLENGE_AUTH_RESPONSE  *SpdmResponse;
       VOID                          *Data;
@@ -257,7 +257,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       UINTN                         SigSize;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
-	
+
       ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
@@ -290,7 +290,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
       SigSize = GetSpdmAsymSize (SpdmContext);
       ReadResponderPrivateCertificate (&Data, &DataSize);
-	  TestSpdmAsymGetPrivateKeyFromPem (USE_ASYM_ALGO, Data, DataSize, NULL, &Context);
+      TestSpdmAsymGetPrivateKeyFromPem (USE_ASYM_ALGO, Data, DataSize, NULL, &Context);
       TestSpdmAsymSign (USE_ASYM_ALGO, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
       TestSpdmAsymFree (USE_ASYM_ALGO, Context);
       Ptr += SigSize;
@@ -347,7 +347,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       SpdmResponse.ExtendErrorData.Token = 1;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
-	  SubIndex2 ++;
+      SubIndex2 ++;
     } else if (SubIndex2 == 1) {
       SPDM_CHALLENGE_AUTH_RESPONSE  *SpdmResponse;
       VOID                          *Data;
@@ -358,7 +358,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       UINTN                         SigSize;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
-	
+
       ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
@@ -391,7 +391,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
       SigSize = GetSpdmAsymSize (SpdmContext);
       ReadResponderPrivateCertificate (&Data, &DataSize);
-	  TestSpdmAsymGetPrivateKeyFromPem (USE_ASYM_ALGO, Data, DataSize, NULL, &Context);
+      TestSpdmAsymGetPrivateKeyFromPem (USE_ASYM_ALGO, Data, DataSize, NULL, &Context);
       TestSpdmAsymSign (USE_ASYM_ALGO, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
       TestSpdmAsymFree (USE_ASYM_ALGO, Context);
       Ptr += SigSize;

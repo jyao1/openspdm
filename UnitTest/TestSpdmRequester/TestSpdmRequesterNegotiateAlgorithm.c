@@ -81,7 +81,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
     SpdmResponse.Header.Param2 = 0;
     SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
+    SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
     SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
     SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
     SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
@@ -101,7 +101,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
     SpdmResponse.Header.Param2 = 0;
     SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-    SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
+    SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
     SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
     SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
     SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
@@ -127,7 +127,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
 
   case 0x5:
   {
-    SPDM_ERROR_RESPONSE	 SpdmResponse;
+    SPDM_ERROR_RESPONSE  SpdmResponse;
 
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
@@ -142,7 +142,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
   {
     STATIC UINTN SubIndex1 = 0;
     if (SubIndex1 == 0) {
-      SPDM_ERROR_RESPONSE	 SpdmResponse;
+      SPDM_ERROR_RESPONSE  SpdmResponse;
 
       SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
@@ -158,7 +158,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
       SpdmResponse.Header.Param2 = 0;
       SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-      SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
+      SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
       SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
       SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
       SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
@@ -225,7 +225,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SpdmResponse.Header.RequestResponseCode = SPDM_ALGORITHMS;
       SpdmResponse.Header.Param2 = 0;
       SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
-      SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;	
+      SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
       SpdmResponse.MeasurementHashAlgo = DEFAULT_MEAHASH_ALGO;
       SpdmResponse.BaseAsymSel = DEFAULT_ASYM_ALGO;
       SpdmResponse.BaseHashSel = DEFAULT_HASH_ALGO;
@@ -240,7 +240,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
 
   case 0xA:
   {
-    SPDM_ALGORITHMS_RESPONSE	  SpdmResponse;
+    SPDM_ALGORITHMS_RESPONSE  SpdmResponse;
 
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.Param1 = 0;
@@ -260,7 +260,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
 
   case 0xB:
   {
-    SPDM_ALGORITHMS_RESPONSE	  SpdmResponse;
+    SPDM_ALGORITHMS_RESPONSE  SpdmResponse;
 
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.Param1 = 0;
@@ -280,7 +280,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
 
   case 0xC:
   {
-    SPDM_ALGORITHMS_RESPONSE	  SpdmResponse;
+    SPDM_ALGORITHMS_RESPONSE  SpdmResponse;
 
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.Param1 = 0;

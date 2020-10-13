@@ -179,7 +179,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
 
   case 0x5:
   {
-    SPDM_ERROR_RESPONSE	 SpdmResponse;
+    SPDM_ERROR_RESPONSE  SpdmResponse;
 
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
@@ -194,7 +194,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
   {
     STATIC UINTN SubIndex1 = 0;
     if (SubIndex1 == 0) {
-      SPDM_ERROR_RESPONSE	 SpdmResponse;
+      SPDM_ERROR_RESPONSE  SpdmResponse;
 
       SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
