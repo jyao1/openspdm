@@ -38,7 +38,6 @@ OBJECT_FILES =  \
 
 INC =  \
     -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)/Library/SpdmLib/SpdmCommonLib \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
     -I$(WORKSPACE)/Include/Hal/$(ARCH)
