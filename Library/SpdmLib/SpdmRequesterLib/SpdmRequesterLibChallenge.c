@@ -131,8 +131,7 @@ SpdmRequesterVerifyChallengeSignature (
   Authenticate based upon the key in one slot.
 */
 RETURN_STATUS
-EFIAPI
-SpdmChallenge (
+TrySpdmChallenge (
   IN     VOID                 *Context,
   IN     UINT8                SlotNum,
   IN     UINT8                MeasurementHashType,
@@ -159,7 +158,7 @@ SpdmChallenge (
   SpdmContext = Context;
   if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
       ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CERTIFICATE_RECEIVE_FLAG) == 0)) {
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
     return RETURN_DEVICE_ERROR;
   }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP) == 0) {
@@ -203,13 +202,18 @@ SpdmChallenge (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageC, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_CHALLENGE, SPDM_CHALLENGE_AUTH, sizeof(SPDM_CHALLENGE_AUTH_RESPONSE_MAX));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_CHALLENGE_AUTH) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_CHALLENGE_AUTH_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_CHALLENGE_AUTH) {
     return RETURN_DEVICE_ERROR;
   }
   *(UINT8 *)&AuthAttribute = SpdmResponse.Header.Param1;
@@ -328,3 +332,29 @@ SpdmChallenge (
 
   return RETURN_SUCCESS;
 }
+
+RETURN_STATUS
+EFIAPI
+SpdmChallenge (
+  IN     VOID                 *Context,
+  IN     UINT8                SlotNum,
+  IN     UINT8                MeasurementHashType,
+     OUT VOID                 *MeasurementHash
+  )
+{
+  SPDM_DEVICE_CONTEXT    *SpdmContext;
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+
+  SpdmContext = Context;
+  Retry = SpdmContext->RetryTimes;
+  do {
+    Status = TrySpdmChallenge(SpdmContext, SlotNum, MeasurementHashType, MeasurementHash);
+    if (RETURN_NO_RESPONSE != Status) {
+      return Status;
+    }
+  } while (Retry-- != 0);
+
+  return Status;
+}
+

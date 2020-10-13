@@ -97,6 +97,31 @@ ReadRequesterPublicCertificateChain (
   );
 
 BOOLEAN
+TestSpdmAsymGetPrivateKeyFromPem (
+  IN      UINT32       AsymAlgo,
+  IN      CONST UINT8  *PemData,
+  IN      UINTN        PemSize,
+  IN      CONST CHAR8  *Password,
+  OUT     VOID         **Context
+  );
+
+BOOLEAN
+TestSpdmAsymSign (
+  IN      UINT32       AsymAlgo,
+  IN      VOID         *Context,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  );
+
+VOID
+TestSpdmAsymFree (
+  IN      UINT32       AsymAlgo,
+  IN      VOID         *Context
+  );
+
+BOOLEAN
 EFIAPI
 SpdmDataSignFunc (
   IN      VOID         *SpdmContext,
