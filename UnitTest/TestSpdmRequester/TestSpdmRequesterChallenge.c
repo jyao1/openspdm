@@ -67,6 +67,7 @@ SpdmRequesterChallengeTestSendMessage (
     LocalBufferSize += (RequestSize - 1);
     return RETURN_SUCCESS;
   case 0x9:
+  {
     STATIC UINTN SubIndex = 0;
     if (SubIndex == 0) {
       LocalBufferSize = 0;
@@ -74,6 +75,7 @@ SpdmRequesterChallengeTestSendMessage (
       LocalBufferSize += (RequestSize - 1);
 	  SubIndex ++;
     }
+  }
     return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
