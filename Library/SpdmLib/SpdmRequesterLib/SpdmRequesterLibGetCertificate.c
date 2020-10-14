@@ -71,7 +71,7 @@ SpdmRequesterVerifyCertificateChainData (
     return FALSE;
   }
 
-  if(!X509SPDMCertificateCheck (LeafCertBuffer, LeafCertBufferSize)) {
+  if(!SpdmX509CertificateCheck (LeafCertBuffer, LeafCertBufferSize)) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (leaf certificate check failed)!!!\n"));
     return FALSE;
   }
