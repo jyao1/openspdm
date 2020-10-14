@@ -54,4 +54,11 @@ GetSpdmTestContext (
   VOID
   );
 
+BOOLEAN
+ReadInputFile (
+  IN CHAR8    *FileName,
+  OUT VOID    **FileData,
+  OUT UINTN   *FileSize
+  );
+
 #endif
