@@ -773,4 +773,92 @@ SpdmIsVersionSupported (
   IN     UINT8                     Version
   );
 
+/**
+  Retrieve the SubjectAltName from SubjectAltName Bytes
+  @param[in]      Buffer           Pointer to subjectAltName oct bytes.
+  @param[in]      Len              Size of Buffer in bytes.
+  @param[out]     NameBuffer       Buffer to contain the retrieved certificate
+                                   SubjectAltName. At most NameBufferSize bytes will be
+                                   written. Maybe NULL in order to determine the size
+                                   buffer needed.
+  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
+                                   and the size of buffer returned Name on output.
+                                   If NameBuffer is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+  @param[out]     Oid              OID of otherName
+  @param[in,out]  OidSize          the buffersize for required OID
+
+  @retval RETURN_SUCCESS           The certificate Organization Name retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If NameBufferSize is NULL.
+                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no SubjectAltName exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   NameBufferSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmGetDMTFSubjectAltNameFromBytes (
+  IN      CONST UINT8   *Buffer,
+  IN      INTN          Len,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize,
+  OUT     UINT8         *Oid,         OPTIONAL
+  IN OUT  UINTN         *OidSize
+  );
+
+/**
+  Retrieve the SubjectAltName from one X.509 certificate.
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     NameBuffer       Buffer to contain the retrieved certificate
+                                   SubjectAltName. At most NameBufferSize bytes will be
+                                   written. Maybe NULL in order to determine the size
+                                   buffer needed.
+  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
+                                   and the size of buffer returned Name on output.
+                                   If NameBuffer is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+  @param[out]     Oid              OID of otherName
+  @param[in,out]  OidSize          the buffersize for required OID
+
+  @retval RETURN_SUCCESS           The certificate Organization Name retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If NameBufferSize is NULL.
+                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no SubjectAltName exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   NameBufferSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+SpdmGetDMTFSubjectAltName (
+  IN      CONST UINT8   *Cert,
+  IN      INTN          CertSize,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize,
+  OUT     UINT8         *Oid,         OPTIONAL
+  IN OUT  UINTN         *OidSize
+  );
+
+/**
+  Certificate Check for SPDM leaf cert.
+
+  @param[in]  Cert            Pointer to the DER-encoded certificate data.
+  @param[in]  CertSize        The size of certificate data in bytes.
+
+  @retval  TRUE   Success.
+  @retval  FALSE  Certificate is not valid
+**/
+BOOLEAN
+SpdmX509CertificateCheck(
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize
+  );
+
 #endif
