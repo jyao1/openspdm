@@ -24,6 +24,46 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CRYPTO_NID_SECP521R1 0x0019  // NID_secp521r1 (NIST P-521)
 
 ///
+/// X.509 v3 Key Usage Extension flags
+///
+#define CRYPTO_X509_KU_DIGITAL_SIGNATURE            (0x80)  // bit 0
+#define CRYPTO_X509_KU_NON_REPUDIATION              (0x40)  // bit 1
+#define CRYPTO_X509_KU_KEY_ENCIPHERMENT             (0x20)  // bit 2
+#define CRYPTO_X509_KU_DATA_ENCIPHERMENT            (0x10)  // bit 3
+#define CRYPTO_X509_KU_KEY_AGREEMENT                (0x08)  // bit 4
+#define CRYPTO_X509_KU_KEY_CERT_SIGN                (0x04)  // bit 5
+#define CRYPTO_X509_KU_CRL_SIGN                     (0x02)  // bit 6
+#define CRYPTO_X509_KU_ENCIPHER_ONLY                (0x01)  // bit 7
+#define CRYPTO_X509_KU_DECIPHER_ONLY              (0x8000)  // bit 8
+
+///
+/// These constants comply with the DER encoded ASN.1 type tags.
+///
+#define CRYPTO_ASN1_BOOLEAN                 0x01
+#define CRYPTO_ASN1_INTEGER                 0x02
+#define CRYPTO_ASN1_BIT_STRING              0x03
+#define CRYPTO_ASN1_OCTET_STRING            0x04
+#define CRYPTO_ASN1_NULL                    0x05
+#define CRYPTO_ASN1_OID                     0x06
+#define CRYPTO_ASN1_UTF8_STRING             0x0C
+#define CRYPTO_ASN1_SEQUENCE                0x10
+#define CRYPTO_ASN1_SET                     0x11
+#define CRYPTO_ASN1_PRINTABLE_STRING        0x13
+#define CRYPTO_ASN1_T61_STRING              0x14
+#define CRYPTO_ASN1_IA5_STRING              0x16
+#define CRYPTO_ASN1_UTC_TIME                0x17
+#define CRYPTO_ASN1_GENERALIZED_TIME        0x18
+#define CRYPTO_ASN1_UNIVERSAL_STRING        0x1C
+#define CRYPTO_ASN1_BMP_STRING              0x1E
+#define CRYPTO_ASN1_PRIMITIVE               0x00
+#define CRYPTO_ASN1_CONSTRUCTED             0x20
+#define CRYPTO_ASN1_CONTEXT_SPECIFIC        0x80
+
+#define CRYPTO_ASN1_TAG_CLASS_MASK          0xC0
+#define CRYPTO_ASN1_TAG_PC_MASK             0x20
+#define CRYPTO_ASN1_TAG_VALUE_MASK          0x1F
+
+///
 /// SHA-256 digest size in bytes
 ///
 #define SHA256_DIGEST_SIZE  32
@@ -1724,6 +1764,26 @@ EcGetPublicKeyFromX509 (
   );
 
 /**
+  Retrieve the tag and length of the tag.
+
+  @param p     The position in the ASN.1 data
+  @param end   End of data
+  @param len   The variable that will receive the length
+  @param tag   The expected tag
+
+  @retval      TRUE   Get tag successful
+  @retval      FALSe  Failed to get tag or tag not match
+**/
+BOOLEAN
+EFIAPI
+Asn1GetTag (
+  UINT8 **Ptr,
+  UINT8 *End,
+  UINTN *Length,
+  int   Tag
+  );
+
+/**
   Retrieve the subject bytes from one X.509 certificate.
 
   If Cert is NULL, then return FALSE.
@@ -1976,61 +2036,61 @@ X509GetIssuerOrganizationName (
   );
 
 /**
-  Retrieve the Signature Algorithm (NID) from one X.509 certificate.
+  Retrieve the Signature Algorithm from one X.509 certificate.
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[out]     Nid              signature algorithm
+  @param[in,out]  Oid              Signature Algorithm Object identifier buffer
+  @param[in,out]  OidSize          Signature Algorithm Object identifier buffer size
 
-  @retval  TRUE   The certificate Nid retrieved successfully.
-  @retval  FALSE  Invalid certificate, or Nid is NULL
-  @retval  FALSE  This interface is not supported.
-**/
-BOOLEAN
-EFIAPI
-X509GetSignatureType (
-  IN    CONST UINT8 *Cert,
-  IN    UINTN        CertSize,
-  OUT   INTN         *Nid
-);
-
-/**
-  Retrieve the SubjectAltName from one X.509 certificate.
-
-  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
-  @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[out]     NameBuffer       Buffer to contain the retrieved certificate
-                                   SubjectAltName. At most NameBufferSize bytes will be
-                                   written. Maybe NULL in order to determine the size
-                                   buffer needed.
-  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
-                                   and the size of buffer returned Name on output.
-                                   If NameBuffer is NULL then the amount of space needed
-                                   in buffer (including the final null) is returned.
-  @param[out]     Oid              OID of otherName
-  @param[in,out]  OidSize          the buffersize for required OID
-
-  @retval RETURN_SUCCESS           The certificate Organization Name retrieved successfully.
+  @retval RETURN_SUCCESS           The certificate Extension data retrieved successfully.
   @retval RETURN_INVALID_PARAMETER If Cert is NULL.
-                                   If NameBufferSize is NULL.
-                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If OidSize is NULL.
+                                   If Oid is not NULL and *OidSize is 0.
                                    If Certificate is invalid.
-  @retval RETURN_NOT_FOUND         If no SubjectAltName exists.
-  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
-                                   (including the final null) is returned in the
-                                   NameBufferSize parameter.
+  @retval RETURN_NOT_FOUND         If no SignatureType.
+  @retval RETURN_BUFFER_TOO_SMALL  If the Oid is NULL. The required buffer size
+                                   is returned in the OidSize.
   @retval RETURN_UNSUPPORTED       The operation is not supported.
-
 **/
 RETURN_STATUS
 EFIAPI
-X509GetDMTFSubjectAltName (
-  IN      CONST UINT8   *Cert,
-  IN      UINTN         CertSize,
-  OUT     CHAR8         *NameBuffer,  OPTIONAL
-  IN OUT  UINTN         *NameBufferSize,
-  OUT     UINT8         *Oid,         OPTIONAL
-  IN OUT  UINTN         *OidSize
+X509GetSignatureAlgorithm (
+  IN CONST UINT8      *Cert,
+  IN      UINTN       CertSize,
+  IN OUT  UINT8       *Oid,  OPTIONAL
+  IN OUT  UINTN       *OidSize
+  );
+
+/**
+  Retrieve Extension data from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[in]      Oid              Object identifier buffer
+  @param[in]      OidSize          Object identifier buffer size
+  @param[out]     ExtensionData    Extension bytes.
+  @param[out]     ExtensionDataSize Extension bytes size.
+
+  @retval RETURN_SUCCESS           The certificate Extension data retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If ExtensionDataSize is NULL.
+                                   If ExtensionData is not NULL and *ExtensionDataSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no Extension entry match Oid.
+  @retval RETURN_BUFFER_TOO_SMALL  If the ExtensionData is NULL. The required buffer size
+                                   is returned in the ExtensionDataSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+EFIAPI
+X509GetExtensionData (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN       CertSize,
+  IN    UINT8       *Oid,
+  IN    UINTN       OidSize,
+  OUT   UINT8       *ExtensionData,
+  OUT   UINTN       *ExtensionDataSize
   );
 
 /**
@@ -2063,11 +2123,65 @@ X509GetValidity  (
   );
 
 /**
+  Format a DateTime object into DataTime Buffer
+
+  If DateTimeStr is NULL, then return FALSE.
+  If DateTimeSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      DateTimeStr      DateTime string like yyyymmddhhmmssZ
+  @param[in,out]  DateTime         Pointer to a DateTime object.
+  @param[in,out]  DateTimeSize     DateTime object buffer size.
+
+  @retval RETURN_SUCCESS           The DateTime object create successfully.
+  @retval RETURN_INVALID_PARAMETER If DateTimeStr is NULL.
+                                   If DateTimeSize is NULL.
+                                   If DateTime is not NULL and *DateTimeSize is 0.
+                                   If Year Month Day Hour Minute Second combination is invalid datetime.
+  @retval RETURN_BUFFER_TOO_SMALL  If the DateTime is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   DateTimeSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+EFIAPI
+X509DateTimeSet (
+  CHAR8         *DateTimeStr,
+  IN OUT VOID   *DateTime,
+  IN OUT UINTN  *DateTimeSize
+  );
+
+/**
+  Compare DateTime1 and DateTime2.
+
+  If DateTime1 is NULL, then return -2.
+  If DateTime2 is NULL, then return -2.
+  If DateTime1 == DateTime2, then return 0
+  If DateTime1 > DateTime2, then return 1
+  If DateTime1 < DateTime2, then return -1
+
+  @param[in]      DateTime1         Pointer to a DateTime Ojbect
+  @param[in]      DateTime2         Pointer to a DateTime Object
+
+  @retval  0      If DateTime1 == DateTime2
+  @retval  1      If DateTime1 > DateTime2
+  @retval  -1     If DateTime1 < DateTime2
+**/
+INTN
+EFIAPI
+X509DateTimeCompare (
+  IN    VOID   *DateTime1,
+  IN    VOID   *DateTime2
+  );
+
+/**
   Retrieve the Key Usage from one X.509 certificate.
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
   @param[out]     Usage            Key Usage
+
+  @note:   See:   CRYPTO_X509_KU_*
 
   @retval  TRUE   The certificate Key Usage retrieved successfully.
   @retval  FALSE  Invalid certificate, or Usage is NULL
@@ -2086,35 +2200,26 @@ X509GetKeyUsage (
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[out]     Usage            Key Usage
+  @param[out]     Usage            Key Usage bytes.
+  @param[in, out] UsageSize        Key Usage buffer sizs in bytes.
 
-  @retval  TRUE   The certificate Extended Key Usage retrieved successfully.
-  @retval  FALSE  Invalid certificate, or Usage is NULL
-  @retval  FALSE  This interface is not supported.
+  @retval RETURN_SUCCESS           The Usage bytes retrieve successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If CertSize is NULL.
+                                   If Usage is not NULL and *UsageSize is 0.
+                                   If Cert is invalid.
+  @retval RETURN_BUFFER_TOO_SMALL  If the Usage is NULL. The required buffer size
+                                   is returned in the UsageSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
 **/
-BOOLEAN
+RETURN_STATUS
 EFIAPI
 X509GetExtendedKeyUsage (
-  IN    CONST UINT8 *Cert,
-  IN    UINTN        CertSize,
-  OUT   UINTN         *Usage
+  IN    CONST UINT8   *Cert,
+  IN    UINTN         CertSize,
+  OUT   UINT8         *Usage,
+  OUT   UINTN         *UsageSize
   );
-
-/**
-  Certificate Check for SPDM leaf cert.
-
-  @param[in]  Cert            Pointer to the DER-encoded certificate data.
-  @param[in]  CertSize        The size of certificate data in bytes.
-
-  @retval  TRUE   Success.
-  @retval  FALSE  Certificate is not valid
-**/
-BOOLEAN
-EFIAPI
-X509SPDMCertificateCheck(
-  IN   CONST UINT8  *Cert,
-  IN   UINTN        CertSize
-);
 
 /**
   Verify one X509 certificate was issued by the trusted CA.
