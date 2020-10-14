@@ -7,40 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Cryptest.h"
 
-RETURN_STATUS
-EFIAPI
-GetDMTFSubjectAltNameFromBytes (
-  IN      CONST UINT8   *Buffer,
-  IN      INTN          Len,
-  OUT     CHAR8         *NameBuffer,  OPTIONAL
-  IN OUT  UINTN         *NameBufferSize,
-  OUT     UINT8         *Oid,         OPTIONAL
-  IN OUT  UINTN         *OidSize
-);
-
-// https://lapo.it/asn1js/#MCQGCisGAQQBgxyCEgEMFkFDTUU6V0lER0VUOjEyMzQ1Njc4OTA
-CONST UINT8 SubjectAltNameBuffer1[] = {
-0x30, 0x24, 0x06, 0x0A, 0x2B, 0x06, 0x01, 0x04, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01, 0x0C, 0x16,
-0x41, 0x43, 0x4D, 0x45, 0x3A, 0x57, 0x49, 0x44, 0x47, 0x45, 0x54, 0x3A, 0x31, 0x32, 0x33, 0x34,
-0x35, 0x36, 0x37, 0x38, 0x39, 0x30
-};
-
-// https://lapo.it/asn1js/#MCYGCisGAQQBgxyCEgGgGAwWQUNNRTpXSURHRVQ6MTIzNDU2Nzg5MA
-CONST UINT8 SubjectAltNameBuffer2[] = {
-0x30, 0x26, 0x06, 0x0A, 0x2B, 0x06, 0x01, 0x04, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01, 0xA0, 0x18,
-0x0C, 0x16, 0x41, 0x43, 0x4D, 0x45, 0x3A, 0x57, 0x49, 0x44, 0x47, 0x45, 0x54, 0x3A, 0x31, 0x32,
-0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30
-};
-
-// https://lapo.it/asn1js/#MCigJgYKKwYBBAGDHIISAaAYDBZBQ01FOldJREdFVDoxMjM0NTY3ODkw
-CONST UINT8 SubjectAltNameBuffer3[] = {
-0x30, 0x28, 0xA0, 0x26, 0x06, 0x0A, 0x2B, 0x06, 0x01, 0x04, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01,
-0xA0, 0x18, 0x0C, 0x16, 0x41, 0x43, 0x4D, 0x45, 0x3A, 0x57, 0x49, 0x44, 0x47, 0x45, 0x54, 0x3A,
-0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30
-};
-
-CONST UINT8 DMTF_OID[] = {
-  0x2B, 0x06, 0x01, 0x4, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x01
+STATIC CONST UINT8 OID_subjectAltName[] = {
+  0x55, 0x1D, 0x11
 };
 
 /**
@@ -75,12 +43,12 @@ ValidateCryptX509 (
   UINTN         CertVersion;
   UINT8         Asn1Buffer[1024];
   UINTN         Asn1BufferLen;
-  UINTN         DMTFOidSize;
-  UINT8         DMTFOid[64];
   UINT8         EndCertFrom[64];
   UINTN         EndCertFromLen;
   UINT8         EndCertTo[64];
   UINTN         EndCertToLen;
+  UINT8         DateTime1[64];
+  UINT8         DateTime2[64];
 
   TestCert = NULL;
   TestCACert = NULL;
@@ -320,60 +288,19 @@ ValidateCryptX509 (
   }
 
   //
-  // Test Three SubjectAltName format
-  //
-  CommonNameSize = 64;
-  DMTFOidSize = 64;
-  ZeroMem (CommonName, CommonNameSize);
-  ZeroMem (DMTFOid, DMTFOidSize);
-  Ret = GetDMTFSubjectAltNameFromBytes(SubjectAltNameBuffer1, sizeof (SubjectAltNameBuffer1), CommonName, &CommonNameSize, DMTFOid, &DMTFOidSize);
-  if (RETURN_ERROR(Ret) || CompareMem(DMTFOid, DMTF_OID, sizeof (DMTF_OID)) != 0) {
-    Print ("\n  - Retrieving  SubjectAltName1 otherName - [Fail]");
-    goto Cleanup;
-  } else {
-    DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName1 otherName = \"%s\" (Size = %d) ", CommonName, CommonNameSize));
-    Print ("- [Pass]");
-  }
-
-  CommonNameSize = 64;
-  DMTFOidSize = 64;
-  ZeroMem (CommonName, CommonNameSize);
-  ZeroMem (DMTFOid, DMTFOidSize);
-  Ret = GetDMTFSubjectAltNameFromBytes(SubjectAltNameBuffer2, sizeof (SubjectAltNameBuffer2), CommonName, &CommonNameSize, DMTFOid, &DMTFOidSize);
-  if (RETURN_ERROR(Ret) || CompareMem(DMTFOid, DMTF_OID, sizeof (DMTF_OID)) != 0) {
-    Print ("\n  - Retrieving  SubjectAltName2 otherName - [Fail]");
-    goto Cleanup;
-  } else {
-    DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName2 otherName = \"%s\" (Size = %d) ", CommonName, CommonNameSize));
-    Print ("- [Pass]");
-  }
-
-  CommonNameSize = 64;
-  DMTFOidSize = 64;
-  ZeroMem (CommonName, CommonNameSize);
-  ZeroMem (DMTFOid, DMTFOidSize);
-  Ret = GetDMTFSubjectAltNameFromBytes(SubjectAltNameBuffer3, sizeof (SubjectAltNameBuffer3), CommonName, &CommonNameSize, DMTFOid, &DMTFOidSize);
-  if (RETURN_ERROR(Ret) || CompareMem(DMTFOid, DMTF_OID, sizeof (DMTF_OID)) != 0) {
-    Print ("\n  - Retrieving  SubjectAltName3 otherName - [Fail]");
-    goto Cleanup;
-  } else {
-    DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName3 otherName = \"%s\" (Size = %d) ", CommonName, CommonNameSize));
-    Print ("- [Pass]");
-  }
-
-  //
   // Get X509GetSubjectAltName
   //
-  CommonNameSize = 64;
-  DMTFOidSize = 64;
-  ZeroMem (CommonName, CommonNameSize);
-  ZeroMem (DMTFOid, DMTFOidSize);
-  Ret = X509GetDMTFSubjectAltName(TestEndCert, TestEndCertLen, CommonName, &CommonNameSize, DMTFOid, &DMTFOidSize);
-  if (RETURN_ERROR(Ret) || CompareMem(DMTFOid, DMTF_OID, sizeof (DMTF_OID)) != 0) {
+  Asn1BufferLen = 1024;
+  ZeroMem (Asn1Buffer, Asn1BufferLen);
+  Ret = X509GetExtensionData (
+    TestEndCert, TestEndCertLen,
+    (UINT8 *)OID_subjectAltName, sizeof (OID_subjectAltName),
+    Asn1Buffer, &Asn1BufferLen);
+  if (RETURN_ERROR(Ret)) {
     Print ("\n  - Retrieving  SubjectAltName otherName - [Fail]");
     goto Cleanup;
   } else {
-    DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName otherName = \"%s\" (Size = %d) ", CommonName, CommonNameSize));
+    DEBUG((DEBUG_INFO, "\n  - Retrieving  SubjectAltName (Size = %d) ", Asn1BufferLen));
     Print ("- [Pass]");
   }
 
@@ -390,15 +317,29 @@ ValidateCryptX509 (
     Print ("\n  - Retrieving Validity - [Pass]");
   }
 
-  //
-  // Check X509 Validity
-  //
-  Status = X509SPDMCertificateCheck(TestEndCert, TestEndCertLen);
-  if (!Status) {
-    Print ("\n- X509 Check SPDM Certificate - [Fail]");
-    goto Cleanup;
+  Asn1BufferLen = 64;
+  Ret = X509DateTimeSet("19700101000000Z", DateTime1, &Asn1BufferLen);
+  if ((Ret == RETURN_SUCCESS) && (Asn1BufferLen != 0)) {
+    Print ("\n  - Set DateTime - [Pass]");
   } else {
-    Print ("\n- X509 Check SPDM Certificate - [Pass]");
+    Print ("\n  - Set DateTime - [Fail]");
+    goto Cleanup;
+  }
+
+  Asn1BufferLen = 64;
+  Ret = X509DateTimeSet("19700201000000Z", DateTime2, &Asn1BufferLen);
+  if ((Ret == RETURN_SUCCESS) && (Asn1BufferLen != 0)) {
+    Print ("\n  - Set DateTime - [Pass]");
+  } else {
+    Print ("\n  - Set DateTime - [Fail]");
+    goto Cleanup;
+  }
+
+  if (X509DateTimeCompare(DateTime1, DateTime2) < 0) {
+    Print ("\n  - Compare DateTime - [Pass]");
+  } else {
+    Print ("\n  - Compare DateTime- [Fail]");
+    goto Cleanup;
   }
 
   Print ("\n");
