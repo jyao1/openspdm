@@ -14,37 +14,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
 
-CONST UINT8 OID_commonName[] = {
+///
+/// OID
+///
+STATIC CONST UINT8 OID_commonName[] = {
   0x55, 0x04, 0x03
 };
-
-CONST UINT8 OID_organizationName[] = {
+STATIC CONST UINT8 OID_organizationName[] = {
   0x55, 0x04, 0x0A
 };
-
-CONST UINT8 OID_subjectAltName[] = {
-  0x55, 0x1D, 0x11
-};
-
-CONST UINT8 OID_keyUsage[] = {
-  0x55, 0x1D, 0x0F
-};
-
-CONST UINT8 OID_extKeyUsage[] = {
+STATIC CONST UINT8 OID_extKeyUsage[] = {
   0x55, 0x1D, 0x25
-};
-
-CONST UINT8 OID_serverAuth[] = {
-  0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x01
-};
-CONST UINT8 OID_clientAuth[] = {
-  0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x02
-};
-CONST UINT8 OID_codeSigning[] = {
-  0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x03
-};
-CONST UINT8 OID_OCSPSigning[] = {
-  0x2B, 0x06, 0x01, 0x05, 0x05, 0x07, 0x03, 0x09
 };
 
 /**
@@ -211,6 +191,33 @@ X509StackFree (
   }
 
   mbedtls_x509_crt_free(X509Stack);
+}
+
+/**
+  Retrieve the tag and length of the tag.
+
+  @param p     The position in the ASN.1 data
+  @param end   End of data
+  @param len   The variable that will receive the length
+  @param tag   The expected tag
+
+  @retval      TRUE   Get tag successful
+  @retval      FALSe  Failed to get tag or tag not match
+**/
+BOOLEAN
+EFIAPI
+Asn1GetTag (
+  UINT8 **Ptr,
+  UINT8 *End,
+  UINTN *Length,
+  int   Tag
+  )
+{
+  if (mbedtls_asn1_get_tag (Ptr, End, Length, Tag) == 0) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
 }
 
 /**
@@ -771,80 +778,6 @@ X509GetCertFromCertChain (
   return FALSE;
 }
 
-RETURN_STATUS
-EFIAPI
-GetDMTFSubjectAltNameFromBytes (
-  IN      CONST UINT8   *Buffer,
-  IN      INTN          Len,
-  OUT     CHAR8         *NameBuffer,  OPTIONAL
-  IN OUT  UINTN         *NameBufferSize,
-  OUT     UINT8         *Oid,         OPTIONAL
-  IN OUT  UINTN         *OidSize
-)
-{
-  UINT8       *Ptr;
-  int         Length;
-  size_t      ObjLen;
-  int         Ret;
-
-  Length = (int)Len;
-  Ptr = (UINT8 *)Buffer;
-
-  // Sequence
-  Ret = mbedtls_asn1_get_tag (
-    &Ptr, Ptr + Length, &ObjLen,
-    MBEDTLS_ASN1_SEQUENCE | MBEDTLS_ASN1_CONSTRUCTED);
-  if (Ret != 0) {
-    return RETURN_NOT_FOUND;
-  }
-
-  Ret = mbedtls_asn1_get_tag (
-    &Ptr, Ptr + ObjLen, &ObjLen,
-    MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED);
-
-  Ret = mbedtls_asn1_get_tag (&Ptr, Ptr + ObjLen, &ObjLen, MBEDTLS_ASN1_OID);
-  if (Ret != 0) {
-    return RETURN_NOT_FOUND;
-  }
-  // CopyData to OID
-  if (*OidSize < (UINTN)ObjLen) {
-    *OidSize = (UINTN)ObjLen;
-    return RETURN_BUFFER_TOO_SMALL;
-
-  }
-  if (Oid != NULL) {
-    CopyMem (Oid, Ptr, ObjLen);
-    *OidSize = ObjLen;
-  }
-
-  // Move to next element
-  Ptr += ObjLen;
-
-  Ret = mbedtls_asn1_get_tag (
-    &Ptr, (CONST UINT8 *)(Buffer + Length),
-    &ObjLen,
-    MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED
-    );
-  Ret = mbedtls_asn1_get_tag (
-    &Ptr, (CONST UINT8 *)(Buffer + Length),
-    &ObjLen,
-    MBEDTLS_ASN1_UTF8_STRING);
-  if (Ret != 0) {
-    return RETURN_NOT_FOUND;
-  }
-
-  if (*NameBufferSize < (UINTN)ObjLen) {
-    *NameBufferSize = (UINTN)ObjLen;
-    return RETURN_BUFFER_TOO_SMALL;
-  }
-
-  if (NameBuffer != NULL) {
-    CopyMem (NameBuffer, Ptr, ObjLen);
-    *NameBufferSize = ObjLen;
-  }
-  return RETURN_SUCCESS;
-}
-
 /**
   Retrieve the TBSCertificate from one given X.509 certificate.
 
@@ -1123,51 +1056,65 @@ X509GetIssuerOrganizationName (
 {
 return InternalX509GetIssuerNIDName (Cert, CertSize, (UINT8 *)OID_organizationName, sizeof (OID_organizationName), NameBuffer, NameBufferSize);
 }
+
 /**
-  Retrieve the Signature Algorithm (NID) from one X.509 certificate.
+  Retrieve the Signature Algorithm from one X.509 certificate.
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[out]     Nid              signature algorithm
+  @param[in,out]  Oid              Signature Algorithm Object identifier buffer
+  @param[in,out]  OidSize          Signature Algorithm Object identifier buffer size
 
-  @retval  TRUE   The certificate Nid retrieved successfully.
-  @retval  FALSE  Invalid certificate, or Nid is NULL
-  @retval  FALSE  This interface is not supported.
+  @retval RETURN_SUCCESS           The certificate Extension data retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If OidSize is NULL.
+                                   If Oid is not NULL and *OidSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no SignatureType.
+  @retval RETURN_BUFFER_TOO_SMALL  If the Oid is NULL. The required buffer size
+                                   is returned in the OidSize.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
 **/
-BOOLEAN
+RETURN_STATUS
 EFIAPI
-X509GetSignatureType (
-  IN    CONST UINT8 *Cert,
-  IN    UINTN        CertSize,
-  OUT   INTN         *Nid
-)
+X509GetSignatureAlgorithm (
+  IN CONST UINT8      *Cert,
+  IN      UINTN       CertSize,
+  IN OUT  UINT8       *Oid,  OPTIONAL
+  IN OUT  UINTN       *OidSize
+  )
 {
-  mbedtls_x509_crt Crt;
-  INT32 Ret;
-  BOOLEAN Status;
+  mbedtls_x509_crt    Crt;
+  INT32               Ret;
+  RETURN_STATUS       ReturnStatus;
 
-  if (Cert == NULL) {
-    return FALSE;
+  if (Cert == NULL || CertSize == 0 || OidSize == NULL) {
+    return RETURN_INVALID_PARAMETER;
   }
 
-  Status = FALSE;
+  ReturnStatus = RETURN_INVALID_PARAMETER;
 
   mbedtls_x509_crt_init(&Crt);
 
   Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
 
   if (Ret == 0) {
-    //
-    // MbedTls doesn't contains convert OID to NID
-    //
-    if(Crt.sig_oid.len > 0) {
-      Status = TRUE;
+    if (*OidSize < Crt.sig_oid.len) {
+      *OidSize = Crt.serial.len;
+      ReturnStatus = RETURN_BUFFER_TOO_SMALL;
+      goto Cleanup;
     }
+    if (Oid != NULL) {
+      CopyMem(Oid, Crt.sig_oid.p, Crt.sig_oid.len);
+    }
+    *OidSize = Crt.sig_oid.len;
+    ReturnStatus = RETURN_SUCCESS;
   }
 
+Cleanup:
   mbedtls_x509_crt_free(&Crt);
 
-  return Status;
+  return ReturnStatus;
 }
 
 
@@ -1184,7 +1131,7 @@ X509GetSignatureType (
  **/
 STATIC
 RETURN_STATUS
-X509FindExtensionData (
+InternalX509FindExtensionData (
   UINT8 *Start,
   UINT8 *End,
   UINT8 *Oid,
@@ -1253,42 +1200,34 @@ X509FindExtensionData (
 }
 
 /**
-  Retrieve the SubjectAltName from one X.509 certificate.
+  Retrieve Extension data from one X.509 certificate.
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[out]     NameBuffer       Buffer to contain the retrieved certificate
-                                   SubjectAltName. At most NameBufferSize bytes will be
-                                   written. Maybe NULL in order to determine the size
-                                   buffer needed.
-  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
-                                   and the size of buffer returned Name on output.
-                                   If NameBuffer is NULL then the amount of space needed
-                                   in buffer (including the final null) is returned.
-  @param[out]     Oid              OID of otherName
-  @param[in,out]  OidSize          the buffersize for required OID
+  @param[in]      Oid              Object identifier buffer
+  @param[in]      OidSize          Object identifier buffer size
+  @param[out]     ExtensionData    Extension bytes.
+  @param[out]     ExtensionDataSize Extension bytes size.
 
-  @retval RETURN_SUCCESS           The certificate Organization Name retrieved successfully.
+  @retval RETURN_SUCCESS           The certificate Extension data retrieved successfully.
   @retval RETURN_INVALID_PARAMETER If Cert is NULL.
-                                   If NameBufferSize is NULL.
-                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If ExtensionDataSize is NULL.
+                                   If ExtensionData is not NULL and *ExtensionDataSize is 0.
                                    If Certificate is invalid.
-  @retval RETURN_NOT_FOUND         If no SubjectAltName exists.
-  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
-                                   (including the final null) is returned in the
-                                   NameBufferSize parameter.
+  @retval RETURN_NOT_FOUND         If no Extension entry match Oid.
+  @retval RETURN_BUFFER_TOO_SMALL  If the ExtensionData is NULL. The required buffer size
+                                   is returned in the ExtensionDataSize parameter.
   @retval RETURN_UNSUPPORTED       The operation is not supported.
-
 **/
 RETURN_STATUS
 EFIAPI
-X509GetDMTFSubjectAltName (
-  IN      CONST UINT8   *Cert,
-  IN      UINTN         CertSize,
-  OUT     CHAR8         *NameBuffer,  OPTIONAL
-  IN OUT  UINTN         *NameBufferSize,
-  OUT     UINT8         *Oid,         OPTIONAL
-  IN OUT  UINTN         *OidSize
+X509GetExtensionData (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN       CertSize,
+  IN    UINT8       *Oid,
+  IN    UINTN       OidSize,
+  OUT   UINT8       *ExtensionData,
+  OUT   UINTN       *ExtensionDataSize
   )
 {
   mbedtls_x509_crt Crt;
@@ -1298,11 +1237,15 @@ X509GetDMTFSubjectAltName (
   UINT8         *End;
   size_t        ObjLen;
 
-  if (Cert == NULL) {
+  if (Cert == NULL ||
+    CertSize == 0 ||
+    Oid == NULL ||
+    OidSize == 0 ||
+    ExtensionDataSize == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
 
-  ReturnStatus = RETURN_NOT_FOUND;
+  ReturnStatus = RETURN_INVALID_PARAMETER;
 
   mbedtls_x509_crt_init(&Crt);
 
@@ -1312,13 +1255,26 @@ X509GetDMTFSubjectAltName (
     Ptr = Crt.v3_ext.p;
     End = Crt.v3_ext.p + Crt.v3_ext.len;
     Ret = mbedtls_asn1_get_tag(&Ptr, End, &ObjLen, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
-    if (Ret == 0) {
-      ReturnStatus = X509FindExtensionData(Ptr, End, (UINT8*)OID_subjectAltName, sizeof (OID_subjectAltName), &Ptr, &ObjLen);
-      if (ReturnStatus == RETURN_SUCCESS) {
-        ReturnStatus = GetDMTFSubjectAltNameFromBytes(Ptr, ObjLen, NameBuffer, NameBufferSize, Oid, OidSize);
-      }
-    }
   }
+
+  if (Ret == 0) {
+      ReturnStatus = InternalX509FindExtensionData(Ptr, End, Oid, OidSize, &Ptr, &ObjLen);
+  }
+
+  if (ReturnStatus == RETURN_SUCCESS) {
+    if (*ExtensionDataSize < ObjLen) {
+      *ExtensionDataSize = ObjLen;
+      ReturnStatus = RETURN_BUFFER_TOO_SMALL;
+      goto Cleanup;
+    }
+    if (Oid != NULL) {
+      CopyMem(ExtensionData, Ptr, ObjLen);
+    }
+    *ExtensionDataSize = ObjLen;
+    ReturnStatus = RETURN_SUCCESS;
+  }
+
+Cleanup:
   mbedtls_x509_crt_free(&Crt);
 
   return ReturnStatus;
@@ -1442,116 +1398,40 @@ X509GetKeyUsage (
 }
 
 /**
-  Retrieve the Extended Key Usage from ExtendedKeyUsageSyntax
-
-  @param[in]      Buffer           Pointer to the DER-encoded extKeyUsage
-  @param[in]      Len              Size of the extKeyUsage
-  @param[out]     Usage            Key Usage
-**/
-STATIC
-RETURN_STATUS
-InternalGetExtendedKeyUsage (
-  IN    UINT8         *Buffer,
-  IN    UINTN         Len,
-  OUT   UINTN         *Usage
-  )
-{
-  //ExtKeyUsageSyntax ::= SEQUENCE SIZE (1..MAX) OF KeyPurposeId
-  UINT8       *Ptr;
-  size_t      ObjLen;
-  int         Ret;
-  RETURN_STATUS ReturnStatus;
-
-  Ptr = (UINT8 *)Buffer;
-  ReturnStatus = RETURN_NOT_FOUND;
-
-  // Sequence
-  Ret = mbedtls_asn1_get_tag (
-    &Ptr, Buffer + Len, &ObjLen,
-    MBEDTLS_ASN1_SEQUENCE | MBEDTLS_ASN1_CONSTRUCTED);
-  if (Ret != 0) {
-    return RETURN_NOT_FOUND;
-  }
-
-  Ret = mbedtls_asn1_get_tag (&Ptr, Buffer + Len, &ObjLen, MBEDTLS_ASN1_OID);
-  *Usage = 0;
-  while (Ret == 0) {
-    if (Ret == MBEDTLS_ERR_ASN1_OUT_OF_DATA) {
-      break;
-    }
-    //
-    // same value as openssl\include\openssl\x509v3.h:389
-    //
-    if (ObjLen == sizeof(OID_serverAuth) && CompareMem (Ptr, OID_serverAuth, ObjLen) == 0) {
-      *Usage |= 0x1;
-    }
-    if (ObjLen == sizeof(OID_clientAuth) && CompareMem (Ptr, OID_clientAuth, ObjLen) == 0) {
-      *Usage |= 0x2;
-    }
-    if (ObjLen == sizeof(OID_codeSigning) && CompareMem (Ptr, OID_codeSigning, ObjLen) == 0) {
-      *Usage |= 0x8;
-    }
-    if (ObjLen == sizeof(OID_OCSPSigning) && CompareMem (Ptr, OID_OCSPSigning, ObjLen) == 0) {
-      *Usage |= 0x20;
-    }
-    // Move to next element
-    Ptr += ObjLen;
-    Ret = mbedtls_asn1_get_tag (&Ptr, Buffer + Len, &ObjLen, MBEDTLS_ASN1_OID);
-  }
-  if (*Usage != 0) {
-    ReturnStatus = RETURN_SUCCESS;
-  }
-  return ReturnStatus;
-}
-
-/**
   Retrieve the Extended Key Usage from one X.509 certificate.
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[out]     Usage            Key Usage
+  @param[out]     Usage            Key Usage bytes.
+  @param[in, out] UsageSize        Key Usage buffer sizs in bytes.
 
-  @retval  TRUE   The certificate Extended Key Usage retrieved successfully.
-  @retval  FALSE  Invalid certificate, or Usage is NULL
-  @retval  FALSE  This interface is not supported.
+  @retval RETURN_SUCCESS           The Usage bytes retrieve successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If CertSize is NULL.
+                                   If Usage is not NULL and *UsageSize is 0.
+                                   If Cert is invalid.
+  @retval RETURN_BUFFER_TOO_SMALL  If the Usage is NULL. The required buffer size
+                                   is returned in the UsageSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
 **/
-BOOLEAN
+RETURN_STATUS
 EFIAPI
 X509GetExtendedKeyUsage (
-  IN    CONST UINT8 *Cert,
-  IN    UINTN        CertSize,
-  OUT   UINTN         *Usage
+  IN    CONST UINT8   *Cert,
+  IN    UINTN         CertSize,
+  OUT   UINT8         *Usage,
+  OUT   UINTN         *UsageSize
   )
 {
-  mbedtls_x509_crt Crt;
-  INT32         Ret;
-  UINT8         *Ptr;
-  UINT8         *End;
-  size_t        ObjLen;
   RETURN_STATUS ReturnStatus;
 
-  if (Cert == NULL) {
-    return FALSE;
+  if (Cert == NULL || CertSize == 0 || UsageSize == NULL) {
+    return RETURN_INVALID_PARAMETER;
   }
 
-  mbedtls_x509_crt_init(&Crt);
+  ReturnStatus = X509GetExtensionData((UINT8 *)Cert, CertSize, (UINT8*)OID_extKeyUsage, sizeof (OID_extKeyUsage), Usage, UsageSize);
 
-  Ret = mbedtls_x509_crt_parse_der(&Crt, Cert, CertSize);
-
-  if (Ret == 0) {
-    Ptr = Crt.v3_ext.p;
-    End = Crt.v3_ext.p + Crt.v3_ext.len;
-    Ret = mbedtls_asn1_get_tag(&Ptr, End, &ObjLen, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
-    if (Ret == 0) {
-      ReturnStatus = X509FindExtensionData(Ptr, End, (UINT8*)OID_extKeyUsage, sizeof (OID_extKeyUsage), &Ptr, &ObjLen);
-      if (ReturnStatus == RETURN_SUCCESS) {
-          ReturnStatus = InternalGetExtendedKeyUsage(Ptr, ObjLen, Usage);
-      }
-    }
-  }
-  mbedtls_x509_crt_free(&Crt);
-
-  return ReturnStatus == RETURN_SUCCESS;
+  return ReturnStatus;
 }
 
 /**
@@ -1601,178 +1481,127 @@ InternalX509CheckTime (
 }
 
 STATIC
-BOOLEAN X509DateTimeCheck(
-  IN UINT8 *From,
-  IN OUT UINTN FromSize,
-  IN OUT UINT8 *To,
-  IN OUT UINTN ToSize)
-{
-  INTN Ret;
-  mbedtls_x509_time F0;
-  mbedtls_x509_time T0;
-  mbedtls_x509_time *F1;
-  mbedtls_x509_time *T1;
-
-  F0.year = 1970;
-  F0.mon = 1;
-  F0.day = 1;
-  F0.hour = 0;
-  F0.min = 0;
-  F0.sec = 0;
-  T0.year = 9999;
-  T0.mon = 12;
-  T0.day = 31;
-  T0.hour = 23;
-  T0.min = 59;
-  T0.sec = 59;
-
-  F1 = (mbedtls_x509_time*)From;
-  T1 = (mbedtls_x509_time*)To;
-
-  // F0 <= F1
-  Ret = InternalX509CheckTime(&F0, F1);
-  if (Ret != 0) {
-    return FALSE;
+INT32
+InternalAtoI(CHAR8 *PStart, CHAR8 *PEnd) {
+  CHAR8 *P = PStart;
+  INT32 K = 0;
+  while (P < PEnd) {
+    ///
+    /// k = k * 2³ + k * 2¹ = k * 8 + k * 2 = k * 10
+    ///
+    K = (K << 3) + (K << 1) + (*P) - '0';
+    P++;
   }
-
-  // T1 <= T0
-  Ret = InternalX509CheckTime(T1, &T0);
-  if (Ret != 0) {
-    return FALSE;
-  }
-
-  return TRUE;
+  return K;
 }
 
 /**
-  Certificate Check for SPDM leaf cert.
+  Format a DateTime object into DataTime Buffer
 
-  @param[in]  Cert            Pointer to the DER-encoded certificate data.
-  @param[in]  CertSize        The size of certificate data in bytes.
+  If DateTimeStr is NULL, then return FALSE.
+  If DateTimeSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
 
-  @retval  TRUE   Success.
-  @retval  FALSE  Certificate is not valid
+  @param[in]      DateTimeStr      DateTime string like yyyymmddhhmmssZ
+  @param[in,out]  DateTime         Pointer to a DateTime object.
+  @param[in,out]  DateTimeSize     DateTime object buffer size.
+
+  @retval RETURN_SUCCESS           The DateTime object create successfully.
+  @retval RETURN_INVALID_PARAMETER If DateTimeStr is NULL.
+                                   If DateTimeSize is NULL.
+                                   If DateTime is not NULL and *DateTimeSize is 0.
+                                   If Year Month Day Hour Minute Second combination is invalid datetime.
+  @retval RETURN_BUFFER_TOO_SMALL  If the DateTime is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   DateTimeSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
 **/
-BOOLEAN
+RETURN_STATUS
 EFIAPI
-X509SPDMCertificateCheck(
-  IN   CONST UINT8  *Cert,
-  IN   UINTN        CertSize
-)
+X509DateTimeSet (
+  IN     CHAR8  *DateTimeStr,
+  IN OUT VOID   *DateTime,
+  IN OUT UINTN  *DateTimeSize
+  )
 {
-  UINT8         EndCertFrom[64];
-  UINTN         EndCertFromLen;
-  UINT8         EndCertTo[64];
-  UINTN         EndCertToLen;
-  UINTN         Asn1BufferLen;
-  BOOLEAN       Status;
-  UINTN         CertVersion;
-  RETURN_STATUS Ret;
-  UINTN         Value;
-  VOID          *RsaContext;
-  VOID          *EcContext;
+  mbedtls_x509_time Dt;
 
-  if (Cert == NULL || CertSize == 0) {
-    return FALSE;
-  }
+  INT32 Year;
+  INT32 Month;
+  INT32 Day;
+  INT32 Hour;
+  INT32 Minute;
+  INT32 Second;
+  RETURN_STATUS ReturnStatus;
+  CHAR8 *P;
 
-  Status = TRUE;
-  RsaContext = NULL;
-  EcContext = NULL;
-  EndCertFromLen = 64;
-  EndCertToLen = 64;
+  P = DateTimeStr;
 
-  // 1. Version
-  CertVersion = 0;
-  Ret = X509GetVersion (Cert, CertSize, &CertVersion);
-  if (RETURN_ERROR (Ret)) {
-    Status = FALSE;
+  Year = InternalAtoI(P, P + 4);
+  P += 4;
+  Month = InternalAtoI(P, P + 2);
+  P += 2;
+  Day = InternalAtoI(P, P + 2);
+  P += 2;
+  Hour = InternalAtoI(P, P + 2);
+  P += 2;
+  Minute = InternalAtoI(P, P + 2);
+  P += 2;
+  Second = InternalAtoI(P, P + 2);
+  P += 2;
+  Dt.year = (int)Year;
+  Dt.mon = (int)Month;
+  Dt.day = (int)Day;
+  Dt.hour = (int)Hour;
+  Dt.min = (int)Minute;
+  Dt.sec = (int)Second;
+
+  if (*DateTimeSize < sizeof (mbedtls_x509_time)) {
+    *DateTimeSize = sizeof (mbedtls_x509_time);
+    ReturnStatus = RETURN_BUFFER_TOO_SMALL;
     goto Cleanup;
   }
-  if (CertVersion != 2) {
-    Status = FALSE;
-    goto Cleanup;
+  if (DateTime != NULL) {
+    CopyMem(DateTime, &Dt, sizeof (mbedtls_x509_time));
   }
-
-  // 2. SerialNumber
-  Asn1BufferLen = 0;
-  Ret = X509GetSerialNumber(Cert, CertSize, NULL, &Asn1BufferLen);
-  if (Ret != RETURN_BUFFER_TOO_SMALL) {
-    Status = FALSE;
-    goto Cleanup;
-  }
-
-  // 3. SinatureAlgorithem
-  Status = X509GetSignatureType (Cert, CertSize, &Value);
-  if (!Status) {
-    goto Cleanup;
-  }
-
-  // 4. Issuer
-  Asn1BufferLen = 0;
-  Status  = X509GetIssuerName (Cert, CertSize, NULL, &Asn1BufferLen);
-  if (Status && Asn1BufferLen == 0) {
-    goto Cleanup;
-  }
-  if (Asn1BufferLen <= 0) {
-    Status = FALSE;
-    goto Cleanup;
-  }
-
-  // 5. SubjectName
-  Asn1BufferLen = 0;
-  Status  = X509GetSubjectName (Cert, CertSize, NULL, &Asn1BufferLen);
-  if (Status && Asn1BufferLen == 0) {
-    goto Cleanup;
-  }
-  if (Asn1BufferLen <= 0) {
-    Status = FALSE;
-    goto Cleanup;
-  }
-
-  // 6. Validaity
-  Status = X509GetValidity (Cert, CertSize, EndCertFrom, &EndCertFromLen, EndCertTo, &EndCertToLen);
-  if (!Status) {
-    goto Cleanup;
-  }
-
-  Status = X509DateTimeCheck(EndCertFrom, EndCertFromLen, EndCertTo, EndCertToLen);
-  if (!Status) {
-    goto Cleanup;
-  }
-
-  // 7. SubjectPublic KeyInfo
-  Status = RsaGetPublicKeyFromX509(Cert, CertSize, &RsaContext);
-  if (!Status) {
-    Status = EcGetPublicKeyFromX509(Cert, CertSize, &EcContext);
-  }
-  if (!Status) {
-    goto Cleanup;
-  }
-
-  // 8. Extended Key Usage
-  Status = X509GetExtendedKeyUsage (Cert, CertSize, &Value);
-  if (!Status) {
-    goto Cleanup;
-  }
-
-  // 9. Key Usage
-  Status = X509GetKeyUsage (Cert, CertSize, &Value);
-  if (!Status) {
-    goto Cleanup;
-  }
-  if (MBEDTLS_X509_KU_DIGITAL_SIGNATURE & Value) {
-    Status = TRUE;
-  } else {
-    Status = FALSE;
-  }
-
+  *DateTimeSize = sizeof (mbedtls_x509_time);
+  ReturnStatus = RETURN_SUCCESS;
 Cleanup:
-  if (RsaContext != NULL) {
-    RsaFree(RsaContext);
+  return ReturnStatus;
+}
+
+/**
+  Compare DateTime1 and DateTime2.
+
+  If DateTime1 is NULL, then return -2.
+  If DateTime2 is NULL, then return -2.
+  If DateTime1 == DateTime2, then return 0
+  If DateTime1 > DateTime2, then return 1
+  If DateTime1 < DateTime2, then return -1
+
+  @param[in]      DateTime1         Pointer to a DateTime Ojbect
+  @param[in]      DateTime2         Pointer to a DateTime Object
+
+  @retval  0      If DateTime1 == DateTime2
+  @retval  1      If DateTime1 > DateTime2
+  @retval  -1     If DateTime1 < DateTime2
+**/
+INTN
+EFIAPI
+X509DateTimeCompare (
+  IN    VOID   *DateTime1,
+  IN    VOID   *DateTime2
+  )
+{
+  if (DateTime1 == NULL || DateTime2 == NULL) {
+    return -2;
   }
-  if (EcContext != NULL) {
-    EcFree(EcContext);
+  if (CompareMem (DateTime2, DateTime1, sizeof (mbedtls_x509_time)) == 0) {
+    return 0;
   }
-  return Status;
+  if(InternalX509CheckTime ((mbedtls_x509_time*)DateTime1, (mbedtls_x509_time*)DateTime2) == 0) {
+    return -1;
+  } else {
+    return 1;
+  }
 }
