@@ -1204,9 +1204,9 @@ BOOLEAN InternalSpdmX509DateTimeCheck(
   F0Size = 64;
   T0Size = 64;
 
-  ReturnStatus = X509DateTimeSet ("19700101000000Z", F0, &F0Size);
+  ReturnStatus = X509SetDateTime ("19700101000000Z", F0, &F0Size);
   if (ReturnStatus == RETURN_SUCCESS) {
-    ReturnStatus = X509DateTimeSet ("99991231235959Z", T0, &T0Size);
+    ReturnStatus = X509SetDateTime ("99991231235959Z", T0, &T0Size);
   }
 
   if (ReturnStatus != RETURN_SUCCESS) {
@@ -1214,13 +1214,13 @@ BOOLEAN InternalSpdmX509DateTimeCheck(
   }
 
   // From >= F0
-  Ret = X509DateTimeCompare(From, F0);
+  Ret = X509CompareDateTime(From, F0);
   if (Ret < 0) {
     return FALSE;
   }
 
   // To <= T0
-  Ret = X509DateTimeCompare(T0, To);
+  Ret = X509CompareDateTime(T0, To);
   if (Ret < 0) {
     return FALSE;
   }

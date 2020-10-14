@@ -318,7 +318,7 @@ ValidateCryptX509 (
   }
 
   Asn1BufferLen = 64;
-  Ret = X509DateTimeSet("19700101000000Z", DateTime1, &Asn1BufferLen);
+  Ret = X509SetDateTime("19700101000000Z", DateTime1, &Asn1BufferLen);
   if ((Ret == RETURN_SUCCESS) && (Asn1BufferLen != 0)) {
     Print ("\n  - Set DateTime - [Pass]");
   } else {
@@ -327,7 +327,7 @@ ValidateCryptX509 (
   }
 
   Asn1BufferLen = 64;
-  Ret = X509DateTimeSet("19700201000000Z", DateTime2, &Asn1BufferLen);
+  Ret = X509SetDateTime("19700201000000Z", DateTime2, &Asn1BufferLen);
   if ((Ret == RETURN_SUCCESS) && (Asn1BufferLen != 0)) {
     Print ("\n  - Set DateTime - [Pass]");
   } else {
@@ -335,7 +335,7 @@ ValidateCryptX509 (
     goto Cleanup;
   }
 
-  if (X509DateTimeCompare(DateTime1, DateTime2) < 0) {
+  if (X509CompareDateTime(DateTime1, DateTime2) < 0) {
     Print ("\n  - Compare DateTime - [Pass]");
   } else {
     Print ("\n  - Compare DateTime- [Fail]");

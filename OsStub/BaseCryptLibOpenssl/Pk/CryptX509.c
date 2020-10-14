@@ -1029,7 +1029,7 @@ X509GetIssuerOrganizationName (
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[in,out]  Oid              Signature Algorithm Object identifier buffer
+  @param[out]     Oid              Signature Algorithm Object identifier buffer.
   @param[in,out]  OidSize          Signature Algorithm Object identifier buffer size
 
   @retval RETURN_SUCCESS           The certificate Extension data retrieved successfully.
@@ -1047,7 +1047,7 @@ EFIAPI
 X509GetSignatureAlgorithm (
   IN CONST UINT8      *Cert,
   IN      UINTN       CertSize,
-  IN OUT  UINT8       *Oid,  OPTIONAL
+  OUT     UINT8       *Oid,  OPTIONAL
   IN OUT  UINTN       *OidSize
   )
 {
@@ -1090,7 +1090,7 @@ X509GetSignatureAlgorithm (
     goto _Exit;
   }
 
-  if (*OidSize < Asn1Obj->length) {
+  if (*OidSize < (UINTN)Asn1Obj->length) {
     *OidSize = Asn1Obj->length;
     ReturnStatus = RETURN_BUFFER_TOO_SMALL;
     goto _Exit;
@@ -1121,10 +1121,13 @@ _Exit:
 
   @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize     Size of the X509 certificate in bytes.
-  @param[in,out]  From         notBefore field bytes.
-  @param[in,out]  FromSize     notBefore field bytes size.
-  @param[in,out]  To           notAfter field bytes.
-  @param[in,out]  ToSize       notAfter field bytes size.
+  @param[out]     From         notBefore Pointer to DateTime object.
+  @param[in,out]  FromSize     notBefore DateTime object size.
+  @param[out]     To           notAfter Pointer to DateTime object.
+  @param[in,out]  ToSize       notAfter DateTime object size.
+
+  Note: X509CompareDateTime to compare DateTime oject
+        x509SetDateTime to get a DateTime object from a DateTimeStr
 
   @retval  TRUE   The certificate Validity retrieved successfully.
   @retval  FALSE  Invalid certificate, or Validity retrieve failed.
@@ -1134,11 +1137,11 @@ BOOLEAN
 EFIAPI
 X509GetValidity  (
   IN    CONST UINT8 *Cert,
-  IN    UINTN        CertSize,
-  IN OUT UINT8 *From,
-  IN OUT UINTN *FromSize,
-  IN OUT UINT8 *To,
-  IN OUT UINTN *ToSize
+  IN    UINTN       CertSize,
+  IN    UINT8       *From,
+  IN OUT UINTN      *FromSize,
+  IN    UINT8       *To,
+  IN OUT UINTN      *ToSize
   )
 {
   BOOLEAN    Status;
@@ -1220,7 +1223,9 @@ _Exit:
   If DateTimeSize is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[in]      DateTimeStr      DateTime string like yyyymmddhhmmssZ
+  @param[in]      DateTimeStr      DateTime string like YYYYMMDDhhmmssZ
+                                   Ref: https://www.w3.org/TR/NOTE-datetime
+                                   Z stand for UTC time
   @param[in,out]  DateTime         Pointer to a DateTime object.
   @param[in,out]  DateTimeSize     DateTime object buffer size.
 
@@ -1236,8 +1241,8 @@ _Exit:
 **/
 RETURN_STATUS
 EFIAPI
-X509DateTimeSet (
-  IN     CHAR8  *DateTimePtr,
+X509SetDateTime (
+  CHAR8         *DateTimeStr,
   IN OUT VOID   *DateTime,
   IN OUT UINTN  *DateTimeSize
   )
@@ -1256,7 +1261,7 @@ X509DateTimeSet (
     goto Cleanup;
   }
 
-  Ret = ASN1_TIME_set_string_X509(Dt, DateTimePtr);
+  Ret = ASN1_TIME_set_string_X509(Dt, DateTimeStr);
   if (Ret != 1) {
     ReturnStatus = RETURN_INVALID_PARAMETER;
     goto Cleanup;
@@ -1284,7 +1289,7 @@ Cleanup:
 }
 
 /**
-  Compare DateTime1 and DateTime2.
+  Compare DateTime1 object and DateTime2 object.
 
   If DateTime1 is NULL, then return -2.
   If DateTime2 is NULL, then return -2.
@@ -1301,7 +1306,7 @@ Cleanup:
 **/
 INTN
 EFIAPI
-X509DateTimeCompare (
+X509CompareDateTime (
   IN    VOID   *DateTime1,
   IN    VOID   *DateTime2
   )
@@ -1377,7 +1382,7 @@ _Exit:
   @param[in]      Oid              Object identifier buffer
   @param[in]      OidSize          Object identifier buffer size
   @param[out]     ExtensionData    Extension bytes.
-  @param[out]     ExtensionDataSize Extension bytes size.
+  @param[in, out] ExtensionDataSize Extension bytes size.
 
   @retval RETURN_SUCCESS           The certificate Extension data retrieved successfully.
   @retval RETURN_INVALID_PARAMETER If Cert is NULL.
@@ -1397,7 +1402,7 @@ X509GetExtensionData (
   IN    UINT8       *Oid,
   IN    UINTN       OidSize,
   OUT   UINT8       *ExtensionData,
-  OUT   UINTN       *ExtensionDataSize
+  IN OUT UINTN      *ExtensionDataSize
   )
 {
   RETURN_STATUS ReturnStatus;
@@ -1446,7 +1451,7 @@ X509GetExtensionData (
       Asn1Obj = X509_EXTENSION_get_object(Ext);
       Asn1Oct = X509_EXTENSION_get_data(Ext);
 
-      if(OidSize == Asn1Obj->length && CompareMem (Asn1Obj->data, Oid, OidSize) == 0) {
+      if(OidSize == (UINTN)Asn1Obj->length && CompareMem (Asn1Obj->data, Oid, OidSize) == 0) {
         //
         // Extension Found
         //
@@ -1455,7 +1460,7 @@ X509GetExtensionData (
       }
   }
   if (ReturnStatus == RETURN_SUCCESS) {
-    if (*ExtensionDataSize < Asn1Oct->length) {
+    if (*ExtensionDataSize < (UINTN)Asn1Oct->length) {
       *ExtensionDataSize = Asn1Oct->length;
       ReturnStatus = RETURN_BUFFER_TOO_SMALL;
       goto Cleanup;
