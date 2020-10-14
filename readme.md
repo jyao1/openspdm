@@ -125,7 +125,7 @@
    We will use CMake to replace makefile in the future, after all features are enabled.
    Currently, only OsTest and UnitTest are enabled with VS2019 and GCC.
 
-1) Use CMake in Linux (Toolchain=GCC)
+1) Use CMake in Linux (Toolchain=GCC|CLANG)
 
    ```
    cd openspdm
@@ -136,7 +136,7 @@
    make
    ```
 
-2) Use CMake in Windows (Toolchain=VS2019|VS2015)
+2) Use CMake in Windows (Toolchain=VS2019|VS2015|CLANG)
 
    Use x86 command prompt for ARCH=Ia32 and x64 command prompt for ARCH=X64.
    ```
