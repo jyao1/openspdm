@@ -130,7 +130,7 @@ VOID
   This function returns the SPDM hash size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM hash size
 **/
 UINT32
@@ -349,7 +349,7 @@ SpdmHkdfExpand (
   This function returns the SPDM asym size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM hash size
 **/
 UINT32
@@ -381,7 +381,7 @@ GetSpdmAsymSize (
   This function returns the SPDM Request asym size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM hash size
 **/
 UINT32
@@ -413,7 +413,7 @@ GetSpdmReqAsymSize (
   This function returns the SPDM measurement hash size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM measurement hash size
 **/
 UINT32
@@ -441,7 +441,7 @@ GetSpdmMeasurementHashSize (
   This function returns the SPDM DheKey size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM DheKey size
 **/
 UINT32
@@ -492,7 +492,7 @@ GetSpdmDheNid (
   This function returns the SPDM AEAD key size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM AEAD key size
 **/
 UINT32
@@ -515,7 +515,7 @@ GetSpdmAeadKeySize (
   This function returns the SPDM AEAD iv size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM AEAD iv size
 **/
 UINT32
@@ -538,7 +538,7 @@ GetSpdmAeadIvSize (
   This function returns the SPDM AEAD tag size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM AEAD iv size
 **/
 UINT32
@@ -561,7 +561,7 @@ GetSpdmAeadTagSize (
   This function returns the SPDM AEAD block size.
 
   @param[in]  SpdmContext             The SPDM context for the device.
-  
+
   @return TCG SPDM AEAD iv size
 **/
 UINT32
@@ -1184,6 +1184,292 @@ SpdmGetRandomNumber (
   )
 {
   RandomBytes (Rand, Size);
-  
+
   return ;
+}
+
+STATIC
+BOOLEAN InternalSpdmX509DateTimeCheck(
+  IN UINT8 *From,
+  IN OUT UINTN FromSize,
+  IN OUT UINT8 *To,
+  IN OUT UINTN ToSize)
+{
+  INTN Ret;
+  RETURN_STATUS ReturnStatus;
+  UINT8 F0[64];
+  UINT8 T0[64];
+  UINTN F0Size;
+  UINTN T0Size;
+  F0Size = 64;
+  T0Size = 64;
+
+  ReturnStatus = X509DateTimeSet ("19700101000000Z", F0, &F0Size);
+  if (ReturnStatus == RETURN_SUCCESS) {
+    ReturnStatus = X509DateTimeSet ("99991231235959Z", T0, &T0Size);
+  }
+
+  if (ReturnStatus != RETURN_SUCCESS) {
+    return FALSE;
+  }
+
+  // From >= F0
+  Ret = X509DateTimeCompare(From, F0);
+  if (Ret < 0) {
+    return FALSE;
+  }
+
+  // To <= T0
+  Ret = X509DateTimeCompare(T0, To);
+  if (Ret < 0) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Certificate Check for SPDM leaf cert.
+
+  @param[in]  Cert            Pointer to the DER-encoded certificate data.
+  @param[in]  CertSize        The size of certificate data in bytes.
+
+  @retval  TRUE   Success.
+  @retval  FALSE  Certificate is not valid
+**/
+BOOLEAN
+EFIAPI
+SpdmX509CertificateCheck(
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize
+)
+{
+  UINT8         EndCertFrom[64];
+  UINTN         EndCertFromLen;
+  UINT8         EndCertTo[64];
+  UINTN         EndCertToLen;
+  UINTN         Asn1BufferLen;
+  BOOLEAN       Status;
+  UINTN         CertVersion;
+  RETURN_STATUS Ret;
+  UINTN         Value;
+  VOID          *RsaContext;
+  VOID          *EcContext;
+
+  if (Cert == NULL || CertSize == 0) {
+    return FALSE;
+  }
+
+  Status = TRUE;
+  RsaContext = NULL;
+  EcContext = NULL;
+  EndCertFromLen = 64;
+  EndCertToLen = 64;
+
+  // 1. Version
+  CertVersion = 0;
+  Ret = X509GetVersion (Cert, CertSize, &CertVersion);
+  if (RETURN_ERROR (Ret)) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+  if (CertVersion != 2) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  // 2. SerialNumber
+  Asn1BufferLen = 0;
+  Ret = X509GetSerialNumber(Cert, CertSize, NULL, &Asn1BufferLen);
+  if (Ret != RETURN_BUFFER_TOO_SMALL) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  // 3. SinatureAlgorithem
+  Value = 0;
+  Ret = X509GetSignatureAlgorithm (Cert, CertSize, NULL, &Value);
+  if (Ret != RETURN_BUFFER_TOO_SMALL || Value == 0) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  // 4. Issuer
+  Asn1BufferLen = 0;
+  Status  = X509GetIssuerName (Cert, CertSize, NULL, &Asn1BufferLen);
+  if (Status && Asn1BufferLen == 0) {
+    goto Cleanup;
+  }
+  if (Asn1BufferLen <= 0) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  // 5. SubjectName
+  Asn1BufferLen = 0;
+  Status  = X509GetSubjectName (Cert, CertSize, NULL, &Asn1BufferLen);
+  if (Status && Asn1BufferLen == 0) {
+    goto Cleanup;
+  }
+  if (Asn1BufferLen <= 0) {
+    Status = FALSE;
+    goto Cleanup;
+  }
+
+  // 6. Validaity
+  Status = X509GetValidity (Cert, CertSize, EndCertFrom, &EndCertFromLen, EndCertTo, &EndCertToLen);
+  if (!Status) {
+    goto Cleanup;
+  }
+
+  Status = InternalSpdmX509DateTimeCheck(EndCertFrom, EndCertFromLen, EndCertTo, EndCertToLen);
+  if (!Status) {
+    goto Cleanup;
+  }
+
+  // 7. SubjectPublic KeyInfo
+  Status = RsaGetPublicKeyFromX509(Cert, CertSize, &RsaContext);
+  if (!Status) {
+    Status = EcGetPublicKeyFromX509(Cert, CertSize, &EcContext);
+  }
+  if (!Status) {
+    goto Cleanup;
+  }
+
+  // 8. Extended Key Usage
+  Value = 0;
+  Ret = X509GetExtendedKeyUsage (Cert, CertSize, NULL, &Value);
+  if (Ret != RETURN_BUFFER_TOO_SMALL || Value == 0) {
+    goto Cleanup;
+  }
+
+  // 9. Key Usage
+  Status = X509GetKeyUsage (Cert, CertSize, &Value);
+  if (!Status) {
+    goto Cleanup;
+  }
+  if (CRYPTO_X509_KU_DIGITAL_SIGNATURE & Value) {
+    Status = TRUE;
+  } else {
+    Status = FALSE;
+  }
+
+Cleanup:
+  if (RsaContext != NULL) {
+    RsaFree(RsaContext);
+  }
+  if (EcContext != NULL) {
+    EcFree(EcContext);
+  }
+  return Status;
+}
+
+STATIC CONST UINT8 OID_subjectAltName[] = {
+  0x55, 0x1D, 0x11
+};
+
+RETURN_STATUS
+EFIAPI
+SpdmGetDMTFSubjectAltNameFromBytes (
+  IN      CONST UINT8   *Buffer,
+  IN      INTN          Len,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize,
+  OUT     UINT8         *Oid,         OPTIONAL
+  IN OUT  UINTN         *OidSize
+)
+{
+  UINT8       *Ptr;
+  int         Length;
+  UINTN       ObjLen;
+  int         Ret;
+
+  Length = (int)Len;
+  Ptr = (UINT8 *)Buffer;
+  ObjLen = 0;
+
+  // Sequence
+  Ret = Asn1GetTag (
+    &Ptr, Ptr + Length, &ObjLen,
+    CRYPTO_ASN1_SEQUENCE | CRYPTO_ASN1_CONSTRUCTED);
+  if (!Ret) {
+    return RETURN_NOT_FOUND;
+  }
+
+  Ret = Asn1GetTag (
+    &Ptr, Ptr + ObjLen, &ObjLen,
+    CRYPTO_ASN1_CONTEXT_SPECIFIC | CRYPTO_ASN1_CONSTRUCTED);
+
+  Ret = Asn1GetTag (&Ptr, Ptr + ObjLen, &ObjLen, CRYPTO_ASN1_OID);
+  if (!Ret) {
+    return RETURN_NOT_FOUND;
+  }
+  // CopyData to OID
+  if (*OidSize < (UINTN)ObjLen) {
+    *OidSize = (UINTN)ObjLen;
+    return RETURN_BUFFER_TOO_SMALL;
+
+  }
+  if (Oid != NULL) {
+    CopyMem (Oid, Ptr, ObjLen);
+    *OidSize = ObjLen;
+  }
+
+  // Move to next element
+  Ptr += ObjLen;
+
+  Ret = Asn1GetTag (
+    &Ptr, (UINT8 *)(Buffer + Length),
+    &ObjLen,
+    CRYPTO_ASN1_CONTEXT_SPECIFIC | CRYPTO_ASN1_CONSTRUCTED
+    );
+  Ret = Asn1GetTag (
+    &Ptr, (UINT8 *)(Buffer + Length),
+    &ObjLen,
+    CRYPTO_ASN1_UTF8_STRING);
+  if (!Ret) {
+    return RETURN_NOT_FOUND;
+  }
+
+  if (*NameBufferSize < (UINTN)ObjLen + 1) {
+    *NameBufferSize = (UINTN)ObjLen + 1;
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  if (NameBuffer != NULL) {
+    CopyMem (NameBuffer, Ptr, ObjLen);
+    *NameBufferSize = ObjLen + 1;
+    NameBuffer[ObjLen] = 0;
+  }
+  return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+EFIAPI
+SpdmGetDMTFSubjectAltName (
+  IN      CONST UINT8   *Cert,
+  IN      INTN          CertSize,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize,
+  OUT     UINT8         *Oid,         OPTIONAL
+  IN OUT  UINTN         *OidSize
+  )
+{
+  RETURN_STATUS ReturnStatus;
+  UINTN ExtensionDataSize;
+  ExtensionDataSize = 0;
+  ReturnStatus = X509GetExtensionData(Cert, CertSize, (UINT8 *)OID_subjectAltName, sizeof (OID_subjectAltName), NULL, &ExtensionDataSize);
+  if (ReturnStatus != RETURN_BUFFER_TOO_SMALL) {
+    return RETURN_NOT_FOUND;
+  }
+  if (ExtensionDataSize > *NameBufferSize) {
+    *NameBufferSize = ExtensionDataSize;
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+  ReturnStatus = X509GetExtensionData(Cert, CertSize, (UINT8 *)OID_subjectAltName, sizeof (OID_subjectAltName), (UINT8 *)NameBuffer, NameBufferSize);
+  if (RETURN_ERROR(ReturnStatus)) {
+    return ReturnStatus;
+  }
+
+  return SpdmGetDMTFSubjectAltNameFromBytes((CONST UINT8 *)NameBuffer, *NameBufferSize, NameBuffer, NameBufferSize, Oid, OidSize);
 }
