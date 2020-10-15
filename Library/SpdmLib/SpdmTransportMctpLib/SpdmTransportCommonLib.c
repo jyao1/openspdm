@@ -53,35 +53,48 @@ EFIAPI
 SpdmTransportMctpEncodeMessage (
   IN     VOID                 *SpdmContext,
   IN     UINT32               *SessionId,
+  IN     BOOLEAN              IsAppMessage,
   IN     BOOLEAN              IsRequester,
-  IN     UINTN                SpdmMessageSize,
-  IN     VOID                 *SpdmMessage,
+  IN     UINTN                MessageSize,
+  IN     VOID                 *Message,
   IN OUT UINTN                *TransportMessageSize,
      OUT VOID                 *TransportMessage
   )
 {
   RETURN_STATUS                       Status;
   TRANSPORT_ENCODE_MESSAGE_FUNC       TransportEncodeMessage;
-  UINT8                               AppMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINT8                               AppMessageBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  VOID                                *AppMessage;
   UINTN                               AppMessageSize;
   UINT8                               SecuredMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               SecuredMessageSize;
 
+  if (IsAppMessage && (SessionId == NULL)) {
+    return RETURN_UNSUPPORTED;
+  }
+
   TransportEncodeMessage = MctpEncodeMessage;
   if (SessionId != NULL) {
-    AppMessageSize = sizeof(AppMessage);
-    Status = TransportEncodeMessage (
-                NULL,
-                SpdmMessageSize,
-                SpdmMessage,
-                &AppMessageSize,
-                AppMessage
-                );
-    if (RETURN_ERROR(Status)) {
-      DEBUG ((DEBUG_ERROR, "TransportEncodeMessage - %p\n", Status));
-      return RETURN_UNSUPPORTED;
+    if (!IsAppMessage) {
+      // SPDM message to APP message
+      AppMessage = AppMessageBuffer;
+      AppMessageSize = sizeof(AppMessageBuffer);
+      Status = TransportEncodeMessage (
+                 NULL,
+                 MessageSize,
+                 Message,
+                 &AppMessageSize,
+                 AppMessageBuffer
+                 );
+      if (RETURN_ERROR(Status)) {
+        DEBUG ((DEBUG_ERROR, "TransportEncodeMessage - %p\n", Status));
+        return RETURN_UNSUPPORTED;
+      }
+    } else {
+      AppMessage = Message;
+      AppMessageSize = MessageSize;
     }
-
+    // APP message to secured message
     SecuredMessageSize = sizeof(SecuredMessage);
     Status = SpdmEncodeSecuredMessage (
                SpdmContext,
@@ -96,7 +109,8 @@ SpdmTransportMctpEncodeMessage (
       DEBUG ((DEBUG_ERROR, "SpdmEncodeSecuredMessage - %p\n", Status));
       return Status;
     }
-    
+
+    // secured message to secured MCTP message
     Status = TransportEncodeMessage (
                 SessionId,
                 SecuredMessageSize,
@@ -109,10 +123,11 @@ SpdmTransportMctpEncodeMessage (
       return RETURN_UNSUPPORTED;
     }
   } else {
+    // SPDM message to normal MCTP message
     Status = TransportEncodeMessage (
                 NULL,
-                SpdmMessageSize,
-                SpdmMessage,
+                MessageSize,
+                Message,
                 TransportMessageSize,
                 TransportMessage
                 );
@@ -130,11 +145,12 @@ EFIAPI
 SpdmTransportMctpDecodeMessage (
   IN     VOID                 *SpdmContext,
      OUT UINT32               **SessionId,
+     OUT BOOLEAN              *IsAppMessage,
   IN     BOOLEAN              IsRequester,
   IN     UINTN                TransportMessageSize,
   IN     VOID                 *TransportMessage,
-  IN OUT UINTN                *SpdmMessageSize,
-     OUT VOID                 *SpdmMessage
+  IN OUT UINTN                *MessageSize,
+     OUT VOID                 *Message
   )
 {
   RETURN_STATUS                       Status;
@@ -145,32 +161,15 @@ SpdmTransportMctpDecodeMessage (
   UINT8                               AppMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               AppMessageSize;
 
-  TransportDecodeMessage = MctpDecodeMessage;
-  SecuredMessageSessionId = NULL;
-  SecuredMessageSize = sizeof(SecuredMessage);
-  if (SessionId == NULL) {
-    // Expect normal message
-    Status = TransportDecodeMessage (
-                &SecuredMessageSessionId,
-                TransportMessageSize,
-                TransportMessage,
-                SpdmMessageSize,
-                SpdmMessage
-                );
-    if (RETURN_ERROR(Status)) {
-      DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - %p\n", Status));
-      return RETURN_UNSUPPORTED;
-    }
-    if (SecuredMessageSessionId == NULL) {
-      return RETURN_SUCCESS;
-    } else {
-      // but get secured message - cannot handle it.
-      DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - expect normal but got session (%08x)\n", *SecuredMessageSessionId));
-      return RETURN_UNSUPPORTED;
-    }
+  if ((SessionId == NULL) || (IsAppMessage == NULL)) {
+    return RETURN_UNSUPPORTED;
   }
 
+  TransportDecodeMessage = MctpDecodeMessage;
+
+  SecuredMessageSessionId = NULL;
   // Detect received message
+  SecuredMessageSize = sizeof(SecuredMessage);
   Status = TransportDecodeMessage (
               &SecuredMessageSessionId,
               TransportMessageSize,
@@ -185,7 +184,7 @@ SpdmTransportMctpDecodeMessage (
 
   if (SecuredMessageSessionId != NULL) {
     *SessionId = SecuredMessageSessionId;
-
+    // Secured message to APP message
     AppMessageSize = sizeof(AppMessage);
     Status = SpdmDecodeSecuredMessage (
                SpdmContext,
@@ -201,23 +200,33 @@ SpdmTransportMctpDecodeMessage (
       return RETURN_UNSUPPORTED;
     }
 
+    // APP message to SPDM message.
     Status = TransportDecodeMessage (
                 &SecuredMessageSessionId,
                 AppMessageSize,
                 AppMessage,
-                SpdmMessageSize,
-                SpdmMessage
+                MessageSize,
+                Message
                 );
     if (RETURN_ERROR(Status)) {
-      DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - %p\n", Status));
-      return RETURN_UNSUPPORTED;
-    }
-    if (SecuredMessageSessionId == NULL) {
+      *IsAppMessage = TRUE;
+      // just return APP message.
+      if (*MessageSize < AppMessageSize) {
+        *MessageSize = AppMessageSize;
+        return RETURN_BUFFER_TOO_SMALL;
+      }
+      *MessageSize = AppMessageSize;
+      CopyMem (Message, AppMessage, *MessageSize);
       return RETURN_SUCCESS;
     } else {
-      // get encapsulated secured message - cannot handle it.
-      DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - expect encapsulated normal but got session (%08x)\n", *SecuredMessageSessionId));
-      return RETURN_UNSUPPORTED;
+      *IsAppMessage = FALSE;
+      if (SecuredMessageSessionId == NULL) {
+        return RETURN_SUCCESS;
+      } else {
+        // get encapsulated secured message - cannot handle it.
+        DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - expect encapsulated normal but got session (%08x)\n", *SecuredMessageSessionId));
+        return RETURN_UNSUPPORTED;
+      }
     }
   } else {
     // get non-secured message
@@ -225,8 +234,8 @@ SpdmTransportMctpDecodeMessage (
                 &SecuredMessageSessionId,
                 TransportMessageSize,
                 TransportMessage,
-                SpdmMessageSize,
-                SpdmMessage
+                MessageSize,
+                Message
                 );
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_ERROR, "TransportDecodeMessage - %p\n", Status));
@@ -234,6 +243,7 @@ SpdmTransportMctpDecodeMessage (
     }
     ASSERT (SecuredMessageSessionId == NULL);
     *SessionId = NULL;
+    *IsAppMessage = FALSE;
     return RETURN_SUCCESS;
   }
 }

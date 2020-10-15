@@ -85,7 +85,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     SpdmResponse.VersionNumberEntry[1].MajorVersion = 1;
     SpdmResponse.VersionNumberEntry[1].MinorVersion = 1;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
     
@@ -99,7 +99,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     SpdmResponse.Header.Param2 = 0;
     SpdmResponse.VersionNumberEntryCount = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -112,7 +112,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -125,7 +125,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -140,7 +140,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
       SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
       SpdmResponse.Header.Param2 = 0;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex1 == 1) {
       MY_SPDM_VERSION_RESPONSE    SpdmResponse;
 
@@ -154,7 +154,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
       SpdmResponse.VersionNumberEntry[1].MajorVersion = 1;
       SpdmResponse.VersionNumberEntry[1].MinorVersion = 1;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex1 ++;
   }
@@ -169,7 +169,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -186,7 +186,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_VERSION;
     SpdmResponse.ExtendErrorData.Token = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -205,7 +205,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
       SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_VERSION;
       SpdmResponse.ExtendErrorData.Token = 1;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex2 == 1) {
       MY_SPDM_VERSION_RESPONSE    SpdmResponse;
 
@@ -219,7 +219,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
       SpdmResponse.VersionNumberEntry[1].MajorVersion = 1;
       SpdmResponse.VersionNumberEntry[1].MinorVersion = 1;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex2 ++;
   }

@@ -94,7 +94,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
       RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     } else {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
@@ -112,7 +112,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
       RemainderLength = 0;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
   }
     return RETURN_SUCCESS;
@@ -141,7 +141,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
       RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     } else {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
@@ -159,7 +159,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
       RemainderLength = 0;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
   }
     return RETURN_SUCCESS;
@@ -173,7 +173,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -186,7 +186,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -202,7 +202,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       SpdmResponse.Header.Param2 = 0;
       SubIndex1 ++;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex1 == 1) {
       if (RemainderLength == 0) {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
@@ -226,7 +226,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
         RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
 
-        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
       } else {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
         UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
@@ -244,7 +244,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
         RemainderLength = 0;
 
-        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
       }
     }
   }
@@ -259,7 +259,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -276,7 +276,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
     SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_CERTIFICATE;
     SpdmResponse.ExtendErrorData.Token = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -296,7 +296,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       SpdmResponse.ExtendErrorData.Token = 1;
       SubIndex2 ++;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex2 == 1) {
       if (RemainderLength == 0) {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
@@ -320,7 +320,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
         RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
 
-        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
       } else {
         SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
         UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
@@ -338,7 +338,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
         RemainderLength = 0;
 
-        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
       }
     }
   }
@@ -368,7 +368,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
       RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     } else {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
@@ -386,7 +386,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
       RemainderLength = 0;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
   }
     return RETURN_SUCCESS;

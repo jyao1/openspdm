@@ -14,6 +14,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmSecuredMessageLib.h>
 #include "SpdmCommonLibInternal.h"
 
+typedef
+RETURN_STATUS
+(EFIAPI *SPDM_GET_SPDM_RESPONSE_FUNC) (
+  IN     VOID                 *SpdmContext,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  );
+
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseVersion (
@@ -276,25 +286,27 @@ SpdmProcessEncapResponseChallengeAuth (
   OUT    BOOLEAN              *Continue
   );
 
-SPDM_GET_RESPONSE_FUNC
+SPDM_GET_SPDM_RESPONSE_FUNC
 SpdmGetResponseFuncViaRequestCode (
   IN     UINT8                    RequestCode
   );
 
 RETURN_STATUS
-SpdmReceiveRequest (
+SpdmReceiveRequestEx (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
      OUT UINT32                  **SessionId,
+     OUT BOOLEAN                 *IsAppMessage,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request
   );
 
 RETURN_STATUS
-SpdmSendResponse (
+SpdmSendResponseEx (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
   IN     UINT32                  *SessionId,
+  IN     BOOLEAN                 IsAppMessage,
   IN OUT UINTN                   *ResponseSize,
-  IN OUT VOID                    *Response
+     OUT VOID                    *Response
   );
 
 UINT16

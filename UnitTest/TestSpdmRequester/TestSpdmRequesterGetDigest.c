@@ -87,7 +87,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -112,7 +112,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -125,7 +125,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -138,7 +138,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -153,7 +153,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
       SpdmResponse.Header.Param2 = 0;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex1 == 1) {
       SPDM_DIGESTS_RESPONSE    *SpdmResponse;
       UINT8                    *Digest;
@@ -174,7 +174,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
     SubIndex1 ++;
   }
@@ -189,7 +189,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -206,7 +206,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_DIGESTS;
     SpdmResponse.ExtendErrorData.Token = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -225,7 +225,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_DIGESTS;
       SpdmResponse.ExtendErrorData.Token = 1;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex2 == 1) {
       SPDM_DIGESTS_RESPONSE    *SpdmResponse;
       UINT8                    *Digest;
@@ -246,7 +246,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
     SubIndex2 ++;
   }

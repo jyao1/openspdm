@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmResponderLibInternal.h"
 
 typedef struct {
-  UINT8                    RequestResponseCode;
-  SPDM_GET_RESPONSE_FUNC   GetResponseFunc;
+  UINT8                            RequestResponseCode;
+  SPDM_GET_SPDM_RESPONSE_FUNC      GetResponseFunc;
 } SPDM_GET_RESPONSE_STRUCT;
 
 SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
@@ -35,7 +35,7 @@ SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
   {SPDM_KEY_UPDATE,                     SpdmGetResponseKeyUpdate},
 };
 
-SPDM_GET_RESPONSE_FUNC
+SPDM_GET_SPDM_RESPONSE_FUNC
 SpdmGetResponseFuncViaLastRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext
   )
@@ -52,7 +52,7 @@ SpdmGetResponseFuncViaLastRequest (
   return NULL;
 }
 
-SPDM_GET_RESPONSE_FUNC
+SPDM_GET_SPDM_RESPONSE_FUNC
 SpdmGetResponseFuncViaRequestCode (
   IN     UINT8                    RequestCode
   )
@@ -69,9 +69,10 @@ SpdmGetResponseFuncViaRequestCode (
 }
 
 RETURN_STATUS
-SpdmReceiveRequest (
+SpdmReceiveRequestEx (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
      OUT UINT32                  **SessionId,
+     OUT BOOLEAN                 *IsAppMessage,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request
   )
@@ -92,7 +93,7 @@ SpdmReceiveRequest (
   MessageSessionId = NULL;
   SpdmContext->LastSpdmRequestSessionIdValid = FALSE;
   SpdmContext->LastSpdmRequestSize = sizeof(SpdmContext->LastSpdmRequest);
-  Status = SpdmContext->TransportDecodeMessage (SpdmContext, &MessageSessionId, TRUE, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
+  Status = SpdmContext->TransportDecodeMessage (SpdmContext, &MessageSessionId, IsAppMessage, TRUE, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "TransportDecodeMessage : %p\n", Status));
     return Status;
@@ -116,17 +117,18 @@ SpdmReceiveRequest (
 }
 
 RETURN_STATUS
-SpdmSendResponse (
+SpdmSendResponseEx (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
   IN     UINT32                  *SessionId,
+  IN     BOOLEAN                 IsAppMessage,
   IN OUT UINTN                   *ResponseSize,
-  IN OUT VOID                    *Response
+     OUT VOID                    *Response
   )
 {
   UINT8                             MyResponse[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                             MyResponseSize;
   RETURN_STATUS                     Status;
-  SPDM_GET_RESPONSE_FUNC            GetResponseFunc;
+  SPDM_GET_SPDM_RESPONSE_FUNC       GetResponseFunc;
   SPDM_SESSION_INFO                 *SessionInfo;
   SPDM_MESSAGE_HEADER               *SpdmRequest;
   SPDM_MESSAGE_HEADER               *SpdmResponse;
@@ -158,14 +160,19 @@ SpdmSendResponse (
 
   MyResponseSize = sizeof(MyResponse);
   ZeroMem (MyResponse, sizeof(MyResponse));
-  GetResponseFunc = SpdmGetResponseFuncViaLastRequest (SpdmContext);
-  if (GetResponseFunc == NULL) {
-    GetResponseFunc = (SPDM_GET_RESPONSE_FUNC)SpdmContext->GetResponseFunc;
+  GetResponseFunc = NULL;
+  if (!IsAppMessage) {
+    GetResponseFunc = SpdmGetResponseFuncViaLastRequest (SpdmContext);
+    if (GetResponseFunc != NULL) {
+      Status = GetResponseFunc (SpdmContext, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
+    }
   }
-  if (GetResponseFunc != NULL) {
-    Status = GetResponseFunc (SpdmContext, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
-  } else {
-    Status = RETURN_NOT_FOUND;
+  if (IsAppMessage || (GetResponseFunc == NULL)) {
+    if (SpdmContext->GetResponseFunc != 0) {
+      Status = ((SPDM_GET_RESPONSE_FUNC)SpdmContext->GetResponseFunc) (SpdmContext, SessionId, IsAppMessage, SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest, &MyResponseSize, MyResponse);
+    } else {
+      Status = RETURN_NOT_FOUND;
+    }
   }
   if (Status != RETURN_SUCCESS) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SpdmRequest->RequestResponseCode, &MyResponseSize, MyResponse);
@@ -174,7 +181,7 @@ SpdmSendResponse (
   DEBUG((DEBUG_INFO, "SpdmSendResponse[%x] (0x%x): \n", (SessionId != NULL) ? *SessionId : 0, MyResponseSize));
   InternalDumpHex (MyResponse, MyResponseSize);
 
-  Status = SpdmContext->TransportEncodeMessage (SpdmContext, SessionId, FALSE, MyResponseSize, MyResponse, ResponseSize, Response);
+  Status = SpdmContext->TransportEncodeMessage (SpdmContext, SessionId, IsAppMessage, FALSE, MyResponseSize, MyResponse, ResponseSize, Response);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "TransportEncodeMessage : %p\n", Status));
     return Status;

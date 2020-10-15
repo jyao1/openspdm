@@ -75,7 +75,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SpdmResponse.CTExponent = 0;
     SpdmResponse.Flags = DEFAULT_CAPABILITY_FLAG;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -90,7 +90,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SpdmResponse.CTExponent = 0;
     SpdmResponse.Flags = DEFAULT_CAPABILITY_FLAG;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -103,7 +103,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -116,7 +116,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -131,7 +131,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
       SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
       SpdmResponse.Header.Param2 = 0;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex1 == 1) {
       SPDM_CAPABILITIES_RESPONSE    SpdmResponse;
 
@@ -142,7 +142,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
       SpdmResponse.CTExponent = 0;
       SpdmResponse.Flags = DEFAULT_CAPABILITY_FLAG;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex1 ++;
   }
@@ -157,7 +157,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -174,7 +174,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
     SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_CAPABILITIES;
     SpdmResponse.ExtendErrorData.Token = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -193,7 +193,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
       SpdmResponse.ExtendErrorData.RequestCode = SPDM_GET_CAPABILITIES;
       SpdmResponse.ExtendErrorData.Token = 1;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex2 == 1) {
       SPDM_CAPABILITIES_RESPONSE    SpdmResponse;
 
@@ -204,7 +204,7 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
       SpdmResponse.CTExponent = 0;
       SpdmResponse.Flags = DEFAULT_CAPABILITY_FLAG;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex2 ++;
   }

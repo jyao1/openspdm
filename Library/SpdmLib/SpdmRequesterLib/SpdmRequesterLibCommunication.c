@@ -223,6 +223,7 @@ EFIAPI
 SpdmSendReceiveData (
   IN     VOID                 *Context,
   IN     UINT32               *SessionId,
+  IN     BOOLEAN              IsAppMessage,
   IN     VOID                 *Request,
   IN     UINTN                RequestSize,
   IN OUT VOID                 *Response,
@@ -234,12 +235,12 @@ SpdmSendReceiveData (
 
   SpdmContext = Context;
 
-  Status = SpdmSendRequest (SpdmContext, SessionId, RequestSize, Request);
+  Status = SpdmSendRequestEx (SpdmContext, SessionId, IsAppMessage, RequestSize, Request);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
-  Status = SpdmReceiveResponse (SpdmContext, SessionId, ResponseSize, Response);
+  Status = SpdmReceiveResponseEx (SpdmContext, SessionId, IsAppMessage, ResponseSize, Response);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

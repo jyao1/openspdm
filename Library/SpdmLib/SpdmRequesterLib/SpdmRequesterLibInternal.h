@@ -221,7 +221,25 @@ SpdmReceiveResponse (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
   IN OUT UINTN                *ResponseSize,
-  IN OUT VOID                 *Response
+     OUT VOID                 *Response
+  );
+
+RETURN_STATUS
+SpdmSendRequestEx (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               *SessionId,
+  IN     BOOLEAN              IsAppMessage,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request
+  );
+
+RETURN_STATUS
+SpdmReceiveResponseEx (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               *SessionId,
+  IN     BOOLEAN              IsAppMessage,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
   );
 
 UINT16

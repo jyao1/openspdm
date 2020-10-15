@@ -228,18 +228,23 @@ SpdmStopSession (
   );
 
 /**
-  Send and receive an SPDM message.
+  Send and receive an SPDM or APP message.
 
   The SPDM message can be a normal message or a secured message in SPDM session.
+
+  The APP message is encoded to a secured message directly in SPDM session.
+  The APP message format is defined by the transport layer.
+  Take MCTP as example: APP message == MCTP header (MCTP_MESSAGE_TYPE_SPDM) + SPDM message
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
                                        If SessionId is NULL, it is a normal message.
                                        If SessionId is NOT NULL, it is a secured message.
-  @param  SpdmRequest                  A pointer to the request data.
-  @param  SpdmRequestSize              Size in bytes of the request data.
-  @param  SpdmResponse                 A pointer to the response data.
-  @param  SpdmResponseSize             Size in bytes of the response data.
+  @param  IsAppMessage                 Indicates if it is an APP message or SPDM message.
+  @param  Request                      A pointer to the request data.
+  @param  RequestSize                  Size in bytes of the request data.
+  @param  Response                     A pointer to the response data.
+  @param  ResponseSize                 Size in bytes of the response data.
                                        On input, it means the size in bytes of response data buffer.
                                        On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
                                        and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
@@ -254,10 +259,11 @@ EFIAPI
 SpdmSendReceiveData (
   IN     VOID                 *SpdmContext,
   IN     UINT32               *SessionId,
-  IN     VOID                 *SpdmRequest,
-  IN     UINTN                SpdmRequestSize,
-     OUT VOID                 *SpdmResponse,
-  IN OUT UINTN                *SpdmResponseSize
+  IN     BOOLEAN              IsAppMessage,
+  IN     VOID                 *Request,
+  IN     UINTN                RequestSize,
+     OUT VOID                 *Response,
+  IN OUT UINTN                *ResponseSize
   );
 
 /**

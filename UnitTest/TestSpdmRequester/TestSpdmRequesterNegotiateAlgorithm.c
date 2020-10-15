@@ -88,7 +88,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -108,7 +108,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -121,7 +121,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -134,7 +134,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -149,7 +149,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
       SpdmResponse.Header.Param2 = 0;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex1 == 1) {
       SPDM_ALGORITHMS_RESPONSE    SpdmResponse;
 
@@ -165,7 +165,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SpdmResponse.ExtAsymSelCount = 0;
       SpdmResponse.ExtHashSelCount = 0;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex1 ++;
   }
@@ -180,7 +180,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
     SpdmResponse.Header.Param2 = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -197,7 +197,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.ExtendErrorData.RequestCode = SPDM_NEGOTIATE_ALGORITHMS;
     SpdmResponse.ExtendErrorData.Token = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -216,7 +216,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SpdmResponse.ExtendErrorData.RequestCode = SPDM_NEGOTIATE_ALGORITHMS;
       SpdmResponse.ExtendErrorData.Token = 1;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex2 == 1) {
       SPDM_ALGORITHMS_RESPONSE    SpdmResponse;
 
@@ -232,7 +232,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SpdmResponse.ExtAsymSelCount = 0;
       SpdmResponse.ExtHashSelCount = 0;
 
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     }
     SubIndex2 ++;
   }
@@ -254,7 +254,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -274,7 +274,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -294,7 +294,7 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
 
-    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 

@@ -68,6 +68,8 @@ DoAppSessionViaSpdm (
   UINTN                              RequestSize;
   SPDM_VENDOR_DEFINED_RESPONSE_MINE  Response;
   UINTN                              ResponseSize;
+  UINT8                              AppResponse[TEST_PAYLOAD_LEN];
+  UINTN                              AppResponseSize;
 
   SpdmContext = mSpdmContext;
 
@@ -75,10 +77,8 @@ DoAppSessionViaSpdm (
 
   RequestSize = sizeof(Request);
   ResponseSize = sizeof(Response);
-  Status = SpdmSendReceiveData (SpdmContext, &SessionId, &Request, RequestSize, &Response, &ResponseSize);
-  if (RETURN_ERROR(Status)) {
-    return Status;
-  }
+  Status = SpdmSendReceiveData (SpdmContext, &SessionId, FALSE, &Request, RequestSize, &Response, &ResponseSize);
+  ASSERT_RETURN_ERROR(Status);
 
   ASSERT (ResponseSize == sizeof(SPDM_VENDOR_DEFINED_RESPONSE_MINE));
   ASSERT (Response.Header.RequestResponseCode == SPDM_VENDOR_DEFINED_RESPONSE);
@@ -86,6 +86,13 @@ DoAppSessionViaSpdm (
   ASSERT (Response.VendorID == 0x8086);
   ASSERT (Response.PayloadLength == TEST_PAYLOAD_LEN);
   ASSERT (CompareMem (Response.VendorDefinedPayload, TEST_PAYLOAD_SERVER, TEST_PAYLOAD_LEN) == 0);
+
+  AppResponseSize = sizeof(AppResponse);
+  Status = SpdmSendReceiveData (SpdmContext, &SessionId, TRUE, TEST_PAYLOAD_CLIENT, TEST_PAYLOAD_LEN, &AppResponse, &AppResponseSize);
+  ASSERT_RETURN_ERROR(Status);
+
+  ASSERT (AppResponseSize == TEST_PAYLOAD_LEN);
+  ASSERT (CompareMem (AppResponse, TEST_PAYLOAD_SERVER, TEST_PAYLOAD_LEN) == 0);
 
   return RETURN_SUCCESS;
 }

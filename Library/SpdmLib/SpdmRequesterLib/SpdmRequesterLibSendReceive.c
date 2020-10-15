@@ -10,9 +10,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmRequesterLibInternal.h"
 
 RETURN_STATUS
-SpdmSendRequest (
+SpdmSendRequestEx (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
+  IN     BOOLEAN              IsAppMessage,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request
   )
@@ -25,7 +26,7 @@ SpdmSendRequest (
   InternalDumpHex (Request, RequestSize);
 
   MessageSize = sizeof(Message);
-  Status = SpdmContext->TransportEncodeMessage (SpdmContext, SessionId, TRUE, RequestSize, Request, &MessageSize, Message);
+  Status = SpdmContext->TransportEncodeMessage (SpdmContext, SessionId, IsAppMessage, TRUE, RequestSize, Request, &MessageSize, Message);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "TransportEncodeMessage Status - %p\n", Status));
     return Status;
@@ -40,29 +41,43 @@ SpdmSendRequest (
 }
 
 RETURN_STATUS
-SpdmReceiveResponse (
+SpdmSendRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request
+  )
+{
+  return SpdmSendRequestEx (SpdmContext, SessionId, FALSE, RequestSize, Request);
+}
+
+RETURN_STATUS
+SpdmReceiveResponseEx (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               *SessionId,
+  IN     BOOLEAN              IsAppMessage,
   IN OUT UINTN                *ResponseSize,
-  IN OUT VOID                 *Response
+     OUT VOID                 *Response
   )
 {
   RETURN_STATUS             Status;
   UINT8                     Message[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                     MessageSize;
   UINT32                    *MessageSessionId;
+  BOOLEAN                   IsMessageAppMessage;
 
   ASSERT (*ResponseSize <= MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
   MessageSize = sizeof(Message);
-  MessageSessionId = NULL;
   Status = SpdmContext->ReceiveMessage (SpdmContext, &MessageSize, Message, 0);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] Status - %p\n", (SessionId != NULL) ? *SessionId : 0x0, Status));
     return Status;
   }
 
-  Status = SpdmContext->TransportDecodeMessage (SpdmContext, &MessageSessionId, FALSE, MessageSize, Message, ResponseSize, Response);
+  MessageSessionId = NULL;
+  IsMessageAppMessage = FALSE;
+  Status = SpdmContext->TransportDecodeMessage (SpdmContext, &MessageSessionId, &IsMessageAppMessage, FALSE, MessageSize, Message, ResponseSize, Response);
 
   if (SessionId != NULL) {
     if (MessageSessionId == NULL) {
@@ -80,6 +95,12 @@ SpdmReceiveResponse (
     }
   }
 
+  if ((IsAppMessage && !IsMessageAppMessage) ||
+      (!IsAppMessage && IsMessageAppMessage)) {
+    DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] AppMessage mismatch\n", (SessionId != NULL) ? *SessionId : 0x0));
+    return RETURN_DEVICE_ERROR;
+  }
+
   DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] (0x%x): \n", (SessionId != NULL) ? *SessionId : 0x0, *ResponseSize));
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] Status - %p\n", (SessionId != NULL) ? *SessionId : 0x0, Status));    
@@ -87,4 +108,15 @@ SpdmReceiveResponse (
     InternalDumpHex (Response, *ResponseSize);
   }
   return Status;
+}
+
+RETURN_STATUS
+SpdmReceiveResponse (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               *SessionId,
+  IN OUT UINTN                *ResponseSize,
+     OUT VOID                 *Response
+  )
+{
+  return SpdmReceiveResponseEx (SpdmContext, SessionId, FALSE, ResponseSize, Response);
 }

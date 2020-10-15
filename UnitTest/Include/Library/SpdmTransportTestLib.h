@@ -17,6 +17,7 @@ EFIAPI
 SpdmTransportTestEncodeMessage (
   IN     VOID                 *SpdmContext,
   IN     UINT32               *SessionId,
+  IN     BOOLEAN              IsAppMessage,
   IN     BOOLEAN              IsRequester,
   IN     UINTN                SpdmMessageSize,
   IN     VOID                 *SpdmMessage,
@@ -29,6 +30,7 @@ EFIAPI
 SpdmTransportTestDecodeMessage (
   IN     VOID                 *SpdmContext,
      OUT UINT32               **SessionId,
+     OUT BOOLEAN              *IsAppMessage,
   IN     BOOLEAN              IsRequester,
   IN     UINTN                TransportMessageSize,
   IN     VOID                 *TransportMessage,

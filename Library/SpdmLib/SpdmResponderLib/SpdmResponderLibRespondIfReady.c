@@ -19,10 +19,10 @@ SpdmGetResponseRespondIfReady (
      OUT VOID                 *Response
   )
 {
-  SPDM_MESSAGE_HEADER         *SpdmRequest;
-  SPDM_DEVICE_CONTEXT         *SpdmContext;
-  SPDM_GET_RESPONSE_FUNC       GetResponseFunc;
-  RETURN_STATUS                Status;
+  SPDM_MESSAGE_HEADER                  *SpdmRequest;
+  SPDM_DEVICE_CONTEXT                  *SpdmContext;
+  SPDM_GET_SPDM_RESPONSE_FUNC          GetResponseFunc;
+  RETURN_STATUS                        Status;
 
   SpdmContext = Context;
   SpdmRequest = Request;

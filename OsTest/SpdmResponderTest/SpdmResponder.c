@@ -65,6 +65,8 @@ RegisterMeasurement (
 RETURN_STATUS
 EFIAPI
 TestSpdmProcessPacketCallback (
+  IN     UINT32                       *SessionId,
+  IN     BOOLEAN                      IsAppMessage,
   IN     VOID                         *Request,
   IN     UINTN                        RequestSize,
      OUT VOID                         *Response,
@@ -72,16 +74,26 @@ TestSpdmProcessPacketCallback (
   )
 {
   SPDM_VENDOR_DEFINED_REQUEST_MINE   *SpmdRequest;
-  SpmdRequest = Request;
-  ASSERT ((RequestSize >= sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE)) && (RequestSize < sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE) + 4));
-  ASSERT (SpmdRequest->Header.RequestResponseCode == SPDM_VENDOR_DEFINED_REQUEST);
-  ASSERT (SpmdRequest->StandardID == SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_PCISIG);
-  ASSERT (SpmdRequest->VendorID == 0x8086);
-  ASSERT (SpmdRequest->PayloadLength == TEST_PAYLOAD_LEN);
-  ASSERT (CompareMem (SpmdRequest->VendorDefinedPayload, TEST_PAYLOAD_CLIENT, TEST_PAYLOAD_LEN) == 0);
 
-  CopyMem (Response, &mVendorDefinedResponse, sizeof(mVendorDefinedResponse));
-  *ResponseSize = sizeof(mVendorDefinedResponse);
+  if (!IsAppMessage) {
+    SpmdRequest = Request;
+    ASSERT ((RequestSize >= sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE)) && (RequestSize < sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE) + 4));
+    ASSERT (SpmdRequest->Header.RequestResponseCode == SPDM_VENDOR_DEFINED_REQUEST);
+    ASSERT (SpmdRequest->StandardID == SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_PCISIG);
+    ASSERT (SpmdRequest->VendorID == 0x8086);
+    ASSERT (SpmdRequest->PayloadLength == TEST_PAYLOAD_LEN);
+    ASSERT (CompareMem (SpmdRequest->VendorDefinedPayload, TEST_PAYLOAD_CLIENT, TEST_PAYLOAD_LEN) == 0);
+
+    CopyMem (Response, &mVendorDefinedResponse, sizeof(mVendorDefinedResponse));
+    *ResponseSize = sizeof(mVendorDefinedResponse);
+  } else {
+    ASSERT (RequestSize == TEST_PAYLOAD_LEN);
+    ASSERT (CompareMem (Request, TEST_PAYLOAD_CLIENT, TEST_PAYLOAD_LEN) == 0);
+
+    CopyMem (Response, TEST_PAYLOAD_SERVER, TEST_PAYLOAD_LEN);
+    *ResponseSize = TEST_PAYLOAD_LEN;
+  }
+
   return RETURN_SUCCESS;
 }
 
@@ -89,6 +101,8 @@ RETURN_STATUS
 EFIAPI
 SpdmGetResponseVendorDefinedRequest (
   IN     VOID                *SpdmContext,
+  IN     UINT32               *SessionId,
+  IN     BOOLEAN              IsAppMessage,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
   IN OUT UINTN                *ResponseSize,
@@ -98,6 +112,8 @@ SpdmGetResponseVendorDefinedRequest (
   RETURN_STATUS  Status;
 
   Status = TestSpdmProcessPacketCallback (
+             SessionId,
+             IsAppMessage,
              Request,
              RequestSize,
              Response,
