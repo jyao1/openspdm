@@ -9,6 +9,23 @@
 
 #include "SpdmResponderLibInternal.h"
 
+/**
+  Process the SPDM KEY_UPDATE request and return the response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  RequestSize                  Size in bytes of the request data.
+  @param  Request                      A pointer to the request data.
+  @param  ResponseSize                 Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  Response                     A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The request is processed and the response is returned.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseKeyUpdate (
@@ -44,10 +61,10 @@ SpdmGetResponseKeyUpdate (
     break;
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
     SpdmCreateUpdateSessionDataKey (Context, SessionId, SpdmKeyUpdateActionAll);
-    SpdmFinalizeUpdateSessionDataKey (Context, SessionId, TRUE, SpdmKeyUpdateActionResponder);
+    SpdmActivateUpdateSessionDataKey (Context, SessionId, TRUE, SpdmKeyUpdateActionResponder);
     break;
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
-    SpdmFinalizeUpdateSessionDataKey (Context, SessionId, TRUE, SpdmKeyUpdateActionRequester);
+    SpdmActivateUpdateSessionDataKey (Context, SessionId, TRUE, SpdmKeyUpdateActionRequester);
     break;
   default:
     SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);

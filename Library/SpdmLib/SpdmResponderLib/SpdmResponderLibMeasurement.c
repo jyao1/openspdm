@@ -84,6 +84,23 @@ SpdmResponderCreateMeasurementSig (
   return Result;
 }
 
+/**
+  Process the SPDM GET_MEASUREMENT request and return the response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  RequestSize                  Size in bytes of the request data.
+  @param  Request                      A pointer to the request data.
+  @param  ResponseSize                 Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  Response                     A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The request is processed and the response is returned.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseMeasurement (
@@ -175,7 +192,7 @@ SpdmGetResponseMeasurement (
     SpdmResponse->Header.Param1 = SpdmContext->LocalContext.DeviceMeasurementCount;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 0;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = 0;
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, 0);
 
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
       if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
@@ -209,7 +226,7 @@ SpdmGetResponseMeasurement (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = SpdmContext->LocalContext.DeviceMeasurementCount;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(MeasurmentBlockSize * SpdmContext->LocalContext.DeviceMeasurementCount);
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(MeasurmentBlockSize * SpdmContext->LocalContext.DeviceMeasurementCount));
 
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
@@ -253,7 +270,7 @@ SpdmGetResponseMeasurement (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = 0;
       SpdmResponse->NumberOfBlocks = 1;
-      *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)MeasurmentBlockSize;
+      SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)MeasurmentBlockSize);
 
       MeasurmentBlock = (VOID *)(SpdmResponse + 1);
       CachedMeasurmentBlock = (VOID *)((UINTN)SpdmContext->LocalContext.DeviceMeasurement + MeasurmentBlockSize * (SpdmRequest->Header.Param2 - 1));

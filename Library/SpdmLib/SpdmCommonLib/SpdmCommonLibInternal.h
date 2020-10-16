@@ -350,12 +350,10 @@ typedef struct {
 } SPDM_DEVICE_CONTEXT;
 
 /**
-
   This function dump raw data.
 
   @param  Data  raw data
   @param  Size  raw data size
-
 **/
 VOID
 InternalDumpData (
@@ -364,12 +362,10 @@ InternalDumpData (
   );
 
 /**
-
   This function dump raw data with colume format.
 
   @param  Data  raw data
   @param  Size  raw data size
-
 **/
 VOID
 InternalDumpHex (
@@ -378,11 +374,37 @@ InternalDumpHex (
   );
 
 /**
-  This function returns the SPDM hash size.
+  Reads a 24-bit value from memory that may be unaligned.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  Buffer  The pointer to a 24-bit value that may be unaligned.
 
-  @return TCG SPDM hash size
+  @return The 24-bit value read from Buffer.
+**/
+UINT32
+SpdmReadUint24 (
+  IN UINT8  *Buffer
+  );
+
+/**
+  Writes a 24-bit value to memory that may be unaligned.
+
+  @param  Buffer  The pointer to a 24-bit value that may be unaligned.
+  @param  Value   24-bit value to write to Buffer.
+
+  @return The 24-bit value to write to Buffer.
+**/
+UINT32
+SpdmWriteUint24 (
+  IN UINT8  *Buffer,
+  IN UINT32 Value
+  );
+
+/**
+  This function returns the SPDM hash algorithm size.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return SPDM hash algorithm size.
 **/
 UINT32
 GetSpdmHashSize (
@@ -390,11 +412,11 @@ GetSpdmHashSize (
   );
 
 /**
-  This function returns the SPDM asym size.
+  This function returns the SPDM asymmetric algorithm size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM hash size
+  @return SPDM asymmetric algorithm size.
 **/
 UINT32
 GetSpdmAsymSize (
@@ -402,11 +424,11 @@ GetSpdmAsymSize (
   );
 
 /**
-  This function returns the SPDM Request asym size.
+  This function returns the SPDM requester asymmetric algorithm size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM hash size
+  @return SPDM requester asymmetric algorithm size.
 **/
 UINT32
 GetSpdmReqAsymSize (
@@ -414,17 +436,30 @@ GetSpdmReqAsymSize (
   );
 
 /**
-  This function returns the SPDM measurement hash size.
+  This function returns the SPDM measurement hash algorithm size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM measurement hash size
+  @return SPDM measurement hash algorithm size.
 **/
 UINT32
 GetSpdmMeasurementHashSize (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
+/**
+  Computes the hash of a input data buffer, based upon the negotiated hash algorithm.
+
+  This function performs the hash of a given data buffer, and return the hash value.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Data                         Pointer to the buffer containing the data to be hashed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the hash value.
+
+  @retval TRUE   Hash computation succeeded.
+  @retval FALSE  Hash computation failed.
+**/
 BOOLEAN
 SpdmHashAll (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -433,6 +468,19 @@ SpdmHashAll (
   OUT  UINT8                        *HashValue
   );
 
+/**
+  Computes the hash of a input data buffer, based upon the negotiated measurement hash algorithm.
+
+  This function performs the hash of a given data buffer, and return the hash value.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Data                         Pointer to the buffer containing the data to be hashed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the hash value.
+
+  @retval TRUE   Hash computation succeeded.
+  @retval FALSE  Hash computation failed.
+**/
 BOOLEAN
 SpdmMeasurementHashAll (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -441,6 +489,21 @@ SpdmMeasurementHashAll (
   OUT  UINT8                        *HashValue
   );
 
+/**
+  Computes the HMAC of a input data buffer, based upon the negotiated HMAC algorithm.
+
+  This function performs the HMAC of a given data buffer, and return the hash value.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  Key                          Pointer to the user-supplied key.
+  @param  KeySize                      Key size in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
 BOOLEAN
 SpdmHmacAll (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -451,6 +514,20 @@ SpdmHmacAll (
   OUT  UINT8                        *HmacValue
   );
 
+/**
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Prk                          Pointer to the user-supplied key.
+  @param  PrkSize                      Key size in bytes.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+**/
 BOOLEAN
 SpdmHkdfExpand (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -463,11 +540,11 @@ SpdmHkdfExpand (
   );
 
 /**
-  This function returns the SPDM DHENamedGroup size.
+  This function returns the SPDM DHE algorithm key size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM DHENamedGroup size
+  @return SPDM DHE algorithm key size.
 **/
 UINT32
 GetSpdmDheKeySize (
@@ -475,11 +552,11 @@ GetSpdmDheKeySize (
   );
 
 /**
-  This function returns the SPDM AEAD key size.
+  This function returns the SPDM AEAD algorithm key size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM AEAD key size
+  @return SPDM AEAD algorithm key size.
 **/
 UINT32
 GetSpdmAeadKeySize (
@@ -487,11 +564,11 @@ GetSpdmAeadKeySize (
   );
 
 /**
-  This function returns the SPDM AEAD iv size.
+  This function returns the SPDM AEAD algorithm iv size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM AEAD iv size
+  @return SPDM AEAD algorithm iv size.
 **/
 UINT32
 GetSpdmAeadIvSize (
@@ -499,11 +576,11 @@ GetSpdmAeadIvSize (
   );
 
 /**
-  This function returns the SPDM AEAD tag size.
+  This function returns the SPDM AEAD algorithm tag size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM AEAD iv size
+  @return SPDM AEAD algorithm tag size.
 **/
 UINT32
 GetSpdmAeadTagSize (
@@ -511,17 +588,38 @@ GetSpdmAeadTagSize (
   );
 
 /**
-  This function returns the SPDM AEAD block size.
+  This function returns the SPDM AEAD algorithm block size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM AEAD iv size
+  @return SPDM AEAD algorithm block size.
 **/
 UINT32
 GetSpdmAeadBlockSize (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
+/**
+  Performs AEAD authenticated encryption on a data buffer and additional authenticated data (AAD),
+  based upon negotiated AEAD algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be encrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  TagOut                       Pointer to a buffer that receives the authentication tag output.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the encryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated encryption succeeded.
+  @retval FALSE  AEAD authenticated encryption failed.
+**/
 BOOLEAN
 SpdmAeadEncryption (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -539,6 +637,27 @@ SpdmAeadEncryption (
   OUT  UINTN*                       DataOutSize
   );
 
+/**
+  Performs AEAD authenticated decryption on a data buffer and additional authenticated data (AAD),
+  based upon negotiated AEAD algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be decrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  Tag                          Pointer to a buffer that contains the authentication tag.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the decryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated decryption succeeded.
+  @retval FALSE  AEAD authenticated decryption failed.
+**/
 BOOLEAN
 SpdmAeadDecryption (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -556,6 +675,19 @@ SpdmAeadDecryption (
   OUT  UINTN*                       DataOutSize
   );
 
+/**
+  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate,
+  based upon negotiated asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Cert                         Pointer to the DER-encoded X509 certificate.
+  @param  CertSize                     Size of the X509 certificate in bytes.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve public key from X509 certificate.
+**/
 BOOLEAN
 SpdmAsymGetPublicKeyFromX509 (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -564,12 +696,33 @@ SpdmAsymGetPublicKeyFromX509 (
   OUT  VOID                         **Context
   );
 
+/**
+  Release the specified asymmetric context,
+  based upon negotiated asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the asymmetric context to be released.
+**/
 VOID
 SpdmAsymFree (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   VOID                         *Context
   );
 
+/**
+  Verifies the asymmetric signature,
+  based upon negotiated asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to asymmetric context for signature verification.
+  @param  MessageHash                  Pointer to octet message hash to be checked.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to asymmetric signature to be verified.
+  @param  SigSize                      Size of signature in bytes.
+
+  @retval  TRUE   Valid asymmetric signature.
+  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
+**/
 BOOLEAN
 SpdmAsymVerify (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -580,6 +733,19 @@ SpdmAsymVerify (
   IN   UINTN                        SigSize
   );
 
+/**
+  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate,
+  based upon negotiated requester asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Cert                         Pointer to the DER-encoded X509 certificate.
+  @param  CertSize                     Size of the X509 certificate in bytes.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve public key from X509 certificate.
+**/
 BOOLEAN
 SpdmReqAsymGetPublicKeyFromX509 (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -588,12 +754,33 @@ SpdmReqAsymGetPublicKeyFromX509 (
   OUT  VOID                         **Context
   );
 
+/**
+  Release the specified asymmetric context,
+  based upon negotiated requester asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the asymmetric context to be released.
+**/
 VOID
 SpdmReqAsymFree (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   VOID                         *Context
   );
 
+/**
+  Verifies the asymmetric signature,
+  based upon negotiated requester asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to asymmetric context for signature verification.
+  @param  MessageHash                  Pointer to octet message hash to be checked.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to asymmetric signature to be verified.
+  @param  SigSize                      Size of signature in bytes.
+
+  @retval  TRUE   Valid asymmetric signature.
+  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
+**/
 BOOLEAN
 SpdmReqAsymVerify (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -604,17 +791,49 @@ SpdmReqAsymVerify (
   IN   UINTN                        SigSize
   );
 
+/**
+  Allocates and Initializes one Diffie-Hellman Ephemeral (DHE) Context for subsequent use,
+  based upon negotiated DHE algorithm.
+
+  @return  Pointer to the Diffie-Hellman Context that has been initialized.
+**/
 VOID *
 SpdmDheNew (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext
   );
 
+/**
+  Release the specified DHE context,
+  based upon negotiated DHE algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the DHE context to be released.
+**/
 VOID
 SpdmDheFree (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN   VOID                         *Context
   );
 
+/**
+  Generates DHE public key,
+  based upon negotiated DHE algorithm.
+
+  This function generates random secret exponent, and computes the public key, which is
+  returned via parameter PublicKey and PublicKeySize. DH context is updated accordingly.
+  If the PublicKey buffer is too small to hold the public key, FALSE is returned and
+  PublicKeySize is set to the required buffer size to obtain the public key.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the DHE context.
+  @param  PublicKey                    Pointer to the buffer to receive generated public key.
+  @param  PublicKeySize                On input, the size of PublicKey buffer in bytes.
+                                       On output, the size of data returned in PublicKey buffer in bytes.
+
+  @retval TRUE   DHE public key generation succeeded.
+  @retval FALSE  DHE public key generation failed.
+  @retval FALSE  PublicKeySize is not large enough.
+**/
 BOOLEAN
 SpdmDheGenerateKey (
   IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -623,6 +842,25 @@ SpdmDheGenerateKey (
   IN OUT  UINTN                        *PublicKeySize
   );
 
+/**
+  Computes exchanged common key,
+  based upon negotiated DHE algorithm.
+
+  Given peer's public key, this function computes the exchanged common key, based on its own
+  context including value of prime modulus and random secret exponent.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the DHE context.
+  @param  PeerPublicKey                Pointer to the peer's public key.
+  @param  PeerPublicKeySize            Size of peer's public key in bytes.
+  @param  Key                          Pointer to the buffer to receive generated key.
+  @param  KeySize                      On input, the size of Key buffer in bytes.
+                                       On output, the size of data returned in Key buffer in bytes.
+
+  @retval TRUE   DHE exchanged key generation succeeded.
+  @retval FALSE  DHE exchanged key generation failed.
+  @retval FALSE  KeySize is not large enough.
+**/
 BOOLEAN
 SpdmDheComputeKey (
   IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -633,6 +871,13 @@ SpdmDheComputeKey (
   IN OUT  UINTN                        *KeySize
   );
 
+/**
+  Generates a random byte stream of the specified size.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Size                         Size of random bytes to generate.
+  @param  Rand                         Pointer to buffer to receive random value.
+**/
 VOID
 SpdmGetRandomNumber (
   IN  UINTN                     Size,
@@ -641,6 +886,13 @@ SpdmGetRandomNumber (
 
 /**
   Append a new data buffer to the managed buffer.
+
+  @param  ManagedBuffer                The managed buffer to be appended.
+  @param  Buffer                       The address of the data buffer to be appended to the managed buffer.
+  @param  BufferSize                   The size in bytes of the data buffer to be appended to the managed buffer.
+
+  @retval RETURN_SUCCESS               The new data buffer is appended to the managed buffer.
+  @retval RETURN_BUFFER_TOO_SMALL      The managed buffer is too small to be appended.
 **/
 RETURN_STATUS
 AppendManagedBuffer (
@@ -651,10 +903,16 @@ AppendManagedBuffer (
 
 /**
   Shrink the size of the managed buffer.
+
+  @param  ManagedBuffer                The managed buffer to be shrinked.
+  @param  BufferSize                   The size in bytes of the size of the buffer to be shrinked.
+
+  @retval RETURN_SUCCESS               The managed buffer is shrinked.
+  @retval RETURN_BUFFER_TOO_SMALL      The managed buffer is too small to be shrinked.
 **/
 RETURN_STATUS
 ShrinkManagedBuffer (
-  IN OUT VOID            *MBuffer,
+  IN OUT VOID            *ManagedBuffer,
   IN UINTN               BufferSize
   );
 
@@ -663,6 +921,8 @@ ShrinkManagedBuffer (
   The BufferSize is reset to 0.
   The MaxBufferSize is unchanged.
   The Buffer is not freed.
+
+  @param  ManagedBuffer                The managed buffer to be shrinked.
 **/
 VOID
 ResetManagedBuffer (
@@ -670,7 +930,11 @@ ResetManagedBuffer (
   );
 
 /**
-  Return the size of buffer
+  Return the size of managed buffer.
+
+  @param  ManagedBuffer                The managed buffer.
+
+  @return the size of managed buffer.
 **/
 UINTN
 GetManagedBufferSize (
@@ -678,7 +942,11 @@ GetManagedBufferSize (
   );
 
 /**
-  Return the buffer
+  Return the address of managed buffer.
+
+  @param  ManagedBuffer                The managed buffer.
+
+  @return the address of managed buffer.
 **/
 VOID *
 GetManagedBuffer (
@@ -686,18 +954,25 @@ GetManagedBuffer (
   );
 
 /**
-  Init the buffer
+  Init the managed buffer.
+
+  @param  ManagedBuffer                The managed buffer.
+  @param  MaxBufferSize                The maximum size in bytes of the managed buffer.
 **/
 VOID
 InitManagedBuffer (
-  IN OUT VOID            *MBuffer,
+  IN OUT VOID            *ManagedBuffer,
   IN UINTN               MaxBufferSize
   );
 
 /**
-  This function generate SPDM HandshakeKey.
+  This function generates SPDM HandshakeKey for a session.
 
-  @param[in]  SpdmContext            The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
+
+  @retval RETURN_SUCCESS  SPDM HandshakeKey for a session is generated.
 **/
 RETURN_STATUS
 SpdmGenerateSessionHandshakeKey (
@@ -707,9 +982,13 @@ SpdmGenerateSessionHandshakeKey (
   );
 
 /**
-  This function generate SPDM DataKey.
+  This function generates SPDM DataKey for a session.
 
-  @param[in]  SpdmContext            The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
+
+  @retval RETURN_SUCCESS  SPDM DataKey for a session is generated.
 **/
 RETURN_STATUS
 SpdmGenerateSessionDataKey (
@@ -725,9 +1004,13 @@ typedef enum {
 } SPDM_KEY_UPDATE_ACTION;
 
 /**
-  This function update SPDM DataKey.
+  This function creates the updates of SPDM DataKey for a session.
 
-  @param[in]  SpdmContext            The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  Action                       Indicate of the key update action.
+
+  @retval RETURN_SUCCESS  SPDM DataKey update is created.
 **/
 RETURN_STATUS
 SpdmCreateUpdateSessionDataKey (
@@ -737,36 +1020,98 @@ SpdmCreateUpdateSessionDataKey (
   );
 
 /**
-  This function activate the update of SPDM DataKey.
+  This function activates the update of SPDM DataKey for a session.
 
-  @param[in]  SpdmContext            The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  Action                       Indicate of the key update action.
+  @param  UseNewKey                    Indicate if the new key should be used.
+
+  @retval RETURN_SUCCESS  SPDM DataKey update is activated.
 **/
 RETURN_STATUS
-SpdmFinalizeUpdateSessionDataKey (
+SpdmActivateUpdateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN UINT32                       SessionId,
   IN SPDM_KEY_UPDATE_ACTION       Action,
   IN BOOLEAN                      UseNewKey
   );
 
+/**
+  This function gets the session info via session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return session info.
+**/
 SPDM_SESSION_INFO *
 SpdmGetSessionInfoViaSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN     UINT32                    SessionId
   );
 
+/**
+  This function assigns a new session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return session info associated with this new session ID.
+**/
 SPDM_SESSION_INFO *
 SpdmAssignSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN     UINT32                    SessionId
   );
 
+/**
+  This function frees a session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return freed session info assicated with this session ID.
+**/
 SPDM_SESSION_INFO *
 SpdmFreeSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN     UINT32                    SessionId
   );
 
+/**
+  This function allocates half of session ID for a requester.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return half of session ID for a requester.
+**/
+UINT16
+SpdmAllocateReqSessionId (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext
+  );
+
+/**
+  This function allocates half of session ID for a responder.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return half of session ID for a responder.
+**/
+UINT16
+SpdmAllocateRspSessionId (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext
+  );
+
+/**
+  This function returns if a given version is supported based upon the GET_VERSION/VERSION.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Version                      The SPDM Version.
+
+  @retval TRUE  the version is supported.
+  @retval FALSE the version is not supported.
+**/
 BOOLEAN
 SpdmIsVersionSupported (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
@@ -774,7 +1119,8 @@ SpdmIsVersionSupported (
   );
 
 /**
-  Retrieve the SubjectAltName from SubjectAltName Bytes
+  Retrieve the SubjectAltName from SubjectAltName Bytes.
+
   @param[in]      Buffer           Pointer to subjectAltName oct bytes.
   @param[in]      Len              Size of Buffer in bytes.
   @param[out]     NameBuffer       Buffer to contain the retrieved certificate
@@ -800,7 +1146,6 @@ SpdmIsVersionSupported (
   @retval RETURN_UNSUPPORTED       The operation is not supported.
 **/
 RETURN_STATUS
-EFIAPI
 SpdmGetDMTFSubjectAltNameFromBytes (
   IN      CONST UINT8   *Buffer,
   IN      INTN          Len,
@@ -812,6 +1157,7 @@ SpdmGetDMTFSubjectAltNameFromBytes (
 
 /**
   Retrieve the SubjectAltName from one X.509 certificate.
+
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
   @param[out]     NameBuffer       Buffer to contain the retrieved certificate
@@ -856,7 +1202,7 @@ SpdmGetDMTFSubjectAltName (
   @retval  FALSE  Certificate is not valid
 **/
 BOOLEAN
-SpdmX509CertificateCheck(
+SpdmX509CertificateCheck (
   IN   CONST UINT8  *Cert,
   IN   UINTN        CertSize
   );

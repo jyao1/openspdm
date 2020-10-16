@@ -52,6 +52,13 @@ SpdmGetResponseFuncViaLastRequest (
   return NULL;
 }
 
+/**
+  Return the GET_SPDM_RESPONSE function via request code.
+
+  @param  RequestCode                  The SPDM request code.
+
+  @return GET_SPDM_RESPONSE function according to the request code.
+**/
 SPDM_GET_SPDM_RESPONSE_FUNC
 SpdmGetResponseFuncViaRequestCode (
   IN     UINT8                    RequestCode
@@ -68,8 +75,24 @@ SpdmGetResponseFuncViaRequestCode (
   return NULL;
 }
 
+/**
+  Process a SPDM request from a device.
+
+  @param  SpdmContext                  The SPDM context for the device.
+  @param  SessionId                    Indicate if the request is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  IsAppMessage                 Indicates if it is an APP message or SPDM message.
+  @param  RequestSize                  Size in bytes of the request data buffer.
+  @param  Request                      A pointer to a destination buffer to store the request.
+                                       The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
+
+  @retval RETURN_SUCCESS               The SPDM request is received successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM request is received from the device.
+**/
 RETURN_STATUS
-SpdmReceiveRequestEx (
+SpdmProcessRequest (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
      OUT UINT32                  **SessionId,
      OUT BOOLEAN                 *IsAppMessage,
@@ -116,8 +139,24 @@ SpdmReceiveRequestEx (
   return RETURN_SUCCESS;
 }
 
+/**
+  Build a SPDM response to a device.
+  
+  @param  SpdmContext                  The SPDM context for the device.
+  @param  SessionId                    Indicate if the response is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  IsAppMessage                 Indicates if it is an APP message or SPDM message.
+  @param  ResponseSize                 Size in bytes of the response data buffer.
+  @param  Response                     A pointer to a destination buffer to store the response.
+                                       The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
+
+  @retval RETURN_SUCCESS               The SPDM response is sent successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM response is sent to the device.
+**/
 RETURN_STATUS
-SpdmSendResponseEx (
+SpdmBuildResponse (
   IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
   IN     UINT32                  *SessionId,
   IN     BOOLEAN                 IsAppMessage,
@@ -221,6 +260,15 @@ SpdmSendResponseEx (
   return RETURN_SUCCESS;
 }
 
+/**
+  Register an SPDM or APP message process function.
+
+  If the default message process function cannot handle the message,
+  this function will be invoked.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  GetResponseFunc              The function to process the encapsuled message.
+**/
 VOID
 EFIAPI
 SpdmRegisterGetResponseFunc (

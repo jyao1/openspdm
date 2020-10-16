@@ -89,7 +89,7 @@ TrySpdmGetDigest (
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;
 
-  Status = SpdmSendRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -101,7 +101,7 @@ TrySpdmGetDigest (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -161,6 +161,23 @@ TrySpdmGetDigest (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function sends GET_DIGEST
+  to get all digest of the certificate chains from device.
+
+  If the peer certificate chain is deployed,
+  this function also verifies the digest with the certificate chain.
+
+  TotalDigestSize = sizeof(Digest) * Count in SlotMask
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SlotMask                     The slots which deploy the CertificateChain.
+  @param  TotalDigestBuffer            A pointer to a destination buffer to store the digest buffer.
+
+  @retval RETURN_SUCCESS               The digests are got successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetDigest (

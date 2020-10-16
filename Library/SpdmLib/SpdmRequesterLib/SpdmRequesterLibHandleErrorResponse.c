@@ -12,19 +12,33 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
-  // Param1: OriginRequestCode
+  // Param1: OriginalRequestCode
   // Param2: Token
 } SPDM_RESPOND_IF_READY_REQUEST;
 #pragma pack()
 
+/**
+  This function sends RESPOND_IF_READY and receives an expected SPDM response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ResponseSize                 The size of the response.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned.
+  @param  Response                     The SPDM response message.
+  @param  ExpectedResponseCode         Indicate the expected response code.
+  @param  ExpectedResponseSize         Indicate the expected response size.
+
+  @retval RETURN_SUCCESS               The RESPOND_IF_READY is sent and an expected SPDM response is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmRequesterRespondIfReady (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINTN                *ResponseSize,
-  IN OUT VOID                 *Response,
-  IN     UINT8                 ExpectResponseCode,
-  IN     UINTN                 ExpectResponseSize
+     OUT VOID                 *Response,
+  IN     UINT8                 ExpectedResponseCode,
+  IN     UINTN                 ExpectedResponseSize
   )
 {
   RETURN_STATUS                             Status;
@@ -34,22 +48,22 @@ SpdmRequesterRespondIfReady (
   SpdmRequest.Header.RequestResponseCode = SPDM_RESPOND_IF_READY;
   SpdmRequest.Header.Param1 = SpdmContext->ErrorData.RequestCode;
   SpdmRequest.Header.Param2 = SpdmContext->ErrorData.Token;
-  Status = SpdmSendRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
-  *ResponseSize = ExpectResponseSize;
-  ZeroMem (Response, ExpectResponseSize);
-  Status = SpdmReceiveResponse (SpdmContext, NULL, ResponseSize, Response);
+  *ResponseSize = ExpectedResponseSize;
+  ZeroMem (Response, ExpectedResponseSize);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, ResponseSize, Response);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (((SPDM_MESSAGE_HEADER*)Response)->RequestResponseCode != ExpectResponseCode) {
+  if (((SPDM_MESSAGE_HEADER*)Response)->RequestResponseCode != ExpectedResponseCode) {
     return RETURN_DEVICE_ERROR;
   }
   // For response like SPDM_ALGORITHMS, we just can expect the max response size
-  if (*ResponseSize > ExpectResponseSize) {
+  if (*ResponseSize > ExpectedResponseSize) {
     return RETURN_DEVICE_ERROR;
   }
   return RETURN_SUCCESS;
@@ -82,9 +96,9 @@ SpdmHandleResponseNotReady (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINTN                *ResponseSize,
   IN OUT VOID                 *Response,
-  IN     UINT8                 OriginRequestCode,
-  IN     UINT8                 ExpectResponseCode,
-  IN     UINTN                 ExpectResponseSize
+  IN     UINT8                 OriginalRequestCode,
+  IN     UINT8                 ExpectedResponseCode,
+  IN     UINTN                 ExpectedResponseSize
   )
 {
   SPDM_ERROR_RESPONSE                  *SpdmResponse;
@@ -95,16 +109,41 @@ SpdmHandleResponseNotReady (
   ASSERT(SpdmResponse->Header.RequestResponseCode == SPDM_ERROR);
   ASSERT(SpdmResponse->Header.Param1 == SPDM_ERROR_CODE_RESPONSE_NOT_READY);
   ASSERT(*ResponseSize == sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY));
-  ASSERT(ExtendErrorData->RequestCode == OriginRequestCode);
+  ASSERT(ExtendErrorData->RequestCode == OriginalRequestCode);
 
   SpdmContext->ErrorData.RDTExponent = ExtendErrorData->RDTExponent;
   SpdmContext->ErrorData.RequestCode = ExtendErrorData->RequestCode;
   SpdmContext->ErrorData.Token       = ExtendErrorData->Token;
   SpdmContext->ErrorData.RDTM        = ExtendErrorData->RDTM;
 
-  return SpdmRequesterRespondIfReady(SpdmContext, ResponseSize, Response, ExpectResponseCode, ExpectResponseSize);
+  return SpdmRequesterRespondIfReady(SpdmContext, ResponseSize, Response, ExpectedResponseCode, ExpectedResponseSize);
 }
 
+/**
+  This function handles the error response.
+
+  The SPDM response code must be SPDM_ERROR.
+  For error code RESPONSE_NOT_READY, this function sends RESPOND_IF_READY and receives an expected SPDM response.
+  For error code BUSY, this function shrinks the managed buffer, and return RETURN_NO_RESPONSE.
+  For error code REQUEST_RESYNCH, this function shrinks the managed buffer, clears SpdmCmdReceiveState, and return RETURN_DEVICE_ERROR.
+  For any other error code, this function shrinks the managed buffer, and return RETURN_DEVICE_ERROR.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ManagedBuffer                The managed buffer to be shrinked.
+  @param  ShrinkBufferSize             The size in bytes of the size of the buffer to be shrinked.
+  @param  ResponseSize                 The size of the response.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned.
+  @param  Response                     The SPDM response message.
+  @param  OriginalRequestCode          Indicate the original request code.
+  @param  ExpectedResponseCode         Indicate the expected response code.
+  @param  ExpectedResponseSize         Indicate the expected response size.
+
+  @retval RETURN_SUCCESS               The error code is RESPONSE_NOT_READY. The RESPOND_IF_READY is sent and an expected SPDM response is received.
+  @retval RETURN_NO_RESPONSE           The error code is BUSY.
+  @retval RETURN_DEVICE_ERROR          The error code is REQUEST_RESYNCH or others.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmHandleErrorResponseMain (
@@ -113,9 +152,9 @@ SpdmHandleErrorResponseMain (
   IN     UINTN                 ShrinkBufferSize,
   IN OUT UINTN                *ResponseSize,
   IN OUT VOID                 *Response,
-  IN     UINT8                 OriginRequestCode,
-  IN     UINT8                 ExpectResponseCode,
-  IN     UINTN                 ExpectResponseSize
+  IN     UINT8                 OriginalRequestCode,
+  IN     UINT8                 ExpectedResponseCode,
+  IN     UINTN                 ExpectedResponseSize
   )
 {
   ASSERT(((SPDM_MESSAGE_HEADER*)Response)->RequestResponseCode == SPDM_ERROR);
@@ -123,7 +162,7 @@ SpdmHandleErrorResponseMain (
     ShrinkManagedBuffer(MBuffer, ShrinkBufferSize);
     return SpdmHandleSimpleErrorResponse(SpdmContext, ((SPDM_MESSAGE_HEADER*)Response)->Param1);
   } else {
-    return SpdmHandleResponseNotReady(SpdmContext, ResponseSize, Response, OriginRequestCode, ExpectResponseCode, ExpectResponseSize);
+    return SpdmHandleResponseNotReady(SpdmContext, ResponseSize, Response, OriginalRequestCode, ExpectedResponseCode, ExpectedResponseSize);
   }
 }
 

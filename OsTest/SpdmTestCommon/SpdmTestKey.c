@@ -11,6 +11,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define SHA256_HASH_SIZE  32
 
+/**
+  Retrieve the Private Key from the password-protected PEM key data.
+
+  @param  PemData                      Pointer to the PEM-encoded key data to be retrieved.
+  @param  PemSize                      Size of the PEM key data in bytes.
+  @param  Password                     NULL-terminated passphrase used for encrypted PEM key data.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved private key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+**/
 typedef
 BOOLEAN
 (EFIAPI *ASYM_GET_PRIVATE_KEY_FROM_PEM) (
@@ -20,12 +32,34 @@ BOOLEAN
   OUT  VOID         **Context
   );
 
+/**
+  Release the specified asymmetric context
+
+  @param  Context                      Pointer to the asymmetric context to be released.
+**/
 typedef
 VOID
 (EFIAPI *ASYM_FREE) (
   IN  VOID         *Context
   );
 
+/**
+  Carries out the signature generation.
+
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  @param  Context                      Pointer to asymmetric context for signature generation.
+  @param  MessageHash                  Pointer to octet message hash to be signed.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to buffer to receive signature.
+  @param  SigSize                      On input, the size of Signature buffer in bytes.
+                                       On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+**/
 typedef
 BOOLEAN
 (EFIAPI *ASYM_SIGN) (
@@ -36,6 +70,24 @@ BOOLEAN
   IN OUT  UINTN        *SigSize
   );
 
+/**
+  Computes the SHA-256 message digest of a input data buffer.
+
+  This function performs the SHA-256 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-256 digest
+                           value (32 bytes).
+
+  @retval TRUE   SHA-256 digest computation succeeded.
+  @retval FALSE  SHA-256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
 BOOLEAN
 EFIAPI
 Sha256HashAll (
@@ -407,6 +459,13 @@ ReadRequesterPublicCertificateChain (
   return TRUE;
 }
 
+/**
+  Return asymmetric GET_PRIVATE_KEY_FROM_PEM function, based upon the asymmetric algorithm.
+
+  @param  AsymAlgo                     The asymmetric algorithm.
+
+  @return asymmetric GET_PRIVATE_KEY_FROM_PEM function
+**/
 ASYM_GET_PRIVATE_KEY_FROM_PEM
 TestGetSpdmAsymGetPrivateKeyFromPem (
   IN      UINT32       AsymAlgo
@@ -428,6 +487,19 @@ TestGetSpdmAsymGetPrivateKeyFromPem (
   return NULL;
 }
 
+/**
+  Retrieve the Private Key from the password-protected PEM key data.
+
+  @param  AsymAlgo                     The asymmetric algorithm.
+  @param  PemData                      Pointer to the PEM-encoded key data to be retrieved.
+  @param  PemSize                      Size of the PEM key data in bytes.
+  @param  Password                     NULL-terminated passphrase used for encrypted PEM key data.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved private key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+**/
 BOOLEAN
 TestSpdmAsymGetPrivateKeyFromPem (
   IN      UINT32       AsymAlgo,
@@ -445,6 +517,13 @@ TestSpdmAsymGetPrivateKeyFromPem (
   return AsymGetPrivateKeyFromPem (PemData, PemSize, Password, Context);
 }
 
+/**
+  Return asymmetric free function, based upon the asymmetric algorithm.
+
+  @param  AsymAlgo                     The asymmetric algorithm.
+
+  @return asymmetric free function
+**/
 ASYM_FREE
 TestGetSpdmAsymFree (
   IN      UINT32       AsymAlgo
@@ -466,6 +545,12 @@ TestGetSpdmAsymFree (
   return NULL;
 }
 
+/**
+  Release the specified asymmetric context
+
+  @param  AsymAlgo                     The asymmetric algorithm.
+  @param  Context                      Pointer to the asymmetric context to be released.
+**/
 VOID
 TestSpdmAsymFree (
   IN      UINT32       AsymAlgo,
@@ -480,6 +565,13 @@ TestSpdmAsymFree (
   AsymFree (Context);
 }
 
+/**
+  Return asymmetric sign function, based upon the asymmetric algorithm.
+
+  @param  AsymAlgo                     The asymmetric algorithm.
+
+  @return asymmetric sign function
+**/
 ASYM_SIGN
 TestGetSpdmAsymSign (
   IN      UINT32       AsymAlgo
@@ -502,6 +594,24 @@ TestGetSpdmAsymSign (
   return NULL;
 }
 
+/**
+  Carries out the signature generation.
+
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  @param  AsymAlgo                     The asymmetric algorithm.
+  @param  Context                      Pointer to asymmetric context for signature generation.
+  @param  MessageHash                  Pointer to octet message hash to be signed.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to buffer to receive signature.
+  @param  SigSize                      On input, the size of Signature buffer in bytes.
+                                       On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+**/
 BOOLEAN
 TestSpdmAsymSign (
   IN      UINT32       AsymAlgo,
@@ -520,6 +630,23 @@ TestSpdmAsymSign (
   return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
 }
 
+/**
+  Sign an SPDM message data.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsResponder                  Indicates if it is a responder message.
+  @param  AsymAlgo                     Indicates the signing algorithm.
+                                       For responder, it must align with BaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
+                                       For requester, it must align with ReqBaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
+  @param  MessageHash                  A pointer to a message hash to be signed.
+  @param  HashSize                     The size in bytes of the message hash to be signed.
+  @param  Signature                    A pointer to a destination buffer to store the signature.
+  @param  SigSize                      On input, indicates the size in bytes of the destination buffer to store the signature.
+                                       On output, indicates the size in bytes of the signature in the buffer.
+
+  @retval TRUE  signing success.
+  @retval FALSE signing fail.
+**/
 BOOLEAN
 EFIAPI
 SpdmDataSignFunc (

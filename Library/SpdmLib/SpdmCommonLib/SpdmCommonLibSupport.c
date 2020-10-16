@@ -10,12 +10,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmCommonLibInternal.h"
 
 /**
-
   This function dump raw data.
 
   @param  Data  raw data
   @param  Size  raw data size
-
 **/
 VOID
 InternalDumpData (
@@ -30,12 +28,10 @@ InternalDumpData (
 }
 
 /**
-
   This function dump raw data with colume format.
 
   @param  Data  raw data
   @param  Size  raw data size
-
 **/
 VOID
 InternalDumpHex (
@@ -65,7 +61,49 @@ InternalDumpHex (
 }
 
 /**
+  Reads a 24-bit value from memory that may be unaligned.
+
+  @param  Buffer  The pointer to a 24-bit value that may be unaligned.
+
+  @return The 24-bit value read from Buffer.
+**/
+UINT32
+SpdmReadUint24 (
+  IN UINT8  *Buffer
+  )
+{
+  return (UINT32)(Buffer[0] | Buffer[1] << 8 | Buffer[2] << 16);
+}
+
+/**
+  Writes a 24-bit value to memory that may be unaligned.
+
+  @param  Buffer  The pointer to a 24-bit value that may be unaligned.
+  @param  Value   24-bit value to write to Buffer.
+
+  @return The 24-bit value to write to Buffer.
+**/
+UINT32
+SpdmWriteUint24 (
+  IN UINT8  *Buffer,
+  IN UINT32 Value
+  )
+{
+  Buffer[0] = (UINT8)(Value & 0xFF);
+  Buffer[1] = (UINT8)((Value >> 8) & 0xFF);
+  Buffer[2] = (UINT8)((Value >> 16) & 0xFF);
+  return Value;
+}
+
+/**
   Append a new data buffer to the managed buffer.
+
+  @param  ManagedBuffer                The managed buffer to be appended.
+  @param  Buffer                       The address of the data buffer to be appended to the managed buffer.
+  @param  BufferSize                   The size in bytes of the data buffer to be appended to the managed buffer.
+
+  @retval RETURN_SUCCESS               The new data buffer is appended to the managed buffer.
+  @retval RETURN_BUFFER_TOO_SMALL      The managed buffer is too small to be appended.
 **/
 RETURN_STATUS
 AppendManagedBuffer (
@@ -102,6 +140,12 @@ AppendManagedBuffer (
 
 /**
   Shrink the size of the managed buffer.
+
+  @param  ManagedBuffer                The managed buffer to be shrinked.
+  @param  BufferSize                   The size in bytes of the size of the buffer to be shrinked.
+
+  @retval RETURN_SUCCESS               The managed buffer is shrinked.
+  @retval RETURN_BUFFER_TOO_SMALL      The managed buffer is too small to be shrinked.
 **/
 RETURN_STATUS
 ShrinkManagedBuffer (
@@ -134,6 +178,8 @@ ShrinkManagedBuffer (
   The BufferSize is reset to 0.
   The MaxBufferSize is unchanged.
   The Buffer is not freed.
+
+  @param  ManagedBuffer                The managed buffer to be shrinked.
 **/
 VOID
 ResetManagedBuffer (
@@ -151,7 +197,11 @@ ResetManagedBuffer (
 }
 
 /**
-  Return the size of buffer
+  Return the size of managed buffer.
+
+  @param  ManagedBuffer                The managed buffer.
+
+  @return the size of managed buffer.
 **/
 UINTN
 GetManagedBufferSize (
@@ -168,7 +218,11 @@ GetManagedBufferSize (
 }
 
 /**
-  Return the buffer
+  Return the address of managed buffer.
+
+  @param  ManagedBuffer                The managed buffer.
+
+  @return the address of managed buffer.
 **/
 VOID *
 GetManagedBuffer (
@@ -185,7 +239,10 @@ GetManagedBuffer (
 }
 
 /**
-  Init the buffer
+  Init the managed buffer.
+
+  @param  ManagedBuffer                The managed buffer.
+  @param  MaxBufferSize                The maximum size in bytes of the managed buffer.
 **/
 VOID
 InitManagedBuffer (

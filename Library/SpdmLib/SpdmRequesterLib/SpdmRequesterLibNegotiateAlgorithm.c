@@ -91,7 +91,7 @@ TrySpdmNegotiateAlgorithms (
   SpdmRequest.StructTable[3].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE;
   SpdmRequest.StructTable[3].AlgCount = 0x20;
   SpdmRequest.StructTable[3].AlgSupported = SpdmContext->LocalContext.Algorithm.KeySchedule;
-  Status = SpdmSendRequest (SpdmContext, NULL, SpdmRequest.Length, &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, SpdmRequest.Length, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -103,7 +103,7 @@ TrySpdmNegotiateAlgorithms (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -198,6 +198,14 @@ TrySpdmNegotiateAlgorithms (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function sends NEGOTIATE_ALGORITHMS and receives ALGORITHMS.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @retval RETURN_SUCCESS               The NEGOTIATE_ALGORITHMS is sent and the ALGORITHMS is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmNegotiateAlgorithms (

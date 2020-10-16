@@ -21,6 +21,15 @@ SPDM_GET_ENCAP_RESPONSE_STRUCT  mSpdmGetEncapResponseStruct[] = {
   {SPDM_CHALLENGE,              SpdmGetEncapResponseChallengeAuth},
 };
 
+/**
+  Register an SPDM encapsulated message process function.
+
+  If the default encapsulated message process function cannot handle the encapsulated message,
+  this function will be invoked.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  GetEncapResponseFunc         The function to process the encapsuled message.
+**/
 VOID
 EFIAPI
 SpdmRegisterGetEncapResponseFunc (
@@ -87,16 +96,27 @@ SpdmProcessEncapsulatedRequest (
 }
 
 /**
-  This function executes SPDM Encapsulated Request.
-  
-  @param[in]  SpdmContext            The SPDM context for the device.
+  This function executes a series of SPDM encapsulated requests and receives SPDM encapsulated responses.
+
+  This function starts with the first encapsulated request (such as GET_ENCAPSULATED_REQUEST)
+  and ends with last encapsulated response (such as RESPONSE_PAYLOAD_TYPE_ABSENT or RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER).
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    Indicate if the encapsulated request is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
+  @param  SlotIdParam                  SlotIdParam from the RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER.
+
+  @retval RETURN_SUCCESS               The SPDM Encapsulated requests are sent and the responses are received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
 SpdmEncapsulatedRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
   IN     UINT8                MutAuthRequested,
-  IN OUT UINT8                *SlotIdParam
+     OUT UINT8                *SlotIdParam
   )
 {
   RETURN_STATUS                               Status;
@@ -155,7 +175,7 @@ SpdmEncapsulatedRequest (
     SpdmGetEncapsulatedRequestRequest->Header.Param1 = 0;
     SpdmGetEncapsulatedRequestRequest->Header.Param2 = 0;
     SpdmRequestSize = sizeof(SPDM_GET_ENCAPSULATED_REQUEST_REQUEST);
-    Status = SpdmSendRequest (SpdmContext, SessionId, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
+    Status = SpdmSendSpdmRequest (SpdmContext, SessionId, SpdmRequestSize, SpdmGetEncapsulatedRequestRequest);
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }
@@ -163,7 +183,7 @@ SpdmEncapsulatedRequest (
     SpdmEncapsulatedRequestResponse = (VOID *)Response;
     SpdmResponseSize = sizeof(Response);
     ZeroMem (&Response, sizeof(Response));
-    Status = SpdmReceiveResponse (SpdmContext, SessionId, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
+    Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, &SpdmResponseSize, SpdmEncapsulatedRequestResponse);
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }
@@ -203,7 +223,7 @@ SpdmEncapsulatedRequest (
     }
 
     SpdmRequestSize = sizeof(SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST) + EncapsulatedResponseSize;
-    Status = SpdmSendRequest (SpdmContext, SessionId, SpdmRequestSize, SpdmDeliverEncapsulatedResponseRequest);
+    Status = SpdmSendSpdmRequest (SpdmContext, SessionId, SpdmRequestSize, SpdmDeliverEncapsulatedResponseRequest);
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }
@@ -211,7 +231,7 @@ SpdmEncapsulatedRequest (
     SpdmEncapsulatedResponseAckResponse = (VOID *)Response;
     SpdmResponseSize = sizeof(Response);
     ZeroMem (&Response, sizeof(Response));
-    Status = SpdmReceiveResponse (SpdmContext, SessionId, &SpdmResponseSize, SpdmEncapsulatedResponseAckResponse);
+    Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, &SpdmResponseSize, SpdmEncapsulatedResponseAckResponse);
     if (RETURN_ERROR(Status)) {
       return RETURN_DEVICE_ERROR;
     }

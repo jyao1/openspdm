@@ -9,6 +9,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmCommonLibInternal.h"
 
+/**
+  This function initializes the session info.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+**/
 VOID
 SpdmSessionInfoInit (
   IN     SPDM_SESSION_INFO       *SessionInfo,
@@ -21,6 +27,14 @@ SpdmSessionInfoInit (
   SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 }
 
+/**
+  This function gets the session info via session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return session info.
+**/
 SPDM_SESSION_INFO *
 SpdmGetSessionInfoViaSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
@@ -47,6 +61,14 @@ SpdmGetSessionInfoViaSessionId (
   return NULL;
 }
 
+/**
+  This function assigns a new session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return session info associated with this new session ID.
+**/
 SPDM_SESSION_INFO *
 SpdmAssignSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
@@ -85,6 +107,13 @@ SpdmAssignSessionId (
   return NULL;
 }
 
+/**
+  This function allocates half of session ID for a requester.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return half of session ID for a requester.
+**/
 UINT16
 SpdmAllocateReqSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext
@@ -107,6 +136,13 @@ SpdmAllocateReqSessionId (
   return (INVALID_SESSION_ID & 0xFFFF0000) >> 16;
 }
 
+/**
+  This function allocates half of session ID for a responder.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return half of session ID for a responder.
+**/
 UINT16
 SpdmAllocateRspSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext
@@ -129,6 +165,14 @@ SpdmAllocateRspSessionId (
   return (INVALID_SESSION_ID & 0xFFFF);
 }
 
+/**
+  This function frees a session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return freed session info assicated with this session ID.
+**/
 SPDM_SESSION_INFO *
 SpdmFreeSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
@@ -157,6 +201,14 @@ SpdmFreeSessionId (
   return NULL;
 }
 
+/**
+  This function initializes the encapsulated context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
+  @param  SlotNum                      SlotNum to the peer in in CHALLENGE_AUTH request or RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER.
+  @param  MeasurementHashType          MeasurementHashType to the peer in CHALLENGE_AUTH request.
+**/
 VOID
 SpdmInitEncapEnv (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
@@ -170,6 +222,14 @@ SpdmInitEncapEnv (
   SpdmContext->EncapContext.MeasurementHashType = MeasurementHashType;
 }
 
+/**
+  Returns if an SPDM DataType is debug only.
+
+  @param DataType  SPDM data type.
+
+  @retval TRUE  This is debug only SPDM data type.
+  @retval FALSE This is not debug only SPDM data type.
+**/
 BOOLEAN
 IsDebugOnlyData (
   IN     SPDM_DATA_TYPE      DataType
@@ -182,6 +242,14 @@ IsDebugOnlyData (
   }
 }
 
+/**
+  Returns if an SPDM DataType requires session info.
+
+  @param DataType  SPDM data type.
+
+  @retval TRUE  session info is required.
+  @retval FALSE session info is not required.
+**/
 BOOLEAN
 NeedSessionInfoForData (
   IN     SPDM_DATA_TYPE      DataType
@@ -219,18 +287,19 @@ NeedSessionInfoForData (
 }
 
 /**
-  Set a SPDM Session Data.
+  Set an SPDM context data.
 
-  @param  This                         Indicates a pointer to the calling context.
-  @param  DataType                     Type of the session data.
-  @param  Data                         A pointer to the session data.
-  @param  DataSize                     Size of the session data.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DataType                     Type of the SPDM context data.
+  @param  Parameter                    Type specific parameter of the SPDM context data.
+  @param  Data                         A pointer to the SPDM context data.
+  @param  DataSize                     Size in bytes of the SPDM context data.
 
-  @retval RETURN_SUCCESS                  The SPDM session data is set successfully.
-  @retval RETURN_INVALID_PARAMETER        The Data is NULL or the DataType is zero.
-  @retval RETURN_UNSUPPORTED              The DataType is unsupported.
-  @retval RETURN_ACCESS_DENIED            The DataType cannot be set.
-  @retval RETURN_NOT_READY                Current session is not started.
+  @retval RETURN_SUCCESS               The SPDM context data is set successfully.
+  @retval RETURN_INVALID_PARAMETER     The Data is NULL or the DataType is zero.
+  @retval RETURN_UNSUPPORTED           The DataType is unsupported.
+  @retval RETURN_ACCESS_DENIED         The DataType cannot be set.
+  @retval RETURN_NOT_READY             Data is not ready to set.
 **/
 RETURN_STATUS
 EFIAPI
@@ -407,22 +476,23 @@ SpdmSetData (
 }
 
 /**
-  Get a SPDM Session Data.
+  Get an SPDM context data.
 
-  @param  This                         Indicates a pointer to the calling context.
-  @param  DataType                     Type of the session data.
-  @param  Data                         A pointer to the session data.
-  @param  DataSize                     Size of the session data. On input, it means the size of Data
-                                       buffer. On output, it means the size of copied Data buffer if
-                                       RETURN_SUCCESS, and means the size of desired Data buffer if
-                                       RETURN_BUFFER_TOO_SMALL.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DataType                     Type of the SPDM context data.
+  @param  Parameter                    Type specific parameter of the SPDM context data.
+  @param  Data                         A pointer to the SPDM context data.
+  @param  DataSize                     Size in bytes of the SPDM context data.
+                                       On input, it means the size in bytes of Data buffer.
+                                       On output, it means the size in bytes of copied Data buffer if RETURN_SUCCESS,
+                                       and means the size in bytes of desired Data buffer if RETURN_BUFFER_TOO_SMALL.
 
-  @retval RETURN_SUCCESS                  The SPDM session data is set successfully.
-  @retval RETURN_INVALID_PARAMETER        The DataSize is NULL or the Data is NULL and *DataSize is not zero.
-  @retval RETURN_UNSUPPORTED              The DataType is unsupported.
-  @retval RETURN_NOT_FOUND                The DataType cannot be found.
-  @retval RETURN_NOT_READY                The DataType is not ready to return.
-  @retval RETURN_BUFFER_TOO_SMALL         The buffer is too small to hold the data.
+  @retval RETURN_SUCCESS               The SPDM context data is set successfully.
+  @retval RETURN_INVALID_PARAMETER     The DataSize is NULL or the Data is NULL and *DataSize is not zero.
+  @retval RETURN_UNSUPPORTED           The DataType is unsupported.
+  @retval RETURN_NOT_FOUND             The DataType cannot be found.
+  @retval RETURN_NOT_READY             The Data is not ready to return.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
 **/
 RETURN_STATUS
 EFIAPI
@@ -656,6 +726,15 @@ SpdmGetData (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function returns if a given version is supported based upon the GET_VERSION/VERSION.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Version                      The SPDM Version.
+
+  @retval TRUE  the version is supported.
+  @retval FALSE the version is not supported.
+**/
 BOOLEAN
 SpdmIsVersionSupported (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
@@ -672,6 +751,12 @@ SpdmIsVersionSupported (
   return FALSE;
 }
 
+/**
+  Register SPDM data signing function.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SpdmDataSignFunc             The fuction to sign the SPDM data.
+**/
 VOID
 EFIAPI
 SpdmRegisterDataSignFunc (
@@ -686,6 +771,15 @@ SpdmRegisterDataSignFunc (
   return ;
 }
 
+/**
+  Register SPDM device input/output functions.
+
+  This function must be called after SpdmInitContext, and before any SPDM communication.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SendMessage                  The fuction to send an SPDM transport layer message.
+  @param  ReceiveMessage               The fuction to receive an SPDM transport layer message.
+**/
 VOID
 EFIAPI
 SpdmRegisterDeviceIoFunc (
@@ -702,6 +796,15 @@ SpdmRegisterDeviceIoFunc (
   return ;
 }
 
+/**
+  Register SPDM transport layer encode/decode functions for SPDM or APP messages.
+
+  This function must be called after SpdmInitContext, and before any SPDM communication.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  TransportEncodeMessage       The fuction to encode an SPDM or APP message to a transport layer message.
+  @param  TransportDecodeMessage       The fuction to decode an SPDM or APP message from a transport layer message.
+**/
 VOID
 EFIAPI
 SpdmRegisterTransportLayerFunc (
@@ -718,6 +821,13 @@ SpdmRegisterTransportLayerFunc (
   return ;
 }
 
+/**
+  Get the last error of an SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return Last error of an SPDM context.
+*/
 UINT32
 EFIAPI
 SpdmGetLastError (
@@ -730,6 +840,13 @@ SpdmGetLastError (
   return SpdmContext->ErrorState;
 }
 
+/**
+  Initialize an SPDM context.
+
+  The size in bytes of the SpdmContext can be returned by SpdmGetContextSize.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+*/
 VOID
 EFIAPI
 SpdmInitContext (
@@ -757,6 +874,11 @@ SpdmInitContext (
   return ;
 }
 
+/**
+  Return the size in bytes of the SPDM context.
+
+  @return the size in bytes of the SPDM context.
+**/
 UINTN
 EFIAPI
 SpdmGetContextSize (

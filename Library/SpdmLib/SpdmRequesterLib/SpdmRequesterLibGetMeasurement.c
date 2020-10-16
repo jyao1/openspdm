@@ -86,10 +86,25 @@ SpdmRequesterVerifyMeasurementSignature (
   return TRUE;
 }
 
+/**
+  This function sends GET_MEASUREMENT
+  to get measurement from the device.
 
-/*
-  Get measurement
-*/
+  If the signature is requested, this function verifies the signature of the measurement.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  RequestAttribute             The request attribute of the request message.
+  @param  MeasurementOperation         The measurement operation of the request message.
+  @param  SlotNum                      The number of slot for the certificate chain.
+  @param  NumberOfBlocks               The number of blocks of the measurement record.
+  @param  MeasurementRecordLength      On input, indicate the size in bytes of the destination buffer to store the measurement record.
+                                       On output, indicate the size in bytes of the measurement record.
+  @param  MeasurementRecord            A pointer to a destination buffer to store the measurement record.
+
+  @retval RETURN_SUCCESS               The measurement is got successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetMeasurement (
@@ -170,7 +185,7 @@ SpdmGetMeasurement (
   } else {
     SpdmRequestSize = sizeof(SpdmRequest.Header);
   }
-  Status = SpdmSendRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -183,7 +198,7 @@ SpdmGetMeasurement (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -215,7 +230,7 @@ SpdmGetMeasurement (
     }
   }
 
-  MeasurementRecordDataLength = (*(UINT32 *)SpdmResponse.MeasurementRecordLength) & 0xFFFFFF;
+  MeasurementRecordDataLength = SpdmReadUint24 (SpdmResponse.MeasurementRecordLength);
   if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
     if (MeasurementRecordDataLength != 0) {
       return RETURN_DEVICE_ERROR;

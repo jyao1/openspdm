@@ -78,10 +78,16 @@ SpdmRequesterVerifyPskExchangeHmac (
 }
 
 /**
-  This function executes SPDM psk change.
-  
-  @param[in]  SpdmContext            The SPDM context for the device.
-  @param[out] DeviceSecurityState    The Device Security state associated with the device.
+  This function sends PSK_EXCHANGE and receives PSK_EXCHANGE_RSP for SPDM PSK exchange.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MeasurementHashType          MeasurementHashType to the PSK_EXCHANGE request.
+  @param  HeartbeatPeriod              HeartbeatPeriod from the PSK_EXCHANGE_RSP response.
+  @param  SessionId                    SessionId from the PSK_EXCHANGE_RSP response.
+  @param  MeasurementHash              MeasurementHash from the PSK_EXCHANGE_RSP response.
+
+  @retval RETURN_SUCCESS               The PSK_EXCHANGE is sent and the PSK_EXCHANGE_RSP is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
 SpdmSendReceivePskExchange (
@@ -144,14 +150,14 @@ SpdmSendReceivePskExchange (
   Ptr += OpaquePskExchangeReqSize;
 
   SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
-  Status = SpdmSendRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

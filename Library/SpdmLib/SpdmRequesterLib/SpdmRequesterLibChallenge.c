@@ -186,7 +186,7 @@ TrySpdmChallenge (
   DEBUG((DEBUG_INFO, "ClientNonce - "));
   InternalDumpData (SpdmRequest.Nonce, SPDM_NONCE_SIZE);
   DEBUG((DEBUG_INFO, "\n"));
-  Status = SpdmSendRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -198,7 +198,7 @@ TrySpdmChallenge (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -336,6 +336,24 @@ TrySpdmChallenge (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function sends CHALLENGE
+  to authenticate the device based upon the key in one slot.
+
+  This function verifies the signature in the challenge auth.
+
+  If basic mutual authentication is requested from the responder,
+  this function also perform the basic mutual authentication.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SlotNum                      The number of slot for the challenge.
+  @param  MeasurementHashType          The type of the measurement hash.
+  @param  MeasurementHash              A pointer to a destination buffer to store the measurement hash.
+
+  @retval RETURN_SUCCESS               The challenge auth is got successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmChallenge (

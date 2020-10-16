@@ -10,6 +10,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmSecuredMessageLib.h>
 #include <IndustryStandard/SpdmSecuredMessage.h>
 
+/**
+  Return the size in bytes of opaque data version selection.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response generation.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return the size in bytes of opaque data version selection.
+**/
 UINTN
 EFIAPI
 SpdmGetOpaqueDataVersionSelectionDataSize (
@@ -23,6 +32,15 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
   return (Size + 3) & ~3;
 }
 
+/**
+  Return the size in bytes of opaque data supproted version.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request generation.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return the size in bytes of opaque data supproted version.
+**/
 UINTN
 EFIAPI
 SpdmGetOpaqueDataSupportedVersionDataSize (
@@ -37,6 +55,21 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
   return (Size + 3) & ~3;
 }
 
+/**
+  Build opaque data supported version.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request generation.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DataOutSize                  Size in bytes of the DataOut.
+                                       On input, it means the size in bytes of DataOut buffer.
+                                       On output, it means the size in bytes of copied DataOut buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired DataOut buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  DataOut                      A pointer to the desination buffer to store the opaque data supported version.
+
+  @retval RETURN_SUCCESS               The opaque data supported version is built successfully.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmBuildOpaqueDataSupportedVersionData (
@@ -82,6 +115,18 @@ SpdmBuildOpaqueDataSupportedVersionData (
   return RETURN_SUCCESS;
 }
 
+/**
+  Process opaque data supported version.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request parsing in responder.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DataInSize                   Size in bytes of the DataIn.
+  @param  DataIn                       A pointer to the buffer to store the opaque data supported version.
+
+  @retval RETURN_SUCCESS               The opaque data supported version is processed successfully.
+  @retval RETURN_UNSUPPORTED           The DataIn is NOT opaque data supported version.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmProcessOpaqueDataSupportedVersionData (
@@ -126,6 +171,21 @@ SpdmProcessOpaqueDataSupportedVersionData (
   return RETURN_SUCCESS;
 }
 
+/**
+  Build opaque data version selection.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response generation.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DataOutSize                  Size in bytes of the DataOut.
+                                       On input, it means the size in bytes of DataOut buffer.
+                                       On output, it means the size in bytes of copied DataOut buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired DataOut buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  DataOut                      A pointer to the desination buffer to store the opaque data version selection.
+
+  @retval RETURN_SUCCESS               The opaque data version selection is built successfully.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmBuildOpaqueDataVersionSelectionData (
@@ -167,6 +227,18 @@ SpdmBuildOpaqueDataVersionSelectionData (
   return RETURN_SUCCESS;
 }
 
+/**
+  Process opaque data version selection.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response parsing in requester.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DataInSize                   Size in bytes of the DataIn.
+  @param  DataIn                       A pointer to the buffer to store the opaque data version selection.
+
+  @retval RETURN_SUCCESS               The opaque data version selection is processed successfully.
+  @retval RETURN_UNSUPPORTED           The DataIn is NOT opaque data version selection.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmProcessOpaqueDataVersionSelectionData (

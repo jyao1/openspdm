@@ -35,7 +35,7 @@ TrySpdmGetVersion (
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_VERSION;
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;
-  Status = SpdmSendRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -51,7 +51,7 @@ TrySpdmGetVersion (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -110,6 +110,16 @@ TrySpdmGetVersion (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function sends GET_VERSION and receives VERSION.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  VersionCount                 VersionCount from the VERSION response.
+  @param  VersionNumberEntries         VersionNumberEntries from the VERSION response.
+
+  @retval RETURN_SUCCESS               The GET_VERSION is sent and the VERSION is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetVersion (

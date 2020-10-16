@@ -10,6 +10,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmSecuredMessageLib.h>
 #include <IndustryStandard/SpdmSecuredMessage.h>
 
+/**
+  This function returns the SPDM negotiated AEAD algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return SPDM negotiated AEAD algorithm.
+**/
 UINT16
 SecuredMessageGetAeadAlgo (
   IN VOID          *SpdmContext
@@ -31,6 +38,13 @@ SecuredMessageGetAeadAlgo (
   return AEADCipherSuite;
 }
 
+/**
+  This function returns the SPDM AEAD algorithm key size.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return SPDM AEAD algorithm key size.
+**/
 UINT32
 SecuredMessageGetSpdmAeadKeySize (
   IN VOID          *SpdmContext
@@ -50,6 +64,13 @@ SecuredMessageGetSpdmAeadKeySize (
   return 0;
 }
 
+/**
+  This function returns the SPDM AEAD algorithm iv size.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return SPDM AEAD algorithm iv size.
+**/
 UINT32
 SecuredMessageGetSpdmAeadIvSize (
   IN VOID          *SpdmContext
@@ -69,6 +90,13 @@ SecuredMessageGetSpdmAeadIvSize (
   return 0;
 }
 
+/**
+  This function returns the SPDM AEAD algorithm tag size.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return SPDM AEAD algorithm tag size.
+**/
 UINT32
 SecuredMessageGetSpdmAeadTagSize (
   IN VOID          *SpdmContext
@@ -88,6 +116,13 @@ SecuredMessageGetSpdmAeadTagSize (
   return 0;
 }
 
+/**
+  This function returns the SPDM AEAD algorithm block size.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return SPDM AEAD algorithm block size.
+**/
 UINT32
 SecuredMessageGetSpdmAeadBlockSize (
   IN VOID          *SpdmContext
@@ -107,6 +142,26 @@ SecuredMessageGetSpdmAeadBlockSize (
   return 0;
 }
 
+/**
+  Performs AEAD authenticated encryption on a data buffer and additional authenticated data (AAD),
+  based upon negotiated AEAD algorithm.
+
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be encrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  TagOut                       Pointer to a buffer that receives the authentication tag output.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the encryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated encryption succeeded.
+  @retval FALSE  AEAD authenticated encryption failed.
+**/
 typedef
 BOOLEAN
 (EFIAPI *AEAD_ENCRYPT) (
@@ -124,6 +179,26 @@ BOOLEAN
   OUT  UINTN*       DataOutSize
   );
 
+/**
+  Performs AEAD authenticated decryption on a data buffer and additional authenticated data (AAD),
+  based upon negotiated AEAD algorithm.
+
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be decrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  Tag                          Pointer to a buffer that contains the authentication tag.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the decryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated decryption succeeded.
+  @retval FALSE  AEAD authenticated decryption failed.
+**/
 typedef
 BOOLEAN
 (EFIAPI *AEAD_DECRYPT) (
@@ -141,6 +216,13 @@ BOOLEAN
   OUT  UINTN*       DataOutSize
   );
 
+/**
+  Return AEAD encryption function, based upon the negotiated AEAD algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return AEAD encryption function
+**/
 AEAD_ENCRYPT
 SecuredMessageGetSpdmAeadEncFunc (
   IN VOID          *SpdmContext
@@ -176,6 +258,13 @@ SecuredMessageGetSpdmAeadEncFunc (
   return NULL;
 }
 
+/**
+  Return AEAD decryption function, based upon the negotiated AEAD algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return AEAD decryption function
+**/
 AEAD_DECRYPT
 SecuredMessageGetSpdmAeadDecFunc (
   IN VOID          *SpdmContext
@@ -211,6 +300,20 @@ SecuredMessageGetSpdmAeadDecFunc (
   return NULL;
 }
 
+/**
+  Encode an application message to a secured message.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The session ID of the SPDM session.
+  @param  IsRequester                  Indicates if it is a requester message.
+  @param  AppMessageSize               Size in bytes of the application message data buffer.
+  @param  AppMessage                   A pointer to a source buffer to store the application message.
+  @param  SecuredMessageSize           Size in bytes of the secured message data buffer.
+  @param  SecuredMessage               A pointer to a destination buffer to store the secured message.
+
+  @retval RETURN_SUCCESS               The application message is encoded successfully.
+  @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmEncodeSecuredMessage (
@@ -401,6 +504,21 @@ SpdmEncodeSecuredMessage (
   return RETURN_SUCCESS;
 }
 
+/**
+  Decode an application message from a secured message.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The session ID of the SPDM session.
+  @param  IsRequester                  Indicates if it is a requester message.
+  @param  SecuredMessageSize           Size in bytes of the secured message data buffer.
+  @param  SecuredMessage               A pointer to a source buffer to store the secured message.
+  @param  AppMessageSize               Size in bytes of the application message data buffer.
+  @param  AppMessage                   A pointer to a destination buffer to store the application message.
+
+  @retval RETURN_SUCCESS               The application message is decoded successfully.
+  @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
+  @retval RETURN_UNSUPPORTED           The SecuredMessage is unsupported.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmDecodeSecuredMessage (

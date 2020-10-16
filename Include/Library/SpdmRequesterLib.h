@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmCommonLib.h>
 
 /**
-  This function sends GET_VERSION, GET_CAPABILITIES, NEGOTIATE_ALGORITHM
+  This function sends GET_VERSION, GET_CAPABILITIES, NEGOTIATE_ALGORITHMS
   to initialize the connection with SPDM responder.
 
   Before this function, the requester configuration data can be set via SpdmSetData.

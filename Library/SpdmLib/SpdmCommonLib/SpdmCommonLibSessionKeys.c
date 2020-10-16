@@ -23,6 +23,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 GLOBAL_REMOVE_IF_UNREFERENCED UINT8  mZeroFilledBuffer[64];
 
+/**
+  This function concatenates binary data, which is used as Info in HKDF expand later.
+
+  @param  Label                        An ascii string label for the BinConcat.
+  @param  LabelSize                    The size in bytes of the ASCII string label, including the NULL terminator.
+  @param  Context                      A pre-defined hash value as the context for the BinConcat.
+  @param  Length                       16 bits length for the BinConcat.
+  @param  HashSize                     The size in bytes of the context hash.
+  @param  OutBin                       The buffer to store the output binary.
+  @param  OutBinSize                   The size in bytes for the OutBin.
+
+  @retval RETURN_SUCCESS               The binary BinConcat data is generated.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 BinConcat (
   IN CHAR8     *Label,
@@ -57,6 +71,16 @@ BinConcat (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function generates SPDM AEAD Key and IV for a session.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MajorSecret                  The major secret.
+  @param  Key                          The buffer to store the AEAD key.
+  @param  Iv                           The buffer to store the AEAD IV.
+
+  @retval RETURN_SUCCESS  SPDM AEAD key and IV for a session is generated.
+**/
 RETURN_STATUS
 SpdmGenerateAeadKeyAndIv (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -104,6 +128,15 @@ SpdmGenerateAeadKeyAndIv (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function generates SPDM FinishedKey for a session.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  HandshakeSecret              The handshake secret.
+  @param  FinishedKey                  The buffer to store the finished key.
+
+  @retval RETURN_SUCCESS  SPDM FinishedKey for a session is generated.
+**/
 RETURN_STATUS
 SpdmGenerateFinishedKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -134,9 +167,13 @@ SpdmGenerateFinishedKey (
 }
 
 /**
-  This function generate SPDM HandshakeKey.
+  This function generates SPDM HandshakeKey for a session.
 
-  @param[in]  SpdmContext            The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
+
+  @retval RETURN_SUCCESS  SPDM HandshakeKey for a session is generated.
 **/
 RETURN_STATUS
 SpdmGenerateSessionHandshakeKey (
@@ -285,9 +322,13 @@ SpdmGenerateSessionHandshakeKey (
 }
 
 /**
-  This function generate SPDM DataKey.
+  This function generates SPDM DataKey for a session.
 
-  @param[in]  SpdmContext            The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
+
+  @retval RETURN_SUCCESS  SPDM DataKey for a session is generated.
 **/
 RETURN_STATUS
 SpdmGenerateSessionDataKey (
@@ -441,9 +482,13 @@ SpdmGenerateSessionDataKey (
 }
 
 /**
-  This function update SPDM DataKey.
+  This function creates the updates of SPDM DataKey for a session.
 
-  @param[in]  SpdmContext            The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  Action                       Indicate of the key update action.
+
+  @retval RETURN_SUCCESS  SPDM DataKey update is created.
 **/
 RETURN_STATUS
 SpdmCreateUpdateSessionDataKey (
@@ -523,12 +568,17 @@ SpdmCreateUpdateSessionDataKey (
 }
 
 /**
-  This function activate the update of SPDM DataKey.
+  This function activates the update of SPDM DataKey for a session.
 
-  @param[in]  SpdmContext            The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  Action                       Indicate of the key update action.
+  @param  UseNewKey                    Indicate if the new key should be used.
+
+  @retval RETURN_SUCCESS  SPDM DataKey update is activated.
 **/
 RETURN_STATUS
-SpdmFinalizeUpdateSessionDataKey (
+SpdmActivateUpdateSessionDataKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN UINT32                       SessionId,
   IN SPDM_KEY_UPDATE_ACTION       Action,
@@ -537,7 +587,7 @@ SpdmFinalizeUpdateSessionDataKey (
 {
   SPDM_SESSION_INFO              *SessionInfo;
 
-  DEBUG ((DEBUG_INFO, "SpdmFinalizeUpdateSessionDataKey[%x]\n", SessionId));
+  DEBUG ((DEBUG_INFO, "SpdmActivateUpdateSessionDataKey[%x]\n", SessionId));
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {

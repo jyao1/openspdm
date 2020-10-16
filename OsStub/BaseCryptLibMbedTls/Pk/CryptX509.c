@@ -717,7 +717,8 @@ X509GetCertFromCertChain (
   IN UINTN  CertChainLength,
   IN INT32  CertIndex,
   OUT UINT8 **Cert,
-  OUT UINTN *CertLength)
+  OUT UINTN *CertLength
+  )
 {
 
   UINTN Asn1Len;
@@ -1078,10 +1079,10 @@ return InternalX509GetIssuerNIDName (Cert, CertSize, (UINT8 *)OID_organizationNa
 RETURN_STATUS
 EFIAPI
 X509GetSignatureAlgorithm (
-  IN CONST UINT8      *Cert,
-  IN      UINTN       CertSize,
-  OUT     UINT8       *Oid,  OPTIONAL
-  IN OUT  UINTN       *OidSize
+  IN CONST UINT8       *Cert,
+  IN       UINTN       CertSize,
+     OUT   UINT8       *Oid,  OPTIONAL
+  IN OUT   UINTN       *OidSize
   )
 {
   mbedtls_x509_crt    Crt;
@@ -1222,12 +1223,12 @@ InternalX509FindExtensionData (
 RETURN_STATUS
 EFIAPI
 X509GetExtensionData (
-  IN    CONST UINT8 *Cert,
-  IN    UINTN       CertSize,
-  IN    UINT8       *Oid,
-  IN    UINTN       OidSize,
-  OUT   UINT8       *ExtensionData,
-  IN OUT UINTN      *ExtensionDataSize
+  IN     CONST UINT8 *Cert,
+  IN     UINTN       CertSize,
+  IN     UINT8       *Oid,
+  IN     UINTN       OidSize,
+     OUT UINT8       *ExtensionData,
+  IN OUT UINTN       *ExtensionDataSize
   )
 {
   mbedtls_x509_crt Crt;
@@ -1304,12 +1305,12 @@ Cleanup:
 BOOLEAN
 EFIAPI
 X509GetValidity  (
-  IN    CONST UINT8 *Cert,
-  IN    UINTN       CertSize,
-  IN    UINT8       *From,
-  IN OUT UINTN      *FromSize,
-  IN    UINT8       *To,
-  IN OUT UINTN      *ToSize
+  IN     CONST UINT8 *Cert,
+  IN     UINTN       CertSize,
+  IN     UINT8       *From,
+  IN OUT UINTN       *FromSize,
+  IN     UINT8       *To,
+  IN OUT UINTN       *ToSize
   )
 {
   mbedtls_x509_crt Crt;
@@ -1363,9 +1364,9 @@ _Exit:
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[out]     Usage            Key Usage
+  @param[out]     Usage            Key Usage (CRYPTO_X509_KU_*)
 
-  @retval  TRUE   The certificate Extended Key Usage retrieved successfully.
+  @retval  TRUE   The certificate Key Usage retrieved successfully.
   @retval  FALSE  Invalid certificate, or Usage is NULL
   @retval  FALSE  This interface is not supported.
 **/
@@ -1420,10 +1421,10 @@ X509GetKeyUsage (
 RETURN_STATUS
 EFIAPI
 X509GetExtendedKeyUsage (
-  IN    CONST UINT8   *Cert,
-  IN    UINTN         CertSize,
-  OUT   UINT8         *Usage,
-  OUT   UINTN         *UsageSize
+  IN     CONST UINT8   *Cert,
+  IN     UINTN         CertSize,
+     OUT UINT8         *Usage,
+  IN OUT UINTN         *UsageSize
   )
 {
   RETURN_STATUS ReturnStatus;
@@ -1508,7 +1509,7 @@ InternalAtoI(CHAR8 *PStart, CHAR8 *PEnd) {
   @param[in]      DateTimeStr      DateTime string like YYYYMMDDhhmmssZ
                                    Ref: https://www.w3.org/TR/NOTE-datetime
                                    Z stand for UTC time
-  @param[in,out]  DateTime         Pointer to a DateTime object.
+  @param[out]     DateTime         Pointer to a DateTime object.
   @param[in,out]  DateTimeSize     DateTime object buffer size.
 
   @retval RETURN_SUCCESS           The DateTime object create successfully.

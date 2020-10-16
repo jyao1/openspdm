@@ -10,10 +10,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmRequesterLibInternal.h"
 
 /**
-  This function executes SPDM EndSession.
-  
-  @param[in]  SpdmContext            The SPDM context for the device.
-  @param[out] DeviceSecurityState    The Device Security state associated with the device.
+  This function sends END_SESSION and receives END_SESSION_ACK for SPDM session end.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    SessionId to the END_SESSION request.
+  @param  EndSessionAttributes         EndSessionAttributes to the END_SESSION_ACK request.
+
+  @retval RETURN_SUCCESS               The END_SESSION is sent and the END_SESSION_ACK is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
 SpdmSendReceiveEndSession (
@@ -48,14 +52,14 @@ SpdmSendReceiveEndSession (
   SpdmRequest.Header.Param2 = 0;
   
   SpdmRequestSize = sizeof(SPDM_END_SESSION_REQUEST);
-  Status = SpdmSendRequest (SpdmContext, &SessionId, SpdmRequestSize, &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, &SessionId, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

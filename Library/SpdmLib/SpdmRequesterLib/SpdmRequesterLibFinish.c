@@ -258,10 +258,14 @@ SpdmRequesterGenerateFinishHmac (
 }
 
 /**
-  This function executes SPDM finish.
-  
-  @param[in]  SpdmContext            The SPDM context for the device.
-  @param[out] DeviceSecurityState    The Device Security state associated with the device.
+  This function sends FINISH and receives FINISH_RSP for SPDM finish.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    SessionId to the FINISH request.
+  @param  SlotIdParam                  SlotIdParam to the FINISH request.
+
+  @retval RETURN_SUCCESS               The FINISH is sent and the FINISH_RSP is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
 SpdmSendReceiveFinish (
@@ -346,9 +350,9 @@ SpdmSendReceiveFinish (
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Ptr, HmacSize);
   
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
-    Status = SpdmSendRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
+    Status = SpdmSendSpdmRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
   } else {
-    Status = SpdmSendRequest (SpdmContext, &SessionId, SpdmRequestSize, &SpdmRequest);
+    Status = SpdmSendSpdmRequest (SpdmContext, &SessionId, SpdmRequestSize, &SpdmRequest);
   }
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
@@ -357,9 +361,9 @@ SpdmSendReceiveFinish (
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
-    Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+    Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   } else {
-    Status = SpdmReceiveResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
+    Status = SpdmReceiveSpdmResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
   }
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;

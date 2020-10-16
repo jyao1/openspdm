@@ -2040,7 +2040,7 @@ X509GetIssuerOrganizationName (
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[out]     Oid              Signature Algorithm Object identifier buffer.
+  @param[out]     Oid              Signature Algorithm Object identifier buffer
   @param[in,out]  OidSize          Signature Algorithm Object identifier buffer size
 
   @retval RETURN_SUCCESS           The certificate Extension data retrieved successfully.
@@ -2056,10 +2056,10 @@ X509GetIssuerOrganizationName (
 RETURN_STATUS
 EFIAPI
 X509GetSignatureAlgorithm (
-  IN CONST UINT8      *Cert,
-  IN      UINTN       CertSize,
-  OUT     UINT8       *Oid,  OPTIONAL
-  IN OUT  UINTN       *OidSize
+  IN CONST UINT8       *Cert,
+  IN       UINTN       CertSize,
+     OUT   UINT8       *Oid,  OPTIONAL
+  IN OUT   UINTN       *OidSize
   );
 
 /**
@@ -2085,12 +2085,12 @@ X509GetSignatureAlgorithm (
 RETURN_STATUS
 EFIAPI
 X509GetExtensionData (
-  IN    CONST UINT8 *Cert,
-  IN    UINTN       CertSize,
-  IN    UINT8       *Oid,
-  IN    UINTN       OidSize,
-  OUT   UINT8       *ExtensionData,
-  IN OUT UINTN      *ExtensionDataSize
+  IN     CONST UINT8 *Cert,
+  IN     UINTN       CertSize,
+  IN     UINT8       *Oid,
+  IN     UINTN       OidSize,
+     OUT UINT8       *ExtensionData,
+  IN OUT UINTN       *ExtensionDataSize
   );
 
 /**
@@ -2116,13 +2116,13 @@ X509GetExtensionData (
 **/
 BOOLEAN
 EFIAPI
-X509GetValidity  (
-  IN    CONST UINT8 *Cert,
-  IN    UINTN       CertSize,
-  IN    UINT8       *From,
-  IN OUT UINTN      *FromSize,
-  IN    UINT8       *To,
-  IN OUT UINTN      *ToSize
+X509GetValidity (
+  IN     CONST UINT8 *Cert,
+  IN     UINTN       CertSize,
+  IN     UINT8       *From,
+  IN OUT UINTN       *FromSize,
+  IN     UINT8       *To,
+  IN OUT UINTN       *ToSize
   );
 
 /**
@@ -2135,7 +2135,7 @@ X509GetValidity  (
   @param[in]      DateTimeStr      DateTime string like YYYYMMDDhhmmssZ
                                    Ref: https://www.w3.org/TR/NOTE-datetime
                                    Z stand for UTC time
-  @param[in,out]  DateTime         Pointer to a DateTime object.
+  @param[out]     DateTime         Pointer to a DateTime object.
   @param[in,out]  DateTimeSize     DateTime object buffer size.
 
   @retval RETURN_SUCCESS           The DateTime object create successfully.
@@ -2184,9 +2184,7 @@ X509CompareDateTime (
 
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
-  @param[out]     Usage            Key Usage
-
-  @note:   Usage is encoded by CRYPTO_X509_KU_*
+  @param[out]     Usage            Key Usage (CRYPTO_X509_KU_*)
 
   @retval  TRUE   The certificate Key Usage retrieved successfully.
   @retval  FALSE  Invalid certificate, or Usage is NULL
@@ -2220,10 +2218,10 @@ X509GetKeyUsage (
 RETURN_STATUS
 EFIAPI
 X509GetExtendedKeyUsage (
-  IN    CONST UINT8   *Cert,
-  IN    UINTN         CertSize,
-  OUT   UINT8         *Usage,
-  OUT   UINTN         *UsageSize
+  IN     CONST UINT8   *Cert,
+  IN     UINTN         CertSize,
+     OUT UINT8         *Usage,
+  IN OUT UINTN         *UsageSize
   );
 
 /**
@@ -2306,7 +2304,8 @@ X509GetCertFromCertChain (
   IN UINTN  CertChainLength,
   IN INT32  CertIndex,
   OUT UINT8 **Cert,
-  OUT UINTN *CertLength);
+  OUT UINTN *CertLength
+  );
 
 
 /**

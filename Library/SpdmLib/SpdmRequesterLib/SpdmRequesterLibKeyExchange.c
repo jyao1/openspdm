@@ -174,10 +174,18 @@ SpdmRequesterVerifyKeyExchangeHmac (
 }
 
 /**
-  This function executes SPDM key change.
+  This function sends KEY_EXCHANGE and receives KEY_EXCHANGE_RSP for SPDM key exchange.
 
-  @param[in]  SpdmContext            The SPDM context for the device.
-  @param[out] DeviceSecurityState    The Device Security state associated with the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MeasurementHashType          MeasurementHashType to the KEY_EXCHANGE request.
+  @param  SlotNum                      SlotNum to the KEY_EXCHANGE request.
+  @param  HeartbeatPeriod              HeartbeatPeriod from the KEY_EXCHANGE_RSP response.
+  @param  SessionId                    SessionId from the KEY_EXCHANGE_RSP response.
+  @param  SlotIdParam                  SlotIdParam from the KEY_EXCHANGE_RSP response.
+  @param  MeasurementHash              MeasurementHash from the KEY_EXCHANGE_RSP response.
+
+  @retval RETURN_SUCCESS               The KEY_EXCHANGE is sent and the KEY_EXCHANGE_RSP is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
 SpdmSendReceiveKeyExchange (
@@ -255,7 +263,7 @@ SpdmSendReceiveKeyExchange (
   Ptr += OpaqueKeyExchangeReqSize;
 
   SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
-  Status = SpdmSendRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     SpdmDheFree (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
@@ -263,7 +271,7 @@ SpdmSendReceiveKeyExchange (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     SpdmDheFree (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;

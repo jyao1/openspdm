@@ -9,6 +9,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmRequesterLibInternal.h"
 
+/**
+  This function sends KEY_UPDATE
+  to update keys for an SPDM Session.
+
+  After keys are updated, this function also uses VERIFY_NEW_KEY to verify the key.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The session ID of the session.
+  @param  SingleDirection              TRUE means the operation is UPDATE_KEY.
+                                       FALSE means the operation is UPDATE_ALL_KEYS.
+
+  @retval RETURN_SUCCESS               The keys of the session are updated.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmKeyUpdate (
@@ -48,7 +63,7 @@ SpdmKeyUpdate (
   }
   SpdmGetRandomNumber (sizeof(SpdmRequest.Header.Param2), &SpdmRequest.Header.Param2);
 
-  Status = SpdmSendRequest (SpdmContext, &SessionId, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, &SessionId, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -58,29 +73,29 @@ SpdmKeyUpdate (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
-    SpdmFinalizeUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
+    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize != sizeof(SPDM_KEY_UPDATE_RESPONSE)) {
-    SpdmFinalizeUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
+    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_UPDATE_ACK) {
-    SpdmFinalizeUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
+    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.Param1 != SpdmRequest.Header.Param1) {
-    SpdmFinalizeUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
+    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.Param2 != SpdmRequest.Header.Param2) {
-    SpdmFinalizeUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
+    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
     return RETURN_DEVICE_ERROR;
   }
 
-  SpdmFinalizeUpdateSessionDataKey (SpdmContext, SessionId, Action, TRUE);
+  SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, TRUE);
 
   //
   // Verify Key
@@ -90,14 +105,14 @@ SpdmKeyUpdate (
   SpdmRequest.Header.Param1 = SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY;
   SpdmGetRandomNumber (sizeof(SpdmRequest.Header.Param2), &SpdmRequest.Header.Param2);
 
-  Status = SpdmSendRequest (SpdmContext, &SessionId, sizeof(SpdmRequest), &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, &SessionId, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

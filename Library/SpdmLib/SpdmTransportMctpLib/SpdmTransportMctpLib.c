@@ -12,13 +12,27 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define MCTP_ALIGNMENT 1
 
+/**
+  Encode a normal message or secured message to a transport message.
+
+  @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  MessageSize                  Size in bytes of the message data buffer.
+  @param  Message                      A pointer to a source buffer to store the message.
+  @param  TransportMessageSize         Size in bytes of the transport message data buffer.
+  @param  TransportMessage             A pointer to a destination buffer to store the transport message.
+
+  @retval RETURN_SUCCESS               The message is encoded successfully.
+  @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
+**/
 RETURN_STATUS
 MctpEncodeMessage (
   IN     UINT32               *SessionId,
   IN     UINTN                MessageSize,
   IN     VOID                 *Message,
-  IN OUT UINTN                *MctpMessageSize,
-     OUT VOID                 *MctpMessage
+  IN OUT UINTN                *TransportMessageSize,
+     OUT VOID                 *TransportMessage
   )
 {
   UINTN                       AlignedMessageSize;
@@ -26,51 +40,64 @@ MctpEncodeMessage (
 
   AlignedMessageSize = (MessageSize + (Alignment - 1)) & ~(Alignment - 1);
 
-  ASSERT (*MctpMessageSize >= AlignedMessageSize + 1);
-  if (*MctpMessageSize < AlignedMessageSize + 1) {
-    *MctpMessageSize = AlignedMessageSize + 1;
+  ASSERT (*TransportMessageSize >= AlignedMessageSize + 1);
+  if (*TransportMessageSize < AlignedMessageSize + 1) {
+    *TransportMessageSize = AlignedMessageSize + 1;
     return RETURN_BUFFER_TOO_SMALL;
   }
-  *MctpMessageSize = AlignedMessageSize + 1;
+  *TransportMessageSize = AlignedMessageSize + 1;
   if (SessionId != NULL) {
-    *(UINT8 *)MctpMessage = MCTP_MESSAGE_TYPE_SECURED_MCTP;
+    *(UINT8 *)TransportMessage = MCTP_MESSAGE_TYPE_SECURED_MCTP;
     ASSERT (*SessionId == *(UINT32 *)(Message));
     if (*SessionId != *(UINT32 *)(Message)) {
       return RETURN_UNSUPPORTED;
     }
   } else {
-    *(UINT8 *)MctpMessage = MCTP_MESSAGE_TYPE_SPDM;
+    *(UINT8 *)TransportMessage = MCTP_MESSAGE_TYPE_SPDM;
   }
-  CopyMem ((UINT8 *)MctpMessage + 1, Message, MessageSize);
-  ZeroMem ((UINT8 *)MctpMessage + 1 + MessageSize, *MctpMessageSize - 1 - MessageSize);
+  CopyMem ((UINT8 *)TransportMessage + 1, Message, MessageSize);
+  ZeroMem ((UINT8 *)TransportMessage + 1 + MessageSize, *TransportMessageSize - 1 - MessageSize);
   return RETURN_SUCCESS;
 }
 
+/**
+  Decode a transport message to a normal message or secured message.
+
+  @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+                                       If *SessionId is NULL, it is a normal message.
+                                       If *SessionId is NOT NULL, it is a secured message.
+  @param  TransportMessageSize         Size in bytes of the transport message data buffer.
+  @param  TransportMessage             A pointer to a source buffer to store the transport message.
+  @param  MessageSize                  Size in bytes of the message data buffer.
+  @param  Message                      A pointer to a destination buffer to store the message.
+  @retval RETURN_SUCCESS               The message is encoded successfully.
+  @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
+**/
 RETURN_STATUS
 MctpDecodeMessage (
      OUT UINT32               **SessionId,
-  IN     UINTN                MctpMessageSize,
-  IN     VOID                 *MctpMessage,
+  IN     UINTN                TransportMessageSize,
+  IN     VOID                 *TransportMessage,
   IN OUT UINTN                *MessageSize,
      OUT VOID                 *Message
   )
 {
   UINTN                       Alignment = MCTP_ALIGNMENT;
 
-  ASSERT (MctpMessageSize > 1);
-  if (MctpMessageSize <= 1) {
+  ASSERT (TransportMessageSize > 1);
+  if (TransportMessageSize <= 1) {
     return RETURN_UNSUPPORTED;
   }
-  switch (*(UINT8 *)MctpMessage) {
+  switch (*(UINT8 *)TransportMessage) {
   case MCTP_MESSAGE_TYPE_SECURED_MCTP:
     ASSERT (SessionId != NULL);
     if (SessionId == NULL) {
       return RETURN_UNSUPPORTED;
     }
-    if (MctpMessageSize <= 1 + sizeof(UINT32)) {
+    if (TransportMessageSize <= 1 + sizeof(UINT32)) {
       return RETURN_UNSUPPORTED;
     }
-    *SessionId = (UINT32 *)((UINT8 *)MctpMessage + 1);
+    *SessionId = (UINT32 *)((UINT8 *)TransportMessage + 1);
     break;
   case MCTP_MESSAGE_TYPE_SPDM:
     if (SessionId != NULL) {
@@ -81,24 +108,24 @@ MctpDecodeMessage (
     return RETURN_UNSUPPORTED;
   }
 
-  ASSERT (((MctpMessageSize - 1) & (Alignment - 1)) == 0);
+  ASSERT (((TransportMessageSize - 1) & (Alignment - 1)) == 0);
 
-  if (*MessageSize < MctpMessageSize - 1) {
+  if (*MessageSize < TransportMessageSize - 1) {
     //
     // Handle special case for the side effect of alignment
     // Caller may allocate a good enough buffer without considering alignment.
     // Here we will not copy all the message and ignore the the last padding bytes.
     //
-    if (*MessageSize + Alignment - 1 >= MctpMessageSize - 1) {
-      CopyMem (Message, (UINT8 *)MctpMessage + 1, *MessageSize);
+    if (*MessageSize + Alignment - 1 >= TransportMessageSize - 1) {
+      CopyMem (Message, (UINT8 *)TransportMessage + 1, *MessageSize);
       return RETURN_SUCCESS;
     }
-    ASSERT (*MessageSize >= MctpMessageSize - 1);
-    *MessageSize = MctpMessageSize - 1;
+    ASSERT (*MessageSize >= TransportMessageSize - 1);
+    *MessageSize = TransportMessageSize - 1;
     return RETURN_BUFFER_TOO_SMALL;
   }
-  *MessageSize = MctpMessageSize - 1;
-  CopyMem (Message, (UINT8 *)MctpMessage + 1, *MessageSize);
+  *MessageSize = TransportMessageSize - 1;
+  CopyMem (Message, (UINT8 *)TransportMessage + 1, *MessageSize);
   return RETURN_SUCCESS;
 }
 

@@ -121,6 +121,19 @@ SpdmEncapRequesterVerifyCertificateChain (
   return TRUE;
 }
 
+/**
+  Get the SPDM encapsulated GET_CERTIFICATE request.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapRequestSize             Size in bytes of the encapsulated request data.
+                                       On input, it means the size in bytes of encapsulated request data buffer.
+                                       On output, it means the size in bytes of copied encapsulated request data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired encapsulated request data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  EncapRequest                 A pointer to the encapsulated request data.
+
+  @retval RETURN_SUCCESS               The encapsulated request is returned.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetEncapReqestGetCertificate (
@@ -156,12 +169,24 @@ SpdmGetEncapReqestGetCertificate (
   return RETURN_SUCCESS;
 }
 
+/**
+  Process the SPDM encapsulated CERTIFICATE response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapResponseSize            Size in bytes of the encapsulated response data.
+  @param  EncapResponse                A pointer to the encapsulated response data.
+  @param  Continue                     Indicate if encapsulated communication need continue.
+
+  @retval RETURN_SUCCESS               The encapsulated response is processed.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmProcessEncapResponseCertificate (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINTN                EncapLastResponseSize,
-  IN     VOID                 *EncapLastResponse,
+  IN     UINTN                EncapResponseSize,
+  IN     VOID                 *EncapResponse,
   OUT    BOOLEAN              *Continue
   )
 {
@@ -171,9 +196,9 @@ SpdmProcessEncapResponseCertificate (
 
   SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
-  SpdmResponse = EncapLastResponse;
-  SpdmResponseSize = EncapLastResponseSize;
-  if (EncapLastResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
+  SpdmResponse = EncapResponse;
+  SpdmResponseSize = EncapResponseSize;
+  if (EncapResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
 

@@ -9,6 +9,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmCommonLibInternal.h"
 
+/**
+  Computes the hash of a input data buffer.
+
+  This function performs the hash of a given data buffer, and return the hash value.
+
+  @param  Data                         Pointer to the buffer containing the data to be hashed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the hash value.
+
+  @retval TRUE   Hash computation succeeded.
+  @retval FALSE  Hash computation failed.
+**/
 typedef
 BOOLEAN
 (EFIAPI *HASH_ALL) (
@@ -17,6 +29,20 @@ BOOLEAN
   OUT  UINT8       *HashValue
   );
 
+/**
+  Computes the HMAC of a input data buffer.
+
+  This function performs the HMAC of a given data buffer, and return the hash value.
+
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  Key                          Pointer to the user-supplied key.
+  @param  KeySize                      Key size in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
 typedef
 BOOLEAN
 (EFIAPI *HMAC_ALL) (
@@ -27,6 +53,19 @@ BOOLEAN
   OUT  UINT8        *HmacValue
   );
 
+/**
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand.
+
+  @param  Prk                          Pointer to the user-supplied key.
+  @param  PrkSize                      Key size in bytes.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+**/
 typedef
 BOOLEAN
 (EFIAPI *HKDF_EXPAND) (
@@ -38,6 +77,25 @@ BOOLEAN
   IN   UINTN        OutSize
   );
 
+/**
+  Performs AEAD authenticated encryption on a data buffer and additional authenticated data (AAD).
+
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be encrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  TagOut                       Pointer to a buffer that receives the authentication tag output.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the encryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated encryption succeeded.
+  @retval FALSE  AEAD authenticated encryption failed.
+**/
 typedef
 BOOLEAN
 (EFIAPI *AEAD_ENCRYPT) (
@@ -55,6 +113,25 @@ BOOLEAN
   OUT  UINTN*       DataOutSize
   );
 
+/**
+  Performs AEAD authenticated decryption on a data buffer and additional authenticated data (AAD).
+
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be decrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  Tag                          Pointer to a buffer that contains the authentication tag.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the decryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated decryption succeeded.
+  @retval FALSE  AEAD authenticated decryption failed.
+**/
 typedef
 BOOLEAN
 (EFIAPI *AEAD_DECRYPT) (
@@ -72,6 +149,17 @@ BOOLEAN
   OUT  UINTN*       DataOutSize
   );
 
+/**
+  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate.
+
+  @param  Cert                         Pointer to the DER-encoded X509 certificate.
+  @param  CertSize                     Size of the X509 certificate in bytes.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve public key from X509 certificate.
+**/
 typedef
 BOOLEAN
 (EFIAPI *ASYM_GET_PUBLIC_KEY_FROM_X509) (
@@ -80,12 +168,29 @@ BOOLEAN
   OUT  VOID         **Context
   );
 
+/**
+  Release the specified asymmetric context.
+
+  @param  Context                      Pointer to the asymmetric context to be released.
+**/
 typedef
 VOID
 (EFIAPI *ASYM_FREE) (
   IN  VOID         *Context
   );
 
+/**
+  Verifies the asymmetric signature.
+
+  @param  Context                      Pointer to asymmetric context for signature verification.
+  @param  MessageHash                  Pointer to octet message hash to be checked.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to asymmetric signature to be verified.
+  @param  SigSize                      Size of signature in bytes.
+
+  @retval  TRUE   Valid asymmetric signature.
+  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
+**/
 typedef
 BOOLEAN
 (EFIAPI *ASYM_VERIFY) (
@@ -96,12 +201,36 @@ BOOLEAN
   IN  UINTN        SigSize
   );
 
+/**
+  Allocates and Initializes one Diffie-Hellman Ephemeral (DHE) Context for subsequent use.
+
+  @param Nid cipher NID
+
+  @return  Pointer to the Diffie-Hellman Context that has been initialized.
+**/
 typedef
 VOID *
 (EFIAPI *DHE_NEW_BY_NID) (
   IN UINTN  Nid
   );
 
+/**
+  Generates DHE public key.
+
+  This function generates random secret exponent, and computes the public key, which is
+  returned via parameter PublicKey and PublicKeySize. DH context is updated accordingly.
+  If the PublicKey buffer is too small to hold the public key, FALSE is returned and
+  PublicKeySize is set to the required buffer size to obtain the public key.
+
+  @param  Context                      Pointer to the DHE context.
+  @param  PublicKey                    Pointer to the buffer to receive generated public key.
+  @param  PublicKeySize                On input, the size of PublicKey buffer in bytes.
+                                       On output, the size of data returned in PublicKey buffer in bytes.
+
+  @retval TRUE   DHE public key generation succeeded.
+  @retval FALSE  DHE public key generation failed.
+  @retval FALSE  PublicKeySize is not large enough.
+**/
 typedef
 BOOLEAN
 (EFIAPI *DHE_GENERATE_KEY) (
@@ -110,6 +239,23 @@ BOOLEAN
   IN OUT  UINTN  *PublicKeySize
   );
 
+/**
+  Computes exchanged common key.
+
+  Given peer's public key, this function computes the exchanged common key, based on its own
+  context including value of prime modulus and random secret exponent.
+
+  @param  Context                      Pointer to the DHE context.
+  @param  PeerPublicKey                Pointer to the peer's public key.
+  @param  PeerPublicKeySize            Size of peer's public key in bytes.
+  @param  Key                          Pointer to the buffer to receive generated key.
+  @param  KeySize                      On input, the size of Key buffer in bytes.
+                                       On output, the size of data returned in Key buffer in bytes.
+
+  @retval TRUE   DHE exchanged key generation succeeded.
+  @retval FALSE  DHE exchanged key generation failed.
+  @retval FALSE  KeySize is not large enough.
+**/
 typedef
 BOOLEAN
 (EFIAPI *DHE_COMPUTE_KEY) (
@@ -120,6 +266,11 @@ BOOLEAN
   IN OUT  UINTN        *KeySize
   );
 
+/**
+  Release the specified DHE context.
+
+  @param  Context                      Pointer to the DHE context to be released.
+**/
 typedef
 VOID
 (EFIAPI *DHE_FREE) (
@@ -127,11 +278,11 @@ VOID
   );
 
 /**
-  This function returns the SPDM hash size.
+  This function returns the SPDM hash algorithm size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM hash size
+  @return SPDM hash algorithm size.
 **/
 UINT32
 GetSpdmHashSize (
@@ -152,6 +303,13 @@ GetSpdmHashSize (
   return 0;
 }
 
+/**
+  Return hash function, based upon the negotiated hash algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return hash function
+**/
 HASH_ALL
 GetSpdmHashFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -189,6 +347,19 @@ GetSpdmHashFunc (
   return NULL;
 }
 
+/**
+  Computes the hash of a input data buffer, based upon the negotiated hash algorithm.
+
+  This function performs the hash of a given data buffer, and return the hash value.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Data                         Pointer to the buffer containing the data to be hashed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the hash value.
+
+  @retval TRUE   Hash computation succeeded.
+  @retval FALSE  Hash computation failed.
+**/
 BOOLEAN
 SpdmHashAll (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -205,6 +376,13 @@ SpdmHashAll (
   return HashFunction (Data, DataSize, HashValue);
 }
 
+/**
+  Return hash function, based upon the negotiated measurement hash algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return hash function
+**/
 HASH_ALL
 GetSpdmMeasurementHashFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -242,6 +420,19 @@ GetSpdmMeasurementHashFunc (
   return NULL;
 }
 
+/**
+  Computes the hash of a input data buffer, based upon the negotiated measurement hash algorithm.
+
+  This function performs the hash of a given data buffer, and return the hash value.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Data                         Pointer to the buffer containing the data to be hashed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the hash value.
+
+  @retval TRUE   Hash computation succeeded.
+  @retval FALSE  Hash computation failed.
+**/
 BOOLEAN
 SpdmMeasurementHashAll (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -258,6 +449,13 @@ SpdmMeasurementHashAll (
   return HashFunction (Data, DataSize, HashValue);
 }
 
+/**
+  Return HMAC function, based upon the negotiated HMAC algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return HMAC function
+**/
 HMAC_ALL
 GetSpdmHmacFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -283,6 +481,21 @@ GetSpdmHmacFunc (
   return NULL;
 }
 
+/**
+  Computes the HMAC of a input data buffer, based upon the negotiated HMAC algorithm.
+
+  This function performs the HMAC of a given data buffer, and return the hash value.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  Key                          Pointer to the user-supplied key.
+  @param  KeySize                      Key size in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
 BOOLEAN
 SpdmHmacAll (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -301,6 +514,13 @@ SpdmHmacAll (
   return HmacFunction (Data, DataSize, Key, KeySize, HmacValue);
 }
 
+/**
+  Return HKDF expand function, based upon the negotiated HKDF algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return HKDF expand function
+**/
 HKDF_EXPAND
 GetSpdmHkdfExpandFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -326,6 +546,20 @@ GetSpdmHkdfExpandFunc (
   return NULL;
 }
 
+/**
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Prk                          Pointer to the user-supplied key.
+  @param  PrkSize                      Key size in bytes.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+**/
 BOOLEAN
 SpdmHkdfExpand (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -346,11 +580,11 @@ SpdmHkdfExpand (
 }
 
 /**
-  This function returns the SPDM asym size.
+  This function returns the SPDM asymmetric algorithm size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM hash size
+  @return SPDM asymmetric algorithm size.
 **/
 UINT32
 GetSpdmAsymSize (
@@ -378,11 +612,11 @@ GetSpdmAsymSize (
 }
 
 /**
-  This function returns the SPDM Request asym size.
+  This function returns the SPDM requester asymmetric algorithm size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM hash size
+  @return SPDM requester asymmetric algorithm size.
 **/
 UINT32
 GetSpdmReqAsymSize (
@@ -410,11 +644,11 @@ GetSpdmReqAsymSize (
 }
 
 /**
-  This function returns the SPDM measurement hash size.
+  This function returns the SPDM measurement hash algorithm size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM measurement hash size
+  @return SPDM measurement hash algorithm size.
 **/
 UINT32
 GetSpdmMeasurementHashSize (
@@ -438,11 +672,11 @@ GetSpdmMeasurementHashSize (
 }
 
 /**
-  This function returns the SPDM DheKey size.
+  This function returns the SPDM DHE algorithm key size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM DheKey size
+  @return SPDM DHE algorithm key size.
 **/
 UINT32
 GetSpdmDheKeySize (
@@ -466,6 +700,13 @@ GetSpdmDheKeySize (
   return 0;
 }
 
+/**
+  Return cipher ID, based upon the negotiated HKDF algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return HKDF expand function
+**/
 UINTN
 GetSpdmDheNid (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -489,11 +730,11 @@ GetSpdmDheNid (
 }
 
 /**
-  This function returns the SPDM AEAD key size.
+  This function returns the SPDM AEAD algorithm key size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM AEAD key size
+  @return SPDM AEAD algorithm key size.
 **/
 UINT32
 GetSpdmAeadKeySize (
@@ -512,11 +753,11 @@ GetSpdmAeadKeySize (
 }
 
 /**
-  This function returns the SPDM AEAD iv size.
+  This function returns the SPDM AEAD algorithm iv size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM AEAD iv size
+  @return SPDM AEAD algorithm iv size.
 **/
 UINT32
 GetSpdmAeadIvSize (
@@ -535,11 +776,11 @@ GetSpdmAeadIvSize (
 }
 
 /**
-  This function returns the SPDM AEAD tag size.
+  This function returns the SPDM AEAD algorithm tag size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM AEAD iv size
+  @return SPDM AEAD algorithm tag size.
 **/
 UINT32
 GetSpdmAeadTagSize (
@@ -558,11 +799,11 @@ GetSpdmAeadTagSize (
 }
 
 /**
-  This function returns the SPDM AEAD block size.
+  This function returns the SPDM AEAD algorithm block size.
 
-  @param[in]  SpdmContext             The SPDM context for the device.
+  @param  SpdmContext                  A pointer to the SPDM context.
 
-  @return TCG SPDM AEAD iv size
+  @return SPDM AEAD algorithm block size.
 **/
 UINT32
 GetSpdmAeadBlockSize (
@@ -580,6 +821,13 @@ GetSpdmAeadBlockSize (
   return 0;
 }
 
+/**
+  Return AEAD encryption function, based upon the negotiated AEAD algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return AEAD encryption function
+**/
 AEAD_ENCRYPT
 GetSpdmAeadEncFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -612,6 +860,27 @@ GetSpdmAeadEncFunc (
   return NULL;
 }
 
+/**
+  Performs AEAD authenticated encryption on a data buffer and additional authenticated data (AAD),
+  based upon negotiated AEAD algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be encrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  TagOut                       Pointer to a buffer that receives the authentication tag output.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the encryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated encryption succeeded.
+  @retval FALSE  AEAD authenticated encryption failed.
+**/
 BOOLEAN
 SpdmAeadEncryption (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -637,6 +906,13 @@ SpdmAeadEncryption (
   return AeadEncFunction (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, TagOut, TagSize, DataOut, DataOutSize);
 }
 
+/**
+  Return AEAD decryption function, based upon the negotiated AEAD algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return AEAD decryption function
+**/
 AEAD_DECRYPT
 GetSpdmAeadDecFunc (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -669,6 +945,27 @@ GetSpdmAeadDecFunc (
   return NULL;
 }
 
+/**
+  Performs AEAD authenticated decryption on a data buffer and additional authenticated data (AAD),
+  based upon negotiated AEAD algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be decrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  Tag                          Pointer to a buffer that contains the authentication tag.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the decryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated decryption succeeded.
+  @retval FALSE  AEAD authenticated decryption failed.
+**/
 BOOLEAN
 SpdmAeadDecryption (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -694,6 +991,13 @@ SpdmAeadDecryption (
   return AeadDecFunction (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, Tag, TagSize, DataOut, DataOutSize);
 }
 
+/**
+  Return asymmetric GET_PUBLIC_KEY_FROM_X509 function, based upon the negotiated asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return asymmetric GET_PUBLIC_KEY_FROM_X509 function
+**/
 ASYM_GET_PUBLIC_KEY_FROM_X509
 GetSpdmAsymGetPublicKeyFromX509 (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -726,6 +1030,19 @@ GetSpdmAsymGetPublicKeyFromX509 (
   return NULL;
 }
 
+/**
+  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate,
+  based upon negotiated asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Cert                         Pointer to the DER-encoded X509 certificate.
+  @param  CertSize                     Size of the X509 certificate in bytes.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve public key from X509 certificate.
+**/
 BOOLEAN
 SpdmAsymGetPublicKeyFromX509 (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -742,6 +1059,13 @@ SpdmAsymGetPublicKeyFromX509 (
   return GetPublicKeyFromX509Function (Cert, CertSize, Context);
 }
 
+/**
+  Return asymmetric free function, based upon the negotiated asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return asymmetric free function
+**/
 ASYM_FREE
 GetSpdmAsymFree (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -774,6 +1098,13 @@ GetSpdmAsymFree (
   return NULL;
 }
 
+/**
+  Release the specified asymmetric context,
+  based upon negotiated asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the asymmetric context to be released.
+**/
 VOID
 SpdmAsymFree (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -788,6 +1119,13 @@ SpdmAsymFree (
   FreeFunction (Context);
 }
 
+/**
+  Return asymmetric verify function, based upon the negotiated asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return asymmetric verify function
+**/
 ASYM_VERIFY
 GetSpdmAsymVerify (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -826,6 +1164,20 @@ GetSpdmAsymVerify (
   return NULL;
 }
 
+/**
+  Verifies the asymmetric signature,
+  based upon negotiated asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to asymmetric context for signature verification.
+  @param  MessageHash                  Pointer to octet message hash to be checked.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to asymmetric signature to be verified.
+  @param  SigSize                      Size of signature in bytes.
+
+  @retval  TRUE   Valid asymmetric signature.
+  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
+**/
 BOOLEAN
 SpdmAsymVerify (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -844,6 +1196,13 @@ SpdmAsymVerify (
   return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
 }
 
+/**
+  Return requester asymmetric GET_PUBLIC_KEY_FROM_X509 function, based upon the negotiated requester asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return requester asymmetric GET_PUBLIC_KEY_FROM_X509 function
+**/
 ASYM_GET_PUBLIC_KEY_FROM_X509
 GetSpdmReqAsymGetPublicKeyFromX509 (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -876,6 +1235,19 @@ GetSpdmReqAsymGetPublicKeyFromX509 (
   return NULL;
 }
 
+/**
+  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate,
+  based upon negotiated requester asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Cert                         Pointer to the DER-encoded X509 certificate.
+  @param  CertSize                     Size of the X509 certificate in bytes.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve public key from X509 certificate.
+**/
 BOOLEAN
 SpdmReqAsymGetPublicKeyFromX509 (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -892,6 +1264,13 @@ SpdmReqAsymGetPublicKeyFromX509 (
   return GetPublicKeyFromX509Function (Cert, CertSize, Context);
 }
 
+/**
+  Return requester asymmetric free function, based upon the negotiated requester asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return requester asymmetric free function
+**/
 ASYM_FREE
 GetSpdmReqAsymFree (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -924,6 +1303,13 @@ GetSpdmReqAsymFree (
   return NULL;
 }
 
+/**
+  Release the specified asymmetric context,
+  based upon negotiated requester asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the asymmetric context to be released.
+**/
 VOID
 SpdmReqAsymFree (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -938,6 +1324,13 @@ SpdmReqAsymFree (
   FreeFunction (Context);
 }
 
+/**
+  Return requester asymmetric verify function, based upon the negotiated requester asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return requester asymmetric verify function
+**/
 ASYM_VERIFY
 GetSpdmReqAsymVerify (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -976,6 +1369,20 @@ GetSpdmReqAsymVerify (
   return NULL;
 }
 
+/**
+  Verifies the asymmetric signature,
+  based upon negotiated requester asymmetric algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to asymmetric context for signature verification.
+  @param  MessageHash                  Pointer to octet message hash to be checked.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to asymmetric signature to be verified.
+  @param  SigSize                      Size of signature in bytes.
+
+  @retval  TRUE   Valid asymmetric signature.
+  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
+**/
 BOOLEAN
 SpdmReqAsymVerify (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -994,6 +1401,13 @@ SpdmReqAsymVerify (
   return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
 }
 
+/**
+  Return DHE new by NID function, based upon the negotiated DHE algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return DHE new by NID function
+**/
 DHE_NEW_BY_NID
 GetSpdmDheNew (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -1023,6 +1437,12 @@ GetSpdmDheNew (
   return NULL;
 }
 
+/**
+  Allocates and Initializes one Diffie-Hellman Ephemeral (DHE) Context for subsequent use,
+  based upon negotiated DHE algorithm.
+
+  @return  Pointer to the Diffie-Hellman Context that has been initialized.
+**/
 VOID *
 SpdmDheNew (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -1042,6 +1462,13 @@ SpdmDheNew (
   return NewFunction (Nid);
 }
 
+/**
+  Return DHE free function, based upon the negotiated DHE algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return DHE free function
+**/
 DHE_FREE
 GetSpdmDheFree (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -1071,6 +1498,13 @@ GetSpdmDheFree (
   return NULL;
 }
 
+/**
+  Release the specified DHE context,
+  based upon negotiated DHE algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the DHE context to be released.
+**/
 VOID
 SpdmDheFree (
   IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -1085,6 +1519,13 @@ SpdmDheFree (
   FreeFunction (Context);
 }
 
+/**
+  Return DHE generate key function, based upon the negotiated DHE algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return DHE generate key function
+**/
 DHE_GENERATE_KEY
 GetSpdmDheGenerateKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -1114,6 +1555,25 @@ GetSpdmDheGenerateKey (
   return NULL;
 }
 
+/**
+  Generates DHE public key,
+  based upon negotiated DHE algorithm.
+
+  This function generates random secret exponent, and computes the public key, which is
+  returned via parameter PublicKey and PublicKeySize. DH context is updated accordingly.
+  If the PublicKey buffer is too small to hold the public key, FALSE is returned and
+  PublicKeySize is set to the required buffer size to obtain the public key.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the DHE context.
+  @param  PublicKey                    Pointer to the buffer to receive generated public key.
+  @param  PublicKeySize                On input, the size of PublicKey buffer in bytes.
+                                       On output, the size of data returned in PublicKey buffer in bytes.
+
+  @retval TRUE   DHE public key generation succeeded.
+  @retval FALSE  DHE public key generation failed.
+  @retval FALSE  PublicKeySize is not large enough.
+**/
 BOOLEAN
 SpdmDheGenerateKey (
   IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -1130,6 +1590,13 @@ SpdmDheGenerateKey (
   return GenerateKeyFunction (Context, PublicKey, PublicKeySize);
 }
 
+/**
+  Return DHE compute key function, based upon the negotiated DHE algorithm.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @return DHE compute key function
+**/
 DHE_COMPUTE_KEY
 GetSpdmDheComputeKey (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext
@@ -1159,6 +1626,25 @@ GetSpdmDheComputeKey (
   return NULL;
 }
 
+/**
+  Computes exchanged common key,
+  based upon negotiated DHE algorithm.
+
+  Given peer's public key, this function computes the exchanged common key, based on its own
+  context including value of prime modulus and random secret exponent.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Context                      Pointer to the DHE context.
+  @param  PeerPublicKey                Pointer to the peer's public key.
+  @param  PeerPublicKeySize            Size of peer's public key in bytes.
+  @param  Key                          Pointer to the buffer to receive generated key.
+  @param  KeySize                      On input, the size of Key buffer in bytes.
+                                       On output, the size of data returned in Key buffer in bytes.
+
+  @retval TRUE   DHE exchanged key generation succeeded.
+  @retval FALSE  DHE exchanged key generation failed.
+  @retval FALSE  KeySize is not large enough.
+**/
 BOOLEAN
 SpdmDheComputeKey (
   IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -1177,6 +1663,13 @@ SpdmDheComputeKey (
   return ComputeKeyFunction (Context, PeerPublic, PeerPublicSize, Key, KeySize);
 }
 
+/**
+  Generates a random byte stream of the specified size.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Size                         Size of random bytes to generate.
+  @param  Rand                         Pointer to buffer to receive random value.
+**/
 VOID
 SpdmGetRandomNumber (
   IN  UINTN                     Size,
@@ -1188,12 +1681,26 @@ SpdmGetRandomNumber (
   return ;
 }
 
+/**
+  Check the X509 DataTime is within a valid range.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  From                         notBefore Pointer to DateTime object.
+  @param  FromSize                     notBefore DateTime object size.
+  @param  To                           notAfter Pointer to DateTime object.
+  @param  ToSize                       notAfter DateTime object size.
+
+  @retval  TRUE   verification pass.
+  @retval  FALSE  verification fail.
+**/
 STATIC
-BOOLEAN InternalSpdmX509DateTimeCheck(
+BOOLEAN
+InternalSpdmX509DateTimeCheck (
   IN UINT8 *From,
-  IN OUT UINTN FromSize,
-  IN OUT UINT8 *To,
-  IN OUT UINTN ToSize)
+  IN UINTN FromSize,
+  IN UINT8 *To,
+  IN UINTN ToSize
+  )
 {
   INTN Ret;
   RETURN_STATUS ReturnStatus;
@@ -1205,10 +1712,11 @@ BOOLEAN InternalSpdmX509DateTimeCheck(
   T0Size = 64;
 
   ReturnStatus = X509SetDateTime ("19700101000000Z", F0, &F0Size);
-  if (ReturnStatus == RETURN_SUCCESS) {
-    ReturnStatus = X509SetDateTime ("99991231235959Z", T0, &T0Size);
+  if (ReturnStatus != RETURN_SUCCESS) {
+    return FALSE;
   }
 
+  ReturnStatus = X509SetDateTime ("99991231235959Z", T0, &T0Size);
   if (ReturnStatus != RETURN_SUCCESS) {
     return FALSE;
   }
@@ -1238,11 +1746,10 @@ BOOLEAN InternalSpdmX509DateTimeCheck(
   @retval  FALSE  Certificate is not valid
 **/
 BOOLEAN
-EFIAPI
-SpdmX509CertificateCheck(
+SpdmX509CertificateCheck (
   IN   CONST UINT8  *Cert,
   IN   UINTN        CertSize
-)
+  )
 {
   UINT8         EndCertFrom[64];
   UINTN         EndCertFromLen;
@@ -1368,8 +1875,34 @@ STATIC CONST UINT8 OID_subjectAltName[] = {
   0x55, 0x1D, 0x11
 };
 
+/**
+  Retrieve the SubjectAltName from SubjectAltName Bytes.
+
+  @param[in]      Buffer           Pointer to subjectAltName oct bytes.
+  @param[in]      Len              Size of Buffer in bytes.
+  @param[out]     NameBuffer       Buffer to contain the retrieved certificate
+                                   SubjectAltName. At most NameBufferSize bytes will be
+                                   written. Maybe NULL in order to determine the size
+                                   buffer needed.
+  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
+                                   and the size of buffer returned Name on output.
+                                   If NameBuffer is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+  @param[out]     Oid              OID of otherName
+  @param[in,out]  OidSize          the buffersize for required OID
+
+  @retval RETURN_SUCCESS           The certificate Organization Name retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If NameBufferSize is NULL.
+                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no SubjectAltName exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   NameBufferSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
 RETURN_STATUS
-EFIAPI
 SpdmGetDMTFSubjectAltNameFromBytes (
   IN      CONST UINT8   *Buffer,
   IN      INTN          Len,
@@ -1377,14 +1910,14 @@ SpdmGetDMTFSubjectAltNameFromBytes (
   IN OUT  UINTN         *NameBufferSize,
   OUT     UINT8         *Oid,         OPTIONAL
   IN OUT  UINTN         *OidSize
-)
+  )
 {
   UINT8       *Ptr;
-  int         Length;
+  INT32       Length;
   UINTN       ObjLen;
-  int         Ret;
+  INT32       Ret;
 
-  Length = (int)Len;
+  Length = (INT32)Len;
   Ptr = (UINT8 *)Buffer;
   ObjLen = 0;
 
@@ -1444,8 +1977,34 @@ SpdmGetDMTFSubjectAltNameFromBytes (
   return RETURN_SUCCESS;
 }
 
+/**
+  Retrieve the SubjectAltName from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     NameBuffer       Buffer to contain the retrieved certificate
+                                   SubjectAltName. At most NameBufferSize bytes will be
+                                   written. Maybe NULL in order to determine the size
+                                   buffer needed.
+  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
+                                   and the size of buffer returned Name on output.
+                                   If NameBuffer is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+  @param[out]     Oid              OID of otherName
+  @param[in,out]  OidSize          the buffersize for required OID
+
+  @retval RETURN_SUCCESS           The certificate Organization Name retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If NameBufferSize is NULL.
+                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no SubjectAltName exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   NameBufferSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
 RETURN_STATUS
-EFIAPI
 SpdmGetDMTFSubjectAltName (
   IN      CONST UINT8   *Cert,
   IN      INTN          CertSize,

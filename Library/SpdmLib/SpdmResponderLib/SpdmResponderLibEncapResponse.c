@@ -21,8 +21,8 @@ typedef
 RETURN_STATUS
 (EFIAPI *SPDM_PROCESS_ENCAP_RESPONSE) (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINTN                EncapLastResponseSize,
-  IN     VOID                 *EncapLastResponse,
+  IN     UINTN                EncapResponseSize,
+  IN     VOID                 *EncapResponse,
   OUT    BOOLEAN              *Continue
   );
 
@@ -90,8 +90,8 @@ RETURN_STATUS
 SpdmProcessEncapsulatedResponse (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINT8                *RequestId,
-  IN     UINTN                EncapLastResponseSize,
-  IN     VOID                 *EncapLastResponse,
+  IN     UINTN                EncapResponseSize,
+  IN     VOID                 *EncapResponse,
   IN OUT UINTN                *EncapRequestSize,
      OUT VOID                 *EncapRequest
   )
@@ -108,7 +108,7 @@ SpdmProcessEncapsulatedResponse (
  
   Continue = FALSE;
   if (EncapResponseStruct->ProcessEncapResponse != NULL) {
-    Status = EncapResponseStruct->ProcessEncapResponse (SpdmContext, EncapLastResponseSize, EncapLastResponse, &Continue);
+    Status = EncapResponseStruct->ProcessEncapResponse (SpdmContext, EncapResponseSize, EncapResponse, &Continue);
     if (RETURN_ERROR(Status)) {
       return Status;
     }
@@ -145,6 +145,12 @@ SpdmProcessEncapsulatedResponse (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function initializes the encapsulated state.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
+**/
 VOID
 SpdmInitEncapState (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
@@ -159,6 +165,23 @@ SpdmInitEncapState (
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
 }
 
+/**
+  Process the SPDM ENCAPSULATED_REQUEST request and return the response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  RequestSize                  Size in bytes of the request data.
+  @param  Request                      A pointer to the request data.
+  @param  ResponseSize                 Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  Response                     A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The request is processed and the response is returned.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedRequest (
@@ -214,6 +237,23 @@ SpdmGetResponseEncapsulatedRequest (
   return RETURN_SUCCESS;
 }
 
+/**
+  Process the SPDM ENCAPSULATED_RESPONSE_ACK request and return the response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  RequestSize                  Size in bytes of the request data.
+  @param  Request                      A pointer to the request data.
+  @param  ResponseSize                 Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  Response                     A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The request is processed and the response is returned.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseEncapsulatedResponseAck (
@@ -228,8 +268,8 @@ SpdmGetResponseEncapsulatedResponseAck (
   UINTN                                       SpdmRequestSize;
   SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE     *SpdmResponse;
   SPDM_DEVICE_CONTEXT                         *SpdmContext;
-  VOID                                        *EncapLastResponse;
-  UINTN                                       EncapLastResponseSize;
+  VOID                                        *EncapResponse;
+  UINTN                                       EncapResponseSize;
   VOID                                        *EncapRequest;
   UINTN                                       EncapRequestSize;
   UINT8                                       RequestId;
@@ -244,8 +284,8 @@ SpdmGetResponseEncapsulatedResponseAck (
   SpdmRequest = Request;
   SpdmRequestSize = RequestSize;
 
-  EncapLastResponse = (SpdmRequest + 1);
-  EncapLastResponseSize = SpdmRequestSize - sizeof(SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST);
+  EncapResponse = (SpdmRequest + 1);
+  EncapResponseSize = SpdmRequestSize - sizeof(SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST);
   RequestId = SpdmRequest->Header.Param1;
 
   ASSERT (*ResponseSize > sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE));
@@ -261,7 +301,7 @@ SpdmGetResponseEncapsulatedResponseAck (
   EncapRequest = SpdmResponse + 1;
 
   RequestId = 0;
-  Status = SpdmProcessEncapsulatedResponse (Context, &RequestId, EncapLastResponseSize, EncapLastResponse, &EncapRequestSize, EncapRequest);
+  Status = SpdmProcessEncapsulatedResponse (Context, &RequestId, EncapResponseSize, EncapResponse, &EncapRequestSize, EncapRequest);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

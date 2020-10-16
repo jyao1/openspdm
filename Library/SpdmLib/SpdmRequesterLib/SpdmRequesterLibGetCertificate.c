@@ -180,7 +180,7 @@ TrySpdmGetCertificate (
     SpdmRequest.Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
     DEBUG((DEBUG_INFO, "Request (Offset 0x%x, Size 0x%x):\n", SpdmRequest.Offset, SpdmRequest.Length));
 
-    Status = SpdmSendRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
+    Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
     if (RETURN_ERROR(Status)) {
       Status = RETURN_DEVICE_ERROR;
       goto Done;
@@ -193,7 +193,7 @@ TrySpdmGetCertificate (
 
     SpdmResponseSize = sizeof(SpdmResponse);
     ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-    Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+    Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
     if (RETURN_ERROR(Status)) {
       Status = RETURN_DEVICE_ERROR;
       goto Done;
@@ -273,6 +273,26 @@ Done:
   return Status;
 }
 
+/**
+  This function sends GET_CERTIFICATE
+  to get certificate chain in one slot from device.
+
+  This function verify the integrity of the certificate chain.
+  RootHash -> Root certificate -> Intermediate certificate -> Leaf certificate.
+
+  If the peer root certificate hash is deployed,
+  this function also verifies the digest with the root hash in the certificate chain.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SlotNum                      The number of slot for the certificate chain.
+  @param  CertChainSize                On input, indicate the size in bytes of the destination buffer to store the digest buffer.
+                                       On output, indicate the size in bytes of the certificate chain.
+  @param  CertChain                    A pointer to a destination buffer to store the certificate chain.
+
+  @retval RETURN_SUCCESS               The certificate chain is got successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetCertificate (

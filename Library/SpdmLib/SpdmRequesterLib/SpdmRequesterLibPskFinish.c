@@ -58,10 +58,13 @@ SpdmRequesterGeneratePskFinishHmac (
 }
 
 /**
-  This function executes SPDM finish.
-  
-  @param[in]  SpdmContext            The SPDM context for the device.
-  @param[out] DeviceSecurityState    The Device Security state associated with the device.
+  This function sends PSK_FINISH and receives PSK_FINISH_RSP for SPDM PSK finish.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    SessionId to the PSK_FINISH request.
+
+  @retval RETURN_SUCCESS               The PSK_FINISH is sent and the PSK_FINISH_RSP is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
 SpdmSendReceivePskFinish (
@@ -103,14 +106,14 @@ SpdmSendReceivePskFinish (
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest + SpdmRequestSize - HmacSize, HmacSize);
 
-  Status = SpdmSendRequest (SpdmContext, &SessionId, SpdmRequestSize, &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, &SessionId, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }

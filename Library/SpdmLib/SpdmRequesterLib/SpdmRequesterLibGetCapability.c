@@ -40,7 +40,7 @@ TrySpdmGetCapabilities (
   SpdmRequest.Header.Param2 = 0;
   SpdmRequest.CTExponent = RequesterCTExponent;
   SpdmRequest.Flags = RequesterFlags;
-  Status = SpdmSendRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -52,7 +52,7 @@ TrySpdmGetCapabilities (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -89,6 +89,18 @@ TrySpdmGetCapabilities (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function sends GET_CAPABILITIES and receives CAPABILITIES.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  RequesterCTExponent          RequesterCTExponent to the GET_CAPABILITIES request.
+  @param  RequesterFlags               RequesterFlags to the GET_CAPABILITIES request.
+  @param  ResponderCTExponent          ResponderCTExponent from the CAPABILITIES response.
+  @param  ResponderFlags               ResponderFlags from the CAPABILITIES response.
+
+  @retval RETURN_SUCCESS               The GET_CAPABILITIES is sent and the CAPABILITIES is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetCapabilities (

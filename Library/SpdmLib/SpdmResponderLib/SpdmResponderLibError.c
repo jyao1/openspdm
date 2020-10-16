@@ -9,6 +9,23 @@
 
 #include "SpdmResponderLibInternal.h"
 
+/**
+  Generate ERROR message.
+
+  This function can be called in SPDM_GET_RESPONSE_FUNC.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ErrorCode                    The error code of the message.
+  @param  ErrorData                    The error data of the message.
+  @param  SpdmResponseSize             Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  SpdmResponse                 A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The error message is generated.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGenerateErrorResponse (
@@ -37,6 +54,25 @@ SpdmGenerateErrorResponse (
   return RETURN_SUCCESS;
 }
 
+/**
+  Generate ERROR message with extended error data.
+
+  This function can be called in SPDM_GET_RESPONSE_FUNC.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ErrorCode                    The error code of the message.
+  @param  ErrorData                    The error data of the message.
+  @param  ExtendedErrorDataSize        The size in bytes of the extended error data.
+  @param  ExtendedErrorData            A pointer to the extended error data.
+  @param  SpdmResponseSize             Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  SpdmResponse                 A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The error message is generated.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGenerateExtendedErrorResponse (

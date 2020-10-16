@@ -9,8 +9,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmRequesterLibInternal.h"
 
+/**
+  Send an SPDM or an APP request to a device.
+
+  @param  SpdmContext                  The SPDM context for the device.
+  @param  SessionId                    Indicate if the request is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  IsAppMessage                 Indicates if it is an APP message or SPDM message.
+  @param  RequestSize                  Size in bytes of the request data buffer.
+  @param  Request                      A pointer to a destination buffer to store the request.
+                                       The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
+
+  @retval RETURN_SUCCESS               The SPDM request is sent successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM request is sent to the device.
+**/
 RETURN_STATUS
-SpdmSendRequestEx (
+SpdmSendRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
   IN     BOOLEAN              IsAppMessage,
@@ -22,7 +38,7 @@ SpdmSendRequestEx (
   UINT8                              Message[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                              MessageSize;
 
-  DEBUG((DEBUG_INFO, "SpdmSendRequest[%x] (0x%x): \n", (SessionId != NULL) ? *SessionId : 0x0, RequestSize));
+  DEBUG((DEBUG_INFO, "SpdmSendSpdmRequest[%x] (0x%x): \n", (SessionId != NULL) ? *SessionId : 0x0, RequestSize));
   InternalDumpHex (Request, RequestSize);
 
   MessageSize = sizeof(Message);
@@ -34,25 +50,30 @@ SpdmSendRequestEx (
 
   Status = SpdmContext->SendMessage (SpdmContext, MessageSize, Message, 0);
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "SpdmSendRequest[%x] Status - %p\n", (SessionId != NULL) ? *SessionId : 0x0, Status));
+    DEBUG((DEBUG_INFO, "SpdmSendSpdmRequest[%x] Status - %p\n", (SessionId != NULL) ? *SessionId : 0x0, Status));
   }
 
   return Status;
 }
 
-RETURN_STATUS
-SpdmSendRequest (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT32               *SessionId,
-  IN     UINTN                RequestSize,
-  IN     VOID                 *Request
-  )
-{
-  return SpdmSendRequestEx (SpdmContext, SessionId, FALSE, RequestSize, Request);
-}
+/**
+  Receive an SPDM or an APP response from a device.
+  
+  @param  SpdmContext                  The SPDM context for the device.
+  @param  SessionId                    Indicate if the response is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  IsAppMessage                 Indicates if it is an APP message or SPDM message.
+  @param  ResponseSize                 Size in bytes of the response data buffer.
+  @param  Response                     A pointer to a destination buffer to store the response.
+                                       The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
 
+  @retval RETURN_SUCCESS               The SPDM response is received successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM response is received from the device.
+**/
 RETURN_STATUS
-SpdmReceiveResponseEx (
+SpdmReceiveResponse (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
   IN     BOOLEAN              IsAppMessage,
@@ -71,7 +92,7 @@ SpdmReceiveResponseEx (
   MessageSize = sizeof(Message);
   Status = SpdmContext->ReceiveMessage (SpdmContext, &MessageSize, Message, 0);
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] Status - %p\n", (SessionId != NULL) ? *SessionId : 0x0, Status));
+    DEBUG((DEBUG_INFO, "SpdmReceiveSpdmResponse[%x] Status - %p\n", (SessionId != NULL) ? *SessionId : 0x0, Status));
     return Status;
   }
 
@@ -81,42 +102,83 @@ SpdmReceiveResponseEx (
 
   if (SessionId != NULL) {
     if (MessageSessionId == NULL) {
-      DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] GetSessionId - NULL\n", (SessionId != NULL) ? *SessionId : 0x0));
+      DEBUG((DEBUG_INFO, "SpdmReceiveSpdmResponse[%x] GetSessionId - NULL\n", (SessionId != NULL) ? *SessionId : 0x0));
       return RETURN_DEVICE_ERROR;
     }
     if (*MessageSessionId != *SessionId) {
-      DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] GetSessionId - %x\n", (SessionId != NULL) ? *SessionId : 0x0, *MessageSessionId));
+      DEBUG((DEBUG_INFO, "SpdmReceiveSpdmResponse[%x] GetSessionId - %x\n", (SessionId != NULL) ? *SessionId : 0x0, *MessageSessionId));
       return RETURN_DEVICE_ERROR;
     }
   } else {
     if (MessageSessionId != NULL) {
-      DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] GetSessionId - %x\n", (SessionId != NULL) ? *SessionId : 0x0, *MessageSessionId));
+      DEBUG((DEBUG_INFO, "SpdmReceiveSpdmResponse[%x] GetSessionId - %x\n", (SessionId != NULL) ? *SessionId : 0x0, *MessageSessionId));
       return RETURN_DEVICE_ERROR;
     }
   }
 
   if ((IsAppMessage && !IsMessageAppMessage) ||
       (!IsAppMessage && IsMessageAppMessage)) {
-    DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] AppMessage mismatch\n", (SessionId != NULL) ? *SessionId : 0x0));
+    DEBUG((DEBUG_INFO, "SpdmReceiveSpdmResponse[%x] AppMessage mismatch\n", (SessionId != NULL) ? *SessionId : 0x0));
     return RETURN_DEVICE_ERROR;
   }
 
-  DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] (0x%x): \n", (SessionId != NULL) ? *SessionId : 0x0, *ResponseSize));
+  DEBUG((DEBUG_INFO, "SpdmReceiveSpdmResponse[%x] (0x%x): \n", (SessionId != NULL) ? *SessionId : 0x0, *ResponseSize));
   if (RETURN_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "SpdmReceiveResponse[%x] Status - %p\n", (SessionId != NULL) ? *SessionId : 0x0, Status));    
+    DEBUG((DEBUG_INFO, "SpdmReceiveSpdmResponse[%x] Status - %p\n", (SessionId != NULL) ? *SessionId : 0x0, Status));    
   } else {
     InternalDumpHex (Response, *ResponseSize);
   }
   return Status;
 }
 
+/**
+  Send an SPDM request to a device.
+
+  @param  SpdmContext                  The SPDM context for the device.
+  @param  SessionId                    Indicate if the request is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  RequestSize                  Size in bytes of the request data buffer.
+  @param  Request                      A pointer to a destination buffer to store the request.
+                                       The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
+
+  @retval RETURN_SUCCESS               The SPDM request is sent successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM request is sent to the device.
+**/
 RETURN_STATUS
-SpdmReceiveResponse (
+SpdmSendSpdmRequest (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               *SessionId,
+  IN     UINTN                RequestSize,
+  IN     VOID                 *Request
+  )
+{
+  return SpdmSendRequest (SpdmContext, SessionId, FALSE, RequestSize, Request);
+}
+
+/**
+  Receive an SPDM response from a device.
+
+  @param  SpdmContext                  The SPDM context for the device.
+  @param  SessionId                    Indicate if the response is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  ResponseSize                 Size in bytes of the response data buffer.
+  @param  Response                     A pointer to a destination buffer to store the response.
+                                       The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
+
+  @retval RETURN_SUCCESS               The SPDM response is received successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM response is received from the device.
+**/
+RETURN_STATUS
+SpdmReceiveSpdmResponse (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
   IN OUT UINTN                *ResponseSize,
      OUT VOID                 *Response
   )
 {
-  return SpdmReceiveResponseEx (SpdmContext, SessionId, FALSE, ResponseSize, Response);
+  return SpdmReceiveResponse (SpdmContext, SessionId, FALSE, ResponseSize, Response);
 }

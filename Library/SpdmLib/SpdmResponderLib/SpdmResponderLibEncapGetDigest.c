@@ -38,11 +38,19 @@ SpdmEncapRequesterVerifyDigest (
   return TRUE;
 }
 
-/*
-  Get all digest of the CertificateChains returned from device.
+/**
+  Get the SPDM encapsulated GET_DIGESTS request.
 
-  TotalDigestSize = sizeof(Digest) * Count in SlotMask
-*/
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapRequestSize             Size in bytes of the encapsulated request data.
+                                       On input, it means the size in bytes of encapsulated request data buffer.
+                                       On output, it means the size in bytes of copied encapsulated request data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired encapsulated request data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  EncapRequest                 A pointer to the encapsulated request data.
+
+  @retval RETURN_SUCCESS               The encapsulated request is returned.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmGetEncapReqestGetDigest (
@@ -75,12 +83,24 @@ SpdmGetEncapReqestGetDigest (
   return RETURN_SUCCESS;
 }
 
+/**
+  Process the SPDM encapsulated DIGESTS response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapResponseSize            Size in bytes of the encapsulated response data.
+  @param  EncapResponse                A pointer to the encapsulated response data.
+  @param  Continue                     Indicate if encapsulated communication need continue.
+
+  @retval RETURN_SUCCESS               The encapsulated response is processed.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmProcessEncapResponseDigest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINTN                EncapLastResponseSize,
-  IN     VOID                 *EncapLastResponse,
+  IN     UINTN                EncapResponseSize,
+  IN     VOID                 *EncapResponse,
   OUT    BOOLEAN              *Continue
   )
 {
@@ -92,9 +112,9 @@ SpdmProcessEncapResponseDigest (
   UINTN                                     DigestCount;
   UINTN                                     Index;
 
-  SpdmResponse = EncapLastResponse;
-  SpdmResponseSize = EncapLastResponseSize;
-  if (EncapLastResponseSize < sizeof(SPDM_DIGESTS_RESPONSE)) {
+  SpdmResponse = EncapResponse;
+  SpdmResponseSize = EncapResponseSize;
+  if (EncapResponseSize < sizeof(SPDM_DIGESTS_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
 

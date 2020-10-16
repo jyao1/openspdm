@@ -10,9 +10,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmResponderLibInternal.h"
 
 /**
-  Receive and send an SPDM message.
+  Process a transport layer message.
 
-  The SPDM message can be a normal message or a secured message in SPDM session.
+  The message can be a normal message or a secured message in SPDM session.
+  The message can be an SPDM message or an APP message.
 
   This function is called in SpdmResponderDispatchMessage to process the message.
   The alternative is: an SPDM responder may receive the request message directly
@@ -22,10 +23,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
                                        If *SessionId is NULL, it is a normal message.
                                        If *SessionId is NOT NULL, it is a secured message.
-  @param  SpdmRequest                  A pointer to the request data.
-  @param  SpdmRequestSize              Size in bytes of the request data.
-  @param  SpdmResponse                 A pointer to the response data.
-  @param  SpdmResponseSize             Size in bytes of the response data.
+  @param  Request                      A pointer to the request data.
+  @param  RequestSize                  Size in bytes of the request data.
+  @param  Response                     A pointer to the response data.
+  @param  ResponseSize                 Size in bytes of the response data.
                                        On input, it means the size in bytes of response data buffer.
                                        On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
                                        and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
@@ -37,7 +38,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 RETURN_STATUS
 EFIAPI
-SpdmReceiveSendData (
+SpdmProcessMessage (
   IN     VOID                 *Context,
   IN OUT UINT32               **SessionId,
   IN     VOID                 *Request,
@@ -52,18 +53,31 @@ SpdmReceiveSendData (
 
   SpdmContext = Context;
 
-  Status = SpdmReceiveRequestEx (SpdmContext, SessionId, &IsAppMessage, RequestSize, Request);
+  Status = SpdmProcessRequest (SpdmContext, SessionId, &IsAppMessage, RequestSize, Request);
   if (RETURN_ERROR(Status)) {
     return Status;
   }
 
-  Status = SpdmSendResponseEx (SpdmContext, *SessionId, IsAppMessage, ResponseSize, Response);
+  Status = SpdmBuildResponse (SpdmContext, *SessionId, IsAppMessage, ResponseSize, Response);
   if (RETURN_ERROR(Status)) {
     return Status;
   }
   return RETURN_SUCCESS;
 }
 
+/**
+  This is the main dispatch function in SPDM responder.
+
+  It receives one request message, processes it and sends the response message.
+
+  It should be called in a while loop or an timer/interrupt handler.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+
+  @retval RETURN_SUCCESS               One SPDM request message is processed.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_UNSUPPORTED           One request message is not supported.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmResponderDispatchMessage (
@@ -80,15 +94,19 @@ SpdmResponderDispatchMessage (
 
   SpdmContext = Context;
 
-  RequestSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  RequestSize = sizeof(Request);
   Status = SpdmContext->ReceiveMessage (SpdmContext, &RequestSize, Request, 0);
-  if (!RETURN_ERROR(Status)) {
-    ResponseSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-    Status = SpdmReceiveSendData (SpdmContext, &SessionId, Request, RequestSize, Response, &ResponseSize);
-    if (!RETURN_ERROR(Status)) {
-      Status = SpdmContext->SendMessage (SpdmContext, ResponseSize, Response, 0);
-    }
+  if (RETURN_ERROR(Status)) {
+    return Status;
   }
+
+  ResponseSize = sizeof(Response);
+  Status = SpdmProcessMessage (SpdmContext, &SessionId, Request, RequestSize, Response, &ResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return Status;
+  }
+
+  Status = SpdmContext->SendMessage (SpdmContext, ResponseSize, Response, 0);
 
   return Status;
 }
