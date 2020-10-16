@@ -38,6 +38,7 @@ RsaNew (
     return RsaContext;
   }
 
+  mbedtls_rsa_init(RsaContext, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_NONE);
   return RsaContext;
 }
 
@@ -88,7 +89,86 @@ RsaSetKey (
   IN      UINTN        BnSize
   )
 {
-  return FALSE;
+  mbedtls_rsa_context *RsaKey;
+  INT32               Ret;
+  mbedtls_mpi         Value;
+
+  //
+  // Check input parameters.
+  //
+  if (RsaContext == NULL || BnSize > INT_MAX) {
+    return FALSE;
+  }
+
+  mbedtls_mpi_init(&Value);
+
+  RsaKey = (mbedtls_rsa_context *)RsaContext;
+
+  // if BigNumber is Null clear
+  if (BigNumber) {
+    Ret = mbedtls_mpi_read_binary(&Value, BigNumber, BnSize);
+  }
+
+  switch (KeyTag) {
+  case RsaKeyN:
+    Ret = mbedtls_rsa_import(
+      RsaKey,
+      &Value,
+      NULL,
+      NULL,
+      NULL,
+      NULL
+    );
+    break;
+  case RsaKeyE:
+    Ret = mbedtls_rsa_import(
+      RsaKey,
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      &Value
+    );
+    break;
+  case RsaKeyD:
+    Ret = mbedtls_rsa_import(
+      RsaKey,
+      NULL,
+      NULL,
+      NULL,
+      &Value,
+      NULL
+    );
+    break;
+  case RsaKeyQ:
+    Ret = mbedtls_rsa_import(
+      RsaKey,
+      NULL,
+      NULL,
+      &Value,
+      NULL,
+      NULL
+    );
+    break;
+  case RsaKeyP:
+  Ret = mbedtls_rsa_import(
+      RsaKey,
+      NULL,
+      &Value,
+      NULL,
+      NULL,
+      NULL
+    );
+    break;
+  case RsaKeyDp:
+    break;
+  case RsaKeyDq:
+    break;
+  case RsaKeyQInv:
+    break;
+  }
+  mbedtls_rsa_complete(RsaKey);
+  return Ret == 0;
 }
 
 /**
@@ -135,7 +215,7 @@ RsaPkcs1Verify (
   case SHA256_DIGEST_SIZE:
     md_alg = MBEDTLS_MD_SHA256;
     break;
-    
+
   case SHA384_DIGEST_SIZE:
     md_alg = MBEDTLS_MD_SHA384;
     break;
@@ -201,5 +281,52 @@ RsaPssVerify (
   IN  UINTN        SigSize
   )
 {
-  return FALSE;
+  INT32             Ret;
+  mbedtls_md_type_t md_alg;
+
+  if (RsaContext == NULL || MessageHash == NULL || Signature == NULL) {
+    return FALSE;
+  }
+
+  if (SigSize > INT_MAX || SigSize == 0) {
+    return FALSE;
+  }
+
+  switch (HashSize) {
+  case SHA256_DIGEST_SIZE:
+    md_alg = MBEDTLS_MD_SHA256;
+    break;
+
+  case SHA384_DIGEST_SIZE:
+    md_alg = MBEDTLS_MD_SHA384;
+    break;
+
+  case SHA512_DIGEST_SIZE:
+    md_alg = MBEDTLS_MD_SHA512;
+    break;
+
+  default:
+    return FALSE;
+  }
+
+  if (mbedtls_rsa_get_len (RsaContext) != SigSize) {
+    return FALSE;
+  }
+
+  mbedtls_rsa_set_padding (RsaContext, MBEDTLS_RSA_PKCS_V21, md_alg);
+
+  Ret = mbedtls_rsa_rsassa_pss_verify (
+          RsaContext,
+          NULL,
+          NULL,
+          MBEDTLS_RSA_PUBLIC,
+          md_alg,
+          (UINT32)HashSize,
+          MessageHash,
+          Signature
+          );
+  if (Ret != 0) {
+    return FALSE;
+  }
+  return TRUE;
 }

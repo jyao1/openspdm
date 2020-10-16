@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalCryptLib.h"
-
 #include <mbedtls/rsa.h>
 
 /**
@@ -53,7 +52,80 @@ RsaGetKey (
   IN OUT  UINTN        *BnSize
   )
 {
-  return FALSE;
+  mbedtls_rsa_context *RsaKey;
+  INT32               Ret;
+  mbedtls_mpi         Value;
+  UINTN               Size;
+
+  //
+  // Check input parameters.
+  //
+  if (RsaContext == NULL || *BnSize > INT_MAX) {
+    return FALSE;
+  }
+  //
+  // Init mbedtls_mpi
+  //
+  mbedtls_mpi_init(&Value);
+  Size = *BnSize;
+  *BnSize = 0;
+
+  RsaKey = (mbedtls_rsa_context *)RsaContext;
+
+  switch (KeyTag) {
+  case RsaKeyN:
+    Ret = mbedtls_rsa_export(RsaKey, &Value, NULL, NULL, NULL, NULL);
+    break;
+  case RsaKeyE:
+    Ret = mbedtls_rsa_export(RsaKey, NULL, NULL, NULL, NULL, &Value);
+    break;
+  case RsaKeyD:
+    Ret = mbedtls_rsa_export(RsaKey, NULL, NULL, NULL, &Value, NULL);
+    break;
+  case RsaKeyQ:
+    Ret = mbedtls_rsa_export(RsaKey, NULL, NULL, &Value, NULL, NULL);
+    break;
+  case RsaKeyP:
+    Ret = mbedtls_rsa_export(RsaKey, NULL, &Value, NULL, NULL, NULL);
+    break;
+  case RsaKeyDp:
+    break;
+  }
+
+  if (!mbedtls_mpi_size(&Value)) {
+    Ret = 0;
+    goto End;
+  }
+
+  *BnSize = Size;
+
+  if (Ret == 0) {
+     Size = mbedtls_mpi_size(&Value);
+  }
+  if (Size == 0) {
+    Ret = 1;
+    goto End;
+  }
+
+  if (*BnSize < Size) {
+    Ret = 1;
+    *BnSize = Size;
+    goto End;
+  }
+
+  if (BigNumber == NULL) {
+    Ret = 0;
+    *BnSize = Size;
+    goto End;
+  }
+
+  if (BigNumber != NULL && Ret == 0) {
+    Ret = mbedtls_mpi_write_binary(&Value, BigNumber, Size);
+    *BnSize = Size;
+  }
+End:
+  mbedtls_mpi_free(&Value);
+  return Ret == 0;
 }
 
 /**
@@ -86,7 +158,42 @@ RsaGenerateKey (
   IN      UINTN        PublicExponentSize
   )
 {
-  return FALSE;
+
+  INT32 Ret = 0;
+  mbedtls_rsa_context *Rsa;
+  INT32 PE;
+  mbedtls_mpi E;
+
+  //
+  // Check input parameters.
+  //
+  if (RsaContext == NULL || ModulusLength > INT_MAX || PublicExponentSize > INT_MAX) {
+    return FALSE;
+  }
+
+  Rsa = (mbedtls_rsa_context*)RsaContext;
+
+  mbedtls_mpi_init(&E);
+
+  if(PublicExponent == NULL) {
+    PE = 0x10001;
+  } else {
+    // TBD
+    Ret = mbedtls_mpi_read_binary(&E, PublicExponent, PublicExponentSize);
+    PE = 0x10001;
+  }
+
+  if(Ret == 0) {
+    Ret = mbedtls_rsa_gen_key(
+      Rsa,
+      myrand,
+      NULL,
+      (UINT32)ModulusLength,
+      PE
+    );
+  }
+
+  return Ret == 0;
 }
 
 /**
@@ -114,7 +221,18 @@ RsaCheckKey (
   IN  VOID  *RsaContext
   )
 {
-  return FALSE;
+
+  if (RsaContext == NULL) {
+    return FALSE;
+  }
+
+  UINT32 Ret;
+
+  Ret = mbedtls_rsa_complete(RsaContext);
+  if (Ret == 0) {
+    Ret = mbedtls_rsa_check_privkey(RsaContext);
+  }
+  return Ret == 0;
 }
 
 /**
@@ -155,11 +273,16 @@ RsaPkcs1Sign (
   INT32             Ret;
   mbedtls_md_type_t md_alg;
 
+
+  if (RsaContext == NULL || MessageHash == NULL) {
+    return FALSE;
+  }
+
   switch (HashSize) {
   case SHA256_DIGEST_SIZE:
     md_alg = MBEDTLS_MD_SHA256;
     break;
-    
+
   case SHA384_DIGEST_SIZE:
     md_alg = MBEDTLS_MD_SHA384;
     break;
@@ -192,6 +315,7 @@ RsaPkcs1Sign (
   if (Ret != 0) {
     return FALSE;
   }
+  *SigSize = mbedtls_rsa_get_len (RsaContext);
   return TRUE;
 }
 
@@ -231,5 +355,54 @@ RsaPssSign (
   IN OUT  UINTN        *SigSize
   )
 {
-  return FALSE;
+  INT32             Ret;
+  mbedtls_md_type_t md_alg;
+
+
+  if (RsaContext == NULL || MessageHash == NULL) {
+    return FALSE;
+  }
+
+  switch (HashSize) {
+  case SHA256_DIGEST_SIZE:
+    md_alg = MBEDTLS_MD_SHA256;
+    break;
+
+  case SHA384_DIGEST_SIZE:
+    md_alg = MBEDTLS_MD_SHA384;
+    break;
+
+  case SHA512_DIGEST_SIZE:
+    md_alg = MBEDTLS_MD_SHA512;
+    break;
+
+  default:
+    return FALSE;
+  }
+
+  if (Signature == NULL) {
+    //
+    // If Signature is NULL, return safe SignatureSize
+    //
+    *SigSize = MBEDTLS_MPI_MAX_SIZE;
+    return FALSE;
+  }
+
+  mbedtls_rsa_set_padding (RsaContext, MBEDTLS_RSA_PKCS_V21, md_alg);
+
+  Ret = mbedtls_rsa_rsassa_pss_sign (
+          RsaContext,
+          myrand,
+          NULL,
+          MBEDTLS_RSA_PRIVATE,
+          md_alg,
+          (UINT32)HashSize,
+          MessageHash,
+          Signature
+          );
+  if (Ret != 0) {
+    return FALSE;
+  }
+  *SigSize = ((mbedtls_rsa_context*)RsaContext)->len;
+  return TRUE;
 }
