@@ -113,7 +113,7 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    }
    ```
 
-5. Use an SPDM session
+5. Manage an SPDM session
 
    5.1, Without PSK, send KEY_EXCHANGE/FINISH to create a session.
    ```
@@ -141,24 +141,32 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
        );
    ```
 
-   5.2, Use the SPDM session to communicate with the responder.
-   ```
-   SpdmSendReceiveData (SpdmContext, &SessionId, &Request, RequestSize, &Response, &ResponseSize);
-   ```
-
-   5.3, Send END_SESSION to close the session.
+   5.2, Send END_SESSION to close the session.
    ```
    SpdmStopSession (SpdmContext, SessionId, EndSessionAttributes);
    ```
 
-   5.4, Send HEARTBEAT, when it is required.
+   5.3, Send HEARTBEAT, when it is required.
    ```
    SpdmHeartbeat (SpdmContext, SessionId);
    ```
 
-   5.5, Send KEY_UPDATE, when it is required.
+   5.4, Send KEY_UPDATE, when it is required.
    ```
    SpdmKeyUpdate (SpdmContext, SessionId, SingleDirection);
+   ```
+
+6. Send and receive message in an SPDM session
+
+   6.1, Use the SPDM vendor defined message.
+        (SPDM vendor defined message + transport layer header (SPDM) => application message)
+   ```
+   SpdmSendReceiveData (SpdmContext, &SessionId, FALSE, &Request, RequestSize, &Response, &ResponseSize);
+   ```
+
+   6.2, Use the transport layer application message.
+   ```
+   SpdmSendReceiveData (SpdmContext, &SessionId, TRUE, &Request, RequestSize, &Response, &ResponseSize);
    ```
 
 ## SPDM responder user guide
@@ -223,13 +231,7 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, PskHint, PskHintSize);
    ```
 
-2. Register vendor defined request response.
-
-   ```
-   SpdmRegisterGetResponseFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
-   ```
-
-3. Dispatch SPDM messages.
+2. Dispatch SPDM messages.
 
    ```
    while (TRUE) {
@@ -240,4 +242,31 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
      // handle non SPDM message
      ......
    }
+   ```
+
+3. Register message process callback
+
+   This callback need handle both SPDM vendor defined message and transport layer application message.
+
+   ```
+   RETURN_STATUS
+   EFIAPI
+   SpdmGetResponseVendorDefinedRequest (
+     IN     VOID                *SpdmContext,
+     IN     UINT32               *SessionId,
+     IN     BOOLEAN              IsAppMessage,
+     IN     UINTN                RequestSize,
+     IN     VOID                 *Request,
+     IN OUT UINTN                *ResponseSize,
+        OUT VOID                 *Response
+     )
+   {
+     if (IsAppMessage) {
+       // this is a transport layer application message
+     } else {
+       // this is a SPDM vendor defined message (without transport layer header)
+     }
+   }
+
+   SpdmRegisterGetResponseFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
    ```
