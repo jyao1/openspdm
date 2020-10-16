@@ -19,17 +19,33 @@ SET(src_TestSpdmCommonLibCrypto
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestSupport.c
 )
 
-SET(TestSpdmCommonLibCrypto_LIBRARY
-    ${LIBRARY_OUTPUT_PATH}/libBaseMemoryLib.a
-    ${LIBRARY_OUTPUT_PATH}/libDebugLib.a
-    ${LIBRARY_OUTPUT_PATH}/libSpdmCommonLib.a
-    ${LIBRARY_OUTPUT_PATH}/lib${CRYPTO}Lib.a
-    ${LIBRARY_OUTPUT_PATH}/libBaseCryptLib${CRYPTO}.a
-    ${LIBRARY_OUTPUT_PATH}/libMemoryAllocationLib.a
-    ${LIBRARY_OUTPUT_PATH}/libCmockaLib.a
-)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    SET(TestSpdmCommonLibCrypto_LIBRARY
+        ${LIBRARY_OUTPUT_PATH}/libBaseMemoryLib.a
+        ${LIBRARY_OUTPUT_PATH}/libDebugLib.a
+        ${LIBRARY_OUTPUT_PATH}/libSpdmCommonLib.a
+        ${LIBRARY_OUTPUT_PATH}/lib${CRYPTO}Lib.a
+        ${LIBRARY_OUTPUT_PATH}/libBaseCryptLib${CRYPTO}.a
+        ${LIBRARY_OUTPUT_PATH}/libMemoryAllocationLib.a
+        ${LIBRARY_OUTPUT_PATH}/libCmockaLib.a
+    )
+elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    SET(TestSpdmCommonLibCrypto_LIBRARY
+        ${LIBRARY_OUTPUT_PATH}/BaseMemoryLib.lib
+        ${LIBRARY_OUTPUT_PATH}/DebugLib.lib
+        ${LIBRARY_OUTPUT_PATH}/SpdmCommonLib.lib
+        ${LIBRARY_OUTPUT_PATH}/${CRYPTO}Lib.lib
+        ${LIBRARY_OUTPUT_PATH}/BaseCryptLib${CRYPTO}.lib
+        ${LIBRARY_OUTPUT_PATH}/MemoryAllocationLib.lib
+        ${LIBRARY_OUTPUT_PATH}/CmockaLib.lib
+    )
+endif()
 
 ADD_EXECUTABLE(TestSpdmCommonLibCrypto ${src_TestSpdmCommonLibCrypto})
 
-TARGET_LINK_LIBRARIES(TestSpdmCommonLibCrypto -Wl,--start-group ${TestSpdmCommonLibCrypto_LIBRARY} -Wl,--end-group)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    TARGET_LINK_LIBRARIES(TestSpdmCommonLibCrypto -Wl,--start-group ${TestSpdmCommonLibCrypto_LIBRARY} -Wl,--end-group)
+elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    TARGET_LINK_LIBRARIES(TestSpdmCommonLibCrypto ${TestSpdmCommonLibCrypto_LIBRARY})
+endif()
 
