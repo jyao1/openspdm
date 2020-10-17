@@ -16,24 +16,26 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmSecuredMessageLib
+MODULE_NAME = SpdmCommonLib
 
 #
 # Build Directory Macro Definition
 #
 BUILD_DIR = $(WORKSPACE)\Build
 BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)\Library\SpdmLib\$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)\Library\$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)\Library\SpdmLib\$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)\Library\$(MODULE_NAME)
 
 #
 # Build Macro
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\SpdmSecuredMessageLib.obj \
-    $(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj \
+    $(OUTPUT_DIR)\SpdmCommonLibContextData.obj \
+    $(OUTPUT_DIR)\SpdmCommonLibCrypto.obj \
+    $(OUTPUT_DIR)\SpdmCommonLibSessionKeys.obj \
+    $(OUTPUT_DIR)\SpdmCommonLibSupport.obj \
 
 
 INC =  \
@@ -69,11 +71,17 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\SpdmSecuredMessageLib.obj : $(SOURCE_DIR)\SpdmSecuredMessageLib.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLib.c
+$(OUTPUT_DIR)\SpdmCommonLibContextData.obj : $(SOURCE_DIR)\SpdmCommonLibContextData.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmCommonLibContextData.c
 
-$(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
+$(OUTPUT_DIR)\SpdmCommonLibCrypto.obj : $(SOURCE_DIR)\SpdmCommonLibCrypto.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmCommonLibCrypto.c
+
+$(OUTPUT_DIR)\SpdmCommonLibSessionKeys.obj : $(SOURCE_DIR)\SpdmCommonLibSessionKeys.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmCommonLibSessionKeys.c
+
+$(OUTPUT_DIR)\SpdmCommonLibSupport.obj : $(SOURCE_DIR)\SpdmCommonLibSupport.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmCommonLibSupport.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

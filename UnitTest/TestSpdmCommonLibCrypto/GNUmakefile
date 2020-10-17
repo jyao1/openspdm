@@ -45,7 +45,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a \
     $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a \
-    $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a \
+    $(BIN_DIR)/Library/SpdmCommonLib/SpdmCommonLib.a \
     $(BIN_DIR)/UnitTest/CmockaLib/CmockaLib.a \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
 
@@ -56,7 +56,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/*.o \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/*.o \
     $(BIN_DIR)/OsStub/MemoryAllocationLib/*.o \
-    $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/*.o \
+    $(BIN_DIR)/Library/SpdmCommonLib/*.o \
     $(BIN_DIR)/UnitTest/CmockaLib/*.o \
     $(OUTPUT_DIR)/*.o \
 
@@ -68,7 +68,7 @@ INC =  \
     -I$(WORKSPACE)/Include/Hal \
     -I$(WORKSPACE)/Include/Hal/$(ARCH) \
     -I$(WORKSPACE)/UnitTest/Include \
-    -I$(WORKSPACE)/Library/SpdmLib/SpdmCommonLib \
+    -I$(WORKSPACE)/Library/SpdmCommonLib \
     -I$(WORKSPACE)/UnitTest/CmockaLib/cmocka/include \
     -I$(WORKSPACE)/UnitTest/CmockaLib/cmocka/include/cmockery \
     -I$(WORKSPACE)/UnitTest/SpdmUnitTestCommon \
@@ -106,7 +106,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseCryptLib$(CRYPTO)/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/$(CRYPTO)Lib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/MemoryAllocationLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmLib/SpdmCommonLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmCommonLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/UnitTest/CmockaLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
@@ -134,7 +134,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/Library/SpdmLib/SpdmCommonLib/SpdmCommonLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/Library/SpdmCommonLib/SpdmCommonLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/UnitTest/CmockaLib/CmockaLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
 	$(DLINK) $(DLINK_FLAGS) $(DLINK_SPATH) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS2)

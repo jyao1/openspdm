@@ -23,9 +23,9 @@ MODULE_NAME = SpdmSecuredMessageLib
 #
 BUILD_DIR = $(WORKSPACE)/Build
 BIN_DIR = $(BUILD_DIR)/$(TARGET)_$(TOOLCHAIN)/$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)/Library/SpdmLib/$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)/Library/$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)/Library/SpdmLib/$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)/Library/$(MODULE_NAME)
 
 #
 # Build Macro

@@ -239,11 +239,11 @@ elseif(CRYPTO STREQUAL "Openssl")
 endif()
 
 if(TESTTYPE STREQUAL "OsTest") 
-    SUBDIRS(Library/SpdmLib/SpdmCommonLib
-            Library/SpdmLib/SpdmRequesterLib
-            Library/SpdmLib/SpdmResponderLib
-            Library/SpdmLib/SpdmSecuredMessageLib
-            Library/SpdmLib/SpdmTransportMctpLib
+    SUBDIRS(Library/SpdmCommonLib
+            Library/SpdmRequesterLib
+            Library/SpdmResponderLib
+            Library/SpdmSecuredMessageLib
+            Library/SpdmTransportMctpLib
             OsStub/BaseMemoryLib
             OsStub/DebugLib
             OsStub/MemoryAllocationLib
@@ -254,11 +254,11 @@ if(TESTTYPE STREQUAL "OsTest")
     )
        
 elseif(TESTTYPE STREQUAL "UnitTest")
-    SUBDIRS(Library/SpdmLib/SpdmCommonLib
-            Library/SpdmLib/SpdmRequesterLib
-            Library/SpdmLib/SpdmResponderLib
-            Library/SpdmLib/SpdmSecuredMessageLib
-            Library/SpdmLib/SpdmTransportMctpLib
+    SUBDIRS(Library/SpdmCommonLib
+            Library/SpdmRequesterLib
+            Library/SpdmResponderLib
+            Library/SpdmSecuredMessageLib
+            Library/SpdmTransportMctpLib
             OsStub/BaseMemoryLib
             OsStub/DebugLib
             OsStub/MemoryAllocationLib

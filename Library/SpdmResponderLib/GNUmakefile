@@ -23,9 +23,9 @@ MODULE_NAME = SpdmResponderLib
 #
 BUILD_DIR = $(WORKSPACE)/Build
 BIN_DIR = $(BUILD_DIR)/$(TARGET)_$(TOOLCHAIN)/$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)/Library/SpdmLib/$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)/Library/$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)/Library/SpdmLib/$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)/Library/$(MODULE_NAME)
 
 #
 # Build Macro
@@ -58,7 +58,7 @@ OBJECT_FILES =  \
 
 INC =  \
     -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)/Library/SpdmLib/SpdmCommonLib \
+    -I$(WORKSPACE)/Library/SpdmCommonLib \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
     -I$(WORKSPACE)/Include/Hal/$(ARCH)

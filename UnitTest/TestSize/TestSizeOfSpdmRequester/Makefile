@@ -61,10 +61,10 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\UnitTest\TestSize\MemoryAllocationLibNull\MemoryAllocationLibNull.lib \
     $(BIN_DIR)\UnitTest\TestSize\IntrinsicLib\IntrinsicLib.lib \
     $(BIN_DIR)\UnitTest\TestSize\BaseCryptStubLibDummy\BaseCryptStubLibDummy.lib \
-    $(BIN_DIR)\Library\SpdmLib\SpdmCommonLib\SpdmCommonLib.lib \
-    $(BIN_DIR)\Library\SpdmLib\SpdmRequesterLib\SpdmRequesterLib.lib \
-    $(BIN_DIR)\Library\SpdmLib\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
-    $(BIN_DIR)\Library\SpdmLib\SpdmTransportMctpLib\SpdmTransportMctpLib.lib \
+    $(BIN_DIR)\Library\SpdmCommonLib\SpdmCommonLib.lib \
+    $(BIN_DIR)\Library\SpdmRequesterLib\SpdmRequesterLib.lib \
+    $(BIN_DIR)\Library\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
+    $(BIN_DIR)\Library\SpdmTransportMctpLib\SpdmTransportMctpLib.lib \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
 
 
@@ -77,10 +77,10 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\UnitTest\TestSize\MemoryAllocationLibNull\*.obj \
     $(BIN_DIR)\UnitTest\TestSize\IntrinsicLib\*.obj \
     $(BIN_DIR)\UnitTest\TestSize\BaseCryptStubLibDummy\*.obj \
-    $(BIN_DIR)\Library\SpdmLib\SpdmCommonLib\*.obj \
-    $(BIN_DIR)\Library\SpdmLib\SpdmRequesterLib\*.obj \
-    $(BIN_DIR)\Library\SpdmLib\SpdmSecuredMessageLib\*.obj \
-    $(BIN_DIR)\Library\SpdmLib\SpdmTransportMctpLib\*.obj \
+    $(BIN_DIR)\Library\SpdmCommonLib\*.obj \
+    $(BIN_DIR)\Library\SpdmRequesterLib\*.obj \
+    $(BIN_DIR)\Library\SpdmSecuredMessageLib\*.obj \
+    $(BIN_DIR)\Library\SpdmTransportMctpLib\*.obj \
 
 
 INC =  \
@@ -125,10 +125,10 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\MemoryAllocationLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\IntrinsicLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\BaseCryptStubLibDummy\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmCommonLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmRequesterLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmLib\SpdmTransportMctpLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCommonLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmRequesterLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmTransportMctpLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
