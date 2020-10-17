@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmRequesterLibInternal.h"
 
-
 typedef struct {
   UINT8                          RequestResponseCode;
   SPDM_GET_ENCAP_RESPONSE_FUNC   GetEncapResponseFunc;
@@ -45,9 +44,15 @@ SpdmRegisterGetEncapResponseFunc (
   return ;
 }
 
+/**
+  Return the GET_ENCAP_RESPONSE function via request code.
+
+  @param  RequestCode                  The SPDM request code.
+
+  @return GET_ENCAP_RESPONSE function according to the request code.
+**/
 SPDM_GET_ENCAP_RESPONSE_FUNC
-SpdmGetEncapResponseFunc (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
+SpdmGetEncapResponseFuncViaRequestCode (
   IN     UINT8                   RequestResponseCode
   )
 {
@@ -61,6 +66,18 @@ SpdmGetEncapResponseFunc (
   return NULL;
 }
 
+/**
+  This function processes encapsulated request.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapRequestSize             Size in bytes of the request data buffer.
+  @param  EncapRequest                 A pointer to a destination buffer to store the request.
+  @param  EncapResponseSize            Size in bytes of the response data buffer.
+  @param  EncapResponse                A pointer to a destination buffer to store the response.
+
+  @retval RETURN_SUCCESS               The SPDM response is processed successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM response is sent to the device.
+**/
 RETURN_STATUS
 SpdmProcessEncapsulatedRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
@@ -79,7 +96,7 @@ SpdmProcessEncapsulatedRequest (
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SpdmRequester->RequestResponseCode, EncapResponseSize, EncapResponse);
   }
 
-  GetEncapResponseFunc = SpdmGetEncapResponseFunc (SpdmContext, SpdmRequester->RequestResponseCode);
+  GetEncapResponseFunc = SpdmGetEncapResponseFuncViaRequestCode (SpdmRequester->RequestResponseCode);
   if (GetEncapResponseFunc == NULL) {
     GetEncapResponseFunc = (SPDM_GET_ENCAP_RESPONSE_FUNC)SpdmContext->GetEncapResponseFunc;
   }

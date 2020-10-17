@@ -18,6 +18,16 @@ typedef struct {
 
 #pragma pack()
 
+/**
+  This function generates the PSK finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Hmac                         The buffer to store the finish HMAC.
+
+  @retval TRUE  PSK finish HMAC is generated.
+  @retval FALSE PSK finish HMAC is not generated.
+**/
 BOOLEAN
 SpdmRequesterGeneratePskFinishHmac (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,

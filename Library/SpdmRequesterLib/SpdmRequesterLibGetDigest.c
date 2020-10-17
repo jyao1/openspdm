@@ -18,6 +18,16 @@ typedef struct {
 
 #pragma pack()
 
+/**
+  This function verifies the digest.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Digest                       The digest data buffer.
+  @param  DigestSize                   Size in bytes of the digest data buffer.
+
+  @retval TRUE  digest verification pass.
+  @retval FALSE digest verification fail.
+**/
 BOOLEAN
 SpdmRequesterVerifyDigest (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -47,11 +57,23 @@ SpdmRequesterVerifyDigest (
   return TRUE;
 }
 
-/*
-  Get all digest of the CertificateChains returned from device.
+/**
+  This function sends GET_DIGEST
+  to get all digest of the certificate chains from device.
+
+  If the peer certificate chain is deployed,
+  this function also verifies the digest with the certificate chain.
 
   TotalDigestSize = sizeof(Digest) * Count in SlotMask
-*/
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SlotMask                     The slots which deploy the CertificateChain.
+  @param  TotalDigestBuffer            A pointer to a destination buffer to store the digest buffer.
+
+  @retval RETURN_SUCCESS               The digests are got successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 TrySpdmGetDigest (
   IN     VOID                 *Context,

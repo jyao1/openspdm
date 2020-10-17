@@ -9,6 +9,17 @@
 
 #include "SpdmResponderLibInternal.h"
 
+/**
+  This function verifies the PSK finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  HmacData                     The HMAC data buffer.
+  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
+
+  @retval TRUE  HMAC verification pass.
+  @retval FALSE HMAC verification fail.
+**/
 BOOLEAN
 SpdmResponderVerifyPskFinishHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,

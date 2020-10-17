@@ -24,6 +24,17 @@ typedef struct {
 
 #pragma pack()
 
+/**
+  This function verifies the finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  HmacData                     The HMAC data buffer.
+  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
+
+  @retval TRUE  HMAC verification pass.
+  @retval FALSE HMAC verification fail.
+**/
 BOOLEAN
 SpdmRequesterVerifyFinishHmac (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
@@ -103,6 +114,16 @@ SpdmRequesterVerifyFinishHmac (
   return TRUE;
 }
 
+/**
+  This function generates the finish signature based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Signature                    The buffer to store the finish signature.
+
+  @retval TRUE  finish signature is generated.
+  @retval FALSE finish signature is not generated.
+**/
 BOOLEAN
 SpdmRequesterGenerateFinishSignature (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
@@ -184,6 +205,16 @@ SpdmRequesterGenerateFinishSignature (
   return Result;
 }
 
+/**
+  This function generates the finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Hmac                         The buffer to store the finish HMAC.
+
+  @retval TRUE  finish HMAC is generated.
+  @retval FALSE finish HMAC is not generated.
+**/
 BOOLEAN
 SpdmRequesterGenerateFinishHmac (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,

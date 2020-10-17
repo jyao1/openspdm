@@ -9,6 +9,17 @@
 
 #include "SpdmResponderLibInternal.h"
 
+/**
+  This function verifies the finish signature based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  SignData                     The signature data buffer.
+  @param  SignDataSize                 Size in bytes of the signature data buffer.
+
+  @retval TRUE  signature verification pass.
+  @retval FALSE signature verification fail.
+**/
 BOOLEAN
 SpdmResponderVerifyFinishSignature (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -107,6 +118,17 @@ SpdmResponderVerifyFinishSignature (
   return TRUE;
 }
 
+/**
+  This function verifies the finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  HmacData                     The HMAC data buffer.
+  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
+
+  @retval TRUE  HMAC verification pass.
+  @retval FALSE HMAC verification fail.
+**/
 BOOLEAN
 SpdmVerifyFinishHmac (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
@@ -183,6 +205,16 @@ SpdmVerifyFinishHmac (
   return TRUE;
 }
 
+/**
+  This function generates the finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Hmac                         The buffer to store the finish HMAC.
+
+  @retval TRUE  finish HMAC is generated.
+  @retval FALSE finish HMAC is not generated.
+**/
 BOOLEAN
 SpdmResponderGenerateFinishHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,

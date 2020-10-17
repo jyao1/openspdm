@@ -9,17 +9,16 @@
 
 #include "SpdmRequesterLibInternal.h"
 
-BOOLEAN
-SpdmEncapResponderCalculateCertChainHash (
-  IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN  UINT8                SlotNum,
-  OUT UINT8                *CertChainHash
-  )
-{
-  SpdmHashAll (SpdmContext, SpdmContext->LocalContext.CertificateChain[SlotNum], SpdmContext->LocalContext.CertificateChainSize[SlotNum], CertChainHash);
-  return TRUE;
-}
+/**
+  This function calculate the measurement summary hash.
 
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MeasurementSummaryHashType   The type of the measurement summary hash.
+  @param  MeasurementSummaryHash       The buffer to store the measurement summary hash.
+
+  @retval TRUE  measurement summary hash is generated.
+  @retval FALSE measurement summary hash is not generated.
+**/
 BOOLEAN
 SpdmEncapResponderCalculateMeasurementSummaryHash (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
@@ -83,6 +82,17 @@ SpdmEncapResponderCalculateMeasurementSummaryHash (
   return TRUE;
 }
 
+/**
+  This function generates the challenge signature based upon M1M2 for mutual authentication.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ResponseMessage              The response message buffer.
+  @param  ResponseMessageSize          Size in bytes of the response message buffer.
+  @param  Signature                    The buffer to store the challenge signature.
+
+  @retval TRUE  challenge signature is generated.
+  @retval FALSE challenge signature is not generated.
+**/
 BOOLEAN
 SpdmEncapResponderGenerateChallengeSignature (
   IN  SPDM_DEVICE_CONTEXT        *SpdmContext,
@@ -221,7 +231,7 @@ SpdmGetEncapResponseChallengeAuth (
   }
 
   Ptr = (VOID *)(SpdmResponse + 1);
-  SpdmEncapResponderCalculateCertChainHash (SpdmContext, SlotNum, Ptr);
+  SpdmHashAll (SpdmContext, SpdmContext->LocalContext.CertificateChain[SlotNum], SpdmContext->LocalContext.CertificateChainSize[SlotNum], Ptr);
   Ptr += HashSize;
 
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);

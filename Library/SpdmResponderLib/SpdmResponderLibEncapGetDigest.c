@@ -9,6 +9,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmResponderLibInternal.h"
 
+/**
+  This function verifies the digest.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Digest                       The digest data buffer.
+  @param  DigestSize                   Size in bytes of the digest data buffer.
+
+  @retval TRUE  digest verification pass.
+  @retval FALSE digest verification fail.
+**/
 BOOLEAN
 SpdmEncapRequesterVerifyDigest (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,

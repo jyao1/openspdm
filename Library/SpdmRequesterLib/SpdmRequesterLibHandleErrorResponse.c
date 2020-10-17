@@ -69,6 +69,15 @@ SpdmRequesterRespondIfReady (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function handles simple error code.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ErrorCode                    Indicate the error code.
+
+  @retval RETURN_NO_RESPONSE           If the error code is BUSY.
+  @retval RETURN_DEVICE_ERROR          If the error code is REQUEST_RESYNCH or others.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmHandleSimpleErrorResponse (
@@ -91,11 +100,26 @@ SpdmHandleSimpleErrorResponse (
   return RETURN_DEVICE_ERROR;
 }
 
+/**
+  This function handles RESPONSE_NOT_READY error code.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ResponseSize                 The size of the response.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned.
+  @param  Response                     The SPDM response message.
+  @param  OriginalRequestCode          Indicate the orginal request code.
+  @param  ExpectedResponseCode         Indicate the expected response code.
+  @param  ExpectedResponseSize         Indicate the expected response size.
+
+  @retval RETURN_SUCCESS               The RESPOND_IF_READY is sent and an expected SPDM response is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
 RETURN_STATUS
 SpdmHandleResponseNotReady (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINTN                *ResponseSize,
-  IN OUT VOID                 *Response,
+     OUT VOID                 *Response,
   IN     UINT8                 OriginalRequestCode,
   IN     UINT8                 ExpectedResponseCode,
   IN     UINTN                 ExpectedResponseSize

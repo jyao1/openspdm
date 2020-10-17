@@ -23,6 +23,16 @@ typedef struct {
 
 #pragma pack()
 
+/**
+  This function verifies the certificate chain hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertificateChainHash         The certificate chain hash data buffer.
+  @param  CertificateChainHashSize     Size in bytes of the certificate chain hash data buffer.
+
+  @retval TRUE  hash verification pass.
+  @retval FALSE hash verification fail.
+**/
 BOOLEAN
 SpdmRequesterVerifyCertificateChainHash (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -57,6 +67,16 @@ SpdmRequesterVerifyCertificateChainHash (
   return TRUE;
 }
 
+/**
+  This function verifies the challenge signature based upon M1M2.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SignData                     The signature data buffer.
+  @param  SignDataSize                 Size in bytes of the signature data buffer.
+
+  @retval TRUE  signature verification pass.
+  @retval FALSE signature verification fail.
+**/
 BOOLEAN
 SpdmRequesterVerifyChallengeSignature (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -127,9 +147,24 @@ SpdmRequesterVerifyChallengeSignature (
   return TRUE;
 }
 
-/*
-  Authenticate based upon the key in one slot.
-*/
+/**
+  This function sends CHALLENGE
+  to authenticate the device based upon the key in one slot.
+
+  This function verifies the signature in the challenge auth.
+
+  If basic mutual authentication is requested from the responder,
+  this function also perform the basic mutual authentication.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SlotNum                      The number of slot for the challenge.
+  @param  MeasurementHashType          The type of the measurement hash.
+  @param  MeasurementHash              A pointer to a destination buffer to store the measurement hash.
+
+  @retval RETURN_SUCCESS               The challenge auth is got successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 TrySpdmChallenge (
   IN     VOID                 *Context,

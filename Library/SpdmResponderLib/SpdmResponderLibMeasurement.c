@@ -9,11 +9,22 @@
 
 #include "SpdmResponderLibInternal.h"
 
+/**
+  This function generates the measurement signature based upon L1L2.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ResponseMessage              The measurement response message without signature.
+  @param  ResponseMessageSize          Size in bytes of the response message without signature.
+  @param  Signature                    The buffer to store the measurement signature.
+
+  @retval TRUE  measurement signature is generated.
+  @retval FALSE measurement signature is not generated.
+**/
 BOOLEAN
 SpdmResponderGenerateSpdmMeasurementSignature (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN VOID                       *ResponseMessage,
-  IN UINTN                      ResponseMessageSize,
+  IN  VOID                      *ResponseMessage,
+  IN  UINTN                     ResponseMessageSize,
   OUT UINT8                     *Signature
   )
 {
@@ -52,11 +63,21 @@ SpdmResponderGenerateSpdmMeasurementSignature (
   return Result;
 }
 
+/**
+  This function creates the measurement signature to response message.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ResponseMessage              The measurement response message with empty signature to be filled.
+  @param  ResponseMessageSize          Total size in bytes of the response message including signature.
+
+  @retval TRUE  measurement signature is created.
+  @retval FALSE measurement signature is not created.
+**/
 BOOLEAN
 SpdmResponderCreateMeasurementSig (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN VOID                       *ResponseMessage,
-  IN UINTN                      ResponseMessageSize
+  IN OUT VOID                   *ResponseMessage,
+  IN     UINTN                  ResponseMessageSize
   )
 {
   UINT8                         *Ptr;

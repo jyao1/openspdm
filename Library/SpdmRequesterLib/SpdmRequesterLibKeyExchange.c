@@ -37,6 +37,17 @@ typedef struct {
 
 #pragma pack()
 
+/**
+  This function verifies the key exchange signature based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  SignData                     The signature data buffer.
+  @param  SignDataSize                 Size in bytes of the signature data buffer.
+
+  @retval TRUE  signature verification pass.
+  @retval FALSE signature verification fail.
+**/
 BOOLEAN
 SpdmRequesterVerifyKeyExchangeSignature (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -118,6 +129,17 @@ SpdmRequesterVerifyKeyExchangeSignature (
   return TRUE;
 }
 
+/**
+  This function verifies the key exchange HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  HmacData                     The HMAC data buffer.
+  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
+
+  @retval TRUE  HMAC verification pass.
+  @retval FALSE HMAC verification fail.
+**/
 BOOLEAN
 SpdmRequesterVerifyKeyExchangeHmac (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,

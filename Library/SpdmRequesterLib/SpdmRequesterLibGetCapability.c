@@ -9,6 +9,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmRequesterLibInternal.h"
 
+/**
+  This function sends GET_CAPABILITIES and receives CAPABILITIES.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  RequesterCTExponent          RequesterCTExponent to the GET_CAPABILITIES request.
+  @param  RequesterFlags               RequesterFlags to the GET_CAPABILITIES request.
+  @param  ResponderCTExponent          ResponderCTExponent from the CAPABILITIES response.
+  @param  ResponderFlags               ResponderFlags from the CAPABILITIES response.
+
+  @retval RETURN_SUCCESS               The GET_CAPABILITIES is sent and the CAPABILITIES is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
 RETURN_STATUS
 TrySpdmGetCapabilities (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,

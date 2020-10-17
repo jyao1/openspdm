@@ -18,6 +18,16 @@ typedef struct {
 } SPDM_VERSION_RESPONSE_MAX;
 #pragma pack()
 
+/**
+  This function sends GET_VERSION and receives VERSION.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  VersionCount                 VersionCount from the VERSION response.
+  @param  VersionNumberEntries         VersionNumberEntries from the VERSION response.
+
+  @retval RETURN_SUCCESS               The GET_VERSION is sent and the VERSION is received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
 RETURN_STATUS
 TrySpdmGetVersion (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,

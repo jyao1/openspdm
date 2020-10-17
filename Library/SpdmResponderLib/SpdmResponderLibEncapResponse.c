@@ -9,6 +9,19 @@
 
 #include "SpdmResponderLibInternal.h"
 
+/**
+  Get the SPDM encapsulated request.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapRequestSize             Size in bytes of the encapsulated request data.
+                                       On input, it means the size in bytes of encapsulated request data buffer.
+                                       On output, it means the size in bytes of copied encapsulated request data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired encapsulated request data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  EncapRequest                 A pointer to the encapsulated request data.
+
+  @retval RETURN_SUCCESS               The encapsulated request is returned.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 typedef
 RETURN_STATUS
 (EFIAPI *SPDM_GET_ENCAP_REQUEST) (
@@ -17,6 +30,18 @@ RETURN_STATUS
      OUT VOID                 *EncapRequest
   );
 
+/**
+  Process the SPDM encapsulated response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapResponseSize            Size in bytes of the encapsulated response data.
+  @param  EncapResponse                A pointer to the encapsulated response data.
+  @param  Continue                     Indicate if encapsulated communication need continue.
+
+  @retval RETURN_SUCCESS               The encapsulated response is processed.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 typedef
 RETURN_STATUS
 (EFIAPI *SPDM_PROCESS_ENCAP_RESPONSE) (
@@ -62,6 +87,14 @@ SPDM_ENCAP_RESPONSE_STRUCT  mSpdmEncapSessionStruct[] = {
   {SpdmEncapResponseStateMax,                  NULL,                                  NULL,                             NULL                            },
 };
 
+/**
+  This function gets the encap structure via state.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapState                   Encap state.
+
+  @return SPDM encap response structure
+**/
 SPDM_ENCAP_RESPONSE_STRUCT *
 SpdmGetEncapStructViaState (
   IN     SPDM_DEVICE_CONTEXT             *SpdmContext,
@@ -86,6 +119,19 @@ SpdmGetEncapStructViaState (
   return NULL;
 }
 
+/**
+  Process a SPDM encapsulated response.
+
+  @param  SpdmContext                  The SPDM context for the device.
+  @param  RequestId                    Indicate if the request ID for the encapsulated message.
+  @param  EncapResponseSize            Size in bytes of the request data.
+  @param  EncapResponse                A pointer to the request data.
+  @param  EncapRequestSize             Size in bytes of the response data.
+  @param  EncapRequest                 A pointer to the response data.
+
+  @retval RETURN_SUCCESS               The SPDM encapsulated request is generated successfully.
+  @retval RETURN_UNSUPPORTED           Do not know how to process the request.
+**/
 RETURN_STATUS
 SpdmProcessEncapsulatedResponse (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,

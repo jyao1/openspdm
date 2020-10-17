@@ -20,6 +20,16 @@ typedef struct {
 
 #pragma pack()
 
+/**
+  This function verifies the integrity of certificate chain.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertificateChain             The certificate chain data buffer.
+  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+
+  @retval TRUE  certificate chain integrity verification pass.
+  @retval FALSE certificate chain integrity verification fail.
+**/
 BOOLEAN
 SpdmRequesterVerifyCertificateChainData (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -79,6 +89,16 @@ SpdmRequesterVerifyCertificateChainData (
   return TRUE;
 }
 
+/**
+  This function verifies the certificate chain.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertificateChain             The certificate chain data buffer.
+  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+
+  @retval TRUE  certificate chain verification pass.
+  @retval FALSE certificate chain verification fail.
+**/
 BOOLEAN
 SpdmRequesterVerifyCertificateChain (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -131,9 +151,26 @@ SpdmRequesterVerifyCertificateChain (
   return TRUE;
 }
 
-/*
-  Get CertificateChain in one slot returned from device.
-*/
+/**
+  This function sends GET_CERTIFICATE
+  to get certificate chain in one slot from device.
+
+  This function verify the integrity of the certificate chain.
+  RootHash -> Root certificate -> Intermediate certificate -> Leaf certificate.
+
+  If the peer root certificate hash is deployed,
+  this function also verifies the digest with the root hash in the certificate chain.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SlotNum                      The number of slot for the certificate chain.
+  @param  CertChainSize                On input, indicate the size in bytes of the destination buffer to store the digest buffer.
+                                       On output, indicate the size in bytes of the certificate chain.
+  @param  CertChain                    A pointer to a destination buffer to store the certificate chain.
+
+  @retval RETURN_SUCCESS               The certificate chain is got successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
 RETURN_STATUS
 TrySpdmGetCertificate (
   IN     VOID                 *Context,

@@ -9,7 +9,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmResponderLibInternal.h"
 
+/**
+  This function verifies the integrity of certificate chain.
 
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertificateChain             The certificate chain data buffer.
+  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+
+  @retval TRUE  certificate chain integrity verification pass.
+  @retval FALSE certificate chain integrity verification fail.
+**/
 BOOLEAN
 SpdmEncapRequesterVerifyCertificateChainData (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
@@ -69,6 +78,16 @@ SpdmEncapRequesterVerifyCertificateChainData (
   return TRUE;
 }
 
+/**
+  This function verifies the certificate chain.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertificateChain             The certificate chain data buffer.
+  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+
+  @retval TRUE  certificate chain verification pass.
+  @retval FALSE certificate chain verification fail.
+**/
 BOOLEAN
 SpdmEncapRequesterVerifyCertificateChain (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,

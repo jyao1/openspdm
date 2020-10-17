@@ -9,6 +9,16 @@
 
 #include "SpdmResponderLibInternal.h"
 
+/**
+  This function calculate the measurement summary hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MeasurementSummaryHashType   The type of the measurement summary hash.
+  @param  MeasurementSummaryHash       The buffer to store the measurement summary hash.
+
+  @retval TRUE  measurement summary hash is generated.
+  @retval FALSE measurement summary hash is not generated.
+**/
 BOOLEAN
 SpdmResponderCalculateMeasurementSummaryHash (
   IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
@@ -16,6 +26,16 @@ SpdmResponderCalculateMeasurementSummaryHash (
   OUT UINT8                *MeasurementSummaryHash
   );
 
+/**
+  This function generates the PSK exchange HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Hmac                         The buffer to store the PSK exchange HMAC.
+
+  @retval TRUE  PSK exchange HMAC is generated.
+  @retval FALSE PSK exchange HMAC is not generated.
+**/
 BOOLEAN
 SpdmResponderGeneratePskExchangeHmac (
   IN  SPDM_DEVICE_CONTEXT       *SpdmContext,

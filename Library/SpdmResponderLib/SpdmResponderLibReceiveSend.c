@@ -35,23 +35,6 @@ SPDM_GET_RESPONSE_STRUCT  mSpdmGetResponseStruct[] = {
   {SPDM_KEY_UPDATE,                     SpdmGetResponseKeyUpdate},
 };
 
-SPDM_GET_SPDM_RESPONSE_FUNC
-SpdmGetResponseFuncViaLastRequest (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext
-  )
-{
-  UINTN                Index;
-  SPDM_MESSAGE_HEADER  *SpdmRequest;
-
-  SpdmRequest = (VOID *)SpdmContext->LastSpdmRequest;
-  for (Index = 0; Index < sizeof(mSpdmGetResponseStruct)/sizeof(mSpdmGetResponseStruct[0]); Index++) {
-    if (SpdmRequest->RequestResponseCode == mSpdmGetResponseStruct[Index].RequestResponseCode) {
-      return mSpdmGetResponseStruct[Index].GetResponseFunc;
-    }
-  }
-  return NULL;
-}
-
 /**
   Return the GET_SPDM_RESPONSE function via request code.
 
@@ -73,6 +56,24 @@ SpdmGetResponseFuncViaRequestCode (
     }
   }
   return NULL;
+}
+
+/**
+  Return the GET_SPDM_RESPONSE function via last request.
+
+  @param  SpdmContext                  The SPDM context for the device.
+
+  @return GET_SPDM_RESPONSE function according to the last request.
+**/
+SPDM_GET_SPDM_RESPONSE_FUNC
+SpdmGetResponseFuncViaLastRequest (
+  IN     SPDM_DEVICE_CONTEXT     *SpdmContext
+  )
+{
+  SPDM_MESSAGE_HEADER  *SpdmRequest;
+
+  SpdmRequest = (VOID *)SpdmContext->LastSpdmRequest;
+  return SpdmGetResponseFuncViaRequestCode (SpdmRequest->RequestResponseCode);
 }
 
 /**

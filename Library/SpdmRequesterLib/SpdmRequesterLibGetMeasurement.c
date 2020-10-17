@@ -22,6 +22,16 @@ typedef struct {
 } SPDM_MEASUREMENTS_RESPONSE_MAX;
 #pragma pack()
 
+/**
+  This function verifies the measurement signature based upon L1L2.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SignData                     The signature data buffer.
+  @param  SignDataSize                 Size in bytes of the signature data buffer.
+
+  @retval TRUE  signature verification pass.
+  @retval FALSE signature verification fail.
+**/
 BOOLEAN
 SpdmRequesterVerifyMeasurementSignature (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
