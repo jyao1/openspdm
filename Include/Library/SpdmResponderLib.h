@@ -66,6 +66,44 @@ SpdmRegisterGetResponseFunc (
   );
 
 /**
+  Process a transport layer message.
+
+  The message can be a normal message or a secured message in SPDM session.
+  The message can be an SPDM message or an APP message.
+
+  This function is called in SpdmResponderDispatchMessage to process the message.
+  The alternative is: an SPDM responder may receive the request message directly
+  and call this function to process it, then send the response message.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+                                       If *SessionId is NULL, it is a normal message.
+                                       If *SessionId is NOT NULL, it is a secured message.
+  @param  Request                      A pointer to the request data.
+  @param  RequestSize                  Size in bytes of the request data.
+  @param  Response                     A pointer to the response data.
+  @param  ResponseSize                 Size in bytes of the response data.
+                                       On input, it means the size in bytes of response data buffer.
+                                       On output, it means the size in bytes of copied response data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired response data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+
+  @retval RETURN_SUCCESS               The SPDM request is set successfully.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmProcessMessage (
+  IN     VOID                 *Context,
+  IN OUT UINT32               **SessionId,
+  IN     VOID                 *Request,
+  IN     UINTN                RequestSize,
+     OUT VOID                 *Response,
+  IN OUT UINTN                *ResponseSize
+  );
+
+/**
   This is the main dispatch function in SPDM responder.
 
   It receives one request message, processes it and sends the response message.
