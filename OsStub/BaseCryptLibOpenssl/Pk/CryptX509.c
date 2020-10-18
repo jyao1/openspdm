@@ -253,10 +253,10 @@ X509StackFree (
 /**
   Retrieve the tag and length of the tag.
 
-  @param p     The position in the ASN.1 data
-  @param end   End of data
-  @param len   The variable that will receive the length
-  @param tag   The expected tag
+  @param Ptr      The position in the ASN.1 data
+  @param End      End of data
+  @param Length   The variable that will receive the length
+  @param Tag      The expected tag
 
   @retval      TRUE   Get tag successful
   @retval      FALSe  Failed to get tag or tag not match
@@ -264,24 +264,26 @@ X509StackFree (
 BOOLEAN
 EFIAPI
 Asn1GetTag (
-  UINT8 **Ptr,
-  UINT8 *End,
-  UINTN *Length,
-  int   Tag
+  IN OUT UINT8  **Ptr,
+  IN     UINT8  *End,
+     OUT UINTN  *Length,
+  IN     UINT32 Tag
   )
 {
   UINT8 *PtrOld;
-  int ObjTag;
-  int ObjCls;
+  INT32 ObjTag;
+  INT32 ObjCls;
+  long ObjLength;
 
   //
   // Save Ptr position
   //
   PtrOld = *Ptr;
 
-  ASN1_get_object ((CONST unsigned char **)Ptr, (long*)Length, &ObjTag, &ObjCls, (long)(End-(*Ptr)));
-  if (ObjTag == (Tag & CRYPTO_ASN1_TAG_VALUE_MASK) &&
-   ObjCls == (Tag & CRYPTO_ASN1_TAG_CLASS_MASK)) {
+  ASN1_get_object ((CONST UINT8 **)Ptr, &ObjLength, &ObjTag, &ObjCls, (INT32)(End - (*Ptr)));
+  if (ObjTag == (INT32)(Tag & CRYPTO_ASN1_TAG_VALUE_MASK) &&
+    ObjCls == (INT32)(Tag & CRYPTO_ASN1_TAG_CLASS_MASK)) {
+    *Length = (UINTN)ObjLength;
     return TRUE;
   } else {
     //

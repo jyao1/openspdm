@@ -196,10 +196,10 @@ X509StackFree (
 /**
   Retrieve the tag and length of the tag.
 
-  @param p     The position in the ASN.1 data
-  @param end   End of data
-  @param len   The variable that will receive the length
-  @param tag   The expected tag
+  @param Ptr      The position in the ASN.1 data
+  @param End      End of data
+  @param Length   The variable that will receive the length
+  @param Tag      The expected tag
 
   @retval      TRUE   Get tag successful
   @retval      FALSe  Failed to get tag or tag not match
@@ -207,13 +207,13 @@ X509StackFree (
 BOOLEAN
 EFIAPI
 Asn1GetTag (
-  UINT8 **Ptr,
-  UINT8 *End,
-  UINTN *Length,
-  int   Tag
+  IN OUT UINT8  **Ptr,
+  IN     UINT8  *End,
+     OUT UINTN  *Length,
+  IN     UINT32 Tag
   )
 {
-  if (mbedtls_asn1_get_tag (Ptr, End, Length, Tag) == 0) {
+  if (mbedtls_asn1_get_tag (Ptr, End, Length, (INT32)Tag) == 0) {
     return TRUE;
   } else {
     return FALSE;
