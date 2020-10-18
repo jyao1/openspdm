@@ -156,7 +156,7 @@ SpdmStartSession (
   SpdmContext = Context;
 
   if (!UsePsk) {
-    Status = SpdmSendReceiveKeyExchange (SpdmContext, MeasurementHashType, SlotNum, HeartbeatPeriod, SessionId, &SlotIdParam, MeasurementHash);
+    Status = SpdmSendReceiveKeyExchange (SpdmContext, MeasurementHashType, SlotNum, SessionId, HeartbeatPeriod, &SlotIdParam, MeasurementHash);
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceiveKeyExchange - %p\n", Status));
       return Status;
@@ -189,7 +189,7 @@ SpdmStartSession (
     Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, SlotIdParam);
     DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceiveFinish - %p\n", Status));
   } else {
-    Status = SpdmSendReceivePskExchange (SpdmContext, MeasurementHashType, HeartbeatPeriod, SessionId, MeasurementHash);
+    Status = SpdmSendReceivePskExchange (SpdmContext, MeasurementHashType, SessionId, HeartbeatPeriod, MeasurementHash);
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceivePskExchange - %p\n", Status));
       return Status;

@@ -125,8 +125,8 @@ SpdmSendReceiveKeyExchange (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MeasurementHashType,
   IN     UINT8                SlotNum,
-     OUT UINT8                *HeartbeatPeriod,
      OUT UINT32               *SessionId,
+     OUT UINT8                *HeartbeatPeriod,
      OUT UINT8                *SlotIdParam,
      OUT VOID                 *MeasurementHash
   );
@@ -164,8 +164,8 @@ RETURN_STATUS
 SpdmSendReceivePskExchange (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MeasurementHashType,
-     OUT UINT8                *HeartbeatPeriod,
      OUT UINT32               *SessionId,
+     OUT UINT8                *HeartbeatPeriod,
      OUT VOID                 *MeasurementHash
   );
 

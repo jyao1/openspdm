@@ -104,8 +104,8 @@ RETURN_STATUS
 SpdmSendReceivePskExchange (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MeasurementHashType,
-     OUT UINT8                *HeartbeatPeriod,
      OUT UINT32               *SessionId,
+     OUT UINT8                *HeartbeatPeriod,
      OUT VOID                 *MeasurementHash
   )
 {

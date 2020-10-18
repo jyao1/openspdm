@@ -273,7 +273,7 @@ SpdmSendReceiveData (
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    The session ID of the session.
 
-  @retval RETURN_SUCCESS               The hearbeat is sent and received.
+  @retval RETURN_SUCCESS               The heartbeat is sent and received.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
   @retval RETURN_SECURITY_VIOLATION    Any verification fails.
 **/
