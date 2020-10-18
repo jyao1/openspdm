@@ -79,6 +79,7 @@ void TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltName(void **state) {
   UINTN         FileBufferSize;
   RETURN_STATUS Ret;
   BOOLEAN       Status;
+
   Status = ReadInputFile ("Rsa2048/end_requester.cert.der", (VOID **)&FileBuffer, &FileBufferSize);
   assert_true(Status);
   DMTFOidSize = 64;
@@ -87,6 +88,7 @@ void TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltName(void **state) {
   assert_int_equal((int)Ret, RETURN_SUCCESS);
   assert_memory_equal(DMTF_OID, DMTFOid, sizeof (DMTF_OID));
   assert_string_equal(CommonName, "ACME:WIDGET:1234567890");
+  free (FileBuffer);
 
   Status = ReadInputFile ("Rsa3072/end_requester.cert.der", (VOID **)&FileBuffer, &FileBufferSize);
   assert_true(Status);
@@ -96,6 +98,7 @@ void TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltName(void **state) {
   assert_int_equal((int)Ret, RETURN_SUCCESS);
   assert_memory_equal(DMTF_OID, DMTFOid, sizeof (DMTF_OID));
   assert_string_equal(CommonName, "ACME:WIDGET:1234567890");
+  free (FileBuffer);
 
   Status = ReadInputFile ("EcP256/end_requester.cert.der", (VOID **)&FileBuffer, &FileBufferSize);
   assert_true(Status);
@@ -105,6 +108,7 @@ void TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltName(void **state) {
   assert_int_equal((int)Ret, RETURN_SUCCESS);
   assert_memory_equal(DMTF_OID, DMTFOid, sizeof (DMTF_OID));
   assert_string_equal(CommonName, "ACME:WIDGET:1234567890");
+  free (FileBuffer);
 
   Status = ReadInputFile ("EcP384/end_requester.cert.der", (VOID **)&FileBuffer, &FileBufferSize);
   assert_true(Status);
@@ -114,31 +118,37 @@ void TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltName(void **state) {
   assert_int_equal((int)Ret, RETURN_SUCCESS);
   assert_memory_equal(DMTF_OID, DMTFOid, sizeof (DMTF_OID));
   assert_string_equal(CommonName, "ACME:WIDGET:1234567890");
+  free (FileBuffer);
 }
 
 void TestSpdmCommonLibCrypto_SpdmX509CertificateCheck(void **state) {
   BOOLEAN       Status;
   UINT8         *FileBuffer;
   UINTN         FileBufferSize;
+
   Status = ReadInputFile ("Rsa2048/end_requester.cert.der", (VOID **)&FileBuffer, &FileBufferSize);
   assert_true(Status);
   Status = SpdmX509CertificateCheck(FileBuffer, FileBufferSize);
   assert_true(Status);
+  free (FileBuffer);
 
   Status = ReadInputFile ("Rsa3072/end_requester.cert.der", (VOID **)&FileBuffer, &FileBufferSize);
   assert_true(Status);
   Status = SpdmX509CertificateCheck(FileBuffer, FileBufferSize);
   assert_true(Status);
+  free (FileBuffer);
+
   Status = ReadInputFile ("EcP256/end_requester.cert.der", (VOID **)&FileBuffer, &FileBufferSize);
   assert_true(Status);
   Status = SpdmX509CertificateCheck(FileBuffer, FileBufferSize);
   assert_true(Status);
+  free (FileBuffer);
 
   Status = ReadInputFile ("EcP384/end_requester.cert.der", (VOID **)&FileBuffer, &FileBufferSize);
   assert_true(Status);
   Status = SpdmX509CertificateCheck(FileBuffer, FileBufferSize);
   assert_true(Status);
-
+  free (FileBuffer);
 }
 
 int Setup(void **state)

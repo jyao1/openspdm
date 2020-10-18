@@ -89,7 +89,15 @@ RsaGetKey (
     Ret = mbedtls_rsa_export(RsaKey, NULL, &Value, NULL, NULL, NULL);
     break;
   case RsaKeyDp:
+  case RsaKeyDq:
+  case RsaKeyQInv:
+  default:
+    Ret = -1;
     break;
+  }
+
+  if (Ret != 0) {
+    return FALSE;
   }
 
   if (!mbedtls_mpi_size(&Value)) {

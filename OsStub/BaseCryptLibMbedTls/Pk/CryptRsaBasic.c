@@ -107,6 +107,9 @@ RsaSetKey (
   // if BigNumber is Null clear
   if (BigNumber) {
     Ret = mbedtls_mpi_read_binary(&Value, BigNumber, BnSize);
+    if (Ret != 0) {
+      return FALSE;
+    }
   }
 
   switch (KeyTag) {
@@ -161,10 +164,10 @@ RsaSetKey (
     );
     break;
   case RsaKeyDp:
-    break;
   case RsaKeyDq:
-    break;
   case RsaKeyQInv:
+  default:
+    Ret = -1;
     break;
   }
   mbedtls_rsa_complete(RsaKey);

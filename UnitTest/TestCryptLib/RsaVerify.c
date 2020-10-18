@@ -132,6 +132,11 @@ ValidateCryptRsa (
   }
 
   KeyBuffer = AllocatePool (KeySize);
+  if (KeyBuffer == NULL) {
+    Print ("[Fail]");
+    RsaFree (Rsa);
+    return EFI_ABORTED;
+  }
   Status = RsaGetKey (Rsa, RsaKeyN, KeyBuffer, &KeySize);
   if (!Status || KeySize != sizeof (RsaN)) {
     Print ("[Fail]");
@@ -168,6 +173,11 @@ ValidateCryptRsa (
   }
 
   KeyBuffer = AllocatePool (KeySize);
+  if (KeyBuffer == NULL) {
+    Print ("[Fail]");
+    RsaFree (Rsa);
+    return EFI_ABORTED;
+  }
   Status = RsaGetKey (Rsa, RsaKeyE, KeyBuffer, &KeySize);
   if (!Status || KeySize != sizeof (RsaE)) {
     Print ("[Fail]");
@@ -240,6 +250,11 @@ ValidateCryptRsa (
 
   KeySize = RSA_MODULUS_LENGTH / 8;
   KeyBuffer = AllocatePool (KeySize);
+  if (KeyBuffer == NULL) {
+    Print ("[Fail]");
+    RsaFree (Rsa);
+    return EFI_ABORTED;
+  }
   Status = RsaGetKey (Rsa, RsaKeyE, KeyBuffer, &KeySize);
   if (!Status) {
     Print ("[Fail]");
@@ -339,6 +354,11 @@ ValidateCryptRsa (
   ZeroMem (HashValue, HashSize);
   CtxSize = Sha256GetContextSize ();
   Sha1Ctx = AllocatePool (CtxSize);
+  if (Sha1Ctx == NULL) {
+    Print ("[Fail]");
+    RsaFree (Rsa);
+    return EFI_ABORTED;
+  }
 
   Status  = Sha256Init (Sha1Ctx);
   if (!Status) {
@@ -409,6 +429,11 @@ ValidateCryptRsa (
   }
 
   Signature = AllocatePool (SigSize);
+  if (Signature == NULL) {
+    Print ("[Fail]");
+    RsaFree (Rsa);
+    return EFI_ABORTED;
+  }
   Status  = RsaPkcs1Sign (Rsa, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
@@ -483,6 +508,11 @@ ValidateCryptRsa (
   }
 
   Signature = AllocatePool (SigSize);
+  if (Signature == NULL) {
+    Print ("[Fail]");
+    RsaFree (Rsa);
+    return EFI_ABORTED;
+  }
   Status  = RsaPssSign (Rsa, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");

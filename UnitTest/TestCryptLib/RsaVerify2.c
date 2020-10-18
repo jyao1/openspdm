@@ -534,6 +534,7 @@ ValidateCryptPkcs7 (
   // Create PKCS#7 signedData on Payload.
   // Note: Caller should release P7SignedData manually.
   //
+  P7SignedDataSize = 0;
   Status = Pkcs7Sign (
              TestKeyPem,
              sizeof (TestKeyPem),

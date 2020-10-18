@@ -49,7 +49,9 @@ ValidateCryptX509 (
   UINTN         EndCertToLen;
   UINT8         DateTime1[64];
   UINT8         DateTime2[64];
+  EFI_STATUS    EfiStatus;
 
+  EfiStatus = EFI_ABORTED;
   TestCert = NULL;
   TestCACert = NULL;
   TestBundleCert = NULL;
@@ -343,7 +345,7 @@ ValidateCryptX509 (
   }
 
   Print ("\n");
-  return EFI_SUCCESS;
+  EfiStatus = EFI_SUCCESS;
 
 Cleanup:
   if (TestCert != NULL) {
@@ -358,5 +360,5 @@ Cleanup:
   if (TestEndCert != NULL) {
     free (TestEndCert);
   }
-  return EFI_ABORTED;
+  return EfiStatus;
 }
