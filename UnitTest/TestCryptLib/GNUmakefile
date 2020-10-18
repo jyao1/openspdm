@@ -53,6 +53,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/OsStub/DebugLib/DebugLib.a \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a \
+    $(BIN_DIR)/OsStub/RngLib/RngLib.a \
     $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
 
@@ -62,6 +63,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/OsStub/DebugLib/*.o \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/*.o \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/*.o \
+    $(BIN_DIR)/OsStub/RngLib/*.o \
     $(BIN_DIR)/OsStub/MemoryAllocationLib/*.o \
     $(OUTPUT_DIR)/*.o \
 
@@ -106,6 +108,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/DebugLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseCryptLib$(CRYPTO)/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/$(CRYPTO)Lib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/RngLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/MemoryAllocationLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
@@ -159,6 +162,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/OsStub/DebugLib/DebugLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsStub/RngLib/RngLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
 	$(DLINK) $(DLINK_FLAGS) $(DLINK_SPATH) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS2)

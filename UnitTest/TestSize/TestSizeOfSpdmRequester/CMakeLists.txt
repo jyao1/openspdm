@@ -29,6 +29,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         ${LIBRARY_OUTPUT_PATH}/libBaseCryptStubLibDummy.a
         ${LIBRARY_OUTPUT_PATH}/lib${CRYPTO}Lib.a
         ${LIBRARY_OUTPUT_PATH}/libBaseCryptLib${CRYPTO}.a   
+        ${LIBRARY_OUTPUT_PATH}/libRngLib.a
         ${LIBRARY_OUTPUT_PATH}/libMemoryAllocationLibNull.a
         ${LIBRARY_OUTPUT_PATH}/libIntrinsicLib.a
         ${LIBRARY_OUTPUT_PATH}/libSpdmSecuredMessageLib.a
@@ -43,6 +44,7 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
         ${LIBRARY_OUTPUT_PATH}/BaseCryptStubLibDummy.lib
         ${LIBRARY_OUTPUT_PATH}/${CRYPTO}Lib.lib
         ${LIBRARY_OUTPUT_PATH}/BaseCryptLib${CRYPTO}.lib   
+        ${LIBRARY_OUTPUT_PATH}/RngLib.lib
         ${LIBRARY_OUTPUT_PATH}/MemoryAllocationLibNull.lib
         ${LIBRARY_OUTPUT_PATH}/SpdmSecuredMessageLib.lib
         ${LIBRARY_OUTPUT_PATH}/SpdmTransportMctpLib.lib 

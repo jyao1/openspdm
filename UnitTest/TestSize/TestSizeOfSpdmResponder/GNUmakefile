@@ -44,6 +44,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/OsStub/DebugLibNull/DebugLibNull.a \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a \
+    $(BIN_DIR)/UnitTest/TestSize/RngLibNull/RngLibNull.a \
     $(BIN_DIR)/UnitTest/TestSize/MemoryAllocationLibNull/MemoryAllocationLibNull.a \
     $(BIN_DIR)/UnitTest/TestSize/IntrinsicLib/IntrinsicLib.a \
     $(BIN_DIR)/UnitTest/TestSize/BaseCryptStubLibDummy/BaseCryptStubLibDummy.a \
@@ -59,6 +60,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/OsStub/DebugLibNull/*.o \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/*.o \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/*.o \
+    $(BIN_DIR)/UnitTest/TestSize/RngLibNull/*.o \
     $(BIN_DIR)/UnitTest/TestSize/MemoryAllocationLibNull/*.o \
     $(BIN_DIR)/UnitTest/TestSize/IntrinsicLib/*.o \
     $(BIN_DIR)/UnitTest/TestSize/BaseCryptStubLibDummy/*.o \
@@ -108,6 +110,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/DebugLibNull/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseCryptLib$(CRYPTO)/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/$(CRYPTO)Lib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/UnitTest/TestSize/RngLibNull/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/UnitTest/TestSize/MemoryAllocationLibNull/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/UnitTest/TestSize/IntrinsicLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/UnitTest/TestSize/BaseCryptStubLibDummy/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
@@ -134,6 +137,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/OsStub/DebugLibNull/DebugLibNull.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/UnitTest/TestSize/RngLibNull/RngLibNull.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/UnitTest/TestSize/MemoryAllocationLibNull/MemoryAllocationLibNull.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/UnitTest/TestSize/IntrinsicLib/IntrinsicLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/UnitTest/TestSize/BaseCryptStubLibDummy/BaseCryptStubLibDummy.a >> $(OUTPUT_DIR)/tmp.list

@@ -1,43 +1,28 @@
 /** @file
-  OpenSSL doesn't implement rand_pool_* functions for UEFI.
+  OpenSSL_1_1_1b doesn't implement rand_pool_* functions for UEFI.
   The file implement these functions.
 
-Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "crypto/rand.h"
+#include <openssl/aes.h>
+
 #include <Base.h>
-#include <Library/BaseMemoryLib.h>
-
-/**
-   Get 64-bit noise source.
-
-   @param[out] Rand         Buffer pointer to store 64-bit noise source
-
-   @retval TRUE             Get randomness successfully.
-   @retval FALSE            Failed to generate
-**/
-BOOLEAN
-EFIAPI
-GetRandomNoise64 (
-  OUT UINT64         *Rand
-  )
-{
-  // TBD
-  return TRUE;
-}
+#include <Library/RngLib.h>
 
 /**
   Calls RandomNumber64 to fill
   a buffer of arbitrary size with random bytes.
+  This is a shim layer to RngLib.
 
   @param[in]   Length        Size of the buffer, in bytes,  to fill with.
   @param[out]  RandBuffer    Pointer to the buffer to store the random result.
 
-  @retval RETURN_SUCCESS        Random bytes generation succeeded.
-  @retval RETURN_NOT_READY      Failed to request random bytes.
+  @retval TRUE        Random bytes generation succeeded.
+  @retval FALSE       Failed to request random bytes.
 
 **/
 STATIC
@@ -45,7 +30,7 @@ BOOLEAN
 EFIAPI
 RandGetBytes (
   IN UINTN         Length,
-  OUT UINT8        *RandBuffer
+  OUT UINT8       *RandBuffer
   )
 {
   BOOLEAN     Ret;
@@ -53,14 +38,17 @@ RandGetBytes (
 
   Ret = FALSE;
 
+  if (RandBuffer == NULL) {
+    DEBUG((DEBUG_ERROR, "[OPENSSL_RAND_POOL] NULL RandBuffer. No random numbers are generated and your system is not secure\n"));
+    ASSERT (RandBuffer != NULL); // Since we can't generate random numbers, we should assert. Otherwise we will just blow up later.
+    return Ret;
+  }
+
+
   while (Length > 0) {
-    //
-    // Get random noise from platform.
-    // If it failed, fallback to PerformanceCounter
-    // If you really care about security, you must override
-    // GetRandomNoise64FromPlatform.
-    //
-    Ret = GetRandomNoise64 (&TempRand);
+    // Use RngLib to get random number
+    Ret = GetRandomNumber64 (&TempRand);
+
     if (!Ret) {
       return Ret;
     }
@@ -68,86 +56,12 @@ RandGetBytes (
       *((UINT64*) RandBuffer) = TempRand;
       RandBuffer += sizeof (UINT64);
       Length -= sizeof (TempRand);
-    } else {
+    }
+    else {
       CopyMem (RandBuffer, &TempRand, Length);
       Length = 0;
     }
   }
-
-  return Ret;
-}
-
-/**
-  Creates a 128bit random value that is fully forward and backward prediction resistant,
-  suitable for seeding a NIST SP800-90 Compliant.
-  This function takes multiple random numbers from PerformanceCounter to ensure reseeding
-  and performs AES-CBC-MAC over the data to compute the seed value.
-
-  @param[out]  SeedBuffer    Pointer to a 128bit buffer to store the random seed.
-
-  @retval TRUE        Random seed generation succeeded.
-  @retval FALSE      Failed to request random bytes.
-
-**/
-STATIC
-BOOLEAN
-EFIAPI
-RandGetSeed128 (
-  OUT UINT8        *SeedBuffer
-  )
-{
-  // TBD
-  return TRUE;
-}
-
-/**
-  Generate high-quality entropy source.
-
-  @param[in]   Length        Size of the buffer, in bytes, to fill with.
-  @param[out]  Entropy       Pointer to the buffer to store the entropy data.
-
-  @retval RETURN_SUCCESS        Entropy generation succeeded.
-  @retval RETURN_NOT_READY      Failed to request random data.
-
-**/
-STATIC
-BOOLEAN
-EFIAPI
-RandGenerateEntropy (
-  IN UINTN         Length,
-  OUT UINT8        *Entropy
-  )
-{
-  BOOLEAN     Ret;
-  UINTN       BlockCount;
-  UINT8       Seed[16];
-  UINT8       *Ptr;
-
-  BlockCount = Length / 16;
-  Ptr        = (UINT8 *) Entropy;
-
-  //
-  // Generate high-quality seed for DRBG Entropy
-  //
-  while (BlockCount > 0) {
-    Ret = RandGetSeed128 (Seed);
-    if (!Ret) {
-      return Ret;
-    }
-    CopyMem (Ptr, Seed, 16);
-
-    BlockCount--;
-    Ptr = Ptr + 16;
-  }
-
-  //
-  // Populate the remained data as request.
-  //
-  Ret = RandGetSeed128 (Seed);
-  if (!Ret) {
-    return Ret;
-  }
-  CopyMem (Ptr, Seed, (Length % 16));
 
   return Ret;
 }
@@ -160,27 +74,31 @@ RandGenerateEntropy (
  *
  * This is OpenSSL required interface.
  */
-size_t rand_pool_acquire_entropy(RAND_POOL *pool)
+size_t
+rand_pool_acquire_entropy (
+  RAND_POOL *pool
+  )
 {
-  BOOLEAN  Ret;
-  size_t bytes_needed;
-  unsigned char * buffer;
+  BOOLEAN        Ret;
+  size_t         Bytes_needed;
+  unsigned char *Buffer;
 
-  bytes_needed = rand_pool_bytes_needed(pool, 1 /*entropy_factor*/);
-  if (bytes_needed > 0) {
-    buffer = rand_pool_add_begin(pool, bytes_needed);
+  Bytes_needed = rand_pool_bytes_needed (pool, 1 /*entropy_factor*/);
+  if (Bytes_needed > 0) {
+    Buffer = rand_pool_add_begin (pool, Bytes_needed);
 
-    if (buffer != NULL) {
-      Ret = RandGenerateEntropy(bytes_needed, buffer);
+    if (Buffer != NULL) {
+      Ret = RandGetBytes (Bytes_needed, Buffer);
       if (FALSE == Ret) {
-        rand_pool_add_end(pool, 0, 0);
-      } else {
-        rand_pool_add_end(pool, bytes_needed, 8 * bytes_needed);
+        rand_pool_add_end (pool, 0, 0);
+      }
+      else {
+        rand_pool_add_end (pool, Bytes_needed, 8 * Bytes_needed);
       }
     }
   }
 
-  return rand_pool_entropy_available(pool);
+  return rand_pool_entropy_available (pool);
 }
 
 /*
@@ -188,15 +106,15 @@ size_t rand_pool_acquire_entropy(RAND_POOL *pool)
  *
  * This is OpenSSL required interface.
  */
-int rand_pool_add_nonce_data(RAND_POOL *pool)
+int
+rand_pool_add_nonce_data (
+  RAND_POOL *pool
+  )
 {
-  struct {
-    UINT64  Rand[2];
-  } data = { 0 };
+  UINT8 data[16];
+  RandGetBytes (sizeof(data), data);
 
-  RandGetBytes(16, (UINT8 *)&(data.Rand));
-
-  return rand_pool_add(pool, (unsigned char*)&data, sizeof(data), 0);
+  return rand_pool_add (pool, (unsigned char*)&data, sizeof(data), 0);
 }
 
 /*
@@ -204,42 +122,50 @@ int rand_pool_add_nonce_data(RAND_POOL *pool)
  *
  * This is OpenSSL required interface.
  */
-int rand_pool_add_additional_data(RAND_POOL *pool)
+int
+rand_pool_add_additional_data (
+  RAND_POOL *pool
+  )
 {
-  struct {
-    UINT64  Rand[2];
-  } data = { 0 };
+  UINT8 data[16];
+  RandGetBytes (sizeof(data), data);
 
-  RandGetBytes(16, (UINT8 *)&(data.Rand));
-
-  return rand_pool_add(pool, (unsigned char*)&data, sizeof(data), 0);
+  return rand_pool_add (pool, (unsigned char*)&data, sizeof(data), 0);
 }
 
 /*
- * Dummy Implememtation for UEFI
+ * Dummy Implementation for UEFI
  *
  * This is OpenSSL required interface.
  */
-int rand_pool_init(void)
+int
+rand_pool_init (
+  VOID
+  )
 {
   return 1;
 }
 
 /*
- * Dummy Implememtation for UEFI
+ * Dummy Implementation for UEFI
  *
  * This is OpenSSL required interface.
  */
-void rand_pool_cleanup(void)
+VOID
+rand_pool_cleanup(
+  VOID
+  )
 {
 }
 
 /*
- * Dummy Implememtation for UEFI
+ * Dummy Implementation for UEFI
  *
  * This is OpenSSL required interface.
  */
-void rand_pool_keep_random_devices_open(int keep)
+VOID
+rand_pool_keep_random_devices_open (
+  int keep
+  )
 {
 }
-

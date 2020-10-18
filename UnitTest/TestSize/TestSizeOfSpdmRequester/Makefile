@@ -58,6 +58,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\DebugLibNull\DebugLibNull.lib \
     $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\BaseCryptLib$(CRYPTO).lib \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\$(CRYPTO)Lib.lib \
+    $(BIN_DIR)\UnitTest\TestSize\RngLibNull\RngLibNull.lib \
     $(BIN_DIR)\UnitTest\TestSize\MemoryAllocationLibNull\MemoryAllocationLibNull.lib \
     $(BIN_DIR)\UnitTest\TestSize\IntrinsicLib\IntrinsicLib.lib \
     $(BIN_DIR)\UnitTest\TestSize\BaseCryptStubLibDummy\BaseCryptStubLibDummy.lib \
@@ -74,6 +75,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\OsStub\DebugLibNull\*.obj \
     $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\*.obj \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\*.obj \
+    $(BIN_DIR)\UnitTest\TestSize\RngLibNull\*.obj \
     $(BIN_DIR)\UnitTest\TestSize\MemoryAllocationLibNull\*.obj \
     $(BIN_DIR)\UnitTest\TestSize\IntrinsicLib\*.obj \
     $(BIN_DIR)\UnitTest\TestSize\BaseCryptStubLibDummy\*.obj \
@@ -122,6 +124,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\DebugLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLib$(CRYPTO)\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\$(CRYPTO)Lib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\RngLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\MemoryAllocationLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\IntrinsicLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\TestSize\BaseCryptStubLibDummy\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)

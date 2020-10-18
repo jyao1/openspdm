@@ -30,6 +30,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         ${LIBRARY_OUTPUT_PATH}/libDebugLib.a  
         ${LIBRARY_OUTPUT_PATH}/lib${CRYPTO}Lib.a
         ${LIBRARY_OUTPUT_PATH}/libBaseCryptLib${CRYPTO}.a   
+        ${LIBRARY_OUTPUT_PATH}/libRngLib.a
         ${LIBRARY_OUTPUT_PATH}/libMemoryAllocationLib.a
     )
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -38,6 +39,7 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
         ${LIBRARY_OUTPUT_PATH}/DebugLib.lib
         ${LIBRARY_OUTPUT_PATH}/${CRYPTO}Lib.lib
         ${LIBRARY_OUTPUT_PATH}/BaseCryptLib${CRYPTO}.lib   
+        ${LIBRARY_OUTPUT_PATH}/RngLib.lib
         ${LIBRARY_OUTPUT_PATH}/MemoryAllocationLib.lib
     )
 endif()

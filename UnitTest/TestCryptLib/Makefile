@@ -53,6 +53,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\DebugLib\DebugLib.lib \
     $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\BaseCryptLib$(CRYPTO).lib \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\$(CRYPTO)Lib.lib \
+    $(BIN_DIR)\OsStub\RngLib\RngLib.lib \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\MemoryAllocationLib.lib \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
 
@@ -63,6 +64,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\OsStub\DebugLib\*.obj \
     $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\*.obj \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\*.obj \
+    $(BIN_DIR)\OsStub\RngLib\*.obj \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\*.obj \
 
 
@@ -106,6 +108,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\DebugLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLib$(CRYPTO)\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\$(CRYPTO)Lib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\RngLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #

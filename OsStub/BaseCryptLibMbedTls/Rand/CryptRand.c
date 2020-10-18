@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalCryptLib.h"
-
-int rand ();
+#include <Library/RngLib.h>
 
 /**
   Sets up the seed value for the pseudorandom number generator.
@@ -56,19 +55,30 @@ RandomBytes (
   IN   UINTN  Size
   )
 {
-  UINTN Count = Size/4;
-  UINTN Final = Size%4;
-  UINTN Index = 0;
-  UINT32 Data32;
+  BOOLEAN     Ret;
+  UINT64      TempRand;
 
-  for (Index = 0; Index < Count; Index++) {
-    *(UINT32 *)(Output + Index * 4) = rand();
+  Ret = FALSE;
+
+  while (Size > 0) {
+    // Use RngLib to get random number
+    Ret = GetRandomNumber64 (&TempRand);
+
+    if (!Ret) {
+      return Ret;
+    }
+    if (Size >= sizeof (TempRand)) {
+      *((UINT64*) Output) = TempRand;
+      Output += sizeof (UINT64);
+      Size -= sizeof (TempRand);
+    }
+    else {
+      CopyMem (Output, &TempRand, Size);
+      Size = 0;
+    }
   }
-  if (Final != 0) {
-    Data32 = rand();
-    CopyMem (Output + Count * 4, &Data32, Final);
-  }
-  return TRUE;
+
+  return Ret;
 }
 
 int myrand( void *rng_state, unsigned char *output, size_t len )
