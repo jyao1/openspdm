@@ -21,6 +21,7 @@ SET(src_TestSpdmRequester
     TestSpdmRequesterGetDigest.c
     TestSpdmRequesterGetCertificate.c
     TestSpdmRequesterChallenge.c
+    TestSpdmRequesterGetMeasurement.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmUnitTestCommon.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestKey.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestSupport.c

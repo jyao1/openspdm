@@ -16,6 +16,7 @@ int SpdmResponderAlgorithmTestMain (void);
 int SpdmResponderDigestTestMain (void);
 int SpdmResponderCertificateTestMain (void);
 int SpdmResponderChallengeAuthTestMain (void);
+int SpdmResponderMeasurementTestMain (void);
 
 int main(void) {
   SpdmResponderVersionTestMain ();
@@ -29,5 +30,7 @@ int main(void) {
   SpdmResponderCertificateTestMain ();
 
   SpdmResponderChallengeAuthTestMain ();
+
+  SpdmResponderMeasurementTestMain ();
   return 0;
 }
