@@ -16,6 +16,7 @@ int SpdmRequesterNegotiateAlgorithmTestMain (void);
 int SpdmRequesterGetDigestTestMain (void);
 int SpdmRequesterGetCertificateTestMain (void);
 int SpdmRequesterChallengeTestMain (void);
+int SpdmRequesterGetMeasurementTestMain (void);
 
 int main(void) {
   SpdmRequesterGetVersionTestMain();
@@ -29,5 +30,7 @@ int main(void) {
   SpdmRequesterGetCertificateTestMain();
 
   SpdmRequesterChallengeTestMain();
+
+  SpdmRequesterGetMeasurementTestMain();
   return 0;
 }

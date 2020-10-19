@@ -116,8 +116,7 @@ SpdmRequesterVerifyMeasurementSignature (
   @retval RETURN_SECURITY_VIOLATION    Any verification fails.
 **/
 RETURN_STATUS
-EFIAPI
-SpdmGetMeasurement (
+TrySpdmGetMeasurement (
   IN     VOID                 *Context,
   IN     UINT8                RequestAttribute,
   IN     UINT8                MeasurementOperation,
@@ -146,7 +145,7 @@ SpdmGetMeasurement (
   SpdmContext = Context;
   if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
       ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CERTIFICATE_RECEIVE_FLAG) == 0)) {
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
     return RETURN_DEVICE_ERROR;
   }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP) == 0) {
@@ -212,13 +211,17 @@ SpdmGetMeasurement (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.L1L2, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_GET_MEASUREMENTS, SPDM_MEASUREMENTS, sizeof(SPDM_MEASUREMENTS_RESPONSE_MAX));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_MEASUREMENTS) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_MEASUREMENTS) {
-    return RETURN_DEVICE_ERROR;
-  }
-
   if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -330,3 +333,32 @@ SpdmGetMeasurement (
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_MEASUREMENTS_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }
+
+RETURN_STATUS
+EFIAPI
+SpdmGetMeasurement (
+  IN     VOID                 *Context,
+  IN     UINT8                RequestAttribute,
+  IN     UINT8                MeasurementOperation,
+  IN     UINT8                SlotIdParam,
+     OUT UINT8                *NumberOfBlocks,
+  IN OUT UINT32               *MeasurementRecordLength,
+     OUT VOID                 *MeasurementRecord
+  )
+{
+  SPDM_DEVICE_CONTEXT    *SpdmContext;
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+
+  SpdmContext = Context;
+  Retry = SpdmContext->RetryTimes;
+  do {
+    Status = TrySpdmGetMeasurement(SpdmContext, RequestAttribute, MeasurementOperation, SlotIdParam, NumberOfBlocks, MeasurementRecordLength, MeasurementRecord);
+    if (RETURN_NO_RESPONSE != Status) {
+      return Status;
+    }
+  } while (Retry-- != 0);
+
+  return Status;
+}
+
