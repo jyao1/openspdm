@@ -125,10 +125,10 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
-    MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);	
+    MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
     TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext) + MeasurmentSigSize;
     SpdmResponse = (VOID *)TempBuf;
-	
+
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_MEASUREMENTS;
     SpdmResponse->Header.Param1 = 0;
@@ -178,7 +178,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
-    MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);	
+    MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
     TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext) + MeasurmentSigSize;
     SpdmResponse = (VOID *)TempBuf;
 
@@ -269,7 +269,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
-      MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);	
+      MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
       TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext) + MeasurmentSigSize;
       SpdmResponse = (VOID *)TempBuf;
 
@@ -369,7 +369,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
-      MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);	
+      MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
       TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext) + MeasurmentSigSize;
       SpdmResponse = (VOID *)TempBuf;
 
@@ -618,7 +618,7 @@ void TestSpdmRequesterGetMeasurementCase5(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.L1L2.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;	
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
@@ -654,7 +654,7 @@ void TestSpdmRequesterGetMeasurementCase6(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.L1L2.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;	
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
@@ -690,7 +690,7 @@ void TestSpdmRequesterGetMeasurementCase7(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.L1L2.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;	
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
@@ -727,7 +727,7 @@ void TestSpdmRequesterGetMeasurementCase8(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.L1L2.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;	
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
@@ -762,7 +762,7 @@ void TestSpdmRequesterGetMeasurementCase9(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.L1L2.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;	
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;

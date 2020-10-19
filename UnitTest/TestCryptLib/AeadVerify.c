@@ -210,63 +210,63 @@ ValidateCryptAeadCipher (
   OutBufferSize = sizeof(OutBuffer);
   OutTagSize = sizeof(gcm_tag);
   Status = AeadAesGcmEncrypt(
-	           gcm_key,
-	           sizeof(gcm_key),
-	           gcm_iv,
-	           sizeof(gcm_iv),
-	           gcm_aad,
-	           sizeof(gcm_aad),
-	           gcm_pt,
-	           sizeof(gcm_pt),
-	           OutTag,
-	           OutTagSize,
-	           OutBuffer,
-	           &OutBufferSize
+             gcm_key,
+             sizeof(gcm_key),
+             gcm_iv,
+             sizeof(gcm_iv),
+             gcm_aad,
+             sizeof(gcm_aad),
+             gcm_pt,
+             sizeof(gcm_pt),
+             OutTag,
+             OutTagSize,
+             OutBuffer,
+             &OutBufferSize
              );
   if (!Status) {
-	  Print ("[Fail]");
-	  return EFI_ABORTED;
+    Print ("[Fail]");
+    return EFI_ABORTED;
   }
   if (OutBufferSize != sizeof(gcm_ct)) {
-	  Print ("[Fail]");
-	  return EFI_ABORTED;
+    Print ("[Fail]");
+    return EFI_ABORTED;
   }
   if (CompareMem(OutBuffer, gcm_ct, sizeof(gcm_ct)) != 0) {
-	  Print ("[Fail]");
-	  return EFI_ABORTED;
+    Print ("[Fail]");
+    return EFI_ABORTED;
   }
   if (CompareMem(OutTag, gcm_tag, sizeof(gcm_tag)) != 0) {
-	  Print ("[Fail]");
-	  return EFI_ABORTED;
+    Print ("[Fail]");
+    return EFI_ABORTED;
   }
   Print ("[Pass]");
 
   Print ("\n- AES-GCM Decryption: ");
   Status = AeadAesGcmDecrypt(
-	           gcm_key,
-	           sizeof(gcm_key),
-	           gcm_iv,
-	           sizeof(gcm_iv),
-	           gcm_aad,
-	           sizeof(gcm_aad),
-	           gcm_ct,
-	           sizeof(gcm_ct),
-	           gcm_tag,
-	           sizeof(gcm_tag),
-	           OutBuffer,
-	           &OutBufferSize
+             gcm_key,
+             sizeof(gcm_key),
+             gcm_iv,
+             sizeof(gcm_iv),
+             gcm_aad,
+             sizeof(gcm_aad),
+             gcm_ct,
+             sizeof(gcm_ct),
+             gcm_tag,
+             sizeof(gcm_tag),
+             OutBuffer,
+             &OutBufferSize
              );
   if (!Status) {
-	  Print ("[Fail]");
-	  return EFI_ABORTED;
+    Print ("[Fail]");
+    return EFI_ABORTED;
   }
   if (OutBufferSize != sizeof(gcm_pt)) {
-	  Print ("[Fail]");
-	  return EFI_ABORTED;
+    Print ("[Fail]");
+    return EFI_ABORTED;
   }
   if (CompareMem(OutBuffer, gcm_pt, sizeof(gcm_pt)) != 0) {
-	  Print ("[Fail]");
-	  return EFI_ABORTED;
+    Print ("[Fail]");
+    return EFI_ABORTED;
   }
 
   Print ("[Pass]");
