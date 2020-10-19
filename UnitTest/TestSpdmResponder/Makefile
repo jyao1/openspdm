@@ -78,7 +78,6 @@ STATIC_LIBRARY_OBJECT_FILES =  \
 
 INC =  \
     -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)\OsTest\SpdmTestCommon \
     -I$(WORKSPACE)\Include \
     -I$(WORKSPACE)\Include\Hal \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \

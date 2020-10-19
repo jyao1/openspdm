@@ -22,16 +22,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //#define USE_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048
 //#define USE_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048
 #define USE_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256
+
 #define USE_HASH_ALGO  SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256
+
 //#define USE_DHE_ALGO   SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048
 #define USE_DHE_ALGO   SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1
+
 #define USE_AEAD_ALGO  SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM
 //#define USE_AEAD_ALGO  SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305
-#define USE_REQ_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048
-//#define USE_REQ_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256
 
-#define DEFAULT_OPAQUE_LENGTH             16
-#define DEFAULT_OPAQUE_DATA               0xCC
+#define USE_REQ_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048
+//#define USE_REQ_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048
+//#define USE_REQ_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256
 
 VOID
 DumpData (
@@ -98,6 +100,22 @@ ReadRequesterPublicCertificateChain (
   );
 
 BOOLEAN
+ReadResponderRootPublicCertificate (
+  OUT VOID    **Data,
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
+  );
+
+BOOLEAN
+ReadRequesterRootPublicCertificate (
+  OUT VOID    **Data,
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
+  );
+
+BOOLEAN
 TestSpdmAsymGetPrivateKeyFromPem (
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *PemData,
@@ -133,21 +151,5 @@ SpdmDataSignFunc (
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
   );
-
-BOOLEAN
-ReadResponderRootPublicCertificate (
-  OUT VOID    **Data,
-  OUT UINTN   *Size,
-  OUT VOID    **Hash,
-  OUT UINTN   *HashSize
- );
-
-BOOLEAN
-ReadRequesterRootPublicCertificate (
-  OUT VOID    **Data,
-  OUT UINTN   *Size,
-  OUT VOID    **Hash,
-  OUT UINTN   *HashSize
- );
 
 #endif

@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmUnitTest.h"
 #include <SpdmResponderLibInternal.h>
-#include "SpdmTest.h"
 
 SPDM_CHALLENGE_REQUEST    mSpdmChallengeRequest1 = {
   {

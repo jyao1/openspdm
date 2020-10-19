@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmUnitTest.h"
 #include <SpdmRequesterLibInternal.h>
-#include "SpdmTest.h"
 
 STATIC UINTN                  LocalBufferSize;
 STATIC UINT8                  LocalBuffer[MAX_SPDM_MESSAGE_SMALL_BUFFER_SIZE];

@@ -181,7 +181,7 @@ ReadResponderRootPublicCertificate (
   OUT UINTN   *Size,
   OUT VOID    **Hash,
   OUT UINTN   *HashSize
- )
+  )
 {
   BOOLEAN             Res;
   VOID                *FileData;

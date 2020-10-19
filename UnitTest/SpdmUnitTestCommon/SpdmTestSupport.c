@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "SpdmTest.h"
+#include "SpdmUnitTest.h"
 
 BOOLEAN
 ReadInputFile (

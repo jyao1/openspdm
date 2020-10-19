@@ -9,8 +9,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __CRYPTEST_H__
 #define __CRYPTEST_H__
 
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+#undef NULL
+
 #include <Hal/Base.h>
-#include <OsInclude.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
