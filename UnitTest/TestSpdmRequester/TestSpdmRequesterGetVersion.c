@@ -75,6 +75,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
   {
     MY_SPDM_VERSION_RESPONSE    SpdmResponse;
 
+    ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.RequestResponseCode = SPDM_VERSION;
     SpdmResponse.Header.Param1 = 0;
@@ -93,6 +94,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
   {
     SPDM_VERSION_RESPONSE    SpdmResponse;
 
+    ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.RequestResponseCode = SPDM_VERSION;
     SpdmResponse.Header.Param1 = 0;
@@ -107,6 +109,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE    SpdmResponse;
 
+    ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_INVALID_REQUEST;
@@ -120,6 +123,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE  SpdmResponse;
 
+    ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
@@ -135,6 +139,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     if (SubIndex1 == 0) {
       SPDM_ERROR_RESPONSE  SpdmResponse;
 
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
       SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
       SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_BUSY;
@@ -144,6 +149,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     } else if (SubIndex1 == 1) {
       MY_SPDM_VERSION_RESPONSE    SpdmResponse;
 
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
       SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse.Header.RequestResponseCode = SPDM_VERSION;
       SpdmResponse.Header.Param1 = 0;
@@ -164,6 +170,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE  SpdmResponse;
 
+    ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_REQUEST_RESYNCH;
@@ -177,6 +184,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
   {
     SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
 
+    ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
     SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
@@ -196,6 +204,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     if (SubIndex2 == 0) {
       SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
 
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
       SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
       SpdmResponse.Header.Param1 = SPDM_ERROR_CODE_RESPONSE_NOT_READY;
@@ -209,6 +218,7 @@ SpdmRequesterGetVersionTestReceiveMessage (
     } else if (SubIndex2 == 1) {
       MY_SPDM_VERSION_RESPONSE    SpdmResponse;
 
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
       SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse.Header.RequestResponseCode = SPDM_VERSION;
       SpdmResponse.Header.Param1 = 0;

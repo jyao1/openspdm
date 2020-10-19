@@ -429,8 +429,8 @@ void TestSpdmRequesterChallengeCase1(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -462,8 +462,8 @@ void TestSpdmRequesterChallengeCase2(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -493,8 +493,8 @@ void TestSpdmRequesterChallengeCase3(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -526,8 +526,8 @@ void TestSpdmRequesterChallengeCase4(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -559,8 +559,8 @@ void TestSpdmRequesterChallengeCase5(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
   
@@ -592,8 +592,8 @@ void TestSpdmRequesterChallengeCase6(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -625,8 +625,8 @@ void TestSpdmRequesterChallengeCase7(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -659,8 +659,8 @@ void TestSpdmRequesterChallengeCase8(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -691,8 +691,8 @@ void TestSpdmRequesterChallengeCase9(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 

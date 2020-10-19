@@ -10,8 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmUnitTest.h"
 #include <SpdmResponderLibInternal.h>
 
-#define DEFAULT_HASH_ALGO     SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256
-
 SPDM_GET_DIGESTS_REQUEST    mSpdmGetDigestRequest1 = {
   {
     SPDM_MESSAGE_VERSION_10,
@@ -44,7 +42,7 @@ void TestSpdmResponderDigestCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG; 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
   SpdmContext->LocalContext.CertificateChain[0] = LocalCertificateChain;
   SpdmContext->LocalContext.CertificateChainSize[0] = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -72,7 +70,7 @@ void TestSpdmResponderDigestCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;  
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
   SpdmContext->LocalContext.CertificateChain[0] = LocalCertificateChain;
   SpdmContext->LocalContext.CertificateChainSize[0] = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -103,7 +101,7 @@ void TestSpdmResponderDigestCase3(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
   SpdmContext->LocalContext.CertificateChain[0] = LocalCertificateChain;
   SpdmContext->LocalContext.CertificateChainSize[0] = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -135,7 +133,7 @@ void TestSpdmResponderDigestCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
   SpdmContext->LocalContext.CertificateChain[0] = LocalCertificateChain;
   SpdmContext->LocalContext.CertificateChainSize[0] = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -168,7 +166,7 @@ void TestSpdmResponderDigestCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
   SpdmContext->LocalContext.CertificateChain[0] = LocalCertificateChain;
   SpdmContext->LocalContext.CertificateChainSize[0] = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -200,7 +198,7 @@ void TestSpdmResponderDigestCase6(void **state) {
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
   SpdmContext->LocalContext.CertificateChain[0] = LocalCertificateChain;
   SpdmContext->LocalContext.CertificateChainSize[0] = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));

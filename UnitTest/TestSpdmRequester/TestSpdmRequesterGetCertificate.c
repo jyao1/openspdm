@@ -10,10 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmUnitTest.h"
 #include <SpdmRequesterLibInternal.h>
 
-#define DEFAULT_HASH_ALGO     SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256
-
-STATIC UINT8                  LocalCertificateChain[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-STATIC UINT16                 RemainderLength = 0;
+STATIC VOID                  *LocalCertificateChain;
+STATIC UINTN                 LocalCertificateChainSize;
 
 RETURN_STATUS
 EFIAPI
@@ -71,95 +69,91 @@ SpdmRequesterGetCertificateTestReceiveMessage (
 
   case 0x2:
   {
-    if (RemainderLength == 0) {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-      VOID                         *Data;
-      UINTN                         DataSize;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
+      UINT16                        PortionLength;
+      UINT16                        RemainderLength;
+      UINTN                         Count;
+      STATIC UINTN                  CallingIndex = 0;
 
-      ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
-      CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
-      free(Data);
-      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      if (LocalCertificateChain == NULL) {
+        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+      }
+      Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      if (CallingIndex != Count - 1) {
+        PortionLength = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+        RemainderLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (CallingIndex + 1));
+      } else {
+        PortionLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (Count - 1));
+        RemainderLength = 0;
+      }
+
+      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + PortionLength;
       SpdmResponse = (VOID *)TempBuf;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->PortionLength = (UINT16)MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-      SpdmResponse->RemainderLength = (UINT16)(DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-      CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-      RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      SpdmResponse->PortionLength = PortionLength;
+      SpdmResponse->RemainderLength = RemainderLength;
+      CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN * CallingIndex, PortionLength);
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-    } else {
-      SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-      UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-      UINTN                         TempBufSize;
 
-      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-      SpdmResponse = (VOID *)TempBuf;
-
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
-      SpdmResponse->Header.Param1 = 0;
-      SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->PortionLength = (UINT16)RemainderLength;
-      SpdmResponse->RemainderLength = 0;
-      CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
-      RemainderLength = 0;
-
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-    }
+      CallingIndex++;
+      if (CallingIndex == Count) {
+        CallingIndex = 0;
+        free (LocalCertificateChain);
+        LocalCertificateChain = NULL;
+        LocalCertificateChainSize = 0;
+      }
   }
     return RETURN_SUCCESS;
 
   case 0x3:
   {
-    if (RemainderLength == 0) {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-      VOID                         *Data;
-      UINTN                         DataSize;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
+      UINT16                        PortionLength;
+      UINT16                        RemainderLength;
+      UINTN                         Count;
+      STATIC UINTN                  CallingIndex = 0;
 
-      ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
-      CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
-      free(Data);
-      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      if (LocalCertificateChain == NULL) {
+        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+      }
+      Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      if (CallingIndex != Count - 1) {
+        PortionLength = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+        RemainderLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (CallingIndex + 1));
+      } else {
+        PortionLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (Count - 1));
+        RemainderLength = 0;
+      }
+
+      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + PortionLength;
       SpdmResponse = (VOID *)TempBuf;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->PortionLength = (UINT16)MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-      SpdmResponse->RemainderLength = (UINT16)(DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-      CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-      RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      SpdmResponse->PortionLength = PortionLength;
+      SpdmResponse->RemainderLength = RemainderLength;
+      CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN * CallingIndex, PortionLength);
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-    } else {
-      SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-      UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-      UINTN                         TempBufSize;
 
-      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-      SpdmResponse = (VOID *)TempBuf;
-
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
-      SpdmResponse->Header.Param1 = 0;
-      SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->PortionLength = (UINT16)RemainderLength;
-      SpdmResponse->RemainderLength = 0;
-      CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
-      RemainderLength = 0;
-
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-    }
+      CallingIndex++;
+      if (CallingIndex == Count) {
+        CallingIndex = 0;
+        free (LocalCertificateChain);
+        LocalCertificateChain = NULL;
+        LocalCertificateChainSize = 0;
+      }
   }
     return RETURN_SUCCESS;
 
@@ -203,47 +197,45 @@ SpdmRequesterGetCertificateTestReceiveMessage (
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex1 == 1) {
-      if (RemainderLength == 0) {
-        SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-        VOID                         *Data;
-        UINTN                         DataSize;
-        UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-        UINTN                         TempBufSize;
+      SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
+      UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+      UINTN                         TempBufSize;
+      UINT16                        PortionLength;
+      UINT16                        RemainderLength;
+      UINTN                         Count;
+      STATIC UINTN                  CallingIndex = 0;
 
-        ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
-        CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
-        free(Data);
-        TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-        SpdmResponse = (VOID *)TempBuf;
-
-        SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-        SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
-        SpdmResponse->Header.Param1 = 0;
-        SpdmResponse->Header.Param2 = 0;
-        SpdmResponse->PortionLength = (UINT16)MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-        SpdmResponse->RemainderLength = (UINT16)(DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-        CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-        RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-
-        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      if (LocalCertificateChain == NULL) {
+        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+      }
+      Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      if (CallingIndex != Count - 1) {
+        PortionLength = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+        RemainderLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (CallingIndex + 1));
       } else {
-        SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-        UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-        UINTN                         TempBufSize;
-
-        TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-        SpdmResponse = (VOID *)TempBuf;
-
-        SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-        SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
-        SpdmResponse->Header.Param1 = 0;
-        SpdmResponse->Header.Param2 = 0;
-        SpdmResponse->PortionLength = (UINT16)RemainderLength;
-        SpdmResponse->RemainderLength = 0;
-        CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
+        PortionLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (Count - 1));
         RemainderLength = 0;
+      }
 
-        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + PortionLength;
+      SpdmResponse = (VOID *)TempBuf;
+
+      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
+      SpdmResponse->Header.Param1 = 0;
+      SpdmResponse->Header.Param2 = 0;
+      SpdmResponse->PortionLength = PortionLength;
+      SpdmResponse->RemainderLength = RemainderLength;
+      CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN * CallingIndex, PortionLength);
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+
+      CallingIndex++;
+      if (CallingIndex == Count) {
+        CallingIndex = 0;
+        free (LocalCertificateChain);
+        LocalCertificateChain = NULL;
+        LocalCertificateChainSize = 0;
       }
     }
   }
@@ -297,47 +289,45 @@ SpdmRequesterGetCertificateTestReceiveMessage (
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     } else if (SubIndex2 == 1) {
-      if (RemainderLength == 0) {
-        SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-        VOID                         *Data;
-        UINTN                         DataSize;
-        UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-        UINTN                         TempBufSize;
+      SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
+      UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+      UINTN                         TempBufSize;
+      UINT16                        PortionLength;
+      UINT16                        RemainderLength;
+      UINTN                         Count;
+      STATIC UINTN                  CallingIndex = 0;
 
-        ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
-        CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
-        free(Data);
-        TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-        SpdmResponse = (VOID *)TempBuf;
-
-        SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-        SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
-        SpdmResponse->Header.Param1 = 0;
-        SpdmResponse->Header.Param2 = 0;
-        SpdmResponse->PortionLength = (UINT16)MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-        SpdmResponse->RemainderLength = (UINT16)(DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-        CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-        RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-
-        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      if (LocalCertificateChain == NULL) {
+        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+      }
+      Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      if (CallingIndex != Count - 1) {
+        PortionLength = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+        RemainderLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (CallingIndex + 1));
       } else {
-        SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-        UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-        UINTN                         TempBufSize;
-
-        TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-        SpdmResponse = (VOID *)TempBuf;
-
-        SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-        SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
-        SpdmResponse->Header.Param1 = 0;
-        SpdmResponse->Header.Param2 = 0;
-        SpdmResponse->PortionLength = (UINT16)RemainderLength;
-        SpdmResponse->RemainderLength = 0;
-        CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
+        PortionLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (Count - 1));
         RemainderLength = 0;
+      }
 
-        SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + PortionLength;
+      SpdmResponse = (VOID *)TempBuf;
+
+      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
+      SpdmResponse->Header.Param1 = 0;
+      SpdmResponse->Header.Param2 = 0;
+      SpdmResponse->PortionLength = PortionLength;
+      SpdmResponse->RemainderLength = RemainderLength;
+      CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN * CallingIndex, PortionLength);
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+
+      CallingIndex++;
+      if (CallingIndex == Count) {
+        CallingIndex = 0;
+        free (LocalCertificateChain);
+        LocalCertificateChain = NULL;
+        LocalCertificateChainSize = 0;
       }
     }
   }
@@ -345,48 +335,46 @@ SpdmRequesterGetCertificateTestReceiveMessage (
 
   case 0xA:
   {
-    if (RemainderLength == 0) {
       SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-      VOID                         *Data;
-      UINTN                         DataSize;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
+      UINT16                        PortionLength;
+      UINT16                        RemainderLength;
+      UINTN                         Count;
+      STATIC UINTN                  CallingIndex = 0;
 
-      ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
-      CopyMem (LocalCertificateChain, (UINT8 *)Data, DataSize);
-      free(Data);
-      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      if (LocalCertificateChain == NULL) {
+        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+      }
+      Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      if (CallingIndex != Count - 1) {
+        PortionLength = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+        RemainderLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (CallingIndex + 1));
+      } else {
+        PortionLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (Count - 1));
+        RemainderLength = 0;
+      }
+
+      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + PortionLength;
       SpdmResponse = (VOID *)TempBuf;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
       SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->PortionLength = (UINT16)MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
-      SpdmResponse->RemainderLength = (UINT16)(DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-      CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-      RemainderLength = (UINT16)DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      SpdmResponse->PortionLength = PortionLength;
+      SpdmResponse->RemainderLength = RemainderLength;
+      CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN * CallingIndex, PortionLength);
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-    } else {
-      SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
-      UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
-      UINTN                         TempBufSize;
 
-      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + RemainderLength;
-      SpdmResponse = (VOID *)TempBuf;
-
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
-      SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
-      SpdmResponse->Header.Param1 = 0;
-      SpdmResponse->Header.Param2 = 0;
-      SpdmResponse->PortionLength = (UINT16)RemainderLength;
-      SpdmResponse->RemainderLength = 0;
-      CopyMem (SpdmResponse + 1, (UINT8 *)(LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN), RemainderLength);
-      RemainderLength = 0;
-
-      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-    }
+      CallingIndex++;
+      if (CallingIndex == Count) {
+        CallingIndex = 0;
+        free (LocalCertificateChain);
+        LocalCertificateChain = NULL;
+        LocalCertificateChainSize = 0;
+      }
   }
     return RETURN_SUCCESS;
 
@@ -418,7 +406,7 @@ void TestSpdmRequesterGetCertificateCase1(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -438,6 +426,7 @@ void TestSpdmRequesterGetCertificateCase2(void **state) {
   UINTN                DataSize;
   VOID                 *Hash;
   UINTN                HashSize;
+  UINTN                Count;
 
   SpdmTestContext = *state;
   SpdmContext = &SpdmTestContext->SpdmContext;
@@ -446,18 +435,19 @@ void TestSpdmRequesterGetCertificateCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  Count = (DataSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN - 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
   Status = SpdmGetCertificate (SpdmContext, 0, &CertChainSize, CertChain);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*2 + sizeof(SPDM_CERTIFICATE_RESPONSE)*2 + DataSize);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
   free(Data);
 }
 
@@ -483,7 +473,7 @@ void TestSpdmRequesterGetCertificateCase3(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -516,7 +506,7 @@ void TestSpdmRequesterGetCertificateCase4(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -549,7 +539,7 @@ void TestSpdmRequesterGetCertificateCase5(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
   
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -569,6 +559,7 @@ void TestSpdmRequesterGetCertificateCase6(void **state) {
   UINTN                DataSize;
   VOID                 *Hash;
   UINTN                HashSize;
+  UINTN                Count;
 
   SpdmTestContext = *state;
   SpdmContext = &SpdmTestContext->SpdmContext;
@@ -577,18 +568,19 @@ void TestSpdmRequesterGetCertificateCase6(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  Count = (DataSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN - 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
   Status = SpdmGetCertificate (SpdmContext, 0, &CertChainSize, CertChain);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*2 + sizeof(SPDM_CERTIFICATE_RESPONSE)*2 + DataSize);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
   free(Data);
 }
 
@@ -615,7 +607,7 @@ void TestSpdmRequesterGetCertificateCase7(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -649,7 +641,7 @@ void TestSpdmRequesterGetCertificateCase8(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -668,6 +660,7 @@ void TestSpdmRequesterGetCertificateCase9(void **state) {
   UINTN                DataSize;
   VOID                 *Hash;
   UINTN                HashSize;
+  UINTN                Count;
 
   SpdmTestContext = *state;
   SpdmContext = &SpdmTestContext->SpdmContext;
@@ -676,18 +669,19 @@ void TestSpdmRequesterGetCertificateCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  Count = (DataSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN - 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;   
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
   Status = SpdmGetCertificate (SpdmContext, 0, &CertChainSize, CertChain);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*2 + sizeof(SPDM_CERTIFICATE_RESPONSE)*2 + DataSize);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
   free(Data);
 }
 
@@ -701,6 +695,7 @@ void TestSpdmRequesterGetCertificateCase10(void **state) {
   UINTN                DataSize;
   VOID                 *Hash;
   UINTN                HashSize;
+  UINTN                Count;
 
   SpdmTestContext = *state;
   SpdmContext = &SpdmTestContext->SpdmContext;
@@ -709,18 +704,19 @@ void TestSpdmRequesterGetCertificateCase10(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  Count = (DataSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN - 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = 0;
   SpdmContext->LocalContext.PeerRootCertHashProvision = NULL;   
   SpdmContext->LocalContext.PeerCertChainProvision = Data;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = DataSize;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = DEFAULT_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
   Status = SpdmGetCertificate (SpdmContext, 0, &CertChainSize, CertChain);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*2 + sizeof(SPDM_CERTIFICATE_RESPONSE)*2 + DataSize);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
   free(Data);
 }
 
