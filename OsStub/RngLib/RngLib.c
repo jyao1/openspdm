@@ -6,12 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Base.h>
-
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <time.h>
 
 /**
   Generates a 64-bit random number.
@@ -31,8 +26,6 @@ GetRandomNumber64 (
   )
 {
   UINT8  *Ptr;
-
-  srand ((unsigned int)time (NULL));
 
   Ptr = (UINT8 *)Rand;
   Ptr[0] = (UINT8)rand();
