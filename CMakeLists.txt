@@ -10,7 +10,7 @@ MESSAGE("## Build Configuration ##")
 MESSAGE("#########################")
 
 SET(ARCH ${ARCH} CACHE STRING "Choose the arch of build: Ia32 X64" FORCE)
-SET(TOOLCHAIN ${TOOLCHAIN} CACHE STRING "Choose the toolchain of build: GCC CLANG CBMC AFL KLEE LIBFUZZER" FORCE)
+SET(TOOLCHAIN ${TOOLCHAIN} CACHE STRING "Choose the toolchain of build: Windows: VS2015 VS2019 CLANG Linux: GCC CLANG CBMC AFL KLEE LIBFUZZER" FORCE)
 SET(CMAKE_BUILD_TYPE ${TARGET} CACHE STRING "Choose the target of build: Debug Release" FORCE)
 SET(CRYPTO ${CRYPTO} CACHE STRING "Choose the crypto of build: MbedTls Openssl" FORCE)
 SET(TESTTYPE ${TESTTYPE} CACHE STRING "Choose the test type for openspdm: OsTest UnitTest UnitFuzzing" FORCE)
@@ -46,8 +46,6 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
         MESSAGE("TOOLCHAIN = VS2019")
     elseif(TOOLCHAIN STREQUAL "CLANG")
         MESSAGE("TOOLCHAIN = CLANG")
-    elseif(TOOLCHAIN STREQUAL "CBMC")
-        MESSAGE("TOOLCHAIN = CBMC")
     else()
         MESSAGE(FATAL_ERROR "Unkown TOOLCHAIN")
     endif()
@@ -82,6 +80,8 @@ else()
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    SET(CMAKE_EXE_EXPORTS_C_FLAG "")
+
     if(TOOLCHAIN STREQUAL "GCC")
         SET(CMAKE_C_COMPILER gcc) 
         SET(CMAKE_C_FLAGS "-g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare --coverage -fprofile-arcs -ftest-coverage")
@@ -91,7 +91,10 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         
         SET(CMAKE_AR gcc-ar)
         
-        SET(CMAKE_EXE_LINKER_FLAGS "-Wno-error -no-pie" )
+        SET(CMAKE_LINKER gcc)
+        SET(CMAKE_EXE_LINKER_FLAGS "-flto -Wno-error -no-pie --coverage -lgcov -fprofile-arcs -ftest-coverage" )
+
+        SET(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <LINK_FLAGS> <OBJECTS> -o <TARGET> -Wl,--start-group <LINK_LIBRARIES> -Wl,--end-group")
 
     elseif(TOOLCHAIN STREQUAL "CLANG")
         SET(CMAKE_C_COMPILER clang) 
@@ -102,9 +105,23 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         
         SET(CMAKE_AR llvm-ar)
         
-        SET(CMAKE_EXE_LINKER_FLAGS "-Wno-error -no-pie" )
+        SET(CMAKE_LINKER clang)
+        SET(CMAKE_EXE_LINKER_FLAGS "-flto -Wno-error -no-pie" )
+
+        SET(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <LINK_FLAGS> <OBJECTS> -o <TARGET> -Wl,--start-group <LINK_LIBRARIES> -Wl,--end-group")
+
     elseif(TOOLCHAIN STREQUAL "CBMC")
-        MESSAGE("TOOLCHAIN=CBMC")
+        SET(CMAKE_C_COMPILER goto-cc)
+        SET(CMAKE_C_FLAGS "-g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare -DCBMC -DDEBUG_ASSERT_CHOICE=0")
+        SET(MBEDTLS_FLAGS "")
+        SET(OPENSSL_FLAGS "-include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable")
+        SET(CMOCKA_FLAGS "-std=gnu99 -Wpedantic -Wall -Wshadow -Wmissing-prototypes -Wcast-align -Werror=address -Wstrict-prototypes -Werror=strict-prototypes -Wwrite-strings -Werror=write-strings -Werror-implicit-function-declaration -Wpointer-arith -Werror=pointer-arith -Wdeclaration-after-statement -Werror=declaration-after-statement -Wreturn-type -Werror=return-type -Wuninitialized -Werror=uninitialized -Werror=strict-overflow -Wstrict-overflow=2 -Wno-format-zero-length -Wmissing-field-initializers -Wformat-security -Werror=format-security -fno-common -Wformat -fno-common -fstack-protector-strong")
+        
+        SET(CMAKE_LINKER goto-cc)
+        SET(CMAKE_EXE_LINKER_FLAGS "-flto -Wno-error")
+
+        SET(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+
     elseif(TOOLCHAIN STREQUAL "AFL")
         SET(CMAKE_C_COMPILER afl-gcc) 
         SET(CMAKE_C_FLAGS "-g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -maccumulate-outgoing-args -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare")
@@ -116,6 +133,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
         SET(CMAKE_LINKER gcc)
         SET(CMAKE_EXE_LINKER_FLAGS "-Wno-error -no-pie" )
+
+        SET(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <LINK_FLAGS> <OBJECTS> -o <TARGET> -Wl,--start-group <LINK_LIBRARIES> -Wl,--end-group")
+
     elseif(TOOLCHAIN STREQUAL "KLEE")
         SET(CMAKE_C_COMPILER clang) 
         SET(CMAKE_C_FLAGS "-g -fno-strict-aliasing -Wall  -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector  -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -emit-llvm -DTEST_WITH_KLEE=TRUE -DDEBUG_ASSERT_CHOICE=0")
@@ -126,6 +146,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         SET(CMAKE_AR llvm-ar)
         
         SET(CMAKE_LINKER llvm-link)
+
+        SET(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+
     elseif(TOOLCHAIN STREQUAL "LIBFUZZER")
         MESSAGE("TOOLCHAIN=LIBFUZZER")
     endif()
@@ -137,6 +160,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
         SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64 -DNO_MSABI_VA_FUNCS -mcmodel=small")
     elseif(ARCH STREQUAL "Ia32")
         SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
+    endif()
+
+    if(NOT CMAKE_C_LINK_EXECUTABLE)
+        SET(CMAKE_C_LINK_EXECUTABLE
+            "<CMAKE_LINKER> <LINK_FLAGS> <OBJECTS> -o <TARGET> -Wl,--start-group <LINK_LIBRARIES> -Wl,--end-group")
     endif()
 
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -246,6 +274,7 @@ if(TESTTYPE STREQUAL "OsTest")
             Library/SpdmTransportMctpLib
             OsStub/BaseMemoryLib
             OsStub/DebugLib
+	    OsStub/RngLib
             OsStub/MemoryAllocationLib
     )
             
@@ -261,6 +290,7 @@ elseif(TESTTYPE STREQUAL "UnitTest")
             Library/SpdmTransportMctpLib
             OsStub/BaseMemoryLib
             OsStub/DebugLib
+	    OsStub/RngLib
             OsStub/MemoryAllocationLib
             UnitTest/SpdmTransportTestLib
             UnitTest/CmockaLib
@@ -276,6 +306,22 @@ elseif(TESTTYPE STREQUAL "UnitTest")
             UnitTest/TestCryptLib
             UnitTest/TestSize/TestSizeOfSpdmRequester
             UnitTest/TestSize/TestSizeOfSpdmResponder
+    )
+    
+elseif(TESTTYPE STREQUAL "UnitFuzzing")
+    SUBDIRS(Library/SpdmCommonLib
+            Library/SpdmRequesterLib
+            Library/SpdmResponderLib
+            Library/SpdmSecuredMessageLib
+            OsStub/BaseMemoryLib
+            OsStub/DebugLib
+	    OsStub/RngLib
+            OsStub/MemoryAllocationLib
+            UnitTest/SpdmTransportTestLib
+    )
+    
+    SUBDIRS(UnitTest/Fuzzing/TestSpdmRequesterGetVersion
+            UnitTest/Fuzzing/TestSpdmResponderVersion
     )
 endif()
 

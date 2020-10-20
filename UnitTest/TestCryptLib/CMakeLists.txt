@@ -23,30 +23,16 @@ SET(src_TestCryptLib
     OsSupport.c
 )
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    SET(TestCryptLib_LIBRARY
-        ${LIBRARY_OUTPUT_PATH}/libBaseMemoryLib.a
-        ${LIBRARY_OUTPUT_PATH}/libDebugLib.a  
-        ${LIBRARY_OUTPUT_PATH}/lib${CRYPTO}Lib.a
-        ${LIBRARY_OUTPUT_PATH}/libBaseCryptLib${CRYPTO}.a   
-        ${LIBRARY_OUTPUT_PATH}/libRngLib.a
-        ${LIBRARY_OUTPUT_PATH}/libMemoryAllocationLib.a
-    )
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    SET(TestCryptLib_LIBRARY
-        ${LIBRARY_OUTPUT_PATH}/BaseMemoryLib.lib
-        ${LIBRARY_OUTPUT_PATH}/DebugLib.lib
-        ${LIBRARY_OUTPUT_PATH}/${CRYPTO}Lib.lib
-        ${LIBRARY_OUTPUT_PATH}/BaseCryptLib${CRYPTO}.lib   
-        ${LIBRARY_OUTPUT_PATH}/RngLib.lib
-        ${LIBRARY_OUTPUT_PATH}/MemoryAllocationLib.lib
-    )
-endif()
+SET(TestCryptLib_LIBRARY
+    BaseMemoryLib 
+    DebugLib 
+    ${CRYPTO}Lib 
+    RngLib
+    BaseCryptLib${CRYPTO}    
+    MemoryAllocationLib 
+)
 
 ADD_EXECUTABLE(TestCryptLib ${src_TestCryptLib})
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    TARGET_LINK_LIBRARIES(TestCryptLib -Wl,--start-group  ${TestCryptLib_LIBRARY} -Wl,--end-group)
-elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    TARGET_LINK_LIBRARIES(TestCryptLib ${TestCryptLib_LIBRARY})
-endif()
+TARGET_LINK_LIBRARIES(TestCryptLib ${TestCryptLib_LIBRARY})
+

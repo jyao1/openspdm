@@ -13,4 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseCryptLib.h>
 
+typedef UINTN size_t;
+
 #endif

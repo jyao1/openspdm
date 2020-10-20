@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+if(TOOLCHAIN MATCHES "VS")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Gl-")
 endif()
 
