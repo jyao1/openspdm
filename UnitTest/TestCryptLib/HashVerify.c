@@ -45,6 +45,38 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Sha512Digest[SHA512_DIGEST_SIZE] = {
   0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 0xe8, 0x0e, 0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f
   };
 
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Sha3_224Digest[SHA3_224_DIGEST_SIZE] = {
+  0xe6, 0x42, 0x82, 0x4c, 0x3f, 0x8c, 0xf2, 0x4a, 0xd0, 0x92, 0x34, 0xee, 0x7d, 0x3c, 0x76, 0x6f,
+  0xc9, 0xa3, 0xa5, 0x16, 0x8d, 0x0c, 0x94, 0xad, 0x73, 0xb4, 0x6f, 0xdf
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Sha3_256Digest[SHA3_256_DIGEST_SIZE] = {
+  0x3a, 0x98, 0x5d, 0xa7, 0x4f, 0xe2, 0x25, 0xb2, 0x04, 0x5c, 0x17, 0x2d, 0x6b, 0xd3, 0x90, 0xbd,
+  0x85, 0x5f, 0x08, 0x6e, 0x3e, 0x9d, 0x52, 0x5b, 0x46, 0xbf, 0xe2, 0x45, 0x11, 0x43, 0x15, 0x32
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Sha3_384Digest[SHA3_384_DIGEST_SIZE] = {
+  0xec, 0x01, 0x49, 0x82, 0x88, 0x51, 0x6f, 0xc9, 0x26, 0x45, 0x9f, 0x58, 0xe2, 0xc6, 0xad, 0x8d,
+  0xf9, 0xb4, 0x73, 0xcb, 0x0f, 0xc0, 0x8c, 0x25, 0x96, 0xda, 0x7c, 0xf0, 0xe4, 0x9b, 0xe4, 0xb2,
+  0x98, 0xd8, 0x8c, 0xea, 0x92, 0x7a, 0xc7, 0xf5, 0x39, 0xf1, 0xed, 0xf2, 0x28, 0x37, 0x6d, 0x25
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Sha3_512Digest[SHA3_512_DIGEST_SIZE] = {
+  0xb7, 0x51, 0x85, 0x0b, 0x1a, 0x57, 0x16, 0x8a, 0x56, 0x93, 0xcd, 0x92, 0x4b, 0x6b, 0x09, 0x6e,
+  0x08, 0xf6, 0x21, 0x82, 0x74, 0x44, 0xf7, 0x0d, 0x88, 0x4f, 0x5d, 0x02, 0x40, 0xd2, 0x71, 0x2e,
+  0x10, 0xe1, 0x16, 0xe9, 0x19, 0x2a, 0xf3, 0xc9, 0x1a, 0x7e, 0xc5, 0x76, 0x47, 0xe3, 0x93, 0x40,
+  0x57, 0x34, 0x0b, 0x4c, 0xf4, 0x08, 0xd5, 0xa5, 0x65, 0x92, 0xf8, 0x27, 0x4e, 0xec, 0x53, 0xf0
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Shake128Digest[SHAKE128_DIGEST_SIZE] = {
+  0x58, 0x81, 0x09, 0x2d, 0xd8, 0x18, 0xbf, 0x5c, 0xf8, 0xa3, 0xdd, 0xb7, 0x93, 0xfb, 0xcb, 0xa7
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8 Shake256Digest[SHAKE256_DIGEST_SIZE] = {
+  0x48, 0x33, 0x66, 0x60, 0x13, 0x60, 0xa8, 0x77, 0x1c, 0x68, 0x63, 0x08, 0x0c, 0xc4, 0x11, 0x4d,
+  0x8d, 0xb4, 0x45, 0x30, 0xf8, 0xf1, 0xe1, 0xee, 0x4f, 0x94, 0xea, 0x37, 0xe7, 0x8b, 0x57, 0x39
+};
+
 /**
   Validate UEFI-OpenSSL Digest Interfaces.
 
@@ -230,6 +262,282 @@ ValidateCryptDigest (
   }
 
   Print ("[Pass]\n");
+
+  Print ("- SHA3_224: ");
+  //
+  // SHA3_224 Digest Validation
+  //
+  ZeroMem (Digest, MAX_DIGEST_SIZE);
+  CtxSize = Sha3_224GetContextSize ();
+  HashCtx = AllocatePool (CtxSize);
+  if (HashCtx != NULL) {
+    Print ("Init... ");
+    Status  = Sha3_224Init (HashCtx);
+  }
+
+  if (Status) {
+    Print ("Update... ");
+    Status  = Sha3_224Update (HashCtx, HashData, DataSize);
+  }
+
+  if (Status) {
+    Print ("Finalize... ");
+    Status  = Sha3_224Final (HashCtx, Digest);
+  }
+
+  if (Status) {
+    Print ("Check Value... ");
+    if (CompareMem (Digest, Sha3_224Digest, SHA3_224_DIGEST_SIZE) == 0) {
+      Status = TRUE;
+    } else {
+      Status = FALSE;
+    }
+  }
+
+  if (HashCtx != NULL) {
+    FreePool(HashCtx);
+  }
+
+  if (Status) {
+    Print ("HashAll... ");
+    ZeroMem (Digest, SHA3_224_DIGEST_SIZE);
+    Status  = Sha3_224HashAll (HashData, DataSize, Digest);
+  }
+  if (Status) {
+    Print ("[Pass]\n");
+  } else {
+    Print ("[Failed]\n");
+  }
+
+  Print ("- SHA3_256: ");
+  //
+  // SHA3_256 Digest Validation
+  //
+  ZeroMem (Digest, MAX_DIGEST_SIZE);
+  CtxSize = Sha3_256GetContextSize ();
+  HashCtx = AllocatePool (CtxSize);
+  if (HashCtx != NULL) {
+    Print ("Init... ");
+    Status  = Sha3_256Init (HashCtx);
+  }
+
+  if (Status) {
+    Print ("Update... ");
+    Status  = Sha3_256Update (HashCtx, HashData, DataSize);
+  }
+
+  if (Status) {
+    Print ("Finalize... ");
+    Status  = Sha3_256Final (HashCtx, Digest);
+  }
+
+  if (Status) {
+    Print ("Check Value... ");
+    if (CompareMem (Digest, Sha3_256Digest, SHA3_256_DIGEST_SIZE) == 0) {
+      Status = TRUE;
+    } else {
+      Status = FALSE;
+    }
+  }
+
+  if (HashCtx != NULL) {
+    FreePool(HashCtx);
+  }
+
+  if (Status) {
+    Print ("HashAll... ");
+    ZeroMem (Digest, SHA3_256_DIGEST_SIZE);
+    Status  = Sha3_256HashAll (HashData, DataSize, Digest);
+  }
+  if (Status) {
+    Print ("[Pass]\n");
+  } else {
+    Print ("[Failed]\n");
+  }
+
+  Print ("- SHA3_384: ");
+  //
+  // SHA3_384 Digest Validation
+  //
+  ZeroMem (Digest, MAX_DIGEST_SIZE);
+  CtxSize = Sha3_384GetContextSize ();
+  HashCtx = AllocatePool (CtxSize);
+  if (HashCtx != NULL) {
+    Print ("Init... ");
+    Status  = Sha3_384Init (HashCtx);
+  }
+
+  if (Status) {
+    Print ("Update... ");
+    Status  = Sha3_384Update (HashCtx, HashData, DataSize);
+  }
+
+  if (Status) {
+    Print ("Finalize... ");
+    Status  = Sha3_384Final (HashCtx, Digest);
+  }
+
+  if (Status) {
+    Print ("Check Value... ");
+    if (CompareMem (Digest, Sha3_384Digest, SHA3_384_DIGEST_SIZE) == 0) {
+      Status = TRUE;
+    } else {
+      Status = FALSE;
+    }
+  }
+
+  if (HashCtx != NULL) {
+    FreePool(HashCtx);
+  }
+
+  if (Status) {
+    Print ("HashAll... ");
+    ZeroMem (Digest, SHA3_384_DIGEST_SIZE);
+    Status  = Sha3_384HashAll (HashData, DataSize, Digest);
+  }
+  if (Status) {
+    Print ("[Pass]\n");
+  } else {
+    Print ("[Failed]\n");
+  }
+
+  Print ("- SHA3_512: ");
+  //
+  // SHA3_512 Digest Validation
+  //
+  ZeroMem (Digest, MAX_DIGEST_SIZE);
+  CtxSize = Sha3_512GetContextSize ();
+  HashCtx = AllocatePool (CtxSize);
+  if (HashCtx != NULL) {
+    Print ("Init... ");
+    Status  = Sha3_512Init (HashCtx);
+  }
+
+  if (Status) {
+    Print ("Update... ");
+    Status  = Sha3_512Update (HashCtx, HashData, DataSize);
+  }
+
+  if (Status) {
+    Print ("Finalize... ");
+    Status  = Sha3_512Final (HashCtx, Digest);
+  }
+
+  if (Status) {
+    Print ("Check Value... ");
+    if (CompareMem (Digest, Sha3_512Digest, SHA3_512_DIGEST_SIZE) == 0) {
+      Status = TRUE;
+    } else {
+      Status = FALSE;
+    }
+  }
+
+  if (HashCtx != NULL) {
+    FreePool(HashCtx);
+  }
+
+  if (Status) {
+    Print ("HashAll... ");
+    ZeroMem (Digest, SHA3_512_DIGEST_SIZE);
+    Status  = Sha3_512HashAll (HashData, DataSize, Digest);
+  }
+  if (Status) {
+    Print ("[Pass]\n");
+  } else {
+    Print ("[Failed]\n");
+  }
+
+  Print ("- SHAKE128: ");
+  //
+  // SHAKE128 Digest Validation
+  //
+  ZeroMem (Digest, MAX_DIGEST_SIZE);
+  CtxSize = Shake128GetContextSize ();
+  HashCtx = AllocatePool (CtxSize);
+  if (HashCtx != NULL) {
+    Print ("Init... ");
+    Status  = Shake128Init (HashCtx);
+  }
+
+  if (Status) {
+    Print ("Update... ");
+    Status  = Shake128Update (HashCtx, HashData, DataSize);
+  }
+
+  if (Status) {
+    Print ("Finalize... ");
+    Status  = Shake128Final (HashCtx, Digest);
+  }
+
+  if (Status) {
+    Print ("Check Value... ");
+    if (CompareMem (Digest, Shake128Digest, SHAKE128_DIGEST_SIZE) == 0) {
+      Status = TRUE;
+    } else {
+      Status = FALSE;
+    }
+  }
+
+  if (HashCtx != NULL) {
+    FreePool(HashCtx);
+  }
+
+  if (Status) {
+    Print ("HashAll... ");
+    ZeroMem (Digest, SHAKE128_DIGEST_SIZE);
+    Status  = Shake128HashAll (HashData, DataSize, Digest);
+  }
+  if (Status) {
+    Print ("[Pass]\n");
+  } else {
+    Print ("[Failed]\n");
+  }
+
+  Print ("- SHAKE256: ");
+  //
+  // SHAKE256 Digest Validation
+  //
+  ZeroMem (Digest, MAX_DIGEST_SIZE);
+  CtxSize = Shake256GetContextSize ();
+  HashCtx = AllocatePool (CtxSize);
+  if (HashCtx != NULL) {
+    Print ("Init... ");
+    Status  = Shake256Init (HashCtx);
+  }
+
+  if (Status) {
+    Print ("Update... ");
+    Status  = Shake256Update (HashCtx, HashData, DataSize);
+  }
+
+  if (Status) {
+    Print ("Finalize... ");
+    Status  = Shake256Final (HashCtx, Digest);
+  }
+
+  if (Status) {
+    Print ("Check Value... ");
+    if (CompareMem (Digest, Shake256Digest, SHAKE256_DIGEST_SIZE) == 0) {
+      Status = TRUE;
+    } else {
+      Status = FALSE;
+    }
+  }
+
+  if (HashCtx != NULL) {
+    FreePool(HashCtx);
+  }
+
+  if (Status) {
+    Print ("HashAll... ");
+    ZeroMem (Digest, SHAKE256_DIGEST_SIZE);
+    Status  = Shake256HashAll (HashData, DataSize, Digest);
+  }
+  if (Status) {
+    Print ("[Pass]\n");
+  } else {
+    Print ("[Failed]\n");
+  }
 
   return EFI_SUCCESS;
 }
