@@ -38,6 +38,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/Cipher/CryptAes.o \
     $(OUTPUT_DIR)/Hash/CryptSha256.o \
     $(OUTPUT_DIR)/Hash/CryptSha512.o \
+    $(OUTPUT_DIR)/Hash/CryptSha3.o \
     $(OUTPUT_DIR)/Hmac/CryptHmacSha256.o \
     $(OUTPUT_DIR)/Kdf/CryptHkdf.o \
     $(OUTPUT_DIR)/Mac/CryptCmacAes.o \
@@ -64,7 +65,8 @@ INC =  \
     -I$(WORKSPACE)/OsStub/Include \
     -I$(WORKSPACE)/OsStub/OpensslLib/Include \
     -I$(WORKSPACE)/OsStub/OpensslLib/openssl/include \
-    -I$(WORKSPACE)/OsStub/OpensslLib/openssl/crypto/include
+    -I$(WORKSPACE)/OsStub/OpensslLib/openssl/crypto/include \
+    -I$(WORKSPACE)/OsStub/OpensslLib/openssl
 
 #
 # Overridable Target Macro Definitions
@@ -118,6 +120,9 @@ $(OUTPUT_DIR)/Hash/CryptSha256.o : $(SOURCE_DIR)/Hash/CryptSha256.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/Hash/CryptSha512.o : $(SOURCE_DIR)/Hash/CryptSha512.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/Hash/CryptSha3.o : $(SOURCE_DIR)/Hash/CryptSha3.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/Hmac/CryptHmacSha256.o : $(SOURCE_DIR)/Hmac/CryptHmacSha256.c
