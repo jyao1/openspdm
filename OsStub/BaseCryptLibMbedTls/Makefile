@@ -37,6 +37,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\CryptAeadChaCha20Poly1305.obj \
     $(OUTPUT_DIR)\CryptSha256.obj \
     $(OUTPUT_DIR)\CryptSha512.obj \
+    $(OUTPUT_DIR)\CryptSha3.obj \
     $(OUTPUT_DIR)\CryptHmacSha256.obj \
     $(OUTPUT_DIR)\CryptHkdf.obj \
     $(OUTPUT_DIR)\CryptCmacAes.obj \
@@ -106,6 +107,9 @@ $(OUTPUT_DIR)\CryptSha256.obj : $(SOURCE_DIR)\Hash/CryptSha256.c
 
 $(OUTPUT_DIR)\CryptSha512.obj : $(SOURCE_DIR)\Hash/CryptSha512.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash/CryptSha512.c
+
+$(OUTPUT_DIR)\CryptSha3.obj : $(SOURCE_DIR)\Hash/CryptSha3.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash/CryptSha3.c
 
 $(OUTPUT_DIR)\CryptHmacSha256.obj : $(SOURCE_DIR)\Hmac/CryptHmacSha256.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hmac/CryptHmacSha256.c
