@@ -39,6 +39,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/CryptAeadChaCha20Poly1305.o \
     $(OUTPUT_DIR)/CryptSha256.o \
     $(OUTPUT_DIR)/CryptSha512.o \
+    $(OUTPUT_DIR)/CryptSha3.o \
     $(OUTPUT_DIR)/CryptHmacSha256.o \
     $(OUTPUT_DIR)/CryptHkdf.o \
     $(OUTPUT_DIR)/CryptCmacAes.o \
@@ -107,6 +108,9 @@ $(OUTPUT_DIR)/CryptSha256.o : $(SOURCE_DIR)/Hash/CryptSha256.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptSha512.o : $(SOURCE_DIR)/Hash/CryptSha512.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/CryptSha3.o : $(SOURCE_DIR)/Hash/CryptSha3.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptHmacSha256.o : $(SOURCE_DIR)/Hmac/CryptHmacSha256.c
