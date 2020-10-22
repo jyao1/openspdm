@@ -21,6 +21,7 @@ SET(src_BaseCryptLibMbedTls
     Cipher/CryptAeadChaCha20Poly1305.c
     Hash/CryptSha256.c
     Hash/CryptSha512.c
+    Hash/CryptSha3.c
     Hmac/CryptHmacSha256.c
     Kdf/CryptHkdf.c
     Mac/CryptCmacAes.c

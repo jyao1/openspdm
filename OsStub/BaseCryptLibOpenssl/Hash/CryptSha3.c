@@ -1,5 +1,5 @@
 /** @file
-  SHA3-224/256/384/512 and Shake-128/256 Digest Wrapper
+  SHA3-256/384/512 and Shake-256 Digest Wrapper
   Implementation over OpenSSL.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -19,253 +19,817 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE 1024
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for S##type####bitlen## hash operations.
+  Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
 
-  @type    "ha3_" is stand for Sha3##bitlen##, "hake" is stand for Shake##bitlen##
-  @bitlen  Hash len, for "ha3_" avaiable value is 224,256,384,512 for "hake" abaiable value is 128,256
-
-  @return  The size, in bytes, of the context buffer required for S##type####bitlen## hash operations.
+  @return  The size, in bytes, of the context buffer required for SHA-256 hash operations.
 
 **/
-#define SHA3_GET_CONETXTSIZE_IMPL(type,bitlen) \
-UINTN \
-EFIAPI \
-S##type####bitlen##GetContextSize ( \
-  VOID \
-  ) \
-{ \
-  CONST EVP_MD      *EvpMd; \
-  struct evp_md_st  *EvpMdSt; \
-\
-  EvpMd = EVP_s##type####bitlen (); \
-  EvpMdSt = (struct evp_md_st  *)EvpMd; \
-\
-  return (UINTN)(EvpMdSt->ctx_size + sizeof (struct evp_md_ctx_st)); \
+UINTN
+EFIAPI
+Sha3_256GetContextSize (
+  VOID
+  )
+{
+  CONST EVP_MD      *EvpMd;
+  struct evp_md_st  *EvpMdSt;
+
+  EvpMd = EVP_sha3_256 ();
+  EvpMdSt = (struct evp_md_st  *)EvpMd;
+
+  return (UINTN)(EvpMdSt->ctx_size + sizeof (struct evp_md_ctx_st));
 }
 
 /**
-  Initializes user-supplied memory pointed by S##type####bitlen##Context as S##type####bitlen## hash context for
+  Initializes user-supplied memory pointed by Sha3_256Context as SHA3-256 hash context for
   subsequent use.
 
-  If S##type####bitlen##Context is NULL, then return FALSE.
+  If Sha3_256Context is NULL, then return FALSE.
 
-  @type    "ha3_" is stand for Sha3##bitlen##, "hake" is stand for Shake##bitlen##
-  @bitlen  Hash len, for "ha3_" avaiable value is 224,256,384,512 for "hake" abaiable value is 128,256
+  @param[out]  Sha3_256Context  Pointer to SHA3-256 context being initialized.
 
-  @param[out]  S##type####bitlen##Context  Pointer to S##type####bitlen##Context context being initialized.
-
-  @retval TRUE   S##type####bitlen##Context context initialization succeeded.
-  @retval FALSE  S##type####bitlen##Context context initialization failed.
+  @retval TRUE   SHA3-256 context initialization succeeded.
+  @retval FALSE  SHA3-256 context initialization failed.
 
 **/
-#define SHA3_INIT_IMPL(type,bitlen) \
-BOOLEAN \
-EFIAPI \
-S##type####bitlen##Init ( \
-  OUT  VOID  *S##type####bitlen##Context \
-  ) \
-{\
-  CONST     EVP_MD      *EvpMd; \
-  struct evp_md_st      *EvpMdSt; \
-  struct evp_md_ctx_st  *EvpMdCtx; \
-\
-  EvpMd = EVP_s##type####bitlen (); \
-\
-  EvpMdCtx = (struct evp_md_ctx_st *)S##type####bitlen##Context; \
-  EvpMdCtx->md_data = (UINT8*)S##type####bitlen##Context + sizeof (struct evp_md_ctx_st); \
-  EvpMdCtx->digest = EvpMd; \
-  EvpMdCtx->engine = NULL; \
-  EvpMdSt = (struct evp_md_st  *)EvpMd; \
-\
-  return (BOOLEAN) EvpMdSt->init(EvpMdCtx); \
+BOOLEAN
+EFIAPI
+Sha3_256Init (
+  OUT  VOID  *Sha3_256Context
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMd = EVP_sha3_256 ();
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Sha3_256Context;
+  EvpMdCtx->md_data = (UINT8*)Sha3_256Context + sizeof (struct evp_md_ctx_st);
+  EvpMdCtx->digest = EvpMd;
+  EvpMdCtx->engine = NULL;
+  EvpMdSt = (struct evp_md_st  *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->init(EvpMdCtx);
 }
 
 /**
-  Makes a copy of an existing S##type####bitlen##Context context.
+  Makes a copy of an existing SHA3-256 context.
 
-  If S##type####bitlen##Context is NULL, then return FALSE.
-  If NewS##type####bitlen##Context is NULL, then return FALSE.
+  If Sha3_256Context is NULL, then return FALSE.
+  If NewSha3_256Context is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @type    "ha3_" is stand for Sha3##bitlen##, "hake" is stand for Shake##bitlen##
-  @bitlen  Hash len, for "ha3_" avaiable value is 224,256,384,512 for "hake" abaiable value is 128,256
+  @param[in]  Sha3_256Context     Pointer to SHA3-256 context being copied.
+  @param[out] NewSha3_256Context  Pointer to new SHA3-256 context.
 
-  @param[in]  S##type####bitlen##Context     Pointer to S##type####bitlen## context being copied.
-  @param[out] NewS##type####bitlen##Context  Pointer to new S##type####bitlen## context.
-
-  @retval TRUE   S##type####bitlen## context copy succeeded.
-  @retval FALSE  S##type####bitlen## context copy failed.
+  @retval TRUE   SHA3-256 context copy succeeded.
+  @retval FALSE  SHA3-256 context copy failed.
   @retval FALSE  This interface is not supported.
 
 **/
-#define SHA3_DUPLICATE_IMPL(type,bitlen) \
-BOOLEAN \
-EFIAPI \
-S##type####bitlen##Duplicate ( \
-  IN   CONST VOID  *S##type####bitlen##Context, \
-  OUT  VOID        *NewS##type####bitlen##Context \
-  ) \
-{ \
-  UINTN CtxSize; \
-  if (S##type####bitlen##Context == NULL || NewS##type####bitlen##Context == NULL) { \
-    return FALSE; \
-  } \
-\
-  CtxSize = S##type####bitlen##GetContextSize(); \
-  CopyMem (NewS##type####bitlen##Context, S##type####bitlen##Context, CtxSize); \
-  return TRUE; \
+BOOLEAN
+EFIAPI
+Sha3_256Duplicate (
+  IN   CONST VOID  *Sha3_256Context,
+  OUT  VOID        *NewSha3_256Context
+  )
+{
+  UINTN CtxSize;
+  if (Sha3_256Context == NULL || NewSha3_256Context == NULL) {
+    return FALSE;
+  }
+
+  CtxSize = Sha3_256GetContextSize();
+  CopyMem (NewSha3_256Context, Sha3_256Context, CtxSize);
+  return TRUE;
 }
 
 /**
-  Digests the input data and updates S##type####bitlen## context.
+  Digests the input data and updates SHA3-256 context.
 
-  This function performs S##type####bitlen## digest on a data buffer of the specified size.
+  This function performs SHA3-256 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  S##type####bitlen## context should be already correctly initialized by S##type####bitlen##Init(), and should not be finalized
-  by S##type####bitlen##Final(). Behavior with invalid context is undefined.
+  SHA3-256 context should be already correctly initialized by Sha3_256Init(), and should not be finalized
+  by Sha3_256Final(). Behavior with invalid context is undefined.
 
-  If S##type####bitlen##Context is NULL, then return FALSE.
+  If Sha3_256Context is NULL, then return FALSE.
 
-  @type    "ha3_" is stand for Sha3##bitlen##, "hake" is stand for Shake##bitlen##
-  @bitlen  Hash len, for "ha3_" avaiable value is 224,256,384,512 for "hake" abaiable value is 128,256
-
-  @param[in, out]  S##type####bitlen##Context  Pointer to the S##type####bitlen## context.
+  @param[in, out]  Sha3_256Context  Pointer to the SHA3-256 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize       Size of Data buffer in bytes.
 
-  @retval TRUE   S##type####bitlen## data digest succeeded.
-  @retval FALSE  S##type####bitlen## data digest failed.
+  @retval TRUE   SHA3-256 data digest succeeded.
+  @retval FALSE  SHA3-256 data digest failed.
 
 **/
-#define SHA3_UPDATE_IMPL(type,bitlen) \
-BOOLEAN \
-EFIAPI \
-S##type####bitlen##Update ( \
-  IN OUT  VOID        *S##type####bitlen##Context, \
-  IN      CONST VOID  *Data, \
-  IN      UINTN       DataSize \
-  ) \
-{ \
-  CONST     EVP_MD      *EvpMd; \
-  struct evp_md_st      *EvpMdSt; \
-  struct evp_md_ctx_st  *EvpMdCtx; \
-\
-  EvpMdCtx = (struct evp_md_ctx_st *)S##type####bitlen##Context; \
-\
-  EvpMd = EVP_s##type####bitlen (); \
-  EvpMdSt = (struct evp_md_st *)EvpMd; \
-\
-  return (BOOLEAN) EvpMdSt->update(EvpMdCtx, Data, (size_t)DataSize); \
+BOOLEAN
+EFIAPI
+Sha3_256Update (
+  IN OUT  VOID        *Sha3_256Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Sha3_256Context;
+
+  EvpMd = EVP_sha3_256 ();
+  EvpMdSt = (struct evp_md_st *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->update(EvpMdCtx, Data, (size_t)DataSize);
 }
 
 /**
-  Completes computation of the S##type####bitlen## digest value.
+  Completes computation of the SHA3-256 digest value.
 
-  This function completes S##type####bitlen## hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the S##type####bitlen## context cannot
+  This function completes SHA3-256 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SHA3-256 context cannot
   be used again.
-  S##type####bitlen## context should be already correctly initialized by S##type####bitlen##Init(), and should not be
-  finalized by S##type####bitlen##Final(). Behavior with invalid S##type####bitlen## context is undefined.
+  SHA3-256 context should be already correctly initialized by Sha3_256Init(), and should not be
+  finalized by Sha3_256Final(). Behavior with invalid SHA3-256 context is undefined.
 
-  If S##type####bitlen##Context is NULL, then return FALSE.
+  If Sha3_256Context is NULL, then return FALSE.
   If HashValue is NULL, then return FALSE.
 
-  @type    "ha3_" is stand for Sha3##bitlen##, "hake" is stand for Shake##bitlen##
-  @bitlen  Hash len, for "ha3_" avaiable value is 224,256,384,512 for "hake" abaiable value is 128,256
+  @param[in, out]  Sha3_256Context  Pointer to the SHA3-256 context.
+  @param[out]      HashValue      Pointer to a buffer that receives the SHA3-256 digest
+                                  value (256 / 8 bytes).
 
-  @param[in, out]  S##type####bitlen##Context  Pointer to the S##type####bitlen## context.
-  @param[out]      HashValue      Pointer to a buffer that receives the S##type####bitlen## digest
-                                  value (bitlen / 8 bytes).
-
-  @retval TRUE   S##type####bitlen## digest computation succeeded.
-  @retval FALSE  S##type####bitlen## digest computation failed.
+  @retval TRUE   SHA3-256 digest computation succeeded.
+  @retval FALSE  SHA3-256 digest computation failed.
 
 **/
-#define SHA3_FINAL_IMPL(type,bitlen) \
-BOOLEAN \
-EFIAPI \
-S##type####bitlen##Final ( \
-  IN OUT  VOID   *S##type####bitlen##Context, \
-  OUT     UINT8  *HashValue \
-  ) \
-{ \
-  CONST     EVP_MD      *EvpMd; \
-  struct evp_md_st      *EvpMdSt; \
-  struct evp_md_ctx_st  *EvpMdCtx; \
-\
-  EvpMdCtx = (struct evp_md_ctx_st *)S##type####bitlen##Context; \
-\
-  EvpMd = EVP_s##type####bitlen (); \
-  EvpMdSt = (struct evp_md_st *)EvpMd; \
-\
-  return (BOOLEAN) EvpMdSt->final(EvpMdCtx, HashValue); \
+BOOLEAN
+EFIAPI
+Sha3_256Final (
+  IN OUT  VOID   *Sha3_256Context,
+  OUT     UINT8  *HashValue
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Sha3_256Context;
+
+  EvpMd = EVP_sha3_256 ();
+  EvpMdSt = (struct evp_md_st *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->final(EvpMdCtx, HashValue);
 }
 
 /**
-  Computes the S##type####bitlen## message digest of a input data buffer.
+  Computes the SHA3-256 message digest of a input data buffer.
 
-  This function performs the S##type####bitlen## message digest of a given data buffer, and places
+  This function performs the SHA3-256 message digest of a given data buffer, and places
   the digest value into the specified memory.
 
   If this interface is not supported, then return FALSE.
 
-  @type    "ha3_" is stand for Sha3##bitlen##, "hake" is stand for Shake##bitlen##
-  @bitlen  Hash len, for "ha3_" avaiable value is 224,256,384,512 for "hake" abaiable value is 128,256
-
   @param[in]   Data        Pointer to the buffer containing the data to be hashed.
   @param[in]   DataSize    Size of Data buffer in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the S##type####bitlen## digest
-                           value (bitlen / 8 bytes).
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA3-256 digest
+                           value (256 / 8 bytes).
 
-  @retval TRUE   S##type####bitlen## digest computation succeeded.
-  @retval FALSE  S##type####bitlen## digest computation failed.
+  @retval TRUE   SHA3-256 digest computation succeeded.
+  @retval FALSE  SHA3-256 digest computation failed.
   @retval FALSE  This interface is not supported.
 
 **/
-#define SHA3_HASHAll_IMPL(type,bitlen) \
-BOOLEAN \
-EFIAPI \
-S##type####bitlen##HashAll ( \
-  IN   CONST VOID  *Data, \
-  IN   UINTN       DataSize, \
-  OUT  UINT8       *HashValue \
-  ) \
-{ \
-  BOOLEAN   Status; \
-  UINT8     HashContext[INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE]; \
-\
-  ZeroMem (HashContext, INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE); \
-  Status = S##type####bitlen##Init (HashContext); \
-  if (Status) { \
-    Status = S##type####bitlen##Update (HashContext, Data, DataSize); \
-  } \
-  if (Status) { \
-    Status = S##type####bitlen##Final (HashContext, HashValue); \
-  } \
-\
-  return Status; \
+BOOLEAN
+EFIAPI
+Sha3_256HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  )
+{
+  BOOLEAN   Status;
+  UINT8     HashContext[INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE];
+
+  ZeroMem (HashContext, INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE);
+  Status = Sha3_256Init (HashContext);
+  if (Status) {
+    Status = Sha3_256Update (HashContext, Data, DataSize);
+  }
+  if (Status) {
+    Status = Sha3_256Final (HashContext, HashValue);
+  }
+
+  return Status;
 }
 
-#define SHA3_IMPL(bitlen) \
-SHA3_GET_CONETXTSIZE_IMPL(ha3_, bitlen) \
-SHA3_INIT_IMPL(ha3_, bitlen) \
-SHA3_DUPLICATE_IMPL(ha3_, bitlen) \
-SHA3_UPDATE_IMPL(ha3_, bitlen) \
-SHA3_FINAL_IMPL(ha3_, bitlen) \
-SHA3_HASHAll_IMPL(ha3_, bitlen)
+/**
+  Retrieves the size, in bytes, of the context buffer required for SHA-384 hash operations.
 
-#define SHAKE_IMP(bitlen) \
-SHA3_GET_CONETXTSIZE_IMPL(hake, bitlen) \
-SHA3_INIT_IMPL(hake, bitlen) \
-SHA3_DUPLICATE_IMPL(hake, bitlen) \
-SHA3_UPDATE_IMPL(hake, bitlen) \
-SHA3_FINAL_IMPL(hake, bitlen) \
-SHA3_HASHAll_IMPL(hake, bitlen)
+  @return  The size, in bytes, of the context buffer required for SHA-384 hash operations.
 
-SHA3_IMPL(224)
-SHA3_IMPL(256)
-SHA3_IMPL(384)
-SHA3_IMPL(512)
+**/
+UINTN
+EFIAPI
+Sha3_384GetContextSize (
+  VOID
+  )
+{
+  CONST EVP_MD      *EvpMd;
+  struct evp_md_st  *EvpMdSt;
 
-SHAKE_IMP(128)
-SHAKE_IMP(256)
+  EvpMd = EVP_sha3_384 ();
+  EvpMdSt = (struct evp_md_st  *)EvpMd;
+
+  return (UINTN)(EvpMdSt->ctx_size + sizeof (struct evp_md_ctx_st));
+}
+
+/**
+  Initializes user-supplied memory pointed by Sha3_384Context as SHA3-384 hash context for
+  subsequent use.
+
+  If Sha3_384Context is NULL, then return FALSE.
+
+  @param[out]  Sha3_384Context  Pointer to SHA3-384 context being initialized.
+
+  @retval TRUE   SHA3-384 context initialization succeeded.
+  @retval FALSE  SHA3-384 context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_384Init (
+  OUT  VOID  *Sha3_384Context
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMd = EVP_sha3_384 ();
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Sha3_384Context;
+  EvpMdCtx->md_data = (UINT8*)Sha3_384Context + sizeof (struct evp_md_ctx_st);
+  EvpMdCtx->digest = EvpMd;
+  EvpMdCtx->engine = NULL;
+  EvpMdSt = (struct evp_md_st  *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->init(EvpMdCtx);
+}
+
+/**
+  Makes a copy of an existing SHA3-384 context.
+
+  If Sha3_384Context is NULL, then return FALSE.
+  If NewSha3_384Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  Sha3_384Context     Pointer to SHA3-384 context being copied.
+  @param[out] NewSha3_384Context  Pointer to new SHA3-384 context.
+
+  @retval TRUE   SHA3-384 context copy succeeded.
+  @retval FALSE  SHA3-384 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_384Duplicate (
+  IN   CONST VOID  *Sha3_384Context,
+  OUT  VOID        *NewSha3_384Context
+  )
+{
+  UINTN CtxSize;
+  if (Sha3_384Context == NULL || NewSha3_384Context == NULL) {
+    return FALSE;
+  }
+
+  CtxSize = Sha3_384GetContextSize();
+  CopyMem (NewSha3_384Context, Sha3_384Context, CtxSize);
+  return TRUE;
+}
+
+/**
+  Digests the input data and updates SHA3-384 context.
+
+  This function performs SHA3-384 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  SHA3-384 context should be already correctly initialized by Sha3_384Init(), and should not be finalized
+  by Sha3_384Final(). Behavior with invalid context is undefined.
+
+  If Sha3_384Context is NULL, then return FALSE.
+
+  @param[in, out]  Sha3_384Context  Pointer to the SHA3-384 context.
+  @param[in]       Data           Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize       Size of Data buffer in bytes.
+
+  @retval TRUE   SHA3-384 data digest succeeded.
+  @retval FALSE  SHA3-384 data digest failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_384Update (
+  IN OUT  VOID        *Sha3_384Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Sha3_384Context;
+
+  EvpMd = EVP_sha3_384 ();
+  EvpMdSt = (struct evp_md_st *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->update(EvpMdCtx, Data, (size_t)DataSize);
+}
+
+/**
+  Completes computation of the SHA3-384 digest value.
+
+  This function completes SHA3-384 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SHA3-384 context cannot
+  be used again.
+  SHA3-384 context should be already correctly initialized by Sha3_384Init(), and should not be
+  finalized by Sha3_384Final(). Behavior with invalid SHA3-384 context is undefined.
+
+  If Sha3_384Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+
+  @param[in, out]  Sha3_384Context  Pointer to the SHA3-384 context.
+  @param[out]      HashValue      Pointer to a buffer that receives the SHA3-384 digest
+                                  value (384 / 8 bytes).
+
+  @retval TRUE   SHA3-384 digest computation succeeded.
+  @retval FALSE  SHA3-384 digest computation failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_384Final (
+  IN OUT  VOID   *Sha3_384Context,
+  OUT     UINT8  *HashValue
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Sha3_384Context;
+
+  EvpMd = EVP_sha3_384 ();
+  EvpMdSt = (struct evp_md_st *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->final(EvpMdCtx, HashValue);
+}
+
+/**
+  Computes the SHA3-384 message digest of a input data buffer.
+
+  This function performs the SHA3-384 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA3-384 digest
+                           value (384 / 8 bytes).
+
+  @retval TRUE   SHA3-384 digest computation succeeded.
+  @retval FALSE  SHA3-384 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_384HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  )
+{
+  BOOLEAN   Status;
+  UINT8     HashContext[INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE];
+
+  ZeroMem (HashContext, INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE);
+  Status = Sha3_384Init (HashContext);
+  if (Status) {
+    Status = Sha3_384Update (HashContext, Data, DataSize);
+  }
+  if (Status) {
+    Status = Sha3_384Final (HashContext, HashValue);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieves the size, in bytes, of the context buffer required for SHA3-512 hash operations.
+
+  @return  The size, in bytes, of the context buffer required for SHA3-512 hash operations.
+
+**/
+UINTN
+EFIAPI
+Sha3_512GetContextSize (
+  VOID
+  )
+{
+  CONST EVP_MD      *EvpMd;
+  struct evp_md_st  *EvpMdSt;
+
+  EvpMd = EVP_sha3_512 ();
+  EvpMdSt = (struct evp_md_st  *)EvpMd;
+
+  return (UINTN)(EvpMdSt->ctx_size + sizeof (struct evp_md_ctx_st));
+}
+
+/**
+  Initializes user-supplied memory pointed by Sha3_512Context as SHA3-512 hash context for
+  subsequent use.
+
+  If Sha3_512Context is NULL, then return FALSE.
+
+  @param[out]  Sha3_512Context  Pointer to SHA3-512 context being initialized.
+
+  @retval TRUE   SHA3-512 context initialization succeeded.
+  @retval FALSE  SHA3-512 context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_512Init (
+  OUT  VOID  *Sha3_512Context
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMd = EVP_sha3_512 ();
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Sha3_512Context;
+  EvpMdCtx->md_data = (UINT8*)Sha3_512Context + sizeof (struct evp_md_ctx_st);
+  EvpMdCtx->digest = EvpMd;
+  EvpMdCtx->engine = NULL;
+  EvpMdSt = (struct evp_md_st  *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->init(EvpMdCtx);
+}
+
+/**
+  Makes a copy of an existing SHA3-512 context.
+
+  If Sha3_512Context is NULL, then return FALSE.
+  If NewSha3_512Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  Sha3_512Context     Pointer to SHA3-512 context being copied.
+  @param[out] NewSha3_512Context  Pointer to new SHA3-512 context.
+
+  @retval TRUE   SHA3-512 context copy succeeded.
+  @retval FALSE  SHA3-512 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_512Duplicate (
+  IN   CONST VOID  *Sha3_512Context,
+  OUT  VOID        *NewSha3_512Context
+  )
+{
+  UINTN CtxSize;
+  if (Sha3_512Context == NULL || NewSha3_512Context == NULL) {
+    return FALSE;
+  }
+
+  CtxSize = Sha3_512GetContextSize();
+  CopyMem (NewSha3_512Context, Sha3_512Context, CtxSize);
+  return TRUE;
+}
+
+/**
+  Digests the input data and updates SHA3-512 context.
+
+  This function performs SHA3-512 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  SHA3-512 context should be already correctly initialized by Sha3_512Init(), and should not be finalized
+  by Sha3_512Final(). Behavior with invalid context is undefined.
+
+  If Sha3_512Context is NULL, then return FALSE.
+
+  @param[in, out]  Sha3_512Context  Pointer to the SHA3-512 context.
+  @param[in]       Data           Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize       Size of Data buffer in bytes.
+
+  @retval TRUE   SHA3-512 data digest succeeded.
+  @retval FALSE  SHA3-512 data digest failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_512Update (
+  IN OUT  VOID        *Sha3_512Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Sha3_512Context;
+
+  EvpMd = EVP_sha3_512 ();
+  EvpMdSt = (struct evp_md_st *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->update(EvpMdCtx, Data, (size_t)DataSize);
+}
+
+/**
+  Completes computation of the SHA3-512 digest value.
+
+  This function completes SHA3-512 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SHA3-512 context cannot
+  be used again.
+  SHA3-512 context should be already correctly initialized by Sha3_512Init(), and should not be
+  finalized by Sha3_512Final(). Behavior with invalid SHA3-512 context is undefined.
+
+  If Sha3_512Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+
+  @param[in, out]  Sha3_512Context  Pointer to the SHA3-512 context.
+  @param[out]      HashValue      Pointer to a buffer that receives the SHA3-512 digest
+                                  value (512 / 8 bytes).
+
+  @retval TRUE   SHA3-512 digest computation succeeded.
+  @retval FALSE  SHA3-512 digest computation failed.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_512Final (
+  IN OUT  VOID   *Sha3_512Context,
+  OUT     UINT8  *HashValue
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Sha3_512Context;
+
+  EvpMd = EVP_sha3_512 ();
+  EvpMdSt = (struct evp_md_st *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->final(EvpMdCtx, HashValue);
+}
+
+/**
+  Computes the SHA3-512 message digest of a input data buffer.
+
+  This function performs the SHA3-512 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA3-512 digest
+                           value (512 / 8 bytes).
+
+  @retval TRUE   SHA3-512 digest computation succeeded.
+  @retval FALSE  SHA3-512 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha3_512HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  )
+{
+  BOOLEAN   Status;
+  UINT8     HashContext[INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE];
+
+  ZeroMem (HashContext, INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE);
+  Status = Sha3_512Init (HashContext);
+  if (Status) {
+    Status = Sha3_512Update (HashContext, Data, DataSize);
+  }
+  if (Status) {
+    Status = Sha3_512Final (HashContext, HashValue);
+  }
+
+  return Status;
+}
+
+/**
+  Retrieves the size, in bytes, of the context buffer required for SHAKE256 hash operations.
+
+  @return  The size, in bytes, of the context buffer required for SHAKE256 hash operations.
+
+**/
+UINTN
+EFIAPI
+Shake256GetContextSize (
+  VOID
+  )
+{
+  CONST EVP_MD      *EvpMd;
+  struct evp_md_st  *EvpMdSt;
+
+  EvpMd = EVP_shake256 ();
+  EvpMdSt = (struct evp_md_st  *)EvpMd;
+
+  return (UINTN)(EvpMdSt->ctx_size + sizeof (struct evp_md_ctx_st));
+}
+
+/**
+  Initializes user-supplied memory pointed by Shake256Context as SHAKE256 hash context for
+  subsequent use.
+
+  If Shake256Context is NULL, then return FALSE.
+
+  @param[out]  Shake256Context  Pointer to SHAKE256 context being initialized.
+
+  @retval TRUE   SHAKE256 context initialization succeeded.
+  @retval FALSE  SHAKE256 context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+Shake256Init (
+  OUT  VOID  *Shake256Context
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMd = EVP_shake256 ();
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Shake256Context;
+  EvpMdCtx->md_data = (UINT8*)Shake256Context + sizeof (struct evp_md_ctx_st);
+  EvpMdCtx->digest = EvpMd;
+  EvpMdCtx->engine = NULL;
+  EvpMdSt = (struct evp_md_st  *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->init(EvpMdCtx);
+}
+
+/**
+  Makes a copy of an existing SHAKE256 context.
+
+  If Shake256Context is NULL, then return FALSE.
+  If NewShake256Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  Shake256Context     Pointer to SHAKE256 context being copied.
+  @param[out] NewShake256Context  Pointer to new SHAKE256 context.
+
+  @retval TRUE   SHAKE256 context copy succeeded.
+  @retval FALSE  SHAKE256 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Shake256Duplicate (
+  IN   CONST VOID  *Shake256Context,
+  OUT  VOID        *NewShake256Context
+  )
+{
+  UINTN CtxSize;
+  if (Shake256Context == NULL || NewShake256Context == NULL) {
+    return FALSE;
+  }
+
+  CtxSize = Shake256GetContextSize();
+  CopyMem (NewShake256Context, Shake256Context, CtxSize);
+  return TRUE;
+}
+
+/**
+  Digests the input data and updates SHAKE256 context.
+
+  This function performs SHAKE256 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  SHAKE256 context should be already correctly initialized by Shake256Init(), and should not be finalized
+  by Shake256Final(). Behavior with invalid context is undefined.
+
+  If Shake256Context is NULL, then return FALSE.
+
+  @param[in, out]  Shake256Context  Pointer to the SHAKE256 context.
+  @param[in]       Data           Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize       Size of Data buffer in bytes.
+
+  @retval TRUE   SHAKE256 data digest succeeded.
+  @retval FALSE  SHAKE256 data digest failed.
+
+**/
+BOOLEAN
+EFIAPI
+Shake256Update (
+  IN OUT  VOID        *Shake256Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Shake256Context;
+
+  EvpMd = EVP_shake256 ();
+  EvpMdSt = (struct evp_md_st *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->update(EvpMdCtx, Data, (size_t)DataSize);
+}
+
+/**
+  Completes computation of the SHAKE256 digest value.
+
+  This function completes SHAKE256 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the SHAKE256 context cannot
+  be used again.
+  SHAKE256 context should be already correctly initialized by Shake256Init(), and should not be
+  finalized by Shake256Final(). Behavior with invalid SHAKE256 context is undefined.
+
+  If Shake256Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+
+  @param[in, out]  Shake256Context  Pointer to the SHAKE256 context.
+  @param[out]      HashValue      Pointer to a buffer that receives the SHAKE256 digest
+                                  value (256 / 8 bytes).
+
+  @retval TRUE   SHAKE256 digest computation succeeded.
+  @retval FALSE  SHAKE256 digest computation failed.
+
+**/
+BOOLEAN
+EFIAPI
+Shake256Final (
+  IN OUT  VOID   *Shake256Context,
+  OUT     UINT8  *HashValue
+  )
+{
+  CONST     EVP_MD      *EvpMd;
+  struct evp_md_st      *EvpMdSt;
+  struct evp_md_ctx_st  *EvpMdCtx;
+
+  EvpMdCtx = (struct evp_md_ctx_st *)Shake256Context;
+
+  EvpMd = EVP_shake256 ();
+  EvpMdSt = (struct evp_md_st *)EvpMd;
+
+  return (BOOLEAN) EvpMdSt->final(EvpMdCtx, HashValue);
+}
+
+/**
+  Computes the SHAKE256 message digest of a input data buffer.
+
+  This function performs the SHAKE256 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHAKE256 digest
+                           value (256 / 8 bytes).
+
+  @retval TRUE   SHAKE256 digest computation succeeded.
+  @retval FALSE  SHAKE256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Shake256HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  )
+{
+  BOOLEAN   Status;
+  UINT8     HashContext[INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE];
+
+  ZeroMem (HashContext, INTERNAL_MAX_CONTEXT_SIZE_FOR_HASHALL_USE);
+  Status = Shake256Init (HashContext);
+  if (Status) {
+    Status = Shake256Update (HashContext, Data, DataSize);
+  }
+  if (Status) {
+    Status = Shake256Final (HashContext, HashValue);
+  }
+
+  return Status;
+}

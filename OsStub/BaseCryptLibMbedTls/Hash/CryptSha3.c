@@ -1,5 +1,5 @@
 /** @file
-  SHA3-224/256/384/512 and Shake-128/256 Digest Wrapper
+  SHA3-256/384/512 and Shake-256 Digest Wrapper
   Implementation over MbedTls.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
@@ -8,155 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalCryptLib.h"
-
-/**
-  Retrieves the size, in bytes, of the context buffer required for SHA-224 hash operations.
-
-  @return  The size, in bytes, of the context buffer required for SHA-224 hash operations.
-
-**/
-UINTN
-EFIAPI
-Sha3_224GetContextSize (
-  VOID
-  )
-{
-  return FALSE;
-}
-
-/**
-  Initializes user-supplied memory pointed by Sha3_224Context as SHA3-224 hash context for
-  subsequent use.
-
-  If Sha3_224Context is NULL, then return FALSE.
-
-  @param[out]  Sha3_224Context  Pointer to SHA3-224 context being initialized.
-
-  @retval TRUE   SHA3-224 context initialization succeeded.
-  @retval FALSE  SHA3-224 context initialization failed.
-
-**/
-BOOLEAN
-EFIAPI
-Sha3_224Init (
-  OUT  VOID  *Sha3_224Context
-  )
-{
-  return FALSE;
-}
-
-/**
-  Makes a copy of an existing SHA3-224 context.
-
-  If Sha3_224Context is NULL, then return FALSE.
-  If NewSha3_224Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Sha3_224Context     Pointer to SHA3-224 context being copied.
-  @param[out] NewSha3_224Context  Pointer to new SHA3-224 context.
-
-  @retval TRUE   SHA3-224 context copy succeeded.
-  @retval FALSE  SHA3-224 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sha3_224Duplicate (
-  IN   CONST VOID  *Sha3_224Context,
-  OUT  VOID        *NewSha3_224Context
-  )
-{
-  return FALSE;
-}
-
-/**
-  Digests the input data and updates SHA3-224 context.
-
-  This function performs SHA3-224 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA3-224 context should be already correctly initialized by Sha3_224Init(), and should not be finalized
-  by Sha3_224Final(). Behavior with invalid context is undefined.
-
-  If Sha3_224Context is NULL, then return FALSE.
-
-  @param[in, out]  Sha3_224Context  Pointer to the SHA3-224 context.
-  @param[in]       Data           Pointer to the buffer containing the data to be hashed.
-  @param[in]       DataSize       Size of Data buffer in bytes.
-
-  @retval TRUE   SHA3-224 data digest succeeded.
-  @retval FALSE  SHA3-224 data digest failed.
-
-**/
-BOOLEAN
-EFIAPI
-Sha3_224Update (
-  IN OUT  VOID        *Sha3_224Context,
-  IN      CONST VOID  *Data,
-  IN      UINTN       DataSize
-  )
-{
-  return FALSE;
-}
-
-/**
-  Completes computation of the SHA3-224 digest value.
-
-  This function completes SHA3-224 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the SHA3-224 context cannot
-  be used again.
-  SHA3-224 context should be already correctly initialized by Sha3_224Init(), and should not be
-  finalized by Sha3_224Final(). Behavior with invalid SHA3-224 context is undefined.
-
-  If Sha3_224Context is NULL, then return FALSE.
-  If HashValue is NULL, then return FALSE.
-
-  @param[in, out]  Sha3_224Context  Pointer to the SHA3-224 context.
-  @param[out]      HashValue      Pointer to a buffer that receives the SHA3-224 digest
-                                  value (56 bytes).
-
-  @retval TRUE   SHA3-224 digest computation succeeded.
-  @retval FALSE  SHA3-224 digest computation failed.
-
-**/
-BOOLEAN
-EFIAPI
-Sha3_224Final (
-  IN OUT  VOID   *Sha3_224Context,
-  OUT     UINT8  *HashValue
-  )
-{
-  return FALSE;
-}
-
-/**
-  Computes the SHA3-224 message digest of a input data buffer.
-
-  This function performs the SHA3-224 message digest of a given data buffer, and places
-  the digest value into the specified memory.
-
-  If this interface is not supported, then return FALSE.
-
-  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
-  @param[in]   DataSize    Size of Data buffer in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the SHA3-224 digest
-                           value (56 bytes).
-
-  @retval TRUE   SHA3-224 digest computation succeeded.
-  @retval FALSE  SHA3-224 digest computation failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sha3_224HashAll (
-  IN   CONST VOID  *Data,
-  IN   UINTN       DataSize,
-  OUT  UINT8       *HashValue
-  )
-{
-  return FALSE;
-}
 
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
@@ -170,7 +21,7 @@ Sha3_256GetContextSize (
   VOID
   )
 {
-  return FALSE;
+  return 0;
 }
 
 /**
@@ -319,7 +170,7 @@ Sha3_384GetContextSize (
   VOID
   )
 {
-  return FALSE;
+  return 0;
 }
 
 /**
@@ -468,7 +319,7 @@ Sha3_512GetContextSize (
   VOID
   )
 {
-  return FALSE;
+  return 0;
 }
 
 /**
@@ -606,155 +457,6 @@ Sha3_512HashAll (
 }
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for SHAKE128 hash operations.
-
-  @return  The size, in bytes, of the context buffer required for SHAKE128 hash operations.
-
-**/
-UINTN
-EFIAPI
-Shake128GetContextSize (
-  VOID
-  )
-{
-  return FALSE;
-}
-
-/**
-  Initializes user-supplied memory pointed by Shake128Context as SHAKE128 hash context for
-  subsequent use.
-
-  If Shake128Context is NULL, then return FALSE.
-
-  @param[out]  Shake128Context  Pointer to SHAKE128 context being initialized.
-
-  @retval TRUE   SHAKE128 context initialization succeeded.
-  @retval FALSE  SHAKE128 context initialization failed.
-
-**/
-BOOLEAN
-EFIAPI
-Shake128Init (
-  OUT  VOID  *Shake128Context
-  )
-{
-  return FALSE;
-}
-
-/**
-  Makes a copy of an existing SHAKE128 context.
-
-  If Shake128Context is NULL, then return FALSE.
-  If NewShake128Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Shake128Context     Pointer to SHAKE128 context being copied.
-  @param[out] NewShake128Context  Pointer to new SHAKE128 context.
-
-  @retval TRUE   SHAKE128 context copy succeeded.
-  @retval FALSE  SHAKE128 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Shake128Duplicate (
-  IN   CONST VOID  *Shake128Context,
-  OUT  VOID        *NewShake128Context
-  )
-{
-  return FALSE;
-}
-
-/**
-  Digests the input data and updates SHAKE128 context.
-
-  This function performs SHAKE128 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHAKE128 context should be already correctly initialized by Shake128Init(), and should not be finalized
-  by Shake128Final(). Behavior with invalid context is undefined.
-
-  If Shake128Context is NULL, then return FALSE.
-
-  @param[in, out]  Shake128Context  Pointer to the SHAKE128 context.
-  @param[in]       Data           Pointer to the buffer containing the data to be hashed.
-  @param[in]       DataSize       Size of Data buffer in bytes.
-
-  @retval TRUE   SHAKE128 data digest succeeded.
-  @retval FALSE  SHAKE128 data digest failed.
-
-**/
-BOOLEAN
-EFIAPI
-Shake128Update (
-  IN OUT  VOID        *Shake128Context,
-  IN      CONST VOID  *Data,
-  IN      UINTN       DataSize
-  )
-{
-  return FALSE;
-}
-
-/**
-  Completes computation of the SHAKE128 digest value.
-
-  This function completes SHAKE128 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the SHAKE128 context cannot
-  be used again.
-  SHAKE128 context should be already correctly initialized by Shake128Init(), and should not be
-  finalized by Shake128Final(). Behavior with invalid SHAKE128 context is undefined.
-
-  If Shake128Context is NULL, then return FALSE.
-  If HashValue is NULL, then return FALSE.
-
-  @param[in, out]  Shake128Context  Pointer to the SHAKE128 context.
-  @param[out]      HashValue      Pointer to a buffer that receives the SHAKE128 digest
-                                  value (128 / 8 bytes).
-
-  @retval TRUE   SHAKE128 digest computation succeeded.
-  @retval FALSE  SHAKE128 digest computation failed.
-
-**/
-BOOLEAN
-EFIAPI
-Shake128Final (
-  IN OUT  VOID   *Shake128Context,
-  OUT     UINT8  *HashValue
-  )
-{
-  return FALSE;
-}
-
-/**
-  Computes the SHAKE128 message digest of a input data buffer.
-
-  This function performs the SHAKE128 message digest of a given data buffer, and places
-  the digest value into the specified memory.
-
-  If this interface is not supported, then return FALSE.
-
-  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
-  @param[in]   DataSize    Size of Data buffer in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the SHAKE128 digest
-                           value (128 / 8 bytes).
-
-  @retval TRUE   SHAKE128 digest computation succeeded.
-  @retval FALSE  SHAKE128 digest computation failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Shake128HashAll (
-  IN   CONST VOID  *Data,
-  IN   UINTN       DataSize,
-  OUT  UINT8       *HashValue
-  )
-{
-  return FALSE;
-}
-
-/**
   Retrieves the size, in bytes, of the context buffer required for SHAKE256 hash operations.
 
   @return  The size, in bytes, of the context buffer required for SHAKE256 hash operations.
@@ -766,7 +468,7 @@ Shake256GetContextSize (
   VOID
   )
 {
-  return FALSE;
+  return 0;
 }
 
 /**
