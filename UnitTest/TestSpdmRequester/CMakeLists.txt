@@ -40,8 +40,24 @@ SET(TestSpdmRequester_LIBRARY
     CmockaLib
 )
 
-ADD_EXECUTABLE(TestSpdmRequester ${src_TestSpdmRequester})
-
-TARGET_LINK_LIBRARIES(TestSpdmRequester ${TestSpdmRequester_LIBRARY})
+if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
+    ADD_EXECUTABLE(TestSpdmRequester  
+                   ${src_TestSpdmRequester}
+                   $<TARGET_OBJECTS:BaseMemoryLib>
+                   $<TARGET_OBJECTS:DebugLib>
+                   $<TARGET_OBJECTS:SpdmRequesterLib>
+                   $<TARGET_OBJECTS:SpdmCommonLib>
+                   $<TARGET_OBJECTS:${CRYPTO}Lib>
+                   $<TARGET_OBJECTS:RngLib>
+                   $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
+                   $<TARGET_OBJECTS:MemoryAllocationLib>
+                   $<TARGET_OBJECTS:SpdmSecuredMessageLib>
+                   $<TARGET_OBJECTS:SpdmTransportTestLib>
+                   $<TARGET_OBJECTS:CmockaLib>
+    ) 
+else()
+    ADD_EXECUTABLE(TestSpdmRequester ${src_TestSpdmRequester})
+    TARGET_LINK_LIBRARIES(TestSpdmRequester ${TestSpdmRequester_LIBRARY})
+endif()
 
 

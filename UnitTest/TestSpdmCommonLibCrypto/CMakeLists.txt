@@ -29,9 +29,21 @@ SET(TestSpdmCommonLibCrypto_LIBRARY
     CmockaLib
 )
 
-
-ADD_EXECUTABLE(TestSpdmCommonLibCrypto ${src_TestSpdmCommonLibCrypto})
-
-TARGET_LINK_LIBRARIES(TestSpdmCommonLibCrypto ${TestSpdmCommonLibCrypto_LIBRARY})
+if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
+    ADD_EXECUTABLE(TestSpdmCommonLibCrypto 
+                   ${src_TestSpdmCommonLibCrypto}
+                   $<TARGET_OBJECTS:BaseMemoryLib>
+                   $<TARGET_OBJECTS:DebugLib>
+                   $<TARGET_OBJECTS:SpdmCommonLib>
+                   $<TARGET_OBJECTS:${CRYPTO}Lib>
+                   $<TARGET_OBJECTS:RngLib>
+                   $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
+                   $<TARGET_OBJECTS:MemoryAllocationLib>
+                   $<TARGET_OBJECTS:CmockaLib>
+    ) 
+else()
+    ADD_EXECUTABLE(TestSpdmCommonLibCrypto ${src_TestSpdmCommonLibCrypto})
+    TARGET_LINK_LIBRARIES(TestSpdmCommonLibCrypto ${TestSpdmCommonLibCrypto_LIBRARY})
+endif()
 
 

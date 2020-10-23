@@ -37,8 +37,25 @@ SET(TestSizeOfSpdmResponder_LIBRARY
     SpdmTransportMctpLib 
 )
 
-ADD_EXECUTABLE(TestSizeOfSpdmResponder ${src_TestSizeOfSpdmResponder})
-
-TARGET_LINK_LIBRARIES(TestSizeOfSpdmResponder ${TestSizeOfSpdmResponder_LIBRARY})
+if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
+    ADD_EXECUTABLE(TestSizeOfSpdmResponder
+                   ${src_TestSizeOfSpdmResponder}
+                   $<TARGET_OBJECTS:BaseMemoryLib>
+                   $<TARGET_OBJECTS:DebugLib>
+                   $<TARGET_OBJECTS:SpdmResponderLib>
+                   $<TARGET_OBJECTS:SpdmCommonLib>
+                   $<TARGET_OBJECTS:BaseCryptStubLibDummy>
+                   $<TARGET_OBJECTS:${CRYPTO}Lib>
+                   $<TARGET_OBJECTS:RngLib>
+                   $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
+                   $<TARGET_OBJECTS:MemoryAllocationLibNull>
+                   $<TARGET_OBJECTS:SpdmSecuredMessageLib>
+                   $<TARGET_OBJECTS:SpdmTransportMctpLib>
+                   $<TARGET_OBJECTS:IntrinsicLib>
+    ) 
+else()
+    ADD_EXECUTABLE(TestSizeOfSpdmResponder ${src_TestSizeOfSpdmResponder})
+    TARGET_LINK_LIBRARIES(TestSizeOfSpdmResponder ${TestSizeOfSpdmResponder_LIBRARY})
+endif()
 
 

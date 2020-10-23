@@ -39,8 +39,25 @@ SET(TestSizeOfSpdmRequester_LIBRARY
     IntrinsicLib    
 )
 
-ADD_EXECUTABLE(TestSizeOfSpdmRequester ${src_TestSizeOfSpdmRequester})
-
-TARGET_LINK_LIBRARIES(TestSizeOfSpdmRequester ${TestSizeOfSpdmRequester_LIBRARY})
+if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
+    ADD_EXECUTABLE(TestSizeOfSpdmRequester 
+                   ${src_TestSizeOfSpdmRequester}
+                   $<TARGET_OBJECTS:BaseMemoryLib>
+                   $<TARGET_OBJECTS:DebugLib>
+                   $<TARGET_OBJECTS:SpdmRequesterLib>
+                   $<TARGET_OBJECTS:SpdmCommonLib>
+                   $<TARGET_OBJECTS:BaseCryptStubLibDummy>
+                   $<TARGET_OBJECTS:${CRYPTO}Lib>
+                   $<TARGET_OBJECTS:RngLib>
+                   $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
+                   $<TARGET_OBJECTS:MemoryAllocationLibNull>
+                   $<TARGET_OBJECTS:SpdmSecuredMessageLib>
+                   $<TARGET_OBJECTS:SpdmTransportMctpLib>
+                   $<TARGET_OBJECTS:IntrinsicLib>
+    ) 
+else()
+    ADD_EXECUTABLE(TestSizeOfSpdmRequester ${src_TestSizeOfSpdmRequester})
+    TARGET_LINK_LIBRARIES(TestSizeOfSpdmRequester ${TestSizeOfSpdmRequester_LIBRARY})
+endif()
 
 

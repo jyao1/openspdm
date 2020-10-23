@@ -111,12 +111,46 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
    Run cases:
    ```
    cp <test_app> winafl\<bin64|bin32>
-   cp <test_app_pdb> winaft\<bin64|bin32>
-   cd winaft\<bin64|bin32>
+   cp <test_app_pdb> winafl\<bin64|bin32>
+   cd winafl\<bin64|bin32>
    afl-fuzz.exe -i in -o out -D %DRIO_PATH%\<bin64|bin32> -t 20000 -- -coverage_module <test_app> -fuzz_iterations 1000 -target_module <test_app> -target_method main -nargs 2 -- <test_app> @@
    ```
 
-3) Fuzzing with LLVM [LibFuzzer](https://llvm.org/docs/LibFuzzer.html)  (TBD)
+3) Fuzzing in Linux with LLVM [LibFuzzer](https://llvm.org/docs/LibFuzzer.html)
+
+   Ensure LLVM binary in in PATH environment variable.
+   ```
+   export CLANG_PATH=<LLVM_PATH>/bin
+   export ASAN_SYMBOLIZER_PATH=$CLANG_PATH/llvm-symbolizer
+   ```
+
+   Build cases with LIBFUZZER toolchain:
+   `make Fuzzing -f GNUmakefile ARCH=<X64|Ia32> TARGET=<DEBUG|RELEASE> TOOLCHAIN=LIBFUZZER CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
+
+   Run cases:
+   ```
+   mkdir NEW_CORPUS_DIR // Copy test seeds to the folder before run test
+   <test_app> NEW_CORPUS_DIR -rss_limit_mb=0 -artifact_prefix=<OUTPUT_PATH>
+   ```
+
+4) Fuzzing in Windows with LLVM [LibFuzzer](https://llvm.org/docs/LibFuzzer.html)
+
+   Note: Please install 64bit exe for X64 build (IA32 build is not supported with LLVM9)
+
+   Ensure LLVM binary in in PATH environment variable.
+   ```
+   set LLVM_PATH=<LLVM_PATH>
+   set PATH=%PATH%;%LLVM_PATH%\bin
+   ```
+
+   Build cases with LIBFUZZER toolchain:
+   `nmake Fuzzing ARCH=X64 TARGET=<DEBUG|RELEASE> TOOLCHAIN=LIBFUZZER CRYPTO=<MbedTls|Openssl> -e WORKSPACE=<openspdm_root_dir>`
+
+   Run cases:
+   ```
+   mkdir NEW_CORPUS_DIR // Copy test seeds to the folder before run test
+   <test_app> NEW_CORPUS_DIR -rss_limit_mb=0 -artifact_prefix=<OUTPUT_PATH>
+   ```
 
 ### Run Symbolic Execution
 
@@ -175,7 +209,7 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
    Build cases with CBMC toolchain:
 
-   For Windowns, open visual studio 2019 command prompt at openspdm dir and type `make ARCH=Ia32 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 only)
+   For Windowns, open visual studio 2019 command prompt at openspdm dir and type `nmake ARCH=Ia32 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`. (Use x86 command prompt for ARCH=Ia32 only)
 
    For Linux, open command prompt at openspdm dir and type `make -f GNUmakefile ARCH=X64 TOOLCHAIN=CBMC TARGET=<DEBUG|RELEASE> CRYPTO=MbedTls -e WORKSPACE=<openspdm_root_dir>`. (ARCH=X64 only)
 

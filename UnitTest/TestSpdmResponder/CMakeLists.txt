@@ -40,8 +40,24 @@ SET(TestSpdmResponder_LIBRARY
     CmockaLib
 )
 
-ADD_EXECUTABLE(TestSpdmResponder ${src_TestSpdmResponder})
-
-TARGET_LINK_LIBRARIES(TestSpdmResponder ${TestSpdmResponder_LIBRARY})
+if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
+    ADD_EXECUTABLE(TestSpdmResponder  
+                   ${src_TestSpdmResponder}
+                   $<TARGET_OBJECTS:BaseMemoryLib>
+                   $<TARGET_OBJECTS:DebugLib>
+                   $<TARGET_OBJECTS:SpdmResponderLib>
+                   $<TARGET_OBJECTS:SpdmCommonLib>
+                   $<TARGET_OBJECTS:${CRYPTO}Lib>
+                   $<TARGET_OBJECTS:RngLib>
+                   $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
+                   $<TARGET_OBJECTS:MemoryAllocationLib>
+                   $<TARGET_OBJECTS:SpdmSecuredMessageLib>
+                   $<TARGET_OBJECTS:SpdmTransportTestLib>
+                   $<TARGET_OBJECTS:CmockaLib>
+    ) 
+else()
+    ADD_EXECUTABLE(TestSpdmResponder ${src_TestSpdmResponder})
+    TARGET_LINK_LIBRARIES(TestSpdmResponder ${TestSpdmResponder_LIBRARY})
+endif()
 
 

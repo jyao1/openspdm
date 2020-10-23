@@ -29,6 +29,21 @@ SET(SpdmResponderTest_LIBRARY
     SpdmTransportMctpLib 
 )
 
-ADD_EXECUTABLE(SpdmResponderTest ${src_SpdmResponderTest})
-
-TARGET_LINK_LIBRARIES(SpdmResponderTest ${SpdmResponderTest_LIBRARY})
+if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
+    ADD_EXECUTABLE(SpdmResponderTest
+                   ${src_SpdmResponderTest}
+                   $<TARGET_OBJECTS:BaseMemoryLib>
+                   $<TARGET_OBJECTS:DebugLib>
+                   $<TARGET_OBJECTS:SpdmResponderLib>
+                   $<TARGET_OBJECTS:SpdmCommonLib>
+                   $<TARGET_OBJECTS:${CRYPTO}Lib>
+                   $<TARGET_OBJECTS:RngLib>
+                   $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
+                   $<TARGET_OBJECTS:MemoryAllocationLib>
+                   $<TARGET_OBJECTS:SpdmSecuredMessageLib>
+                   $<TARGET_OBJECTS:SpdmTransportMctpLib>
+    ) 
+else()
+    ADD_EXECUTABLE(SpdmResponderTest ${src_SpdmResponderTest})
+    TARGET_LINK_LIBRARIES(SpdmResponderTest ${SpdmResponderTest_LIBRARY})
+endif()

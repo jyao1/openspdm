@@ -45,6 +45,8 @@ TOOLCHAIN = VS2019
 !MESSAGE TOOLCHAIN=VS2019
 !ELSEIF "$(TOOLCHAIN)" == "CLANG"
 !MESSAGE TOOLCHAIN=CLANG
+!ELSEIF "$(TOOLCHAIN)" == "LIBFUZZER"
+!MESSAGE TOOLCHAIN=LIBFUZZER
 !ELSEIF "$(TOOLCHAIN)" == "CBMC"
 !MESSAGE TOOLCHAIN=CBMC
 !ELSE
@@ -159,6 +161,62 @@ DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%Un
 
 DLINK_FLAGS = $(DLINK_FLAGS) Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib ws2_32.lib
 
+#
+# LIBFUZZER
+#
+!ELSEIF "$(TOOLCHAIN)" == "LIBFUZZER"
+CC = clang.exe
+
+CC_OBJ_FLAG = -o
+MBEDTLS_FLAGS = 
+OPENSSL_FLAGS = -include Base.h -Wno-error=format -Wno-format
+CMOCKA_FLAGS = -std=gnu99 -Wpedantic -Wall -Wshadow -Wmissing-prototypes -Wcast-align -Werror=address -Wstrict-prototypes -Werror=strict-prototypes -Wwrite-strings -Werror=write-strings -Werror-implicit-function-declaration -Wpointer-arith -Werror=pointer-arith -Wdeclaration-after-statement -Werror=declaration-after-statement -Wreturn-type -Werror=return-type -Wuninitialized -Werror=uninitialized -Werror=strict-overflow -Wstrict-overflow=2 -Wno-format-zero-length -Wmissing-field-initializers -Wformat-security -Werror=format-security -fno-common -Wformat -fno-common -fstack-protector-strong
+
+CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall  -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector  -mno-red-zone -Wno-address -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -funwind-tables -D_CRT_SECURE_NO_WARNINGS -DTEST_WITH_LIBFUZZER=TRUE -O1 -fsanitize=fuzzer,address
+!IF "$(TARGET)" == "DEBUG"
+CC_FLAGS = $(CC_FLAGS) -O0 -gcodeview
+!ELSEIF "$(TARGET)" == "RELEASE"
+CC_FLAGS = $(CC_FLAGS) -Oz
+!ENDIF
+
+!IF "$(ARCH)" == "X64"
+CC_FLAGS = $(CC_FLAGS) -m64 -mcmodel=small
+!ELSEIF "$(ARCH)" == "Ia32"
+CC_FLAGS = $(CC_FLAGS) -m32 -march=i586
+!ENDIF
+
+SLINK = llvm-lib.exe
+
+SLINK_OBJ_FLAG = /OUT:
+SLINK_FLAGS = 
+
+DLINK = lld-link.exe
+DLINK_OBJECT_FILES = $(STATIC_LIBRARY_FILES)
+
+DLINK_FLAGS = /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB:libcmt.lib /IGNORE:4086 /MLLVM:-exception-model=wineh /lldmap /OPT:REF
+!IF "$(TARGET)" == "DEBUG"
+DLINK_FLAGS = $(DLINK_FLAGS) /DEBUG:GHASH
+!ELSEIF "$(TARGET)" == "RELEASE"
+DLINK_FLAGS = $(DLINK_FLAGS)
+!ENDIF
+
+!IF "$(ARCH)" == "X64"
+DLINK_FLAGS = $(DLINK_FLAGS) /MACHINE:AMD64
+!ELSEIF "$(ARCH)" == "Ia32"
+DLINK_FLAGS = $(DLINK_FLAGS) /MACHINE:I386
+!ENDIF
+
+!IF "$(ARCH)" == "X64"
+DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64" /LIBPATH:"%LLVM_PATH%\lib\clang\9.0.0\lib\windows"
+!ELSEIF "$(ARCH)" == "Ia32"
+DLINK_FLAGS = $(DLINK_FLAGS) /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86" /LIBPATH:"%LLVMx86_PATH%\lib\clang\9.0.0\lib\windows"
+!ENDIF
+
+!IF "$(ARCH)" == "X64"
+DLINK_FLAGS = $(DLINK_FLAGS) Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib ws2_32.lib clang_rt.asan_dynamic-x86_64.lib clang_rt.asan_dynamic_runtime_thunk-x86_64.lib clang_rt.fuzzer-x86_64.lib
+!ELSEIF "$(ARCH)" == "Ia32"
+DLINK_FLAGS = $(DLINK_FLAGS) Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib ws2_32.lib clang_rt.asan_dynamic-i386.lib clang_rt.asan_dynamic_runtime_thunk-i386.lib clang_rt.fuzzer-i386.lib
+!ENDIF
 #
 # Visual Studio
 #

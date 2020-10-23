@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-
-if(TOOLCHAIN STREQUAL "KLEE")
-    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/TestSpdmRequesterGetVersion
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/TestSpdmRequesterGetVersion
                         ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon
                         ${PROJECT_SOURCE_DIR}/Include
                         ${PROJECT_SOURCE_DIR}/Include/Hal 
@@ -10,19 +8,10 @@ if(TOOLCHAIN STREQUAL "KLEE")
                         ${PROJECT_SOURCE_DIR}/Library/SpdmRequesterLib
                         ${PROJECT_SOURCE_DIR}/UnitTest/Include
                         ${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/SpdmUnitFuzzingCommon
-                        $ENV{KLEE_SRC_PATH}/include
-    )
-else()
-    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/TestSpdmRequesterGetVersion
-                        ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon
-                        ${PROJECT_SOURCE_DIR}/Include
-                        ${PROJECT_SOURCE_DIR}/Include/Hal 
-                        ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
-                        ${PROJECT_SOURCE_DIR}/Library/SpdmCommonLib
-                        ${PROJECT_SOURCE_DIR}/Library/SpdmRequesterLib
-                        ${PROJECT_SOURCE_DIR}/UnitTest/Include
-                        ${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/SpdmUnitFuzzingCommon              
-    )
+)
+
+if(TOOLCHAIN STREQUAL "KLEE")  
+    INCLUDE_DIRECTORIES($ENV{KLEE_SRC_PATH}/include)        
 endif()
 
 SET(src_TestSpdmRequesterGetVersion
@@ -44,36 +33,21 @@ SET(TestSpdmRequesterGetVersion_LIBRARY
     SpdmTransportTestLib 
 )
 
-ADD_EXECUTABLE(TestSpdmRequesterGetVersion ${src_TestSpdmRequesterGetVersion})
-
-if(TOOLCHAIN STREQUAL "KLEE")
-    if(CRYPTO STREQUAL "MbedTls")
-        TARGET_LINK_LIBRARIES(TestSpdmRequesterGetVersion
-                              ${BaseMemoryLib_OBJECTS}
-                              ${DebugLib_OBJECTS}
-                              ${SpdmRequesterLib_OBJECTS}
-                              ${SpdmSecuredMessageLib_OBJECTS}
-                              ${MbedTlsLib_OBJECTS}
-                              ${RngLib_OBJECTS}
-                              ${SpdmCommonLib_OBJECTS}
-                              ${BaseCryptLibMbedTls_OBJECTS}
-                              ${MemoryAllocationLib_OBJECTS}
-                              ${SpdmTransportTestLib_OBJECTS}
-        )
-    else()
-        TARGET_LINK_LIBRARIES(TestSpdmRequesterGetVersion
-                              ${BaseMemoryLib_OBJECTS}
-                              ${DebugLib_OBJECTS}
-                              ${SpdmRequesterLib_OBJECTS}
-                              ${SpdmSecuredMessageLib_OBJECTS}
-                              ${OpensslLib_OBJECTS}
-                              ${RngLib_OBJECTS}
-                              ${SpdmCommonLib_OBJECTS}
-                              ${BaseCryptLibOpenssl_OBJECTS}
-                              ${MemoryAllocationLib_OBJECTS}
-                              ${SpdmTransportTestLib_OBJECTS}
-        )
-    endif()
+if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
+    ADD_EXECUTABLE(TestSpdmRequesterGetVersion 
+                   ${src_TestSpdmRequesterGetVersion}
+                   $<TARGET_OBJECTS:BaseMemoryLib>
+                   $<TARGET_OBJECTS:DebugLib>
+                   $<TARGET_OBJECTS:SpdmRequesterLib>
+                   $<TARGET_OBJECTS:SpdmCommonLib>
+                   $<TARGET_OBJECTS:${CRYPTO}Lib>
+                   $<TARGET_OBJECTS:RngLib>
+                   $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
+                   $<TARGET_OBJECTS:MemoryAllocationLib>
+                   $<TARGET_OBJECTS:SpdmSecuredMessageLib>
+                   $<TARGET_OBJECTS:SpdmTransportTestLib>
+    ) 
 else()
+    ADD_EXECUTABLE(TestSpdmRequesterGetVersion ${src_TestSpdmRequesterGetVersion})
     TARGET_LINK_LIBRARIES(TestSpdmRequesterGetVersion ${TestSpdmRequesterGetVersion_LIBRARY})
 endif()
