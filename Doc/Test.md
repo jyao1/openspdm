@@ -10,6 +10,36 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
 ## Run Test
 
+### Test other ARCH (ARM, AArch64, RiscV32, RiscV64)
+
+Linux support only.
+
+1) Install compiler:
+
+```
+sudo apt-get install gcc-arm-linux-gnueabi
+sudo apt-get install gcc-aarch64-linux-gnu
+sudo apt-get install gcc-riscv64-linux-gnu
+```
+
+2) Install [qemu](https://qemu.org).
+
+```
+sudo apt-get install build-essential pkg-config zlib1g-dev libglib2.0-0 libglib2.0-dev  libsdl2-dev libpixman-1-dev libfdt-dev autoconf automake libtool librbd-dev libaio-dev flex bison -y
+wget https://download.qemu.org/qemu-4.2.0.tar.xz
+tar xvf qemu-4.2.0.tar.xz
+cd qemu-4.2.0
+./configure --prefix=/usr/local/qemu --audio-drv-list=
+sudo make -j 8 && sudo make install
+sudo ln -s /usr/local/qemu/bin/* /usr/local/bin
+```
+
+3) Run test
+
+For ARM: `qemu-arm -L /usr/arm-linux-gnueabi <TestBinary>`
+For AArch64: `qemu-aarch64 -L /usr/aarch64-linux-gnu <TestBinary>`
+For RiscV64: `qemu-riscv64 -L /usr/riscv64-linux-gnu <TestBinary>`
+
 ### Collect Code Coverage
 
 1) Code Coverage in Windows with [DynamoRIO](https://dynamorio.org/)

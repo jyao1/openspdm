@@ -179,9 +179,7 @@
 
 ## Feature not implemented yet
 
-1) Other architectures such as Arm, AArch64, RiscV64, or Arc.
-
-2) Please refer to [issues](https://github.com/jyao1/openspdm/issues) for detail
+1) Please refer to [issues](https://github.com/jyao1/openspdm/issues) for detail
 
 ## Known limitation
 This package is only the sample code to show the concept.
