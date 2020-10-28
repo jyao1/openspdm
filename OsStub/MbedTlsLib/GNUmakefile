@@ -33,8 +33,8 @@ ifeq ("$(ARCH)","X64")
     CC_FLAGS += -DEFIX64
 else ifeq ("$(ARCH)","Ia32")
     CC_FLAGS += -DEFI32
-else
-    $(error unknown ARCH)
+else ifeq ("$(ARCH)","ARM")
+    CC_FLAGS += 
 endif
 
 #
