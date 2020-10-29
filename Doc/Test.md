@@ -21,6 +21,16 @@ sudo apt-get install gcc-arm-linux-gnueabi
 sudo apt-get install gcc-aarch64-linux-gnu
 sudo apt-get install gcc-riscv64-linux-gnu
 ```
+    Build RiscV32 compiler:
+    
+```
+sudo apt-get install autoconf automake autotools-dev curl python3 libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev
+git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
+cd riscv-gnu-toolchain
+./configure --prefix=/opt/riscv32 --with-arch=rv32gc --with-abi=ilp32d
+sudo make linux
+sudo ln -s /opt/riscv32/bin/* /usr/bin
+```
 
 2) Install [qemu](https://qemu.org).
 
@@ -38,6 +48,7 @@ sudo ln -s /usr/local/qemu/bin/* /usr/local/bin
 
 For ARM: `qemu-arm -L /usr/arm-linux-gnueabi <TestBinary>`
 For AArch64: `qemu-aarch64 -L /usr/aarch64-linux-gnu <TestBinary>`
+For RiscV32: `qemu-riscv32 -L /opt/riscv32/sysroot <TestBinary>`
 For RiscV64: `qemu-riscv64 -L /usr/riscv64-linux-gnu <TestBinary>`
 
 ### Collect Code Coverage
