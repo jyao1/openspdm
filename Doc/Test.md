@@ -10,7 +10,7 @@ Besides OsTest and UnitTest introduced in readme, openspdm also supports some ot
 
 ## Run Test
 
-### Test other ARCH (ARM, AArch64, RiscV32, RiscV64)
+### Test other ARCH (ARM, AArch64, RiscV32, RiscV64, ARC)
 
 Linux support only.
 
@@ -31,6 +31,27 @@ cd riscv-gnu-toolchain
 sudo make linux
 sudo ln -s /opt/riscv32/bin/* /usr/bin
 ```
+   Build ARC compiler:
+
+```
+sudo apt-get install -y texinfo byacc flex libncurses5-dev zlib1g-dev libexpat1-dev texlive build-essential git wget gawk bison xz-utils make python3 rsync locales
+mkdir arc_gnu
+cd arc_gnu
+git clone https://github.com/foss-for-synopsys-dwc-arc-processors/toolchain.git
+git clone https://github.com/foss-for-synopsys-dwc-arc-processors/binutils-gdb.git binutils
+git clone https://github.com/foss-for-synopsys-dwc-arc-processors/gcc.git
+git clone --reference binutils https://github.com/foss-for-synopsys-dwc-arc-processors/binutils-gdb.git gdb
+git clone https://github.com/foss-for-synopsys-dwc-arc-processors/newlib.git
+git clone https://github.com/wbx-github/uclibc-ng.git # For For Linux uClibc toolchain
+git clone https://github.com/foss-for-synopsys-dwc-arc-processors/glibc.git # For Linux glibc toolchain
+git clone https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git linux
+
+cd toolchain
+./build-all.sh --no-elf32 --cpu hs38 --install-dir $INSTALL_ROOT 
+# This command will build toolchain for ARC HS Linux development, for other ARC cores please refer to https://github.com/foss-for-synopsys-dwc-arc-processors/toolchain/blob/arc-releases/README.md
+
+sudo ln -s /<work_dir>/arc_gnu/toolchain/bin/* /usr/bin
+```
 
 2) Install [qemu](https://qemu.org).
 
@@ -47,8 +68,11 @@ sudo ln -s /usr/local/qemu/bin/* /usr/local/bin
 3) Run test
 
 For ARM: `qemu-arm -L /usr/arm-linux-gnueabi <TestBinary>`
+
 For AArch64: `qemu-aarch64 -L /usr/aarch64-linux-gnu <TestBinary>`
+
 For RiscV32: `qemu-riscv32 -L /opt/riscv32/sysroot <TestBinary>`
+
 For RiscV64: `qemu-riscv64 -L /usr/riscv64-linux-gnu <TestBinary>`
 
 ### Collect Code Coverage

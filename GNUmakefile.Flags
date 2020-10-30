@@ -27,6 +27,8 @@ else ifeq ("$(ARCH)","RiscV32")
     $(echo ARCH=RiscV32)
 else ifeq ("$(ARCH)","RiscV64")
     $(echo ARCH=RiscV64)
+else ifeq ("$(ARCH)","ARC")
+    $(echo ARCH=ARC)
 else
     $(error unknown ARCH)
 endif
@@ -43,6 +45,8 @@ else ifeq ("$(TOOLCHAIN)","RISCV32_GCC")
     $(info TOOLCHAIN=RISCV32_GCC)  
 else ifeq ("$(TOOLCHAIN)","RISCV64_GCC")
     $(info TOOLCHAIN=RISCV64_GCC)    
+else ifeq ("$(TOOLCHAIN)","ARC_GCC")
+    $(info TOOLCHAIN=ARC_GCC)  
 else ifeq ("$(TOOLCHAIN)","CBMC")
     $(info TOOLCHAIN=CBMC)
 else ifeq ("$(TOOLCHAIN)","AFL")
@@ -176,6 +180,22 @@ else ifeq ("$(TOOLCHAIN)","RISCV64_GCC")
     SLINK = riscv64-linux-gnu-gcc-ar
 
     DLINK = riscv64-linux-gnu-gcc
+    DLINK_OBJECT_FILES = -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group
+    DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
+    DLINK_FLAGS2 = -Wno-error -no-pie
+    DLINK_FLAGS += --coverage -lgcov -fprofile-arcs -ftest-coverage
+
+else ifeq ("$(TOOLCHAIN)","ARC_GCC")
+    CC = arc-linux-gcc
+    CC_FLAGS = -c -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common -fno-stack-protector -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -Wno-maybe-uninitialized -Wno-uninitialized  -Wno-builtin-declaration-mismatch -Wno-nonnull-compare
+    MBEDTLS_FLAGS = 
+    OPENSSL_FLAGS = -include Base.h -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable
+    CMOCKA_FLAGS = -std=gnu99 -Wpedantic -Wall -Wshadow -Wmissing-prototypes -Wcast-align -Werror=address -Wstrict-prototypes -Werror=strict-prototypes -Wwrite-strings -Werror=write-strings -Werror-implicit-function-declaration -Wpointer-arith -Werror=pointer-arith -Wdeclaration-after-statement -Werror=declaration-after-statement -Wreturn-type -Werror=return-type -Wuninitialized -Werror=uninitialized -Werror=strict-overflow -Wstrict-overflow=2 -Wno-format-zero-length -Wmissing-field-initializers -Wformat-security -Werror=format-security -fno-common -Wformat -fno-common -fstack-protector-strong
+    CC_FLAGS += --coverage -fprofile-arcs -ftest-coverage
+
+    SLINK = arc-linux-gcc-ar
+
+    DLINK = arc-linux-gcc
     DLINK_OBJECT_FILES = -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group
     DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
     DLINK_FLAGS2 = -Wno-error -no-pie

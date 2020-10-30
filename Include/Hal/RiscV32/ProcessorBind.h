@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types for RISC-V
 
-  Copyright (c) 2016 - 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -105,7 +105,7 @@ typedef INT32   INTN __attribute__ ((aligned (4)));
 ///
 /// Maximum legal RISC-V INTN and UINTN values.
 ///
-#define MAX_INTN   ((INTN)0x7FFFFFF)
+#define MAX_INTN   ((INTN)0x7FFFFFFF)
 #define MAX_UINTN  ((UINTN)0xFFFFFFFF)
 
 ///
