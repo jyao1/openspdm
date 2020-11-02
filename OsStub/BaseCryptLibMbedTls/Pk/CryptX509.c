@@ -837,7 +837,7 @@ X509GetVersion (
   RETURN_STATUS ReturnStatus;
 
   if (Cert == NULL) {
-    return FALSE;
+    return RETURN_INVALID_PARAMETER;
   }
 
   ReturnStatus = RETURN_INVALID_PARAMETER;
@@ -893,7 +893,7 @@ X509GetSerialNumber (
   RETURN_STATUS ReturnStatus;
 
   if (Cert == NULL) {
-    return FALSE;
+    return RETURN_INVALID_PARAMETER;
   }
 
   ReturnStatus = RETURN_INVALID_PARAMETER;
@@ -1055,7 +1055,7 @@ X509GetIssuerOrganizationName (
   IN OUT  UINTN         *NameBufferSize
   )
 {
-return InternalX509GetIssuerNIDName (Cert, CertSize, (UINT8 *)OID_organizationName, sizeof (OID_organizationName), NameBuffer, NameBufferSize);
+  return InternalX509GetIssuerNIDName (Cert, CertSize, (UINT8 *)OID_organizationName, sizeof (OID_organizationName), NameBuffer, NameBufferSize);
 }
 
 /**

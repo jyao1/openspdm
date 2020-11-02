@@ -96,6 +96,30 @@ X509StackFree (
 }
 
 /**
+  Retrieve the tag and length of the tag.
+
+  @param Ptr      The position in the ASN.1 data
+  @param End      End of data
+  @param Length   The variable that will receive the length
+  @param Tag      The expected tag
+
+  @retval      TRUE   Get tag successful
+  @retval      FALSe  Failed to get tag or tag not match
+**/
+BOOLEAN
+EFIAPI
+Asn1GetTag (
+  IN OUT UINT8  **Ptr,
+  IN     UINT8  *End,
+     OUT UINTN  *Length,
+  IN     UINT32 Tag
+  )
+{
+  ASSERT(FALSE);
+  return FALSE;
+}
+
+/**
   Retrieve the subject bytes from one X.509 certificate.
 
   @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
@@ -379,4 +403,397 @@ X509GetTBSCert (
 {
   ASSERT(FALSE);
   return FALSE;
+}
+
+
+/**
+  Retrieve the version from one X.509 certificate.
+
+  If Cert is NULL, then return FALSE.
+  If CertSize is 0, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     Version      Pointer to the retrieved version integer.
+
+  @retval RETURN_SUCCESS           The certificate version retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If  Cert is NULL or CertSize is Zero.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetVersion (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  OUT     UINTN          *Version
+  )
+{
+  ASSERT(FALSE);
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Retrieve the serialNumber from one X.509 certificate.
+
+  If Cert is NULL, then return FALSE.
+  If CertSize is 0, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     SerialNumber  Pointer to the retrieved certificate SerialNumber bytes.
+  @param[in, out] SerialNumberSize  The size in bytes of the SerialNumber buffer on input,
+                               and the size of buffer returned SerialNumber on output.
+
+  @retval RETURN_SUCCESS           The certificate serialNumber retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL or CertSize is Zero.
+                                   If SerialNumberSize is NULL.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no SerialNumber exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the SerialNumber is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   SerialNumberSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+EFIAPI
+X509GetSerialNumber (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  OUT     UINT8         *SerialNumber,  OPTIONAL
+  IN OUT  UINTN         *SerialNumberSize
+  )
+{
+  ASSERT(FALSE);
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Retrieve the issuer bytes from one X.509 certificate.
+
+  If Cert is NULL, then return FALSE.
+  If CertIssuerSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     CertIssuer  Pointer to the retrieved certificate subject bytes.
+  @param[in, out] CertIssuerSize  The size in bytes of the CertIssuer buffer on input,
+                               and the size of buffer returned CertSubject on output.
+
+  @retval  TRUE   The certificate issuer retrieved successfully.
+  @retval  FALSE  Invalid certificate, or the CertIssuerSize is too small for the result.
+                  The CertIssuerSize will be updated with the required size.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+X509GetIssuerName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     UINT8        *CertIssuer,
+  IN OUT  UINTN        *CertIssuerSize
+  )
+{
+  ASSERT(FALSE);
+  return FALSE;
+}
+
+/**
+  Retrieve the issuer common name (CN) string from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     CommonName       Buffer to contain the retrieved certificate issuer common
+                                   name string. At most CommonNameSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,
+                                   and the size of buffer returned CommonName on output.
+                                   If CommonName is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate Issuer CommonName retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If CommonNameSize is NULL.
+                                   If CommonName is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no CommonName entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the CommonName is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetIssuerCommonName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     CHAR8        *CommonName,  OPTIONAL
+  IN OUT  UINTN        *CommonNameSize
+  )
+{
+  ASSERT(FALSE);
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Retrieve the issuer organization name (O) string from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     NameBuffer       Buffer to contain the retrieved certificate issuer organization
+                                   name string. At most NameBufferSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  NameBufferSize   The size in bytes of the Name buffer on input,
+                                   and the size of buffer returned Name on output.
+                                   If NameBuffer is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_SUCCESS           The certificate issuer Organization Name retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If NameBufferSize is NULL.
+                                   If NameBuffer is not NULL and *CommonNameSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no Organization Name entry exists.
+  @retval RETURN_BUFFER_TOO_SMALL  If the NameBuffer is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   CommonNameSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetIssuerOrganizationName (
+  IN      CONST UINT8   *Cert,
+  IN      UINTN         CertSize,
+  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  IN OUT  UINTN         *NameBufferSize
+  )
+{
+  ASSERT(FALSE);
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Retrieve the Signature Algorithm from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Oid              Signature Algorithm Object identifier buffer.
+  @param[in,out]  OidSize          Signature Algorithm Object identifier buffer size
+
+  @retval RETURN_SUCCESS           The certificate Extension data retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If OidSize is NULL.
+                                   If Oid is not NULL and *OidSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no SignatureType.
+  @retval RETURN_BUFFER_TOO_SMALL  If the Oid is NULL. The required buffer size
+                                   is returned in the OidSize.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+EFIAPI
+X509GetSignatureAlgorithm (
+  IN CONST UINT8       *Cert,
+  IN       UINTN       CertSize,
+     OUT   UINT8       *Oid,  OPTIONAL
+  IN OUT   UINTN       *OidSize
+  )
+{
+  ASSERT(FALSE);
+  return RETURN_UNSUPPORTED;
+}
+
+
+/**
+  Retrieve Extension data from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[in]      Oid              Object identifier buffer
+  @param[in]      OidSize          Object identifier buffer size
+  @param[out]     ExtensionData    Extension bytes.
+  @param[in, out] ExtensionDataSize Extension bytes size.
+
+  @retval RETURN_SUCCESS           The certificate Extension data retrieved successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If ExtensionDataSize is NULL.
+                                   If ExtensionData is not NULL and *ExtensionDataSize is 0.
+                                   If Certificate is invalid.
+  @retval RETURN_NOT_FOUND         If no Extension entry match Oid.
+  @retval RETURN_BUFFER_TOO_SMALL  If the ExtensionData is NULL. The required buffer size
+                                   is returned in the ExtensionDataSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+EFIAPI
+X509GetExtensionData (
+  IN     CONST UINT8 *Cert,
+  IN     UINTN       CertSize,
+  IN     UINT8       *Oid,
+  IN     UINTN       OidSize,
+     OUT UINT8       *ExtensionData,
+  IN OUT UINTN       *ExtensionDataSize
+  )
+{
+  ASSERT(FALSE);
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Retrieve the Validity from one X.509 certificate
+
+  If Cert is NULL, then return FALSE.
+  If CertIssuerSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize     Size of the X509 certificate in bytes.
+  @param[out]     From         notBefore Pointer to DateTime object.
+  @param[in,out]  FromSize     notBefore DateTime object size.
+  @param[out]     To           notAfter Pointer to DateTime object.
+  @param[in,out]  ToSize       notAfter DateTime object size.
+
+  Note: X509CompareDateTime to compare DateTime oject
+        x509SetDateTime to get a DateTime object from a DateTimeStr
+
+  @retval  TRUE   The certificate Validity retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Validity retrieve failed.
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetValidity  (
+  IN     CONST UINT8 *Cert,
+  IN     UINTN       CertSize,
+  IN     UINT8       *From,
+  IN OUT UINTN       *FromSize,
+  IN     UINT8       *To,
+  IN OUT UINTN       *ToSize
+  )
+{
+  ASSERT(FALSE);
+  return FALSE;
+}
+
+/**
+  Retrieve the Key Usage from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Usage            Key Usage (CRYPTO_X509_KU_*)
+
+  @retval  TRUE   The certificate Key Usage retrieved successfully.
+  @retval  FALSE  Invalid certificate, or Usage is NULL
+  @retval  FALSE  This interface is not supported.
+**/
+BOOLEAN
+EFIAPI
+X509GetKeyUsage (
+  IN    CONST UINT8 *Cert,
+  IN    UINTN        CertSize,
+  OUT   UINTN        *Usage
+  )
+{
+  ASSERT(FALSE);
+  return FALSE;
+}
+
+/**
+  Retrieve the Extended Key Usage from one X.509 certificate.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     Usage            Key Usage bytes.
+  @param[in, out] UsageSize        Key Usage buffer sizs in bytes.
+
+  @retval RETURN_SUCCESS           The Usage bytes retrieve successfully.
+  @retval RETURN_INVALID_PARAMETER If Cert is NULL.
+                                   If CertSize is NULL.
+                                   If Usage is not NULL and *UsageSize is 0.
+                                   If Cert is invalid.
+  @retval RETURN_BUFFER_TOO_SMALL  If the Usage is NULL. The required buffer size
+                                   is returned in the UsageSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+EFIAPI
+X509GetExtendedKeyUsage (
+  IN     CONST UINT8   *Cert,
+  IN     UINTN         CertSize,
+     OUT UINT8         *Usage,
+  IN OUT UINTN         *UsageSize
+  )
+{
+  ASSERT(FALSE);
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Format a DateTime object into DataTime Buffer
+
+  If DateTimeStr is NULL, then return FALSE.
+  If DateTimeSize is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      DateTimeStr      DateTime string like YYYYMMDDhhmmssZ
+                                   Ref: https://www.w3.org/TR/NOTE-datetime
+                                   Z stand for UTC time
+  @param[out]     DateTime         Pointer to a DateTime object.
+  @param[in,out]  DateTimeSize     DateTime object buffer size.
+
+  @retval RETURN_SUCCESS           The DateTime object create successfully.
+  @retval RETURN_INVALID_PARAMETER If DateTimeStr is NULL.
+                                   If DateTimeSize is NULL.
+                                   If DateTime is not NULL and *DateTimeSize is 0.
+                                   If Year Month Day Hour Minute Second combination is invalid datetime.
+  @retval RETURN_BUFFER_TOO_SMALL  If the DateTime is NULL. The required buffer size
+                                   (including the final null) is returned in the
+                                   DateTimeSize parameter.
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+**/
+RETURN_STATUS
+EFIAPI
+X509SetDateTime (
+  CHAR8         *DateTimeStr,
+  IN OUT VOID   *DateTime,
+  IN OUT UINTN  *DateTimeSize
+  )
+{
+  ASSERT(FALSE);
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Compare DateTime1 object and DateTime2 object.
+
+  If DateTime1 is NULL, then return -2.
+  If DateTime2 is NULL, then return -2.
+  If DateTime1 == DateTime2, then return 0
+  If DateTime1 > DateTime2, then return 1
+  If DateTime1 < DateTime2, then return -1
+
+  @param[in]      DateTime1         Pointer to a DateTime Ojbect
+  @param[in]      DateTime2         Pointer to a DateTime Object
+
+  @retval  0      If DateTime1 == DateTime2
+  @retval  1      If DateTime1 > DateTime2
+  @retval  -1     If DateTime1 < DateTime2
+**/
+INTN
+EFIAPI
+X509CompareDateTime (
+  IN    VOID   *DateTime1,
+  IN    VOID   *DateTime2
+  )
+{
+  ASSERT(FALSE);
+  return -3;
 }
