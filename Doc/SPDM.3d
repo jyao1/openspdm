@@ -1,0 +1,44 @@
+UINT32 enum SPDMReqCode {
+  GET_DIGESTS = 129,            // 0x81 GET_DIGESTS request message format
+  GET_CERTIFICATE = 130,        // 0x82 GET_CERTIFICATE request message format
+  CHALLENGE = 131,              // 0x83 CHALLENGE request message format
+  GET_VERSION = 132,            // 0x84 GET_VERSION request message format
+  GET_MEASUREMENTS = 224,       // 0xE0 GET_MEASUREMENTS request message format
+  GET_CAPABILITIES = 225,       // 0xE1 GET_CAPABILITIES request message format
+  NEGOTIATE_ALGORITHMS = 227,   // 0xE3 NEGOTIATE_ALGORITHMS request message format
+  KEY_EXCHANGE,                 // 0xE4 KEY_EXCHANGE request message format
+  FINISH,                       // 0xE5 FINISH request message format
+  PSK_EXCHANGE,                 // 0xE6 PSK_EXCHANGE request message format
+  PSK_FINISH,                   // 0xE7 PSK_FINISH request message format
+  HEARTBEAT,                    // 0xE8 HEARTBEAT request message format
+  KEY_UPDATE,                   // 0xE9 KEY_UPDATE request message format
+  GET_ENCAPSULATED_REQUEST,     // 0xEA GET_ENCAPSULATED_REQUEST request message format
+  DELIVER_ENCAPSULATED_RESPONSE,// 0xEB DELIVER_ENCAPSULATED_RESPONSE request message format
+  END_SESSION,                  // 0xEC END_SESSION request message format
+  VENDOR_DEFINED_REQUEST = 254, // 0xFE VENDOR_DEFINED_REQUEST request message format
+  RESPOND_IF_READY = 255,       // 0xFF RESPOND_IF_READY request message format
+}
+
+entrypoint typedef struct _GET_VERSION_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode;
+  UINT8 Param1;
+  UINT8 Param2;
+} GET_VERSION_REQUEST_MESSAGE;
+
+entrypoint typedef struct _VersionNumberEntry {
+  UINT8 Alpha : 4;
+  UINT8 UpdateVersionNumber: 4; // Version of the specification with editorial updates but no functionality additions or changes. Informational; possible errata fixes. Ignore when checking versions for interoperability.
+  UINT8 MinorVersion : 4; // Version of the specification with changes that are compatible with functions in earlier minor versions of this major version specification.
+  UINT8 MajorVersion: 4;  // Version of the specification with changes that are incompatible with one or more functions in earlier major versions of the specification.
+} VersionNumberEntry;
+
+entrypoint typedef struct _SuccessfulVERSIONResponse {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode;
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 Reserved;
+  UINT8 VersionNumberEntryCount;
+  VersionNumberEntry VersionNumberEntries[(UINT32)VersionNumberEntryCount];
+} SuccessfulVERSIONResponse;
