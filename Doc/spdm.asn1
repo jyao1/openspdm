@@ -1,0 +1,538 @@
+/** @file
+  Definitions of Security Protocol & Data Model Specification (SPDM)
+  version 1.1.0 in Distributed Management Task Force (DMTF).
+
+Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+SPDM DEFINITIONS ::=BEGIN
+    UINT8 ::= INTEGER (0..255)
+    UINT16 ::= INTEGER (0..65535)
+    UINT32 ::= INTEGER (0..4294967295)
+    UINT24 ::= OCTET STRING (SIZE(3))
+
+    /* header */
+    SpdmRequestResponseCode ::= ENUMERATED {
+        digests                   (1),
+        certificate               (2),
+        challengeAuth             (3),
+        version                   (4),
+        measurements             (96), -- 0x60
+        capabilities             (97), -- 0x61
+        algorithms               (99), -- 0x63
+        keyExchangeRsp          (100), -- 0x64
+        finishRsp               (101), -- 0x65
+        pskExchangeRsp          (102), -- 0x66
+        pskFinishRsp            (103), -- 0x67
+        heartBeatAck            (104), -- 0x68
+        keyUpdateAck            (105), -- 0x69
+        encapsulatedRequest     (106), -- 0x6A
+        encapsulatedResponseAck (107), -- 0x6B
+        endSessionAck           (108), -- 0x6C
+        vendorDefinedResponse   (126), -- 0x7E
+        error                   (127), -- 0x7F
+
+        getDigests                  (129), -- 0x81
+        getCertificate              (130), -- 0x82
+        challenge                   (131), -- 0x83
+        getVersion                  (132), -- 0x84
+        getMeasurements             (224), -- 0xE0
+        getCapabilities             (225), -- 0xE1
+        negotiateAlgorithms         (227), -- 0xE3
+        keyExchange                 (228), -- 0xE4
+        finish                      (229), -- 0xE5
+        pskExchange                 (230), -- 0xE6
+        pskFinish                   (231), -- 0xE7
+        heartBeat                   (232), -- 0xE8
+        keyUpdate                   (233), -- 0xE9
+        getEncapsulatedRequest      (234), -- 0xEA
+        deliverEncapsulatedResponse (235), -- 0xEB
+        endSession                  (236), -- 0xEC
+        vendorDefinedRequest        (254), -- 0xFE
+        respondIfReady              (255)  -- 0xFF
+    }
+
+    SpdmMessageHeader ::= SEQUENCE {
+        spdmVersion          UINT8,
+        requestResponseCode  UINT8,
+        param1               UINT8,
+        param2               UINT8
+    }
+
+    SpdmDigest ::= SEQUENCE {
+        digest                      OCTET STRING
+    }
+
+    SpdmSignature ::= SEQUENCE {
+        signature                   OCTET STRING
+    }
+
+    SpdmHmac ::= SEQUENCE {
+        hmac                        OCTET STRING
+    }
+
+    SpdmExchangeData ::= SEQUENCE {
+        exchangeData                OCTET STRING
+    }
+
+    /* GET_VERSION request */
+    SpdmGetVersionRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* VERSION response */
+    SpdmVersionNumber ::= SEQUENCE {
+        alphaAndUpdate       UINT8,
+        version              UINT8
+    }
+
+    SpdmVersionResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        reserved                    UINT8,
+        versionNumberEntryCount     UINT8,
+        versionNumberEntry          SEQUENCE OF SpdmVersionNumber
+    }
+
+    /* GET_CAPABILITIES request */
+    SpdmGetCapabilitisRequestFlags ::= BIT STRING {
+        certCap                (1),
+        chalCap                (2),
+        measCapNoSig           (3),
+        measCapSig             (4),
+        measFreshCap           (5),
+        encryptCap             (6),
+        macCap                 (7),
+        mutAuthCap             (8),
+        keyExCap               (9),
+        pskCapRequester        (10),
+        encapCap               (12),
+        hBeatCap               (13),
+        keyUpdCap              (14),
+        handShakeInTheClearCap (15),
+        pubKeyIdCap            (16)
+    }
+
+    SpdmGetCapabilitiesRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        reserved                    UINT8,
+        ctExponent                  UINT8,
+        reserved2                   UINT16,
+        flags                       UINT32
+    }
+
+    /* CAPABILITIES response */
+    SpdmGetCapabilitisResponseFlags ::= BIT STRING {
+        cacheCap                    (0),
+        certCap                     (1),
+        chalCap                     (2),
+        measCapNoSig                (3),
+        measCapSig                  (4),
+        measFreshCap                (5),
+        encryptCap                  (6),
+        macCap                      (7),
+        mutAuthCap                  (8),
+        keyExCap                    (9),
+        pskCapResponder            (10),
+        pskCapResponderWithContext (11),
+        encapCap                   (12),
+        hBeatCap                   (13),
+        keyUpdCap                  (14),
+        handShakeInTheClearCap     (15),
+        pubKeyIdCap                (16)
+    }
+
+    SpdmCapabilitiesResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        reserved                    UINT8,
+        ctExponent                  UINT8,
+        reserved2                   UINT16,
+        flags                       UINT32
+    }
+
+    /* NEGOTIATE_ALGORITHMS request */
+    SpdmExtendedAlgorithmRegistryId ::= ENUMERATED {
+        dmtf    (0),
+        tcg     (1),
+        usb     (2),
+        pcisig  (3),
+        iana    (4),
+        hdbaset (5),
+        mipi    (6),
+        cxl     (7),
+        jedec   (8)
+    }
+
+    SpdmExtendedAlgorithm ::= SEQUENCE {
+        registryID                  UINT8,
+        reserved                    UINT8,
+        algorithmID                 UINT16
+    }
+
+    SpdmNegotiateAlgorithmStructTableAlgoType ::= ENUMERATED {
+        dhe            (0),
+        aead           (1),
+        reqBaseAsymAlg (2),
+        keySchedule    (3)
+    }
+
+    SpdmNegotiateAlgorithmStructTable ::= SEQUENCE {
+        algType                     UINT8,
+        algCount                    UINT8,
+        algSupported                UINT16
+    }
+
+    SpdmAlgorithmBaseAsymAlgo ::= BIT STRING {
+        rsaSsa2048       (0),
+        rsaPss2048       (1),
+        rsaSsa3072       (2),
+        rsaPss3072       (3),
+        ecdsaEccNistP256 (4),
+        rsaSsa4096       (5),
+        rsaPss4096       (6),
+        ecdsaEccNistP384 (7),
+        ecdsaEccNistP521 (8)
+    }
+
+    SpdmAlgorithmBaseHashAlgo ::= BIT STRING {
+        sha256     (0),
+        sha384     (1),
+        sha512     (2),
+        sha3Set256 (3),
+        sha3Set384 (4),
+        sha3Set512 (5)
+    }
+
+    SpdmAlgorithmDheNamedGroup ::= BIT STRING {
+        ffdhe2048 (0),
+        ffdhe3072 (1),
+        ffdhe4096 (2),
+        secp256R1 (3),
+        secp384R1 (4),
+        secp521R1 (5)
+    }
+
+    SpdmAlgorithmAead ::= BIT STRING {
+        aes128gcm        (0),
+        aes256gcm        (1),
+        chacha20poly1305 (2)
+    }
+
+    SpdmAlgorithmReqBaseAsymAlg ::= BIT STRING {
+        rsaSsa2048       (0),
+        rsaPss2048       (1),
+        rsaSsa3072       (2),
+        rsaPss3072       (3),
+        ecdsaEccNistP256 (4),
+        rsaSsa4096       (5),
+        rsaPss4096       (6),
+        ecdsaEccNistP384 (7),
+        ecdsaEccNistP521 (8)
+    }
+
+    SpdmAlgorithmKeyShedule ::= BIT STRING {
+        hmacHash (0)
+    }
+
+    SpdmNegotiateAlgorithmRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        length                      UINT16,
+        measurementSpecification    UINT8,
+        reserved                    UINT8,
+        baseAsymAlgo                UINT32,
+        baseHashAlgo                UINT32,
+        reserved2                   OCTET STRING (SIZE (12)),
+        extAsymCount                UINT8,
+        extHashCount                UINT8,
+        reserved3                   UINT16,
+        extAsym                     SEQUENCE OF SpdmExtendedAlgorithm,
+        extHash                     SEQUENCE OF SpdmExtendedAlgorithm,
+        algStruct                   SEQUENCE OF SpdmNegotiateAlgorithmStructTable
+    }
+
+    /* ALGORITHMS response */
+    SpdmAlgorithmsResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        length                      UINT16,
+        measurementSpecificationSel UINT8,
+        reserved                    UINT8,
+        measurementHashAlgo         UINT32,
+        baseAsymSel                 UINT32,
+        baseHashSel                 UINT32,
+        reserved2                   OCTET STRING (SIZE (12)),
+        extAsymSelCount             UINT8,
+        extHashSelCount             UINT8,
+        reserved3                   UINT16,
+        extAsymSel                  SEQUENCE OF SpdmExtendedAlgorithm,
+        extHashSel                  SEQUENCE OF SpdmExtendedAlgorithm,
+        algStruct                   SEQUENCE OF SpdmNegotiateAlgorithmStructTable
+    }
+
+    /* GET_DIGESTS request */
+    SpdmGetDigestsRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* DIGESTS response */
+    SpdmDigestsResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        digests                     SEQUENCE OF SpdmDigest
+    }
+
+    /* GET_CERTIFICATE request */
+    SpdmGetCertificateRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        offset                      UINT16,
+        length                      UINT16
+    }
+
+    /* CERTIFICATE response */
+    SpdmCertChain ::= SEQUENCE {
+        length                      UINT16,
+        reserved                    UINT16,
+        rootHash                    SpdmDigest,
+        certificates                OCTET STRING
+    }
+
+    SpdmCertificateResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        portionLength               UINT16,
+        remainderLength             UINT16,
+        certChain                   OCTET STRING
+    }
+
+    /* CHALLENGE request */
+    SpdmChallengeRequestHashType ::= ENUMERATED {
+        noMeasurementSummaryHash       (0),
+        tcbComponentMeasurementHash    (1),
+        allMeasurementHash           (255)
+    }
+
+    SpdmChallengeRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        nonce                       OCTET STRING (SIZE (32))
+    }
+
+    /* CHALLENGE_AUTH response */
+    SpdmChallengeAuthResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        certChainHash               SpdmDigest,
+        nonce                       OCTET STRING (SIZE (32)),
+        measurementSummaryHash      SpdmDigest,
+        opaqueLength                UINT16,
+        opaqueData                  OCTET STRING,
+        signature                   SpdmSignature
+    }
+
+    /* GET_MEASUREMENTS request */
+    SpdmGetMeasurementsAttributes ::= BIT STRING {
+        generateSignature       (0)
+    }
+
+    SpdmGetMeasurementsOperation ::= ENUMERATED {
+        totalNumberOfMeasurement       (0),
+        allMeasurements              (255)
+    }
+
+    SpdmGetMeasurementsRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        nonce                       OCTET STRING (SIZE (32)),
+        slotIDParam                 UINT8
+    }
+
+    /* MEASUREMENTS response */
+    SpdmMeasurementSpecification ::= ENUMERATED {
+        dmtf                           (0)
+    }
+
+    SpdmMeasurementBlockCommonHeader ::= SEQUENCE {
+        index                          UINT8,
+        measurementSpecification       UINT8,
+        measurementSize                UINT16
+    }
+
+    SpdmMeasurementDmtfSpecificationType ::= ENUMERATED {
+        immutableRom                   (0),
+        mutableFirmware                (1),
+        hardwareConfiguration          (2),
+        firmwareConfiguration          (3)
+    }
+
+    SpdmMeasurementBlockDmtfHeader ::= SEQUENCE {
+        dmtfSpecMeasurementValueType   UINT8,
+        dmtfSpecMeasurementValueSize   UINT8
+    }
+
+    SpdmMeasurementBlockDmtf ::= SEQUENCE {
+        measurementBlockCommonHeader   SpdmMeasurementBlockCommonHeader,
+        measurementBlockDmtfHeader     SpdmMeasurementBlockDmtfHeader,
+        hashValue                      SpdmDigest
+    }
+
+    SpdmMeasurementBlock ::= CHOICE {
+        dmtf                           SpdmMeasurementBlockDmtf
+    }
+
+    SpdmMeasurementsResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        numberOfBlocks              UINT8,
+        measurementRecordLength     UINT24,
+        measurementRecord           SEQUENCE OF SpdmMeasurementBlock,
+        nonce                       OCTET STRING (SIZE (32)),
+        opaqueLength                UINT16,
+        opaqueData                  OCTET STRING,
+        signature                   SpdmSignature
+    }
+
+    /* ERROR response */
+    SpdmErrorCode ::= ENUMERATED {
+        invalidRequest             (1),
+        busy                       (3),
+        unexpectedRequest          (4),
+        unspecified                (5),
+        unsupportedRequest         (7),
+        majorVersionMismatch      (65), -- 0x41
+        responseNotReady          (66), -- 0x42
+        requestResynch            (67)  -- 0x43
+    }
+
+    SpdmError ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        extendedErrorData           OCTET STRING
+    }
+
+    /* RESPONSE_IF_READY request */
+    SpdmResponseIfReady ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* KEY_EXCHANGE request */
+    SpdmKeyExchangeRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        reqSessionID                UINT16,
+        reserved                    UINT16,
+        randomData                  OCTET STRING (SIZE (32)),
+        exchangeData                SpdmExchangeData,
+        opaqueLength                UINT16,
+        opaqueData                  OCTET STRING
+    }
+
+    /* KEY_EXCHANGE response */
+    SpdmKeyExchangeResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        rspSessionID                UINT16,
+        mutAuthRequested            UINT8,
+        slotIDParam                 UINT8,
+        randomData                  OCTET STRING (SIZE (32)),
+        exchangeData                SpdmExchangeData,
+        measurementSummaryHash      SpdmDigest,
+        opaqueLength                UINT16,
+        opaqueData                  OCTET STRING,
+        signature                   SpdmSignature,
+        verifyData                  SpdmHmac
+    }
+
+    /* FINISH request */
+    SpdmFinishRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        signature                   SpdmSignature,
+        verifyData                  SpdmHmac
+    }
+
+    /* FINISH response */
+    SpdmFinishResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        verifyData                  SpdmHmac
+    }
+
+    /* PSK_EXCHANGE request */
+    SpdmPskExchangeRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        reqSessionID                UINT16,
+        pskHintLength               UINT16,
+        requesterContextLength      UINT16,
+        opaqueLength                UINT16,
+        pskHint                     OCTET STRING,
+        requesterContext            OCTET STRING,
+        opaqueData                  OCTET STRING
+    }
+
+    /* PSK_EXCHANGE response */
+    SpdmPskExchangeResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        rspSessionID                UINT16,
+        reserved                    UINT16,
+        responderContextLength      UINT16,
+        opaqueLength                UINT16,
+        measurementSummaryHash      SpdmDigest,
+        responderContext            OCTET STRING,
+        opaqueData                  OCTET STRING,
+        verifyData                  SpdmHmac
+    }
+
+    /* PSK_FINISH request */
+    SpdmPskFinishRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        verifyData                  SpdmHmac
+    }
+
+    /* PSK_FINISH response */
+    SpdmPskFinishResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* HEARTBEAT request */
+    SpdmHeartbeatRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* HEARTBEAT response */
+    SpdmHeartbeatResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* KEY_UPDATE request */
+    SpdmKeyUpdateRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* KEY_UPDATE response */
+    SpdmKeyUpdateResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* GET_ENCAPSULATED_REQUEST request */
+    SpdmGetEncapsulatedRequestRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* ENCAPSULATED_REQUEST response */
+    SpdmEncapsulatedRequestResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        encapsulatedRequest         OCTET STRING
+    }
+
+    /* DELIVER_ENCAPSULATED_RESPONSE request */
+    SpdmDeliverEncapsulatedResponseRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        encapsulatedResponse        OCTET STRING
+    }
+
+    /* ENCAPSULATED_RESPONSE_ACK response */
+    SpdmEncapsulatedResponseAckResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader,
+        encapsulatedRequest         OCTET STRING
+    }
+
+    /* END_SESSION request */
+    SpdmEndSessionRequest ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+    /* END_SESSION response */
+    SpdmEndSessionResponse ::= SEQUENCE {
+        header                      SpdmMessageHeader
+    }
+
+END
