@@ -1,0 +1,1 @@
+/home/ralves/generate_certificate_chain.sh
