@@ -37,6 +37,10 @@ extern UINT16  mUseKeyScheduleAlgo;
 
 #define SPDM_TEST_CONTEXT_SIGNATURE  SIGNATURE_32 ('S', 'T', 'C', 'S')
 
+#define TEST_CERT_MAXINT16  1
+#define TEST_CERT_MAXUINT16 2
+#define TEST_CERT_MAXUINT16_LARGER 3
+
 typedef struct {
   UINT32                            Signature;
   BOOLEAN                           IsRequester;
@@ -84,6 +88,15 @@ ReadRequesterPrivateCertificate (
 
 BOOLEAN
 ReadResponderPublicCertificateChain (
+  OUT VOID    **Data,
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
+  );
+
+BOOLEAN
+ReadResponderLongPublicCertificateChain (
+  IN  UINT16  CertId,
   OUT VOID    **Data,
   OUT UINTN   *Size,
   OUT VOID    **Hash,
