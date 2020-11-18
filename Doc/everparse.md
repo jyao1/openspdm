@@ -14,7 +14,7 @@ Video presentation:
 
 Prebuilt binary: 
 - https://github.com/project-everest/everparse/releases 
-- Download everparse_v2020.05.21_Windows_NT_x86_64.zip 
+- Download everparse_v2020.10.01_Windows_NT_x86_64.zip
 
 Doc page: 
 - https://project-everest.github.io/everparse/ 
@@ -24,10 +24,10 @@ Doc page:
 
 ### Download everparse
 
-Download [everparse](https://github.com/project-everest/everparse/releases/download/v2020.05.21/everparse_v2020.05.21_Windows_NT_x86_64.zip)
+Download [everparse](https://github.com/project-everest/everparse/releases/download/v2020.10.01/everparse_v2020.10.01_Windows_NT_x86_64.zip)
 
 Unzip it, such as C:\everparse
 
 ### Run everparse
 
-In SPDM.3d filder, run `<everparse path>\everparse.bat /3D SPDM`. It will generate SPDM.c
+In SPDM.3d filder, run `<path-to-everparse>\everparse.cmd SPDM.3d`. It will generate SPDM.c
