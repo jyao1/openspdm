@@ -27,13 +27,22 @@ UINT32 enum SPDM_RESPONSE_CODES {
   MEASUREMENTS = 96,               // 0x60 Successful MEASUREMENTS response message format
   CAPABILITIES = 97,               // 0x61 Successful CAPABILITIES response message format
   ALGORITHMS = 99,                 // 0x63 Successful ALGORITHMS response message format
+  KEY_EXCHANGE_RSP,                // 0x64 Successful KEY_EXCHANGE_RSP response message format
+  FINISH_RSP,                      // 0x65 Successful FINISH_RSP response message format
+  PSK_EXCHANGE_RSP,                // 0x66 PSK_EXCHANGE_RSP response message format
+  PSK_FINISH_RSP,                  // 0x67 Successful PSK_FINISH_RSP response message format
+  HEARTBEAT_ACK,                   // 0x68 ENCAPSULATED_RESPONSE_ACK response message format
+  KEY_UPDATE_ACK,                  // 0x69 KEY_UPDATE_ACK response message format
+  ENCAPSULATED_REQUEST,            // 0x6A ENCAPSULATED_REQUEST response message format
+  ENCAPSULATED_RESPONSE_ACK,       // 0x6B ENCAPSULATED_RESPONSE_ACK response message format
+  END_SESSION_ACK,                 // 0x6C END_SESSION_ACK response message format
   VENDOR_DEFINED_RESPONSE = 126,   // 0x7E VENDOR_DEFINED_RESPONSE response message format
   ERROR = 127,                     // 0x7F ERROR response message format
 }
 
 entrypoint typedef struct _GET_VERSION_REQUEST_MESSAGE {
   UINT8 SPDMVersion;
-  UINT8 RequestResponseCode;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x84 };
   UINT8 Param1;
   UINT8 Param2;
 } GET_VERSION_REQUEST_MESSAGE;
@@ -47,13 +56,140 @@ entrypoint typedef struct _VersionNumberEntry {
 
 entrypoint typedef struct _SUCCESSFUL_VERSION_RESPONSE_MESSAGE {
   UINT8 SPDMVersion;
-  UINT8 RequestResponseCode;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x04 };
   UINT8 Param1;
   UINT8 Param2;
   UINT8 Reserved;
   UINT8 VersionNumberEntryCount;
-  VersionNumberEntry VersionNumberEntries[:byte-size VersionNumberEntryCount];
+  VersionNumberEntry VersionNumberEntries[:byte-size sizeof(VersionNumberEntry)*VersionNumberEntryCount];
 } SUCCESSFUL_VERSION_RESPONSE_MESSAGE;
 
+entrypoint typedef struct _REQUESTER_FLAG {
+  UINT8 Reserved : 1;
+  UINT8 CERT_CAP : 1;
+  UINT8 CHAL_CAP : 1;
+  UINT8 MEAS_CAP : 2;
+  UINT8 MEAS_FRESH_CAP : 1;
+  UINT8 ENCRYPT_CAP : 1;
+  UINT8 MAC_CAP : 1;
+  UINT8 MUT_AUTH_CAP : 1;
+  UINT8 KEY_EX_CAP : 1;
+  UINT8 PSK_CAP : 2;
+  UINT8 ENCAP_CAP : 1;
+  UINT8 HBEAT_CAP : 1;
+  UINT8 KEY_UPD_CAP : 1;
+  UINT8 HANDSHAKE_IN_THE_CLEAR_CAP : 1;
+  UINT8 PUB_KEY_ID_CAP : 1;
+  UINT8 Reserved1 : 7;
+  UINT8 Reserved2 : 8;
+} REQUESTER_FLAG;
 
+entrypoint typedef struct _GET_CPABILITIES_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xE1 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 Reserved;
+  UINT8 CTExponent;
+  UINT16 Reserved1;
+  REQUESTER_FLAG Flags;
+} GET_CPABILITIES_REQUEST_MESSAGE;
+
+entrypoint typedef struct _RESPONDER_FLAG {
+  UINT8 CACHE_CAP : 1;
+  UINT8 CERT_CAP : 1;
+  UINT8 CHAL_CAP : 1;
+  UINT8 MEAS_CAP : 2;
+  UINT8 MEAS_FRESH_CAP : 1;
+  UINT8 ENCRYPT_CAP : 1;
+  UINT8 MAC_CAP : 1;
+  UINT8 MUT_AUTH_CAP : 1;
+  UINT8 KEY_EX_CAP : 1;
+  UINT8 PSK_CAP : 2;
+  UINT8 ENCAP_CAP : 1;
+  UINT8 HBEAT_CAP : 1;
+  UINT8 KEY_UPD_CAP : 1;
+  UINT8 HANDSHAKE_IN_THE_CLEAR_CAP : 1;
+  UINT8 PUB_KEY_ID_CAP : 1;
+  UINT8 Reserved1 : 7;
+  UINT8 Reserved2 : 8;
+} RESPONDER_FLAG;
+
+entrypoint typedef struct _SUCCESSFUL_CPABILITIES_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x61 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 Reserved;
+  UINT8 CTExponent;
+  UINT16 Reserved1;
+  RESPONDER_FLAG Flags;
+} SUCCESSFUL_CPABILITIES_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _DHE {
+  UINT8 AlgType { AlgType == 0x2};
+  UINT8 AlgCount;
+  UINT16 AlgSupported;
+  UINT32 AlgExternal[:byte-size sizeof(UINT32)*(AlgCount & 0x0F)];
+} DHE;
+
+entrypoint typedef struct _AEAD {
+  UINT8 AlgType { AlgType == 0x3};
+  UINT8 AlgCount;
+  UINT16 AlgSupported;
+  UINT32 AlgExternal[:byte-size sizeof(UINT32)*(AlgCount & 0x0F)];
+} AEAD;
+
+entrypoint typedef struct _ReqBaseAsymAlg {
+  UINT8 AlgType { AlgType == 0x4};
+  UINT8 AlgCount;
+  UINT16 AlgSupported;
+  UINT32 AlgExternal[:byte-size sizeof(UINT32)*(AlgCount & 0x0F)];
+} ReqBaseAsymAlg;
+
+entrypoint typedef struct _KeySchedule {
+  UINT8 AlgType { AlgType == 0x5};
+  UINT8 AlgCount;
+  UINT16 AlgSupported;
+  UINT32 AlgExternal[:byte-size sizeof(UINT32)*(AlgCount & 0x0F)];
+} KeySchedule;
+
+entrypoint typedef struct _NEGOTIATE_ALGORITHMS_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xE3 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 Length;
+  UINT8 MeasurementSpecification;
+  UINT8 Reserved;
+  UINT32 BaseAsymAlgo;
+  UINT32 BaseHashAlgo;
+  UINT8 Reserved1[12];
+  UINT8 ExtAsymCount;
+  UINT8 ExtHashCount;
+  UINT16 Reserved2;
+  UINT32 ExtAsym[:byte-size sizeof(UINT32)*ExtAsymCount];
+  UINT32 ExtHash[:byte-size sizeof(UINT32)*ExtHashCount];
+  UINT8 ReqAlgStruct[:byte-size sizeof(DHE)+sizeof(AEAD)+sizeof(ReqBaseAsymAlg)+sizeof(KeySchedule)];
+} NEGOTIATE_ALGORITHMS_REQUEST_MESSAGE;
+
+entrypoint typedef struct _SUCCESSFUL_ALGORITHMS_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode;
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 Length;
+  UINT8 MeasurementSpecificationSel;
+  UINT8 Reserved;
+  UINT32 MeasurementHashAlgo;
+  UINT32 BaseAsymSel;
+  UINT32 BaseHashSel;
+  UINT8 Reserved1[12];
+  UINT8 ExtAsymSelCount ;
+  UINT8 ExtHashSelCount;
+  UINT16 Reserved2;
+  UINT32 ExtAsym[:byte-size sizeof(UINT32)*ExtAsymSelCount];
+  UINT32 ExtHash[:byte-size sizeof(UINT32)*ExtHashSelCount];
+  UINT8 ReqAlgStruct[:byte-size sizeof(DHE)+sizeof(AEAD)+sizeof(ReqBaseAsymAlg)+sizeof(KeySchedule)];
+} SUCCESSFUL_ALGORITHMS_RESPONSE_MESSAGE;
 
