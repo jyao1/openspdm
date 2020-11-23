@@ -39,7 +39,7 @@ SpdmRequesterVerifyDigest (
   UINT8                                     CertBufferHash[MAX_HASH_SIZE];
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
-  
+
   CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
   CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
   if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
@@ -99,9 +99,9 @@ TrySpdmGetDigest (
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
   }
-  
+
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
- 
+
   if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
     SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   } else {
@@ -167,12 +167,12 @@ TrySpdmGetDigest (
 
   Result = SpdmRequesterVerifyDigest (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
   if (!Result) {
-    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-  
+
   if (SlotMask != NULL) {
     *SlotMask = SpdmResponse.Header.Param2;
   }
@@ -211,7 +211,7 @@ SpdmGetDigest (
   SPDM_DEVICE_CONTEXT    *SpdmContext;
   UINTN                   Retry;
   RETURN_STATUS           Status;
-  
+
   SpdmContext = Context;
   Retry = SpdmContext->RetryTimes;
   do {

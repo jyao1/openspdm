@@ -286,7 +286,7 @@ TrySpdmGetCertificate (
 
   Result = SpdmRequesterVerifyCertificateChain (SpdmContext, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
   if (!Result) {
-    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     Status = RETURN_SECURITY_VIOLATION;
     goto Done;
   }

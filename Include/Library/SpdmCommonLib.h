@@ -51,7 +51,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPDM_STATUS_ERROR_TCG_EXTEND_TPM_PCR         (SPDM_STATUS_ERROR + 0x20)
 #define SPDM_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE   (SPDM_STATUS_ERROR + 0x21)
 #define SPDM_STATUS_ERROR_CHALLENGE_FAILURE          (SPDM_STATUS_ERROR + 0x30)
-#define SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE        (SPDM_STATUS_ERROR + 0x31)
+#define SPDM_STATUS_ERROR_CERTIFICATE_FAILURE        (SPDM_STATUS_ERROR + 0x31)
 #define SPDM_STATUS_ERROR_NO_CERT_PROVISION          (SPDM_STATUS_ERROR + 0x32)
 #define SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE       (SPDM_STATUS_ERROR + 0x40)
 #define SPDM_STATUS_ERROR_NO_MUTUAL_AUTH             (SPDM_STATUS_ERROR + 0x41)
@@ -65,7 +65,7 @@ typedef enum {
   // SPDM capability
   //
   SpdmDataCapabilityFlags,
-  SpdmDataCapabilityCTExponent,  
+  SpdmDataCapabilityCTExponent,
   //
   // SPDM Algorithm setting
   //
@@ -402,7 +402,7 @@ SpdmRegisterPskHkdfExpandFunc (
                                        than zero, then this function will return RETURN_TIMEOUT if the
                                        time required to execute the message is greater
                                        than Timeout.
-                                       
+
   @retval RETURN_SUCCESS               The SPDM message is sent successfully.
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is sent to the device.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -439,7 +439,7 @@ RETURN_STATUS
                                        than zero, then this function will return RETURN_TIMEOUT if the
                                        time required to execute the message is greater
                                        than Timeout.
-                                       
+
   @retval RETURN_SUCCESS               The SPDM message is received successfully.
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is received from the device.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL, MessageSize is NULL or
