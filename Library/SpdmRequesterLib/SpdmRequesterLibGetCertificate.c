@@ -163,6 +163,7 @@ SpdmRequesterVerifyCertificateChain (
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  SlotNum                      The number of slot for the certificate chain.
+  @param  Length                       Length parameter in the get_certificate message (limited by MAX_SPDM_CERT_CHAIN_BLOCK_LEN).
   @param  CertChainSize                On input, indicate the size in bytes of the destination buffer to store the digest buffer.
                                        On output, indicate the size in bytes of the certificate chain.
   @param  CertChain                    A pointer to a destination buffer to store the certificate chain.
@@ -175,6 +176,7 @@ RETURN_STATUS
 TrySpdmGetCertificate (
   IN     VOID                 *Context,
   IN     UINT8                SlotNum,
+  IN     UINT16               Length,
   IN OUT UINTN                *CertChainSize,
      OUT VOID                 *CertChain
   )
@@ -188,6 +190,7 @@ TrySpdmGetCertificate (
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
 
   InitManagedBuffer (&CertificateChainBuffer, MAX_SPDM_MESSAGE_BUFFER_SIZE);
+  Length = MIN(Length, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
 
   SpdmContext = Context;
   if (((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0) ||
@@ -214,7 +217,7 @@ TrySpdmGetCertificate (
     SpdmRequest.Header.Param1 = SlotNum;
     SpdmRequest.Header.Param2 = 0;
     SpdmRequest.Offset = (UINT16)GetManagedBufferSize (&CertificateChainBuffer);
-    SpdmRequest.Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+    SpdmRequest.Length = Length;
     DEBUG((DEBUG_INFO, "Request (Offset 0x%x, Size 0x%x):\n", SpdmRequest.Offset, SpdmRequest.Length));
 
     Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
@@ -339,6 +342,40 @@ SpdmGetCertificate (
      OUT VOID                 *CertChain
   )
 {
+  return SpdmGetCertificateChooseLength(Context, SlotNum, MAX_SPDM_CERT_CHAIN_BLOCK_LEN, CertChainSize, CertChain);
+}
+
+/**
+  This function sends GET_CERTIFICATE
+  to get certificate chain in one slot from device.
+
+  This function verify the integrity of the certificate chain.
+  RootHash -> Root certificate -> Intermediate certificate -> Leaf certificate.
+
+  If the peer root certificate hash is deployed,
+  this function also verifies the digest with the root hash in the certificate chain.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SlotNum                      The number of slot for the certificate chain.
+  @param  Length                       Length parameter in the get_certificate message (limited by MAX_SPDM_CERT_CHAIN_BLOCK_LEN).
+  @param  CertChainSize                On input, indicate the size in bytes of the destination buffer to store the digest buffer.
+                                       On output, indicate the size in bytes of the certificate chain.
+  @param  CertChain                    A pointer to a destination buffer to store the certificate chain.
+
+  @retval RETURN_SUCCESS               The certificate chain is got successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmGetCertificateChooseLength (
+  IN     VOID                 *Context,
+  IN     UINT8                SlotNum,
+  IN     UINT16               Length,
+  IN OUT UINTN                *CertChainSize,
+     OUT VOID                 *CertChain
+  )
+{
   SPDM_DEVICE_CONTEXT    *SpdmContext;
   UINTN                   Retry;
   RETURN_STATUS           Status;
@@ -346,7 +383,7 @@ SpdmGetCertificate (
   SpdmContext = Context;
   Retry = SpdmContext->RetryTimes;
   do {
-    Status = TrySpdmGetCertificate(SpdmContext, SlotNum, CertChainSize, CertChain);
+    Status = TrySpdmGetCertificate(SpdmContext, SlotNum, Length, CertChainSize, CertChain);
     if (RETURN_NO_RESPONSE != Status) {
       return Status;
     }
@@ -354,4 +391,3 @@ SpdmGetCertificate (
 
   return Status;
 }
-
