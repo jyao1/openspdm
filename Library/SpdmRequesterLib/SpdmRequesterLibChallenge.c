@@ -294,7 +294,7 @@ TrySpdmChallenge (
   DEBUG((DEBUG_INFO, "\n"));
   Result = SpdmRequesterVerifyCertificateChainHash (SpdmContext, CertChainHash, HashSize);
   if (!Result) {
-    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
 
@@ -344,7 +344,7 @@ TrySpdmChallenge (
   InternalDumpHex (Signature, SignatureSize);
   Result = SpdmRequesterVerifyChallengeSignature (SpdmContext, Signature, SignatureSize);
   if (!Result) {
-    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
 
@@ -361,7 +361,7 @@ TrySpdmChallenge (
     Status = SpdmEncapsulatedRequest (SpdmContext, NULL, 0, NULL);
     DEBUG ((DEBUG_INFO, "SpdmChallenge - SpdmEncapsulatedRequest - %p\n", Status));
     if (RETURN_ERROR(Status)) {
-      SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
+      SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
       return RETURN_SECURITY_VIOLATION;
     }
   }
