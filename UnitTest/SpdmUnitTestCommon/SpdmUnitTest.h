@@ -40,6 +40,7 @@ extern UINT16  mUseKeyScheduleAlgo;
 #define TEST_CERT_MAXINT16  1
 #define TEST_CERT_MAXUINT16 2
 #define TEST_CERT_MAXUINT16_LARGER 3
+#define TEST_CERT_SMALL 4
 
 typedef struct {
   UINT32                            Signature;
@@ -95,7 +96,7 @@ ReadResponderPublicCertificateChain (
   );
 
 BOOLEAN
-ReadResponderLongPublicCertificateChain (
+ReadResponderPublicCertificateChainBySize (
   IN  UINT16  CertId,
   OUT VOID    **Data,
   OUT UINTN   *Size,
@@ -113,6 +114,15 @@ ReadRequesterPublicCertificateChain (
 
 BOOLEAN
 ReadResponderRootPublicCertificate (
+  OUT VOID    **Data,
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
+  );
+
+BOOLEAN
+ReadResponderRootPublicCertificateBySize (
+  IN  UINT16  CertId,
   OUT VOID    **Data,
   OUT UINTN   *Size,
   OUT VOID    **Hash,

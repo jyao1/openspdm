@@ -423,6 +423,13 @@ ReadRequesterPublicCertificateChain (
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
 
+  Res = SpdmVerifyCertificateChainData(FileData, FileSize);
+  if (!Res) {
+    free (FileData);
+    free (CertChain);
+    return Res;
+  }
+
   //
   // Get Root Certificate and calculate hash value
   //

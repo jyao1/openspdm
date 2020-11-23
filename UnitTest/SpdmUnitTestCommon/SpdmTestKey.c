@@ -226,6 +226,73 @@ ReadResponderRootPublicCertificate (
 }
 
 BOOLEAN
+ReadResponderRootPublicCertificateBySize (
+  IN  UINT16  ChainId,
+  OUT VOID    **Data,
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
+  )
+{
+  BOOLEAN             Res;
+  VOID                *FileData;
+  UINTN               FileSize;
+  SPDM_CERT_CHAIN     *CertChain;
+  UINTN               CertChainSize;
+  CHAR8               *File;
+
+  switch (ChainId) {
+  case TEST_CERT_SMALL:
+    File = "LongChains/Shorter1024B_ca.cert.der";
+    break;
+  case TEST_CERT_MAXINT16: // DataSize slightly smaller than MAX_INT16
+    File = "LongChains/ShorterMAXINT16_ca.cert.der";
+    break;
+  case TEST_CERT_MAXUINT16: // DataSize slightly smaller than MAX_UINT16
+    File = "LongChains/ShorterMAXUINT16_ca.cert.der";
+    break;
+  case TEST_CERT_MAXUINT16_LARGER: // DataSize larger than MAX_UINT16
+    File = "LongChains/LongerMAXUINT16_ca.cert.der";
+    break;
+  default:
+    assert (0);
+    return FALSE;
+  }
+  Res = ReadInputFile (File, &FileData, &FileSize);
+  if (!Res) {
+    return Res;
+  }
+
+  CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
+  CertChain = (VOID *)malloc (CertChainSize);
+  if (CertChain == NULL) {
+    free (FileData);
+    return FALSE;
+  }
+  CertChain->Length = (UINT16)CertChainSize;
+  CertChain->Reserved = 0;
+
+  Sha256HashAll (FileData, FileSize, (UINT8 *)(CertChain + 1));
+  CopyMem (
+    (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE,
+    FileData,
+    FileSize
+    );
+
+  *Data = CertChain;
+  *Size = CertChainSize;
+  if (Hash != NULL) {
+    *Hash = (CertChain + 1);
+  }
+  if (HashSize != NULL) {
+    *HashSize = SHA256_HASH_SIZE;
+  }
+
+  free (FileData);
+  return TRUE;
+}
+
+BOOLEAN
 ReadRequesterRootPublicCertificate (
   OUT VOID    **Data,
   OUT UINTN   *Size,
@@ -343,6 +410,13 @@ ReadResponderPublicCertificateChain (
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
 
+  Res = SpdmVerifyCertificateChainData(FileData, FileSize);
+  if (!Res) {
+    free (FileData);
+    free (CertChain);
+    return Res;
+  }
+
   //
   // Get Root Certificate and calculate hash value
   //
@@ -374,7 +448,7 @@ ReadResponderPublicCertificateChain (
 }
 
 BOOLEAN
-ReadResponderLongPublicCertificateChain (
+ReadResponderPublicCertificateChainBySize (
   IN  UINT16  ChainId,
   OUT VOID    **Data,
   OUT UINTN   *Size,
@@ -392,6 +466,9 @@ ReadResponderLongPublicCertificateChain (
   UINTN                RootCertLen;
 
   switch (ChainId) {
+  case TEST_CERT_SMALL: // DataSize smaller than 1024 Bytes
+    File = "LongChains/Shorter1024B_bundle_responder.certchain.der";
+    break;
   case TEST_CERT_MAXINT16: // DataSize slightly smaller than MAX_INT16
     File = "LongChains/ShorterMAXINT16_bundle_responder.certchain.der";
     break;
@@ -418,6 +495,13 @@ ReadResponderLongPublicCertificateChain (
   }
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
+
+  // Res = SpdmVerifyCertificateChainData(FileData, FileSize);
+  // if (!Res) {
+  //   free (FileData);
+  //   free (CertChain);
+  //   return Res;
+  // }
 
   //
   // Get Root Certificate and calculate hash value
@@ -498,6 +582,13 @@ ReadRequesterPublicCertificateChain (
   }
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
+
+  Res = SpdmVerifyCertificateChainData(FileData, FileSize);
+  if (!Res) {
+    free (FileData);
+    free (CertChain);
+    return Res;
+  }
 
   //
   // Get Root Certificate and calculate hash value

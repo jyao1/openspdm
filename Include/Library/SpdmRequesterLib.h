@@ -85,6 +85,37 @@ SpdmGetCertificate (
   );
 
 /**
+  This function sends GET_CERTIFICATE
+  to get certificate chain in one slot from device.
+
+  This function verify the integrity of the certificate chain.
+  RootHash -> Root certificate -> Intermediate certificate -> Leaf certificate.
+
+  If the peer root certificate hash is deployed,
+  this function also verifies the digest with the root hash in the certificate chain.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SlotNum                      The number of slot for the certificate chain.
+  @param  Length                       MAX_SPDM_CERT_CHAIN_BLOCK_LEN.
+  @param  CertChainSize                On input, indicate the size in bytes of the destination buffer to store the digest buffer.
+                                       On output, indicate the size in bytes of the certificate chain.
+  @param  CertChain                    A pointer to a destination buffer to store the certificate chain.
+
+  @retval RETURN_SUCCESS               The certificate chain is got successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmGetCertificateChooseLength (
+  IN     VOID                 *SpdmContext,
+  IN     UINT8                SlotNum,
+  IN     UINT16               Length,
+  IN OUT UINTN                *CertChainSize,
+     OUT VOID                 *CertChain
+  );
+
+/**
   This function sends CHALLENGE
   to authenticate the device based upon the key in one slot.
 
