@@ -61,10 +61,10 @@ SpdmGetResponseKeyUpdate (
     break;
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
     SpdmCreateUpdateSessionDataKey (Context, SessionId, SpdmKeyUpdateActionAll);
-    SpdmActivateUpdateSessionDataKey (Context, SessionId, TRUE, SpdmKeyUpdateActionResponder);
+    SpdmActivateUpdateSessionDataKey (Context, SessionId, SpdmKeyUpdateActionResponder, TRUE);
     break;
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
-    SpdmActivateUpdateSessionDataKey (Context, SessionId, TRUE, SpdmKeyUpdateActionRequester);
+    SpdmActivateUpdateSessionDataKey (Context, SessionId, SpdmKeyUpdateActionRequester, TRUE);
     break;
   default:
     SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
