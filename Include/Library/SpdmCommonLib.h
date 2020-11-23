@@ -567,4 +567,19 @@ SpdmRegisterTransportLayerFunc (
   IN     SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  TransportDecodeMessage
   );
 
+/**
+  This function verifies the integrity of a certificate chain
+
+  @param  CertBuffer                  A pointer to the certificate chain.
+  @param  CertBufferSize              The chain size
+
+  @retval TRUE  certificate chain integrity verification pass.
+  @retval FALSE certificate chain integrity verification fail.
+**/
+BOOLEAN
+SpdmVerifyCertificateChainData (
+  UINT8                                     *CertBuffer,
+  UINTN                                     CertBufferSize
+  );
+
 #endif
