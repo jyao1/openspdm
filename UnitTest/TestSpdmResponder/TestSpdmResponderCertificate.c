@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifdef TEST_DEBUG
 #define TEST_DEBUG_PRINT(format, ...) printf(format, ##__VA_ARGS__)
 #else
-#define TEST_DEBUG_PRINT
+#define TEST_DEBUG_PRINT(...)
 #endif
 
 SPDM_GET_CERTIFICATE_REQUEST    mSpdmGetCertificateRequest1 = {
@@ -53,6 +53,10 @@ SPDM_GET_CERTIFICATE_REQUEST    mSpdmGetCertificateRequest3 = {
 };
 UINTN mSpdmGetCertificateRequest3Size = sizeof(mSpdmGetCertificateRequest3);
 
+/**
+  Test 1: Request the first MAX_SPDM_CERT_CHAIN_BLOCK_LEN bytes of the certificate chain
+  Expected Behavior: generate a correctly formed Certficate message, including its PortionLength and RemainderLength fields
+**/
 void TestSpdmResponderCertificateCase1(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -65,9 +69,9 @@ void TestSpdmResponderCertificateCase1(void **state) {
 
   SpdmTestContext = *state;
   SpdmContext = &SpdmTestContext->SpdmContext;
-  SpdmTestContext->CaseId = 0x1;  
+  SpdmTestContext->CaseId = 0x1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG; 
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
@@ -79,13 +83,17 @@ void TestSpdmResponderCertificateCase1(void **state) {
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (ResponseSize, sizeof(SPDM_CERTIFICATE_RESPONSE) + MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
   SpdmResponse = (VOID *)Response;
-  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_CERTIFICATE);  
+  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_CERTIFICATE);
   assert_int_equal (SpdmResponse->Header.Param1, 0);
-  assert_int_equal (SpdmResponse->PortionLength, MAX_SPDM_CERT_CHAIN_BLOCK_LEN); 
+  assert_int_equal (SpdmResponse->PortionLength, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
   assert_int_equal (SpdmResponse->RemainderLength, DataSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
   free(Data);
 }
 
+/**
+  Test 2: Wrong GET_CERTIFICATE message size (larger than expected)
+  Expected Behavior: generate an ERROR_RESPONSE with code SPDM_ERROR_CODE_INVALID_REQUEST
+**/
 void TestSpdmResponderCertificateCase2(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -99,7 +107,7 @@ void TestSpdmResponderCertificateCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = &SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;  
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
@@ -118,6 +126,10 @@ void TestSpdmResponderCertificateCase2(void **state) {
   free(Data);
 }
 
+/**
+  Test 3: Force ResponseState = SpdmResponseStateBusy when asked GET_CERTIFICATE
+  Expected Behavior: generate an ERROR_RESPONSE with code SPDM_ERROR_CODE_BUSY
+**/
 void TestSpdmResponderCertificateCase3(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -152,6 +164,10 @@ void TestSpdmResponderCertificateCase3(void **state) {
   free(Data);
 }
 
+/**
+  Test 4: Force ResponseState = SpdmResponseStateNeedResync when asked GET_CERTIFICATE
+  Expected Behavior: generate an ERROR_RESPONSE with code SPDM_ERROR_CODE_REQUEST_RESYNCH
+**/
 void TestSpdmResponderCertificateCase4(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -186,6 +202,10 @@ void TestSpdmResponderCertificateCase4(void **state) {
   free(Data);
 }
 
+/**
+  Test 5: Force ResponseState = SpdmResponseStateNotReady when asked GET_CERTIFICATE
+  Expected Behavior: generate an ERROR_RESPONSE with code SPDM_ERROR_CODE_RESPONSE_NOT_READY and correct ErrorData
+**/
 void TestSpdmResponderCertificateCase5(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -223,6 +243,10 @@ void TestSpdmResponderCertificateCase5(void **state) {
   free(Data);
 }
 
+/**
+  Test 6: simulate wrong SpdmCmdReceiveState when asked GET_CERTIFICATE (missing SPDM_GET_DIGESTS_RECEIVE_FLAG and SPDM_GET_CAPABILITIES_RECEIVE_FLAG)
+  Expected Behavior: generate an ERROR_RESPONSE with code SPDM_ERROR_CODE_UNEXPECTED_REQUEST
+**/
 void TestSpdmResponderCertificateCase6(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -254,6 +278,10 @@ void TestSpdmResponderCertificateCase6(void **state) {
   free(Data);
 }
 
+/**
+  Test 7: request Length at the boundary of maximum integer values, while keeping offset 0
+  Expected Behavior: generate correctly formed Certficate messages, including its PortionLength and RemainderLength fields
+**/
 void TestSpdmResponderCertificateCase7(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -304,6 +332,10 @@ void TestSpdmResponderCertificateCase7(void **state) {
   free(Data);
 }
 
+/**
+  Test 8: request Offset at the boundary of maximum integer values, while keeping Length 0
+  Expected Behavior: generate correctly formed Certficate messages, including its PortionLength and RemainderLength fields
+**/
 void TestSpdmResponderCertificateCase8(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -317,7 +349,6 @@ void TestSpdmResponderCertificateCase8(void **state) {
 
   // Testing Offsets at the boundary of maximum integer values and at the boundary of certificate length (first three positions)
   UINT16               TestOffsets[] = {-1, 0, +1, 0, MAX_INT8, MAX_INT8+1, MAX_UINT8, MAX_INT16, MAX_INT16+1, MAX_UINT16, -1};
-  UINT16               ExpectedChunkSize;
 
   // Setting up the SpdmContext and loading a sample certificate chain
   SpdmTestContext = *state;
@@ -366,6 +397,10 @@ void TestSpdmResponderCertificateCase8(void **state) {
   free(Data);
 }
 
+/**
+  Test 9: request Offset and Length at the boundary of maximum integer values
+  Expected Behavior: generate correctly formed Certficate messages, including its PortionLength and RemainderLength fields
+**/
 void TestSpdmResponderCertificateCase9(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -445,6 +480,10 @@ void TestSpdmResponderCertificateCase9(void **state) {
   free(Data);
 }
 
+/**
+  Test 10: request MAX_SPDM_CERT_CHAIN_BLOCK_LEN bytes of long certificate chains, with the largest valid Offset
+  Expected Behavior: generate correctly formed Certficate messages, including its PortionLength and RemainderLength fields
+**/
 void TestSpdmResponderCertificateCase10(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -472,7 +511,8 @@ void TestSpdmResponderCertificateCase10(void **state) {
   mSpdmGetCertificateRequest3.Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
 
   for(int i=0; i<sizeof(TestCases)/sizeof(TestCases[0]); i++) {
-    ReadResponderLongPublicCertificateChain (TestCases[i], &Data, &DataSize, NULL, NULL);
+    ReadResponderPublicCertificateChainBySize (TestCases[i], &Data, &DataSize, NULL, NULL);
+
     SpdmContext->LocalContext.CertificateChain[0] = Data;
     SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
     SpdmContext->LocalContext.SlotCount = 1;
@@ -517,6 +557,136 @@ void TestSpdmResponderCertificateCase10(void **state) {
   }
 }
 
+/**
+  Test 11: request MAX_SPDM_CERT_CHAIN_BLOCK_LEN bytes of a short certificate chain (fits in 1 message)
+  Expected Behavior: generate correctly formed Certficate messages, including its PortionLength and RemainderLength fields
+**/
+void TestSpdmResponderCertificateCase11(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINTN                ResponseSize;
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE*5];
+  SPDM_CERTIFICATE_RESPONSE *SpdmResponse;
+  SPDM_ERROR_RESPONSE  *SpdmResponseError;
+  VOID                 *Data;
+  UINTN                DataSize;
+
+  UINT16               TestCases[] =   {TEST_CERT_SMALL};
+
+  UINTN                ExpectedChunkSize;
+  UINTN                ExpectedRemainder;
+
+  // Setting up the SpdmContext and loading a sample certificate chain
+  SpdmTestContext = *state;
+  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xB;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+
+  mSpdmGetCertificateRequest3.Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+  mSpdmGetCertificateRequest3.Offset = 0;
+
+  for(int i=0; i<sizeof(TestCases)/sizeof(TestCases[0]); i++) {
+    ReadResponderPublicCertificateChainBySize (TestCases[i], &Data, &DataSize, NULL, NULL);
+    SpdmContext->LocalContext.CertificateChain[0] = Data;
+    SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+    SpdmContext->LocalContext.SlotCount = 1;
+
+    TEST_DEBUG_PRINT("DataSize: %u\n",DataSize);
+    TEST_DEBUG_PRINT("mSpdmGetCertificateRequest3.Offset: %u\n",mSpdmGetCertificateRequest3.Offset);
+    TEST_DEBUG_PRINT("mSpdmGetCertificateRequest3.Length: %u\n",mSpdmGetCertificateRequest3.Length);
+    TEST_DEBUG_PRINT("Offset + Length: %u\n",mSpdmGetCertificateRequest3.Offset + mSpdmGetCertificateRequest3.Length);
+
+    // reseting an internal buffer to avoid overflow and prevent tests to succeed
+    ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
+    ResponseSize = sizeof(Response);
+    Status = SpdmGetResponseCertificate (SpdmContext, mSpdmGetCertificateRequest3Size, &mSpdmGetCertificateRequest3, &ResponseSize, Response);
+    assert_int_equal (Status, RETURN_SUCCESS);
+
+    // Expected received length is limited by MAX_SPDM_CERT_CHAIN_BLOCK_LEN and by the remaining length
+    ExpectedChunkSize = MIN(mSpdmGetCertificateRequest3.Length, DataSize - mSpdmGetCertificateRequest3.Offset);
+    ExpectedChunkSize = MIN(ExpectedChunkSize, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
+    // Expected certificate length left
+    ExpectedRemainder = DataSize - mSpdmGetCertificateRequest3.Offset - ExpectedChunkSize;
+
+    TEST_DEBUG_PRINT("ExpectedChunkSize %u\n",ExpectedChunkSize);
+    TEST_DEBUG_PRINT("ExpectedRemainder %u\n",ExpectedRemainder);
+
+    if (ExpectedRemainder > MAX_UINT16 || ExpectedChunkSize > MAX_UINT16) {
+      SpdmResponseError = (VOID *)Response;
+      assert_int_equal (SpdmResponseError->Header.RequestResponseCode, SPDM_ERROR);
+      assert_int_equal (SpdmResponseError->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
+    } else {
+      assert_int_equal (ResponseSize, sizeof(SPDM_CERTIFICATE_RESPONSE) + ExpectedChunkSize);
+      SpdmResponse = (VOID *)Response;
+      assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_CERTIFICATE);
+      assert_int_equal (SpdmResponse->Header.Param1, 0);
+      assert_int_equal (SpdmResponse->PortionLength, ExpectedChunkSize);
+      assert_int_equal (SpdmResponse->RemainderLength, ExpectedRemainder);
+    }
+
+    TEST_DEBUG_PRINT("\n");
+
+    free(Data);
+  }
+}
+
+/**
+  Test 12: Request a whole certificate chain byte by byte
+  Expected Behavior: generate correctly formed Certficate messages, including its PortionLength and RemainderLength fields
+**/
+void TestSpdmResponderCertificateCase12(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINTN                ResponseSize;
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  SPDM_CERTIFICATE_RESPONSE *SpdmResponse;
+  VOID                 *Data;
+  UINTN                DataSize;
+
+  UINT16               ExpectedChunkSize;
+
+  // Setting up the SpdmContext and loading a sample certificate chain
+  SpdmTestContext = *state;
+  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x7;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  SpdmContext->LocalContext.CertificateChain[0] = Data;
+  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.SlotCount = 1;
+
+  // This tests considers only Length = 1
+  mSpdmGetCertificateRequest3.Length = 1;
+  ExpectedChunkSize = 1;
+
+  // reseting an internal buffer to avoid overflow and prevent tests to succeed
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
+
+  for(UINTN offset=0; offset<DataSize; offset++) {
+    TEST_DEBUG_PRINT("offset:%u \n", offset);
+    mSpdmGetCertificateRequest3.Offset = offset;
+
+    ResponseSize = sizeof(Response);
+    Status = SpdmGetResponseCertificate (SpdmContext, mSpdmGetCertificateRequest3Size, &mSpdmGetCertificateRequest3, &ResponseSize, Response);
+    assert_int_equal (Status, RETURN_SUCCESS);
+    assert_int_equal (ResponseSize, sizeof(SPDM_CERTIFICATE_RESPONSE) + ExpectedChunkSize);
+    SpdmResponse = (VOID *)Response;
+    assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_CERTIFICATE);
+    assert_int_equal (SpdmResponse->Header.Param1, 0);
+    assert_int_equal (SpdmResponse->PortionLength, ExpectedChunkSize);
+    assert_int_equal (SpdmResponse->RemainderLength, DataSize - offset - ExpectedChunkSize);
+    assert_int_equal ( ((UINT8*) Data)[offset], (Response + sizeof(SPDM_CERTIFICATE_RESPONSE))[0]);
+    // printf("%u =? %u\n", , (Response + sizeof(SPDM_CERTIFICATE_RESPONSE))[0]);
+  }
+  free(Data);
+}
+
 
 SPDM_TEST_CONTEXT       mSpdmResponderCertificateTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
@@ -545,6 +715,11 @@ int SpdmResponderCertificateTestMain(void) {
     cmocka_unit_test(TestSpdmResponderCertificateCase9),
     // Tests large certificate chains
     cmocka_unit_test(TestSpdmResponderCertificateCase10),
+    // Certificate fits in one single message
+    cmocka_unit_test(TestSpdmResponderCertificateCase11),
+    // Requests byte by byte
+    cmocka_unit_test(TestSpdmResponderCertificateCase12),
+
   };
 
   SetupSpdmTestContext (&mSpdmResponderCertificateTestContext);
