@@ -126,32 +126,38 @@ entrypoint typedef struct _SUCCESSFUL_CPABILITIES_RESPONSE_MESSAGE {
   RESPONDER_FLAG Flags;
 } SUCCESSFUL_CPABILITIES_RESPONSE_MESSAGE;
 
+entrypoint typedef struct _EXTENDED_ALGORITHM_FIELD {
+  UINT8 RegistryID;
+  UINT8 Reserved;
+  UINT16 AlgorithmID;
+} EXTENDED_ALGORITHM_FIELD;
+
 entrypoint typedef struct _DHE {
   UINT8 AlgType { AlgType == 0x2};
   UINT8 AlgCount;
   UINT16 AlgSupported;
-  UINT32 AlgExternal[:byte-size sizeof(UINT32)*(AlgCount & 0x0F)];
+  EXTENDED_ALGORITHM_FIELD AlgExternal[:byte-size sizeof(EXTENDED_ALGORITHM_FIELD)*(AlgCount & 0x0F)];
 } DHE;
 
 entrypoint typedef struct _AEAD {
   UINT8 AlgType { AlgType == 0x3};
   UINT8 AlgCount;
   UINT16 AlgSupported;
-  UINT32 AlgExternal[:byte-size sizeof(UINT32)*(AlgCount & 0x0F)];
+  EXTENDED_ALGORITHM_FIELD AlgExternal[:byte-size sizeof(EXTENDED_ALGORITHM_FIELD)*(AlgCount & 0x0F)];
 } AEAD;
 
 entrypoint typedef struct _ReqBaseAsymAlg {
   UINT8 AlgType { AlgType == 0x4};
   UINT8 AlgCount;
   UINT16 AlgSupported;
-  UINT32 AlgExternal[:byte-size sizeof(UINT32)*(AlgCount & 0x0F)];
+  EXTENDED_ALGORITHM_FIELD AlgExternal[:byte-size sizeof(EXTENDED_ALGORITHM_FIELD)*(AlgCount & 0x0F)];
 } ReqBaseAsymAlg;
 
 entrypoint typedef struct _KeySchedule {
   UINT8 AlgType { AlgType == 0x5};
   UINT8 AlgCount;
   UINT16 AlgSupported;
-  UINT32 AlgExternal[:byte-size sizeof(UINT32)*(AlgCount & 0x0F)];
+  EXTENDED_ALGORITHM_FIELD AlgExternal[:byte-size sizeof(EXTENDED_ALGORITHM_FIELD)*(AlgCount & 0x0F)];
 } KeySchedule;
 
 entrypoint typedef struct _NEGOTIATE_ALGORITHMS_REQUEST_MESSAGE {
@@ -175,7 +181,7 @@ entrypoint typedef struct _NEGOTIATE_ALGORITHMS_REQUEST_MESSAGE {
 
 entrypoint typedef struct _SUCCESSFUL_ALGORITHMS_RESPONSE_MESSAGE {
   UINT8 SPDMVersion;
-  UINT8 RequestResponseCode;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x63 };
   UINT8 Param1;
   UINT8 Param2;
   UINT16 Length;
@@ -193,3 +199,58 @@ entrypoint typedef struct _SUCCESSFUL_ALGORITHMS_RESPONSE_MESSAGE {
   UINT8 ReqAlgStruct[:byte-size sizeof(DHE)+sizeof(AEAD)+sizeof(ReqBaseAsymAlg)+sizeof(KeySchedule)];
 } SUCCESSFUL_ALGORITHMS_RESPONSE_MESSAGE;
 
+entrypoint typedef struct _GET_CERTIFICATE_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x82 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 Offset;
+  UINT16 Length;
+} GET_CERTIFICATE_REQUEST_MESSAGE;
+
+entrypoint typedef struct _SUCCESSFUL_CERTIFICATE_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x02 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 PortionLength;
+  UINT8 CertChain[:byte-size PortionLength];
+} SUCCESSFUL_CERTIFICATE_RESPONSE_MESSAGE;
+entrypoint typedef struct _ERROR_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x7F };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 ExtendedErrorData[:byte-size-at-most 32];
+} ERROR_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _RESPOND_IF_READY_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xFF };
+  UINT8 Param1;
+  UINT8 Param2;
+} RESPOND_IF_READY_REQUEST_MESSAGE;
+
+entrypoint typedef struct _VENDOR_DEFINED_REQUEST_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xFE };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 StandardID;
+  UINT8 Len;
+  UINT8 VendorID[:byte-size Len];
+  UINT16 ReqLength;
+  UINT8 VendorDefinedReqPayload[:byte-size ReqLength];
+} VENDOR_DEFINED_REQUEST_REQUEST_MESSAGE;
+
+entrypoint typedef struct _VENDOR_DEFINED_RESPONSE_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x7E };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 StandardID;
+  UINT8 Len;
+  UINT8 VendorID[:byte-size Len];
+  UINT16 RespLength;
+  UINT8 VendorDefinedRespPayload[:byte-size RespLength];
+} VENDOR_DEFINED_RESPONSE_RESPONSE_MESSAGE;
