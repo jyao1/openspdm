@@ -1,3 +1,8 @@
+// H refers to the output size, in bytes, of the hash algorithm agreed upon in NEGOTIATE_ALGORITHMS .
+#define H 256
+// S is the size of the asymmetric-signing algorithm output that the Responder selected through the last ALGORITHMS response message to the Requester
+#define S 256
+
 UINT32 enum SPDM_REQUEST_CODES {
   GET_DIGESTS = 129,            // 0x81 GET_DIGESTS request message format
   GET_CERTIFICATE = 130,        // 0x82 GET_CERTIFICATE request message format
@@ -38,6 +43,29 @@ UINT32 enum SPDM_RESPONSE_CODES {
   END_SESSION_ACK,                 // 0x6C END_SESSION_ACK response message format
   VENDOR_DEFINED_RESPONSE = 126,   // 0x7E VENDOR_DEFINED_RESPONSE response message format
   ERROR = 127,                     // 0x7F ERROR response message format
+}
+
+UINT32 enum ERROR_CODE_AND_ERROR_DATA {
+  InvalidRequest = 1,
+  InvalidSession = 2,
+  Busy = 3,
+  UnexpectedRequest = 4,
+  Unspecified = 5,
+  DecryptError = 6,
+  UnsupportedRequest = 7,
+  RequestInFlight = 8,
+  InvalidResponseCode = 9,
+  SessionLimitExceeded = 10,
+  MajorVersionMismatch = 65,
+  ResponseNotReady = 66,
+  RequestResynch = 67,
+  Vendor = 255,
+}
+
+UINT32 enum KEY_UPDATE_OPERATIONS {
+  UpdateKey = 1,
+  UpdateAllKeys = 2,
+  VerifyNewKey = 3,
 }
 
 entrypoint typedef struct _GET_VERSION_REQUEST_MESSAGE {
@@ -199,6 +227,21 @@ entrypoint typedef struct _SUCCESSFUL_ALGORITHMS_RESPONSE_MESSAGE {
   UINT8 ReqAlgStruct[:byte-size sizeof(DHE)+sizeof(AEAD)+sizeof(ReqBaseAsymAlg)+sizeof(KeySchedule)];
 } SUCCESSFUL_ALGORITHMS_RESPONSE_MESSAGE;
 
+entrypoint typedef struct _GET_DIGESTS_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x81 };
+  UINT8 Param1;
+  UINT8 Param2; 
+} GET_DIGESTS_REQUEST_MESSAGE;
+
+entrypoint typedef struct _SUCCESSFUL_DIGESTS_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode;
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 Digest[:byte-size H*Param2];
+} SUCCESSFUL_DIGESTS_RESPONSE_MESSAGE;
+
 entrypoint typedef struct _GET_CERTIFICATE_REQUEST_MESSAGE {
   UINT8 SPDMVersion;
   UINT8 RequestResponseCode { RequestResponseCode == 0x82 };
@@ -216,6 +259,57 @@ entrypoint typedef struct _SUCCESSFUL_CERTIFICATE_RESPONSE_MESSAGE {
   UINT16 PortionLength;
   UINT8 CertChain[:byte-size PortionLength];
 } SUCCESSFUL_CERTIFICATE_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _CHALLENGE_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x83 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 Nonce[32];
+} CHALLENGE_REQUEST_MESSAGE;
+
+entrypoint typedef struct _CHALLENGE_AUTH_RESPONSE_ATTRIBUTE {
+  UINT8 SlotID : 4;
+  UINT8 Reserved : 3;
+  UINT8 BasicMutAuthReq : 1;
+} CHALLENGE_AUTH_RESPONSE_ATTRIBUTE;
+
+entrypoint typedef struct _SUCCESSFUL_CHALLENGE_AUTH_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x03 };
+  CHALLENGE_AUTH_RESPONSE_ATTRIBUTE Param1;
+  UINT8 Param2;
+  UINT8 CertChainHash[H];
+  UINT8 Nonce[32];
+  UINT8 MeasurementSummaryHash[H];
+  UINT16 OpaqueLength;
+  UINT8 OpaqueData[OpaqueLength];
+  UINT8 Signature[S];
+} SUCCESSFUL_CHALLENGE_AUTH_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _GET_MEASUREMENTS_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xE0 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 Nonce[32];
+  UINT8 SlotIDParam;
+} GET_MEASUREMENTS_REQUEST_MESSAGE;
+
+entrypoint typedef struct _SUCCESSFUL_MEASUREMENTS_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x60 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 NumberOfBlocks;
+  UINT32 MeasurementRecordLength; // it should be UINT24, but 3D doesn't support UINT24
+  UINT8 MeasurementRecord[MeasurementRecordLength];
+  UINT8 Nonce[32];
+  UINT16 OpaqueLength;
+  UINT8 OpaqueData[OpaqueLength];
+  UINT8 Signature[S];
+} SUCCESSFUL_MEASUREMENTS_RESPONSE_MESSAGE;
+
 entrypoint typedef struct _ERROR_RESPONSE_MESSAGE {
   UINT8 SPDMVersion;
   UINT8 RequestResponseCode { RequestResponseCode == 0x7F };
@@ -223,6 +317,19 @@ entrypoint typedef struct _ERROR_RESPONSE_MESSAGE {
   UINT8 Param2;
   UINT8 ExtendedErrorData[:byte-size-at-most 32];
 } ERROR_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _RESPONSENOTREADY_EXTENDED_ERROR_DATA {
+  UINT8 RDTExponent;
+  UINT8 RequestCode;
+  UINT8 Token;
+  UINT8 RDTM;
+} RESPONSENOTREADY_EXTENDED_ERROR_DATA;
+
+entrypoint typedef struct _EXTENDERRORDATA_FOR_VENDOR (UINT32 Variable)  {
+  UINT8 Len;
+  UINT8 VendorID[Len];
+  UINT8 OpaqueErrorData[:byte-size-single-element-array Variable]; // Defined by the vendor or other standards
+} EXTENDERRORDATA_FOR_VENDOR;
 
 entrypoint typedef struct _RESPOND_IF_READY_REQUEST_MESSAGE {
   UINT8 SPDMVersion;
@@ -254,3 +361,167 @@ entrypoint typedef struct _VENDOR_DEFINED_RESPONSE_RESPONSE_MESSAGE {
   UINT16 RespLength;
   UINT8 VendorDefinedRespPayload[:byte-size RespLength];
 } VENDOR_DEFINED_RESPONSE_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _KEY_EXCHANGE_REQUEST_MESSAGE (UINT32 D) {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xE4 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 ReqSessionID;
+  UINT16 Reserved;
+  UINT8 RandomData[32];
+  UINT8 ExchangeData[D];
+  UINT16 OpaqueDataLength;
+  UINT8 OpaqueData[:byte-size OpaqueDataLength];
+} KEY_EXCHANGE_REQUEST_MESSAGE;
+
+entrypoint typedef struct _SUCCESSFUL_KEY_EXCHANGE_RSP_RESPONSE_MESSAGE (UINT32 D) {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x64 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 ReqSessionID;
+  UINT8 MutAuthRequested;
+  UINT8 SlotIDParam;
+  UINT8 RandomData[32];
+  UINT8 ExchangeData[D];
+  UINT8 MeasurementSummaryHash[H];
+  UINT16 OpaqueDataLength;
+  UINT8 OpaqueData[:byte-size OpaqueDataLength];
+  UINT8 Signature[S];
+  UINT8 ResponderVerifyData[H];
+} SUCCESSFUL_KEY_EXCHANGE_RSP_RESPONSE_MESSAG;
+
+entrypoint typedef struct _FINISH_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xE5 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 Signature[S];
+  UINT8 RequesterVerifyData[H];
+} FINISH_REQUEST_MESSAGE;
+
+entrypoint typedef struct _SUCCESSFUL_FINISH_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x65 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 RequesterVerifyData[H];
+} SUCCESSFUL_FINISH_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _PSK_EXCHANGE_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xE6 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 ReqSessionID;
+  UINT16 P;
+  UINT16 R;
+  UINT16 OpaqueDataLength;
+  UINT8 PSKHint[P];
+  UINT8 RequesterContext[R];
+  UINT8 OpaqueData[OpaqueDataLength];
+} PSK_EXCHANGE_REQUEST_MESSAGE;
+
+entrypoint typedef struct _PSK_EXCHANGE_RSP_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x66 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT16 RspSessionID;
+  UINT16 Reserved ;
+  UINT16 Q;
+  UINT16 OpaqueDataLength;
+  UINT8 MeasurementSummaryHash[H];
+  UINT8 ResponderContext[Q];
+  UINT8 OpaqueData[OpaqueDataLength];
+  UINT8 ResponderVerifyData[H];
+} PSK_EXCHANGE_RSP_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _PSK_FINISH_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xE7 };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 RequesterVerifyData[H];
+} PSK_FINISH_REQUEST_MESSAGE;
+
+entrypoint typedef struct _SUCCESSFUL_PSK_FINISH_RSP_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x67 };
+  UINT8 Param1;
+  UINT8 Param2;
+} SUCCESSFUL_PSK_FINISH_RSP_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _HEARTBEAT_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xE8 };
+  UINT8 Param1;
+  UINT8 Param2;
+} HEARTBEAT_REQUEST_MESSAGE;
+
+entrypoint typedef struct _HEARTBEAT_ACK_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x68 };
+  UINT8 Param1;
+  UINT8 Param2;
+} HEARTBEAT_ACK_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _KEY_UPDATE_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xE9 };
+  UINT8 Param1;
+  UINT8 Param2;
+} KEY_UPDATE_REQUEST_MESSAGE;
+
+entrypoint typedef struct _KEY_UPDATE_ACK_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x69 };
+  UINT8 Param1;
+  UINT8 Param2;
+} KEY_UPDATE_ACK_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _GET_ENCAPSULATED_REQUEST_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xEA };
+  UINT8 Param1;
+  UINT8 Param2;
+} GET_ENCAPSULATED_REQUEST_REQUEST_MESSAGE;
+
+entrypoint typedef struct _ENCAPSULATED_REQUEST_RESPONSE_MESSAGE (UINT32 Variable) {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x6A };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 EncapsulatedRequest[:byte-size-single-element-array Variable];
+} ENCAPSULATED_REQUEST_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _DELIVER_ENCAPSULATED_RESPONSE_REQUEST_MESSAGE (UINT32 Variable) {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xEB };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 EncapsulatedResponse[:byte-size-single-element-array Variable];
+} DELIVER_ENCAPSULATED_RESPONSE_REQUEST_MESSAGE;
+
+entrypoint typedef struct _ENCAPSULATED_RESPONSE_ACK_RESPONSE_MESSAGE (UINT32 Variable) {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x6B };
+  UINT8 Param1;
+  UINT8 Param2;
+  UINT8 EncapsulatedRequest[:byte-size-single-element-array Variable];
+} ENCAPSULATED_RESPONSE_ACK_RESPONSE_MESSAGE;
+
+entrypoint typedef struct _END_SESSION_REQUEST_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0xEC };
+  UINT8 Param1;
+  UINT8 Param2;
+} END_SESSION_REQUEST_MESSAGE;
+
+entrypoint typedef struct _END_SESSION_ACK_RESPONSE_MESSAGE {
+  UINT8 SPDMVersion;
+  UINT8 RequestResponseCode { RequestResponseCode == 0x6C };
+  UINT8 Param1;
+  UINT8 Param2;
+} END_SESSION_ACK_RESPONSE_MESSAGE;
