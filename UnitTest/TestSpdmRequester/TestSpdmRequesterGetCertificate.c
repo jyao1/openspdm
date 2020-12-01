@@ -54,6 +54,8 @@ SpdmRequesterGetCertificateTestSendMessage (
     return RETURN_SUCCESS;
   case 0xE:
     return RETURN_SUCCESS;
+  case 0xF:
+    return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -576,6 +578,51 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       SpdmResponse->PortionLength = PortionLength;
       SpdmResponse->RemainderLength = RemainderLength;
       CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain + GetCertLength * CallingIndex, PortionLength);
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+
+      CallingIndex++;
+      if (CallingIndex == Count) {
+        CallingIndex = 0;
+        free (LocalCertificateChain);
+        LocalCertificateChain = NULL;
+        LocalCertificateChainSize = 0;
+      }
+  }
+    return RETURN_SUCCESS;
+
+  case 0xF:
+  {
+      SPDM_CERTIFICATE_RESPONSE    *SpdmResponse;
+      UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+      UINTN                         TempBufSize;
+      UINT16                        PortionLength;
+      UINT16                        RemainderLength;
+      UINTN                         Count;
+      STATIC UINTN                  CallingIndex = 0;
+
+      if (LocalCertificateChain == NULL) {
+        ReadResponderPublicCertificateChainBySize (TEST_CERT_MAXUINT16, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+      }
+      Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+      if (CallingIndex != Count - 1) {
+        PortionLength = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+        RemainderLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (CallingIndex + 1));
+      } else {
+        PortionLength = (UINT16)(LocalCertificateChainSize - MAX_SPDM_CERT_CHAIN_BLOCK_LEN * (Count - 1));
+        RemainderLength = 0;
+      }
+
+      TempBufSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + PortionLength;
+      SpdmResponse = (VOID *)TempBuf;
+
+      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
+      SpdmResponse->Header.Param1 = 0;
+      SpdmResponse->Header.Param2 = 0;
+      SpdmResponse->PortionLength = PortionLength;
+      SpdmResponse->RemainderLength = RemainderLength;
+      CopyMem (SpdmResponse + 1, (UINT8 *)LocalCertificateChain + MAX_SPDM_CERT_CHAIN_BLOCK_LEN * CallingIndex, PortionLength);
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
 
@@ -1148,6 +1195,49 @@ void TestSpdmRequesterGetCertificateCase14(void **state) {
   free(Data);
 }
 
+/**
+  Test 15: Request a long certificate chain
+  Expected Behavior: receives a valid certificate chain with the correct number of Certificate messages
+**/
+void TestSpdmRequesterGetCertificateCase15(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINTN                CertChainSize;
+  UINT8                CertChain[MAX_SPDM_CERT_CHAIN_SIZE];
+  VOID                 *Data;
+  UINTN                DataSize;
+  VOID                 *Hash;
+  UINTN                HashSize;
+  UINTN                Count;
+
+  SpdmTestContext = *state;
+  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xF;
+  // Setting SPDM context as the first steps of the protocol has been accomplished
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  // Loading Root certificate and saving its hash
+  ReadResponderPublicCertificateChainBySize (TEST_CERT_MAXUINT16, &Data, &DataSize, &Hash, &HashSize);
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  // Reseting message buffer
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+  // Calculating expected number of messages received
+  Count = (DataSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN - 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
+
+  CertChainSize = sizeof(CertChain);
+  ZeroMem (CertChain, sizeof(CertChain));
+  Status = SpdmGetCertificate (SpdmContext, 0, &CertChainSize, CertChain);
+  assert_int_equal (Status, RETURN_SUCCESS);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
+  free(Data);
+}
+
 SPDM_TEST_CONTEXT       mSpdmRequesterGetCertificateTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
@@ -1181,10 +1271,12 @@ int SpdmRequesterGetCertificateTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterGetCertificateCase11),
       // Fail certificate chain check
       cmocka_unit_test(TestSpdmRequesterGetCertificateCase12),
-      // // Sucessful response: get certificate in one single message
+      // // Sucessful response: get a certificate chain that fits in one single message
       cmocka_unit_test(TestSpdmRequesterGetCertificateCase13),
-      // // Sucessful response: get certificate byte by byte
+      // // Sucessful response: get certificate chain byte by byte
       cmocka_unit_test(TestSpdmRequesterGetCertificateCase14),
+      // // Sucessful response: get a long certificate chain
+      cmocka_unit_test(TestSpdmRequesterGetCertificateCase15),
   };
 
   SetupSpdmTestContext (&mSpdmRequesterGetCertificateTestContext);

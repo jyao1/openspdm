@@ -647,6 +647,7 @@ void TestSpdmResponderCertificateCase12(void **state) {
   VOID                 *Data;
   UINTN                DataSize;
 
+  UINTN                Count;
   UINT16               ExpectedChunkSize;
 
   // Setting up the SpdmContext and loading a sample certificate chain
@@ -665,6 +666,8 @@ void TestSpdmResponderCertificateCase12(void **state) {
   mSpdmGetCertificateRequest3.Length = 1;
   ExpectedChunkSize = 1;
 
+  Count = (DataSize + mSpdmGetCertificateRequest3.Length - 1) / mSpdmGetCertificateRequest3.Length;
+
   // reseting an internal buffer to avoid overflow and prevent tests to succeed
   ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
 
@@ -682,7 +685,7 @@ void TestSpdmResponderCertificateCase12(void **state) {
     assert_int_equal (SpdmResponse->PortionLength, ExpectedChunkSize);
     assert_int_equal (SpdmResponse->RemainderLength, DataSize - offset - ExpectedChunkSize);
     assert_int_equal ( ((UINT8*) Data)[offset], (Response + sizeof(SPDM_CERTIFICATE_RESPONSE))[0]);
-    // printf("%u =? %u\n", , (Response + sizeof(SPDM_CERTIFICATE_RESPONSE))[0]);
+    assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
   }
   free(Data);
 }
