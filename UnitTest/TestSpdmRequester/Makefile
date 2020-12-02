@@ -41,6 +41,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmRequesterGetCertificate.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterChallenge.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterGetMeasurement.obj \
+	$(OUTPUT_DIR)\TestSpdmRequesterKeyExchange.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
     $(OUTPUT_DIR)\SpdmTestKey.obj \
     $(OUTPUT_DIR)\SpdmTestSupport.obj \
@@ -154,6 +155,9 @@ $(OUTPUT_DIR)\TestSpdmRequesterChallenge.obj : $(SOURCE_DIR)\TestSpdmRequesterCh
 
 $(OUTPUT_DIR)\TestSpdmRequesterGetMeasurement.obj : $(SOURCE_DIR)\TestSpdmRequesterGetMeasurement.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterGetMeasurement.c
+
+$(OUTPUT_DIR)\TestSpdmRequesterKeyExchange.obj : $(SOURCE_DIR)\TestSpdmRequesterKeyExchange.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterKeyExchange.c
 
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c

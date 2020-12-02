@@ -210,7 +210,7 @@ SpdmRequesterVerifyKeyExchangeHmac (
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
-SpdmSendReceiveKeyExchange (
+TrySpdmSendReceiveKeyExchange (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MeasurementHashType,
   IN     UINT8                SlotNum,
@@ -243,6 +243,11 @@ SpdmSendReceiveKeyExchange (
   SPDM_SESSION_INFO                         *SessionInfo;
   UINTN                                     OpaqueKeyExchangeReqSize;
 
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
   }
@@ -298,15 +303,21 @@ SpdmSendReceiveKeyExchange (
     SpdmDheFree (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, 0, &SpdmResponseSize, &SpdmResponse, SPDM_KEY_EXCHANGE, SPDM_KEY_EXCHANGE_RSP, sizeof(SPDM_KEY_EXCHANGE_RESPONSE_MAX));
+    if (RETURN_ERROR(Status)) {
+      SpdmDheFree (SpdmContext, DHEContext);
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_EXCHANGE_RSP) {
+    SpdmDheFree (SpdmContext, DHEContext);
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_KEY_EXCHANGE_RESPONSE)) {
     SpdmDheFree (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
-    SpdmDheFree (SpdmContext, DHEContext);
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_EXCHANGE_RSP) {
     SpdmDheFree (SpdmContext, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
@@ -464,7 +475,33 @@ SpdmSendReceiveKeyExchange (
 
   SessionInfo->SessionState = SpdmStateHandshaking;
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_KEY_EXCHANGE_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+SpdmSendReceiveKeyExchange (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                MeasurementHashType,
+  IN     UINT8                SlotNum,
+     OUT UINT32               *SessionId,
+     OUT UINT8                *HeartbeatPeriod,
+     OUT UINT8                *SlotIdParam,
+     OUT VOID                 *MeasurementHash
+  )
+{
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+
+  Retry = SpdmContext->RetryTimes;
+  do {
+    Status = TrySpdmSendReceiveKeyExchange(SpdmContext, MeasurementHashType, SlotNum, SessionId, HeartbeatPeriod, SlotIdParam, MeasurementHash);
+    if (RETURN_NO_RESPONSE != Status) {
+      return Status;
+    }
+  } while (Retry-- != 0);
+
+  return Status;
 }
 
