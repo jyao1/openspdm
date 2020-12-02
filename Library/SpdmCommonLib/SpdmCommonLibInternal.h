@@ -278,6 +278,8 @@ typedef enum {
 #define SPDM_GET_CERTIFICATE_RECEIVE_FLAG               BIT4
 #define SPDM_CHALLENGE_RECEIVE_FLAG                     BIT5
 #define SPDM_GET_MEASUREMENTS_RECEIVE_FLAG              BIT6
+#define SPDM_KEY_EXCHANGE_RECEIVE_FLAG                  BIT7
+
 
 typedef struct {
   UINT32                          Version;
@@ -963,6 +965,17 @@ VOID
 InitManagedBuffer (
   IN OUT VOID            *ManagedBuffer,
   IN UINTN               MaxBufferSize
+  );
+
+RETURN_STATUS
+BinConcat (
+  IN CHAR8     *Label,
+  IN UINTN     LabelSize,
+  IN UINT8     *Context,
+  IN UINT16    Length,
+  IN UINTN     HashSize,
+  OUT UINT8    *OutBin,
+  IN OUT UINTN *OutBinSize
   );
 
 /**
