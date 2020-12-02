@@ -43,15 +43,24 @@
 
    Support to build an OS application for SpdmRequester and SpdmResponder to trace the communication.
 
-   Support to be included in UEFI host environment, such as [SpdmRequester](https://github.com/jyao1/edk2/tree/DeviceSecurity/DeviceSecurityPkg)
+   Support to be included in UEFI host environment [EDKII](https://github.com/tianocore/edk2), such as [SpdmRequester](https://github.com/jyao1/edk2/tree/DeviceSecurity/DeviceSecurityPkg)
 
-7) openspdm library design:
+   Support to be included in [OpenBMC](https://github.com/openbmc). It is in planning, see [SPDM Integration](https://www.youtube.com/watch?v=PmgXkLJYI-E).
+
+## Document
+
+1) Presentation
+
+   Open Source Firmware Conference 2020 - [openspdm](https://cfp.osfc.io/osfc2020/talk/ECQ88N/)
+
+2) openspdm library design:
 
    The detailed design can be found at [Design](https://github.com/jyao1/openspdm/blob/master/Doc/Design.md)
 
-8) openspdm user guide:
+3) openspdm user guide:
 
    The user guide can be found at [UserGuide](https://github.com/jyao1/openspdm/blob/master/Doc/UserGuide.md)
+
 
 ## Prerequisit
 
