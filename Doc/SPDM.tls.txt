@@ -1,0 +1,549 @@
+uint8 uint16[2];
+uint8 uint24[3];
+uint8 uint32[4];
+uint8 uint64[8];
+
+enum {
+  GET_DIGESTS(129),
+  GET_CERTIFICATE(130),
+  CHALLENGE(131),
+  GET_VERSION(132),
+  GET_MEASUREMENTS(224),
+  GET_CAPABILITIES(225),
+  NEGOTIATE_ALGORITHMS(227),
+  KEY_EXCHANGE(228),
+  FINISH(229),
+  PSK_EXCHANGE(230),
+  PSK_FINISH(231),
+  HEARTBEAT(232),
+  KEY_UPDATE(233),
+  GET_ENCAPSULATED_REQUEST(234),
+  DELIVER_ENCAPSULATED_RESPONSE(235),
+  END_SESSION(236),
+  VENDOR_DEFINED_REQUEST(254),
+  RESPOND_IF_READY(255)
+} SPDM_REQUEST_CODES;
+
+enum {
+  DIGESTS(1),
+  CERTIFICATE(2),
+  CHALLENGE_AUTH(3),
+  VERSION(4),
+  MEASUREMENTS(96),
+  CAPABILITIES(97),
+  ALGORITHMS(99),
+  KEY_EXCHANGE_RSP(100),
+  FINISH_RSP(101),
+  PSK_EXCHANGE_RSP(102),
+  PSK_FINISH_RSP(103),
+  HEARTBEAT_ACK(104),
+  KEY_UPDATE_ACK(105),
+  ENCAPSULATED_REQUEST(106),
+  ENCAPSULATED_RESPONSE_ACK(107),
+  END_SESSION_ACK(108),
+  VENDOR_DEFINED_RESPONSE(126),
+  ERROR(127)
+} SPDM_RESPONSE_CODES;
+
+struct {
+  uint8 digest<2^8..2^9>; 
+} SpdmDigest; 
+
+struct {
+  uint8 digest<2^6..2^9>; 
+} SpdmSignature; 
+
+struct {
+  uint8 digest<0..2^10>; /* set one value */
+} SpdmExchangeData; 
+
+struct {
+  uint8 AlphaAndUpdateVerNum;
+  uint8 Version;
+} SpdmVersionNumber;
+
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmGetVersionRequest;
+
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 Reserved;
+  uint8 VersionNumberEntryCount;
+  SpdmVersionNumber VersionNumberEntries<2..2*SpdmVersionResponse.VersionNumberEntryCount>;
+} SpdmVersionResponse;
+
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 Reserved;
+  uint8 CTExponent;
+  uint16 Reserved1;
+  uint64 Flags;  /* Requester flag fields definitions table */
+} SpdmGetCpabilitiesRequest;
+
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 Reserved;
+  uint8 CTExponent;
+  uint16 Reserved1;
+  uint64 Flags;  /* Responder flag fields definitions table */
+} SpdmCpabilitiesResponse;
+
+
+/* NEGOTIATE_ALGORITHMS request */
+enum {
+  DMTF(0),
+  TCG(1),
+  USB(2),
+  PCISIG(3),
+  IANA(4),
+  HDBaseT(5),
+  MIPI(6),
+  CXL(7),
+  JEDEC(8)
+} SpdmExtendedAlgorithmRegistryId;
+
+enum {
+  DHE(2),
+  AEADCipherSuite(3),
+  ReqBaseAsymAlg(4),
+  KeySchedule(5)
+} SpdmAlgorithmRequest;
+
+struct {
+  uint8 RegistryID;
+  uint8 Reserved;
+  uint16 AlgorithmID;
+} SpdmExtendedAlgorithm;
+
+struct {
+  uint8 AlgType;
+  uint8 AlgCount;
+  uint16 AlgSupported;
+  SpdmExtendedAlgorithm AlgExternal[4*(SpdmAlorithmRequest.AlgCount & 0x0F)];
+} SpdmAlorithmRequest;
+
+enum {
+  rsaSsa2048(0),
+  rsaPss2048(1),
+  rsaSsa3072(2),
+  rsaPss3072(3),
+  ecdsaEccNistP256(4),
+  rsaSsa4096(5),
+  rsaPss4096(6),
+  ecdsaEccNistP384(7),
+  ecdsaEccNistP521(8)
+} SpdmAlgorithmBaseAsymAlgo;
+
+enum {
+  sha256(0),
+  sha384(1),
+  sha512(2),
+  sha3Set256(3),
+  sha3Set384(4),
+  sha3Set512(5)
+} SpdmAlgorithmBaseHashAlgo;
+
+enum {
+  ffdhe2048(0),
+  ffdhe3072(1),
+  ffdhe4096(2),
+  secp256R1(3),
+  secp384R1(4),
+  secp521R1(5)
+} SpdmAlgorithmDheNamedGroup;
+
+enum {
+  aes128gcm(0),
+  aes256gcm(1),
+  chacha20poly1305(2)
+} SpdmAlgorithmAead;
+
+enum {
+  rsaSsa2048(0),
+  rsaPss2048(1),
+  rsaSsa3072(2),
+  rsaPss3072(3),
+  ecdsaEccNistP256(4),
+  rsaSsa4096(5),
+  rsaPss4096(6),
+  ecdsaEccNistP384(7),
+  ecdsaEccNistP521(8)
+} SpdmAlgorithmReqBaseAsymAlg;
+
+enum {
+  hmacHash (0)
+} SpdmAlgorithmKeyShedule;
+
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 Length;
+  uint8 MeasurementSpecification;
+  uint8 Reserved;
+  uint32 BaseAsymAlgo;
+  uint32 BaseHashAlgo;
+  uint8 Reserved1[12];
+  uint8 ExtAsymCount;
+  uint8 ExtHashCount;
+  uint16 Reserved2;
+  SpdmExtendedAlgorithm ExtAsym[4*SpdmNegotiateAlgorithmsRequest.ExtAsymCount];
+  SpdmExtendedAlgorithm ExtHash[4*SpdmNegotiateAlgorithmsRequest.ExtHashCount];
+  SpdmAlorithmRequest ReqAlgStruct;
+} SpdmNegotiateAlgorithmsRequest;
+
+/* ALGORITHMS response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 Length;
+  uint8 MeasurementSpecificationSel;
+  uint8 Reserved;
+  uint32 MeasurementHashAlgo;
+  uint32 BaseAsymSel;
+  uint32 BaseHashSel;
+  uint8 Reserved1[12];
+  uint8 ExtAsymSelCount ;
+  uint8 ExtHashSelCount;
+  uint16 Reserved2;
+  SpdmExtendedAlgorithm ExtAsym[4*SpdmAlgorithmsResponse.ExtAsymSelCount];
+  SpdmExtendedAlgorithm ExtHash[4*SpdmAlgorithmsResponse.ExtHashSelCount];
+  SpdmAlorithmRequest ReqAlgStruct;
+} SpdmAlgorithmsResponse;
+
+/* GET_DIGESTS request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2; 
+} SpdmGetDigestRequest;
+
+/* DIGESTS response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  SpdmDigest Digest[2^8*SpdmDigestsResponse.Param2..2^9*SpdmDigestsResponse.Param2]; 
+} SpdmDigestsResponse;
+
+/* GET_CERTIFICATE request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 Offset;
+  uint16 Length; 
+} SpdmGetCertificateRequest;
+
+/* CERTIFICATE response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 PortionLength;
+  uint8 CertChain[SpdmCertificateResponse.PortionLength];
+} SpdmCertificateResponse;
+
+/* CHALLENGE request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 Nonce[32];
+} SpdmChallengeRequest;
+
+/* CHALLENGE_AUTH response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  SpdmDigest CertChainHash;
+  uint8 Nonce[32];
+  SpdmDigest MeasurementSummaryHash;
+  uint16 OpaqueLength;
+  uint8 OpaqueData[SpdmChallengeAuthRespons.OpaqueLength];
+  SpdmSignature Signature;
+} SpdmChallengeAuthResponse;
+
+/* GET_MEASUREMENTS request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 Nonce[32];
+  uint8 SlotIDParam;
+} SpdmGetMeasurementsRequest;
+
+/* MEASUREMENTS response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 NumberOfBlocks;
+  uint24 MeasurementRecordLength;
+  uint8 MeasurementRecord[SpdmMeasurementsResponse.MeasurementRecordLength];
+  uint8 Nonce[32];
+  uint16 OpaqueLength;
+  uint8 OpaqueData[SpdmMeasurementsResponse.OpaqueLength];
+  SpdmSignature Signature;
+} SpdmMeasurementsResponse;
+
+/* ERROR response */
+enum {
+  invalidRequest(1), 
+  busy(3),
+  unexpectedRequest(4),
+  unspecified(5),
+  unsupportedRequest(7),
+  majorVersionMismatch(65),
+  responseNotReady(66),
+  requestResynch(67) 
+} SpdmErrorCode;
+
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 ExtendedErrorData<0..2^5>;
+} SpdmError;
+
+/* RESPONSE_IF_READY request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmResponseIfReady;
+
+/* VENDOR_DEFINED_REQUEST */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 StandardID;
+  uint8 Len;
+  uint8 VendorID[SpdmVendorDefinedRequest.Len];
+  uint16 ReqLength;
+  uint8 VendorDefinedReqPayload[SpdmVendorDefinedRequest.ReqLength];
+} SpdmVendorDefinedRequest;
+
+/* VENDOR_DEFINED_RESPONSE */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 StandardID;
+  uint8 Len;
+  uint8 VendorID[SpdmVendorDefinedResponse.Len];
+  uint16 RespLength;
+  uint8 VendorDefinedRespPayload[SpdmVendorDefinedResponse.RespLength];
+} SpdmVendorDefinedResponse;
+
+/* KEY_EXCHANGE request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 ReqSessionID;
+  uint16 Reserved;
+  uint8 RandomData[32];
+  SpdmExchangeData ExchangeData;
+  uint16 OpaqueDataLength;
+  uint8 OpaqueData[SpdmKeyExchangeRequest.OpaqueDataLength];
+} SpdmKeyExchangeRequest;
+
+/* KEY_EXCHANGE response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 ReqSessionID;
+  uint8 MutAuthRequested;
+  uint8 SlotIDParam;
+  uint8 RandomData[32];
+  SpdmExchangeData ExchangeData;
+  SpdmDigest MeasurementSummaryHash;
+  uint16 OpaqueDataLength;
+  uint8 OpaqueData[SpdmKeyExchangeResponse.OpaqueDataLength];
+  SpdmSignature Signature;
+  SpdmDigest ResponderVerifyData;
+} SpdmKeyExchangeResponse; 
+
+/* FINISH request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  SpdmSignature Signature;
+  SpdmDigest RequesterVerifyData;
+} SpdmFinishRequest;
+
+/* FINISH response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  SpdmDigest RequesterVerifyData;
+} SpdmFinishRequest;
+
+/* PSK_EXCHANGE request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 ReqSessionID;
+  uint16 P;
+  uint16 R;
+  uint16 OpaqueDataLength;
+  uint8 PSKHint[SpdmPskExchangeRequest.P];
+  uint8 RequesterContext[SpdmPskExchangeRequest.R];
+  uint8 OpaqueData[SpdmPskExchangeRequest.OpaqueDataLength];
+} SpdmPskExchangeRequest;
+
+/* PSK_EXCHANGE response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint16 RspSessionID;
+  uint16 Reserved ;
+  uint16 Q;
+  uint16 OpaqueDataLength;
+  SpdmDigest MeasurementSummaryHash;
+  uint8 ResponderContext[SpdmPskExchangeResponse.Q];
+  uint8 OpaqueData[SpdmPskExchangeResponse.OpaqueDataLength];
+  SpdmDigest ResponderVerifyData;
+} SpdmPskExchangeResponse;
+
+/* PSK_FINISH request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  SpdmDigest RequesterVerifyData;
+} SpdmPskFinishRequest;
+
+/* PSK_FINISH response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmPskFinishResponse;
+
+/* HEARTBEAT request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmHeartbeatRequest;
+
+/* HEARTBEAT response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmHeartbeatResponse;
+
+/* KEY_UPDATE request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmKeyUpdateRequest; 
+
+/* KEY_UPDATE response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmKeyUpdateResponse;
+
+/* GET_ENCAPSULATED_REQUEST request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmGetEncapsulatedRequestRequest;
+
+/* ENCAPSULATED_REQUEST response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 EncapsulatedRequest<0..2^10>; /* set one value to test */
+} SpdmEncapsulatedRequestResponse;
+
+/* DELIVER_ENCAPSULATED_RESPONSE request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 EncapsulatedResponse<0..2^10>; /* set one value to test */;
+} SpdmDeliverEncapsulatedResponseRequest;
+
+/* ENCAPSULATED_RESPONSE_ACK response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+  uint8 EncapsulatedRequest<0..2^10>; /* set one value to test */;
+} SpdmEncapsulatedResponseAckResponse;
+
+/* END_SESSION request */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmEndSessionRequest;
+
+/* END_SESSION response */
+struct {
+  uint8 SPDMVersion;
+  uint8 RequestResponseCode;
+  uint8 Param1;
+  uint8 Param2;
+} SpdmEndSessionResponse;
