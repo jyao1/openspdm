@@ -31,3 +31,5 @@ Unzip it, such as C:\everparse
 ### Run everparse
 
 In SPDM.3d filder, run `<path-to-everparse>\everparse.cmd SPDM.3d`. It will generate SPDM.c
+
+In SPDM.tls filder, run `<path-to-everparse>\qd.exe SPDM.tls`.
