@@ -14,6 +14,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmSecuredMessageLib.h>
 #include "SpdmCommonLibInternal.h"
 
+#define MY_SPDM_VERSION_ENTRY_COUNT 2
+
 /**
   Process the SPDM request and return the response.
 
@@ -690,7 +692,7 @@ SpdmProcessRequest (
 
 /**
   Build a SPDM response to a device.
-  
+
   @param  SpdmContext                  The SPDM context for the device.
   @param  SessionId                    Indicate if the response is a secured message.
                                        If SessionId is NULL, it is a normal message.

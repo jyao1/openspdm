@@ -52,9 +52,17 @@ SpdmGetResponseVersion (
 
   SpdmContext = Context;
   SpdmRequest = Request;
+  if (SpdmRequest->Header.SPDMVersion != SPDM_MESSAGE_VERSION_10)  {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   if (RequestSize != sizeof(SPDM_GET_VERSION_REQUEST)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
+  }
+  if (SpdmContext->ResponseState == SpdmResponseStateNeedResync) {
+    // receiving a GET_VERSION resets a need to resynchronization
+    SpdmContext->ResponseState = SpdmResponseStateNormal;
   }
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
@@ -71,7 +79,7 @@ SpdmGetResponseVersion (
 
 
   ASSERT (*ResponseSize >= sizeof(MY_SPDM_VERSION_RESPONSE));
-  *ResponseSize = sizeof(MY_SPDM_VERSION_RESPONSE);
+  *ResponseSize = sizeof(SPDM_VERSION_RESPONSE) + MY_SPDM_VERSION_ENTRY_COUNT * sizeof(SPDM_VERSION_NUMBER);
   ZeroMem (Response, *ResponseSize);
   SpdmResponse = Response;
 
@@ -79,7 +87,7 @@ SpdmGetResponseVersion (
   SpdmResponse->Header.RequestResponseCode = SPDM_VERSION;
   SpdmResponse->Header.Param1 = 0;
   SpdmResponse->Header.Param2 = 0;
-  SpdmResponse->VersionNumberEntryCount = 2;
+  SpdmResponse->VersionNumberEntryCount = MY_SPDM_VERSION_ENTRY_COUNT; // = 2
   SpdmResponse->VersionNumberEntry[0].MajorVersion = 1;
   SpdmResponse->VersionNumberEntry[0].MinorVersion = 0;
   SpdmResponse->VersionNumberEntry[1].MajorVersion = 1;

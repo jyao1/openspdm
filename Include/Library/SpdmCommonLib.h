@@ -31,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //          The message exchange in a session is cipher text.
 //
 
-#define MAX_SPDM_VERSION_COUNT            2
+#define MAX_SPDM_VERSION_COUNT            5
 #define MAX_SPDM_SLOT_COUNT               8
 #define MAX_SPDM_OPAQUE_DATA_SIZE         1024
 
