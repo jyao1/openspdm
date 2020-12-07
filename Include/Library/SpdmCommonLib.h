@@ -31,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //          The message exchange in a session is cipher text.
 //
 
-#define MAX_SPDM_VERSION_COUNT            2
+#define MAX_SPDM_VERSION_COUNT            5
 #define MAX_SPDM_SLOT_COUNT               8
 #define MAX_SPDM_OPAQUE_DATA_SIZE         1024
 
@@ -65,7 +65,7 @@ typedef enum {
   // SPDM capability
   //
   SpdmDataCapabilityFlags,
-  SpdmDataCapabilityCTExponent,  
+  SpdmDataCapabilityCTExponent,
   //
   // SPDM Algorithm setting
   //
@@ -364,7 +364,7 @@ SpdmRegisterDataSignFunc (
                                        than zero, then this function will return RETURN_TIMEOUT if the
                                        time required to execute the message is greater
                                        than Timeout.
-                                       
+
   @retval RETURN_SUCCESS               The SPDM message is sent successfully.
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is sent to the device.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -401,7 +401,7 @@ RETURN_STATUS
                                        than zero, then this function will return RETURN_TIMEOUT if the
                                        time required to execute the message is greater
                                        than Timeout.
-                                       
+
   @retval RETURN_SUCCESS               The SPDM message is received successfully.
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM message is received from the device.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL, MessageSize is NULL or

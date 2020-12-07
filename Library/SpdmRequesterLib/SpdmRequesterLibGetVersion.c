@@ -40,7 +40,10 @@ TrySpdmGetVersion (
   SPDM_VERSION_RESPONSE_MAX                 SpdmResponse;
   UINTN                                     SpdmResponseSize;
   UINTN                                     Index;
-  
+  UINT8                                     Version;
+  UINTN                                     CompatibleVersionCount;
+  SPDM_VERSION_NUMBER                       CompatibleVersionNumberEntry[MAX_SPDM_VERSION_COUNT];
+
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_VERSION;
   SpdmRequest.Header.Param1 = 0;
@@ -66,6 +69,9 @@ TrySpdmGetVersion (
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponse.Header.SPDMVersion != SPDM_MESSAGE_VERSION_10) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
@@ -97,22 +103,33 @@ TrySpdmGetVersion (
   //
   AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
 
+  CompatibleVersionCount = 0;
+  ZeroMem (&CompatibleVersionNumberEntry, sizeof(CompatibleVersionNumberEntry) * sizeof(SPDM_VERSION_NUMBER));
   for (Index = 0; Index < SpdmResponse.VersionNumberEntryCount; Index++) {
-    SpdmContext->ConnectionInfo.Version[Index] = (UINT8)((SpdmResponse.VersionNumberEntry[Index].MajorVersion << 4) |
+    Version = (UINT8)((SpdmResponse.VersionNumberEntry[Index].MajorVersion << 4) |
                                                          SpdmResponse.VersionNumberEntry[Index].MinorVersion);
+
+    if(Version == SPDM_MESSAGE_VERSION_11 || Version == SPDM_MESSAGE_VERSION_10) {
+         SpdmContext->ConnectionInfo.Version[Index] = Version;
+         CompatibleVersionNumberEntry[CompatibleVersionCount] = SpdmResponse.VersionNumberEntry[Index];
+         CompatibleVersionCount++;
+    }
+  }
+  if(CompatibleVersionCount == 0) {
+    return RETURN_DEVICE_ERROR;
   }
 
   if (VersionCount != NULL) {
-    if (*VersionCount < SpdmResponse.VersionNumberEntryCount) {
-      *VersionCount = SpdmResponse.VersionNumberEntryCount;
+    *VersionCount = CompatibleVersionCount;
+    if (*VersionCount < CompatibleVersionCount) {
       return RETURN_BUFFER_TOO_SMALL;
     }
-    *VersionCount = SpdmResponse.VersionNumberEntryCount;
+
     if (VersionNumberEntries != NULL) {
       CopyMem (
         VersionNumberEntries,
-        SpdmResponse.VersionNumberEntry,
-        SpdmResponse.VersionNumberEntryCount * sizeof(SPDM_VERSION_NUMBER)
+        CompatibleVersionNumberEntry,
+        CompatibleVersionCount * sizeof(SPDM_VERSION_NUMBER)
         );
     }
   }
@@ -151,4 +168,3 @@ SpdmGetVersion (
 
   return Status;
 }
-

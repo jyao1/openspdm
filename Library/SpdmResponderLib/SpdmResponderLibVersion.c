@@ -52,9 +52,17 @@ SpdmGetResponseVersion (
 
   SpdmContext = Context;
   SpdmRequest = Request;
+  if (SpdmRequest->Header.SPDMVersion != SPDM_MESSAGE_VERSION_10)  {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   if (RequestSize != sizeof(SPDM_GET_VERSION_REQUEST)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
+  }
+  if (SpdmContext->ResponseState == SpdmResponseStateNeedResync) {
+    // receiving a GET_VERSION resets a need to resynchronization
+    SpdmContext->ResponseState = SpdmResponseStateNormal;
   }
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
@@ -95,4 +103,3 @@ SpdmGetResponseVersion (
 
   return RETURN_SUCCESS;
 }
-
