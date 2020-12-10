@@ -264,7 +264,7 @@ SpdmProcessEncapResponseChallengeAuth (
   DEBUG((DEBUG_INFO, "\n"));
   Result = SpdmEncapRequesterVerifyCertificateChainHash (SpdmContext, CertChainHash, HashSize);
   if (!Result) {
-    SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
 
@@ -313,7 +313,7 @@ SpdmProcessEncapResponseChallengeAuth (
   InternalDumpHex (Signature, SignatureSize);
   Result = SpdmEncapRequesterVerifyChallengeSignature (SpdmContext, Signature, SignatureSize);
   if (!Result) {
-    SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE;
+    SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
 

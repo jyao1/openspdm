@@ -47,6 +47,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define SPDM_TEST_CONTEXT_SIGNATURE  SIGNATURE_32 ('S', 'T', 'C', 'S')
 
+#define TEST_CERT_MAXINT16  1
+#define TEST_CERT_MAXUINT16 2
+#define TEST_CERT_MAXUINT16_LARGER 3
+#define TEST_CERT_SMALL 4
+
 typedef struct {
   UINT32                            Signature;
   BOOLEAN                           IsRequester;
@@ -101,6 +106,15 @@ ReadResponderPublicCertificateChain (
   );
 
 BOOLEAN
+ReadResponderPublicCertificateChainBySize (
+  IN  UINT16  CertId,
+  OUT VOID    **Data,
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
+  );
+
+BOOLEAN
 ReadRequesterPublicCertificateChain (
   OUT VOID    **Data,
   OUT UINTN   *Size,
@@ -110,6 +124,15 @@ ReadRequesterPublicCertificateChain (
 
 BOOLEAN
 ReadResponderRootPublicCertificate (
+  OUT VOID    **Data,
+  OUT UINTN   *Size,
+  OUT VOID    **Hash,
+  OUT UINTN   *HashSize
+  );
+
+BOOLEAN
+ReadResponderRootPublicCertificateBySize (
+  IN  UINT16  CertId,
   OUT VOID    **Data,
   OUT UINTN   *Size,
   OUT VOID    **Hash,
