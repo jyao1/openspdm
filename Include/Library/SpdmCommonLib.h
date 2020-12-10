@@ -51,7 +51,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPDM_STATUS_ERROR_TCG_EXTEND_TPM_PCR         (SPDM_STATUS_ERROR + 0x20)
 #define SPDM_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE   (SPDM_STATUS_ERROR + 0x21)
 #define SPDM_STATUS_ERROR_CHALLENGE_FAILURE          (SPDM_STATUS_ERROR + 0x30)
-#define SPDM_STATUS_ERROR_CERTIFIACTE_FAILURE        (SPDM_STATUS_ERROR + 0x31)
+#define SPDM_STATUS_ERROR_CERTIFICATE_FAILURE        (SPDM_STATUS_ERROR + 0x31)
 #define SPDM_STATUS_ERROR_NO_CERT_PROVISION          (SPDM_STATUS_ERROR + 0x32)
 #define SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE       (SPDM_STATUS_ERROR + 0x40)
 #define SPDM_STATUS_ERROR_NO_MUTUAL_AUTH             (SPDM_STATUS_ERROR + 0x41)
@@ -527,6 +527,19 @@ SpdmRegisterTransportLayerFunc (
   IN     VOID                                *SpdmContext,
   IN     SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC  TransportEncodeMessage,
   IN     SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  TransportDecodeMessage
+  );
+
+/**
+  This function verifies the integrity of a certificate chain
+  @param  CertBuffer                  A pointer to the certificate chain.
+  @param  CertBufferSize              The chain size
+  @retval TRUE  certificate chain integrity verification pass.
+  @retval FALSE certificate chain integrity verification fail.
+**/
+BOOLEAN
+SpdmVerifyCertificateChainData (
+  UINT8                                     *CertBuffer,
+  UINTN                                     CertBufferSize
   );
 
 #endif
