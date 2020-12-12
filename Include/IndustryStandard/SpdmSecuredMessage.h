@@ -83,7 +83,7 @@ typedef struct {
 #define SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_DATA_VERSION  0x1
 
 typedef struct {
-  UINT8    Id; // SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_DMTF
+  UINT8    Id; // SPDM_REGISTRY_ID_DMTF
   UINT8    VendorLen;
   UINT16   OpaqueElementDataLen;
 //UINT8    SMDataVersion;

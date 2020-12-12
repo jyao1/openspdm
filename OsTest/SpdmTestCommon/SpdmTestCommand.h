@@ -28,6 +28,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Vendor Hello
 //
 #pragma pack(1)
+
+#define SPDM_REGISTRY_ID_TEST         0xEE
+#define SPDM_TEST_VENDOR_ID_HELLO   0x5AA5
+
 #define TEST_PAYLOAD_CLIENT "Hello Server!"
 #define TEST_PAYLOAD_SERVER "Hello Client!"
 #define TEST_PAYLOAD_LEN (sizeof("Hello XXXXXX!"))

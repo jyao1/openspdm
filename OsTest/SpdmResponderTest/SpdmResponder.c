@@ -20,9 +20,9 @@ SPDM_VENDOR_DEFINED_REQUEST_MINE  mVendorDefinedResponse = {
     0, // Param1
     0, // Param2
   },
-  SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_PCISIG, // StandardID
+  SPDM_REGISTRY_ID_TEST, // StandardID
   2, // Len
-  0x8086, // VendorID
+  SPDM_TEST_VENDOR_ID_HELLO, // VendorID
   TEST_PAYLOAD_LEN, // PayloadLength
   {TEST_PAYLOAD_SERVER}
 };
@@ -79,8 +79,8 @@ TestSpdmProcessPacketCallback (
     SpmdRequest = Request;
     ASSERT ((RequestSize >= sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE)) && (RequestSize < sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE) + 4));
     ASSERT (SpmdRequest->Header.RequestResponseCode == SPDM_VENDOR_DEFINED_REQUEST);
-    ASSERT (SpmdRequest->StandardID == SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_PCISIG);
-    ASSERT (SpmdRequest->VendorID == 0x8086);
+    ASSERT (SpmdRequest->StandardID == SPDM_REGISTRY_ID_TEST);
+    ASSERT (SpmdRequest->VendorID == SPDM_TEST_VENDOR_ID_HELLO);
     ASSERT (SpmdRequest->PayloadLength == TEST_PAYLOAD_LEN);
     ASSERT (CompareMem (SpmdRequest->VendorDefinedPayload, TEST_PAYLOAD_CLIENT, TEST_PAYLOAD_LEN) == 0);
 

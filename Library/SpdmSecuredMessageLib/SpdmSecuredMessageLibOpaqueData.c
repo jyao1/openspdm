@@ -97,7 +97,7 @@ SpdmBuildOpaqueDataSupportedVersionData (
   GeneralOpaqueDataTableHeader->Reserved = 0;
 
   OpaqueElementTableHeader = (VOID *)(GeneralOpaqueDataTableHeader + 1);
-  OpaqueElementTableHeader->Id = SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_DMTF;
+  OpaqueElementTableHeader->Id = SPDM_REGISTRY_ID_DMTF;
   OpaqueElementTableHeader->VendorLen = 0;
   OpaqueElementTableHeader->OpaqueElementDataLen = sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) + sizeof(SPDM_VERSION_NUMBER);
 
@@ -151,7 +151,7 @@ SpdmProcessOpaqueDataSupportedVersionData (
     return RETURN_UNSUPPORTED;
   }
   OpaqueElementTableHeader = (VOID *)(GeneralOpaqueDataTableHeader + 1);
-  if ((OpaqueElementTableHeader->Id != SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_DMTF) ||
+  if ((OpaqueElementTableHeader->Id != SPDM_REGISTRY_ID_DMTF) ||
       (OpaqueElementTableHeader->VendorLen != 0) ||
       (OpaqueElementTableHeader->OpaqueElementDataLen != sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) + sizeof(SPDM_VERSION_NUMBER)) ) {
     return RETURN_UNSUPPORTED;
@@ -212,7 +212,7 @@ SpdmBuildOpaqueDataVersionSelectionData (
   GeneralOpaqueDataTableHeader->Reserved = 0;
 
   OpaqueElementTableHeader = (VOID *)(GeneralOpaqueDataTableHeader + 1);
-  OpaqueElementTableHeader->Id = SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_DMTF;
+  OpaqueElementTableHeader->Id = SPDM_REGISTRY_ID_DMTF;
   OpaqueElementTableHeader->VendorLen = 0;
   OpaqueElementTableHeader->OpaqueElementDataLen = sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION);
 
@@ -262,7 +262,7 @@ SpdmProcessOpaqueDataVersionSelectionData (
     return RETURN_UNSUPPORTED;
   }
   OpaqueElementTableHeader = (VOID *)(GeneralOpaqueDataTableHeader + 1);
-  if ((OpaqueElementTableHeader->Id != SPDM_EXTENDED_ALGORITHM_REGISTRY_ID_DMTF) ||
+  if ((OpaqueElementTableHeader->Id != SPDM_REGISTRY_ID_DMTF) ||
       (OpaqueElementTableHeader->VendorLen != 0) ||
       (OpaqueElementTableHeader->OpaqueElementDataLen != sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION)) ) {
     return RETURN_UNSUPPORTED;
