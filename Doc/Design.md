@@ -52,9 +52,18 @@
 
    This library encrypts and decrypts secured messages.
 
-5) [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) (follows DSP0275 and DSP0276)
+5.1) [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) (follows DSP0275 and DSP0276)
 
    This library encodes and decodes MCTP message header.
+
+   SPDM requester/responder need register SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC
+   and SPDM_TRANSPORT_DECODE_MESSAGE_FUNC to the SpdmRequesterLib/SpdmResponderLib.
+
+   These two APIs encode and decode transport layer messages to or from a SPDM device.
+
+5.2) [SpdmTransportPciDoeLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportPciDoeLib.h) (follows PCI DOE)
+
+   This library encodes and decodes PCI DOE message header.
 
    SPDM requester/responder need register SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC
    and SPDM_TRANSPORT_DECODE_MESSAGE_FUNC to the SpdmRequesterLib/SpdmResponderLib.

@@ -16,6 +16,14 @@
 
    DSP0276	Secured MCTP Messages over MCTP Binding Specification (version [1.0.0a](https://www.dmtf.org/sites/default/files/standards/documents/DSP0276_1.0.0a.pdf))
 
+   The PCI DOE / IDE follow :
+
+   PCI	Data Object Exchange (DOE) [ECN](https://members.pcisig.com/wg/PCI-SIG/document/14143)
+
+   PCI	Component Measurement and Authentication (CMA) [ECN](https://members.pcisig.com/wg/PCI-SIG/document/14236)
+
+   PCI	Integrity and Data Encryption (IDE) [ECN](https://members.pcisig.com/wg/PCI-SIG/document/15149)
+
 2) Both SPDM requester and SPDM responder.
 
 3) Programming Context:

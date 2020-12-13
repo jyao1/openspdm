@@ -52,6 +52,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/Library/SpdmResponderLib/SpdmResponderLib.a \
     $(BIN_DIR)/Library/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a \
     $(BIN_DIR)/Library/SpdmTransportMctpLib/SpdmTransportMctpLib.a \
+    $(BIN_DIR)/Library/SpdmTransportPciDoeLib/SpdmTransportPciDoeLib.a \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
 
 
@@ -66,6 +67,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/Library/SpdmResponderLib/*.o \
     $(BIN_DIR)/Library/SpdmSecuredMessageLib/*.o \
     $(BIN_DIR)/Library/SpdmTransportMctpLib/*.o \
+    $(BIN_DIR)/Library/SpdmTransportPciDoeLib/*.o \
     $(OUTPUT_DIR)/*.o \
 
 
@@ -114,6 +116,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmResponderLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmSecuredMessageLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmTransportMctpLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmTransportPciDoeLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
@@ -151,6 +154,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/Library/SpdmResponderLib/SpdmResponderLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmTransportMctpLib/SpdmTransportMctpLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/Library/SpdmTransportPciDoeLib/SpdmTransportPciDoeLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
 	$(DLINK) $(DLINK_FLAGS) $(DLINK_SPATH) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS2)
 

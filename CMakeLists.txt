@@ -423,6 +423,7 @@ if(TESTTYPE STREQUAL "OsTest")
             Library/SpdmResponderLib
             Library/SpdmSecuredMessageLib
             Library/SpdmTransportMctpLib
+            Library/SpdmTransportPciDoeLib
             OsStub/BaseMemoryLib
             OsStub/DebugLib
             OsStub/RngLib
@@ -439,6 +440,7 @@ elseif(TESTTYPE STREQUAL "UnitTest")
             Library/SpdmResponderLib
             Library/SpdmSecuredMessageLib
             Library/SpdmTransportMctpLib
+            Library/SpdmTransportPciDoeLib
             OsStub/BaseMemoryLib
             OsStub/DebugLib
             OsStub/RngLib
