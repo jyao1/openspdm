@@ -86,11 +86,10 @@ typedef enum {
   SpdmDataMeasurementRecord,
   SpdmDataMutAuthRequested,
   //
-  // Pre-shared secret
+  // Pre-shared Key Hint
   // If PSK is present, then PSK_EXCHANGE is used.
   // Otherwise, the KEY_EXCHANGE is used.
   //
-  SpdmDataPsk,
   SpdmDataPskHint,
   //
   // Session Type
@@ -341,6 +340,45 @@ EFIAPI
 SpdmRegisterDataSignFunc (
   IN     VOID                      *SpdmContext,
   IN     SPDM_DATA_SIGN_FUNC       SpdmDataSignFunc
+  );
+
+/**
+  Computes the HMAC of a input data buffer with PSK.
+
+  This function performs the HMAC of a given data buffer, and return the hash value.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  PskHint                      Pointer to the user-supplied PSK Hint.
+  @param  PskHintSize                  PSK Hint size in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
+typedef
+BOOLEAN
+(EFIAPI *SPDM_PSK_HMAC_FUNC) (
+  IN      VOID         *SpdmContext,
+  IN      CONST VOID   *Data,
+  IN      UINTN        DataSize,
+  IN      CONST UINT8  *PskHint, OPTIONAL
+  IN      UINTN        PskHintSize, OPTIONAL
+     OUT  UINT8        *HmacValue
+  );
+
+/**
+  Register SPDM PSK HMAC function.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SpdmPskHmacFunc              The fuction to HMAC data with PSK.
+**/
+VOID
+EFIAPI
+SpdmRegisterPskHmacFunc (
+  IN     VOID                      *SpdmContext,
+  IN     SPDM_PSK_HMAC_FUNC        SpdmPskHmacFunc
   );
 
 /**

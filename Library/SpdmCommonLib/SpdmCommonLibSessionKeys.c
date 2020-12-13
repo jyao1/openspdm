@@ -210,8 +210,6 @@ SpdmGenerateSessionHandshakeKey (
     return RETURN_UNSUPPORTED;
   }
 
-  ASSERT ((SessionInfo->DheKeySize != 0) || (SpdmContext->LocalContext.PskSize != 0));
-
   HashSize = GetSpdmHashSize (SpdmContext);
 
   SessionInfo->HashSize = HashSize;
@@ -260,9 +258,9 @@ SpdmGenerateSessionHandshakeKey (
   DEBUG((DEBUG_INFO, "\n"));
 
   if (SessionInfo->UsePsk) {
-    RetVal = SpdmHmacAll (SpdmContext, SpdmContext->LocalContext.Psk, SpdmContext->LocalContext.PskSize, Salt0, HashSize, SessionInfo->HandshakeSecret.HandshakeSecret);
+    RetVal = SpdmContext->LocalContext.SpdmPskHmacFunc (SpdmContext, Salt0, HashSize, SpdmContext->LocalContext.PskHint, SpdmContext->LocalContext.PskHintSize, SessionInfo->HandshakeSecret.HandshakeSecret);
   } else {
-    RetVal = SpdmHmacAll (SpdmContext, SessionInfo->HandshakeSecret.DheSecret, SessionInfo->DheKeySize, Salt0, HashSize, SessionInfo->HandshakeSecret.HandshakeSecret);
+    RetVal = SpdmHmacAll (SpdmContext, Salt0, HashSize, SessionInfo->HandshakeSecret.DheSecret, SessionInfo->DheKeySize, SessionInfo->HandshakeSecret.HandshakeSecret);
   }
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "HandshakeSecret (0x%x) - ", HashSize));
@@ -369,7 +367,6 @@ SpdmGenerateSessionDataKey (
     return RETURN_UNSUPPORTED;
   }
 
-  ASSERT ((SessionInfo->DheKeySize != 0) || (SpdmContext->LocalContext.PskSize != 0));
   ASSERT (SessionInfo->HashSize != 0);
 
   HashSize = GetSpdmHashSize (SpdmContext);
@@ -424,7 +421,7 @@ SpdmGenerateSessionDataKey (
   InternalDumpData (Salt1, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  RetVal = SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, Salt1, HashSize, SessionInfo->HandshakeSecret.MasterSecret);
+  RetVal = SpdmHmacAll (SpdmContext, Salt1, HashSize, mZeroFilledBuffer, HashSize, SessionInfo->HandshakeSecret.MasterSecret);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "MasterSecret (0x%x) - ", HashSize));
   InternalDumpData (SessionInfo->HandshakeSecret.MasterSecret, HashSize);
@@ -512,7 +509,6 @@ SpdmCreateUpdateSessionDataKey (
     return RETURN_UNSUPPORTED;
   }
 
-  ASSERT ((SessionInfo->DheKeySize != 0) || (SpdmContext->LocalContext.PskSize != 0));
   ASSERT (SessionInfo->HashSize != 0);
 
   HashSize = GetSpdmHashSize (SpdmContext);

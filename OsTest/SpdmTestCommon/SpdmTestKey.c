@@ -96,6 +96,36 @@ Sha256HashAll (
   OUT  UINT8       *HashValue
   );
 
+/**
+  Computes the HMAC-SHA256 digest of a input data buffer.
+
+  This function performs the HMAC-SHA256 digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be digested.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[in]   Key         Pointer to the user-supplied key.
+  @param[in]   KeySize     Key size in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the HMAC-SHA1 digest
+                           value (32 bytes).
+
+  @retval TRUE   HMAC-SHA256 digest computation succeeded.
+  @retval FALSE  HMAC-SHA256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256All (
+  IN   CONST VOID   *Data,
+  IN   UINTN        DataSize,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  OUT  UINT8        *HmacValue
+  );
+
 VOID  *mResponderPrivateCertData;
 UINTN mResponderPrivateCertDataSize;
 
@@ -707,6 +737,53 @@ SpdmDataSignFunc (
              SigSize
              );
   TestSpdmAsymFree (AsymAlgo, Context);
+
+  return Result;
+}
+
+/**
+  Computes the HMAC of a input data buffer with PSK.
+
+  This function performs the HMAC of a given data buffer, and return the hash value.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  PskHint                      Pointer to the user-supplied PSK Hint.
+  @param  PskHintSize                  PSK Hint size in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
+BOOLEAN
+EFIAPI
+SpdmPskHmacFunc (
+  IN      VOID         *SpdmContext,
+  IN      CONST VOID   *Data,
+  IN      UINTN        DataSize,
+  IN      CONST UINT8  *PskHint, OPTIONAL
+  IN      UINTN        PskHintSize, OPTIONAL
+     OUT  UINT8        *HmacValue
+  )
+{
+  VOID                          *Psk;
+  UINTN                         PskSize;
+  BOOLEAN                       Result;
+
+  if ((PskHint == NULL) && (PskHintSize == 0)) {
+    Psk = TEST_PSK_DATA_STRING;
+    PskSize = sizeof(TEST_PSK_DATA_STRING);
+  } else if ((PskHint != NULL) && (PskHintSize != 0) &&
+             (strcmp((const char *)PskHint, TEST_PSK_HINT_STRING) == 0) &&
+             (PskHintSize == sizeof(TEST_PSK_HINT_STRING))) {
+    Psk = TEST_PSK_DATA_STRING;
+    PskSize = sizeof(TEST_PSK_DATA_STRING);
+  } else {
+    return FALSE;
+  }
+
+  Result = HmacSha256All (Data, DataSize, Psk, PskSize, HmacValue);
 
   return Result;
 }

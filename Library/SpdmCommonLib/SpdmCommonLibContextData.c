@@ -432,10 +432,6 @@ SpdmSetData (
     SpdmContext->LocalContext.MutAuthRequested = MutAuthRequested;
     SpdmInitEncapEnv (Context, MutAuthRequested, Parameter->AdditionalData[0], Parameter->AdditionalData[1]);
     break;
-  case SpdmDataPsk:
-    SpdmContext->LocalContext.PskSize = DataSize;
-    SpdmContext->LocalContext.Psk = Data;
-    break;
   case SpdmDataPskHint:
     if (DataSize > MAX_SPDM_PSK_HINT_LENGTH) {
       return RETURN_INVALID_PARAMETER;
@@ -768,6 +764,26 @@ SpdmRegisterDataSignFunc (
 
   SpdmContext = Context;
   SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
+  return ;
+}
+
+/**
+  Register SPDM PSK HMAC function.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SpdmPskHmacFunc              The fuction to HMAC data with PSK.
+**/
+VOID
+EFIAPI
+SpdmRegisterPskHmacFunc (
+  IN     VOID                      *Context,
+  IN     SPDM_PSK_HMAC_FUNC        SpdmPskHmacFunc
+  )
+{
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+
+  SpdmContext = Context;
+  SpdmContext->LocalContext.SpdmPskHmacFunc = SpdmPskHmacFunc;
   return ;
 }
 

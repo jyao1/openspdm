@@ -225,6 +225,12 @@ SpdmClientInit (
   Data16 = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
   SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
 
+  SpdmRegisterPskHmacFunc (SpdmContext, SpdmPskHmacFunc);
+  Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
+  if (RETURN_ERROR(Status)) {
+    printf ("SpdmSetData - %x\n", (UINT32)Status);
+  }
+
   Status = SpdmInitConnection (SpdmContext);
   if (RETURN_ERROR(Status)) {
     printf ("SpdmInitConnection - 0x%x\n", (UINT32)Status);

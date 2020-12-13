@@ -117,17 +117,6 @@ DoSessionViaSpdm (
 
   SpdmContext = mSpdmContext;
 
-  Status = SpdmSetData (SpdmContext, SpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmSetData - %x\n", (UINT32)Status);
-    return Status;
-  }
-  Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, "TestPskHint", sizeof("TestPskHint"));
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmSetData - %x\n", (UINT32)Status);
-    return Status;
-  }
-
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmStartSession (

@@ -58,9 +58,9 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &KeySchedule, sizeof(KeySchedule));
    ```
 
-   1.6, if PSK is required, deploy PSK data.
+   1.6, if PSK is required, register PSK HMAC function, and optionally deploy PSK Hint.
    ```
-   SpdmSetData (SpdmContext, SpdmDataPsk, NULL, PskData, PskDataSize);
+   SpdmRegisterDataSignFunc (SpdmContext, SpdmPskHmacFunc);
    SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, PskHint, PskHintSize);
    ```
 
@@ -225,9 +225,9 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &KeySchedule, sizeof(KeySchedule));
    ```
 
-   1.6, if PSK is required, deploy PSK data.
+   1.6, if PSK is required, register PSK HMAC function, and optionally deploy PSK Hint.
    ```
-   SpdmSetData (SpdmContext, SpdmDataPsk, NULL, PskData, PskDataSize);
+   SpdmRegisterDataSignFunc (SpdmContext, SpdmPskHmacFunc);
    SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, PskHint, PskHintSize);
    ```
 

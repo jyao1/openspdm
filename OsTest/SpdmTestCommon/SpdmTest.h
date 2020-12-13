@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "OsInclude.h"
 #include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 #include "assert.h"
 #include "SpdmTestCommand.h"
 
@@ -39,6 +41,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define USE_REQ_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048
 //#define USE_REQ_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048
 //#define USE_REQ_ASYM_ALGO  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256
+
+#define TEST_PSK_DATA_STRING  "TestPskData"
+#define TEST_PSK_HINT_STRING  "TestPskHint"
 
 VOID
 DumpData (
@@ -155,6 +160,17 @@ SpdmDataSignFunc (
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
+  );
+
+BOOLEAN
+EFIAPI
+SpdmPskHmacFunc (
+  IN      VOID         *SpdmContext,
+  IN      CONST VOID   *Data,
+  IN      UINTN        DataSize,
+  IN      CONST UINT8  *PskHint, OPTIONAL
+  IN      UINTN        PskHintSize, OPTIONAL
+     OUT  UINT8        *HmacValue
   );
 
 #endif

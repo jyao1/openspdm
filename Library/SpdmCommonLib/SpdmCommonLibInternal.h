@@ -44,7 +44,7 @@ typedef struct {
   // My provisioned certificate (for SlotNum - 0xFF, default 0)
   UINT8                           ProvisionedSlotNum;
   //
-  // My Private Certificate
+  // Use my Private Certificate to sign
   //
   SPDM_DATA_SIGN_FUNC             SpdmDataSignFunc;
   //
@@ -66,10 +66,12 @@ typedef struct {
   //
   // PSK provision locally
   //
-  UINTN                           PskSize;
-  UINT8                           *Psk;
   UINTN                           PskHintSize;
   UINT8                           *PskHint;
+  //
+  // Use my PSK to HMAC
+  //
+  SPDM_PSK_HMAC_FUNC              SpdmPskHmacFunc;
   //
   // OpaqueData provision locally
   //

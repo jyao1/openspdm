@@ -201,7 +201,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     BinStr0Size = sizeof(BinStr0);
     BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
     SpdmHkdfExpand (SpdmContext, Secret0, HashSize, BinStr0, BinStr0Size, Salt0, HashSize);
-    SpdmHmacAll (SpdmContext, FinalKey, FinalKeySize, Salt0, HashSize, HandshakeSecret);
+    SpdmHmacAll (SpdmContext, Salt0, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
     BinStr2Size = sizeof(BinStr2);
     BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
     SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
@@ -310,7 +310,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     BinStr0Size = sizeof(BinStr0);
     BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
     SpdmHkdfExpand (SpdmContext, Secret0, HashSize, BinStr0, BinStr0Size, Salt0, HashSize);
-    SpdmHmacAll (SpdmContext, FinalKey, FinalKeySize, Salt0, HashSize, HandshakeSecret);
+    SpdmHmacAll (SpdmContext, Salt0, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
     BinStr2Size = sizeof(BinStr2);
     BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
     SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
@@ -457,7 +457,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       BinStr0Size = sizeof(BinStr0);
       BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
       SpdmHkdfExpand (SpdmContext, Secret0, HashSize, BinStr0, BinStr0Size, Salt0, HashSize);
-      SpdmHmacAll (SpdmContext, FinalKey, FinalKeySize, Salt0, HashSize, HandshakeSecret);
+      SpdmHmacAll (SpdmContext, Salt0, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
       BinStr2Size = sizeof(BinStr2);
       BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
       SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
@@ -613,7 +613,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       BinStr0Size = sizeof(BinStr0);
       BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
       SpdmHkdfExpand (SpdmContext, Secret0, HashSize, BinStr0, BinStr0Size, Salt0, HashSize);
-      SpdmHmacAll (SpdmContext, FinalKey, FinalKeySize, Salt0, HashSize, HandshakeSecret);
+      SpdmHmacAll (SpdmContext, Salt0, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
       BinStr2Size = sizeof(BinStr2);
       BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
       SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);

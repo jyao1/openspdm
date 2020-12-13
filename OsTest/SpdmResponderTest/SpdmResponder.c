@@ -336,11 +336,8 @@ SpdmServerInit (
 
   SpdmRegisterGetResponseFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
 
-  Status = SpdmSetData (SpdmContext, SpdmDataPsk, NULL, "TestPskData", sizeof("TestPskData"));
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmSetData - %x\n", (UINT32)Status);
-  }
-  Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, "TestPskHint", sizeof("TestPskHint"));
+  SpdmRegisterPskHmacFunc (SpdmContext, SpdmPskHmacFunc);
+  Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);
   }
