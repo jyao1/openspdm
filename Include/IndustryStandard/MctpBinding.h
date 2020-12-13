@@ -18,6 +18,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #pragma pack(1)
 
+//
+// MCTP header
+//
+typedef struct {
+  UINT8    MessageType;
+} MCTP_MESSAGE_HEADER;
+
 #define MCTP_MESSAGE_TYPE_MCTP_CONTROL        0x00
 #define MCTP_MESSAGE_TYPE_PLDM                0x01
 #define MCTP_MESSAGE_TYPE_NCSI_CONTROL        0x02

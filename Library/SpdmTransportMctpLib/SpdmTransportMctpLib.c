@@ -36,27 +36,30 @@ MctpEncodeMessage (
   )
 {
   UINTN                       AlignedMessageSize;
-  UINTN                       Alignment = MCTP_ALIGNMENT;
+  UINTN                       Alignment;
+  MCTP_MESSAGE_HEADER         *MctpHeader;
 
+  Alignment = MCTP_ALIGNMENT;
   AlignedMessageSize = (MessageSize + (Alignment - 1)) & ~(Alignment - 1);
 
-  ASSERT (*TransportMessageSize >= AlignedMessageSize + 1);
-  if (*TransportMessageSize < AlignedMessageSize + 1) {
-    *TransportMessageSize = AlignedMessageSize + 1;
+  ASSERT (*TransportMessageSize >= AlignedMessageSize + sizeof(MCTP_MESSAGE_HEADER));
+  if (*TransportMessageSize < AlignedMessageSize + sizeof(MCTP_MESSAGE_HEADER)) {
+    *TransportMessageSize = AlignedMessageSize + sizeof(MCTP_MESSAGE_HEADER);
     return RETURN_BUFFER_TOO_SMALL;
   }
-  *TransportMessageSize = AlignedMessageSize + 1;
+  *TransportMessageSize = AlignedMessageSize + sizeof(MCTP_MESSAGE_HEADER);
+  MctpHeader = TransportMessage;
   if (SessionId != NULL) {
-    *(UINT8 *)TransportMessage = MCTP_MESSAGE_TYPE_SECURED_MCTP;
+    MctpHeader->MessageType = MCTP_MESSAGE_TYPE_SECURED_MCTP;
     ASSERT (*SessionId == *(UINT32 *)(Message));
     if (*SessionId != *(UINT32 *)(Message)) {
       return RETURN_UNSUPPORTED;
     }
   } else {
-    *(UINT8 *)TransportMessage = MCTP_MESSAGE_TYPE_SPDM;
+    MctpHeader->MessageType = MCTP_MESSAGE_TYPE_SPDM;
   }
-  CopyMem ((UINT8 *)TransportMessage + 1, Message, MessageSize);
-  ZeroMem ((UINT8 *)TransportMessage + 1 + MessageSize, *TransportMessageSize - 1 - MessageSize);
+  CopyMem ((UINT8 *)TransportMessage + sizeof(MCTP_MESSAGE_HEADER), Message, MessageSize);
+  ZeroMem ((UINT8 *)TransportMessage + sizeof(MCTP_MESSAGE_HEADER) + MessageSize, *TransportMessageSize - sizeof(MCTP_MESSAGE_HEADER) - MessageSize);
   return RETURN_SUCCESS;
 }
 
@@ -82,22 +85,28 @@ MctpDecodeMessage (
      OUT VOID                 *Message
   )
 {
-  UINTN                       Alignment = MCTP_ALIGNMENT;
+  UINTN                       Alignment;
+  MCTP_MESSAGE_HEADER         *MctpHeader;
 
-  ASSERT (TransportMessageSize > 1);
-  if (TransportMessageSize <= 1) {
+  Alignment = MCTP_ALIGNMENT;
+
+  ASSERT (TransportMessageSize > sizeof(MCTP_MESSAGE_HEADER));
+  if (TransportMessageSize <= sizeof(MCTP_MESSAGE_HEADER)) {
     return RETURN_UNSUPPORTED;
   }
-  switch (*(UINT8 *)TransportMessage) {
+
+  MctpHeader = TransportMessage;
+
+  switch (MctpHeader->MessageType) {
   case MCTP_MESSAGE_TYPE_SECURED_MCTP:
     ASSERT (SessionId != NULL);
     if (SessionId == NULL) {
       return RETURN_UNSUPPORTED;
     }
-    if (TransportMessageSize <= 1 + sizeof(UINT32)) {
+    if (TransportMessageSize <= sizeof(MCTP_MESSAGE_HEADER) + sizeof(UINT32)) {
       return RETURN_UNSUPPORTED;
     }
-    *SessionId = (UINT32 *)((UINT8 *)TransportMessage + 1);
+    *SessionId = (UINT32 *)((UINT8 *)TransportMessage + sizeof(MCTP_MESSAGE_HEADER));
     break;
   case MCTP_MESSAGE_TYPE_SPDM:
     if (SessionId != NULL) {
@@ -108,24 +117,24 @@ MctpDecodeMessage (
     return RETURN_UNSUPPORTED;
   }
 
-  ASSERT (((TransportMessageSize - 1) & (Alignment - 1)) == 0);
+  ASSERT (((TransportMessageSize - sizeof(MCTP_MESSAGE_HEADER)) & (Alignment - 1)) == 0);
 
-  if (*MessageSize < TransportMessageSize - 1) {
+  if (*MessageSize < TransportMessageSize - sizeof(MCTP_MESSAGE_HEADER)) {
     //
     // Handle special case for the side effect of alignment
     // Caller may allocate a good enough buffer without considering alignment.
     // Here we will not copy all the message and ignore the the last padding bytes.
     //
-    if (*MessageSize + Alignment - 1 >= TransportMessageSize - 1) {
-      CopyMem (Message, (UINT8 *)TransportMessage + 1, *MessageSize);
+    if (*MessageSize + Alignment - 1 >= TransportMessageSize - sizeof(MCTP_MESSAGE_HEADER)) {
+      CopyMem (Message, (UINT8 *)TransportMessage + sizeof(MCTP_MESSAGE_HEADER), *MessageSize);
       return RETURN_SUCCESS;
     }
-    ASSERT (*MessageSize >= TransportMessageSize - 1);
-    *MessageSize = TransportMessageSize - 1;
+    ASSERT (*MessageSize >= TransportMessageSize - sizeof(MCTP_MESSAGE_HEADER));
+    *MessageSize = TransportMessageSize - sizeof(MCTP_MESSAGE_HEADER);
     return RETURN_BUFFER_TOO_SMALL;
   }
-  *MessageSize = TransportMessageSize - 1;
-  CopyMem (Message, (UINT8 *)TransportMessage + 1, *MessageSize);
+  *MessageSize = TransportMessageSize - sizeof(MCTP_MESSAGE_HEADER);
+  CopyMem (Message, (UINT8 *)TransportMessage + sizeof(MCTP_MESSAGE_HEADER), *MessageSize);
   return RETURN_SUCCESS;
 }
 
