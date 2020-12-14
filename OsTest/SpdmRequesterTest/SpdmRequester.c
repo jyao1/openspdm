@@ -172,7 +172,7 @@ SpdmClientInit (
   Res = ReadRequesterPrivateCertificate (&Data, &DataSize);
   if (Res) {
     HasReqPrivKey = TRUE;
-    SpdmRegisterDataSignFunc (SpdmContext, SpdmDataSignFunc);
+    SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
   } else{
     HasReqPrivKey = FALSE;
   }

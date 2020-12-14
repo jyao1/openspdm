@@ -106,7 +106,7 @@ SpdmEncapResponderGenerateChallengeSignature (
   UINTN                         SignatureSize;
   UINT32                        HashSize;
   
-  if (SpdmContext->LocalContext.SpdmDataSignFunc == NULL) {
+  if (SpdmContext->LocalContext.SpdmRequesterDataSignFunc == NULL) {
     return FALSE;
   }
 
@@ -128,8 +128,7 @@ SpdmEncapResponderGenerateChallengeSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   
-  Result = SpdmContext->LocalContext.SpdmDataSignFunc (
-             FALSE,
+  Result = SpdmContext->LocalContext.SpdmRequesterDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
              HashData,
              HashSize,

@@ -54,7 +54,7 @@ SpdmResponderGenerateKeyExchangeSignature (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  if (SpdmContext->LocalContext.SpdmDataSignFunc == NULL) {
+  if (SpdmContext->LocalContext.SpdmResponderDataSignFunc == NULL) {
     return FALSE;
   }
 
@@ -87,8 +87,7 @@ SpdmResponderGenerateKeyExchangeSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  Result = SpdmContext->LocalContext.SpdmDataSignFunc (
-             TRUE,
+  Result = SpdmContext->LocalContext.SpdmResponderDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
              HashData,
              HashSize,

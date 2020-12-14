@@ -70,62 +70,6 @@ BOOLEAN
   IN OUT  UINTN        *SigSize
   );
 
-/**
-  Computes the SHA-256 message digest of a input data buffer.
-
-  This function performs the SHA-256 message digest of a given data buffer, and places
-  the digest value into the specified memory.
-
-  If this interface is not supported, then return FALSE.
-
-  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
-  @param[in]   DataSize    Size of Data buffer in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the SHA-256 digest
-                           value (32 bytes).
-
-  @retval TRUE   SHA-256 digest computation succeeded.
-  @retval FALSE  SHA-256 digest computation failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sha256HashAll (
-  IN   CONST VOID  *Data,
-  IN   UINTN       DataSize,
-  OUT  UINT8       *HashValue
-  );
-
-/**
-  Computes the HMAC-SHA256 digest of a input data buffer.
-
-  This function performs the HMAC-SHA256 digest of a given data buffer, and places
-  the digest value into the specified memory.
-
-  If this interface is not supported, then return FALSE.
-
-  @param[in]   Data        Pointer to the buffer containing the data to be digested.
-  @param[in]   DataSize    Size of Data buffer in bytes.
-  @param[in]   Key         Pointer to the user-supplied key.
-  @param[in]   KeySize     Key size in bytes.
-  @param[out]  HashValue   Pointer to a buffer that receives the HMAC-SHA1 digest
-                           value (32 bytes).
-
-  @retval TRUE   HMAC-SHA256 digest computation succeeded.
-  @retval FALSE  HMAC-SHA256 digest computation failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-HmacSha256All (
-  IN   CONST VOID   *Data,
-  IN   UINTN        DataSize,
-  IN   CONST UINT8  *Key,
-  IN   UINTN        KeySize,
-  OUT  UINT8        *HmacValue
-  );
-
 VOID  *mResponderPrivateCertData;
 UINTN mResponderPrivateCertDataSize;
 
@@ -689,7 +633,6 @@ TestSpdmAsymSign (
   @retval FALSE signing fail.
 **/
 BOOLEAN
-EFIAPI
 SpdmDataSignFunc (
   IN      BOOLEAN      IsResponder,
   IN      UINT32       AsymAlgo,
@@ -738,6 +681,33 @@ SpdmDataSignFunc (
 
   return Result;
 }
+
+BOOLEAN
+EFIAPI
+SpdmRequesterDataSignFunc (
+  IN      UINT32       AsymAlgo,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  return SpdmDataSignFunc (FALSE, AsymAlgo, MessageHash, HashSize, Signature, SigSize);
+}
+
+BOOLEAN
+EFIAPI
+SpdmResponderDataSignFunc (
+  IN      UINT32       AsymAlgo,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  return SpdmDataSignFunc (TRUE, AsymAlgo, MessageHash, HashSize, Signature, SigSize);
+}
+
 
 UINT8  mMyZeroFilledBuffer[64];
 UINT8  gBinStr0[0x12] = {

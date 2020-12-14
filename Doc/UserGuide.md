@@ -41,7 +41,7 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    Parameter.AdditionalData[0] = MeasurementCount;
    SpdmSetData (SpdmContext, SpdmDataMeasurementRecord, &Parameter, Measurement, MeasurementSize);
 
-   SpdmRegisterDataSignFunc (SpdmContext, SpdmDataSignFunc);
+   SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
    ```
 
    1.5, set capabilities and choose algorithms, based upon need.
@@ -58,7 +58,7 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &KeySchedule, sizeof(KeySchedule));
    ```
 
-   1.6, if PSK is required, register PSK HMAC function, and optionally deploy PSK Hint.
+   1.6, if PSK is required, register PSK HKDF_EXPAND function, and optionally deploy PSK Hint.
    ```
    SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
    SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, PskHint, PskHintSize);
@@ -208,7 +208,7 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    Parameter.AdditionalData[0] = MeasurementCount;
    SpdmSetData (SpdmContext, SpdmDataMeasurementRecord, &Parameter, Measurement, MeasurementSize);
 
-   SpdmRegisterDataSignFunc (SpdmContext, SpdmDataSignFunc);
+   SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
    ```
 
    1.5, set capabilities and choose algorithms, based upon need.
@@ -225,7 +225,7 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &KeySchedule, sizeof(KeySchedule));
    ```
 
-   1.6, if PSK is required, register PSK HMAC function, and optionally deploy PSK Hint.
+   1.6, if PSK is required, register PSK HKDF_EXPAND function, and optionally deploy PSK Hint.
    ```
    SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
    SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, PskHint, PskHintSize);

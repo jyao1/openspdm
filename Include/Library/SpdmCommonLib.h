@@ -303,7 +303,6 @@ SpdmGetContextSize (
 /**
   Sign an SPDM message data.
 
-  @param  IsResponder                  Indicates if it is a responder message.
   @param  AsymAlgo                     Indicates the signing algorithm.
                                        For responder, it must align with BaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
                                        For requester, it must align with ReqBaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
@@ -319,7 +318,6 @@ SpdmGetContextSize (
 typedef
 BOOLEAN
 (EFIAPI *SPDM_DATA_SIGN_FUNC) (
-  IN      BOOLEAN      IsResponder,
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
@@ -331,13 +329,15 @@ BOOLEAN
   Register SPDM data signing function.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SpdmDataSignFunc             The fuction to sign the SPDM data.
+  @param  SpdmRequesterDataSignFunc    The fuction to sign the SPDM data from a requester.
+  @param  SpdmResponderDataSignFunc    The fuction to sign the SPDM data from a responder.
 **/
 VOID
 EFIAPI
 SpdmRegisterDataSignFunc (
   IN     VOID                      *SpdmContext,
-  IN     SPDM_DATA_SIGN_FUNC       SpdmDataSignFunc
+  IN     SPDM_DATA_SIGN_FUNC       SpdmRequesterDataSignFunc,
+  IN     SPDM_DATA_SIGN_FUNC       SpdmResponderDataSignFunc
   );
 
 /**

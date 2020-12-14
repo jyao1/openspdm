@@ -751,19 +751,22 @@ SpdmIsVersionSupported (
   Register SPDM data signing function.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SpdmDataSignFunc             The fuction to sign the SPDM data.
+  @param  SpdmRequesterDataSignFunc    The fuction to sign the SPDM data from a requester.
+  @param  SpdmResponderDataSignFunc    The fuction to sign the SPDM data from a responder.
 **/
 VOID
 EFIAPI
 SpdmRegisterDataSignFunc (
   IN     VOID                      *Context,
-  IN     SPDM_DATA_SIGN_FUNC       SpdmDataSignFunc
+  IN     SPDM_DATA_SIGN_FUNC       SpdmRequesterDataSignFunc,
+  IN     SPDM_DATA_SIGN_FUNC       SpdmResponderDataSignFunc
   )
 {
   SPDM_DEVICE_CONTEXT       *SpdmContext;
 
   SpdmContext = Context;
-  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
+  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
+  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   return ;
 }
 

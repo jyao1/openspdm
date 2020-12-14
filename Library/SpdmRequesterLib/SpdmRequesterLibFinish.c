@@ -145,7 +145,7 @@ SpdmRequesterGenerateFinishSignature (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  if (SpdmContext->LocalContext.SpdmDataSignFunc == NULL) {
+  if (SpdmContext->LocalContext.SpdmRequesterDataSignFunc == NULL) {
     return FALSE;
   }
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
@@ -192,8 +192,7 @@ SpdmRequesterGenerateFinishSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  Result = SpdmContext->LocalContext.SpdmDataSignFunc (
-             FALSE,
+  Result = SpdmContext->LocalContext.SpdmRequesterDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
              HashData,
              HashSize,

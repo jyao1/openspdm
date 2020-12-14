@@ -46,7 +46,8 @@ typedef struct {
   //
   // Use my Private Certificate to sign
   //
-  SPDM_DATA_SIGN_FUNC             SpdmDataSignFunc;
+  SPDM_DATA_SIGN_FUNC             SpdmRequesterDataSignFunc;
+  SPDM_DATA_SIGN_FUNC             SpdmResponderDataSignFunc;
   //
   // Peer Root Certificate Hash
   //

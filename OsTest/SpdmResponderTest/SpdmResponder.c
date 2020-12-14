@@ -245,7 +245,7 @@ SpdmServerInit (
   Res = ReadResponderPrivateCertificate (&Data, &DataSize);
   if (Res) {
     HasRspPrivKey = TRUE;
-    SpdmRegisterDataSignFunc (SpdmContext, SpdmDataSignFunc);
+    SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
   } else{
     HasRspPrivKey = FALSE;
   }
