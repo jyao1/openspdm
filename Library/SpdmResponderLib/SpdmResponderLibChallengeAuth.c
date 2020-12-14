@@ -133,7 +133,6 @@ SpdmResponderGenerateChallengeSignature (
   DEBUG((DEBUG_INFO, "\n"));
   
   Result = SpdmContext->LocalContext.SpdmDataSignFunc (
-             SpdmContext,
              TRUE,
              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
              HashData,

@@ -153,7 +153,6 @@ TestSpdmAsymFree (
 BOOLEAN
 EFIAPI
 SpdmDataSignFunc (
-  IN      VOID         *SpdmContext,
   IN      BOOLEAN      IsResponder,
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *MessageHash,
@@ -164,13 +163,26 @@ SpdmDataSignFunc (
 
 BOOLEAN
 EFIAPI
-SpdmPskHmacFunc (
-  IN      VOID         *SpdmContext,
-  IN      CONST VOID   *Data,
-  IN      UINTN        DataSize,
+SpdmPskHandshakeSecretHkdfExpandFunc (
+  IN      UINT32       HashAlgo,
   IN      CONST UINT8  *PskHint, OPTIONAL
   IN      UINTN        PskHintSize, OPTIONAL
-     OUT  UINT8        *HmacValue
+  IN      CONST UINT8  *Info,
+  IN      UINTN        InfoSize,
+     OUT  UINT8        *Out,
+  IN      UINTN        OutSize
+  );
+
+BOOLEAN
+EFIAPI
+SpdmPskMasterSecretHkdfExpandFunc (
+  IN      UINT32       HashAlgo,
+  IN      CONST UINT8  *PskHint, OPTIONAL
+  IN      UINTN        PskHintSize, OPTIONAL
+  IN      CONST UINT8  *Info,
+  IN      UINTN        InfoSize,
+     OUT  UINT8        *Out,
+  IN      UINTN        OutSize
   );
 
 #endif

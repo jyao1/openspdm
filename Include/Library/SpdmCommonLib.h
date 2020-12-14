@@ -303,7 +303,6 @@ SpdmGetContextSize (
 /**
   Sign an SPDM message data.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  IsResponder                  Indicates if it is a responder message.
   @param  AsymAlgo                     Indicates the signing algorithm.
                                        For responder, it must align with BaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
@@ -320,7 +319,6 @@ SpdmGetContextSize (
 typedef
 BOOLEAN
 (EFIAPI *SPDM_DATA_SIGN_FUNC) (
-  IN      VOID         *SpdmContext,
   IN      BOOLEAN      IsResponder,
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *MessageHash,
@@ -343,42 +341,44 @@ SpdmRegisterDataSignFunc (
   );
 
 /**
-  Computes the HMAC of a input data buffer with PSK.
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
 
-  This function performs the HMAC of a given data buffer, and return the hash value.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Data                         Pointer to the buffer containing the data to be HMACed.
-  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashAlgo                     Indicates the hash algorithm.
   @param  PskHint                      Pointer to the user-supplied PSK Hint.
   @param  PskHintSize                  PSK Hint size in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
 
-  @retval TRUE   HMAC computation succeeded.
-  @retval FALSE  HMAC computation failed.
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
 **/
 typedef
 BOOLEAN
-(EFIAPI *SPDM_PSK_HMAC_FUNC) (
-  IN      VOID         *SpdmContext,
-  IN      CONST VOID   *Data,
-  IN      UINTN        DataSize,
+(EFIAPI *SPDM_PSK_HKDF_EXPAND_FUNC) (
+  IN      UINT32       HashAlgo,
   IN      CONST UINT8  *PskHint, OPTIONAL
   IN      UINTN        PskHintSize, OPTIONAL
-     OUT  UINT8        *HmacValue
+  IN      CONST UINT8  *Info,
+  IN      UINTN        InfoSize,
+     OUT  UINT8        *Out,
+  IN      UINTN        OutSize
   );
 
 /**
-  Register SPDM PSK HMAC function.
+  Register SPDM PSK HKDF_EXPAND function.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SpdmPskHmacFunc              The fuction to HMAC data with PSK.
+  @param  SpdmContext                             A pointer to the SPDM context.
+  @param  SpdmPskHandshakeSecretHkdfExpandFunc    The fuction to HKDF_EXPAND key with PSK derived HandshakeSecret.
+  @param  SpdmPskMasterSecretHkdfExpandFunc       The fuction to HKDF_EXPAND key with PSK derived MasterSecret.
 **/
 VOID
 EFIAPI
-SpdmRegisterPskHmacFunc (
+SpdmRegisterPskHkdfExpandFunc (
   IN     VOID                      *SpdmContext,
-  IN     SPDM_PSK_HMAC_FUNC        SpdmPskHmacFunc
+  IN     SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskHandshakeSecretHkdfExpandFunc,
+  IN     SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskMasterSecretHkdfExpandFunc
   );
 
 /**

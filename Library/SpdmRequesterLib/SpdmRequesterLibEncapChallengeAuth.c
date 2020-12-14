@@ -129,7 +129,6 @@ SpdmEncapResponderGenerateChallengeSignature (
   DEBUG((DEBUG_INFO, "\n"));
   
   Result = SpdmContext->LocalContext.SpdmDataSignFunc (
-             SpdmContext,
              FALSE,
              SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
              HashData,

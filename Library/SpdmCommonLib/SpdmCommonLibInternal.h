@@ -69,9 +69,10 @@ typedef struct {
   UINTN                           PskHintSize;
   UINT8                           *PskHint;
   //
-  // Use my PSK to HMAC
+  // Use my PSK to HKDF
   //
-  SPDM_PSK_HMAC_FUNC              SpdmPskHmacFunc;
+  SPDM_PSK_HKDF_EXPAND_FUNC       SpdmPskHandshakeSecretHkdfExpandFunc;
+  SPDM_PSK_HKDF_EXPAND_FUNC       SpdmPskMasterSecretHkdfExpandFunc;
   //
   // OpaqueData provision locally
   //
@@ -212,9 +213,12 @@ typedef struct {
 typedef struct {
   UINT8                DheSecret[MAX_DHE_KEY_SIZE];
   UINT8                HandshakeSecret[MAX_HASH_SIZE];
+  UINT8                MasterSecret[MAX_HASH_SIZE];
+} SPDM_SESSION_INFO_MASTER_SECRET;
+
+typedef struct {
   UINT8                RequestHandshakeSecret[MAX_HASH_SIZE];
   UINT8                ResponseHandshakeSecret[MAX_HASH_SIZE];
-  UINT8                MasterSecret[MAX_HASH_SIZE];
   UINT8                ExportMasterSecret[MAX_HASH_SIZE];
   UINT8                RequestFinishedKey[MAX_HASH_SIZE];
   UINT8                ResponseFinishedKey[MAX_HASH_SIZE];
@@ -246,6 +250,7 @@ typedef struct {
   UINTN                                HashSize;
   UINTN                                AeadKeySize;
   UINTN                                AeadIvSize;
+  SPDM_SESSION_INFO_MASTER_SECRET      MasterSecret;
   SPDM_SESSION_INFO_HANDSHAKE_SECRET   HandshakeSecret;
   SPDM_SESSION_INFO_APPLICATION_SECRET ApplicationSecret;
   SPDM_SESSION_INFO_APPLICATION_SECRET ApplicationSecretBackup;

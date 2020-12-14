@@ -645,7 +645,6 @@ TestSpdmAsymSign (
 /**
   Sign an SPDM message data.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  IsResponder                  Indicates if it is a responder message.
   @param  AsymAlgo                     Indicates the signing algorithm.
                                        For responder, it must align with BaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
@@ -662,7 +661,6 @@ TestSpdmAsymSign (
 BOOLEAN
 EFIAPI
 SpdmDataSignFunc (
-  IN      VOID         *SpdmContext,
   IN      BOOLEAN      IsResponder,
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *MessageHash,

@@ -675,7 +675,6 @@ TestSpdmAsymSign (
 /**
   Sign an SPDM message data.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  IsResponder                  Indicates if it is a responder message.
   @param  AsymAlgo                     Indicates the signing algorithm.
                                        For responder, it must align with BaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
@@ -692,7 +691,6 @@ TestSpdmAsymSign (
 BOOLEAN
 EFIAPI
 SpdmDataSignFunc (
-  IN      VOID         *SpdmContext,
   IN      BOOLEAN      IsResponder,
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *MessageHash,
@@ -741,35 +739,47 @@ SpdmDataSignFunc (
   return Result;
 }
 
+UINT8  mMyZeroFilledBuffer[64];
+UINT8  gBinStr0[0x12] = {
+       SHA256_HASH_SIZE, 0x00, // Length
+       0x73, 0x70, 0x64, 0x6d, 0x31, 0x2e, 0x31, 0x00, // Version: 'spdm1.1/0'
+       0x64, 0x65, 0x72, 0x69, 0x76, 0x65, 0x64, 0x00, // label: 'derived/0'
+       };
+
 /**
-  Computes the HMAC of a input data buffer with PSK.
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
 
-  This function performs the HMAC of a given data buffer, and return the hash value.
+  The PRK is PSK derived HandshakeSecret.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Data                         Pointer to the buffer containing the data to be HMACed.
-  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashAlgo                     Indicates the hash algorithm.
   @param  PskHint                      Pointer to the user-supplied PSK Hint.
   @param  PskHintSize                  PSK Hint size in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
 
-  @retval TRUE   HMAC computation succeeded.
-  @retval FALSE  HMAC computation failed.
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
 **/
 BOOLEAN
 EFIAPI
-SpdmPskHmacFunc (
-  IN      VOID         *SpdmContext,
-  IN      CONST VOID   *Data,
-  IN      UINTN        DataSize,
+SpdmPskHandshakeSecretHkdfExpandFunc (
+  IN      UINT32       HashAlgo,
   IN      CONST UINT8  *PskHint, OPTIONAL
   IN      UINTN        PskHintSize, OPTIONAL
-     OUT  UINT8        *HmacValue
+  IN      CONST UINT8  *Info,
+  IN      UINTN        InfoSize,
+     OUT  UINT8        *Out,
+  IN      UINTN        OutSize
   )
 {
   VOID                          *Psk;
   UINTN                         PskSize;
   BOOLEAN                       Result;
+  UINT8                         HandshakeSecret[64];
+
+  ASSERT (HashAlgo == SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256);
 
   if ((PskHint == NULL) && (PskHintSize == 0)) {
     Psk = TEST_PSK_DATA_STRING;
@@ -783,7 +793,85 @@ SpdmPskHmacFunc (
     return FALSE;
   }
 
-  Result = HmacSha256All (Data, DataSize, Psk, PskSize, HmacValue);
+  Result = HmacSha256All (mMyZeroFilledBuffer, SHA256_HASH_SIZE, Psk, PskSize, HandshakeSecret);
+  if (!Result) {
+    return Result;
+  }
+
+  Result = HkdfSha256Expand (HandshakeSecret, SHA256_HASH_SIZE, Info, InfoSize, Out, OutSize);
+  ZeroMem (HandshakeSecret, SHA256_HASH_SIZE);
+
+  return Result;
+}
+
+/**
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
+
+  The PRK is PSK derived MasterSecret.
+
+  @param  HashAlgo                     Indicates the hash algorithm.
+  @param  PskHint                      Pointer to the user-supplied PSK Hint.
+  @param  PskHintSize                  PSK Hint size in bytes.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+**/
+BOOLEAN
+EFIAPI
+SpdmPskMasterSecretHkdfExpandFunc (
+  IN      UINT32       HashAlgo,
+  IN      CONST UINT8  *PskHint, OPTIONAL
+  IN      UINTN        PskHintSize, OPTIONAL
+  IN      CONST UINT8  *Info,
+  IN      UINTN        InfoSize,
+     OUT  UINT8        *Out,
+  IN      UINTN        OutSize
+  )
+{
+  VOID                          *Psk;
+  UINTN                         PskSize;
+  BOOLEAN                       Result;
+  UINT8                         HandshakeSecret[64];
+  UINT8                         Salt1[64];
+  UINT8                         MasterSecret[64];
+
+  ASSERT (HashAlgo == SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256);
+
+  if ((PskHint == NULL) && (PskHintSize == 0)) {
+    Psk = TEST_PSK_DATA_STRING;
+    PskSize = sizeof(TEST_PSK_DATA_STRING);
+  } else if ((PskHint != NULL) && (PskHintSize != 0) &&
+             (strcmp((const char *)PskHint, TEST_PSK_HINT_STRING) == 0) &&
+             (PskHintSize == sizeof(TEST_PSK_HINT_STRING))) {
+    Psk = TEST_PSK_DATA_STRING;
+    PskSize = sizeof(TEST_PSK_DATA_STRING);
+  } else {
+    return FALSE;
+  }
+
+  Result = HmacSha256All (mMyZeroFilledBuffer, SHA256_HASH_SIZE, Psk, PskSize, HandshakeSecret);
+  if (!Result) {
+    return Result;
+  }
+
+  Result = HkdfSha256Expand (HandshakeSecret, SHA256_HASH_SIZE, gBinStr0, sizeof(gBinStr0), Salt1, SHA256_HASH_SIZE);
+  ZeroMem (HandshakeSecret, SHA256_HASH_SIZE);
+  if (!Result) {
+    return Result;
+  }
+
+  Result = HmacSha256All (Salt1, SHA256_HASH_SIZE, mMyZeroFilledBuffer, SHA256_HASH_SIZE, MasterSecret);
+  ZeroMem (Salt1, SHA256_HASH_SIZE);
+  if (!Result) {
+    return Result;
+  }
+
+  Result = HkdfSha256Expand (MasterSecret, SHA256_HASH_SIZE, Info, InfoSize, Out, OutSize);
+  ZeroMem (MasterSecret, SHA256_HASH_SIZE);
 
   return Result;
 }

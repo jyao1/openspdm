@@ -152,7 +152,6 @@ TestSpdmAsymFree (
 BOOLEAN
 EFIAPI
 SpdmDataSignFunc (
-  IN      VOID         *SpdmContext,
   IN      BOOLEAN      IsResponder,
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *MessageHash,

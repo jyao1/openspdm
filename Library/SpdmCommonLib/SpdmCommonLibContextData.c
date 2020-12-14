@@ -673,15 +673,15 @@ SpdmGetData (
   //
   case SpdmDataDheSecret:
     TargetDataSize = SessionInfo->DheKeySize;
-    TargetData = SessionInfo->HandshakeSecret.DheSecret;
+    TargetData = SessionInfo->MasterSecret.DheSecret;
     break;
   case SpdmDataHandshakeSecret:
     TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.HandshakeSecret;
+    TargetData = SessionInfo->MasterSecret.HandshakeSecret;
     break;
   case SpdmDataMasterSecret:
     TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.MasterSecret;
+    TargetData = SessionInfo->MasterSecret.MasterSecret;
     break;
   case SpdmDataRequestHandshakeSecret:
     TargetDataSize = SessionInfo->HashSize;
@@ -768,22 +768,25 @@ SpdmRegisterDataSignFunc (
 }
 
 /**
-  Register SPDM PSK HMAC function.
+  Register SPDM PSK HKDF_EXPAND function.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SpdmPskHmacFunc              The fuction to HMAC data with PSK.
+  @param  SpdmContext                             A pointer to the SPDM context.
+  @param  SpdmPskHandshakeSecretHkdfExpandFunc    The fuction to HKDF_EXPAND key with PSK derived HandshakeSecret.
+  @param  SpdmPskMasterSecretHkdfExpandFunc       The fuction to HKDF_EXPAND key with PSK derived MasterSecret.
 **/
 VOID
 EFIAPI
-SpdmRegisterPskHmacFunc (
+SpdmRegisterPskHkdfExpandFunc (
   IN     VOID                      *Context,
-  IN     SPDM_PSK_HMAC_FUNC        SpdmPskHmacFunc
+  IN     SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskHandshakeSecretHkdfExpandFunc,
+  IN     SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskMasterSecretHkdfExpandFunc
   )
 {
   SPDM_DEVICE_CONTEXT       *SpdmContext;
 
   SpdmContext = Context;
-  SpdmContext->LocalContext.SpdmPskHmacFunc = SpdmPskHmacFunc;
+  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
+  SpdmContext->LocalContext.SpdmPskMasterSecretHkdfExpandFunc = SpdmPskMasterSecretHkdfExpandFunc;
   return ;
 }
 

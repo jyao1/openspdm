@@ -442,9 +442,9 @@ TrySpdmSendReceiveKeyExchange (
   DEBUG((DEBUG_INFO, "FinalKey (0x%x):\n", FinalKeySize));
   InternalDumpHex (FinalKey, FinalKeySize);
 
-  ASSERT (FinalKeySize <= sizeof(SessionInfo->HandshakeSecret.DheSecret));
+  ASSERT (FinalKeySize <= sizeof(SessionInfo->MasterSecret.DheSecret));
   SessionInfo->DheKeySize = FinalKeySize;
-  CopyMem (SessionInfo->HandshakeSecret.DheSecret, FinalKey, FinalKeySize);
+  CopyMem (SessionInfo->MasterSecret.DheSecret, FinalKey, FinalKeySize);
 
   Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId, TRUE);
   if (RETURN_ERROR(Status)) {
