@@ -685,8 +685,8 @@ void TestSpdmResponderCertificateCase12(void **state) {
     assert_int_equal (SpdmResponse->PortionLength, ExpectedChunkSize);
     assert_int_equal (SpdmResponse->RemainderLength, DataSize - offset - ExpectedChunkSize);
     assert_int_equal ( ((UINT8*) Data)[offset], (Response + sizeof(SPDM_CERTIFICATE_RESPONSE))[0]);
-    assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
   }
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
   free(Data);
 }
 
