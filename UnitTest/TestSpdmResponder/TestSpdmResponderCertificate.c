@@ -293,7 +293,7 @@ void TestSpdmResponderCertificateCase7(void **state) {
   UINTN                DataSize;
 
   // Testing Lengths at the boundary of maximum integer values
-  UINT16               TestLenghts[] = {0, MAX_INT8, MAX_INT8+1, MAX_UINT8, MAX_INT16, MAX_INT16+1, MAX_UINT16, -1};
+  UINT16               TestLenghts[] = {0, MAX_INT8, (UINT16)(MAX_INT8+1), MAX_UINT8, MAX_INT16, (UINT16)(MAX_INT16+1), MAX_UINT16, (UINT16)(-1)};
   UINT16               ExpectedChunkSize;
 
   // Setting up the SpdmContext and loading a sample certificate chain
@@ -348,7 +348,7 @@ void TestSpdmResponderCertificateCase8(void **state) {
   UINTN                DataSize;
 
   // Testing Offsets at the boundary of maximum integer values and at the boundary of certificate length (first three positions)
-  UINT16               TestOffsets[] = {-1, 0, +1, 0, MAX_INT8, MAX_INT8+1, MAX_UINT8, MAX_INT16, MAX_INT16+1, MAX_UINT16, -1};
+  UINT16               TestOffsets[] = {(UINT16)(-1), 0, +1, 0, MAX_INT8, (UINT16)(MAX_INT8+1), MAX_UINT8, MAX_INT16, (UINT16)(MAX_INT16+1), MAX_UINT16, (UINT16)(-1)};
 
   // Setting up the SpdmContext and loading a sample certificate chain
   SpdmTestContext = *state;
@@ -365,9 +365,9 @@ void TestSpdmResponderCertificateCase8(void **state) {
   // This tests considers only length = 0, other tests vary length value
   mSpdmGetCertificateRequest3.Length = 0;
   // Setting up offset values at the boundary of certificate length
-  TestOffsets[0] += DataSize;
-  TestOffsets[1] += DataSize;
-  TestOffsets[2] += DataSize;
+  TestOffsets[0] = (UINT16)(TestOffsets[0] + DataSize);
+  TestOffsets[1] = (UINT16)(TestOffsets[1] + DataSize);
+  TestOffsets[2] = (UINT16)(TestOffsets[2] + DataSize);
 
   for(int i=0; i<sizeof(TestOffsets)/sizeof(TestOffsets[0]); i++) {
     TEST_DEBUG_PRINT("i:%d TestOffsets[i]:%u\n",i, TestOffsets[i]);
@@ -391,7 +391,7 @@ void TestSpdmResponderCertificateCase8(void **state) {
       assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_CERTIFICATE);
       assert_int_equal (SpdmResponse->Header.Param1, 0);
       assert_int_equal (SpdmResponse->PortionLength, 0);
-      assert_int_equal (SpdmResponse->RemainderLength, DataSize - mSpdmGetCertificateRequest3.Offset);
+      assert_int_equal (SpdmResponse->RemainderLength, (UINT16)(DataSize - mSpdmGetCertificateRequest3.Offset));
     }
   }
   free(Data);
@@ -414,12 +414,12 @@ void TestSpdmResponderCertificateCase9(void **state) {
 
   // Testing Offsets and Length combinations
   // Check at the boundary of maximum integer values and at the boundary of certificate length
-  UINT16               TestSizes[] =   {-1, 0, +1, // reserved for sizes around the certificate chain size
-                                        -1, 0, +1,
-                                        MAX_INT8-1, MAX_INT8, MAX_INT8+1,
-                                        MAX_UINT8-1, MAX_UINT8,
-                                        MAX_INT16-1, MAX_INT16, MAX_INT16+1,
-                                        MAX_UINT16-1, MAX_UINT16
+  UINT16               TestSizes[] =   {(UINT16)(-1), 0, +1, // reserved for sizes around the certificate chain size
+                                        (UINT16)(-1), 0, +1,
+                                        (UINT16)(MAX_INT8-1), MAX_INT8, (UINT16)(MAX_INT8+1),
+                                        (UINT16)(MAX_UINT8-1), MAX_UINT8,
+                                        (UINT16)(MAX_INT16-1), MAX_INT16, (UINT16)(MAX_INT16+1),
+                                        (UINT16)(MAX_UINT16-1), MAX_UINT16
                                        };
   UINT16               ExpectedChunkSize;
   UINT16               ExpectedRemainder;
@@ -437,9 +437,9 @@ void TestSpdmResponderCertificateCase9(void **state) {
   SpdmContext->LocalContext.SlotCount = 1;
 
   // Setting up offset values at the boundary of certificate length
-  TestSizes[0] += DataSize;
-  TestSizes[1] += DataSize;
-  TestSizes[2] += DataSize;
+  TestSizes[0] += (UINT16)(TestSizes[0] + DataSize);
+  TestSizes[1] += (UINT16)(TestSizes[1] + DataSize);
+  TestSizes[2] += (UINT16)(TestSizes[2] + DataSize);
 
   for(int i=0; i<sizeof(TestSizes)/sizeof(TestSizes[0]); i++) {
     TEST_DEBUG_PRINT("i:%d TestSizes[i]=Length:%u\n",i, TestSizes[i]);
@@ -463,10 +463,10 @@ void TestSpdmResponderCertificateCase9(void **state) {
         // Otherwise it should work properly
 
         // Expected received length is limited by MAX_SPDM_CERT_CHAIN_BLOCK_LEN and by the remaining length
-        ExpectedChunkSize = MIN(mSpdmGetCertificateRequest3.Length, DataSize - mSpdmGetCertificateRequest3.Offset);
+        ExpectedChunkSize = (UINT16)(MIN(mSpdmGetCertificateRequest3.Length, DataSize - mSpdmGetCertificateRequest3.Offset));
         ExpectedChunkSize = MIN(ExpectedChunkSize, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
         // Expected certificate length left
-        ExpectedRemainder = DataSize - mSpdmGetCertificateRequest3.Offset - ExpectedChunkSize;
+        ExpectedRemainder = (UINT16)(DataSize - mSpdmGetCertificateRequest3.Offset - ExpectedChunkSize);
 
         assert_int_equal (ResponseSize, sizeof(SPDM_CERTIFICATE_RESPONSE) + ExpectedChunkSize);
         SpdmResponse = (VOID *)Response;
@@ -517,7 +517,7 @@ void TestSpdmResponderCertificateCase10(void **state) {
     SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
     SpdmContext->LocalContext.SlotCount = 1;
 
-    mSpdmGetCertificateRequest3.Offset = MIN(DataSize - 1, MAX_UINT16);
+    mSpdmGetCertificateRequest3.Offset = (UINT16)(MIN(DataSize - 1, MAX_UINT16));
     TEST_DEBUG_PRINT("DataSize: %u\n",DataSize);
     TEST_DEBUG_PRINT("mSpdmGetCertificateRequest3.Offset: %u\n",mSpdmGetCertificateRequest3.Offset);
     TEST_DEBUG_PRINT("mSpdmGetCertificateRequest3.Length: %u\n",mSpdmGetCertificateRequest3.Length);
@@ -530,10 +530,10 @@ void TestSpdmResponderCertificateCase10(void **state) {
     assert_int_equal (Status, RETURN_SUCCESS);
 
     // Expected received length is limited by MAX_SPDM_CERT_CHAIN_BLOCK_LEN and by the remaining length
-    ExpectedChunkSize = MIN(mSpdmGetCertificateRequest3.Length, DataSize - mSpdmGetCertificateRequest3.Offset);
+    ExpectedChunkSize = (UINT16)(MIN(mSpdmGetCertificateRequest3.Length, DataSize - mSpdmGetCertificateRequest3.Offset));
     ExpectedChunkSize = MIN(ExpectedChunkSize, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
     // Expected certificate length left
-    ExpectedRemainder = DataSize - mSpdmGetCertificateRequest3.Offset - ExpectedChunkSize;
+    ExpectedRemainder = (UINT16)(DataSize - mSpdmGetCertificateRequest3.Offset - ExpectedChunkSize);
 
     TEST_DEBUG_PRINT("ExpectedChunkSize %u\n",ExpectedChunkSize);
     TEST_DEBUG_PRINT("ExpectedRemainder %u\n",ExpectedRemainder);
