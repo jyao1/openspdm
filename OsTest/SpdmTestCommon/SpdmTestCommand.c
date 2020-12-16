@@ -151,6 +151,15 @@ ReceivePlatformData (
   }
   *BytesToReceive = BytesReceived;
 
+  switch (*Command) {
+  case SOCKET_SPDM_COMMAND_STOP:
+    ClosePcapPacketFile ();
+    break;
+  case SOCKET_SPDM_COMMAND_NORMAL:
+    AppendPcapPacketData (ReceiveBuffer, BytesReceived);
+    break;
+  }
+
   return Result;
 }
 
@@ -247,18 +256,29 @@ SendPlatformData (
   )
 {
   BOOLEAN  Result;
+  UINT32   Request;
 
-  Result = WriteData32 (Socket, Command);
+  Request = Command;
+  Result = WriteData32 (Socket, Request);
   if (!Result) {
     return Result;
   }
   printf ("Platform Port Transmit Command: ");
-  Command = htonl(Command);
-  DumpData ((UINT8 *)&Command, sizeof(UINT32));
+  Request = htonl(Request);
+  DumpData ((UINT8 *)&Request, sizeof(UINT32));
 
   Result = WriteMultipleBytes (Socket, SendBuffer, (UINT32)BytesToSend);
   if (!Result) {
     return Result;
+  }
+
+  switch (Command) {
+  case SOCKET_SPDM_COMMAND_STOP:
+    ClosePcapPacketFile ();
+    break;
+  case SOCKET_SPDM_COMMAND_NORMAL:
+    AppendPcapPacketData (SendBuffer, BytesToSend);
+    break;
   }
 
   return TRUE;

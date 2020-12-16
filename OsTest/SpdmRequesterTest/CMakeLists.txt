@@ -3,8 +3,9 @@ cmake_minimum_required(VERSION 2.6)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/OsTest/SpdmRequesterTest
                     ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon
                     ${PROJECT_SOURCE_DIR}/Include
-                    ${PROJECT_SOURCE_DIR}/Include/Hal 
-                    ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}                 
+                    ${PROJECT_SOURCE_DIR}/Include/Hal
+                    ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
+                    ${PROJECT_SOURCE_DIR}/OsStub/Include
 )
 
 SET(src_SpdmRequesterTest
@@ -15,6 +16,7 @@ SET(src_SpdmRequesterTest
     SpdmRequesterTest.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestCommand.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestKey.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestPcap.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestSupport.c
 )
 

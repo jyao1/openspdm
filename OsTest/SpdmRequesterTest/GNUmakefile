@@ -40,6 +40,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmRequesterTest.o \
     $(OUTPUT_DIR)/SpdmTestCommand.o \
     $(OUTPUT_DIR)/SpdmTestKey.o \
+    $(OUTPUT_DIR)/SpdmTestPcap.o \
     $(OUTPUT_DIR)/SpdmTestSupport.o \
 
 
@@ -78,7 +79,8 @@ INC =  \
     -I$(WORKSPACE)/OsTest/SpdmTestCommon \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
-    -I$(WORKSPACE)/Include/Hal/$(ARCH)
+    -I$(WORKSPACE)/Include/Hal/$(ARCH) \
+    -I$(WORKSPACE)/OsStub/Include \
 
 #
 # Overridable Target Macro Definitions
@@ -142,6 +144,9 @@ $(OUTPUT_DIR)/SpdmTestCommand.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestComman
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestKey.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmTestPcap.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestPcap.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestSupport.c

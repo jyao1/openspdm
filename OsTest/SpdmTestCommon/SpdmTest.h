@@ -81,6 +81,22 @@ WriteOutputFile (
   IN UINTN   FileSize
   );
 
+VOID
+OpenPcapPacketFile (
+  IN CHAR8  *PcapFileName
+  );
+
+VOID
+ClosePcapPacketFile (
+  VOID
+  );
+
+VOID
+AppendPcapPacketData (
+  IN VOID    *Data,
+  IN UINTN   Size
+  );
+
 BOOLEAN
 ReadResponderPrivateCertificate (
   OUT VOID    **Data,

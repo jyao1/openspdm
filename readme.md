@@ -172,6 +172,10 @@
    The OsTest output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
    Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
 
+### Generate pcap file for offline analysis
+
+   Use "SpdmResponderTest --pcap <pcap_file>" or "SpdmRequesterTest --pcap <pcap_file>".
+
 ### Run [UnitTest](https://github.com/jyao1/openspdm/tree/master/UnitTest)
 
    The UnitTest output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.

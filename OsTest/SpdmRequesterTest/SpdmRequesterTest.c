@@ -189,10 +189,47 @@ Done:
   return TRUE;
 }
 
-
-int main (void)
+void
+PrintUsage (
+  void
+  )
 {
+  printf ("SpdmResponder [--pcap <PcapFileName>]\n");
+}
+
+void
+ProcessArgs (
+  int argc,
+  char *argv[ ]
+  )
+{
+  if (argc >= 2) {
+    if ((strcmp (argv[1], "-h") == 0) ||
+        (strcmp (argv[1], "--help") == 0)) {
+      PrintUsage ();
+      exit (0);
+    }
+    if (strcmp (argv[1], "--pcap") == 0) {
+      if (argc == 3) {
+        OpenPcapPacketFile (argv[2]);
+      } else {
+        PrintUsage ();
+        exit (0);
+      }
+    }
+  }
+}
+
+int main (
+  int argc,
+  char *argv[ ]
+  )
+{
+  ProcessArgs (argc, argv);
+
   PlatformClientRoutine (DEFAULT_SPDM_PLATFORM_PORT);
   printf ("Client stopped\n");
+
+  ClosePcapPacketFile ();
   return 0;
 }
