@@ -287,7 +287,7 @@ void TestSpdmResponderCertificateCase7(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINTN                ResponseSize;
-  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE*5];
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_CERTIFICATE_RESPONSE *SpdmResponse;
   VOID                 *Data;
   UINTN                DataSize;
@@ -341,7 +341,7 @@ void TestSpdmResponderCertificateCase8(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINTN                ResponseSize;
-  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE*5];
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_CERTIFICATE_RESPONSE *SpdmResponse;
   SPDM_ERROR_RESPONSE  *SpdmResponseError;
   VOID                 *Data;
@@ -406,7 +406,7 @@ void TestSpdmResponderCertificateCase9(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINTN                ResponseSize;
-  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE*5];
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_CERTIFICATE_RESPONSE *SpdmResponse;
   SPDM_ERROR_RESPONSE  *SpdmResponseError;
   VOID                 *Data;
@@ -489,7 +489,7 @@ void TestSpdmResponderCertificateCase10(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINTN                ResponseSize;
-  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE*5];
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_CERTIFICATE_RESPONSE *SpdmResponse;
   SPDM_ERROR_RESPONSE  *SpdmResponseError;
   VOID                 *Data;
@@ -566,7 +566,7 @@ void TestSpdmResponderCertificateCase11(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINTN                ResponseSize;
-  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE*5];
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_CERTIFICATE_RESPONSE *SpdmResponse;
   SPDM_ERROR_RESPONSE  *SpdmResponseError;
   VOID                 *Data;
