@@ -157,7 +157,7 @@ TrySpdmGetMeasurement (
     return RETURN_DEVICE_ERROR;
   }
 
-  if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+  if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
     if (SpdmResponse.NumberOfBlocks != 0) {
       return RETURN_DEVICE_ERROR;
     }
@@ -172,7 +172,7 @@ TrySpdmGetMeasurement (
   }
 
   MeasurementRecordDataLength = SpdmReadUint24 (SpdmResponse.MeasurementRecordLength);
-  if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+  if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
     if (MeasurementRecordDataLength != 0) {
       return RETURN_DEVICE_ERROR;
     }
@@ -241,7 +241,7 @@ TrySpdmGetMeasurement (
 
     ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
   } else {
-    if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+    if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
       SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE);
     } else {
       SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurementRecordDataLength;
@@ -252,7 +252,7 @@ TrySpdmGetMeasurement (
     }
   }
 
-  if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+  if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
     *NumberOfBlocks = SpdmResponse.Header.Param1;
   } else {
     *NumberOfBlocks = SpdmResponse.NumberOfBlocks;

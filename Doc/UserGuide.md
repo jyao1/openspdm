@@ -108,7 +108,7 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    SpdmGetMeasurement (
        SpdmContext,
        RequestAttribute,
-       SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS,
+       SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS,
        SlotNum,
        &NumberOfBlocks,
        NULL,

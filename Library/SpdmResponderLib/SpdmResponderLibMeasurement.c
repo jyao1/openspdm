@@ -165,7 +165,7 @@ SpdmGetResponseMeasurement (
                       SignatureSize;
 
   switch (SpdmRequest->Header.Param2) {
-  case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS:
+  case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS:
     SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE);
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
       SpdmResponseSize += MeasurmentSigSize;
