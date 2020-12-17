@@ -463,14 +463,26 @@ GetSpdmHmacFunc (
 {
   switch (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo) {
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
-#if OPENSPDM_HMAC_SHA256_SUPPORT == 1
+#if OPENSPDM_SHA256_SUPPORT == 1
     return HmacSha256All;
 #else
     ASSERT (FALSE);
     break;
 #endif
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
+#if OPENSPDM_SHA384_SUPPORT == 1
+    return HmacSha384All;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
+#if OPENSPDM_SHA512_SUPPORT == 1
+    return HmacSha512All;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_256:
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_384:
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512:
@@ -528,14 +540,26 @@ GetSpdmHkdfExpandFunc (
 {
   switch (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo) {
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
-#if OPENSPDM_HKDF_SHA256_SUPPORT == 1
+#if OPENSPDM_SHA256_SUPPORT == 1
     return HkdfSha256Expand;
 #else
     ASSERT (FALSE);
     break;
 #endif
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
+#if OPENSPDM_SHA384_SUPPORT == 1
+    return HkdfSha384Expand;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
+#if OPENSPDM_SHA512_SUPPORT == 1
+    return HkdfSha512Expand;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_256:
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_384:
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512:

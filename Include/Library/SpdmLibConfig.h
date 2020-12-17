@@ -44,9 +44,4 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define OPENSPDM_SHA384_SUPPORT      1
 #define OPENSPDM_SHA512_SUPPORT      1
 
-#define OPENSPDM_HMAC_SHA256_SUPPORT 1
-
-#define OPENSPDM_HKDF_SHA256_SUPPORT 1
-
-
 #endif
