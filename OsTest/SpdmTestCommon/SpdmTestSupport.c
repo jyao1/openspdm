@@ -79,14 +79,14 @@ PrintUsage (
   IN CHAR8* Name
   )
 {
-  printf ("%s [--trans <MCTP|PCI_DOE>]", Name);
-  printf ("   [--hash <SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512>]\n");
-  printf ("   [--measurement_hash <SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512>]\n");
-  printf ("   [--asym <RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521>]\n");
-  printf ("   [--req_asym <RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521>]\n");
-  printf ("   [--dhe <FFDHE_2048|FFDHE_3072|FFDHE_4096|SECP_256_R1|SECP_384_R1|SECP_521_R1>]\n");
-  printf ("   [--aead <AES_128_GCM|AES_256_GCM|CHACHA20_POLY1305>]\n");
-  printf ("   [--key_schedule <HMAC_HASH>]\n");
+  printf ("%s [--trans MCTP|PCI_DOE]\n", Name);
+  printf ("   [--hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]\n");
+  printf ("   [--measurement_hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]\n");
+  printf ("   [--asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]\n");
+  printf ("   [--req_asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]\n");
+  printf ("   [--dhe FFDHE_2048|FFDHE_3072|FFDHE_4096|SECP_256_R1|SECP_384_R1|SECP_521_R1]\n");
+  printf ("   [--aead AES_128_GCM|AES_256_GCM|CHACHA20_POLY1305]\n");
+  printf ("   [--key_schedule HMAC_HASH]\n");
   printf ("   [--pcap <PcapFileName>]\n");
 }
 
@@ -187,8 +187,8 @@ ProcessArgs (
   argc --;
   argv ++;
 
-  if ((strcmp (argv[1], "-h") == 0) ||
-      (strcmp (argv[1], "--help") == 0)) {
+  if ((strcmp (argv[0], "-h") == 0) ||
+      (strcmp (argv[0], "--help") == 0)) {
     PrintUsage (ProgramName);
     exit (0);
   }
