@@ -11,7 +11,6 @@
 
 /**
   This function creates the measurement signature to response message based upon L1L2.
-
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  ResponseMessage              The measurement response message with empty signature to be filled.
   @param  ResponseMessageSize          Total size in bytes of the response message including signature.
@@ -193,6 +192,7 @@ SpdmGetResponseMeasurement (
         SlotIdParam = SpdmRequest->SlotIDParam;
         if ((SlotIdParam != 0xF) && (SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+          ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
           return RETURN_SUCCESS;
         }
         SpdmResponse->Header.Param2 = SlotIdParam;
@@ -200,6 +200,7 @@ SpdmGetResponseMeasurement (
       Status = SpdmCreateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
+        ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
         return RETURN_SUCCESS;
       }
     }
@@ -249,6 +250,7 @@ SpdmGetResponseMeasurement (
         SlotIdParam = SpdmRequest->SlotIDParam;
         if ((SlotIdParam != 0xF) && (SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+          ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
           return RETURN_SUCCESS;
         }
         SpdmResponse->Header.Param2 = SlotIdParam;
@@ -256,6 +258,7 @@ SpdmGetResponseMeasurement (
       Status = SpdmCreateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
+        ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
         return RETURN_SUCCESS;
       }
     }
@@ -311,6 +314,7 @@ SpdmGetResponseMeasurement (
           SlotIdParam = SpdmRequest->SlotIDParam;
           if ((SlotIdParam != 0xF) && (SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
             SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+            ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
             return RETURN_SUCCESS;
           }
           SpdmResponse->Header.Param2 = SlotIdParam;
@@ -318,6 +322,7 @@ SpdmGetResponseMeasurement (
         Status = SpdmCreateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
         if (RETURN_ERROR(Status)) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
+          ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
           return RETURN_SUCCESS;
         }
       }
