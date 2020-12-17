@@ -243,7 +243,11 @@ SpdmGetResponseMeasurement (
     ZeroMem (Response, *ResponseSize);
     SpdmResponse = Response;
 
-    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+    } else {
+      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    }
     SpdmResponse->Header.RequestResponseCode = SPDM_MEASUREMENTS;
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
@@ -287,7 +291,11 @@ SpdmGetResponseMeasurement (
       ZeroMem (Response, *ResponseSize);
       SpdmResponse = Response;
 
-      SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+        SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+      } else {
+        SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+      }
       SpdmResponse->Header.RequestResponseCode = SPDM_MEASUREMENTS;
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = 0;
