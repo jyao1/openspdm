@@ -43,6 +43,7 @@ RETURN_STATUS
 EFIAPI
 SpdmHandleErrorResponseMain (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               *SessionId,
   IN OUT VOID                 *ManagedBuffer,
   IN     UINTN                 ShrinkBufferSize,
   IN OUT UINTN                *ResponseSize,

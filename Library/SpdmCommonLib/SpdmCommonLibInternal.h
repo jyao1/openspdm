@@ -287,6 +287,8 @@ typedef enum {
 #define SPDM_CHALLENGE_RECEIVE_FLAG                     BIT5
 #define SPDM_GET_MEASUREMENTS_RECEIVE_FLAG              BIT6
 #define SPDM_KEY_EXCHANGE_RECEIVE_FLAG                  BIT7
+#define SPDM_FINISH_RECEIVE_FLAG                        BIT8
+
 
 
 typedef struct {

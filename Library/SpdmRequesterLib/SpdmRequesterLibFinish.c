@@ -297,7 +297,7 @@ SpdmRequesterGenerateFinishHmac (
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
-SpdmSendReceiveFinish (
+TrySpdmSendReceiveFinish (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               SessionId,
   IN     UINT8                SlotIdParam
@@ -314,6 +314,12 @@ SpdmSendReceiveFinish (
   UINT8                                     *Ptr;
   BOOLEAN                                   Result;
 
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_KEY_EXCHANGE_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
   }
@@ -397,15 +403,20 @@ SpdmSendReceiveFinish (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SessionId, &SessionInfo->SessionTranscript.MessageF, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_FINISH, SPDM_FINISH_RSP, sizeof(SPDM_FINISH_RESPONSE_MINE));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_FINISH_RSP) {
+    return RETURN_DEVICE_ERROR;
+  }
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
     HmacSize = 0;
   }
 
   if (SpdmResponseSize != sizeof(SPDM_FINISH_RESPONSE) + HmacSize) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_FINISH_RSP) {
     return RETURN_DEVICE_ERROR;
   }
 
@@ -430,7 +441,29 @@ SpdmSendReceiveFinish (
 
   SessionInfo->SessionState = SpdmStateEstablished;
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_FINISH_RECEIVE_FLAG;
   
   return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+SpdmSendReceiveFinish (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               SessionId,
+  IN     UINT8                SlotIdParam
+  )
+{
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+
+  Retry = SpdmContext->RetryTimes;
+  do {
+    Status = TrySpdmSendReceiveFinish(SpdmContext, SessionId, SlotIdParam);
+    if (RETURN_NO_RESPONSE != Status) {
+      return Status;
+    }
+  } while (Retry-- != 0);
+
+  return Status;
 }
 

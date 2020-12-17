@@ -212,7 +212,7 @@ TrySpdmGetMeasurement (
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
-    Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.L1L2, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_GET_MEASUREMENTS, SPDM_MEASUREMENTS, sizeof(SPDM_MEASUREMENTS_RESPONSE_MAX));
+    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.L1L2, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_GET_MEASUREMENTS, SPDM_MEASUREMENTS, sizeof(SPDM_MEASUREMENTS_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {
       return Status;
     }
