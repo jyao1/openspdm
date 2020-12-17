@@ -33,9 +33,9 @@ OpenPcapPacketFile (
   PcapGlobalHeader.ThisZone = 0;
   PcapGlobalHeader.SigFigs = 0;
   PcapGlobalHeader.SnapLen = PCAP_PACKET_MAX_SIZE;
-  if (mUseTransportLayer == USE_MCTP_TRANSPORT) {
+  if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_MCTP) {
     PcapGlobalHeader.Network = LINKTYPE_MCTP;
-  } else if (mUseTransportLayer == USE_PCI_DOE_TRANSPORT) {
+  } else if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_PCI_DOE) {
     PcapGlobalHeader.Network = LINKTYPE_PCI_DOE;
   } else {
     return FALSE;

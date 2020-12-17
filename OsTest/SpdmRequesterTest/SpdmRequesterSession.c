@@ -87,7 +87,7 @@ DoAppSessionViaSpdm (
   ASSERT (Response.PayloadLength == TEST_PAYLOAD_LEN);
   ASSERT (CompareMem (Response.VendorDefinedPayload, TEST_PAYLOAD_SERVER, TEST_PAYLOAD_LEN) == 0);
 
-  if (mUseTransportLayer == USE_MCTP_TRANSPORT) {
+  if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_MCTP) {
     AppResponseSize = sizeof(AppResponse);
     Status = SpdmSendReceiveData (SpdmContext, &SessionId, TRUE, TEST_PAYLOAD_CLIENT, TEST_PAYLOAD_LEN, &AppResponse, &AppResponseSize);
     ASSERT_RETURN_ERROR(Status);

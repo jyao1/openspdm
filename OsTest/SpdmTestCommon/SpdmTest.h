@@ -21,8 +21,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "assert.h"
 #include "SpdmTestCommand.h"
 
-#define USE_MCTP_TRANSPORT    1
-#define USE_PCI_DOE_TRANSPORT 2
 extern UINT32  mUseTransportLayer;
 
 extern UINT32  mUseHashAlgo;

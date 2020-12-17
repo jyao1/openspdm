@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmTest.h"
 
-UINT32  mUseTransportLayer = USE_MCTP_TRANSPORT;
+UINT32  mUseTransportLayer = SOCKET_TRANSPORT_TYPE_MCTP;
 
 VOID
 DumpData (
@@ -135,6 +135,7 @@ ReceivePlatformData (
 {
   BOOLEAN  Result;
   UINT32   Response;
+  UINT32   TransportType;
   UINT32   BytesReceived;
 
   Result = ReadData32 (Socket, &Response);
@@ -145,6 +146,19 @@ ReceivePlatformData (
   printf ("Platform Port Receive Command: ");
   Response = ntohl(Response);
   DumpData ((UINT8 *)&Response, sizeof(UINT32));
+
+  Result = ReadData32 (Socket, &TransportType);
+  if (!Result) {
+    return Result;
+  }
+  printf ("Platform Port Receive TransportType: ");
+  TransportType = ntohl(TransportType);
+  DumpData ((UINT8 *)&TransportType, sizeof(UINT32));
+  TransportType = ntohl(TransportType);
+  if (TransportType != mUseTransportLayer) {
+    printf ("TransportType mismatch\n");
+    return FALSE;
+  }
 
   BytesReceived = 0;
   Result = ReadMultipleBytes (Socket, ReceiveBuffer, &BytesReceived, (UINT32)*BytesToReceive);
@@ -259,6 +273,7 @@ SendPlatformData (
 {
   BOOLEAN  Result;
   UINT32   Request;
+  UINT32   TransportType;
 
   Request = Command;
   Result = WriteData32 (Socket, Request);
@@ -268,6 +283,14 @@ SendPlatformData (
   printf ("Platform Port Transmit Command: ");
   Request = htonl(Request);
   DumpData ((UINT8 *)&Request, sizeof(UINT32));
+
+  Result = WriteData32 (Socket, mUseTransportLayer);
+  if (!Result) {
+    return Result;
+  }
+  printf ("Platform Port Transmit TransportType: ");
+  TransportType = ntohl(mUseTransportLayer);
+  DumpData ((UINT8 *)&TransportType, sizeof(UINT32));
 
   Result = WriteMultipleBytes (Socket, SendBuffer, (UINT32)BytesToSend);
   if (!Result) {

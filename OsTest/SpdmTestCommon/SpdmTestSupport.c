@@ -96,8 +96,8 @@ typedef struct {
 } VALUE_STRING_ENTRY;
 
 VALUE_STRING_ENTRY  mTransportValueStringTable[] = {
-  {USE_MCTP_TRANSPORT,    "MCTP"},
-  {USE_PCI_DOE_TRANSPORT, "PCI_DOE"},
+  {SOCKET_TRANSPORT_TYPE_MCTP,    "MCTP"},
+  {SOCKET_TRANSPORT_TYPE_PCI_DOE, "PCI_DOE"},
 };
 
 VALUE_STRING_ENTRY  mHashValueStringTable[] = {

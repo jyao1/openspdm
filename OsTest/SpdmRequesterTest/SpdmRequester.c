@@ -132,9 +132,9 @@ SpdmClientInit (
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
-  if (mUseTransportLayer == USE_MCTP_TRANSPORT) {
+  if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_MCTP) {
     SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTransportMctpEncodeMessage, SpdmTransportMctpDecodeMessage);
-  } else if (mUseTransportLayer == USE_PCI_DOE_TRANSPORT) {
+  } else if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_PCI_DOE) {
     SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTransportPciDoeEncodeMessage, SpdmTransportPciDoeDecodeMessage);
   } else {
     return NULL;
