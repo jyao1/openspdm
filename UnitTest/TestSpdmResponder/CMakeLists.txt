@@ -21,7 +21,8 @@ SET(src_TestSpdmResponder
     TestSpdmResponderCertificate.c
     TestSpdmResponderChallengeAuth.c
     TestSpdmResponderMeasurement.c
-	TestSpdmResponderKeyExchange.c
+    TestSpdmResponderKeyExchange.c
+    TestSpdmResponderFinish.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmUnitTestCommon.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestKey.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestSupport.c

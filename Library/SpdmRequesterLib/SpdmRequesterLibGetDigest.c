@@ -131,7 +131,7 @@ TrySpdmGetDigest (
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
-    Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageB, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_DIGESTS, SPDM_DIGESTS, sizeof(SPDM_DIGESTS_RESPONSE_MAX));
+    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.MessageB, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_DIGESTS, SPDM_DIGESTS, sizeof(SPDM_DIGESTS_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {
       return Status;
     }

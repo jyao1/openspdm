@@ -41,7 +41,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmResponderCertificate.obj \
     $(OUTPUT_DIR)\TestSpdmResponderChallengeAuth.obj \
     $(OUTPUT_DIR)\TestSpdmResponderMeasurement.obj \
-	$(OUTPUT_DIR)\TestSpdmResponderKeyExchange.obj \
+    $(OUTPUT_DIR)\TestSpdmResponderKeyExchange.obj \
+    $(OUTPUT_DIR)\TestSpdmResponderFinish.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
     $(OUTPUT_DIR)\SpdmTestKey.obj \
     $(OUTPUT_DIR)\SpdmTestSupport.obj \
@@ -158,6 +159,9 @@ $(OUTPUT_DIR)\TestSpdmResponderMeasurement.obj : $(SOURCE_DIR)\TestSpdmResponder
 
 $(OUTPUT_DIR)\TestSpdmResponderKeyExchange.obj : $(SOURCE_DIR)\TestSpdmResponderKeyExchange.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderKeyExchange.c
+
+$(OUTPUT_DIR)\TestSpdmResponderFinish.obj : $(SOURCE_DIR)\TestSpdmResponderFinish.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderFinish.c
 
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c

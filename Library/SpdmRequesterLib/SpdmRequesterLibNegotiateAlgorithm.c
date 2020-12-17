@@ -116,7 +116,7 @@ TrySpdmNegotiateAlgorithms (
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
-    Status = SpdmHandleErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageA, SpdmRequest.Length, &SpdmResponseSize, &SpdmResponse, SPDM_NEGOTIATE_ALGORITHMS, SPDM_ALGORITHMS, sizeof(SPDM_ALGORITHMS_RESPONSE_MAX));
+    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.MessageA, SpdmRequest.Length, &SpdmResponseSize, &SpdmResponse, SPDM_NEGOTIATE_ALGORITHMS, SPDM_ALGORITHMS, sizeof(SPDM_ALGORITHMS_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {
       return Status;
     }

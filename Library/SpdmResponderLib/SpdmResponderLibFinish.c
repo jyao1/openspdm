@@ -327,19 +327,29 @@ SpdmGetResponseFinish (
   SPDM_SESSION_INFO        *SessionInfo;
 
   SpdmContext = Context;
+  SpdmRequest = Request;
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_KEY_EXCHANGE_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
+  }
+  
   if (SpdmContext->LastSpdmRequestSessionIdValid) {
     SessionId = SpdmContext->LastSpdmRequestSessionId;
   } else {
     SessionId = SpdmContext->LatestSessionId;
   }
-
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  SpdmRequest = Request;
   if (((SessionInfo->MutAuthRequested == 0) && (SpdmRequest->Header.Param1 != 0)) ||
       ((SessionInfo->MutAuthRequested != 0) && (SpdmRequest->Header.Param1 == 0)) ) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
@@ -416,6 +426,7 @@ SpdmGetResponseFinish (
   }
 
   SpdmGenerateSessionDataKey (SpdmContext, SessionId, FALSE);
+  SpdmContext->SpdmCmdReceiveState |= SPDM_FINISH_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;
 }

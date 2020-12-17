@@ -35,6 +35,7 @@ RETURN_STATUS
 EFIAPI
 SpdmRequesterRespondIfReady (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               *SessionId,
   IN OUT UINTN                *ResponseSize,
      OUT VOID                 *Response,
   IN     UINT8                 ExpectedResponseCode,
@@ -48,14 +49,30 @@ SpdmRequesterRespondIfReady (
   SpdmRequest.Header.RequestResponseCode = SPDM_RESPOND_IF_READY;
   SpdmRequest.Header.Param1 = SpdmContext->ErrorData.RequestCode;
   SpdmRequest.Header.Param2 = SpdmContext->ErrorData.Token;
-  Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
+  if (ExpectedResponseCode != SPDM_FINISH_RSP) {
+    Status = SpdmSendSpdmRequest (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
+  } else {
+    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+      Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
+    } else {
+      Status = SpdmSendSpdmRequest (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
+    }
+  }
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   *ResponseSize = ExpectedResponseSize;
   ZeroMem (Response, ExpectedResponseSize);
-  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, ResponseSize, Response);
+  if (ExpectedResponseCode != SPDM_FINISH_RSP) {
+    Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, ResponseSize, Response);
+  } else {
+    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+      Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, ResponseSize, Response);
+    } else {
+      Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, ResponseSize, Response);
+    }
+  }
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -118,6 +135,7 @@ SpdmHandleSimpleErrorResponse (
 RETURN_STATUS
 SpdmHandleResponseNotReady (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               *SessionId,
   IN OUT UINTN                *ResponseSize,
      OUT VOID                 *Response,
   IN     UINT8                 OriginalRequestCode,
@@ -140,7 +158,7 @@ SpdmHandleResponseNotReady (
   SpdmContext->ErrorData.Token       = ExtendErrorData->Token;
   SpdmContext->ErrorData.RDTM        = ExtendErrorData->RDTM;
 
-  return SpdmRequesterRespondIfReady(SpdmContext, ResponseSize, Response, ExpectedResponseCode, ExpectedResponseSize);
+  return SpdmRequesterRespondIfReady(SpdmContext, SessionId, ResponseSize, Response, ExpectedResponseCode, ExpectedResponseSize);
 }
 
 /**
@@ -172,6 +190,7 @@ RETURN_STATUS
 EFIAPI
 SpdmHandleErrorResponseMain (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               *SessionId,
   IN OUT VOID                 *MBuffer,
   IN     UINTN                 ShrinkBufferSize,
   IN OUT UINTN                *ResponseSize,
@@ -186,7 +205,7 @@ SpdmHandleErrorResponseMain (
     ShrinkManagedBuffer(MBuffer, ShrinkBufferSize);
     return SpdmHandleSimpleErrorResponse(SpdmContext, ((SPDM_MESSAGE_HEADER*)Response)->Param1);
   } else {
-    return SpdmHandleResponseNotReady(SpdmContext, ResponseSize, Response, OriginalRequestCode, ExpectedResponseCode, ExpectedResponseSize);
+    return SpdmHandleResponseNotReady(SpdmContext, SessionId, ResponseSize, Response, OriginalRequestCode, ExpectedResponseCode, ExpectedResponseSize);
   }
 }
 
