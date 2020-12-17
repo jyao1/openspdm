@@ -432,6 +432,7 @@ if(TESTTYPE STREQUAL "OsTest")
             
     SUBDIRS(OsTest/SpdmRequesterTest
             OsTest/SpdmResponderTest
+            Tool/SpdmDump
     )
        
 elseif(TESTTYPE STREQUAL "UnitTest")

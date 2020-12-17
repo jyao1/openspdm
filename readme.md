@@ -174,7 +174,9 @@
 
 ### Generate pcap file for offline analysis
 
-   Use "SpdmResponderTest --pcap <pcap_file>" or "SpdmRequesterTest --pcap <pcap_file>".
+   Use "SpdmResponderTest --pcap <pcap_file>" or "SpdmRequesterTest --pcap <pcap_file>" to generate pcap file.
+
+   [SpdmDump](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmDump.md) tool can be used to parse the pcap file offline.
 
 ### Run [UnitTest](https://github.com/jyao1/openspdm/tree/master/UnitTest)
 
