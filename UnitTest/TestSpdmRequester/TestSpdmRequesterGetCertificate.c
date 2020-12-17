@@ -406,7 +406,7 @@ void TestSpdmRequesterGetCertificateCase1(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -441,7 +441,7 @@ void TestSpdmRequesterGetCertificateCase2(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -473,7 +473,7 @@ void TestSpdmRequesterGetCertificateCase3(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -506,7 +506,7 @@ void TestSpdmRequesterGetCertificateCase4(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -539,7 +539,7 @@ void TestSpdmRequesterGetCertificateCase5(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -574,7 +574,7 @@ void TestSpdmRequesterGetCertificateCase6(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -607,7 +607,7 @@ void TestSpdmRequesterGetCertificateCase7(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -641,7 +641,7 @@ void TestSpdmRequesterGetCertificateCase8(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -675,7 +675,7 @@ void TestSpdmRequesterGetCertificateCase9(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));
@@ -710,7 +710,7 @@ void TestSpdmRequesterGetCertificateCase10(void **state) {
   SpdmContext->LocalContext.PeerCertChainProvision = Data;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = DataSize;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
 
   CertChainSize = sizeof(CertChain);
   ZeroMem (CertChain, sizeof(CertChain));

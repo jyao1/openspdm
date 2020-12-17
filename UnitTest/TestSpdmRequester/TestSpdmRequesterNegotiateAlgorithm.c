@@ -79,9 +79,9 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Header.Param2 = 0;
     SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
     SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
-    SpdmResponse.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-    SpdmResponse.BaseAsymSel = USE_ASYM_ALGO;
-    SpdmResponse.BaseHashSel = USE_HASH_ALGO;
+    SpdmResponse.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+    SpdmResponse.BaseAsymSel = mUseAsymAlgo;
+    SpdmResponse.BaseHashSel = mUseHashAlgo;
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
 
@@ -100,9 +100,9 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Header.Param2 = 0;
     SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
     SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
-    SpdmResponse.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-    SpdmResponse.BaseAsymSel = USE_ASYM_ALGO;
-    SpdmResponse.BaseHashSel = USE_HASH_ALGO;
+    SpdmResponse.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+    SpdmResponse.BaseAsymSel = mUseAsymAlgo;
+    SpdmResponse.BaseHashSel = mUseHashAlgo;
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
 
@@ -161,9 +161,9 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SpdmResponse.Header.Param2 = 0;
       SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
       SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
-      SpdmResponse.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-      SpdmResponse.BaseAsymSel = USE_ASYM_ALGO;
-      SpdmResponse.BaseHashSel = USE_HASH_ALGO;
+      SpdmResponse.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+      SpdmResponse.BaseAsymSel = mUseAsymAlgo;
+      SpdmResponse.BaseHashSel = mUseHashAlgo;
       SpdmResponse.ExtAsymSelCount = 0;
       SpdmResponse.ExtHashSelCount = 0;
 
@@ -232,9 +232,9 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
       SpdmResponse.Header.Param2 = 0;
       SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
       SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
-      SpdmResponse.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-      SpdmResponse.BaseAsymSel = USE_ASYM_ALGO;
-      SpdmResponse.BaseHashSel = USE_HASH_ALGO;
+      SpdmResponse.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+      SpdmResponse.BaseAsymSel = mUseAsymAlgo;
+      SpdmResponse.BaseHashSel = mUseHashAlgo;
       SpdmResponse.ExtAsymSelCount = 0;
       SpdmResponse.ExtHashSelCount = 0;
 
@@ -256,8 +256,8 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
     SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;   
     SpdmResponse.MeasurementHashAlgo = 0;
-    SpdmResponse.BaseAsymSel = USE_ASYM_ALGO;
-    SpdmResponse.BaseHashSel = USE_HASH_ALGO;
+    SpdmResponse.BaseAsymSel = mUseAsymAlgo;
+    SpdmResponse.BaseHashSel = mUseHashAlgo;
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
 
@@ -276,9 +276,9 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Header.Param2 = 0;
     SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
     SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;   
-    SpdmResponse.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
+    SpdmResponse.MeasurementHashAlgo = mUseMeasurementHashAlgo;
     SpdmResponse.BaseAsymSel = 0;
-    SpdmResponse.BaseHashSel = USE_HASH_ALGO;
+    SpdmResponse.BaseHashSel = mUseHashAlgo;
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
 
@@ -297,8 +297,8 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
     SpdmResponse.Header.Param2 = 0;
     SpdmResponse.Length = sizeof(SPDM_ALGORITHMS_RESPONSE);
     SpdmResponse.MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;   
-    SpdmResponse.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-    SpdmResponse.BaseAsymSel = USE_ASYM_ALGO;
+    SpdmResponse.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+    SpdmResponse.BaseAsymSel = mUseAsymAlgo;
     SpdmResponse.BaseHashSel = 0;
     SpdmResponse.ExtAsymSelCount = 0;
     SpdmResponse.ExtHashSelCount = 0;
@@ -322,9 +322,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase1(void **state) {
   SpdmTestContext->CaseId = 0x1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -342,9 +342,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase2(void **state) {
   SpdmTestContext->CaseId = 0x2;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;  
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;  
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -361,9 +361,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase3(void **state) {
   SpdmContext = &SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -381,9 +381,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase4(void **state) {
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -401,9 +401,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase5(void **state) {
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -421,9 +421,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase6(void **state) {
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -441,9 +441,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase7(void **state) {
   SpdmTestContext->CaseId = 0x7;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -462,9 +462,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase8(void **state) {
   SpdmTestContext->CaseId = 0x8;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -481,9 +481,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase9(void **state) {
   SpdmTestContext->CaseId = 0x9;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -501,9 +501,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase10(void **state) {
   SpdmTestContext->CaseId = 0xA;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = 0;
@@ -524,9 +524,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase11(void **state) {
   SpdmTestContext->CaseId = 0xB;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = 0;
@@ -547,9 +547,9 @@ void TestSpdmRequesterNegotiateAlgorithmCase12(void **state) {
   SpdmTestContext->CaseId = 0xC;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
-  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = 0;

@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmRequesterTest
+MODULE_NAME = SpdmDump
 BASE_NAME = $(MODULE_NAME)
 
 #

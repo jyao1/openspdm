@@ -217,9 +217,9 @@ SpdmServerInit (
   SpdmContext = mSpdmContext;
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
-  if (TRANSPORT_LAYER == USE_MCTP_TRANSPORT) {
+  if (mUseTransportLayer == USE_MCTP_TRANSPORT) {
     SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTransportMctpEncodeMessage, SpdmTransportMctpDecodeMessage);
-  } else if (TRANSPORT_LAYER == USE_PCI_DOE_TRANSPORT) {
+  } else if (mUseTransportLayer == USE_PCI_DOE_TRANSPORT) {
     SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTransportPciDoeEncodeMessage, SpdmTransportPciDoeDecodeMessage);
   } else {
     return NULL;
@@ -310,19 +310,19 @@ SpdmServerInit (
   }
   SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &Data32, sizeof(Data32));
 
-  Data32 = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
+  Data32 = mUseMeasurementHashAlgo;
   SpdmSetData (SpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &Data32, sizeof(Data32));
-  Data32 = USE_ASYM_ALGO;
+  Data32 = mUseAsymAlgo;
   SpdmSetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, sizeof(Data32));
-  Data32 = USE_HASH_ALGO;
+  Data32 = mUseHashAlgo;
   SpdmSetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &Data32, sizeof(Data32));
-  Data16 = USE_DHE_ALGO;
+  Data16 = mUseDheAlgo;
   SpdmSetData (SpdmContext, SpdmDataDHENamedGroup, &Parameter, &Data16, sizeof(Data16));
-  Data16 = USE_AEAD_ALGO;
+  Data16 = mUseAeadAlgo;
   SpdmSetData (SpdmContext, SpdmDataAEADCipherSuite, &Parameter, &Data16, sizeof(Data16));
-  Data16 = USE_REQ_ASYM_ALGO;
+  Data16 = mUseReqAsymAlgo;
   SpdmSetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, sizeof(Data16));
-  Data16 = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
+  Data16 = mUseKeyScheduleAlgo;
   SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
 
   Res = RegisterMeasurement (&Data, &DataSize, &Data8);

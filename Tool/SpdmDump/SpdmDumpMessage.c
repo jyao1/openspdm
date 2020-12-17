@@ -61,7 +61,7 @@ SpdmOpCodeToString (
 {
   UINTN  Index;
 
-  for (Index = 0; Index < sizeof(mSpdmOpcodeStringTable)/sizeof(mSpdmOpcodeStringTable[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE(mSpdmOpcodeStringTable); Index++) {
     if (SpdmOpCode == mSpdmOpcodeStringTable[Index].OpCode) {
       return mSpdmOpcodeStringTable[Index].String;
     }

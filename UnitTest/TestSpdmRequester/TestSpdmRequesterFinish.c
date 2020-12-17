@@ -113,10 +113,10 @@ SpdmRequesterFinishTestReceiveMessage (
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
 
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO;
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
     HashSize = GetSpdmHashSize (SpdmContext);
     HmacSize = GetSpdmHashSize (SpdmContext);
     TempBufSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
@@ -163,10 +163,10 @@ SpdmRequesterFinishTestReceiveMessage (
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;    
     
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO;
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
     HashSize = GetSpdmHashSize (SpdmContext);
     HmacSize = GetSpdmHashSize (SpdmContext);
     TempBufSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
@@ -251,10 +251,10 @@ SpdmRequesterFinishTestReceiveMessage (
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
       
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO;
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
       HashSize = GetSpdmHashSize (SpdmContext);
       HmacSize = GetSpdmHashSize (SpdmContext);
       TempBufSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
@@ -348,10 +348,10 @@ SpdmRequesterFinishTestReceiveMessage (
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
       
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO;
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
       HashSize = GetSpdmHashSize (SpdmContext);
       HmacSize = GetSpdmHashSize (SpdmContext);
       TempBufSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
@@ -410,10 +410,10 @@ void TestSpdmRequesterFinishCase1(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO; 
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = USE_AEAD_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -457,10 +457,10 @@ void TestSpdmRequesterFinishCase2(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO; 
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = USE_AEAD_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -502,10 +502,10 @@ void TestSpdmRequesterFinishCase3(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO; 
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = USE_AEAD_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -549,10 +549,10 @@ void TestSpdmRequesterFinishCase4(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO; 
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = USE_AEAD_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -596,10 +596,10 @@ void TestSpdmRequesterFinishCase5(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO; 
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = USE_AEAD_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -643,10 +643,10 @@ void TestSpdmRequesterFinishCase6(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO; 
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = USE_AEAD_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -691,10 +691,10 @@ void TestSpdmRequesterFinishCase7(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO; 
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = USE_AEAD_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -739,10 +739,10 @@ void TestSpdmRequesterFinishCase8(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO; 
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = USE_AEAD_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 
@@ -786,10 +786,10 @@ void TestSpdmRequesterFinishCase9(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
   ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = USE_DHE_ALGO; 
-  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = USE_AEAD_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
   CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
 

@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 FILE   *mPcapFile;
 
-VOID
+BOOLEAN
 OpenPcapPacketFile (
   IN CHAR8  *PcapFileName
   )
@@ -24,7 +24,7 @@ OpenPcapPacketFile (
   PCAP_GLOBAL_HEADER  PcapGlobalHeader;
 
   if (PcapFileName == NULL) {
-    return ;
+    return FALSE;
   }
 
   PcapGlobalHeader.MagicNumber  = PCAP_GLOBAL_HEADER_MAGIC;
@@ -33,24 +33,26 @@ OpenPcapPacketFile (
   PcapGlobalHeader.ThisZone = 0;
   PcapGlobalHeader.SigFigs = 0;
   PcapGlobalHeader.SnapLen = PCAP_PACKET_MAX_SIZE;
-  if (TRANSPORT_LAYER == USE_MCTP_TRANSPORT) {
+  if (mUseTransportLayer == USE_MCTP_TRANSPORT) {
     PcapGlobalHeader.Network = LINKTYPE_MCTP;
-  } else if (TRANSPORT_LAYER == USE_PCI_DOE_TRANSPORT) {
+  } else if (mUseTransportLayer == USE_PCI_DOE_TRANSPORT) {
     PcapGlobalHeader.Network = LINKTYPE_PCI_DOE;
   } else {
-    return ;
+    return FALSE;
   }
 
   if ((mPcapFile = fopen (PcapFileName, "wb")) == NULL) {
     printf ("!!!Unable to open pcap file %s!!!\n", PcapFileName);
-    return ;
+    return FALSE;
   }
 
   if ((fwrite (&PcapGlobalHeader, 1, sizeof(PcapGlobalHeader), mPcapFile)) != sizeof(PcapGlobalHeader)) {
     printf ("!!!Write pcap file error!!!\n");
     ClosePcapPacketFile ();
-    return ;
+    return FALSE;
   }
+
+  return TRUE;
 }
 
 VOID

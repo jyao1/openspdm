@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmTest.h"
 
+UINT32  mUseTransportLayer = USE_MCTP_TRANSPORT;
+
 VOID
 DumpData (
   IN UINT8 *Buffer,

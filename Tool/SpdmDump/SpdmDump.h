@@ -20,6 +20,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "OsInclude.h"
 #include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 
 BOOLEAN
 OpenPcapPacketFile (

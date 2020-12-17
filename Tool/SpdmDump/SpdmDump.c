@@ -14,7 +14,7 @@ PrintUsage (
   void
   )
 {
-  printf ("SpdmResponder -r <PcapFileName>\n");
+  printf ("SpdmDump -r <PcapFileName>\n");
 }
 
 void

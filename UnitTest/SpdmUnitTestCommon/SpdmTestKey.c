@@ -9,6 +9,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmUnitTest.h"
 
+UINT32  mUseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
+UINT32  mUseMeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
+UINT32  mUseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+UINT16  mUseReqAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048;
+UINT16  mUseDheAlgo = SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1;
+UINT16  mUseAeadAlgo = SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM;
+UINT16  mUseKeyScheduleAlgo = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
+
 #define SHA256_HASH_SIZE  32
 
 /**
@@ -85,7 +93,7 @@ ReadResponderPrivateCertificate (
   BOOLEAN  Res;
   CHAR8    *File;
 
-  switch (USE_ASYM_ALGO) {
+  switch (mUseAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
     File = "Rsa2048/end_responder.key";
@@ -121,7 +129,7 @@ ReadRequesterPrivateCertificate (
   BOOLEAN  Res;
   CHAR8    *File;
 
-  switch (USE_REQ_ASYM_ALGO) {
+  switch (mUseReqAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
     File = "Rsa2048/end_requester.key";
@@ -164,7 +172,7 @@ ReadResponderRootPublicCertificate (
   UINTN               CertChainSize;
   CHAR8               *File;
 
-  switch (USE_ASYM_ALGO) {
+  switch (mUseAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
     File = "Rsa2048/ca.cert.der";
@@ -232,7 +240,7 @@ ReadRequesterRootPublicCertificate (
   UINTN               CertChainSize;
   CHAR8               *File;
 
-  switch (USE_REQ_ASYM_ALGO) {
+  switch (mUseReqAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
     File = "Rsa2048/ca.cert.der";
@@ -302,7 +310,7 @@ ReadResponderPublicCertificateChain (
   UINT8               *RootCert;
   UINTN                RootCertLen;
 
-  switch (USE_ASYM_ALGO) {
+  switch (mUseAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
     File = "Rsa2048/bundle_responder.certchain.der";
@@ -382,7 +390,7 @@ ReadRequesterPublicCertificateChain (
   UINT8               *RootCert;
   UINTN               RootCertLen;
 
-  switch (USE_REQ_ASYM_ALGO) {
+  switch (mUseReqAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
     File = "Rsa2048/bundle_requester.certchain.der";
@@ -648,11 +656,11 @@ SpdmDataSignFunc (
   BOOLEAN                       Result;
 
   if (IsResponder) {
-    if (AsymAlgo != USE_ASYM_ALGO) {
+    if (AsymAlgo != mUseAsymAlgo) {
       return FALSE;
     }
   } else {
-    if (AsymAlgo != USE_REQ_ASYM_ALGO) {
+    if (AsymAlgo != mUseReqAsymAlgo) {
       return FALSE;
     }
   }

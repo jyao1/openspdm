@@ -19,9 +19,6 @@ SPDM_NEGOTIATE_ALGORITHMS_REQUEST    mSpdmNegotiateAlgorithmRequest1 = {
   },
   sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST),
   SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
-  0,
-  USE_ASYM_ALGO,
-  USE_HASH_ALGO,
 };
 UINTN mSpdmNegotiateAlgorithmRequest1Size = sizeof(mSpdmNegotiateAlgorithmRequest1);
 
@@ -34,9 +31,6 @@ SPDM_NEGOTIATE_ALGORITHMS_REQUEST    mSpdmNegotiateAlgorithmRequest2 = {
   },
   sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST),
   SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
-  0,
-  USE_ASYM_ALGO,
-  USE_HASH_ALGO,
 };
 UINTN mSpdmNegotiateAlgorithmRequest2Size = sizeof(SPDM_MESSAGE_HEADER);
 
@@ -210,6 +204,11 @@ int SpdmResponderAlgorithmTestMain(void) {
     // SpdmCmdReceiveState Check
     cmocka_unit_test(TestSpdmResponderAlgorithmCase6),
   };
+
+  mSpdmNegotiateAlgorithmRequest1.BaseAsymAlgo = mUseAsymAlgo;
+  mSpdmNegotiateAlgorithmRequest1.BaseHashAlgo = mUseHashAlgo;
+  mSpdmNegotiateAlgorithmRequest2.BaseAsymAlgo = mUseAsymAlgo;
+  mSpdmNegotiateAlgorithmRequest2.BaseHashAlgo = mUseHashAlgo;
 
   SetupSpdmTestContext (&mSpdmResponderAlgorithmTestContext);
 

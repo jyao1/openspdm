@@ -71,7 +71,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                    TempBufSize;
 
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
     SpdmResponse = (VOID *)TempBuf;
 
@@ -96,7 +96,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                    TempBufSize;
 
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
     SpdmResponse = (VOID *)TempBuf;
 
@@ -158,7 +158,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                    TempBufSize;
 
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
       SpdmResponse = (VOID *)TempBuf;
 
@@ -230,7 +230,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                    TempBufSize;
 
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
       SpdmResponse = (VOID *)TempBuf;
 
@@ -268,7 +268,7 @@ void TestSpdmRequesterGetDigestCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -293,7 +293,7 @@ void TestSpdmRequesterGetDigestCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -317,7 +317,7 @@ void TestSpdmRequesterGetDigestCase3(void **state) {
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -342,7 +342,7 @@ void TestSpdmRequesterGetDigestCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -367,7 +367,7 @@ void TestSpdmRequesterGetDigestCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -392,7 +392,7 @@ void TestSpdmRequesterGetDigestCase6(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -417,7 +417,7 @@ void TestSpdmRequesterGetDigestCase7(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -443,7 +443,7 @@ void TestSpdmRequesterGetDigestCase8(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
@@ -467,7 +467,7 @@ void TestSpdmRequesterGetDigestCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
   SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
