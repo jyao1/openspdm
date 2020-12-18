@@ -16,6 +16,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param  Size  raw data size
 **/
 VOID
+InternalDumpHexStr (
+  IN UINT8  *Data,
+  IN UINTN  Size
+  )
+{
+  UINTN  Index;
+  for (Index = 0; Index < Size; Index++) {
+    DEBUG ((DEBUG_INFO, "%02x", (UINTN)Data[Index]));
+  }
+}
+
+/**
+  This function dump raw data.
+
+  @param  Data  raw data
+  @param  Size  raw data size
+**/
+VOID
 InternalDumpData (
   IN UINT8  *Data,
   IN UINTN  Size

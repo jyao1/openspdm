@@ -32,6 +32,10 @@ GetRandomNumber64 (
   Ptr[1] = (UINT8)rand();
   Ptr[2] = (UINT8)rand();
   Ptr[3] = (UINT8)rand();
+  Ptr[4] = (UINT8)rand();
+  Ptr[5] = (UINT8)rand();
+  Ptr[6] = (UINT8)rand();
+  Ptr[7] = (UINT8)rand();
 
   return TRUE;
 }

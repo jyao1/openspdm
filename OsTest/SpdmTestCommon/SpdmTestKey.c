@@ -784,6 +784,10 @@ SpdmPskHandshakeSecretHkdfExpandFunc (
   } else {
     return FALSE;
   }
+  printf ("[PSK]: ");
+  DumpHexStr (Psk, PskSize);
+  printf ("\n");
+
 
   Result = HmacSha256All (mMyZeroFilledBuffer, SHA256_HASH_SIZE, Psk, PskSize, HandshakeSecret);
   if (!Result) {

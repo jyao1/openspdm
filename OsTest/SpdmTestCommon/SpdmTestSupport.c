@@ -10,6 +10,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmTest.h"
 
 VOID
+DumpHexStr (
+  IN UINT8 *Buffer,
+  IN UINTN BufferSize
+  )
+{
+  UINTN Index;
+
+  for (Index = 0; Index < BufferSize; Index++) {
+    printf ("%02x", Buffer[Index]);
+  }
+  printf ("\n");
+}
+
+VOID
 DumpData (
   IN UINT8 *Buffer,
   IN UINTN BufferSize
@@ -21,6 +35,33 @@ DumpData (
     printf ("%02x ", Buffer[Index]);
   }
   printf ("\n");
+}
+
+VOID
+DumpHex (
+  IN UINT8  *Data,
+  IN UINTN  Size
+  )
+{
+  UINTN   Index;
+  UINTN   Count;
+  UINTN   Left;
+
+#define COLUME_SIZE  (16 * 2)
+
+  Count = Size / COLUME_SIZE;
+  Left  = Size % COLUME_SIZE;
+  for (Index = 0; Index < Count; Index++) {
+    printf ("%04x: ", (UINT32)(Index * COLUME_SIZE));
+    DumpData (Data + Index * COLUME_SIZE, COLUME_SIZE);
+    printf ("\n");
+  }
+
+  if (Left != 0) {
+    printf ("%04x: ", (UINT32)(Index * COLUME_SIZE));
+    DumpData (Data + Index * COLUME_SIZE, Left);
+    printf ("\n");
+  }
 }
 
 BOOLEAN

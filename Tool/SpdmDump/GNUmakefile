@@ -36,6 +36,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmDump.o \
     $(OUTPUT_DIR)/SpdmDumpMessage.o \
     $(OUTPUT_DIR)/SpdmDumpPcap.o \
+    $(OUTPUT_DIR)/SpdmDumpSession.o \
     $(OUTPUT_DIR)/SpdmDumpSupport.o \
     $(OUTPUT_DIR)/MctpDump.o \
     $(OUTPUT_DIR)/PciDoeDump.o \
@@ -43,7 +44,7 @@ OBJECT_FILES =  \
 
 STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/OsStub/BaseMemoryLib/BaseMemoryLib.a \
-    $(BIN_DIR)/OsStub/DebugLib/DebugLib.a \
+    $(BIN_DIR)/OsStub/DebugLibNull/DebugLibNull.a \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a \
     $(BIN_DIR)/OsStub/RngLib/RngLib.a \
@@ -57,7 +58,7 @@ STATIC_LIBRARY_FILES =  \
 
 STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/OsStub/BaseMemoryLib/*.o \
-    $(BIN_DIR)/OsStub/DebugLib/*.o \
+    $(BIN_DIR)/OsStub/DebugLibNull/*.o \
     $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/*.o \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/*.o \
     $(BIN_DIR)/OsStub/RngLib/*.o \
@@ -71,6 +72,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
 
 INC =  \
     -I$(SOURCE_DIR) \
+    -I$(WORKSPACE)/Library/SpdmCommonLib \
     -I$(WORKSPACE)/Tool/SpdmTestCommon \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
@@ -106,7 +108,7 @@ init:
 #
 gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseMemoryLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/DebugLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/DebugLibNull/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/BaseCryptLib$(CRYPTO)/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/$(CRYPTO)Lib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/RngLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
@@ -128,6 +130,9 @@ $(OUTPUT_DIR)/SpdmDumpMessage.o : $(SOURCE_DIR)/SpdmDumpMessage.c
 $(OUTPUT_DIR)/SpdmDumpPcap.o : $(SOURCE_DIR)/SpdmDumpPcap.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
+$(OUTPUT_DIR)/SpdmDumpSession.o : $(SOURCE_DIR)/SpdmDumpSession.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
 $(OUTPUT_DIR)/SpdmDumpSupport.o : $(SOURCE_DIR)/SpdmDumpSupport.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
@@ -143,7 +148,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
 
 $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/OsStub/BaseMemoryLib/BaseMemoryLib.a > $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/OsStub/DebugLib/DebugLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsStub/DebugLibNull/DebugLibNull.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/BaseCryptLib$(CRYPTO)/BaseCryptLib$(CRYPTO).a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/RngLib/RngLib.a >> $(OUTPUT_DIR)/tmp.list

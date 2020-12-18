@@ -16,6 +16,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param  Size  raw data size
 **/
 VOID
+DumpHexStr (
+  IN UINT8  *Data,
+  IN UINTN  Size
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < Size; Index++) {
+    printf ("%02x", Data[Index]);
+  }
+  printf ("\n");
+}
+
+/**
+  This function dump raw data.
+
+  @param  Data  raw data
+  @param  Size  raw data size
+**/
+VOID
 DumpData (
   IN UINT8  *Data,
   IN UINTN  Size
@@ -58,6 +78,81 @@ DumpHex (
     printf ("    %04x: ", Index * COLUME_SIZE);
     DumpData (Data + Index * COLUME_SIZE, Left);
   }
+}
+
+STATIC
+BOOLEAN
+CharToByte (
+  IN  CHAR8  Ch,
+  OUT UINT8  *Data
+  )
+{
+  if (Ch >= '0' && Ch <= '9') {
+    *Data = Ch - '0';
+    return TRUE;
+  }
+  if (Ch >= 'a' && Ch <= 'f') {
+    *Data = Ch - 'a' + 0xa;
+    return TRUE;
+  }
+  if (Ch >= 'A' && Ch <= 'F') {
+    *Data = Ch - 'A' + 0xA;
+    return TRUE;
+  }
+  printf ("HexString error - invalid char '%c'\n", Ch);
+  return FALSE;
+}
+
+STATIC
+BOOLEAN
+OneByteStringToBuffer (
+  IN  CHAR8   OneByteString[2],
+  OUT UINT8   *Buffer
+  )
+{
+  UINT8 DataH;
+  UINT8 DataL;
+
+  if (!CharToByte (OneByteString[0], &DataH)) {
+    return FALSE;
+  }
+  if (!CharToByte (OneByteString[1], &DataL)) {
+    return FALSE;
+  }
+
+  *Buffer = (DataH << 4) | DataL;
+  return TRUE;
+}
+
+BOOLEAN
+HexStringToBuffer (
+  IN  CHAR8   *HexString,
+  OUT VOID    **Buffer,
+  OUT UINTN   *BufferSize
+  )
+{
+  UINTN   StrLen;
+  UINTN   Index;
+
+  StrLen = strlen (HexString);
+  if ((StrLen & 0x1) != 0) {
+    printf ("HexString error - strlen (%d) is not even\n", (UINT32)StrLen);
+    return FALSE;
+  }
+  *BufferSize = StrLen / 2;
+  *Buffer = (VOID *)malloc(*BufferSize);
+  if (*Buffer == NULL) {
+    printf ("memory out of resource\n");
+    return FALSE;
+  }
+
+  for (Index = 0; Index < StrLen / 2; Index++) {
+    if (!OneByteStringToBuffer (HexString + Index * 2, (UINT8 *)*Buffer + Index)) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
 }
 
 BOOLEAN

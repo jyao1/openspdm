@@ -18,10 +18,23 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Pcap.h>
 #include <IndustryStandard/LinkTypeEx.h>
 
+#include <Library/SpdmSecuredMessageLib.h>
+#include <SpdmCommonLibInternal.h>
+
 #include "OsInclude.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+
+BOOLEAN
+InitSpdmDump (
+  VOID
+  );
+
+VOID
+DeinitSpdmDump (
+  VOID
+  );
 
 BOOLEAN
 OpenPcapPacketFile (
@@ -43,6 +56,17 @@ GetDataLinkType (
   VOID
   );
 
+UINT32
+GetMaxPacketLength (
+  VOID
+  );
+
+VOID
+DumpHexStr (
+  IN UINT8  *Data,
+  IN UINTN  Size
+  );
+
 VOID
 DumpData (
   IN UINT8  *Data,
@@ -58,29 +82,59 @@ DumpHex (
 VOID
 DumpMctpPacket (
   IN VOID    *Buffer,
-  IN UINTN   BufferSize,
-  IN BOOLEAN Truncated
+  IN UINTN   BufferSize
   );
 
 VOID
 DumpPciDoePacket (
   IN VOID    *Buffer,
-  IN UINTN   BufferSize,
-  IN BOOLEAN Truncated
+  IN UINTN   BufferSize
   );
 
 VOID
-DumpSpdmPacket (
+DumpMctpMessage (
   IN VOID    *Buffer,
-  IN UINTN   BufferSize,
-  IN BOOLEAN Truncated
+  IN UINTN   BufferSize
   );
 
 VOID
-DumpSecuredSpdmPacket (
+DumpSpdmMessage (
   IN VOID    *Buffer,
-  IN UINTN   BufferSize,
-  IN BOOLEAN Truncated
+  IN UINTN   BufferSize
+  );
+
+VOID
+DumpSecuredSpdmMessage (
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  );
+
+RETURN_STATUS
+SpdmCalculateSessionHandshakeKey (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN UINT32                       SessionId,
+  IN BOOLEAN                      IsRequester
+  );
+
+RETURN_STATUS
+SpdmCalculateSessionDataKey (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN UINT32                       SessionId,
+  IN BOOLEAN                      IsRequester
+  );
+
+BOOLEAN
+HexStringToBuffer (
+  IN  CHAR8   *HexString,
+  OUT VOID    **Buffer,
+  OUT UINTN   *BufferSize
+  );
+
+BOOLEAN
+ReadInputFile (
+  IN CHAR8    *FileName,
+  OUT VOID    **FileData,
+  OUT UINTN   *FileSize
   );
 
 extern BOOLEAN  mParamQuiteMode;
@@ -88,8 +142,14 @@ extern BOOLEAN  mParamAllMode;
 extern BOOLEAN  mParamDumpAsn1;
 extern BOOLEAN  mParamDumpVendorApp;
 extern BOOLEAN  mParamDumpHex;
-extern CHAR8    *mParamPsk;
-extern CHAR8    *mParamReqDhePrivKey;
-extern CHAR8    *mParamRspDhePrivKey;
+
+extern VOID    *mRequesterCertChainBuffer;
+extern UINTN   mRequesterCertChainBufferSize;
+extern VOID    *mResponderCertChainBuffer;
+extern UINTN   mResponderCertChainBufferSize;
+extern VOID    *mDheSecretBuffer;
+extern UINTN   mDheSecretBufferSize;
+extern VOID    *mPskBuffer;
+extern UINTN   mPskBufferSize;
 
 #endif

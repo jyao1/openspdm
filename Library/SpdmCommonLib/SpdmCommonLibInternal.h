@@ -12,6 +12,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/SpdmCommonLib.h>
 
+#define BIN_CONCAT_LABEL "spdm1.1"
+#define BIN_STR_0_LABEL  "derived"
+#define BIN_STR_1_LABEL  "req hs data"
+#define BIN_STR_2_LABEL  "rsp hs data"
+#define BIN_STR_3_LABEL  "req app data"
+#define BIN_STR_4_LABEL  "rsp app data"
+#define BIN_STR_5_LABEL  "key"
+#define BIN_STR_6_LABEL  "iv"
+#define BIN_STR_7_LABEL  "finished"
+#define BIN_STR_8_LABEL  "exp master"
+#define BIN_STR_9_LABEL  "traffic upd"
 
 typedef struct {
   UINT8                CTExponent;
@@ -360,6 +371,18 @@ typedef struct {
   //
   UINT8                           RetryTimes;
 } SPDM_DEVICE_CONTEXT;
+
+/**
+  This function dump raw data.
+
+  @param  Data  raw data
+  @param  Size  raw data size
+**/
+VOID
+InternalDumpHexStr (
+  IN UINT8  *Data,
+  IN UINTN  Size
+  );
 
 /**
   This function dump raw data.

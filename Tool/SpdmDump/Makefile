@@ -36,6 +36,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmDump.obj \
     $(OUTPUT_DIR)\SpdmDumpMessage.obj \
     $(OUTPUT_DIR)\SpdmDumpPcap.obj \
+    $(OUTPUT_DIR)\SpdmDumpSession.obj \
     $(OUTPUT_DIR)\SpdmDumpSupport.obj \
     $(OUTPUT_DIR)\MctpDump.obj \
     $(OUTPUT_DIR)\PciDoeDump.obj \
@@ -43,7 +44,7 @@ OBJECT_FILES =  \
 
 STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\BaseMemoryLib\BaseMemoryLib.lib \
-    $(BIN_DIR)\OsStub\DebugLib\DebugLib.lib \
+    $(BIN_DIR)\OsStub\DebugLibNull\DebugLibNull.lib \
     $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\BaseCryptLib$(CRYPTO).lib \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\$(CRYPTO)Lib.lib \
     $(BIN_DIR)\OsStub\RngLib\RngLib.lib \
@@ -58,7 +59,7 @@ STATIC_LIBRARY_FILES =  \
 STATIC_LIBRARY_OBJECT_FILES =  \
     $(OBJECT_FILES) \
     $(BIN_DIR)\OsStub\BaseMemoryLib\*.obj \
-    $(BIN_DIR)\OsStub\DebugLib\*.obj \
+    $(BIN_DIR)\OsStub\DebugLibNull\*.obj \
     $(BIN_DIR)\OsStub\BaseCryptLib$(CRYPTO)\*.obj \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\*.obj \
     $(BIN_DIR)\OsStub\RngLib\*.obj \
@@ -71,6 +72,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
 
 INC =  \
     -I$(SOURCE_DIR) \
+    -I$(WORKSPACE)\Library\SpdmCommonLib \
     -I$(WORKSPACE)\Tool\SpdmTestCommon \
     -I$(WORKSPACE)\Include \
     -I$(WORKSPACE)\Include\Hal \
@@ -106,7 +108,7 @@ init:
 #
 gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseMemoryLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\DebugLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\DebugLibNull\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\BaseCryptLib$(CRYPTO)\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\$(CRYPTO)Lib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\RngLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
@@ -127,6 +129,9 @@ $(OUTPUT_DIR)\SpdmDumpMessage.obj : $(SOURCE_DIR)\SpdmDumpMessage.c
 
 $(OUTPUT_DIR)\SpdmDumpPcap.obj : $(SOURCE_DIR)\SpdmDumpPcap.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmDumpPcap.c
+
+$(OUTPUT_DIR)\SpdmDumpSession.obj : $(SOURCE_DIR)\SpdmDumpSession.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmDumpSession.c
 
 $(OUTPUT_DIR)\SpdmDumpSupport.obj : $(SOURCE_DIR)\SpdmDumpSupport.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmDumpSupport.c

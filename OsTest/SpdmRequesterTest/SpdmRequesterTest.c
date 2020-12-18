@@ -194,7 +194,10 @@ int main (
   char *argv[ ]
   )
 {
-  ProcessArgs ("SpdmRequester", argc, argv);
+  printf ("%s version 0.1\n", "SpdmRequesterTest");
+  srand((unsigned int)time(NULL));
+
+  ProcessArgs ("SpdmRequesterTest", argc, argv);
 
   PlatformClientRoutine (DEFAULT_SPDM_PLATFORM_PORT);
   printf ("Client stopped\n");

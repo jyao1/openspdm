@@ -205,7 +205,10 @@ int main (
   char *argv[ ]
   )
 {
-  ProcessArgs ("SpdmResponder", argc, argv);
+  printf ("%s version 0.1\n", "SpdmResponderTest");
+  srand((unsigned int)time(NULL));
+
+  ProcessArgs ("SpdmResponderTest", argc, argv);
 
   mSpdmContext = SpdmServerInit ();
   if (mSpdmContext == NULL) {

@@ -29,6 +29,14 @@ DataLinkTypeToString (
 }
 
 UINT32
+GetMaxPacketLength (
+  VOID
+  )
+{
+  return mPcapGlobalHeader.SnapLen;
+}
+
+UINT32
 GetDataLinkType (
   VOID
   )
@@ -100,6 +108,10 @@ ClosePcapPacketFile (
     fclose (mPcapFile);
     mPcapFile = NULL;
   }
+  if (mPcapPacketDataBuffer != NULL) {
+    free (mPcapPacketDataBuffer);
+    mPcapPacketDataBuffer = NULL;
+  }
 }
 
 VOID
@@ -118,16 +130,15 @@ DumpPcapPacketHeader (
 VOID
 DumpPcapPacket (
   IN VOID    *Buffer,
-  IN UINTN   BufferSize,
-  IN BOOLEAN Truncated
+  IN UINTN   BufferSize
   )
 {
   switch (mPcapGlobalHeader.Network) {
   case LINKTYPE_MCTP:
-    DumpMctpPacket (Buffer, BufferSize, Truncated);
+    DumpMctpPacket (Buffer, BufferSize);
     return ;
   case LINKTYPE_PCI_DOE:
-    DumpPciDoePacket (Buffer, BufferSize, Truncated);
+    DumpPciDoePacket (Buffer, BufferSize);
     return ;
   default:
     return ;
@@ -152,6 +163,6 @@ DumpPcap (
     if (fread (mPcapPacketDataBuffer, 1, PcapPacketHeader.InclLen, mPcapFile) != PcapPacketHeader.InclLen) {
       return ;
     }
-    DumpPcapPacket (mPcapPacketDataBuffer, PcapPacketHeader.InclLen, PcapPacketHeader.InclLen != PcapPacketHeader.OrigLen);
+    DumpPcapPacket (mPcapPacketDataBuffer, PcapPacketHeader.InclLen);
   }
 }

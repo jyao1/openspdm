@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Tool/SpdmDump
+                    ${PROJECT_SOURCE_DIR}/Library/SpdmCommonLib
+                    ${PROJECT_SOURCE_DIR}/Tool/SpdmTestCommon
                     ${PROJECT_SOURCE_DIR}/Include
                     ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
@@ -11,6 +13,7 @@ SET(src_SpdmDump
     SpdmDump.c
     SpdmDumpMessage.c
     SpdmDumpPcap.c
+    SpdmDumpSession.c
     SpdmDumpSupport.c
     MctpDump.c
     PciDoeDump.c
@@ -18,7 +21,7 @@ SET(src_SpdmDump
 
 SET(SpdmDump_LIBRARY
     BaseMemoryLib
-    DebugLib
+    DebugLibNull
     SpdmCommonLib
     ${CRYPTO}Lib
     RngLib
@@ -33,7 +36,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
     ADD_EXECUTABLE(SpdmDump
                    ${src_SpdmDump}
                    $<TARGET_OBJECTS:BaseMemoryLib>
-                   $<TARGET_OBJECTS:DebugLib>
+                   $<TARGET_OBJECTS:DebugLibNull>
                    $<TARGET_OBJECTS:SpdmCommonLib>
                    $<TARGET_OBJECTS:${CRYPTO}Lib>
                    $<TARGET_OBJECTS:RngLib>

@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 VOID
 DumpPciDoePacket (
   IN VOID    *Buffer,
-  IN UINTN   BufferSize,
-  IN BOOLEAN Truncated
+  IN UINTN   BufferSize
   )
 {
   PCI_DOE_DATA_OBJECT_HEADER  *PciDoeHeader;
@@ -32,10 +31,10 @@ DumpPciDoePacket (
   }
   switch (PciDoeHeader->DataObjectType) {
   case PCI_DOE_DATA_OBJECT_TYPE_SPDM:
-    DumpSpdmPacket ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize, Truncated);
+    DumpSpdmMessage ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
     break;
   case PCI_DOE_DATA_OBJECT_TYPE_SECURED_SPDM:
-    DumpSecuredSpdmPacket ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize, Truncated);
+    DumpSecuredSpdmMessage ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
     break;
   case PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY:
     // TBD

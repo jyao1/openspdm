@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "stdlib.h"
 #include "string.h"
 #include "assert.h"
+#include "time.h"
 #include "SpdmTestCommand.h"
 
 extern UINT32  mUseTransportLayer;
@@ -36,7 +37,19 @@ extern UINT16  mUseKeyScheduleAlgo;
 #define TEST_PSK_HINT_STRING  "TestPskHint"
 
 VOID
+DumpHexStr (
+  IN UINT8 *Buffer,
+  IN UINTN BufferSize
+  );
+
+VOID
 DumpData (
+  IN UINT8 *Buffer,
+  IN UINTN BufferSize
+  );
+
+VOID
+DumpHex (
   IN UINT8 *Buffer,
   IN UINTN BufferSize
   );

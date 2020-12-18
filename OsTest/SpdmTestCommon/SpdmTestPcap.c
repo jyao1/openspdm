@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "SpdmTest.h"
-#include <time.h>
 #include <IndustryStandard/Pcap.h>
 #include <IndustryStandard/LinkTypeEx.h>
 
