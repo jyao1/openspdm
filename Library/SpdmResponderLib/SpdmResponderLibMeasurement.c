@@ -332,6 +332,7 @@ SpdmGetResponseMeasurement (
       }
     } else {
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
       return RETURN_SUCCESS;
     }
     break;
