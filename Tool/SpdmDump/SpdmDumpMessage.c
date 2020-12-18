@@ -92,8 +92,15 @@ DumpSpdmPacket (
   }
 
   printf ("%s ", SpdmOpCodeToString(SpdmHeader->RequestResponseCode));
-
   printf ("\n");
+
+  if (mParamQuiteMode) {
+    return ;
+  }
+
+  if (mParamDumpHex) {
+    DumpHex (Buffer, BufferSize);
+  }
 }
 
 VOID
@@ -113,4 +120,12 @@ DumpSecuredSpdmPacket (
   printf ("SecuredSPDM(0x%08x) ", SecuredMessageHeader->SessionId);
   // TBD
   printf ("\n");
+
+  if (mParamQuiteMode) {
+    return ;
+  }
+
+  if (mParamDumpHex) {
+    DumpHex (Buffer, BufferSize);
+  }
 }

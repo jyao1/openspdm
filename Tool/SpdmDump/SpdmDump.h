@@ -44,6 +44,18 @@ GetDataLinkType (
   );
 
 VOID
+DumpData (
+  IN UINT8  *Data,
+  IN UINTN  Size
+  );
+
+VOID
+DumpHex (
+  IN UINT8  *Data,
+  IN UINTN  Size
+  );
+
+VOID
 DumpMctpPacket (
   IN VOID    *Buffer,
   IN UINTN   BufferSize,
@@ -70,5 +82,14 @@ DumpSecuredSpdmPacket (
   IN UINTN   BufferSize,
   IN BOOLEAN Truncated
   );
+
+extern BOOLEAN  mParamQuiteMode;
+extern BOOLEAN  mParamAllMode;
+extern BOOLEAN  mParamDumpAsn1;
+extern BOOLEAN  mParamDumpVendorApp;
+extern BOOLEAN  mParamDumpHex;
+extern CHAR8    *mParamPsk;
+extern CHAR8    *mParamReqDhePrivKey;
+extern CHAR8    *mParamRspDhePrivKey;
 
 #endif

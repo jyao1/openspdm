@@ -9,6 +9,57 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmDump.h"
 
+/**
+  This function dump raw data.
+
+  @param  Data  raw data
+  @param  Size  raw data size
+**/
+VOID
+DumpData (
+  IN UINT8  *Data,
+  IN UINTN  Size
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < Size; Index++) {
+    printf ("%02x ", Data[Index]);
+  }
+  printf ("\n");
+}
+
+/**
+  This function dump raw data with colume format.
+
+  @param  Data  raw data
+  @param  Size  raw data size
+**/
+VOID
+DumpHex (
+  IN UINT8  *Data,
+  IN UINTN  Size
+  )
+{
+  UINT32  Index;
+  UINTN   Count;
+  UINTN   Left;
+
+#define COLUME_SIZE  (16 * 2)
+
+  Count = Size / COLUME_SIZE;
+  Left  = Size % COLUME_SIZE;
+  for (Index = 0; Index < Count; Index++) {
+    printf ("    %04x: ", Index * COLUME_SIZE);
+    DumpData (Data + Index * COLUME_SIZE, COLUME_SIZE);
+  }
+
+  if (Left != 0) {
+    printf ("    %04x: ", Index * COLUME_SIZE);
+    DumpData (Data + Index * COLUME_SIZE, Left);
+  }
+}
+
 BOOLEAN
 ReadInputFile (
   IN CHAR8    *FileName,

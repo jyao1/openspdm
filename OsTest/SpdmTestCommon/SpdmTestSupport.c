@@ -9,6 +9,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmTest.h"
 
+VOID
+DumpData (
+  IN UINT8 *Buffer,
+  IN UINTN BufferSize
+  )
+{
+  UINTN Index;
+
+  for (Index = 0; Index < BufferSize; Index++) {
+    printf ("%02x ", Buffer[Index]);
+  }
+  printf ("\n");
+}
+
 BOOLEAN
 ReadInputFile (
   IN CHAR8    *FileName,
@@ -346,6 +360,10 @@ ProcessArgs (
         exit (0);
       }
     }
+
+    printf ("invalid %s\n", argv[0]);
+    PrintUsage (ProgramName);
+    exit (0);
   }
 
   //

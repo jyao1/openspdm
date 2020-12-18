@@ -11,20 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 UINT32  mUseTransportLayer = SOCKET_TRANSPORT_TYPE_MCTP;
 
-VOID
-DumpData (
-  IN UINT8 *Buffer,
-  IN UINTN BufferSize
-  )
-{
-  UINTN Index;
-
-  for (Index = 0; Index < BufferSize; Index++) {
-    printf ("%02x ", Buffer[Index]);
-  }
-  printf ("\n");
-}
-
 /**
   Read number of bytes data in blocking mode.
 
