@@ -204,6 +204,10 @@
 
 1) Please refer to [issues](https://github.com/jyao1/openspdm/issues) for detail
 
+## Contribution
+
+1) Please refer to [contribution](https://github.com/jyao1/openspdm/blob/master/contribution.md) for detail
+
 ## Known limitation
 This package is only the sample code to show the concept.
 It does not have a full validation such as robustness functional test and fuzzing test. It does not meet the production quality yet.
