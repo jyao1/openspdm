@@ -37,7 +37,7 @@ MctpEncodeMessage (
 {
   UINTN                       AlignedMessageSize;
   UINTN                       Alignment;
-  MCTP_MESSAGE_HEADER         *MctpHeader;
+  MCTP_MESSAGE_HEADER         *MctpMessageHeader;
 
   Alignment = MCTP_ALIGNMENT;
   AlignedMessageSize = (MessageSize + (Alignment - 1)) & ~(Alignment - 1);
@@ -48,15 +48,15 @@ MctpEncodeMessage (
     return RETURN_BUFFER_TOO_SMALL;
   }
   *TransportMessageSize = AlignedMessageSize + sizeof(MCTP_MESSAGE_HEADER);
-  MctpHeader = TransportMessage;
+  MctpMessageHeader = TransportMessage;
   if (SessionId != NULL) {
-    MctpHeader->MessageType = MCTP_MESSAGE_TYPE_SECURED_MCTP;
+    MctpMessageHeader->MessageType = MCTP_MESSAGE_TYPE_SECURED_MCTP;
     ASSERT (*SessionId == *(UINT32 *)(Message));
     if (*SessionId != *(UINT32 *)(Message)) {
       return RETURN_UNSUPPORTED;
     }
   } else {
-    MctpHeader->MessageType = MCTP_MESSAGE_TYPE_SPDM;
+    MctpMessageHeader->MessageType = MCTP_MESSAGE_TYPE_SPDM;
   }
   CopyMem ((UINT8 *)TransportMessage + sizeof(MCTP_MESSAGE_HEADER), Message, MessageSize);
   ZeroMem ((UINT8 *)TransportMessage + sizeof(MCTP_MESSAGE_HEADER) + MessageSize, *TransportMessageSize - sizeof(MCTP_MESSAGE_HEADER) - MessageSize);
@@ -86,7 +86,7 @@ MctpDecodeMessage (
   )
 {
   UINTN                       Alignment;
-  MCTP_MESSAGE_HEADER         *MctpHeader;
+  MCTP_MESSAGE_HEADER         *MctpMessageHeader;
 
   Alignment = MCTP_ALIGNMENT;
 
@@ -95,9 +95,9 @@ MctpDecodeMessage (
     return RETURN_UNSUPPORTED;
   }
 
-  MctpHeader = TransportMessage;
+  MctpMessageHeader = TransportMessage;
 
-  switch (MctpHeader->MessageType) {
+  switch (MctpMessageHeader->MessageType) {
   case MCTP_MESSAGE_TYPE_SECURED_MCTP:
     ASSERT (SessionId != NULL);
     if (SessionId == NULL) {

@@ -22,6 +22,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // MCTP header
 //
 typedef struct {
+  // B[0~3]: HeaderVersion
+  // B[4~7]: Reserved
+  UINT8   HeaderVersion;
+  UINT8   DestinationId;
+  UINT8   SourceId;
+  // B[0~2]: MessageTag
+  // B[3]:   TagOwner
+  // B[4~5]: PacketSequenceNumber
+  // B[6]:   EndOfMessage
+  // B[7]:   StartOfMessage
+  UINT8   MessageTag;
+} MCTP_HEADER;
+
+typedef struct {
+  // B[0~6]: MessageType
+  // B[7]  : IntegrityCheck
   UINT8    MessageType;
 } MCTP_MESSAGE_HEADER;
 

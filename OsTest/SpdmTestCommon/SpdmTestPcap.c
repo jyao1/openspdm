@@ -68,11 +68,16 @@ ClosePcapPacketFile (
 
 VOID
 AppendPcapPacketData (
+  IN VOID    *Header, OPTIONAL
+  IN UINTN   HeaderSize, OPTIONAL
   IN VOID    *Data,
   IN UINTN   Size
   )
 {
   PCAP_PACKET_HEADER  PcapPacketHeader;
+  UINTN               TotalSize;
+
+  TotalSize = HeaderSize + Size;
 
   if (mPcapFile != NULL) {
     time_t rawtime;
@@ -81,8 +86,8 @@ AppendPcapPacketData (
     PcapPacketHeader.TsSec = (UINT32)rawtime;
     PcapPacketHeader.TsUsec = 0;
 
-    PcapPacketHeader.InclLen = (UINT32)((Size > PCAP_PACKET_MAX_SIZE) ? PCAP_PACKET_MAX_SIZE : Size);
-    PcapPacketHeader.OrigLen = (UINT32)Size;
+    PcapPacketHeader.InclLen = (UINT32)((TotalSize > PCAP_PACKET_MAX_SIZE) ? PCAP_PACKET_MAX_SIZE : TotalSize);
+    PcapPacketHeader.OrigLen = (UINT32)TotalSize;
 
     if ((fwrite (&PcapPacketHeader, 1, sizeof(PcapPacketHeader), mPcapFile)) != sizeof(PcapPacketHeader)) {
       printf ("!!!Write pcap file error!!!\n");
@@ -90,8 +95,16 @@ AppendPcapPacketData (
       return ;
     }
 
-    if (Size > PCAP_PACKET_MAX_SIZE) {
-      Size = PCAP_PACKET_MAX_SIZE;
+    if (TotalSize > PCAP_PACKET_MAX_SIZE) {
+      TotalSize = PCAP_PACKET_MAX_SIZE;
+    }
+
+    if (HeaderSize != 0) {
+      if ((fwrite (Header, 1, HeaderSize, mPcapFile)) != HeaderSize) {
+        printf ("!!!Write pcap file error!!!\n");
+        ClosePcapPacketFile ();
+        return ;
+      }
     }
 
     if ((fwrite (Data, 1, Size, mPcapFile)) != Size) {

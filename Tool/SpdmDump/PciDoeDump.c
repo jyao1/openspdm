@@ -17,7 +17,10 @@ DumpPciDoePacket (
   )
 {
   PCI_DOE_DATA_OBJECT_HEADER  *PciDoeHeader;
-  if (BufferSize < sizeof(PCI_DOE_DATA_OBJECT_HEADER)) {
+  UINTN                HeaderSize;
+
+  HeaderSize = sizeof(PCI_DOE_DATA_OBJECT_HEADER);
+  if (BufferSize < HeaderSize) {
     return ;
   }
   PciDoeHeader = Buffer;
@@ -29,15 +32,15 @@ DumpPciDoePacket (
   }
   switch (PciDoeHeader->DataObjectType) {
   case PCI_DOE_DATA_OBJECT_TYPE_SPDM:
-    DumpSpdmPacket ((UINT8 *)Buffer + sizeof(PCI_DOE_DATA_OBJECT_HEADER), BufferSize - sizeof(PCI_DOE_DATA_OBJECT_HEADER), Truncated);
+    DumpSpdmPacket ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize, Truncated);
     break;
   case PCI_DOE_DATA_OBJECT_TYPE_SECURED_SPDM:
-    DumpSecuredSpdmPacket ((UINT8 *)Buffer + sizeof(PCI_DOE_DATA_OBJECT_HEADER), BufferSize - sizeof(PCI_DOE_DATA_OBJECT_HEADER), Truncated);
+    DumpSecuredSpdmPacket ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize, Truncated);
     break;
   case PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY:
     // TBD
-    break;
   default:
+    printf ("\n");
     break;
   }
 }

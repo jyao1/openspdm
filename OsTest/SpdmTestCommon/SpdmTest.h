@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Base.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/SpdmCommonLib.h>
+#include <IndustryStandard/MctpBinding.h>
 
 #include "OsInclude.h"
 #include "stdio.h"
@@ -82,6 +83,8 @@ ClosePcapPacketFile (
 
 VOID
 AppendPcapPacketData (
+  IN VOID    *Header, OPTIONAL
+  IN UINTN   HeaderSize, OPTIONAL
   IN VOID    *Data,
   IN UINTN   Size
   );

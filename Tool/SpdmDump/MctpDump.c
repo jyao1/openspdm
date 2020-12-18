@@ -16,25 +16,28 @@ DumpMctpPacket (
   IN BOOLEAN Truncated
   )
 {
-  MCTP_MESSAGE_HEADER  *MctpHeader;
-  if (BufferSize < sizeof(MCTP_MESSAGE_HEADER)) {
+  MCTP_MESSAGE_HEADER  *MctpMessageHeader;
+  UINTN                HeaderSize;
+
+  HeaderSize = sizeof(MCTP_HEADER) + sizeof(MCTP_MESSAGE_HEADER);
+  if (BufferSize < HeaderSize) {
     return ;
   }
-  MctpHeader = Buffer;
+  MctpMessageHeader = (MCTP_MESSAGE_HEADER *)((UINT8 *)Buffer + sizeof(MCTP_HEADER));
 
-  printf ("MCTP(%d) ", MctpHeader->MessageType);
+  printf ("MCTP(%d) ", MctpMessageHeader->MessageType);
 
-  switch (MctpHeader->MessageType) {
+  switch (MctpMessageHeader->MessageType) {
   case MCTP_MESSAGE_TYPE_SPDM:
-    DumpSpdmPacket ((UINT8 *)Buffer + sizeof(MCTP_MESSAGE_HEADER), BufferSize - sizeof(MCTP_MESSAGE_HEADER), Truncated);
+    DumpSpdmPacket ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize, Truncated);
     break;
   case MCTP_MESSAGE_TYPE_SECURED_MCTP:
-    DumpSecuredSpdmPacket ((UINT8 *)Buffer + sizeof(MCTP_MESSAGE_HEADER), BufferSize - sizeof(MCTP_MESSAGE_HEADER), Truncated);
+    DumpSecuredSpdmPacket ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize, Truncated);
     break;
   case MCTP_MESSAGE_TYPE_PLDM:
     // TBD
-    break;
   default:
+    printf ("\n");
     break;
   }
 

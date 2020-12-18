@@ -172,7 +172,19 @@ ReceivePlatformData (
     ClosePcapPacketFile ();
     break;
   case SOCKET_SPDM_COMMAND_NORMAL:
-    AppendPcapPacketData (ReceiveBuffer, BytesReceived);
+    if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_MCTP) {
+      //
+      // Append MCTP_HEADER for PCAP
+      //
+      MCTP_HEADER  MctpHeader;
+      MctpHeader.HeaderVersion = 0;
+      MctpHeader.DestinationId = 0;
+      MctpHeader.SourceId = 0;
+      MctpHeader.MessageTag = 0xC0;
+      AppendPcapPacketData (&MctpHeader, sizeof(MctpHeader), ReceiveBuffer, BytesReceived);
+    } else {
+      AppendPcapPacketData (NULL, 0, ReceiveBuffer, BytesReceived);
+    }
     break;
   }
 
@@ -302,7 +314,19 @@ SendPlatformData (
     ClosePcapPacketFile ();
     break;
   case SOCKET_SPDM_COMMAND_NORMAL:
-    AppendPcapPacketData (SendBuffer, BytesToSend);
+    if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_MCTP) {
+      //
+      // Append MCTP_HEADER for PCAP
+      //
+      MCTP_HEADER  MctpHeader;
+      MctpHeader.HeaderVersion = 0;
+      MctpHeader.DestinationId = 0;
+      MctpHeader.SourceId = 0;
+      MctpHeader.MessageTag = 0xC0;
+      AppendPcapPacketData (&MctpHeader, sizeof(MctpHeader), SendBuffer, BytesToSend);
+    } else {
+      AppendPcapPacketData (NULL, 0, SendBuffer, BytesToSend);
+    }
     break;
   }
 
