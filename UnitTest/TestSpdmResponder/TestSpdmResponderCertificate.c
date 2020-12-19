@@ -673,7 +673,7 @@ void TestSpdmResponderCertificateCase12(void **state) {
 
   for(UINTN offset=0; offset<DataSize; offset++) {
     TEST_DEBUG_PRINT("offset:%u \n", offset);
-    mSpdmGetCertificateRequest3.Offset = offset;
+    mSpdmGetCertificateRequest3.Offset = (UINT16)offset;
 
     ResponseSize = sizeof(Response);
     Status = SpdmGetResponseCertificate (SpdmContext, mSpdmGetCertificateRequest3Size, &mSpdmGetCertificateRequest3, &ResponseSize, Response);
