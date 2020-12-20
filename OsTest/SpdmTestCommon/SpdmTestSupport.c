@@ -143,6 +143,19 @@ PrintUsage (
   printf ("   [--aead AES_128_GCM|AES_256_GCM|CHACHA20_POLY1305]\n");
   printf ("   [--key_schedule HMAC_HASH]\n");
   printf ("   [--pcap <PcapFileName>]\n");
+  printf ("\n");
+  printf ("NOTE:\n");
+  printf ("   [--trans] is used to select transport layer message. By default, MCTP is used.\n");
+  printf ("\n");
+  printf ("   [--hash] is hash algorithm. By default, SHA_256 is used.\n");
+  printf ("   [--measurement_hash] is measurement hash algorithm. By default, SHA_256 is used.\n");
+  printf ("   [--asym] is asym algorithm. By default, ECDSA_P256 is used.\n");
+  printf ("   [--req_asym] is requester asym algorithm. By default, RSASSA_2048 is used.\n");
+  printf ("   [--dhe] is DHE algorithm. By default, SECP_256_R1 is used.\n");
+  printf ("   [--aead] is AEAD algorithm. By default, AES_256_GCM is used.\n");
+  printf ("   [--key_schedule] is key schedule algorithm. By default, HMAC_HASH is used.\n");
+  printf ("\n");
+  printf ("   [--pcap] is used to generate PCAP dump file for offline analysis.\n");
 }
 
 typedef struct {

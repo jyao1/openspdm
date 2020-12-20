@@ -170,18 +170,14 @@
 ### Run [OsTest](https://github.com/jyao1/openspdm/tree/master/OsTest)
 
    The OsTest output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
-   Open one command prompt at output dir to run SpdmResponderTest and another command prompt to run SpdmRequesterTest.
+   Open one command prompt at output dir to run `SpdmResponderTest` and another command prompt to run `SpdmRequesterTest`.
 
-### Generate pcap file for offline analysis
-
-   Use "SpdmResponderTest --pcap <pcap_file>" or "SpdmRequesterTest --pcap <pcap_file>" to generate pcap file.
-
-   [SpdmDump](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmDump.md) tool can be used to parse the pcap file offline.
+   Please refer to [SpdmOsTest](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmOsTest.md) for detail.
 
 ### Run [UnitTest](https://github.com/jyao1/openspdm/tree/master/UnitTest)
 
    The UnitTest output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
-   Open one command prompt at output dir to run TestSpdmRequester and TestSpdmResponder.
+   Open one command prompt at output dir to run `TestSpdmRequester > NUL` and `TestSpdmResponder > NUL`.
 
    You may see something like:
 
@@ -195,10 +191,17 @@
       [  PASSED  ] 2 test(s).
    </pre>
 
+### [SpdmDump](https://github.com/jyao1/openspdm/tree/master/Tool/SpdmDump) tool
+
+   The tool output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>. It can be used to parse the pcap file for offline analysis.
+
+   Please refer to [SpdmDump](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmDump.md) for detail. 
+
 ### Other Test
 
   openspdm also supports other test such as code coverage, fuzzing, symbolic execution, model checker.
-  Please refer to [Test](https://github.com/jyao1/openspdm/blob/master/Doc/Test.md)
+
+  Please refer to [Test](https://github.com/jyao1/openspdm/blob/master/Doc/Test.md) for detail. 
 
 ## Feature not implemented yet
 
