@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/OsTest/SpdmResponderTest
-                    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/OsTest/SpdmResponderEmu
+                    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon
                     ${PROJECT_SOURCE_DIR}/Include
                     ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
@@ -11,11 +11,11 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/OsTest/SpdmResponderTest
 SET(src_SpdmResponderTest
     SpdmResponder.c
     SpdmResponderMeasurement.c
-    SpdmResponderTest.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestCommand.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestKey.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestPcap.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestSupport.c
+    SpdmResponderEmu.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuCommand.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuKey.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuPcap.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuSupport.c
 )
 
 SET(SpdmResponderTest_LIBRARY
@@ -33,7 +33,7 @@ SET(SpdmResponderTest_LIBRARY
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
-    ADD_EXECUTABLE(SpdmResponderTest
+    ADD_EXECUTABLE(SpdmResponderEmu
                    ${src_SpdmResponderTest}
                    $<TARGET_OBJECTS:BaseMemoryLib>
                    $<TARGET_OBJECTS:DebugLib>
@@ -48,6 +48,6 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:SpdmTransportPciDoeLib>
     ) 
 else()
-    ADD_EXECUTABLE(SpdmResponderTest ${src_SpdmResponderTest})
-    TARGET_LINK_LIBRARIES(SpdmResponderTest ${SpdmResponderTest_LIBRARY})
+    ADD_EXECUTABLE(SpdmResponderEmu ${src_SpdmResponderTest})
+    TARGET_LINK_LIBRARIES(SpdmResponderEmu ${SpdmResponderTest_LIBRARY})
 endif()

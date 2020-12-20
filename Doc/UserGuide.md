@@ -4,7 +4,7 @@ This document provides the general information on how to write an SPDM requester
 
 ## SPDM requester user guide
 
-Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmRequesterTest/SpdmRequester.c)
+Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmRequesterEmu/SpdmRequester.c)
 
 1. Initialize SPDM context
 
@@ -171,7 +171,7 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
 
 ## SPDM responder user guide
 
-Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmResponderTest/SpdmResponder.c)
+Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmResponderEmu/SpdmResponder.c)
 
 1. Initialize SPDM context (similar to SPDM requester)
 

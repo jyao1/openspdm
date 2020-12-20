@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "string.h"
 #include "assert.h"
 #include "time.h"
-#include "SpdmTestCommand.h"
+#include "SpdmEmuCommand.h"
 
 extern UINT32  mUseTransportLayer;
 

@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmRequesterTest
+MODULE_NAME = SpdmRequesterEmu
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -37,8 +37,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmRequesterAuthentication.o \
     $(OUTPUT_DIR)/SpdmRequesterMeasurement.o \
     $(OUTPUT_DIR)/SpdmRequesterSession.o \
-    $(OUTPUT_DIR)/SpdmRequesterTest.o \
-    $(OUTPUT_DIR)/SpdmTestCommand.o \
+    $(OUTPUT_DIR)/SpdmRequesterEmu.o \
+    $(OUTPUT_DIR)/SpdmEmuCommand.o \
     $(OUTPUT_DIR)/SpdmTestKey.o \
     $(OUTPUT_DIR)/SpdmTestPcap.o \
     $(OUTPUT_DIR)/SpdmTestSupport.o \
@@ -76,7 +76,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
 
 INC =  \
     -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)/OsTest/SpdmTestCommon \
+    -I$(WORKSPACE)/OsTest/SpdmEmuCommon \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
     -I$(WORKSPACE)/Include/Hal/$(ARCH) \
@@ -137,19 +137,19 @@ $(OUTPUT_DIR)/SpdmRequesterMeasurement.o : $(SOURCE_DIR)/SpdmRequesterMeasuremen
 $(OUTPUT_DIR)/SpdmRequesterSession.o : $(SOURCE_DIR)/SpdmRequesterSession.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmRequesterTest.o : $(SOURCE_DIR)/SpdmRequesterTest.c
+$(OUTPUT_DIR)/SpdmRequesterEmu.o : $(SOURCE_DIR)/SpdmRequesterEmu.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestCommand.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestCommand.c
+$(OUTPUT_DIR)/SpdmEmuCommand.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuCommand.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestKey.c
+$(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuKey.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestPcap.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestPcap.c
+$(OUTPUT_DIR)/SpdmTestPcap.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuPcap.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestSupport.c
+$(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuSupport.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

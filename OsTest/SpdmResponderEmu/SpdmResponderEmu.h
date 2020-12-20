@@ -18,6 +18,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "OsInclude.h"
 #include "stdio.h"
-#include "SpdmTest.h"
+#include "SpdmEmu.h"
 
 #endif

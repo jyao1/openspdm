@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "SpdmResponderTest.h"
+#include "SpdmResponderEmu.h"
 
 UINT32 mCommand;
 UINTN  mReceiveBufferSize;
@@ -205,10 +205,10 @@ int main (
   char *argv[ ]
   )
 {
-  printf ("%s version 0.1\n", "SpdmResponderTest");
+  printf ("%s version 0.1\n", "SpdmResponderEmu");
   srand((unsigned int)time(NULL));
 
-  ProcessArgs ("SpdmResponderTest", argc, argv);
+  ProcessArgs ("SpdmResponderEmu", argc, argv);
 
   mSpdmContext = SpdmServerInit ();
   if (mSpdmContext == NULL) {

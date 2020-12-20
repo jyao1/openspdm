@@ -430,8 +430,8 @@ if(TESTTYPE STREQUAL "OsTest")
             OsStub/MemoryAllocationLib
     )
             
-    SUBDIRS(OsTest/SpdmRequesterTest
-            OsTest/SpdmResponderTest
+    SUBDIRS(OsTest/SpdmRequesterEmu
+            OsTest/SpdmResponderEmu
             Tool/SpdmDump
     )
        

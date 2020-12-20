@@ -109,7 +109,7 @@ Please test your patch with "git am --3way --ignore-space-change --keep-cr *.pat
 
 1) Please build with Visual Studio 2019 in Windows and GCC in Linux, at least IA32 and X64 version.
 
-2) Please run OsTest (SpdmResponderTest.exe / SpdmRequesterTest.exe) and UnitTest (TestSpdmResponder.exe / TestSpdmRequester.exe) to ensure they can still pass.
+2) Please run OsTest (SpdmResponderEmu.exe / SpdmRequesterEmu.exe) and UnitTest (TestSpdmResponder.exe / TestSpdmRequester.exe) to ensure they can still pass.
 
 ## Patch submission
 

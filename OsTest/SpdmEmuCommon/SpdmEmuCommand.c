@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "SpdmTest.h"
+#include "SpdmEmu.h"
 
 UINT32  mUseTransportLayer = SOCKET_TRANSPORT_TYPE_MCTP;
 

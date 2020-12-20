@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "SpdmRequesterTest.h"
+#include "SpdmRequesterEmu.h"
 
 #define IP_ADDRESS "127.0.0.1"
 
@@ -194,10 +194,10 @@ int main (
   char *argv[ ]
   )
 {
-  printf ("%s version 0.1\n", "SpdmRequesterTest");
+  printf ("%s version 0.1\n", "SpdmRequesterEmu");
   srand((unsigned int)time(NULL));
 
-  ProcessArgs ("SpdmRequesterTest", argc, argv);
+  ProcessArgs ("SpdmRequesterEmu", argc, argv);
 
   PlatformClientRoutine (DEFAULT_SPDM_PLATFORM_PORT);
   printf ("Client stopped\n");

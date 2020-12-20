@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "SpdmRequesterTest.h"
+#include "SpdmRequesterEmu.h"
 
 #define SLOT_NUMBER    2
 

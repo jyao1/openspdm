@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmResponderTest
+MODULE_NAME = SpdmResponderEmu
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -35,8 +35,8 @@ SOURCE_DIR = $(WORKSPACE)/OsTest/$(MODULE_NAME)
 OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmResponder.o \
     $(OUTPUT_DIR)/SpdmResponderMeasurement.o \
-    $(OUTPUT_DIR)/SpdmResponderTest.o \
-    $(OUTPUT_DIR)/SpdmTestCommand.o \
+    $(OUTPUT_DIR)/SpdmResponderEmu.o \
+    $(OUTPUT_DIR)/SpdmEmuCommand.o \
     $(OUTPUT_DIR)/SpdmTestKey.o \
     $(OUTPUT_DIR)/SpdmTestPcap.o \
     $(OUTPUT_DIR)/SpdmTestSupport.o \
@@ -74,7 +74,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
 
 INC =  \
     -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)/OsTest/SpdmTestCommon \
+    -I$(WORKSPACE)/OsTest/SpdmEmuCommon \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
     -I$(WORKSPACE)/Include/Hal/$(ARCH) \
@@ -129,19 +129,19 @@ $(OUTPUT_DIR)/SpdmResponder.o : $(SOURCE_DIR)/SpdmResponder.c
 $(OUTPUT_DIR)/SpdmResponderMeasurement.o : $(SOURCE_DIR)/SpdmResponderMeasurement.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmResponderTest.o : $(SOURCE_DIR)/SpdmResponderTest.c
+$(OUTPUT_DIR)/SpdmResponderEmu.o : $(SOURCE_DIR)/SpdmResponderEmu.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestCommand.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestCommand.c
+$(OUTPUT_DIR)/SpdmEmuCommand.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuCommand.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestKey.c
+$(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuKey.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestPcap.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestPcap.c
+$(OUTPUT_DIR)/SpdmTestPcap.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuPcap.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmTestCommon/SpdmTestSupport.c
+$(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuSupport.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

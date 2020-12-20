@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/OsTest/SpdmRequesterTest
-                    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/OsTest/SpdmRequesterEmu
+                    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon
                     ${PROJECT_SOURCE_DIR}/Include
                     ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
@@ -13,11 +13,11 @@ SET(src_SpdmRequesterTest
     SpdmRequesterAuthentication.c
     SpdmRequesterMeasurement.c
     SpdmRequesterSession.c
-    SpdmRequesterTest.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestCommand.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestKey.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestPcap.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmTestCommon/SpdmTestSupport.c
+    SpdmRequesterEmu.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuCommand.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuKey.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuPcap.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuSupport.c
 )
 
 SET(SpdmRequesterTest_LIBRARY
@@ -35,7 +35,7 @@ SET(SpdmRequesterTest_LIBRARY
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
-    ADD_EXECUTABLE(SpdmRequesterTest
+    ADD_EXECUTABLE(SpdmRequesterEmu
                    ${src_SpdmRequesterTest}
                    $<TARGET_OBJECTS:BaseMemoryLib>
                    $<TARGET_OBJECTS:DebugLib>
@@ -50,6 +50,6 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:SpdmTransportPciDoeLib>
     ) 
 else()
-    ADD_EXECUTABLE(SpdmRequesterTest ${src_SpdmRequesterTest})
-    TARGET_LINK_LIBRARIES(SpdmRequesterTest ${SpdmRequesterTest_LIBRARY})
+    ADD_EXECUTABLE(SpdmRequesterEmu ${src_SpdmRequesterTest})
+    TARGET_LINK_LIBRARIES(SpdmRequesterEmu ${SpdmRequesterTest_LIBRARY})
 endif()

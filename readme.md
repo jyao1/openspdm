@@ -170,7 +170,7 @@
 ### Run [OsTest](https://github.com/jyao1/openspdm/tree/master/OsTest)
 
    The OsTest output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
-   Open one command prompt at output dir to run `SpdmResponderTest` and another command prompt to run `SpdmRequesterTest`.
+   Open one command prompt at output dir to run `SpdmResponderEmu` and another command prompt to run `SpdmRequesterEmu`.
 
    Please refer to [SpdmOsTest](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmOsTest.md) for detail.
 

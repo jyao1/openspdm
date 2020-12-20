@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmRequesterTest
+MODULE_NAME = SpdmRequesterEmu
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -37,8 +37,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmRequesterAuthentication.obj \
     $(OUTPUT_DIR)\SpdmRequesterMeasurement.obj \
     $(OUTPUT_DIR)\SpdmRequesterSession.obj \
-    $(OUTPUT_DIR)\SpdmRequesterTest.obj \
-    $(OUTPUT_DIR)\SpdmTestCommand.obj \
+    $(OUTPUT_DIR)\SpdmRequesterEmu.obj \
+    $(OUTPUT_DIR)\SpdmEmuCommand.obj \
     $(OUTPUT_DIR)\SpdmTestKey.obj \
     $(OUTPUT_DIR)\SpdmTestPcap.obj \
     $(OUTPUT_DIR)\SpdmTestSupport.obj \
@@ -76,7 +76,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
 
 INC =  \
     -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)\OsTest\SpdmTestCommon \
+    -I$(WORKSPACE)\OsTest\SpdmEmuCommon \
     -I$(WORKSPACE)\Include \
     -I$(WORKSPACE)\Include\Hal \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \
@@ -137,20 +137,20 @@ $(OUTPUT_DIR)\SpdmRequesterMeasurement.obj : $(SOURCE_DIR)\SpdmRequesterMeasurem
 $(OUTPUT_DIR)\SpdmRequesterSession.obj : $(SOURCE_DIR)\SpdmRequesterSession.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterSession.c
 
-$(OUTPUT_DIR)\SpdmRequesterTest.obj : $(SOURCE_DIR)\SpdmRequesterTest.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterTest.c
+$(OUTPUT_DIR)\SpdmRequesterEmu.obj : $(SOURCE_DIR)\SpdmRequesterEmu.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterEmu.c
 
-$(OUTPUT_DIR)\SpdmTestCommand.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestCommand.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestCommand.c
+$(OUTPUT_DIR)\SpdmEmuCommand.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuCommand.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuCommand.c
 
-$(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestKey.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestKey.c
+$(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuKey.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuKey.c
 
-$(OUTPUT_DIR)\SpdmTestPcap.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestPcap.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestPcap.c
+$(OUTPUT_DIR)\SpdmTestPcap.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuPcap.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuPcap.c
 
-$(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestSupport.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestSupport.c
+$(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuSupport.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuSupport.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

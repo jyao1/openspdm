@@ -1,11 +1,11 @@
 # SPDM OsTest Tool
 
-This document describes SpdmRequesterTest and SpdmResponderTest tool. It can be used to test the SPDM communication in the OS.
+This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be used to test the SPDM communication in the OS.
 
 ## Spdm OS tool user guide
 
    <pre>
-      SpdmRequesterTest|SpdmResponderTest [--trans MCTP|PCI_DOE]
+      SpdmRequesterEmu|SpdmResponderEmu [--trans MCTP|PCI_DOE]
          [--hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]
          [--measurement_hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]
          [--asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]
@@ -29,8 +29,8 @@ This document describes SpdmRequesterTest and SpdmResponderTest tool. It can be 
          [--pcap] is used to generate PCAP dump file for offline analysis.
    </pre>
 
-   Take SpdmRequesterTest or SpdmResponderTest as an example, a user may use `SpdmRequesterTest --pcap SpdmRequester.pcap > SpdmRequester.log` or `SpdmResponderTest --pcap SpdmResponder.pcap > SpdmResponder.log` to get the PCAP file and the log file.
+   Take SpdmRequesterEmu or SpdmResponderEmu as an example, a user may use `SpdmRequesterEmu --pcap SpdmRequester.pcap > SpdmRequester.log` or `SpdmResponderEmu --pcap SpdmResponder.pcap > SpdmResponder.log` to get the PCAP file and the log file.
 
-   To test PCI_DOE, a user may use `SpdmRequesterTest --trans PCI_DOE --pcap SpdmRequester.pcap > SpdmRequester.log` or `SpdmResponderTest  --trans PCI_DOE --pcap SpdmResponder.pcap > SpdmResponder.log` to get the PCAP file and the log file.
+   To test PCI_DOE, a user may use `SpdmRequesterEmu --trans PCI_DOE --pcap SpdmRequester.pcap > SpdmRequester.log` or `SpdmResponderEmu  --trans PCI_DOE --pcap SpdmResponder.pcap > SpdmResponder.log` to get the PCAP file and the log file.
 
    [SpdmDump](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmDump.md) tool can be used to parse the pcap file for offline analysis.
