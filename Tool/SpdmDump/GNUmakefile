@@ -34,12 +34,16 @@ SOURCE_DIR = $(WORKSPACE)/Tool/$(MODULE_NAME)
 
 OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmDump.o \
-    $(OUTPUT_DIR)/SpdmDumpMessage.o \
     $(OUTPUT_DIR)/SpdmDumpPcap.o \
     $(OUTPUT_DIR)/SpdmDumpSession.o \
     $(OUTPUT_DIR)/SpdmDumpSupport.o \
+    $(OUTPUT_DIR)/SpdmDumpSpdm.o \
     $(OUTPUT_DIR)/MctpDump.o \
+    $(OUTPUT_DIR)/MctpDumpPldm.o \
     $(OUTPUT_DIR)/PciDoeDump.o \
+    $(OUTPUT_DIR)/SpdmDumpVendorPci.o \
+    $(OUTPUT_DIR)/PciDoeDumpDoe.o \
+    $(OUTPUT_DIR)/SpdmDumpPciIdeKm.o \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -124,9 +128,6 @@ gen_libs:
 $(OUTPUT_DIR)/SpdmDump.o : $(SOURCE_DIR)/SpdmDump.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmDumpMessage.o : $(SOURCE_DIR)/SpdmDumpMessage.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
 $(OUTPUT_DIR)/SpdmDumpPcap.o : $(SOURCE_DIR)/SpdmDumpPcap.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
@@ -136,10 +137,25 @@ $(OUTPUT_DIR)/SpdmDumpSession.o : $(SOURCE_DIR)/SpdmDumpSession.c
 $(OUTPUT_DIR)/SpdmDumpSupport.o : $(SOURCE_DIR)/SpdmDumpSupport.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/MctpDump.o : $(SOURCE_DIR)/MctpDump.c
+$(OUTPUT_DIR)/SpdmDumpSpdm.o : $(SOURCE_DIR)/Spdm/SpdmDumpSpdm.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/PciDoeDump.o : $(SOURCE_DIR)/PciDoeDump.c
+$(OUTPUT_DIR)/MctpDump.o : $(SOURCE_DIR)/Mctp/MctpDump.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/MctpDumpPldm.o : $(SOURCE_DIR)/Mctp/Pldm/MctpDumpPldm.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/PciDoeDump.o : $(SOURCE_DIR)/Pci/PciDoeDump.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmDumpVendorPci.o : $(SOURCE_DIR)/Pci/SpdmDumpVendorPci.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/PciDoeDumpDoe.o : $(SOURCE_DIR)/Pci/PciDoe/PciDoeDumpDoe.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmDumpPciIdeKm.o : $(SOURCE_DIR)/Pci/PciIdeKm/SpdmDumpPciIdeKm.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

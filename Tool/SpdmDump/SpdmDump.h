@@ -26,6 +26,35 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "stdlib.h"
 #include "string.h"
 
+typedef
+VOID
+(*DUMP_MESSAGE) (
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  );
+
+typedef struct {
+  UINT32        Id;
+  CHAR8         *Name;
+  DUMP_MESSAGE  DumpFunc;
+} DISPATCH_TABLE_ENTRY;
+
+DISPATCH_TABLE_ENTRY *
+GetDispatchEntryById (
+  IN DISPATCH_TABLE_ENTRY  *DispatchTable,
+  IN UINTN                 DispatchTableCount,
+  IN UINT32                Id
+  );
+
+VOID
+DumpDispatchMessage (
+  IN DISPATCH_TABLE_ENTRY  *DispatchTable,
+  IN UINTN                 DispatchTableCount,
+  IN UINT32                Id,
+  IN VOID                  *Buffer,
+  IN UINTN                 BufferSize
+  );
+
 BOOLEAN
 InitSpdmDump (
   VOID
@@ -105,6 +134,24 @@ DumpSpdmMessage (
 
 VOID
 DumpSecuredSpdmMessage (
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  );
+
+VOID
+DumpPldmMessage (
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  );
+
+VOID
+DumpPciDoeDiscoveryMessage (
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  );
+
+VOID
+DumpPciIdeKmMessage (
   IN VOID    *Buffer,
   IN UINTN   BufferSize
   );

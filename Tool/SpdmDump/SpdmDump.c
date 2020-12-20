@@ -15,6 +15,46 @@ BOOLEAN  mParamDumpAsn1;
 BOOLEAN  mParamDumpVendorApp;
 BOOLEAN  mParamDumpHex;
 
+DISPATCH_TABLE_ENTRY *
+GetDispatchEntryById (
+  IN DISPATCH_TABLE_ENTRY  *DispatchTable,
+  IN UINTN                 DispatchTableCount,
+  IN UINT32                Id
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < DispatchTableCount; Index++) {
+    if (DispatchTable[Index].Id == Id) {
+      return &DispatchTable[Index];
+    }
+  }
+  return NULL;
+}
+
+VOID
+DumpDispatchMessage (
+  IN DISPATCH_TABLE_ENTRY  *DispatchTable,
+  IN UINTN                 DispatchTableCount,
+  IN UINT32                Id,
+  IN VOID                  *Buffer,
+  IN UINTN                 BufferSize
+  )
+{
+  DISPATCH_TABLE_ENTRY *Entry;
+
+  Entry = GetDispatchEntryById (DispatchTable, DispatchTableCount, Id);
+  if (Entry != NULL) {
+    if (Entry->DumpFunc != NULL) {
+      Entry->DumpFunc (Buffer, BufferSize);
+    } else if (Entry->Name != NULL) {
+      printf ("%s\n", Entry->Name);
+    }
+  } else {
+    printf ("<Unknown>\n");
+  }
+}
+
 void
 PrintUsage (
   void

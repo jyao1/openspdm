@@ -9,6 +9,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmDump.h"
 
+DISPATCH_TABLE_ENTRY mMctpDispatch[] = {
+  {MCTP_MESSAGE_TYPE_SPDM,         "SPDM",        DumpSpdmMessage},
+  {MCTP_MESSAGE_TYPE_SECURED_MCTP, "SecuredSPDM", DumpSecuredSpdmMessage},
+  {MCTP_MESSAGE_TYPE_PLDM,         "PLDM",        DumpPldmMessage},
+};
+
 VOID
 DumpMctpMessage (
   IN VOID    *Buffer,
@@ -20,26 +26,14 @@ DumpMctpMessage (
 
   HeaderSize = sizeof(MCTP_MESSAGE_HEADER);
   if (BufferSize < HeaderSize) {
+    printf ("\n");
     return ;
   }
   MctpMessageHeader = (MCTP_MESSAGE_HEADER *)((UINT8 *)Buffer);
 
   printf ("MCTP(%d) ", MctpMessageHeader->MessageType);
 
-  switch (MctpMessageHeader->MessageType) {
-  case MCTP_MESSAGE_TYPE_SPDM:
-    DumpSpdmMessage ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
-    break;
-  case MCTP_MESSAGE_TYPE_SECURED_MCTP:
-    DumpSecuredSpdmMessage ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
-    break;
-  case MCTP_MESSAGE_TYPE_PLDM:
-    // TBD
-  default:
-    printf ("\n");
-    break;
-  }
-
+  DumpDispatchMessage (mMctpDispatch, ARRAY_SIZE(mMctpDispatch), MctpMessageHeader->MessageType, (UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
 }
 
 VOID

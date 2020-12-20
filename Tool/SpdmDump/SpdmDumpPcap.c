@@ -13,6 +13,11 @@ PCAP_GLOBAL_HEADER  mPcapGlobalHeader;
 FILE                *mPcapFile;
 VOID                *mPcapPacketDataBuffer;
 
+DISPATCH_TABLE_ENTRY mPcapDispatch[] = {
+  {LINKTYPE_MCTP,    "MCTP",    DumpMctpPacket},
+  {LINKTYPE_PCI_DOE, "PCI_DOE", DumpPciDoePacket},
+};
+
 CHAR8 *
 DataLinkTypeToString (
   IN UINT32  DataLinkType
@@ -133,16 +138,7 @@ DumpPcapPacket (
   IN UINTN   BufferSize
   )
 {
-  switch (mPcapGlobalHeader.Network) {
-  case LINKTYPE_MCTP:
-    DumpMctpPacket (Buffer, BufferSize);
-    return ;
-  case LINKTYPE_PCI_DOE:
-    DumpPciDoePacket (Buffer, BufferSize);
-    return ;
-  default:
-    return ;
-  }
+  DumpDispatchMessage (mPcapDispatch, ARRAY_SIZE(mPcapDispatch), mPcapGlobalHeader.Network, Buffer, BufferSize);
 }
 
 VOID
@@ -166,3 +162,4 @@ DumpPcap (
     DumpPcapPacket (mPcapPacketDataBuffer, PcapPacketHeader.InclLen);
   }
 }
+

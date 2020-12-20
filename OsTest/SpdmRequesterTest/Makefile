@@ -140,17 +140,17 @@ $(OUTPUT_DIR)\SpdmRequesterSession.obj : $(SOURCE_DIR)\SpdmRequesterSession.c
 $(OUTPUT_DIR)\SpdmRequesterTest.obj : $(SOURCE_DIR)\SpdmRequesterTest.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterTest.c
 
-$(OUTPUT_DIR)\SpdmTestCommand.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestCommand.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestCommand.c
+$(OUTPUT_DIR)\SpdmTestCommand.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestCommand.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestCommand.c
 
-$(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestKey.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestKey.c
+$(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestKey.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestKey.c
 
-$(OUTPUT_DIR)\SpdmTestPcap.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestPcap.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestPcap.c
+$(OUTPUT_DIR)\SpdmTestPcap.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestPcap.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestPcap.c
 
-$(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestSupport.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestSupport.c
+$(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestSupport.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestSupport.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

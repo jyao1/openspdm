@@ -34,12 +34,16 @@ SOURCE_DIR = $(WORKSPACE)\Tool\$(MODULE_NAME)
 
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmDump.obj \
-    $(OUTPUT_DIR)\SpdmDumpMessage.obj \
     $(OUTPUT_DIR)\SpdmDumpPcap.obj \
     $(OUTPUT_DIR)\SpdmDumpSession.obj \
     $(OUTPUT_DIR)\SpdmDumpSupport.obj \
+    $(OUTPUT_DIR)\SpdmDumpSpdm.obj \
     $(OUTPUT_DIR)\MctpDump.obj \
+    $(OUTPUT_DIR)\MctpDumpPldm.obj \
     $(OUTPUT_DIR)\PciDoeDump.obj \
+    $(OUTPUT_DIR)\SpdmDumpVendorPci.obj \
+    $(OUTPUT_DIR)\PciDoeDumpDoe.obj \
+    $(OUTPUT_DIR)\SpdmDumpPciIdeKm.obj \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -124,9 +128,6 @@ gen_libs:
 $(OUTPUT_DIR)\SpdmDump.obj : $(SOURCE_DIR)\SpdmDump.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmDump.c
 
-$(OUTPUT_DIR)\SpdmDumpMessage.obj : $(SOURCE_DIR)\SpdmDumpMessage.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmDumpMessage.c
-
 $(OUTPUT_DIR)\SpdmDumpPcap.obj : $(SOURCE_DIR)\SpdmDumpPcap.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmDumpPcap.c
 
@@ -136,11 +137,26 @@ $(OUTPUT_DIR)\SpdmDumpSession.obj : $(SOURCE_DIR)\SpdmDumpSession.c
 $(OUTPUT_DIR)\SpdmDumpSupport.obj : $(SOURCE_DIR)\SpdmDumpSupport.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmDumpSupport.c
 
-$(OUTPUT_DIR)\MctpDump.obj : $(SOURCE_DIR)\MctpDump.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\MctpDump.c
+$(OUTPUT_DIR)\SpdmDumpSpdm.obj : $(SOURCE_DIR)\Spdm\SpdmDumpSpdm.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Spdm\SpdmDumpSpdm.c
 
-$(OUTPUT_DIR)\PciDoeDump.obj : $(SOURCE_DIR)\PciDoeDump.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\PciDoeDump.c
+$(OUTPUT_DIR)\MctpDump.obj : $(SOURCE_DIR)\Mctp\MctpDump.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Mctp\MctpDump.c
+
+$(OUTPUT_DIR)\MctpDumpPldm.obj : $(SOURCE_DIR)\Mctp\Pldm\MctpDumpPldm.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Mctp\Pldm\MctpDumpPldm.c
+
+$(OUTPUT_DIR)\PciDoeDump.obj : $(SOURCE_DIR)\Pci\PciDoeDump.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pci\PciDoeDump.c
+
+$(OUTPUT_DIR)\SpdmDumpVendorPci.obj : $(SOURCE_DIR)\Pci\SpdmDumpVendorPci.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pci\SpdmDumpVendorPci.c
+
+$(OUTPUT_DIR)\PciDoeDumpDoe.obj : $(SOURCE_DIR)\Pci\PciDoe\PciDoeDumpDoe.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pci\PciDoe\PciDoeDumpDoe.c
+
+$(OUTPUT_DIR)\SpdmDumpPciIdeKm.obj : $(SOURCE_DIR)\Pci\PciIdeKm\SpdmDumpPciIdeKm.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pci\PciIdeKm\SpdmDumpPciIdeKm.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

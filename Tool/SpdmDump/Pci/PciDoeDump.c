@@ -9,6 +9,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmDump.h"
 
+DISPATCH_TABLE_ENTRY mPciDoeDispatch[] = {
+  {PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY, "DOE_DISCOVERY", DumpPciDoeDiscoveryMessage},
+  {PCI_DOE_DATA_OBJECT_TYPE_SPDM,          "SPDM",          DumpSpdmMessage},
+  {PCI_DOE_DATA_OBJECT_TYPE_SECURED_SPDM,  "SecuredSPDM",   DumpSecuredSpdmMessage},
+};
+
 VOID
 DumpPciDoePacket (
   IN VOID    *Buffer,
@@ -20,6 +26,7 @@ DumpPciDoePacket (
 
   HeaderSize = sizeof(PCI_DOE_DATA_OBJECT_HEADER);
   if (BufferSize < HeaderSize) {
+    printf ("\n");
     return ;
   }
   PciDoeHeader = Buffer;
@@ -27,19 +34,8 @@ DumpPciDoePacket (
   printf ("PCI_DOE(%d, %d) ", PciDoeHeader->VendorId, PciDoeHeader->DataObjectType);
 
   if (PciDoeHeader->VendorId != PCI_DOE_VENDOR_ID_PCISIG) {
+    printf ("\n");
     return ;
   }
-  switch (PciDoeHeader->DataObjectType) {
-  case PCI_DOE_DATA_OBJECT_TYPE_SPDM:
-    DumpSpdmMessage ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
-    break;
-  case PCI_DOE_DATA_OBJECT_TYPE_SECURED_SPDM:
-    DumpSecuredSpdmMessage ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
-    break;
-  case PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY:
-    // TBD
-  default:
-    printf ("\n");
-    break;
-  }
+  DumpDispatchMessage (mPciDoeDispatch, ARRAY_SIZE(mPciDoeDispatch), PciDoeHeader->DataObjectType, (UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
 }

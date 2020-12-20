@@ -132,17 +132,17 @@ $(OUTPUT_DIR)\SpdmResponderMeasurement.obj : $(SOURCE_DIR)\SpdmResponderMeasurem
 $(OUTPUT_DIR)\SpdmResponderTest.obj : $(SOURCE_DIR)\SpdmResponderTest.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderTest.c
 
-$(OUTPUT_DIR)\SpdmTestCommand.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestCommand.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestCommand.c
+$(OUTPUT_DIR)\SpdmTestCommand.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestCommand.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestCommand.c
 
-$(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestKey.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestKey.c
+$(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestKey.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestKey.c
 
-$(OUTPUT_DIR)\SpdmTestPcap.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestPcap.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestPcap.c
+$(OUTPUT_DIR)\SpdmTestPcap.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestPcap.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestPcap.c
 
-$(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestSupport.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\../SpdmTestCommon/SpdmTestSupport.c
+$(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestSupport.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmTestCommon\SpdmTestSupport.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@
