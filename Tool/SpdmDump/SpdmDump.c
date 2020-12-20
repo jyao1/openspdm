@@ -55,6 +55,44 @@ DumpDispatchMessage (
   }
 }
 
+VOID
+DumpEntryFlags (
+  IN VALUE_STRING_ENTRY  *EntryTable,
+  IN UINTN               EntryTableCount,
+  IN UINT32              Flags
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < EntryTableCount; Index++) {
+    if (Index != 0) {
+      printf (", ");
+    }
+    printf ("%s=%d",
+      EntryTable[Index].Name,
+      ((EntryTable[Index].Value & Flags) != 0) ? 1 : 0
+      );
+  }
+}
+
+VOID
+DumpEntryValue (
+  IN VALUE_STRING_ENTRY  *EntryTable,
+  IN UINTN               EntryTableCount,
+  IN UINT32              Value
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < EntryTableCount; Index++) {
+    if (EntryTable[Index].Value == Value) {
+      printf ("%s", EntryTable[Index].Name);
+      return ;
+    }
+  }
+  printf ("<Unknown>");
+}
+
 void
 PrintUsage (
   void
@@ -62,7 +100,7 @@ PrintUsage (
 {
   printf ("%s -r <PcapFileName>\n", "SpdmDump");
   printf ("   [-q] (quite mode, dump message type only)\n");
-  printf ("   [-a] (all mode, dump all fields) -- TBD\n");
+  printf ("   [-a] (all mode, dump all fields)\n");
   printf ("   [-n] (dump ASN.1 certificate) -- TBD\n");
   printf ("   [-d] (dump application message) -- TBD\n");
   printf ("   [-x] (dump message in hex)\n");

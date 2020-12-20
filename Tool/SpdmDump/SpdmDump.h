@@ -55,6 +55,25 @@ DumpDispatchMessage (
   IN UINTN                 BufferSize
   );
 
+typedef struct {
+  UINT32  Value;
+  CHAR8   *Name;
+} VALUE_STRING_ENTRY;
+
+VOID
+DumpEntryFlags (
+  IN VALUE_STRING_ENTRY  *EntryTable,
+  IN UINTN               EntryTableCount,
+  IN UINT32              Flags
+  );
+
+VOID
+DumpEntryValue (
+  IN VALUE_STRING_ENTRY  *EntryTable,
+  IN UINTN               EntryTableCount,
+  IN UINT32              Value
+  );
+
 BOOLEAN
 InitSpdmDump (
   VOID

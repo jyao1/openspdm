@@ -77,7 +77,7 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
    <pre>
       SpdmDump -r <PcapFileName>
          [-q] (quite mode, dump message type only)
-         [-a] (all mode, dump all fields) -- TBD
+         [-a] (all mode, dump all fields)
          [-n] (dump ASN.1 certificate) -- TBD
          [-d] (dump application message) -- TBD
          [-x] (dump message in hex)

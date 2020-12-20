@@ -16,8 +16,94 @@ VOID               *mSpdmLastMessageBuffer;
 UINTN              mSpdmLastMessageBufferSize;
 UINT32             mCachedSessionId;
 SPDM_SESSION_INFO  *mCurrentSessionInfo;
-
 BOOLEAN            mEncapsulated;
+
+VALUE_STRING_ENTRY  mSpdmRequesterCapabilitiesStringTable[] = {
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP,                   "CERT"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP,                   "CHAL"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_NO_SIG,            "MEAS_NO_SIG"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_SIG,               "MEAS_SIG"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_FRESH_CAP,             "MEAS_FRESH"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP,                "ENCRYPT"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP,                    "MAC"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP,               "MUT_AUTH"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP,                 "KEY_EX"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP_REQUESTER,          "PSK"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP,                  "ENCAP"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP,                  "HBEAT"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP,                "KEY_UPD"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, "HANDSHAKE_IN_CLEAR"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP,             "PUB_KEY_ID"},
+};
+
+VALUE_STRING_ENTRY  mSpdmResponderCapabilitiesStringTable[] = {
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP,                      "CACHE"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP,                       "CERT"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP,                       "CHAL"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG,                "MEAS_NO_SIG"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG,                   "MEAS_SIG"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_FRESH_CAP,                 "MEAS_FRESH"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP,                    "ENCRYPT"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP,                        "MAC"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP,                   "MUT_AUTH"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP,                     "KEY_EX"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER,              "PSK"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT, "PSK_WITH_CONTEXT"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP,                      "ENCAP"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP,                      "HBEAT"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP,                    "KEY_UPD"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP,     "HANDSHAKE_IN_CLEAR"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP,                 "PUB_KEY_ID"},
+};
+
+VALUE_STRING_ENTRY  mSpdmHashValueStringTable[] = {
+  {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256,  "SHA_256"},
+  {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384,  "SHA_384"},
+  {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512,  "SHA_512"},
+  {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_256, "SHA3_256"},
+  {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_384, "SHA3_384"},
+  {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512, "SHA3_512"},
+};
+
+VALUE_STRING_ENTRY  mSpdmMeasurementHashValueStringTable[] = {
+  {SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256,  "SHA_256"},
+  {SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384,  "SHA_384"},
+  {SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512,  "SHA_512"},
+  {SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_256, "SHA3_256"},
+  {SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_384, "SHA3_384"},
+  {SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_512, "SHA3_512"},
+};
+
+VALUE_STRING_ENTRY  mSpdmAsymValueStringTable[] = {
+  {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048,          "RSASSA_2048"},
+  {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072,          "RSASSA_3072"},
+  {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096,          "RSASSA_4096"},
+  {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048,          "RSAPSS_2048"},
+  {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072,          "RSAPSS_3072"},
+  {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096,          "RSAPSS_4096"},
+  {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256,  "ECDSA_P256"},
+  {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384,  "ECDSA_P384"},
+  {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521,  "ECDSA_P521"},
+};
+
+VALUE_STRING_ENTRY  mSpdmDheValueStringTable[] = {
+  {SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048,  "FFDHE_2048"},
+  {SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072,  "FFDHE_3072"},
+  {SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096,  "FFDHE_4096"},
+  {SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1, "SECP_256_R1"},
+  {SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1, "SECP_384_R1"},
+  {SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1, "SECP_521_R1"},
+};
+
+VALUE_STRING_ENTRY  mSpdmAeadValueStringTable[] = {
+  {SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM,        "AES_128_GCM"},
+  {SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM,        "AES_256_GCM"},
+  {SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305,  "CHACHA20_POLY1305"},
+};
+
+VALUE_STRING_ENTRY  mSpdmKeyScheduleValueStringTable[] = {
+  {SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH,        "HMAC_HASH"},
+};
 
 VOID
 DumpSpdmGetVersion (
@@ -36,7 +122,9 @@ DumpSpdmGetVersion (
     return ;
   }
 
-  printf ("() ");
+  if (!mParamQuiteMode) {
+    printf ("() ");
+  }
 
   printf ("\n");
 
@@ -74,21 +162,22 @@ DumpSpdmVersion (
     return ;
   }
 
-  SpdmVersionNumber = (VOID *)((UINTN)Buffer + sizeof(SPDM_VERSION_RESPONSE));
-  printf ("(");
-  for (Index = 0; Index < SpdmResponse->VersionNumberEntryCount; Index ++) {
-    if (Index != 0) {
-      printf (", ");
+  if (!mParamQuiteMode) {
+    SpdmVersionNumber = (VOID *)((UINTN)Buffer + sizeof(SPDM_VERSION_RESPONSE));
+    printf ("(");
+    for (Index = 0; Index < SpdmResponse->VersionNumberEntryCount; Index ++) {
+      if (Index != 0) {
+        printf (", ");
+      }
+      printf ("%d.%d.%d.%d",
+        SpdmVersionNumber[Index].MajorVersion,
+        SpdmVersionNumber[Index].MinorVersion,
+        SpdmVersionNumber[Index].UpdateVersionNumber,
+        SpdmVersionNumber[Index].Alpha
+        );
     }
-    printf ("%d.%d.%d.%d",
-      SpdmVersionNumber[Index].MajorVersion,
-      SpdmVersionNumber[Index].MinorVersion,
-      SpdmVersionNumber[Index].UpdateVersionNumber,
-      SpdmVersionNumber[Index].Alpha
-      );
+    printf (") ");
   }
-  printf (") ");
-
   printf ("\n");
 
   SpdmContext = mSpdmContext;
@@ -106,8 +195,8 @@ DumpSpdmGetCapabilities (
   SPDM_GET_CAPABILITIES_REQUEST  *SpdmRequest;
 
   printf ("SPDM_GET_CAPABILITIES ");
-  
-  MessageSize = sizeof(SPDM_GET_CAPABILITIES_REQUEST);
+
+  MessageSize = OFFSET_OF(SPDM_GET_CAPABILITIES_REQUEST, Reserved);
   if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
@@ -115,7 +204,27 @@ DumpSpdmGetCapabilities (
 
   SpdmRequest = Buffer;
 
-  printf ("(Flags=0x%08x) ", SpdmRequest->Flags);
+  if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+    MessageSize = sizeof(SPDM_GET_CAPABILITIES_REQUEST);
+    if (BufferSize < MessageSize) {
+      printf ("\n");
+      return ;
+    }
+  }
+
+  if (!mParamQuiteMode) {
+    if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+      printf ("(Flags=0x%08x) ", SpdmRequest->Flags);
+
+      if (mParamAllMode) {
+        printf ("\n    Flags(");
+        DumpEntryFlags (mSpdmRequesterCapabilitiesStringTable, ARRAY_SIZE(mSpdmRequesterCapabilitiesStringTable), SpdmRequest->Flags);
+        printf (") ");
+      }
+    } else {
+      printf ("() ");
+    }
+  }
 
   printf ("\n");
 
@@ -143,7 +252,15 @@ DumpSpdmCapabilities (
 
   SpdmResponse = Buffer;
 
-  printf ("(Flags=0x%08x) ", SpdmResponse->Flags);
+  if (!mParamQuiteMode) {
+    printf ("(Flags=0x%08x) ", SpdmResponse->Flags);
+
+    if (mParamAllMode) {
+      printf ("\n    Flags(");
+      DumpEntryFlags (mSpdmResponderCapabilitiesStringTable, ARRAY_SIZE(mSpdmResponderCapabilitiesStringTable), SpdmResponse->Flags);
+      printf (") ");
+    }
+  }
 
   printf ("\n");
 
@@ -181,36 +298,79 @@ DumpSpdmNegotiateAlgorithms (
     return ;
   }
 
-  printf ("(Hash=0x%08x, Asym=0x%08x",
-    SpdmRequest->BaseHashAlgo,
-    SpdmRequest->BaseAsymAlgo
-    );
-    
-  if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
-    StructTable = (VOID *)((UINTN)Buffer +
-                            sizeof(SPDM_ALGORITHMS_RESPONSE) +
-                            SpdmRequest->ExtAsymCount * sizeof(SPDM_EXTENDED_ALGORITHM) +
-                            SpdmRequest->ExtHashCount * sizeof(SPDM_EXTENDED_ALGORITHM)
-                            );
-    for (Index = 0; Index <SpdmRequest->Header.Param1; Index++) {
-      switch (StructTable[Index].AlgType) {
-      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-        printf (", DHE=0x%04x", StructTable[Index].AlgSupported);
-        break;
-      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-        printf (", AEAD=0x%04x", StructTable[Index].AlgSupported);
-        break;
-      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-        printf (", ReqAsym=0x%04x", StructTable[Index].AlgSupported);
-        break;
-      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-        printf (", KeySchedule=0x%04x", StructTable[Index].AlgSupported);
-        break;
+  if (!mParamQuiteMode) {
+    printf ("(Hash=0x%08x, Asym=0x%08x",
+      SpdmRequest->BaseHashAlgo,
+      SpdmRequest->BaseAsymAlgo
+      );
+
+    if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+      StructTable = (VOID *)((UINTN)Buffer +
+                              sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) +
+                              SpdmRequest->ExtAsymCount * sizeof(SPDM_EXTENDED_ALGORITHM) +
+                              SpdmRequest->ExtHashCount * sizeof(SPDM_EXTENDED_ALGORITHM)
+                              );
+      for (Index = 0; Index <SpdmRequest->Header.Param1; Index++) {
+        switch (StructTable[Index].AlgType) {
+        case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
+          printf (", DHE=0x%04x", StructTable[Index].AlgSupported);
+          break;
+        case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
+          printf (", AEAD=0x%04x", StructTable[Index].AlgSupported);
+          break;
+        case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
+          printf (", ReqAsym=0x%04x", StructTable[Index].AlgSupported);
+          break;
+        case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
+          printf (", KeySchedule=0x%04x", StructTable[Index].AlgSupported);
+          break;
+        }
       }
     }
-  }
+    printf (") ");
 
-  printf (") ");
+    if (mParamAllMode) {
+      printf ("\n    Hash(");
+      DumpEntryFlags (mSpdmHashValueStringTable, ARRAY_SIZE(mSpdmHashValueStringTable), SpdmRequest->BaseHashAlgo);
+      printf (") ");
+      printf ("\n    Asym(");
+      DumpEntryFlags (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), SpdmRequest->BaseAsymAlgo);
+      printf (") ");
+
+      if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+        StructTable = (VOID *)((UINTN)Buffer +
+                                sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) +
+                                SpdmRequest->ExtAsymCount * sizeof(SPDM_EXTENDED_ALGORITHM) +
+                                SpdmRequest->ExtHashCount * sizeof(SPDM_EXTENDED_ALGORITHM)
+                                );
+        for (Index = 0; Index <SpdmRequest->Header.Param1; Index++) {
+          switch (StructTable[Index].AlgType) {
+          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
+            printf ("\n    DHE(");
+            DumpEntryFlags (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable[Index].AlgSupported);
+            printf (") ");
+            break;
+          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
+            printf ("\n    AEAD(");
+            DumpEntryFlags (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable[Index].AlgSupported);
+            printf (") ");
+            break;
+          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
+            printf ("\n    ReqAsym(");
+            DumpEntryFlags (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable[Index].AlgSupported);
+            printf (") ");
+            break;
+          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
+            printf ("\n    KeySchedule(");
+            DumpEntryFlags (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable[Index].AlgSupported);
+            printf (") ");
+            break;
+          }
+        }
+      }
+    }
+
+  }
 
   printf ("\n");
 
@@ -247,37 +407,83 @@ DumpSpdmAlgorithms (
     return ;
   }
 
-  printf ("(Hash=0x%08x, MeasHash=0x%08x, Asym=0x%08x",
-    SpdmResponse->BaseHashSel,
-    SpdmResponse->MeasurementHashAlgo,
-    SpdmResponse->BaseAsymSel
-    );
+  if (!mParamQuiteMode) {
+    printf ("(Hash=0x%08x, MeasHash=0x%08x, Asym=0x%08x",
+      SpdmResponse->BaseHashSel,
+      SpdmResponse->MeasurementHashAlgo,
+      SpdmResponse->BaseAsymSel
+      );
 
-  if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
-    StructTable = (VOID *)((UINTN)Buffer +
-                            sizeof(SPDM_ALGORITHMS_RESPONSE) +
-                            SpdmResponse->ExtAsymSelCount * sizeof(SPDM_EXTENDED_ALGORITHM) +
-                            SpdmResponse->ExtHashSelCount * sizeof(SPDM_EXTENDED_ALGORITHM)
-                            );
-    for (Index = 0; Index <SpdmResponse->Header.Param1; Index++) {
-      switch (StructTable[Index].AlgType) {
-      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-        printf (", DHE=0x%04x", StructTable[Index].AlgSupported);
-        break;
-      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-        printf (", AEAD=0x%04x", StructTable[Index].AlgSupported);
-        break;
-      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-        printf (", ReqAsym=0x%04x", StructTable[Index].AlgSupported);
-        break;
-      case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-        printf (", KeySchedule=0x%04x", StructTable[Index].AlgSupported);
-        break;
+    if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+      StructTable = (VOID *)((UINTN)Buffer +
+                              sizeof(SPDM_ALGORITHMS_RESPONSE) +
+                              SpdmResponse->ExtAsymSelCount * sizeof(SPDM_EXTENDED_ALGORITHM) +
+                              SpdmResponse->ExtHashSelCount * sizeof(SPDM_EXTENDED_ALGORITHM)
+                              );
+      for (Index = 0; Index <SpdmResponse->Header.Param1; Index++) {
+        switch (StructTable[Index].AlgType) {
+        case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
+          printf (", DHE=0x%04x", StructTable[Index].AlgSupported);
+          break;
+        case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
+          printf (", AEAD=0x%04x", StructTable[Index].AlgSupported);
+          break;
+        case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
+          printf (", ReqAsym=0x%04x", StructTable[Index].AlgSupported);
+          break;
+        case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
+          printf (", KeySchedule=0x%04x", StructTable[Index].AlgSupported);
+          break;
+        }
       }
     }
-  }
+    printf (") ");
 
-  printf (") ");
+    if (mParamAllMode) {
+      printf ("\n    Hash(");
+      DumpEntryValue (mSpdmHashValueStringTable, ARRAY_SIZE(mSpdmHashValueStringTable), SpdmResponse->BaseHashSel);
+      printf (") ");
+      printf ("\n    MeasHash(");
+      DumpEntryValue (mSpdmMeasurementHashValueStringTable, ARRAY_SIZE(mSpdmMeasurementHashValueStringTable), SpdmResponse->MeasurementHashAlgo);
+      printf (") ");
+      printf ("\n    Asym(");
+      DumpEntryValue (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), SpdmResponse->BaseAsymSel);
+      printf (") ");
+
+      if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+        StructTable = (VOID *)((UINTN)Buffer +
+                                sizeof(SPDM_ALGORITHMS_RESPONSE) +
+                                SpdmResponse->ExtAsymSelCount * sizeof(SPDM_EXTENDED_ALGORITHM) +
+                                SpdmResponse->ExtHashSelCount * sizeof(SPDM_EXTENDED_ALGORITHM)
+                                );
+        for (Index = 0; Index <SpdmResponse->Header.Param1; Index++) {
+          switch (StructTable[Index].AlgType) {
+          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
+            printf ("\n    DHE(");
+            DumpEntryValue (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable[Index].AlgSupported);
+            printf (") ");
+            break;
+          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
+            printf ("\n    AEAD(");
+            DumpEntryValue (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable[Index].AlgSupported);
+            printf (") ");
+            break;
+          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
+            printf ("\n    ReqAsym(");
+            DumpEntryValue (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable[Index].AlgSupported);
+            printf (") ");
+            break;
+          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
+            printf ("\n    KeySchedule(");
+            DumpEntryValue (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable[Index].AlgSupported);
+            printf (") ");
+            break;
+          }
+        }
+      }
+    }
+
+  }
 
   printf ("\n");
 
@@ -468,7 +674,9 @@ DumpSpdmKeyExchange (
     return ;
   }
 
-  printf ("(ReqSessionID=0x%04x) ", SpdmRequest->ReqSessionID);
+  if (!mParamQuiteMode) {
+    printf ("(ReqSessionID=0x%04x) ", SpdmRequest->ReqSessionID);
+  }
 
   printf ("\n");
 
@@ -523,11 +731,13 @@ DumpSpdmKeyExchangeRsp (
     return ;
   }
 
-  printf ("(RspSessionID=0x%04x, MutAuth=0x%02x, SlotID=0x%02x) ",
-    SpdmResponse->RspSessionID,
-    SpdmResponse->MutAuthRequested,
-    SpdmResponse->SlotIDParam
-    );
+  if (!mParamQuiteMode) {
+    printf ("(RspSessionID=0x%04x, MutAuth=0x%02x, SlotID=0x%02x) ",
+      SpdmResponse->RspSessionID,
+      SpdmResponse->MutAuthRequested,
+      SpdmResponse->SlotIDParam
+      );
+  }
 
   printf ("\n");
 
@@ -584,10 +794,12 @@ DumpSpdmFinish (
     return ;
   }
 
-  printf ("(SigIncl=0x%02x, SlotNum=0x%02x) ",
-    SpdmRequest->Header.Param1,
-    SpdmRequest->Header.Param2
-    );
+  if (!mParamQuiteMode) {
+    printf ("(SigIncl=0x%02x, SlotNum=0x%02x) ",
+      SpdmRequest->Header.Param1,
+      SpdmRequest->Header.Param2
+      );
+  }
 
   printf ("\n");
 
@@ -620,7 +832,9 @@ DumpSpdmFinishRsp (
     return ;
   }
 
-  printf ("() ");
+  if (!mParamQuiteMode) {
+    printf ("() ");
+  }
 
   printf ("\n");
 
@@ -655,9 +869,11 @@ DumpSpdmPskExchange (
     return ;
   }
 
-  printf ("(ReqSessionID=0x%04x, PSKHint=", SpdmRequest->ReqSessionID);
-  DumpHexStr ((VOID *)(SpdmRequest + 1), SpdmRequest->PSKHintLength);
-  printf (") ");
+  if (!mParamQuiteMode) {
+    printf ("(ReqSessionID=0x%04x, PSKHint=", SpdmRequest->ReqSessionID);
+    DumpHexStr ((VOID *)(SpdmRequest + 1), SpdmRequest->PSKHintLength);
+    printf (") ");
+  }
 
   printf ("\n");
 
@@ -694,7 +910,9 @@ DumpSpdmPskExchangeRsp (
     return ;
   }
 
-  printf ("(RspSessionID=0x%04x) ", SpdmResponse->RspSessionID);
+  if (!mParamQuiteMode) {
+    printf ("(RspSessionID=0x%04x) ", SpdmResponse->RspSessionID);
+  }
 
   printf ("\n");
 
@@ -735,7 +953,9 @@ DumpSpdmPskFinish (
     return ;
   }
 
-  printf ("() ");
+  if (!mParamQuiteMode) {
+    printf ("() ");
+  }
 
   printf ("\n");
 
@@ -752,14 +972,16 @@ DumpSpdmPskFinishRsp (
   UINTN                       MessageSize;
 
   printf ("SPDM_PSK_FINISH_RSP ");
-  
+
   MessageSize = sizeof(SPDM_PSK_FINISH_RESPONSE);
   if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
   }
 
-  printf ("() ");
+  if (!mParamQuiteMode) {
+    printf ("() ");
+  }
 
   printf ("\n");
 
@@ -796,18 +1018,33 @@ DumpSpdmKeyUpdate (
   IN UINTN   BufferSize
   )
 {
+  SPDM_KEY_UPDATE_REQUEST  *SpdmRequest;
+  UINTN                    MessageSize;
+
   printf ("SPDM_KEY_UPDATE ");
-  switch (((SPDM_MESSAGE_HEADER *)Buffer)->Param1) {
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
-    printf ("(UPDATE_KEY) ");
-    break;
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
-    printf ("(UPDATE_ALL_KEYS) ");
-    break;
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
-    printf ("(VERIFY_NEW_KEY) ");
-    break;
+
+  MessageSize = sizeof(SPDM_KEY_UPDATE_REQUEST);
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
   }
+
+  SpdmRequest = Buffer;
+
+  if (!mParamQuiteMode) {
+    switch (SpdmRequest->Header.Param1) {
+    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
+      printf ("(UPDATE_KEY, Tag=0x%02x) ", SpdmRequest->Header.Param2);
+      break;
+    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
+      printf ("(UPDATE_ALL_KEYS, Tag=0x%02x) ", SpdmRequest->Header.Param2);
+      break;
+    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
+      printf ("(VERIFY_NEW_KEY, Tag=0x%02x) ", SpdmRequest->Header.Param2);
+      break;
+    }
+  }
+
   printf ("\n");
 
   ASSERT (mCurrentSessionInfo != NULL);
@@ -827,18 +1064,33 @@ DumpSpdmKeyUpdateAck (
   IN UINTN   BufferSize
   )
 {
+  SPDM_KEY_UPDATE_RESPONSE  *SpdmResponse;
+  UINTN                     MessageSize;
+
   printf ("SPDM_KEY_UPDATE_ACK ");
-  switch (((SPDM_MESSAGE_HEADER *)Buffer)->Param1) {
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
-    printf ("(UPDATE_KEY) ");
-    break;
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
-    printf ("(UPDATE_ALL_KEYS) ");
-    break;
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
-    printf ("(VERIFY_NEW_KEY) ");
-    break;
+
+  MessageSize = sizeof(SPDM_KEY_UPDATE_RESPONSE);
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
   }
+
+  SpdmResponse = Buffer;
+
+  if (!mParamQuiteMode) {
+    switch (SpdmResponse->Header.Param1) {
+    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
+      printf ("(UPDATE_KEY, Tag=0x%02x) ", SpdmResponse->Header.Param2);
+      break;
+    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
+      printf ("(UPDATE_ALL_KEYS, Tag=0x%02x) ", SpdmResponse->Header.Param2);
+      break;
+    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
+      printf ("(VERIFY_NEW_KEY, Tag=0x%02x) ", SpdmResponse->Header.Param2);
+      break;
+    }
+  }
+
   printf ("\n");
 }
 
@@ -858,7 +1110,15 @@ DumpSpdmEncapsulatedRequest (
   IN UINTN   BufferSize
   )
 {
+  SPDM_ENCAPSULATED_REQUEST_RESPONSE  *SpdmResponse;
+
   printf ("SPDM_ENCAPSULATED_REQUEST ");
+
+  SpdmResponse = Buffer;
+  if (!mParamQuiteMode) {
+    printf ("(ReqID=0x%02x) ", SpdmResponse->Header.Param1);
+  }
+
   mEncapsulated = TRUE;
   DumpSpdmMessage ((UINT8 *)Buffer + sizeof(SPDM_MESSAGE_HEADER), BufferSize - sizeof(SPDM_MESSAGE_HEADER));
   mEncapsulated = FALSE;
@@ -870,7 +1130,15 @@ DumpSpdmDeliverEncapsulatedResponse (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST  *SpdmRequest;
+
   printf ("SPDM_DELIVER_ENCAPSULATED_RESPONSE ");
+  
+  SpdmRequest = Buffer;
+  if (!mParamQuiteMode) {
+    printf ("(ReqID=0x%02x) ", SpdmRequest->Header.Param1);
+  }
+
   mEncapsulated = TRUE;
   DumpSpdmMessage ((UINT8 *)Buffer + sizeof(SPDM_MESSAGE_HEADER), BufferSize - sizeof(SPDM_MESSAGE_HEADER));
   mEncapsulated = FALSE;
@@ -882,18 +1150,39 @@ DumpSpdmEncapsulatedResponseAck (
   IN UINTN   BufferSize
   )
 {
+  SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE  *SpdmResponse;
+  UINTN                                    MessageSize;
+
   printf ("SPDM_ENCAPSULATED_RESPONSE_ACK ");
-  switch (((SPDM_MESSAGE_HEADER *)Buffer)->Param2) {
+
+  SpdmResponse = Buffer;
+  if (!mParamQuiteMode) {
+    printf ("(ReqID=0x%02x) ", SpdmResponse->Header.Param1);
+  }
+
+  switch (SpdmResponse->Header.Param2) {
   case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_ABSENT:
-    printf ("(Done)");
+    if (!mParamQuiteMode) {
+      printf ("(Done) ");
+    }
     break;
+
   case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_PRESENT:
     mEncapsulated = TRUE;
     DumpSpdmMessage ((UINT8 *)Buffer + sizeof(SPDM_MESSAGE_HEADER), BufferSize - sizeof(SPDM_MESSAGE_HEADER));
     mEncapsulated = FALSE;
     return ;
+
   case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER:
-    printf ("(Slot(%d))", *((UINT8 *)Buffer + sizeof(SPDM_MESSAGE_HEADER)));
+    MessageSize = sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE) + 1;
+    if (BufferSize < MessageSize) {
+      printf ("\n");
+      return ;
+    }
+
+    if (!mParamQuiteMode) {
+      printf ("(Slot(%d)) ", *((UINT8 *)Buffer + sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE)));
+    }
     break;
   }
   printf ("\n");
@@ -1051,10 +1340,6 @@ DumpSecuredSpdmMessage (
     } else {
       printf ("<Unknown>\n");
     }
-  }
-
-  if (mParamQuiteMode) {
-    return ;
   }
 
   if (mParamDumpHex) {
