@@ -20,7 +20,6 @@ DumpHexStr (
   for (Index = 0; Index < BufferSize; Index++) {
     printf ("%02x", Buffer[Index]);
   }
-  printf ("\n");
 }
 
 VOID
@@ -34,7 +33,6 @@ DumpData (
   for (Index = 0; Index < BufferSize; Index++) {
     printf ("%02x ", Buffer[Index]);
   }
-  printf ("\n");
 }
 
 VOID

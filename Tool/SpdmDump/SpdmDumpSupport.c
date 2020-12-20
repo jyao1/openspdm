@@ -26,7 +26,6 @@ DumpHexStr (
   for (Index = 0; Index < Size; Index++) {
     printf ("%02x", Data[Index]);
   }
-  printf ("\n");
 }
 
 /**
@@ -46,7 +45,6 @@ DumpData (
   for (Index = 0; Index < Size; Index++) {
     printf ("%02x ", Data[Index]);
   }
-  printf ("\n");
 }
 
 /**
@@ -72,11 +70,13 @@ DumpHex (
   for (Index = 0; Index < Count; Index++) {
     printf ("    %04x: ", Index * COLUME_SIZE);
     DumpData (Data + Index * COLUME_SIZE, COLUME_SIZE);
+    printf ("\n");
   }
 
   if (Left != 0) {
     printf ("    %04x: ", Index * COLUME_SIZE);
     DumpData (Data + Index * COLUME_SIZE, Left);
+    printf ("\n");
   }
 }
 

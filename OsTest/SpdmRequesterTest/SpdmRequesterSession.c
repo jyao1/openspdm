@@ -159,6 +159,7 @@ DoSessionViaSpdm (
     if (!RETURN_ERROR(Status)) {
       printf ("%s (%d) - ", mDataTypeString[Index].String, (UINT32)DataSize);
       DumpData (Data, DataSize);
+      printf ("\n");
     } else {
       printf ("%s - %x\n", mDataTypeString[Index].String, (UINT32)Status);
     }

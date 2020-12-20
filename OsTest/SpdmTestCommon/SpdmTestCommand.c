@@ -91,6 +91,7 @@ ReadMultipleBytes (
   printf ("Platform Port Receive Size: ");
   Length = ntohl(Length);
   DumpData ((UINT8 *)&Length, sizeof(UINT32));
+  printf ("\n");
   Length = ntohl(Length);
 
   *BytesReceived = Length;
@@ -107,6 +108,7 @@ ReadMultipleBytes (
   }
   printf ("Platform Port Receive Buffer:\n    ");
   DumpData (Buffer, Length);
+  printf ("\n");
 
   return TRUE;
 }
@@ -132,6 +134,7 @@ ReceivePlatformData (
   printf ("Platform Port Receive Command: ");
   Response = ntohl(Response);
   DumpData ((UINT8 *)&Response, sizeof(UINT32));
+  printf ("\n");
 
   Result = ReadData32 (Socket, &TransportType);
   if (!Result) {
@@ -140,6 +143,7 @@ ReceivePlatformData (
   printf ("Platform Port Receive TransportType: ");
   TransportType = ntohl(TransportType);
   DumpData ((UINT8 *)&TransportType, sizeof(UINT32));
+  printf ("\n");
   TransportType = ntohl(TransportType);
   if (TransportType != mUseTransportLayer) {
     printf ("TransportType mismatch\n");
@@ -250,6 +254,7 @@ WriteMultipleBytes (
   printf ("Platform Port Transmit Size: ");
   BytesToSend = htonl(BytesToSend);
   DumpData ((UINT8 *)&BytesToSend, sizeof(UINT32));
+  printf ("\n");
   BytesToSend = htonl(BytesToSend);
 
   Result = WriteBytes (Socket, Buffer, BytesToSend);
@@ -258,6 +263,7 @@ WriteMultipleBytes (
   }
   printf ("Platform Port Transmit Buffer:\n    ");
   DumpData (Buffer, BytesToSend);
+  printf ("\n");
   return TRUE;
 }
 
@@ -281,6 +287,7 @@ SendPlatformData (
   printf ("Platform Port Transmit Command: ");
   Request = htonl(Request);
   DumpData ((UINT8 *)&Request, sizeof(UINT32));
+  printf ("\n");
 
   Result = WriteData32 (Socket, mUseTransportLayer);
   if (!Result) {
@@ -289,6 +296,7 @@ SendPlatformData (
   printf ("Platform Port Transmit TransportType: ");
   TransportType = ntohl(mUseTransportLayer);
   DumpData ((UINT8 *)&TransportType, sizeof(UINT32));
+  printf ("\n");
 
   Result = WriteMultipleBytes (Socket, SendBuffer, (UINT32)BytesToSend);
   if (!Result) {
