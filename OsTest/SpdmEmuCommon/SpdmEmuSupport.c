@@ -132,9 +132,11 @@ PrintUsage (
   IN CHAR8* Name
   )
 {
-  printf ("%s [--trans MCTP|PCI_DOE]\n", Name);
+  printf ("\n%s [--trans MCTP|PCI_DOE]\n", Name);
+  printf ("   [--ver 1.0|1.1]\n");
+  printf ("   [--cap CACHE|CERT|CHAL|MEAS_NO_SIG|MEAS_SIG|MEAS_FRESH|ENCRYPT|MAC|MUT_AUTH|KEY_EX|PSK|PSK_WITH_CONTEXT|ENCAP|HBEAT|KEY_UPD|HANDSHAKE_IN_CLEAR|PUB_KEY_ID]\n");
   printf ("   [--hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]\n");
-  printf ("   [--measurement_hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]\n");
+  printf ("   [--meas_hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]\n");
   printf ("   [--asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]\n");
   printf ("   [--req_asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]\n");
   printf ("   [--dhe FFDHE_2048|FFDHE_3072|FFDHE_4096|SECP_256_R1|SECP_384_R1|SECP_521_R1]\n");
@@ -144,15 +146,17 @@ PrintUsage (
   printf ("\n");
   printf ("NOTE:\n");
   printf ("   [--trans] is used to select transport layer message. By default, MCTP is used.\n");
-  printf ("\n");
+  printf ("   [--ver] is version. By default, 1.1 is used.\n");
+  printf ("   [--cap] is capability flags. Multiple flags can be set together. Please use ',' for them.\n");
+  printf ("           By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Requester.\n");
+  printf ("           By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Responder.\n");
   printf ("   [--hash] is hash algorithm. By default, SHA_256 is used.\n");
-  printf ("   [--measurement_hash] is measurement hash algorithm. By default, SHA_256 is used.\n");
+  printf ("   [--meas_hash] is measurement hash algorithm. By default, SHA_256 is used.\n");
   printf ("   [--asym] is asym algorithm. By default, ECDSA_P256 is used.\n");
   printf ("   [--req_asym] is requester asym algorithm. By default, RSASSA_2048 is used.\n");
   printf ("   [--dhe] is DHE algorithm. By default, SECP_256_R1 is used.\n");
   printf ("   [--aead] is AEAD algorithm. By default, AES_256_GCM is used.\n");
   printf ("   [--key_schedule] is key schedule algorithm. By default, HMAC_HASH is used.\n");
-  printf ("\n");
   printf ("   [--pcap] is used to generate PCAP dump file for offline analysis.\n");
 }
 
@@ -164,6 +168,49 @@ typedef struct {
 VALUE_STRING_ENTRY  mTransportValueStringTable[] = {
   {SOCKET_TRANSPORT_TYPE_MCTP,    "MCTP"},
   {SOCKET_TRANSPORT_TYPE_PCI_DOE, "PCI_DOE"},
+};
+
+VALUE_STRING_ENTRY  mVersionValueStringTable[] = {
+  {SPDM_MESSAGE_VERSION_10,  "1.0"},
+  {SPDM_MESSAGE_VERSION_11,  "1.1"},
+};
+
+VALUE_STRING_ENTRY  mSpdmRequesterCapabilitiesStringTable[] = {
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP,                   "CERT"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP,                   "CHAL"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_NO_SIG,            "MEAS_NO_SIG"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_SIG,               "MEAS_SIG"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_FRESH_CAP,             "MEAS_FRESH"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP,                "ENCRYPT"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP,                    "MAC"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP,               "MUT_AUTH"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP,                 "KEY_EX"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP_REQUESTER,          "PSK"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP,                  "ENCAP"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP,                  "HBEAT"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP,                "KEY_UPD"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, "HANDSHAKE_IN_CLEAR"},
+  {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP,             "PUB_KEY_ID"},
+};
+
+VALUE_STRING_ENTRY  mSpdmResponderCapabilitiesStringTable[] = {
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP,                      "CACHE"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP,                       "CERT"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP,                       "CHAL"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG,                "MEAS_NO_SIG"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG,                   "MEAS_SIG"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_FRESH_CAP,                 "MEAS_FRESH"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP,                    "ENCRYPT"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP,                        "MAC"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP,                   "MUT_AUTH"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP,                     "KEY_EX"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER,              "PSK"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT, "PSK_WITH_CONTEXT"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP,                      "ENCAP"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP,                      "HBEAT"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP,                    "KEY_UPD"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP,     "HANDSHAKE_IN_CLEAR"},
+  {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP,                 "PUB_KEY_ID"},
 };
 
 VALUE_STRING_ENTRY  mHashValueStringTable[] = {
@@ -234,6 +281,49 @@ GetValueFromName (
   return FALSE;
 }
 
+BOOLEAN
+GetFlagsFromName (
+  IN VALUE_STRING_ENTRY  *Table,
+  IN UINTN               EntryCount,
+  IN CHAR8               *Name,
+  OUT UINT32             *Flags
+  )
+{
+  UINT32  Value;
+  CHAR8   *FlagName;
+  CHAR8   *LocalName;
+  BOOLEAN Ret;
+
+  LocalName = (VOID *)malloc (strlen(Name) + 1);
+  if (LocalName == NULL) {
+    return FALSE;
+  }
+  strcpy (LocalName, Name);
+
+  //
+  // Name = Flag1,Flag2,...,FlagN
+  //
+  *Flags = 0;
+  FlagName = strtok (LocalName, ",");
+  while (FlagName != NULL) {
+    if (!GetValueFromName (Table, EntryCount, FlagName, &Value)) {
+      printf ("unsupported flag - %s\n", FlagName);
+      Ret = FALSE;
+      goto Done;
+    }
+    *Flags |= Value;
+    FlagName = strtok (NULL, ",");
+  }
+  if (*Flags == 0) {
+    Ret = FALSE;
+  } else {
+    Ret = TRUE;
+  }
+Done:
+  free (LocalName);
+  return Ret;
+}
+
 void
 ProcessArgs (
   char  *ProgramName,
@@ -267,11 +357,64 @@ ProcessArgs (
           PrintUsage (ProgramName);
           exit (0);
         }
+        printf ("trans - 0x%x\n", mUseTransportLayer);
         argc -= 2;
         argv += 2;
         continue;
       } else {
         printf ("invalid --trans\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--ver") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mVersionValueStringTable, ARRAY_SIZE(mVersionValueStringTable), argv[1], &Data32)) {
+          printf ("invalid --ver %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mUseVersion = (UINT8)Data32;
+        printf ("ver - 0x%02x\n", mUseVersion);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --ver\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--cap") == 0) {
+      if (argc >= 2) {
+        VALUE_STRING_ENTRY  *CapabilitiesStringTable;
+        UINTN               Count;
+
+        if (strcmp (ProgramName, "SpdmRequesterEmu") == 0) {
+          CapabilitiesStringTable = mSpdmRequesterCapabilitiesStringTable;
+          Count = ARRAY_SIZE(mSpdmRequesterCapabilitiesStringTable);
+        } else if (strcmp (ProgramName, "SpdmResponderEmu") == 0) {
+          CapabilitiesStringTable = mSpdmResponderCapabilitiesStringTable;
+          Count = ARRAY_SIZE(mSpdmResponderCapabilitiesStringTable);
+        } else {
+          ASSERT (FALSE);
+          printf ("unsupported --cap\n");
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        if (!GetFlagsFromName (CapabilitiesStringTable, Count, argv[1], &mUseCapabilityFlags)) {
+          printf ("invalid --cap %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        printf ("cap - 0x%08x\n", mUseCapabilityFlags);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --cap\n");
         PrintUsage (ProgramName);
         exit (0);
       }
@@ -284,6 +427,7 @@ ProcessArgs (
           PrintUsage (ProgramName);
           exit (0);
         }
+        printf ("hash - 0x%08x\n", mUseHashAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -294,18 +438,19 @@ ProcessArgs (
       }
     }
 
-    if (strcmp (argv[0], "--measurement_hash") == 0) {
+    if (strcmp (argv[0], "--meas_hash") == 0) {
       if (argc >= 2) {
         if (!GetValueFromName (mMeasurementHashValueStringTable, ARRAY_SIZE(mMeasurementHashValueStringTable), argv[1], &mUseMeasurementHashAlgo)) {
-          printf ("invalid --measurement_hash %s\n", argv[1]);
+          printf ("invalid --meas_hash %s\n", argv[1]);
           PrintUsage (ProgramName);
           exit (0);
         }
+        printf ("meas_hash - 0x%08x\n", mUseMeasurementHashAlgo);
         argc -= 2;
         argv += 2;
         continue;
       } else {
-        printf ("invalid --measurement_hash\n");
+        printf ("invalid --meas_hash\n");
         PrintUsage (ProgramName);
         exit (0);
       }
@@ -318,6 +463,7 @@ ProcessArgs (
           PrintUsage (ProgramName);
           exit (0);
         }
+        printf ("asym - 0x%08x\n", mUseAsymAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -336,6 +482,7 @@ ProcessArgs (
           exit (0);
         }
         mUseReqAsymAlgo = (UINT16)Data32;
+        printf ("req_asym - 0x%04x\n", mUseReqAsymAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -354,6 +501,7 @@ ProcessArgs (
           exit (0);
         }
         mUseDheAlgo = (UINT16)Data32;
+        printf ("dhe - 0x%04x\n", mUseDheAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -372,6 +520,7 @@ ProcessArgs (
           exit (0);
         }
         mUseAeadAlgo = (UINT16)Data32;
+        printf ("aead - 0x%04x\n", mUseAeadAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -390,6 +539,7 @@ ProcessArgs (
           exit (0);
         }
         mUseKeyScheduleAlgo = (UINT16)Data32;
+        printf ("key_schedule - 0x%04x\n", mUseKeyScheduleAlgo);
         argc -= 2;
         argv += 2;
         continue;

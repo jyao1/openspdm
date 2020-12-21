@@ -24,7 +24,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmEmuCommand.h"
 
 extern UINT32  mUseTransportLayer;
-
+extern UINT8   mUseVersion;
+extern UINT32  mUseCapabilityFlags;
 extern UINT32  mUseHashAlgo;
 extern UINT32  mUseMeasurementHashAlgo;
 extern UINT32  mUseAsymAlgo;
