@@ -1,4 +1,7 @@
 /** @file
+  Definitions of DSP0236 Management Component Transport Protocol (MCTP) Base Specification
+  version 1.3.1 in Distributed Management Task Force (DMTF).
+
   Definitions of DSP0239 Management Component Transport Protocol (MCTP) IDs and Codes
   version 1.7.0 in Distributed Management Task Force (DMTF).
 

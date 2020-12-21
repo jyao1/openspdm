@@ -66,6 +66,17 @@ SPDM_VENDOR_DEFINED_REQUEST_MINE  mVendorDefinedRequest = {
   }
 };
 
+SECURE_SESSION_REQUEST_MINE  mSecureSessionRequest = {
+  {
+    MCTP_MESSAGE_TYPE_PLDM
+  },
+  {
+    0x80,
+    PLDM_MESSAGE_TYPE_CONTROL_DISCOVERY,
+    PLDM_CONTROL_DISCOVERY_COMMAND_GET_TID,
+  },
+};
+
 RETURN_STATUS
 DoAppSessionViaSpdm (
   IN UINT32                          SessionId
@@ -77,7 +88,7 @@ DoAppSessionViaSpdm (
   UINTN                              RequestSize;
   SPDM_VENDOR_DEFINED_RESPONSE_MINE  Response;
   UINTN                              ResponseSize;
-  UINT8                              AppResponse[TEST_PAYLOAD_LEN];
+  SECURE_SESSION_RESPONSE_MINE       AppResponse;
   UINTN                              AppResponseSize;
 
   SpdmContext = mSpdmContext;
@@ -99,11 +110,14 @@ DoAppSessionViaSpdm (
 
   if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_MCTP) {
     AppResponseSize = sizeof(AppResponse);
-    Status = SpdmSendReceiveData (SpdmContext, &SessionId, TRUE, TEST_PAYLOAD_CLIENT, TEST_PAYLOAD_LEN, &AppResponse, &AppResponseSize);
+    Status = SpdmSendReceiveData (SpdmContext, &SessionId, TRUE, &mSecureSessionRequest, sizeof(mSecureSessionRequest), &AppResponse, &AppResponseSize);
     ASSERT_RETURN_ERROR(Status);
 
-    ASSERT (AppResponseSize == TEST_PAYLOAD_LEN);
-    ASSERT (CompareMem (AppResponse, TEST_PAYLOAD_SERVER, TEST_PAYLOAD_LEN) == 0);
+    ASSERT (AppResponseSize == sizeof(AppResponse));
+    ASSERT (AppResponse.MctpHeader.MessageType == MCTP_MESSAGE_TYPE_PLDM);
+    ASSERT (AppResponse.PldmHeader.PldmType == PLDM_MESSAGE_TYPE_CONTROL_DISCOVERY);
+    ASSERT (AppResponse.PldmHeader.PldmCommandCode == PLDM_CONTROL_DISCOVERY_COMMAND_GET_TID);
+    ASSERT (AppResponse.PldmResponseHeader.PldmCompletionCode == PLDM_BASE_CODE_SUCCESS);
   }
 
   return RETURN_SUCCESS;

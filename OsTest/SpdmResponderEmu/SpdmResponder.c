@@ -40,6 +40,21 @@ SPDM_VENDOR_DEFINED_RESPONSE_MINE  mVendorDefinedResponse = {
   }
 };
 
+SECURE_SESSION_RESPONSE_MINE  mSecureSessionResponse = {
+  {
+    MCTP_MESSAGE_TYPE_PLDM
+  },
+  {
+    0,
+    PLDM_MESSAGE_TYPE_CONTROL_DISCOVERY,
+    PLDM_CONTROL_DISCOVERY_COMMAND_GET_TID,
+  },
+  {
+    PLDM_BASE_CODE_SUCCESS,
+  },
+  1, // TID
+};
+
 extern UINT32 mCommand;
 extern UINTN  mReceiveBufferSize;
 extern UINT8  mReceiveBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
@@ -87,6 +102,7 @@ TestSpdmProcessPacketCallback (
   )
 {
   SPDM_VENDOR_DEFINED_REQUEST_MINE   *SpmdRequest;
+  SECURE_SESSION_REQUEST_MINE        *AppRequest;
 
   if (!IsAppMessage) {
     SpmdRequest = Request;
@@ -101,11 +117,14 @@ TestSpdmProcessPacketCallback (
     CopyMem (Response, &mVendorDefinedResponse, sizeof(mVendorDefinedResponse));
     *ResponseSize = sizeof(mVendorDefinedResponse);
   } else {
-    ASSERT (RequestSize == TEST_PAYLOAD_LEN);
-    ASSERT (CompareMem (Request, TEST_PAYLOAD_CLIENT, TEST_PAYLOAD_LEN) == 0);
+    AppRequest = Request;
+    ASSERT (RequestSize == sizeof(SECURE_SESSION_REQUEST_MINE));
+    ASSERT (AppRequest->MctpHeader.MessageType == MCTP_MESSAGE_TYPE_PLDM);
+    ASSERT (AppRequest->PldmHeader.PldmType == PLDM_MESSAGE_TYPE_CONTROL_DISCOVERY);
+    ASSERT (AppRequest->PldmHeader.PldmCommandCode == PLDM_CONTROL_DISCOVERY_COMMAND_GET_TID);
 
-    CopyMem (Response, TEST_PAYLOAD_SERVER, TEST_PAYLOAD_LEN);
-    *ResponseSize = TEST_PAYLOAD_LEN;
+    CopyMem (Response, &mSecureSessionResponse, sizeof(mSecureSessionResponse));
+    *ResponseSize = sizeof(mSecureSessionResponse);
   }
 
   return RETURN_SUCCESS;

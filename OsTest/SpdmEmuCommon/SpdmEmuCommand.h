@@ -33,9 +33,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #pragma pack(1)
 
-#define TEST_PAYLOAD_CLIENT "Hello Server!"
-#define TEST_PAYLOAD_SERVER "Hello Client!"
-#define TEST_PAYLOAD_LEN (sizeof("Hello XXXXXX!"))
 ///
 /// SPDM VENDOR_DEFINED request
 ///
@@ -65,6 +62,24 @@ typedef struct {
   PCI_PROTOCOL_HEADER    PciProtocol;
   PCI_IDE_KM_QUERY_RESP  PciIdeKmQueryResp;
 } SPDM_VENDOR_DEFINED_RESPONSE_MINE;
+
+///
+/// Secure Session APP request
+///
+typedef struct {
+  MCTP_MESSAGE_HEADER  MctpHeader;
+  PLDM_MESSAGE_HEADER  PldmHeader;
+} SECURE_SESSION_REQUEST_MINE;
+
+///
+/// Secure Session APP response
+///
+typedef struct {
+  MCTP_MESSAGE_HEADER          MctpHeader;
+  PLDM_MESSAGE_HEADER          PldmHeader;
+  PLDM_MESSAGE_RESPONSE_HEADER PldmResponseHeader;
+  UINT8                        TID;
+} SECURE_SESSION_RESPONSE_MINE;
 
 #pragma pack()
 
