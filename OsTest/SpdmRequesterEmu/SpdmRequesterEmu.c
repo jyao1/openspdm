@@ -99,6 +99,18 @@ InitClient (
   return TRUE;
 }
 
+DOE_DISCOVERY_REQUEST_MINE   mDoeRequest = {
+  {
+    PCI_DOE_VENDOR_ID_PCISIG,
+    PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY,
+    0,
+    sizeof(mDoeRequest) / sizeof(UINT32), // Length
+  },
+  {
+    0, // Index
+  },
+};
+
 BOOLEAN
 PlatformClientRoutine (
   IN UINT16 PortNumber
@@ -123,10 +135,6 @@ PlatformClientRoutine (
   }
   
   mSocket = PlatformSocket;
-  mSpdmContext = SpdmClientInit ();
-  if (mSpdmContext == NULL) {
-    goto Done;
-  }
 
   ResponseSize = sizeof(mReceiveBuffer);
   Result = CommunicatePlatformData (
@@ -139,6 +147,38 @@ PlatformClientRoutine (
              mReceiveBuffer
              );
   if (!Result) {
+    goto Done;
+  }
+
+  if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_PCI_DOE) {
+    DOE_DISCOVERY_RESPONSE_MINE  DoeResponse;
+
+    do {
+      ResponseSize = sizeof(DoeResponse);
+      Result = CommunicatePlatformData (
+                PlatformSocket,
+                SOCKET_SPDM_COMMAND_NORMAL,
+                (UINT8 *)&mDoeRequest,
+                sizeof(mDoeRequest),
+                &Response,
+                &ResponseSize,
+                (UINT8 *)&DoeResponse
+                );
+      if (!Result) {
+        goto Done;
+      }
+      ASSERT (ResponseSize == sizeof(DoeResponse));
+      ASSERT (DoeResponse.DoeHeader.VendorId == PCI_DOE_VENDOR_ID_PCISIG);
+      ASSERT (DoeResponse.DoeHeader.DataObjectType == PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY);
+      ASSERT (DoeResponse.DoeHeader.Length == sizeof(DoeResponse) / sizeof(UINT32));
+      ASSERT (DoeResponse.DoeDiscoveryResponse.VendorId == PCI_DOE_VENDOR_ID_PCISIG);
+
+      mDoeRequest.DoeDiscoveryRequest.Index = DoeResponse.DoeDiscoveryResponse.NextIndex;
+    } while (DoeResponse.DoeDiscoveryResponse.NextIndex != 0);
+  }
+
+  mSpdmContext = SpdmClientInit ();
+  if (mSpdmContext == NULL) {
     goto Done;
   }
 

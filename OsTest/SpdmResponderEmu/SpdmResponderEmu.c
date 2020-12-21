@@ -85,6 +85,20 @@ CreateSocket(
   return TRUE;
 }
 
+DOE_DISCOVERY_RESPONSE_MINE   mDoeResponse = {
+  {
+    PCI_DOE_VENDOR_ID_PCISIG,
+    PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY,
+    0,
+    sizeof(mDoeResponse) / sizeof(UINT32), // Length
+  },
+  {
+    PCI_DOE_VENDOR_ID_PCISIG,
+    PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY,
+    0x00
+  },
+};
+
 BOOLEAN
 PlatformServer (
   IN SOCKET           Socket
@@ -132,7 +146,51 @@ PlatformServer (
       return FALSE;
       break;
     case SOCKET_SPDM_COMMAND_NORMAL:
-      assert (0);
+      if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_PCI_DOE) {
+        DOE_DISCOVERY_REQUEST_MINE  *DoeRequest;
+
+        DoeRequest = (VOID *)mReceiveBuffer;
+        ASSERT (mReceiveBufferSize == sizeof(DOE_DISCOVERY_REQUEST_MINE));
+        ASSERT (DoeRequest->DoeHeader.VendorId == PCI_DOE_VENDOR_ID_PCISIG);
+        ASSERT (DoeRequest->DoeHeader.DataObjectType == PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY);
+        ASSERT (DoeRequest->DoeHeader.Length == sizeof(*DoeRequest) / sizeof(UINT32));
+
+        switch (DoeRequest->DoeDiscoveryRequest.Index) {
+        case 0:
+          mDoeResponse.DoeDiscoveryResponse.DataObjectType = PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY;
+          mDoeResponse.DoeDiscoveryResponse.NextIndex = 1;
+          break;
+        case 1:
+          mDoeResponse.DoeDiscoveryResponse.DataObjectType = PCI_DOE_DATA_OBJECT_TYPE_SPDM;
+          mDoeResponse.DoeDiscoveryResponse.NextIndex = 2;
+          break;
+        case 2:
+        default:
+          mDoeResponse.DoeDiscoveryResponse.DataObjectType = PCI_DOE_DATA_OBJECT_TYPE_SECURED_SPDM;
+          mDoeResponse.DoeDiscoveryResponse.NextIndex = 0;
+          break;
+        }
+
+        Result = SendPlatformData (
+                  Socket,
+                  SOCKET_SPDM_COMMAND_NORMAL,
+                  (UINT8 *)&mDoeResponse,
+                  sizeof(mDoeResponse)
+                  );
+        if (!Result) {
+          printf ("SendPlatformData Error - %x\n",
+  #ifdef _MSC_VER
+            WSAGetLastError()
+  #else
+            errno
+  #endif
+            );
+          return TRUE;
+        }
+      } else {
+        ASSERT (FALSE);
+      }
+      break;
     default:
       printf ("Unrecognized platform interface command %x\n", mCommand);
       Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_UNKOWN, NULL, 0);

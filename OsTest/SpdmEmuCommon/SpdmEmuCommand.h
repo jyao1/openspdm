@@ -81,6 +81,22 @@ typedef struct {
   UINT8                        TID;
 } SECURE_SESSION_RESPONSE_MINE;
 
+///
+/// DOE Discovery request
+///
+typedef struct {
+  PCI_DOE_DATA_OBJECT_HEADER  DoeHeader;
+  PCI_DOE_DISCOVERY_REQUEST   DoeDiscoveryRequest;
+} DOE_DISCOVERY_REQUEST_MINE;
+
+///
+/// DOE Discovery response
+///
+typedef struct {
+  PCI_DOE_DATA_OBJECT_HEADER  DoeHeader;
+  PCI_DOE_DISCOVERY_RESPONSE  DoeDiscoveryResponse;
+} DOE_DISCOVERY_RESPONSE_MINE;
+
 #pragma pack()
 
 #endif

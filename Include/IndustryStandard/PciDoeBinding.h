@@ -48,7 +48,7 @@ typedef struct {
 
 typedef struct {
   UINT16 VendorId;
-  UINT8  DataObjectProtocol;
+  UINT8  DataObjectType;
   UINT8  NextIndex;
 } PCI_DOE_DISCOVERY_RESPONSE;
 

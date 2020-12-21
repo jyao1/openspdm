@@ -1352,6 +1352,7 @@ DumpSecuredSpdmMessage (
   STATIC BOOLEAN                      IsRequester = FALSE;
 
   if (BufferSize < sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER)) {
+    printf ("\n");
     return ;
   }
 
@@ -1400,11 +1401,11 @@ DumpSecuredSpdmMessage (
     DumpDispatchMessage (mSecuredSpdmDispatch, ARRAY_SIZE(mSecuredSpdmDispatch), GetDataLinkType(), mSpdmDecMessageBuffer, MessageSize);
     mDecrypted = FALSE;
   } else {
-    printf ("<Unknown> ");
+    printf ("(?)->(?) ");
     printf ("SecuredSPDM(0x%08x) ", SecuredMessageHeader->SessionId);
+    printf ("<Unknown> ");
     printf ("\n");
   }
-
 
   if (mParamDumpHex) {
     printf ("  SecuredSPDM Message:\n");

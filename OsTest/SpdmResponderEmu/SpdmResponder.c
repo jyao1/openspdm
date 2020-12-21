@@ -207,6 +207,9 @@ SpdmDeviceReceiveMessage (
     return RETURN_DEVICE_ERROR;
   }
   if (mCommand == SOCKET_SPDM_COMMAND_NORMAL) {
+    //
+    // Cache the message in case it is not for SPDM.
+    //
   } else {
     //
     // Cache the message
