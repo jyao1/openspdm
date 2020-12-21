@@ -14,6 +14,8 @@ VOID               *mSpdmContext;
 
 VOID               *mSpdmLastMessageBuffer;
 UINTN              mSpdmLastMessageBufferSize;
+UINT8              mCachedGetMeasurementRequestAttribute;
+UINT8              mCachedGetMeasurementOperation;
 UINT32             mCachedSessionId;
 SPDM_SESSION_INFO  *mCurrentSessionInfo;
 BOOLEAN            mEncapsulated;
@@ -548,7 +550,20 @@ DumpSpdmGetDigests (
   IN UINTN   BufferSize
   )
 {
+  UINTN                     MessageSize;
+
   printf ("SPDM_GET_DIGESTS ");
+
+  MessageSize = sizeof(SPDM_GET_DIGESTS_REQUEST);
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  if (!mParamQuiteMode) {
+    printf ("() ");
+  }
+
   printf ("\n");
 }
 
@@ -558,7 +573,41 @@ DumpSpdmDigests (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DIGESTS_RESPONSE  *SpdmResponse;
+  UINTN                  MessageSize;
+  UINTN                  HashSize;
+  UINTN                  SlotCount;
+  UINTN                  Index;
+
   printf ("SPDM_DIGESTS ");
+
+  MessageSize = sizeof(SPDM_DIGESTS_RESPONSE);
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmResponse = Buffer;
+
+  SlotCount = 0;
+  for (Index = 0; Index < 8; Index++) {
+    if (((1 << Index) & SpdmResponse->Header.Param2) != 0) {
+      SlotCount ++;
+    }
+  }
+
+  HashSize = GetSpdmHashSize (mSpdmContext);
+
+  MessageSize += SlotCount * HashSize;
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  if (!mParamQuiteMode) {
+    printf ("(SlotMask=0x%02x) ", SpdmResponse->Header.Param2);
+  }
+
   printf ("\n");
 }
 
@@ -569,10 +618,12 @@ DumpSpdmGetCertificate (
   )
 {
   SPDM_GET_CERTIFICATE_REQUEST  *SpdmRequest;
+  UINTN                         MessageSize;
 
   printf ("SPDM_GET_CERTIFICATE ");
 
-  if (BufferSize < sizeof(SPDM_GET_CERTIFICATE_REQUEST)) {
+  MessageSize = sizeof(SPDM_GET_CERTIFICATE_REQUEST);
+  if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
   }
@@ -599,19 +650,22 @@ DumpSpdmCertificate (
   )
 {
   SPDM_CERTIFICATE_RESPONSE  *SpdmResponse;
+  UINTN                      MessageSize;
   VOID                       *CertChain;
   UINTN                      CertChainSize;
   UINTN                      HashSize;
 
   printf ("SPDM_CERTIFICATE ");
 
-  if (BufferSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
+  MessageSize = sizeof(SPDM_CERTIFICATE_RESPONSE);
+  if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
   }
 
   SpdmResponse = Buffer;
-  if (SpdmResponse->PortionLength > BufferSize - sizeof(SPDM_CERTIFICATE_RESPONSE)) {
+  MessageSize += SpdmResponse->PortionLength;
+  if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
   }
@@ -683,7 +737,26 @@ DumpSpdmChallenge (
   IN UINTN   BufferSize
   )
 {
+  SPDM_CHALLENGE_REQUEST  *SpdmRequest;
+  UINTN                   MessageSize;
+
   printf ("SPDM_CHALLENGE ");
+
+  MessageSize = sizeof(SPDM_CHALLENGE_REQUEST);
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmRequest = Buffer;
+
+  if (!mParamQuiteMode) {
+    printf ("(SlotNUm=0x%02x, HashType=0x%02x) ",
+      SpdmRequest->Header.Param1,
+      SpdmRequest->Header.Param2
+      );
+  }
+
   printf ("\n");
 }
 
@@ -693,7 +766,41 @@ DumpSpdmChallengeAuth (
   IN UINTN   BufferSize
   )
 {
+  SPDM_CHALLENGE_AUTH_RESPONSE  *SpdmResponse;
+  UINTN                         MessageSize;
+  UINTN                         HashSize;
+  UINTN                         SignatureSize;
+  UINT16                        OpaqueLength;
+
   printf ("SPDM_CHALLENGE_AUTH ");
+
+  HashSize = GetSpdmHashSize (mSpdmContext);
+  SignatureSize = GetSpdmAsymSize (mSpdmContext);
+
+  MessageSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + HashSize + 32 + HashSize + sizeof(UINT16);
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + HashSize + 32 + HashSize);
+  MessageSize += OpaqueLength + SignatureSize;
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmResponse = Buffer;
+
+  if (!mParamQuiteMode) {
+    printf ("(RspAttr=0x%02x (SlotNum=0x%02x, BasicMutAuthReq=%x), SlotMask=0x%02x) ",
+      SpdmResponse->Header.Param1,
+      SpdmResponse->Header.Param1 & 0xF,
+      ((SpdmResponse->Header.Param1 & 0x80) != 0) ? 1 : 0,
+      SpdmResponse->Header.Param2
+      );
+  }
+
   printf ("\n");
 }
 
@@ -703,7 +810,50 @@ DumpSpdmGetMeasurements (
   IN UINTN   BufferSize
   )
 {
+  SPDM_GET_MEASUREMENTS_REQUEST  *SpdmRequest;
+  UINTN                          MessageSize;
+  BOOLEAN                        IncludeSignature;
+
   printf ("SPDM_GET_MEASUREMENTS ");
+
+  MessageSize = OFFSET_OF(SPDM_GET_MEASUREMENTS_REQUEST, Nonce);
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmRequest = Buffer;
+  IncludeSignature = ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0);
+  if (IncludeSignature) {
+    if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+      MessageSize = sizeof(SPDM_GET_MEASUREMENTS_REQUEST);
+    } else {
+      MessageSize = OFFSET_OF(SPDM_GET_MEASUREMENTS_REQUEST, SlotIDParam);
+    }
+  }
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  mCachedGetMeasurementRequestAttribute = SpdmRequest->Header.Param1;
+  mCachedGetMeasurementOperation = SpdmRequest->Header.Param2;
+
+  if (!mParamQuiteMode) {
+    if (IncludeSignature && (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11)) {
+      printf ("(Attr=0x%02x, MeasOp=0x%02x, SlotId=0x%02x) ",
+        SpdmRequest->Header.Param1,
+        SpdmRequest->Header.Param2,
+        SpdmRequest->SlotIDParam
+        );
+    } else {
+      printf ("(Attr=0x%02x, MeasOp=0x%02x) ",
+        SpdmRequest->Header.Param1,
+        SpdmRequest->Header.Param2
+        );
+    }
+  }
+
   printf ("\n");
 }
 
@@ -713,7 +863,77 @@ DumpSpdmMeasurements (
   IN UINTN   BufferSize
   )
 {
+  SPDM_MEASUREMENTS_RESPONSE  *SpdmResponse;
+  UINTN                       MessageSize;
+  UINT32                      MeasurementRecordLength;
+  UINTN                       SignatureSize;
+  UINT16                      OpaqueLength;
+  BOOLEAN                     IncludeSignature;
+
   printf ("SPDM_MEASUREMENTS ");
+
+  MessageSize = sizeof(SPDM_MEASUREMENTS_RESPONSE);
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  IncludeSignature = ((mCachedGetMeasurementRequestAttribute & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0);
+
+  SpdmResponse = Buffer;
+
+  MeasurementRecordLength = SpdmReadUint24 (SpdmResponse->MeasurementRecordLength);
+  MessageSize += MeasurementRecordLength;
+  if (BufferSize < MessageSize) {
+    printf ("\n");
+    return ;
+  }
+
+  if (IncludeSignature) {
+    SignatureSize = GetSpdmAsymSize (mSpdmContext);
+
+    MessageSize += 32 + sizeof(UINT16);
+    if (BufferSize < MessageSize) {
+      printf ("\n");
+      return ;
+    }
+
+    OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurementRecordLength + 32);
+    MessageSize += OpaqueLength + SignatureSize;
+    if (BufferSize < MessageSize) {
+      printf ("\n");
+      return ;
+    }
+  }
+
+  if (!mParamQuiteMode) {
+    if (mCachedGetMeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+      if (IncludeSignature) {
+        printf ("(SlotNum=0x%02x, TotalMeasIndex=0x%02x) ",
+          SpdmResponse->Header.Param2,
+          SpdmResponse->Header.Param1
+          );
+      } else {
+        printf ("(TotalMeasIndex=0x%02x) ",
+          SpdmResponse->Header.Param1
+          );
+      }
+    } else {
+      if (IncludeSignature) {
+        printf ("(SlotNum=0x%02x, NumOfBlocks=0x%x, MeasRecordLen=0x%x) ",
+          SpdmResponse->Header.Param2,
+          SpdmResponse->NumberOfBlocks,
+          MeasurementRecordLength
+          );
+      } else {
+        printf ("(NumOfBlocks=0x%x, MeasRecordLen=0x%x) ",
+          SpdmResponse->NumberOfBlocks,
+          MeasurementRecordLength
+          );
+      }
+    }
+  }
+
   printf ("\n");
 }
 
