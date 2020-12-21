@@ -50,11 +50,20 @@ SPDM_VENDOR_DEFINED_REQUEST_MINE  mVendorDefinedRequest = {
     0, // Param1
     0, // Param2
   },
-  SPDM_REGISTRY_ID_TEST, // StandardID
+  SPDM_REGISTRY_ID_PCISIG, // StandardID
   2, // Len
-  SPDM_TEST_VENDOR_ID_HELLO, // VendorID
-  TEST_PAYLOAD_LEN, // PayloadLength
-  {TEST_PAYLOAD_CLIENT}
+  SPDM_VENDOR_ID_PCISIG, // VendorID
+  sizeof(PCI_PROTOCOL_HEADER) + sizeof(PCI_IDE_KM_QUERY), // PayloadLength
+  {
+    PCI_PROTOCAL_ID_IDE_KM,
+  },
+  {
+    {
+      PCI_IDE_KM_OBJECT_ID_QUERY,
+    },
+    0, // Reserved
+    0, // PortIndex
+  }
 };
 
 RETURN_STATUS
@@ -82,10 +91,11 @@ DoAppSessionViaSpdm (
 
   ASSERT (ResponseSize == sizeof(SPDM_VENDOR_DEFINED_RESPONSE_MINE));
   ASSERT (Response.Header.RequestResponseCode == SPDM_VENDOR_DEFINED_RESPONSE);
-  ASSERT (Response.StandardID == SPDM_REGISTRY_ID_TEST);
-  ASSERT (Response.VendorID == SPDM_TEST_VENDOR_ID_HELLO);
-  ASSERT (Response.PayloadLength == TEST_PAYLOAD_LEN);
-  ASSERT (CompareMem (Response.VendorDefinedPayload, TEST_PAYLOAD_SERVER, TEST_PAYLOAD_LEN) == 0);
+  ASSERT (Response.StandardID == SPDM_REGISTRY_ID_PCISIG);
+  ASSERT (Response.VendorID == SPDM_VENDOR_ID_PCISIG);
+  ASSERT (Response.PayloadLength == sizeof(PCI_PROTOCOL_HEADER) + sizeof(PCI_IDE_KM_QUERY_RESP));
+  ASSERT (Response.PciProtocol.ProtocolId == PCI_PROTOCAL_ID_IDE_KM);
+  ASSERT (Response.PciIdeKmQueryResp.Header.ObjectId == PCI_IDE_KM_OBJECT_ID_QUERY_RESP);
 
   if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_MCTP) {
     AppResponseSize = sizeof(AppResponse);

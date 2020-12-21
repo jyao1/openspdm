@@ -98,11 +98,11 @@ PrintUsage (
   void
   )
 {
-  printf ("%s -r <PcapFileName>\n", "SpdmDump");
+  printf ("\n%s -r <PcapFileName>\n", "SpdmDump");
   printf ("   [-q] (quite mode, dump message type only)\n");
   printf ("   [-a] (all mode, dump all fields)\n");
   printf ("   [-n] (dump ASN.1 certificate) -- TBD\n");
-  printf ("   [-d] (dump application message) -- TBD\n");
+  printf ("   [-d] (dump application message)\n");
   printf ("   [-x] (dump message in hex)\n");
   printf ("   [--psk <pre-shared key>]\n");
   printf ("   [--dhe_secret <session DHE secret>]\n");

@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/SpdmSecuredMessage.h>
 #include <IndustryStandard/MctpBinding.h>
 #include <IndustryStandard/PciDoeBinding.h>
+#include <IndustryStandard/PciIdeKm.h>
 #include <IndustryStandard/Pcap.h>
 #include <IndustryStandard/LinkTypeEx.h>
 
@@ -165,6 +166,12 @@ DumpPldmMessage (
 
 VOID
 DumpPciDoeDiscoveryMessage (
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  );
+
+VOID
+DumpSpdmVendorPci (
   IN VOID    *Buffer,
   IN UINTN   BufferSize
   );

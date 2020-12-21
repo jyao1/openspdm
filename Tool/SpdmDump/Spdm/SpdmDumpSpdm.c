@@ -17,6 +17,24 @@ UINTN              mSpdmLastMessageBufferSize;
 UINT32             mCachedSessionId;
 SPDM_SESSION_INFO  *mCurrentSessionInfo;
 BOOLEAN            mEncapsulated;
+BOOLEAN            mDecrypted;
+
+DISPATCH_TABLE_ENTRY mSpdmVendorDispatch[] = {
+  {SPDM_REGISTRY_ID_DMTF,    "DMTF",    NULL},
+  {SPDM_REGISTRY_ID_TCG,     "TCG",     NULL},
+  {SPDM_REGISTRY_ID_USB,     "USB",     NULL},
+  {SPDM_REGISTRY_ID_PCISIG,  "PCISIG",  DumpSpdmVendorPci},
+  {SPDM_REGISTRY_ID_IANA,    "IANA",    NULL},
+  {SPDM_REGISTRY_ID_HDBASET, "HDBASET", NULL},
+  {SPDM_REGISTRY_ID_MIPI,    "MIPI",    NULL},
+  {SPDM_REGISTRY_ID_CXL,     "CXL",     NULL},
+  {SPDM_REGISTRY_ID_JEDEC,   "JEDEC",   NULL},
+};
+
+DISPATCH_TABLE_ENTRY mSecuredSpdmDispatch[] = {
+  {LINKTYPE_MCTP,    "", DumpMctpMessage},
+  {LINKTYPE_PCI_DOE, "", DumpSpdmMessage},
+};
 
 VALUE_STRING_ENTRY  mSpdmRequesterCapabilitiesStringTable[] = {
   {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP,                   "CERT"},
@@ -626,8 +644,28 @@ DumpSpdmVendorDefinedRequest (
   IN UINTN   BufferSize
   )
 {
+  SPDM_VENDOR_DEFINED_REQUEST_MSG  *SpdmRequest;
+  UINTN                            HeaderSize;
+
   printf ("SPDM_VENDOR_DEFINED_REQUEST ");
-  printf ("\n");
+
+  HeaderSize = OFFSET_OF(SPDM_VENDOR_DEFINED_REQUEST_MSG, Len);
+  if (BufferSize < HeaderSize) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmRequest = Buffer;
+
+  if (!mParamQuiteMode) {
+    printf ("(StandID=0x%04x) ", SpdmRequest->StandardID);
+  }
+
+  if (mParamDumpVendorApp) {
+    DumpDispatchMessage (mSpdmVendorDispatch, ARRAY_SIZE(mSpdmVendorDispatch), SpdmRequest->StandardID, (UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
+  } else {
+    printf ("\n");
+  }
 }
 
 VOID
@@ -636,8 +674,28 @@ DumpSpdmVendorDefinedResponse (
   IN UINTN   BufferSize
   )
 {
+  SPDM_VENDOR_DEFINED_RESPONSE_MSG  *SpdmResponse;
+  UINTN                             HeaderSize;
+
   printf ("SPDM_VENDOR_DEFINED_RESPONSE ");
-  printf ("\n");
+  
+  HeaderSize = OFFSET_OF(SPDM_VENDOR_DEFINED_REQUEST_MSG, Len);
+  if (BufferSize < HeaderSize) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmResponse = Buffer;
+
+  if (!mParamQuiteMode) {
+    printf ("(StandID=0x%04x) ", SpdmResponse->StandardID);
+  }
+
+  if (mParamDumpVendorApp) {
+    DumpDispatchMessage (mSpdmVendorDispatch, ARRAY_SIZE(mSpdmVendorDispatch), SpdmResponse->StandardID, (UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
+  } else {
+    printf ("\n");
+  }
 }
 
 VOID
@@ -1263,7 +1321,7 @@ DumpSpdmMessage (
 
   SpdmHeader = Buffer;
 
-  if (!mEncapsulated) {
+  if (!mEncapsulated && !mDecrypted) {
     if ((SpdmHeader->RequestResponseCode & 0x80) != 0) {
       printf ("REQ->RSP ");
     } else {
@@ -1281,11 +1339,6 @@ DumpSpdmMessage (
     }
   }
 }
-
-DISPATCH_TABLE_ENTRY mSecuredSpdmDispatch[] = {
-  {LINKTYPE_MCTP,    "", DumpMctpMessage},
-  {LINKTYPE_PCI_DOE, "", DumpSpdmMessage},
-};
 
 VOID
 DumpSecuredSpdmMessage (
@@ -1305,10 +1358,6 @@ DumpSecuredSpdmMessage (
   SecuredMessageHeader = Buffer;
   IsRequester = (BOOLEAN)(!IsRequester);
 
-  printf ("SecuredSPDM(0x%08x) ", SecuredMessageHeader->SessionId);
-
-  mCurrentSessionInfo = SpdmGetSessionInfoViaSessionId (mSpdmContext, SecuredMessageHeader->SessionId);
-
   MessageSize = GetMaxPacketLength();
   Status = SpdmDecodeSecuredMessage (
              mSpdmContext,
@@ -1319,9 +1368,7 @@ DumpSecuredSpdmMessage (
              &MessageSize,
              mSpdmDecMessageBuffer
              );
-  if (!RETURN_ERROR(Status)) {
-    DumpDispatchMessage (mSecuredSpdmDispatch, ARRAY_SIZE(mSecuredSpdmDispatch), GetDataLinkType(), mSpdmDecMessageBuffer, MessageSize);
-  } else {
+  if (RETURN_ERROR(Status)) {
     //
     // Try other direction, because a responder might initiate a message in Session.
     //
@@ -1336,11 +1383,28 @@ DumpSecuredSpdmMessage (
               );
     if (!RETURN_ERROR(Status)) {
       IsRequester = !IsRequester;
-      DumpDispatchMessage (mSecuredSpdmDispatch, ARRAY_SIZE(mSecuredSpdmDispatch), GetDataLinkType(), mSpdmDecMessageBuffer, MessageSize);
-    } else {
-      printf ("<Unknown>\n");
     }
   }
+
+  if (!RETURN_ERROR(Status)) {
+    mCurrentSessionInfo = SpdmGetSessionInfoViaSessionId (mSpdmContext, SecuredMessageHeader->SessionId);
+
+    if (IsRequester) {
+      printf ("REQ->RSP ");
+    } else {
+      printf ("RSP->REQ ");
+    }
+    printf ("SecuredSPDM(0x%08x) ", SecuredMessageHeader->SessionId);
+
+    mDecrypted = TRUE;
+    DumpDispatchMessage (mSecuredSpdmDispatch, ARRAY_SIZE(mSecuredSpdmDispatch), GetDataLinkType(), mSpdmDecMessageBuffer, MessageSize);
+    mDecrypted = FALSE;
+  } else {
+    printf ("<Unknown> ");
+    printf ("SecuredSPDM(0x%08x) ", SecuredMessageHeader->SessionId);
+    printf ("\n");
+  }
+
 
   if (mParamDumpHex) {
     printf ("  SecuredSPDM Message:\n");

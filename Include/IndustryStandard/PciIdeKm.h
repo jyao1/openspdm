@@ -10,18 +10,29 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define __PCI_IDE_KM_H__
 
 //
-// IDE_KM is inside of SPDM VendorDefined message with StandardId being SPDM_REGISTRY_ID_PCISIG.
+// Standard ID and Vendor ID for PCISIG
 //
 #define SPDM_STANDARD_ID_PCISIG       SPDM_REGISTRY_ID_PCISIG
-#define SPDM_VENDOR_ID_PCISIG_IDE_KM  0x0001
+#define SPDM_VENDOR_ID_PCISIG         0x0001
 
 #pragma pack(1)
+
+//
+// PCI Protocol definition
+//
+typedef struct {
+  UINT8    ProtocolId;
+} PCI_PROTOCOL_HEADER;
+
+//
+// IDE_KM Definition
+//
+#define PCI_PROTOCAL_ID_IDE_KM                     0x00
 
 //
 // IDE_KM header
 //
 typedef struct {
-  UINT8    ProtocolId;
   UINT8    ObjectId;
 } PCI_IDE_KM_HEADER;
 

@@ -13,18 +13,31 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 VOID                              *mSpdmContext;
 
-SPDM_VENDOR_DEFINED_REQUEST_MINE  mVendorDefinedResponse = {
+SPDM_VENDOR_DEFINED_RESPONSE_MINE  mVendorDefinedResponse = {
   {
     SPDM_MESSAGE_VERSION_10,
     SPDM_VENDOR_DEFINED_RESPONSE,
     0, // Param1
     0, // Param2
   },
-  SPDM_REGISTRY_ID_TEST, // StandardID
+  SPDM_REGISTRY_ID_PCISIG, // StandardID
   2, // Len
-  SPDM_TEST_VENDOR_ID_HELLO, // VendorID
-  TEST_PAYLOAD_LEN, // PayloadLength
-  {TEST_PAYLOAD_SERVER}
+  SPDM_VENDOR_ID_PCISIG, // VendorID
+  sizeof(PCI_PROTOCOL_HEADER) + sizeof(PCI_IDE_KM_QUERY_RESP), // PayloadLength
+  {
+    PCI_PROTOCAL_ID_IDE_KM,
+  },
+  {
+    {
+      PCI_IDE_KM_OBJECT_ID_QUERY_RESP,
+    },
+    0, // Reserved
+    0, // PortIndex
+    0, // DevFuncNum
+    0, // BusNum
+    0, // Segment
+    7, // MaxPortIndex
+  }
 };
 
 extern UINT32 mCommand;
@@ -79,10 +92,11 @@ TestSpdmProcessPacketCallback (
     SpmdRequest = Request;
     ASSERT ((RequestSize >= sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE)) && (RequestSize < sizeof(SPDM_VENDOR_DEFINED_REQUEST_MINE) + 4));
     ASSERT (SpmdRequest->Header.RequestResponseCode == SPDM_VENDOR_DEFINED_REQUEST);
-    ASSERT (SpmdRequest->StandardID == SPDM_REGISTRY_ID_TEST);
-    ASSERT (SpmdRequest->VendorID == SPDM_TEST_VENDOR_ID_HELLO);
-    ASSERT (SpmdRequest->PayloadLength == TEST_PAYLOAD_LEN);
-    ASSERT (CompareMem (SpmdRequest->VendorDefinedPayload, TEST_PAYLOAD_CLIENT, TEST_PAYLOAD_LEN) == 0);
+    ASSERT (SpmdRequest->StandardID == SPDM_REGISTRY_ID_PCISIG);
+    ASSERT (SpmdRequest->VendorID == SPDM_VENDOR_ID_PCISIG);
+    ASSERT (SpmdRequest->PayloadLength == sizeof(PCI_PROTOCOL_HEADER) + sizeof(PCI_IDE_KM_QUERY));
+    ASSERT (SpmdRequest->PciProtocol.ProtocolId == PCI_PROTOCAL_ID_IDE_KM);
+    ASSERT (SpmdRequest->PciIdeKmQuery.Header.ObjectId == PCI_IDE_KM_OBJECT_ID_QUERY);
 
     CopyMem (Response, &mVendorDefinedResponse, sizeof(mVendorDefinedResponse));
     *ResponseSize = sizeof(mVendorDefinedResponse);

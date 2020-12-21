@@ -79,7 +79,7 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
          [-q] (quite mode, dump message type only)
          [-a] (all mode, dump all fields)
          [-n] (dump ASN.1 certificate) -- TBD
-         [-d] (dump application message) -- TBD
+         [-d] (dump application message)
          [-x] (dump message in hex)
          [--psk <pre-shared key>]
          [--dhe_secret <session DHE secret>]

@@ -29,12 +29,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SOCKET_SPDM_COMMAND_TEST     0xDEAD
 
 //
-// Vendor Hello
+// Vendor Message
 //
 #pragma pack(1)
-
-#define SPDM_REGISTRY_ID_TEST         0xEE
-#define SPDM_TEST_VENDOR_ID_HELLO   0x5AA5
 
 #define TEST_PAYLOAD_CLIENT "Hello Server!"
 #define TEST_PAYLOAD_SERVER "Hello Client!"
@@ -50,21 +47,23 @@ typedef struct {
   UINT8                Len;
   UINT16               VendorID;
   UINT16               PayloadLength;
-  UINT8                VendorDefinedPayload[TEST_PAYLOAD_LEN];
+  PCI_PROTOCOL_HEADER  PciProtocol;
+  PCI_IDE_KM_QUERY     PciIdeKmQuery;
 } SPDM_VENDOR_DEFINED_REQUEST_MINE;
 
 ///
 /// SPDM VENDOR_DEFINED response
 ///
 typedef struct {
-  SPDM_MESSAGE_HEADER  Header;
+  SPDM_MESSAGE_HEADER    Header;
   // Param1 == RSVD
   // Param2 == RSVD
-  UINT16               StandardID;
-  UINT8                Len;
-  UINT16               VendorID;
-  UINT16               PayloadLength;
-  UINT8                VendorDefinedPayload[TEST_PAYLOAD_LEN];
+  UINT16                 StandardID;
+  UINT8                  Len;
+  UINT16                 VendorID;
+  UINT16                 PayloadLength;
+  PCI_PROTOCOL_HEADER    PciProtocol;
+  PCI_IDE_KM_QUERY_RESP  PciIdeKmQueryResp;
 } SPDM_VENDOR_DEFINED_RESPONSE_MINE;
 
 #pragma pack()

@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/SpdmCommonLib.h>
 #include <IndustryStandard/MctpBinding.h>
+#include <IndustryStandard/PciIdeKm.h>
 
 #include "OsInclude.h"
 #include "stdio.h"
