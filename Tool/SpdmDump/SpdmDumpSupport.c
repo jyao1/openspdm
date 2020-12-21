@@ -219,3 +219,20 @@ WriteOutputFile (
 
   return TRUE;
 }
+
+BOOLEAN
+OpenOutputFile (
+  IN CHAR8   *FileName
+  )
+{
+  FILE                        *FpOut;
+
+  if ((FpOut = fopen (FileName, "w+b")) == NULL) {
+    printf ("Unable to open file %s\n", FileName);
+    return FALSE;
+  }
+
+  fclose (FpOut);
+
+  return TRUE;
+}

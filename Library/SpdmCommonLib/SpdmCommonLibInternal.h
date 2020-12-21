@@ -108,7 +108,7 @@ typedef struct {
   //
   // Peer CertificateChain
   //
-  UINT8                           PeerCertChainBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINT8                           PeerCertChainBuffer[MAX_SPDM_CERT_CHAIN_SIZE];
   UINTN                           PeerCertChainBufferSize;
   //
   // Local Used CertificateChain (for responder, or requester in mut auth)

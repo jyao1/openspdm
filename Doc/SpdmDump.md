@@ -19,13 +19,14 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
       SpdmDump -r <PcapFileName>
          [-q] (quite mode, dump message type only)
          [-a] (all mode, dump all fields)
-         [-n] (dump ASN.1 certificate) -- TBD
          [-d] (dump application message)
          [-x] (dump message in hex)
          [--psk <pre-shared key>]
          [--dhe_secret <session DHE secret>]
-         [--req_cert_chain <requester public cert chain file>]
-         [--rsp_cert_chain <responder public cert chain file>]
+         [--req_cert_chain <input requester public cert chain file>]
+         [--rsp_cert_chain <input responder public cert chain file>]
+         [--out_req_cert_chain <output requester public cert chain file>]
+         [--out_rsp_cert_chain <output responder public cert chain file>]
 
       NOTE:
          [--psk] is required to decrypt a PSK session
@@ -35,8 +36,10 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
                   '0123CDEF' means 4 bytes 0x01, 0x23, 0xCD, 0xEF,
                   where 0x01 is the first byte and 0xEF is the last byte in memory
 
-         [--req_cert_chain] is required to if GET_CERTIFICATE is not sent
-         [--rsp_cert_chain] is required to if encapsulated GET_CERTIFICATE is not sent
+         [--req_cert_chain] is required to if encapsulated GET_CERTIFICATE is not sent
+         [--rsp_cert_chain] is required to if GET_CERTIFICATE is not sent
+         [--out_req_cert_chain] can be used to if encapsulated GET_CERTIFICATE is sent
+         [--out_rsp_cert_chain] can be used to if GET_CERTIFICATE is sent
             Format: A file containing certificates defined in SPDM spec 'certificate chain fomrat'.
                   It is one or more ASN.1 DER-encoded X.509 v3 certificates.
                   It may include multiple certificates, starting from root cert to leaf cert.
@@ -110,7 +113,7 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
       ......
    </pre>
 
-2. In order to dump the SPDM secure session, you need use `--psk` or `--dhe_secret`. `--req_cert_chain` and `--rsp_cert_chain` is also needed if GET_CERTIFICATE is not sent.
+2. In order to dump the SPDM secure session, you need use `--psk` or `--dhe_secret`.
 
    The DHE secret can be found from SPDM debug message.
    Take [SpdmOsTest](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmOsTest.md) tool as an example, a user may use `SpdmRequesterEmu --pcap SpdmRequester.pcap > SpdmRequester.log` or `SpdmResponderEmu --pcap SpdmResponder.pcap > SpdmResponder.log` to get the PCAP file and the log file, search "\[DHE Secret\]" or "\[PSK\]" in the log file to get the HEX string.
@@ -121,7 +124,7 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
    [PSK]: 5465737450736b4461746100
    ```
 
-   Then the user may use command `SpdmDump -r SpdmRequester.pcap --psk 5465737450736b4461746100 --dhe_secret c7ac17ee29b6a4f84e978223040b7eddff792477a6f7fc0f51faa553fee58175 --req_cert_chain Rsa2048/bundle_requester.certchain.der --rsp_cert_chain EcP256/bundle_responder.certchain.der`
+   Then the user may use command `SpdmDump -r SpdmRequester.pcap --psk 5465737450736b4461746100 --dhe_secret c7ac17ee29b6a4f84e978223040b7eddff792477a6f7fc0f51faa553fee58175`
 
    A full SPDM log is like below:
 
@@ -173,7 +176,15 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
       82 (1608538701) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0x6c) SPDM_END_SESSION_ACK
    </pre>
 
-3. By default, SpdmDump only displays SPDM messge. If you want to dump other application message, you need use `-d`.
+3. If GET_CERTIFICATE or encapsulated GET_CERTIFICATE is not sent, the user need use `--rsp_cert_chain` or `--req_cert_chain` to indicate the responder certificate chain or the requester certificate chain, to dump the secured session data.
+
+   For example, `SpdmDump -r SpdmRequester.pcap --psk 5465737450736b4461746100 --dhe_secret c7ac17ee29b6a4f84e978223040b7eddff792477a6f7fc0f51faa553fee58175 --req_cert_chain Rsa2048/bundle_requester.certchain.der --rsp_cert_chain EcP256/bundle_responder.certchain.der`
+
+   If GET_CERTIFICATE or encapsulated GET_CERTIFICATE is sent, the user may use `--out_rsp_cert_chain` or `--out_req_cert_chain` to get the responder certificate chain or the requester certificate chain.
+   
+   Then the user may use other tool to view the certificate chain, such as `openssl x509 -in cert.der -inform der -noout -text` or `openssl asn1parse -in cert.der -inform der`.
+
+4. By default, SpdmDump only displays SPDM messge. If you want to dump other application message, you need use `-d`.
 
    Then you can see the MCTP message, such as:
 
@@ -207,7 +218,7 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
       ......
    </pre>
 
-4. You can also choose different dump level. By default, SpdmDump dumps most important fields. `-q` means quite mode, which only dumps header. `-a` means all mode, which dumps all fields as well as detailed parsing.
+5. You can also choose different dump level. By default, SpdmDump dumps most important fields. `-q` means quite mode, which only dumps header. `-a` means all mode, which dumps all fields as well as detailed parsing.
 
    Below is default dump:
 

@@ -19,6 +19,10 @@ SPDM_SESSION_INFO  *mCurrentSessionInfo;
 BOOLEAN            mEncapsulated;
 BOOLEAN            mDecrypted;
 
+VOID               *mSpdmCertChainBuffer;
+UINTN              mSpdmCertChainBufferSize;
+UINTN              mCachedSpdmCertChainBufferOffset;
+
 DISPATCH_TABLE_ENTRY mSpdmVendorDispatch[] = {
   {SPDM_REGISTRY_ID_DMTF,    "DMTF",    NULL},
   {SPDM_REGISTRY_ID_TCG,     "TCG",     NULL},
@@ -564,7 +568,27 @@ DumpSpdmGetCertificate (
   IN UINTN   BufferSize
   )
 {
+  SPDM_GET_CERTIFICATE_REQUEST  *SpdmRequest;
+
   printf ("SPDM_GET_CERTIFICATE ");
+
+  if (BufferSize < sizeof(SPDM_GET_CERTIFICATE_REQUEST)) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmRequest = Buffer;
+
+  if (!mParamQuiteMode) {
+    printf ("(SlotNum=0x%02x, Offset=0x%x, Length=0x%x) ",
+      SpdmRequest->Header.Param1,
+      SpdmRequest->Offset,
+      SpdmRequest->Length
+      );
+  }
+
+  mCachedSpdmCertChainBufferOffset = SpdmRequest->Offset;
+
   printf ("\n");
 }
 
@@ -574,7 +598,82 @@ DumpSpdmCertificate (
   IN UINTN   BufferSize
   )
 {
+  SPDM_CERTIFICATE_RESPONSE  *SpdmResponse;
+  VOID                       *CertChain;
+  UINTN                      CertChainSize;
+  UINTN                      HashSize;
+
   printf ("SPDM_CERTIFICATE ");
+
+  if (BufferSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmResponse = Buffer;
+  if (SpdmResponse->PortionLength > BufferSize - sizeof(SPDM_CERTIFICATE_RESPONSE)) {
+    printf ("\n");
+    return ;
+  }
+
+  if (!mParamQuiteMode) {
+    printf ("(SlotNum=0x%02x, PortLen=0x%x, RemLen=0x%x) ",
+      SpdmResponse->Header.Param1,
+      SpdmResponse->PortionLength,
+      SpdmResponse->RemainderLength
+      );
+  }
+
+  if (mCachedSpdmCertChainBufferOffset + SpdmResponse->PortionLength > MAX_SPDM_CERT_CHAIN_SIZE) {
+    printf ("SPDM cert_chain is too larger. Please increase MAX_SPDM_CERT_CHAIN_SIZE and rebuild.\n");
+    exit (0);
+  }
+  memcpy (
+    (UINT8 *)mSpdmCertChainBuffer + mCachedSpdmCertChainBufferOffset,
+    (SpdmResponse + 1),
+    SpdmResponse->PortionLength
+    );
+  mSpdmCertChainBufferSize = mCachedSpdmCertChainBufferOffset + SpdmResponse->PortionLength;
+
+  if (SpdmResponse->RemainderLength == 0) {
+    HashSize = GetSpdmHashSize (mSpdmContext);
+    if (mSpdmCertChainBufferSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
+      printf ("\n");
+      return ;
+    }
+
+    CertChain = (UINT8 *)mSpdmCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+    CertChainSize = mSpdmCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+
+    if (mEncapsulated) {
+      if (mParamOutReqCertChainFileName != NULL) {
+        if (!WriteOutputFile (mParamOutReqCertChainFileName, CertChain, CertChainSize)) {
+          printf ("Fail to write out_req_cert_chain\n");
+        }
+      }
+      if (mRequesterCertChainBuffer == NULL || mRequesterCertChainBufferSize == 0) {
+        mRequesterCertChainBuffer = malloc (CertChainSize);
+        if (mRequesterCertChainBuffer != NULL) {
+          memcpy (mRequesterCertChainBuffer, CertChain, CertChainSize);
+          mRequesterCertChainBufferSize = CertChainSize;
+        }
+      }
+    } else {
+      if (mParamOutRspCertChainFileName != NULL) {
+        if (!WriteOutputFile (mParamOutRspCertChainFileName, CertChain, CertChainSize)) {
+          printf ("Fail to write out_rsp_cert_chain\n");
+        }
+      }
+      if (mResponderCertChainBuffer == NULL || mResponderCertChainBufferSize == 0) {
+        mResponderCertChainBuffer = malloc (CertChainSize);
+        if (mResponderCertChainBuffer != NULL) {
+          memcpy (mResponderCertChainBuffer, CertChain, CertChainSize);
+          mResponderCertChainBufferSize = CertChainSize;
+        }
+      }
+    }
+  }
+
   printf ("\n");
 }
 
@@ -1430,6 +1529,11 @@ InitSpdmDump (
     printf ("!!!memory out of resources!!!\n");
     goto Error;
   }
+  mSpdmCertChainBuffer = (VOID *)malloc (MAX_SPDM_CERT_CHAIN_SIZE);
+  if (mSpdmCertChainBuffer == NULL) {
+    printf ("!!!memory out of resources!!!\n");
+    goto Error;
+  }
 
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   if (mSpdmContext == NULL) {
@@ -1439,7 +1543,7 @@ InitSpdmDump (
   SpdmInitContext (mSpdmContext);
 
   SpdmContext = mSpdmContext;
-  SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = (VOID *)malloc (MAX_SPDM_MESSAGE_BUFFER_SIZE);
+  SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = (VOID *)malloc (MAX_SPDM_CERT_CHAIN_SIZE);
   if (SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) {
     printf ("!!!memory out of resources!!!\n");
     goto Error;
@@ -1455,6 +1559,10 @@ Error:
   if (mSpdmLastMessageBuffer != NULL) {
     free (mSpdmLastMessageBuffer);
     mSpdmLastMessageBuffer = NULL;
+  }
+  if (mSpdmCertChainBuffer != NULL) {
+    free (mSpdmCertChainBuffer);
+    mSpdmCertChainBuffer = NULL;
   }
   if (mSpdmContext != NULL) {
     if (SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) {
@@ -1474,6 +1582,7 @@ DeinitSpdmDump (
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   free (mSpdmDecMessageBuffer);
   free (mSpdmLastMessageBuffer);
+  free (mSpdmCertChainBuffer);
 
   SpdmContext = mSpdmContext;
   if (SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) {

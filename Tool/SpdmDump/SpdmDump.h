@@ -211,11 +211,24 @@ ReadInputFile (
   OUT UINTN   *FileSize
   );
 
+BOOLEAN
+WriteOutputFile (
+  IN CHAR8   *FileName,
+  IN VOID    *FileData,
+  IN UINTN   FileSize
+  );
+
+BOOLEAN
+OpenOutputFile (
+  IN CHAR8   *FileName
+  );
+
 extern BOOLEAN  mParamQuiteMode;
 extern BOOLEAN  mParamAllMode;
-extern BOOLEAN  mParamDumpAsn1;
 extern BOOLEAN  mParamDumpVendorApp;
 extern BOOLEAN  mParamDumpHex;
+extern CHAR8    *mParamOutRspCertChainFileName;
+extern CHAR8    *mParamOutReqCertChainFileName;
 
 extern VOID    *mRequesterCertChainBuffer;
 extern UINTN   mRequesterCertChainBufferSize;
