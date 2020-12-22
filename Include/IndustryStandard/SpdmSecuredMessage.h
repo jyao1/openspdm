@@ -60,7 +60,7 @@ typedef struct {
 //
 // Secured Messages opaque data format
 //
-#define SECURED_MESSAGE_OPAQUE_DATA_SPEC_ID  0x444D546
+#define SECURED_MESSAGE_OPAQUE_DATA_SPEC_ID  0x444D5446
 #define SECURED_MESSAGE_OPAQUE_VERSION       0x1
 
 typedef struct {
