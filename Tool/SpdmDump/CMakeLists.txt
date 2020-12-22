@@ -14,6 +14,7 @@ SET(src_SpdmDump
     SpdmDumpSession.c
     SpdmDumpSupport.c
     Spdm/SpdmDumpSpdm.c
+    Spdm/SpdmDumpSecuredSpdm.c
     Mctp/MctpDump.c
     Mctp/Pldm/MctpDumpPldm.c
     Pci/PciDoeDump.c

@@ -38,6 +38,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmDumpSession.obj \
     $(OUTPUT_DIR)\SpdmDumpSupport.obj \
     $(OUTPUT_DIR)\SpdmDumpSpdm.obj \
+    $(OUTPUT_DIR)\SpdmDumpSecuredSpdm.obj \
     $(OUTPUT_DIR)\MctpDump.obj \
     $(OUTPUT_DIR)\MctpDumpPldm.obj \
     $(OUTPUT_DIR)\PciDoeDump.obj \
@@ -138,6 +139,9 @@ $(OUTPUT_DIR)\SpdmDumpSupport.obj : $(SOURCE_DIR)\SpdmDumpSupport.c
 
 $(OUTPUT_DIR)\SpdmDumpSpdm.obj : $(SOURCE_DIR)\Spdm\SpdmDumpSpdm.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Spdm\SpdmDumpSpdm.c
+
+$(OUTPUT_DIR)\SpdmDumpSecuredSpdm.obj : $(SOURCE_DIR)\Spdm\SpdmDumpSecuredSpdm.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Spdm\SpdmDumpSecuredSpdm.c
 
 $(OUTPUT_DIR)\MctpDump.obj : $(SOURCE_DIR)\Mctp\MctpDump.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Mctp\MctpDump.c

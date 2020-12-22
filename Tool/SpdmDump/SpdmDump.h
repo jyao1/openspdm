@@ -167,6 +167,12 @@ DumpSecuredSpdmMessage (
   );
 
 VOID
+DumpSpdmOpaqueData (
+  IN UINT8    *OpaqueData,
+  IN UINT16   OpaqueLength
+  );
+
+VOID
 DumpPldmMessage (
   IN VOID    *Buffer,
   IN UINTN   BufferSize
