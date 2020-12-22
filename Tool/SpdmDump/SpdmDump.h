@@ -63,6 +63,13 @@ typedef struct {
 } VALUE_STRING_ENTRY;
 
 VOID
+DumpEntryFlagsAll (
+  IN VALUE_STRING_ENTRY  *EntryTable,
+  IN UINTN               EntryTableCount,
+  IN UINT32              Flags
+  );
+
+VOID
 DumpEntryFlags (
   IN VALUE_STRING_ENTRY  *EntryTable,
   IN UINTN               EntryTableCount,

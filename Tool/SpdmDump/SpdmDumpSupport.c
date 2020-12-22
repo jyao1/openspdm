@@ -43,7 +43,10 @@ DumpData (
   UINTN  Index;
 
   for (Index = 0; Index < Size; Index++) {
-    printf ("%02x ", Data[Index]);
+    if (Index != 0) {
+      printf (" ");
+    }
+    printf ("%02x", Data[Index]);
   }
 }
 

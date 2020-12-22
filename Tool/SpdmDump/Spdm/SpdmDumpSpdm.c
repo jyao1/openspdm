@@ -129,6 +129,48 @@ VALUE_STRING_ENTRY  mSpdmKeyScheduleValueStringTable[] = {
   {SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH,        "HMAC_HASH"},
 };
 
+VALUE_STRING_ENTRY  mSpdmMeasurementSpecValueStringTable[] = {
+  {SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,        "DMTF"},
+};
+
+VALUE_STRING_ENTRY  mSpdmMeasurementTypeValueStringTable[] = {
+  {SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_IMMUTABLE_ROM,          "ImmutableROM"},
+  {SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MUTABLE_FIRMWARE,       "MutableFirmware"},
+  {SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_HARDWARE_CONFIGURATION, "HardwareConfig"},
+  {SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_FIRMWARE_CONFIGURATION, "FirmwareConfig"},
+  {SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MEASUREMENT_MANIFEST,   "Manifest"},
+};
+
+VALUE_STRING_ENTRY  mSpdmRequestHashTypeStringTable[] = {
+  {SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH,    "NoHash"},
+  {SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH, "TcbHash"},
+  {SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH,          "AllHash"},
+};
+
+VALUE_STRING_ENTRY  mSpdmMeasurementAttributeStringTable[] = {
+  {SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE, "GenSig"},
+};
+
+VALUE_STRING_ENTRY  mSpdmChallengeAuthAttributeStringTable[] = {
+  {SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE_BASIC_MUT_AUTH_REQ, "BasicMutAuth"},
+};
+
+VALUE_STRING_ENTRY  mSpdmKeyExchangeMutAuthStringTable[] = {
+  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED,                    "Requested"},
+  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST, "WithEncap"},
+  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS,   "WithGetDigests"},
+};
+
+VALUE_STRING_ENTRY  mSpdmKeyUpdateOperationStringTable[] = {
+  {SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY,      "UpdateKey"},
+  {SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS, "UpdateAllkeys"},
+  {SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY,  "VerifyNewKey"},
+};
+
+VALUE_STRING_ENTRY  mSpdmEndSessionAttributeStringTable[] = {
+  {SPDM_END_SESSION_REQUEST_ATTRIBUTES_PRESERVE_NEGOTIATED_STATE, "PreserveState"},
+};
+
 VOID
 DumpSpdmGetVersion (
   IN VOID    *Buffer,
@@ -238,12 +280,12 @@ DumpSpdmGetCapabilities (
 
   if (!mParamQuiteMode) {
     if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
-      printf ("(Flags=0x%08x) ", SpdmRequest->Flags);
+      printf ("(Flags=0x%08x, CTExponent=0x%02x) ", SpdmRequest->Flags, SpdmRequest->CTExponent);
 
       if (mParamAllMode) {
         printf ("\n    Flags(");
-        DumpEntryFlags (mSpdmRequesterCapabilitiesStringTable, ARRAY_SIZE(mSpdmRequesterCapabilitiesStringTable), SpdmRequest->Flags);
-        printf (") ");
+        DumpEntryFlagsAll (mSpdmRequesterCapabilitiesStringTable, ARRAY_SIZE(mSpdmRequesterCapabilitiesStringTable), SpdmRequest->Flags);
+        printf (")");
       }
     } else {
       printf ("() ");
@@ -277,12 +319,12 @@ DumpSpdmCapabilities (
   SpdmResponse = Buffer;
 
   if (!mParamQuiteMode) {
-    printf ("(Flags=0x%08x) ", SpdmResponse->Flags);
+    printf ("(Flags=0x%08x, CTExponent=0x%02x) ", SpdmResponse->Flags, SpdmResponse->CTExponent);
 
     if (mParamAllMode) {
       printf ("\n    Flags(");
-      DumpEntryFlags (mSpdmResponderCapabilitiesStringTable, ARRAY_SIZE(mSpdmResponderCapabilitiesStringTable), SpdmResponse->Flags);
-      printf (") ");
+      DumpEntryFlagsAll (mSpdmResponderCapabilitiesStringTable, ARRAY_SIZE(mSpdmResponderCapabilitiesStringTable), SpdmResponse->Flags);
+      printf (")");
     }
   }
 
@@ -323,10 +365,12 @@ DumpSpdmNegotiateAlgorithms (
   }
 
   if (!mParamQuiteMode) {
-    printf ("(Hash=0x%08x, Asym=0x%08x",
-      SpdmRequest->BaseHashAlgo,
-      SpdmRequest->BaseAsymAlgo
-      );
+    printf ("(MeasSpec=0x%02x(", SpdmRequest->MeasurementSpecification);
+    DumpEntryFlags (mSpdmMeasurementSpecValueStringTable, ARRAY_SIZE(mSpdmMeasurementSpecValueStringTable), SpdmRequest->MeasurementSpecification);
+    printf ("), Hash=0x%08x(", SpdmRequest->BaseHashAlgo);
+    DumpEntryFlags (mSpdmHashValueStringTable, ARRAY_SIZE(mSpdmHashValueStringTable), SpdmRequest->BaseHashAlgo);
+    printf ("), Asym=0x%08x(", SpdmRequest->BaseAsymAlgo);
+    DumpEntryFlags (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), SpdmRequest->BaseAsymAlgo);
 
     if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
       StructTable = (VOID *)((UINTN)Buffer +
@@ -337,63 +381,29 @@ DumpSpdmNegotiateAlgorithms (
       for (Index = 0; Index <SpdmRequest->Header.Param1; Index++) {
         switch (StructTable[Index].AlgType) {
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-          printf (", DHE=0x%04x", StructTable[Index].AlgSupported);
+          printf ("), DHE=0x%04x(", StructTable[Index].AlgSupported);
+          DumpEntryFlags (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable[Index].AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-          printf (", AEAD=0x%04x", StructTable[Index].AlgSupported);
+          printf ("), AEAD=0x%04x(", StructTable[Index].AlgSupported);
+          DumpEntryFlags (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable[Index].AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-          printf (", ReqAsym=0x%04x", StructTable[Index].AlgSupported);
+          printf ("), ReqAsym=0x%04x(", StructTable[Index].AlgSupported);
+          DumpEntryFlags (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable[Index].AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-          printf (", KeySchedule=0x%04x", StructTable[Index].AlgSupported);
+          printf ("), KeySchedule=0x%04x(", StructTable[Index].AlgSupported);
+          DumpEntryFlags (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable[Index].AlgSupported);
           break;
         }
       }
     }
-    printf (") ");
+    printf (")) ");
 
     if (mParamAllMode) {
-      printf ("\n    Hash(");
-      DumpEntryFlags (mSpdmHashValueStringTable, ARRAY_SIZE(mSpdmHashValueStringTable), SpdmRequest->BaseHashAlgo);
-      printf (") ");
-      printf ("\n    Asym(");
-      DumpEntryFlags (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), SpdmRequest->BaseAsymAlgo);
-      printf (") ");
-
-      if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
-        StructTable = (VOID *)((UINTN)Buffer +
-                                sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) +
-                                SpdmRequest->ExtAsymCount * sizeof(SPDM_EXTENDED_ALGORITHM) +
-                                SpdmRequest->ExtHashCount * sizeof(SPDM_EXTENDED_ALGORITHM)
-                                );
-        for (Index = 0; Index <SpdmRequest->Header.Param1; Index++) {
-          switch (StructTable[Index].AlgType) {
-          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-            printf ("\n    DHE(");
-            DumpEntryFlags (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable[Index].AlgSupported);
-            printf (") ");
-            break;
-          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-            printf ("\n    AEAD(");
-            DumpEntryFlags (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable[Index].AlgSupported);
-            printf (") ");
-            break;
-          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-            printf ("\n    ReqAsym(");
-            DumpEntryFlags (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable[Index].AlgSupported);
-            printf (") ");
-            break;
-          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-            printf ("\n    KeySchedule(");
-            DumpEntryFlags (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable[Index].AlgSupported);
-            printf (") ");
-            break;
-          }
-        }
-      }
+      printf ("\n    ExtHashCount(0x%02x) ExtAsymCount(0x%02x)", SpdmRequest->ExtHashCount, SpdmRequest->ExtAsymCount);
     }
-
   }
 
   printf ("\n");
@@ -432,11 +442,14 @@ DumpSpdmAlgorithms (
   }
 
   if (!mParamQuiteMode) {
-    printf ("(Hash=0x%08x, MeasHash=0x%08x, Asym=0x%08x",
-      SpdmResponse->BaseHashSel,
-      SpdmResponse->MeasurementHashAlgo,
-      SpdmResponse->BaseAsymSel
-      );
+    printf ("(MeasSpec=0x%02x(", SpdmResponse->MeasurementSpecificationSel);
+    DumpEntryValue (mSpdmMeasurementSpecValueStringTable, ARRAY_SIZE(mSpdmMeasurementSpecValueStringTable), SpdmResponse->MeasurementSpecificationSel);
+    printf ("), Hash=0x%08x(", SpdmResponse->BaseHashSel);
+    DumpEntryValue (mSpdmHashValueStringTable, ARRAY_SIZE(mSpdmHashValueStringTable), SpdmResponse->BaseHashSel);
+    printf ("), MeasHash=0x%08x(", SpdmResponse->MeasurementHashAlgo);
+    DumpEntryValue (mSpdmMeasurementHashValueStringTable, ARRAY_SIZE(mSpdmMeasurementHashValueStringTable), SpdmResponse->MeasurementHashAlgo);
+    printf ("), Asym=0x%08x(", SpdmResponse->BaseAsymSel);
+    DumpEntryValue (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), SpdmResponse->BaseAsymSel);
 
     if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
       StructTable = (VOID *)((UINTN)Buffer +
@@ -447,66 +460,29 @@ DumpSpdmAlgorithms (
       for (Index = 0; Index <SpdmResponse->Header.Param1; Index++) {
         switch (StructTable[Index].AlgType) {
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-          printf (", DHE=0x%04x", StructTable[Index].AlgSupported);
+          printf ("), DHE=0x%04x(", StructTable[Index].AlgSupported);
+          DumpEntryValue (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable[Index].AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-          printf (", AEAD=0x%04x", StructTable[Index].AlgSupported);
+          printf ("), AEAD=0x%04x(", StructTable[Index].AlgSupported);
+          DumpEntryValue (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable[Index].AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-          printf (", ReqAsym=0x%04x", StructTable[Index].AlgSupported);
+          printf ("), ReqAsym=0x%04x(", StructTable[Index].AlgSupported);
+          DumpEntryValue (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable[Index].AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-          printf (", KeySchedule=0x%04x", StructTable[Index].AlgSupported);
+          printf ("), KeySchedule=0x%04x(", StructTable[Index].AlgSupported);
+          DumpEntryValue (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable[Index].AlgSupported);
           break;
         }
       }
     }
-    printf (") ");
+    printf (")) ");
 
     if (mParamAllMode) {
-      printf ("\n    Hash(");
-      DumpEntryValue (mSpdmHashValueStringTable, ARRAY_SIZE(mSpdmHashValueStringTable), SpdmResponse->BaseHashSel);
-      printf (") ");
-      printf ("\n    MeasHash(");
-      DumpEntryValue (mSpdmMeasurementHashValueStringTable, ARRAY_SIZE(mSpdmMeasurementHashValueStringTable), SpdmResponse->MeasurementHashAlgo);
-      printf (") ");
-      printf ("\n    Asym(");
-      DumpEntryValue (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), SpdmResponse->BaseAsymSel);
-      printf (") ");
-
-      if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
-        StructTable = (VOID *)((UINTN)Buffer +
-                                sizeof(SPDM_ALGORITHMS_RESPONSE) +
-                                SpdmResponse->ExtAsymSelCount * sizeof(SPDM_EXTENDED_ALGORITHM) +
-                                SpdmResponse->ExtHashSelCount * sizeof(SPDM_EXTENDED_ALGORITHM)
-                                );
-        for (Index = 0; Index <SpdmResponse->Header.Param1; Index++) {
-          switch (StructTable[Index].AlgType) {
-          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-            printf ("\n    DHE(");
-            DumpEntryValue (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable[Index].AlgSupported);
-            printf (") ");
-            break;
-          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-            printf ("\n    AEAD(");
-            DumpEntryValue (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable[Index].AlgSupported);
-            printf (") ");
-            break;
-          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-            printf ("\n    ReqAsym(");
-            DumpEntryValue (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable[Index].AlgSupported);
-            printf (") ");
-            break;
-          case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-            printf ("\n    KeySchedule(");
-            DumpEntryValue (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable[Index].AlgSupported);
-            printf (") ");
-            break;
-          }
-        }
-      }
+      printf ("\n    ExtHashCount(0x%02x) ExtAsymCount(0x%02x)", SpdmResponse->ExtHashSelCount, SpdmResponse->ExtAsymSelCount);
     }
-
   }
 
   printf ("\n");
@@ -578,6 +554,7 @@ DumpSpdmDigests (
   UINTN                  HashSize;
   UINTN                  SlotCount;
   UINTN                  Index;
+  UINT8                  *Digest;
 
   printf ("SPDM_DIGESTS ");
 
@@ -606,6 +583,16 @@ DumpSpdmDigests (
 
   if (!mParamQuiteMode) {
     printf ("(SlotMask=0x%02x) ", SpdmResponse->Header.Param2);
+
+    if (mParamAllMode) {
+      Digest = (VOID *)(SpdmResponse + 1);
+      for (Index = 0; Index < SlotCount; Index++) {
+        printf ("\n    Digest_%d(", (UINT32)Index);
+        DumpData (Digest, HashSize);
+        printf (")");
+        Digest += HashSize;
+      }
+    }
   }
 
   printf ("\n");
@@ -631,11 +618,7 @@ DumpSpdmGetCertificate (
   SpdmRequest = Buffer;
 
   if (!mParamQuiteMode) {
-    printf ("(SlotNum=0x%02x, Offset=0x%x, Length=0x%x) ",
-      SpdmRequest->Header.Param1,
-      SpdmRequest->Offset,
-      SpdmRequest->Length
-      );
+    printf ("(SlotID=0x%02x, Offset=0x%x, Length=0x%x) ", SpdmRequest->Header.Param1, SpdmRequest->Offset, SpdmRequest->Length);
   }
 
   mCachedSpdmCertChainBufferOffset = SpdmRequest->Offset;
@@ -654,6 +637,8 @@ DumpSpdmCertificate (
   VOID                       *CertChain;
   UINTN                      CertChainSize;
   UINTN                      HashSize;
+  SPDM_CERT_CHAIN            *SpdmCertChain;
+  UINT8                      *RootHash;
 
   printf ("SPDM_CERTIFICATE ");
 
@@ -671,11 +656,7 @@ DumpSpdmCertificate (
   }
 
   if (!mParamQuiteMode) {
-    printf ("(SlotNum=0x%02x, PortLen=0x%x, RemLen=0x%x) ",
-      SpdmResponse->Header.Param1,
-      SpdmResponse->PortionLength,
-      SpdmResponse->RemainderLength
-      );
+    printf ("(SlotID=0x%02x, PortLen=0x%x, RemLen=0x%x) ", SpdmResponse->Header.Param1, SpdmResponse->PortionLength, SpdmResponse->RemainderLength);
   }
 
   if (mCachedSpdmCertChainBufferOffset + SpdmResponse->PortionLength > MAX_SPDM_CERT_CHAIN_SIZE) {
@@ -689,13 +670,42 @@ DumpSpdmCertificate (
     );
   mSpdmCertChainBufferSize = mCachedSpdmCertChainBufferOffset + SpdmResponse->PortionLength;
 
+  HashSize = GetSpdmHashSize (mSpdmContext);
+
   if (SpdmResponse->RemainderLength == 0) {
-    HashSize = GetSpdmHashSize (mSpdmContext);
     if (mSpdmCertChainBufferSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
       printf ("\n");
       return ;
     }
 
+    SpdmCertChain = mSpdmCertChainBuffer;
+    if (SpdmCertChain->Length != mSpdmCertChainBufferSize) {
+      printf ("\n");
+      return ;
+    }
+  }
+
+  if (!mParamQuiteMode) {
+    if (mParamAllMode) {
+      if (SpdmResponse->RemainderLength == 0) {
+        SpdmCertChain = mSpdmCertChainBuffer;
+        printf ("\n    SpdmCertChainSize(0x%04x)", SpdmCertChain->Length);
+
+        RootHash = (VOID *)(SpdmCertChain + 1);
+        printf ("\n    RootHash(");
+        DumpData (RootHash, HashSize);
+        printf (")");
+
+        CertChain = (UINT8 *)mSpdmCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+        CertChainSize = mSpdmCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+        printf ("\n    CertChain(\n");
+        DumpHex (CertChain, CertChainSize);
+        printf ("    )");
+      }
+    }
+  }
+
+  if (SpdmResponse->RemainderLength == 0) {
     CertChain = (UINT8 *)mSpdmCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertChainSize = mSpdmCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
 
@@ -751,13 +761,150 @@ DumpSpdmChallenge (
   SpdmRequest = Buffer;
 
   if (!mParamQuiteMode) {
-    printf ("(SlotNUm=0x%02x, HashType=0x%02x) ",
-      SpdmRequest->Header.Param1,
-      SpdmRequest->Header.Param2
-      );
+    printf ("(SlotID=0x%02x, HashType=0x%02x(", SpdmRequest->Header.Param1, SpdmRequest->Header.Param2);
+    DumpEntryValue (mSpdmRequestHashTypeStringTable, ARRAY_SIZE(mSpdmRequestHashTypeStringTable), SpdmRequest->Header.Param2);
+    printf (")) ");
+
+    if (mParamAllMode) {
+      printf ("\n    Nonce(");
+      DumpData (SpdmRequest->Nonce, 32);
+      printf (")");
+    }
   }
 
   printf ("\n");
+}
+
+VOID
+DumpSpdmOpaqueVersionSelection (
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  )
+{
+  SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION *VersionSelection;
+
+  if (BufferSize < sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION)) {
+    return ;
+  }
+
+  VersionSelection = Buffer;
+
+  printf ("VERSION_SELECTION ");
+  
+  printf ("(%d.%d.%d.%d) ",
+    VersionSelection->SelectedVersion.MajorVersion,
+    VersionSelection->SelectedVersion.MinorVersion,
+    VersionSelection->SelectedVersion.UpdateVersionNumber,
+    VersionSelection->SelectedVersion.Alpha
+    );
+}
+
+VOID
+DumpSpdmOpaqueSupportedVersion (
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  )
+{
+  SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION *SupportedVersion;
+  SPDM_VERSION_NUMBER                              *SpdmVersionNumber;
+  UINTN                                            Index;
+
+  if (BufferSize < sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION)) {
+    return ;
+  }
+
+  SupportedVersion = Buffer;
+  if (BufferSize < sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) + SupportedVersion->VersionCount * sizeof(SPDM_VERSION_NUMBER)) {
+    return ;
+  }
+
+  printf ("SUPPORTED_VERSION ");
+
+  SpdmVersionNumber = (VOID *)(SupportedVersion + 1);
+  printf ("(");
+  for (Index = 0; Index < SupportedVersion->VersionCount; Index ++) {
+    if (Index != 0) {
+      printf (", ");
+    }
+    printf ("%d.%d.%d.%d",
+      SpdmVersionNumber[Index].MajorVersion,
+      SpdmVersionNumber[Index].MinorVersion,
+      SpdmVersionNumber[Index].UpdateVersionNumber,
+      SpdmVersionNumber[Index].Alpha
+      );
+    printf (") ");
+  }
+}
+
+DISPATCH_TABLE_ENTRY mSpdmOpaqueDispatch[] = {
+  {SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_VERSION_SELECTION,  "VERSION_SELECTION",  DumpSpdmOpaqueVersionSelection},
+  {SECURED_MESSAGE_OPAQUE_ELEMENT_SMDATA_ID_SUPPORTED_VERSION,  "SUPPORTED_VERSION",  DumpSpdmOpaqueSupportedVersion},
+};
+
+VOID
+DumpSpdmOpaqueData (
+  IN UINT8    *OpaqueData,
+  IN UINT16   OpaqueLength
+  )
+{
+  SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER  *SecuredMessageOpaqueDataTable;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER       *SecuredMessageElementTable;
+  SECURED_MESSAGE_OPAQUE_ELEMENT_HEADER             *SecuredMessageElement;
+  UINTN                                             EndOfElementTable;
+  UINTN                                             EndOfOpaqueData;
+  UINTN                                             Index;
+  CHAR8                                             *Ch;
+
+  EndOfOpaqueData = (UINTN)OpaqueData + OpaqueLength;
+
+  if (OpaqueLength < sizeof(SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER)) {
+    return ;
+  }
+
+  SecuredMessageOpaqueDataTable = (VOID *)OpaqueData;
+  if (SecuredMessageOpaqueDataTable->SpecId != SECURED_MESSAGE_OPAQUE_DATA_SPEC_ID) {
+    return ;
+  }
+
+  Ch = (VOID *)&SecuredMessageOpaqueDataTable->SpecId;
+  printf ("\n      SecuredMessageOpaqueDataHeader(SpecId=0x%08x(%c%c%c%c), Ver=0x%02x, TotalElem=0x%02x)",
+    SecuredMessageOpaqueDataTable->SpecId,
+    Ch[3], Ch[2], Ch[1], Ch[0],
+    SecuredMessageOpaqueDataTable->OpaqueVersion,
+    SecuredMessageOpaqueDataTable->TotalElements
+    );
+  
+  SecuredMessageElementTable = (VOID *)(SecuredMessageOpaqueDataTable + 1);
+  for (Index = 0; Index < SecuredMessageOpaqueDataTable->TotalElements; Index++) {
+    if ((UINTN)SecuredMessageElementTable + sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) > EndOfOpaqueData) {
+      break;
+    }
+    if (SecuredMessageElementTable->Id != SPDM_REGISTRY_ID_DMTF) {
+      break;
+    }
+    if (SecuredMessageElementTable->VendorLen != 0) {
+      break;
+    }
+    EndOfElementTable = (UINTN)SecuredMessageElementTable + sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) + SecuredMessageElementTable->OpaqueElementDataLen;
+    if (EndOfElementTable > EndOfOpaqueData) {
+      break;
+    }
+    printf ("\n      SecuredMessageOpaqueElement_%d(Id=0x%02x, Len=0x%04x) ",
+      (UINT32)Index,
+      SecuredMessageElementTable->Id,
+      SecuredMessageElementTable->OpaqueElementDataLen
+      );
+
+    if (SecuredMessageElementTable->OpaqueElementDataLen < sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_HEADER)) {
+      break;
+    }
+    SecuredMessageElement = (VOID *)(SecuredMessageElementTable + 1);
+    printf ("Element(Ver=0x%02x, Id=0x%02x) ", SecuredMessageElement->SMDataVersion, SecuredMessageElement->SMDataID);
+
+    DumpDispatchMessage (mSpdmOpaqueDispatch, ARRAY_SIZE(mSpdmOpaqueDispatch), SecuredMessageElement->SMDataID, (UINT8 *)SecuredMessageElement, SecuredMessageElementTable->OpaqueElementDataLen);
+
+    SecuredMessageElementTable = (VOID *)EndOfElementTable;
+  }
 }
 
 VOID
@@ -771,6 +918,11 @@ DumpSpdmChallengeAuth (
   UINTN                         HashSize;
   UINTN                         SignatureSize;
   UINT16                        OpaqueLength;
+  UINT8                         *CertChainHash;
+  UINT8                         *Nonce;
+  UINT8                         *MeasurementSummaryHash;
+  UINT8                         *OpaqueData;
+  UINT8                         *Signature;
 
   printf ("SPDM_CHALLENGE_AUTH ");
 
@@ -793,12 +945,39 @@ DumpSpdmChallengeAuth (
   SpdmResponse = Buffer;
 
   if (!mParamQuiteMode) {
-    printf ("(RspAttr=0x%02x (SlotNum=0x%02x, BasicMutAuthReq=%x), SlotMask=0x%02x) ",
-      SpdmResponse->Header.Param1,
+    printf ("(Attr=0x%02x(",
+      SpdmResponse->Header.Param1
+      );
+    DumpEntryFlags (mSpdmChallengeAuthAttributeStringTable, ARRAY_SIZE(mSpdmChallengeAuthAttributeStringTable), SpdmResponse->Header.Param1 & 0xF0);
+    printf (", SlotID=0x%02x), SlotMask=0x%02x) ",
       SpdmResponse->Header.Param1 & 0xF,
-      ((SpdmResponse->Header.Param1 & 0x80) != 0) ? 1 : 0,
       SpdmResponse->Header.Param2
       );
+
+    if (mParamAllMode) {
+      CertChainHash = (VOID *)(SpdmResponse + 1);
+      printf ("\n    CertChainHash(");
+      DumpData (CertChainHash, HashSize);
+      printf (")");
+      Nonce = CertChainHash + HashSize;
+      printf ("\n    Nonce(");
+      DumpData (Nonce, 32);
+      printf (")");
+      MeasurementSummaryHash = Nonce + 32;
+      printf ("\n    MeasurementSummaryHash(");
+      DumpData (MeasurementSummaryHash, HashSize);
+      printf (")");
+      OpaqueLength = *(UINT16 *)(MeasurementSummaryHash + HashSize);
+      OpaqueData = MeasurementSummaryHash + HashSize + sizeof(UINT16);
+      printf ("\n    OpaqueData(");
+      DumpData (OpaqueData, OpaqueLength);
+      printf (")");
+      DumpSpdmOpaqueData (OpaqueData, OpaqueLength);
+      Signature = OpaqueData + OpaqueLength;
+      printf ("\n    Signature(");
+      DumpData (Signature, SignatureSize);
+      printf (")");
+    }
   }
 
   printf ("\n");
@@ -840,21 +1019,92 @@ DumpSpdmGetMeasurements (
   mCachedGetMeasurementOperation = SpdmRequest->Header.Param2;
 
   if (!mParamQuiteMode) {
+    printf ("(Attr=0x%02x(", SpdmRequest->Header.Param1);
+    DumpEntryFlags (mSpdmMeasurementAttributeStringTable, ARRAY_SIZE(mSpdmMeasurementAttributeStringTable), SpdmRequest->Header.Param1);
+    printf ("), MeasOp=0x%02x", SpdmRequest->Header.Param2);
+    switch (SpdmRequest->Header.Param2) {
+    case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS:
+      printf ("(TotalNum)");
+      break;
+    case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS:
+      printf ("(All)");
+      break;
+    }
     if (IncludeSignature && (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11)) {
-      printf ("(Attr=0x%02x, MeasOp=0x%02x, SlotId=0x%02x) ",
-        SpdmRequest->Header.Param1,
-        SpdmRequest->Header.Param2,
-        SpdmRequest->SlotIDParam
-        );
-    } else {
-      printf ("(Attr=0x%02x, MeasOp=0x%02x) ",
-        SpdmRequest->Header.Param1,
-        SpdmRequest->Header.Param2
-        );
+      printf (", SlotID=0x%02x", SpdmRequest->SlotIDParam);
+    }
+    printf (") ");
+
+    if (mParamAllMode) {
+      if (IncludeSignature) {
+        printf ("\n    Nonce(");
+        DumpData (SpdmRequest->Nonce, 32);
+        printf (")");
+      }
     }
   }
 
   printf ("\n");
+}
+
+VOID
+DumpSpdmMeasurementRecord (
+  IN UINT8   NumberOfBlocks,
+  IN VOID    *MeasurementRecord,
+  IN UINT32  MeasurementRecordLength
+  )
+{
+  SPDM_MEASUREMENT_BLOCK_DMTF           *DmtfBlock;
+  UINTN                                 Index;
+  UINTN                                 EndOfBlock;
+  UINTN                                 EndOfRecord;
+
+  EndOfRecord = (UINTN)MeasurementRecord + MeasurementRecordLength;
+
+  DmtfBlock = (VOID *)MeasurementRecord;
+  for (Index = 0; Index < NumberOfBlocks; Index++) {
+    if ((UINTN)DmtfBlock + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) > EndOfRecord) {
+      break;
+    }
+    if (DmtfBlock->MeasurementBlockCommonHeader.MeasurementSpecification != SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF) {
+      break;
+    }
+    if (DmtfBlock->MeasurementBlockCommonHeader.MeasurementSize != DmtfBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER)) {
+      break;
+    }
+    EndOfBlock = (UINTN)DmtfBlock + DmtfBlock->MeasurementBlockCommonHeader.MeasurementSize + sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER);
+    if (EndOfBlock > EndOfRecord) {
+      break;
+    }
+
+    printf ("\n      MeasurementRecord_%d(", (UINT32)Index);
+    printf ("\n        CommonHeader(Index=0x%02x, MeasSpec=0x%02x(",
+      DmtfBlock->MeasurementBlockCommonHeader.Index,
+      DmtfBlock->MeasurementBlockCommonHeader.MeasurementSpecification
+      );
+    DumpEntryFlags (mSpdmMeasurementSpecValueStringTable, ARRAY_SIZE(mSpdmMeasurementSpecValueStringTable), DmtfBlock->MeasurementBlockCommonHeader.MeasurementSpecification);
+    printf ("), Size=0x%04x)",
+      DmtfBlock->MeasurementBlockCommonHeader.MeasurementSize
+      );
+
+    printf ("\n        DmtfHeader(Type=0x%02x(",
+      DmtfBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType
+      );
+    DumpEntryValue (mSpdmMeasurementTypeValueStringTable, ARRAY_SIZE(mSpdmMeasurementTypeValueStringTable), DmtfBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType & SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MASK);
+    if (DmtfBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType & SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_RAW_BIT_STREAM) {
+      printf (", RawBitStream");
+    }
+    printf ("), Size=0x%04x)",
+      DmtfBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize
+      );
+
+    printf ("\n        Value(");
+    DumpData ((VOID *)(DmtfBlock + 1), DmtfBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
+    printf (")");
+    printf ("\n        )");
+
+    DmtfBlock = (VOID *)EndOfBlock;
+  }
 }
 
 VOID
@@ -869,6 +1119,10 @@ DumpSpdmMeasurements (
   UINTN                       SignatureSize;
   UINT16                      OpaqueLength;
   BOOLEAN                     IncludeSignature;
+  UINT8                       *MeasurementRecord;
+  UINT8                       *Nonce;
+  UINT8                       *OpaqueData;
+  UINT8                       *Signature;
 
   printf ("SPDM_MEASUREMENTS ");
 
@@ -908,28 +1162,43 @@ DumpSpdmMeasurements (
 
   if (!mParamQuiteMode) {
     if (mCachedGetMeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+      printf ("(TotalMeasIndex=0x%02x", SpdmResponse->Header.Param1);
       if (IncludeSignature) {
-        printf ("(SlotNum=0x%02x, TotalMeasIndex=0x%02x) ",
-          SpdmResponse->Header.Param2,
-          SpdmResponse->Header.Param1
-          );
-      } else {
-        printf ("(TotalMeasIndex=0x%02x) ",
-          SpdmResponse->Header.Param1
-          );
+        printf (", SlotID=0x%02x", SpdmResponse->Header.Param2);
       }
+      printf (") ");
     } else {
+      printf ("(NumOfBlocks=0x%x, MeasRecordLen=0x%x", SpdmResponse->NumberOfBlocks, MeasurementRecordLength);
       if (IncludeSignature) {
-        printf ("(SlotNum=0x%02x, NumOfBlocks=0x%x, MeasRecordLen=0x%x) ",
-          SpdmResponse->Header.Param2,
-          SpdmResponse->NumberOfBlocks,
-          MeasurementRecordLength
-          );
-      } else {
-        printf ("(NumOfBlocks=0x%x, MeasRecordLen=0x%x) ",
-          SpdmResponse->NumberOfBlocks,
-          MeasurementRecordLength
-          );
+        printf (", SlotID=0x%02x", SpdmResponse->Header.Param2);
+      }
+      printf (") ");
+    }
+
+    if (mParamAllMode) {
+      MeasurementRecord = (VOID *)(SpdmResponse + 1);
+      if (mCachedGetMeasurementOperation != SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+        printf ("\n    MeasurementRecord(");
+        DumpData (MeasurementRecord, MeasurementRecordLength);
+        printf (")");
+
+        DumpSpdmMeasurementRecord (SpdmResponse->NumberOfBlocks, MeasurementRecord, MeasurementRecordLength);
+      }
+      if (IncludeSignature) {
+        Nonce = MeasurementRecord + MeasurementRecordLength;
+        printf ("\n    Nonce(");
+        DumpData (Nonce, 32);
+        printf (")");
+        OpaqueLength = *(UINT16 *)(Nonce + 32);
+        OpaqueData = Nonce + 32 + sizeof(UINT16);
+        printf ("\n    OpaqueData(");
+        DumpData (OpaqueData, OpaqueLength);
+        printf (")");
+        DumpSpdmOpaqueData (OpaqueData, OpaqueLength);
+        Signature = OpaqueData + OpaqueLength;
+        printf ("\n    Signature(");
+        DumpData (Signature, SignatureSize);
+        printf (")");
       }
     }
   }
@@ -943,7 +1212,20 @@ DumpSpdmRespondIfReady (
   IN UINTN   BufferSize
   )
 {
+  SPDM_RESPONSE_IF_READY_REQUEST  *SpdmRequest;
+
   printf ("SPDM_RESPOND_IF_READY ");
+  if (BufferSize < sizeof(SPDM_RESPONSE_IF_READY_REQUEST)) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmRequest = Buffer;
+
+  if (!mParamQuiteMode) {
+    printf ("(ReqCode=0x%02x, Token=0x%02x) ", SpdmRequest->Header.Param1, SpdmRequest->Header.Param2);
+  }
+
   printf ("\n");
 }
 
@@ -953,7 +1235,35 @@ DumpSpdmError (
   IN UINTN   BufferSize
   )
 {
+  SPDM_ERROR_RESPONSE  *SpdmResponse;
+
   printf ("SPDM_ERROR ");
+
+  if (BufferSize < sizeof(SPDM_ERROR_RESPONSE)) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmResponse = Buffer;
+
+  if (!mParamQuiteMode) {
+    printf ("(ErrCode=0x%02x, ErrData=0x%02x) ", SpdmResponse->Header.Param1, SpdmResponse->Header.Param2);
+
+    if (SpdmResponse->Header.Param1 == SPDM_ERROR_CODE_RESPONSE_NOT_READY) {
+      if (BufferSize >= sizeof(SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY)) {
+        SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  *SpdmResponseNotReady;
+
+        SpdmResponseNotReady = Buffer;
+        printf ("(ReqCode=0x%02x, Token=0x%02x, RDTExponent=0x%02x, RDTM=0x%02x) ",
+          SpdmResponseNotReady->ExtendErrorData.RequestCode,
+          SpdmResponseNotReady->ExtendErrorData.Token,
+          SpdmResponseNotReady->ExtendErrorData.RDTExponent,
+          SpdmResponseNotReady->ExtendErrorData.RDTM
+          );
+      }
+    }
+  }
+
   printf ("\n");
 }
 
@@ -1026,7 +1336,9 @@ DumpSpdmKeyExchange (
   SPDM_KEY_EXCHANGE_REQUEST  *SpdmRequest;
   UINTN                      MessageSize;
   UINTN                      DheKeySize;
-  UINT16                     OpaqueDataLength;
+  UINT16                     OpaqueLength;
+  UINT8                      *ExchangeData;
+  UINT8                      *OpaqueData;
 
   printf ("SPDM_KEY_EXCHANGE ");
 
@@ -1044,15 +1356,33 @@ DumpSpdmKeyExchange (
     return ;
   }
 
-  OpaqueDataLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DheKeySize);
-  MessageSize += OpaqueDataLength;
+  OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DheKeySize);
+  MessageSize += OpaqueLength;
   if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
   }
 
   if (!mParamQuiteMode) {
-    printf ("(ReqSessionID=0x%04x) ", SpdmRequest->ReqSessionID);
+    printf ("(HashType=0x%02x(", SpdmRequest->Header.Param1);
+    DumpEntryValue (mSpdmRequestHashTypeStringTable, ARRAY_SIZE(mSpdmRequestHashTypeStringTable), SpdmRequest->Header.Param1);
+    printf ("), SlotID=0x%02x, ReqSessionID=0x%04x) ", SpdmRequest->Header.Param2, SpdmRequest->ReqSessionID);
+
+    if (mParamAllMode) {
+      printf ("\n    RandomData(");
+      DumpData (SpdmRequest->RandomData, 32);
+      printf (")");
+      ExchangeData = (VOID *)(SpdmRequest + 1);
+      printf ("\n    ExchangeData(");
+      DumpData (ExchangeData, DheKeySize);
+      printf (")");
+      OpaqueLength = *(UINT16 *)((UINT8 *)ExchangeData + DheKeySize);
+      OpaqueData = (VOID *)((UINT8 *)ExchangeData + DheKeySize + sizeof(UINT16));
+      printf ("\n    OpaqueData(");
+      DumpData (OpaqueData, OpaqueLength);
+      printf (")");
+      DumpSpdmOpaqueData (OpaqueData, OpaqueLength);
+    }
   }
 
   printf ("\n");
@@ -1075,7 +1405,13 @@ DumpSpdmKeyExchangeRsp (
   UINTN                       HashSize;
   UINTN                       SignatureSize;
   UINTN                       HmacSize;
-  UINT16                      OpaqueDataLength;
+  UINT16                      OpaqueLength;
+  BOOLEAN                     IncludeHmac;
+  UINT8                       *ExchangeData;
+  UINT8                       *MeasurementSummaryHash;
+  UINT8                       *OpaqueData;
+  UINT8                       *Signature;
+  UINT8                       *VerifyData;
 
   printf ("SPDM_KEY_EXCHANGE_RSP ");
 
@@ -1098,9 +1434,10 @@ DumpSpdmKeyExchangeRsp (
     return ;
   }
 
-  OpaqueDataLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_KEY_EXCHANGE_RESPONSE) + DheKeySize + HashSize);
-  MessageSize += OpaqueDataLength + SignatureSize;
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+  OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_KEY_EXCHANGE_RESPONSE) + DheKeySize + HashSize);
+  MessageSize += OpaqueLength + SignatureSize;
+  IncludeHmac = ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0);
+  if (IncludeHmac) {
     MessageSize += HmacSize;
   }
   if (BufferSize < MessageSize) {
@@ -1109,11 +1446,39 @@ DumpSpdmKeyExchangeRsp (
   }
 
   if (!mParamQuiteMode) {
-    printf ("(RspSessionID=0x%04x, MutAuth=0x%02x, SlotID=0x%02x) ",
-      SpdmResponse->RspSessionID,
-      SpdmResponse->MutAuthRequested,
-      SpdmResponse->SlotIDParam
-      );
+    printf ("(Heart=0x%02x, RspSessionID=0x%04x, MutAuth=0x%02x(", SpdmResponse->Header.Param1, SpdmResponse->RspSessionID, SpdmResponse->MutAuthRequested);
+    DumpEntryFlags (mSpdmKeyExchangeMutAuthStringTable, ARRAY_SIZE(mSpdmKeyExchangeMutAuthStringTable), SpdmResponse->MutAuthRequested);
+    printf ("), SlotID=0x%02x) ", SpdmResponse->SlotIDParam);
+
+    if (mParamAllMode) {
+      printf ("\n    RandomData(");
+      DumpData (SpdmResponse->RandomData, 32);
+      printf (")");
+      ExchangeData = (VOID *)(SpdmResponse + 1);
+      printf ("\n    ExchangeData(");
+      DumpData (ExchangeData, DheKeySize);
+      printf (")");
+      MeasurementSummaryHash = ExchangeData + DheKeySize;
+      printf ("\n    MeasurementSummaryHash(");
+      DumpData (MeasurementSummaryHash, HashSize);
+      printf (")");
+      OpaqueLength = *(UINT16 *)((UINT8 *)MeasurementSummaryHash + HashSize);
+      OpaqueData = (VOID *)((UINT8 *)MeasurementSummaryHash + HashSize + sizeof(UINT16));
+      printf ("\n    OpaqueData(");
+      DumpData (OpaqueData, OpaqueLength);
+      printf (")");
+      DumpSpdmOpaqueData (OpaqueData, OpaqueLength);
+      Signature = OpaqueData + OpaqueLength;
+      printf ("\n    Signature(");
+      DumpData (Signature, SignatureSize);
+      printf (")");
+      if (IncludeHmac) {
+        VerifyData = Signature + SignatureSize;
+        printf ("\n    VerifyData(");
+        DumpData (VerifyData, HmacSize);
+        printf (")");
+      }
+    }
   }
 
   printf ("\n");
@@ -1149,6 +1514,9 @@ DumpSpdmFinish (
   UINTN                MessageSize;
   UINTN                SignatureSize;
   UINTN                HmacSize;
+  BOOLEAN              IncludeSignature;
+  UINT8                *Signature;
+  UINT8                *VerifyData;
 
   printf ("SPDM_FINISH ");
 
@@ -1162,7 +1530,8 @@ DumpSpdmFinish (
   SignatureSize = GetSpdmReqAsymSize (mSpdmContext);
   HmacSize = GetSpdmHashSize (mSpdmContext);
 
-  if (SpdmRequest->Header.Param1 != 0) {
+  IncludeSignature = ((SpdmRequest->Header.Param1 & SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED) != 0);
+  if (IncludeSignature) {
     MessageSize += SignatureSize;
   }
   MessageSize += HmacSize;
@@ -1172,10 +1541,26 @@ DumpSpdmFinish (
   }
 
   if (!mParamQuiteMode) {
-    printf ("(SigIncl=0x%02x, SlotNum=0x%02x) ",
+    printf ("(Attr=0x%02x (SigIncl=%x), SlotID=0x%02x) ",
       SpdmRequest->Header.Param1,
+      ((SpdmRequest->Header.Param1 & SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED) != 0) ? 1 : 0,
       SpdmRequest->Header.Param2
       );
+
+    if (mParamAllMode) {
+      if (IncludeSignature) {
+        Signature = (VOID *)(SpdmRequest + 1);
+        printf ("\n    Signature(");
+        DumpData (Signature, SignatureSize);
+        printf (")");
+        VerifyData = Signature + SignatureSize;
+      } else {
+        VerifyData = (VOID *)(SpdmRequest + 1);
+      }
+      printf ("\n    VerifyData(");
+      DumpData (VerifyData, HmacSize);
+      printf (")");
+    }
   }
 
   printf ("\n");
@@ -1190,8 +1575,12 @@ DumpSpdmFinishRsp (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DEVICE_CONTEXT   *SpdmContext;
+  SPDM_FINISH_RESPONSE  *SpdmResponse;
   UINTN                 MessageSize;
   UINTN                 HmacSize;
+  BOOLEAN               IncludeHmac;
+  UINT8                 *VerifyData;
 
   printf ("SPDM_FINISH_RSP ");
 
@@ -1201,9 +1590,14 @@ DumpSpdmFinishRsp (
     return ;
   }
 
+  SpdmContext = mSpdmContext;
+  SpdmResponse = Buffer;
   HmacSize = GetSpdmHashSize (mSpdmContext);
 
-  MessageSize += HmacSize;
+  IncludeHmac = ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0);
+  if (IncludeHmac) {
+    MessageSize += HmacSize;
+  }
   if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
@@ -1211,6 +1605,15 @@ DumpSpdmFinishRsp (
 
   if (!mParamQuiteMode) {
     printf ("() ");
+
+    if (mParamAllMode) {
+      if (IncludeHmac) {
+        VerifyData = (VOID *)(SpdmResponse + 1);
+        printf ("\n    VerifyData(");
+        DumpData (VerifyData, HmacSize);
+        printf (")");
+      }
+    }
   }
 
   printf ("\n");
@@ -1230,6 +1633,9 @@ DumpSpdmPskExchange (
 {
   SPDM_PSK_EXCHANGE_REQUEST  *SpdmRequest;
   UINTN                      MessageSize;
+  UINT8                      *PSKHint;
+  UINT8                      *RequesterContext;
+  UINT8                      *OpaqueData;
 
   printf ("SPDM_PSK_EXCHANGE ");
 
@@ -1247,9 +1653,24 @@ DumpSpdmPskExchange (
   }
 
   if (!mParamQuiteMode) {
-    printf ("(ReqSessionID=0x%04x, PSKHint=", SpdmRequest->ReqSessionID);
-    DumpHexStr ((VOID *)(SpdmRequest + 1), SpdmRequest->PSKHintLength);
+    printf ("(HashType=0x%02x(", SpdmRequest->Header.Param1);
+    DumpEntryValue (mSpdmRequestHashTypeStringTable, ARRAY_SIZE(mSpdmRequestHashTypeStringTable), SpdmRequest->Header.Param1);
+    printf ("), ReqSessionID=0x%04x, PSKHint=", SpdmRequest->ReqSessionID);
+    PSKHint = (VOID *)(SpdmRequest + 1);
+    DumpHexStr (PSKHint, SpdmRequest->PSKHintLength);
     printf (") ");
+
+    if (mParamAllMode) {
+      RequesterContext = PSKHint + SpdmRequest->PSKHintLength;
+      printf ("\n    Context(");
+      DumpData (RequesterContext, SpdmRequest->RequesterContextLength);
+      printf (")");
+      OpaqueData = RequesterContext + SpdmRequest->RequesterContextLength;
+      printf ("\n    OpaqueData(");
+      DumpData (OpaqueData, SpdmRequest->OpaqueLength);
+      printf (")");
+      DumpSpdmOpaqueData (OpaqueData, SpdmRequest->OpaqueLength);
+    }
   }
 
   printf ("\n");
@@ -1269,6 +1690,10 @@ DumpSpdmPskExchangeRsp (
   UINTN                       MessageSize;
   UINTN                       HashSize;
   UINTN                       HmacSize;
+  UINT8                       *MeasurementSummaryHash;
+  UINT8                       *ResponderContext;
+  UINT8                       *OpaqueData;
+  UINT8                       *VerifyData;
 
   printf ("SPDM_PSK_EXCHANGE_RSP ");
 
@@ -1288,7 +1713,27 @@ DumpSpdmPskExchangeRsp (
   }
 
   if (!mParamQuiteMode) {
-    printf ("(RspSessionID=0x%04x) ", SpdmResponse->RspSessionID);
+    printf ("(Heart=0x%02x, RspSessionID=0x%04x) ", SpdmResponse->Header.Param1, SpdmResponse->RspSessionID);
+
+    if (mParamAllMode) {
+      MeasurementSummaryHash = (VOID *)(SpdmResponse + 1);
+      printf ("\n    MeasurementSummaryHash(");
+      DumpData (MeasurementSummaryHash, HashSize);
+      printf (")");
+      ResponderContext = MeasurementSummaryHash + HashSize;
+      printf ("\n    Context(");
+      DumpData (ResponderContext, SpdmResponse->ResponderContextLength);
+      printf (")");
+      OpaqueData = ResponderContext + SpdmResponse->ResponderContextLength;
+      printf ("\n    OpaqueData(");
+      DumpData (OpaqueData, SpdmResponse->OpaqueLength);
+      printf (")");
+      DumpSpdmOpaqueData (OpaqueData, SpdmResponse->OpaqueLength);
+      VerifyData = OpaqueData + SpdmResponse->OpaqueLength;
+      printf ("\n    VerifyData(");
+      DumpData (VerifyData, HmacSize);
+      printf (")");
+    }
   }
 
   printf ("\n");
@@ -1312,8 +1757,10 @@ DumpSpdmPskFinish (
   IN UINTN   BufferSize
   )
 {
+  SPDM_PSK_FINISH_REQUEST     *SpdmRequest;
   UINTN                       MessageSize;
   UINTN                       HmacSize;
+  UINT8                       *VerifyData;
 
   printf ("SPDM_PSK_FINISH ");
 
@@ -1322,6 +1769,8 @@ DumpSpdmPskFinish (
     printf ("\n");
     return ;
   }
+
+  SpdmRequest = Buffer;
 
   HmacSize = GetSpdmHashSize (mSpdmContext);
   MessageSize += HmacSize;
@@ -1332,6 +1781,13 @@ DumpSpdmPskFinish (
 
   if (!mParamQuiteMode) {
     printf ("() ");
+
+    if (mParamAllMode) {
+      VerifyData = (VOID *)(SpdmRequest + 1);
+      printf ("\n    VerifyData(");
+      DumpData (VerifyData, HmacSize);
+      printf (")");
+    }
   }
 
   printf ("\n");
@@ -1376,6 +1832,16 @@ DumpSpdmHeartbeat (
   )
 {
   printf ("SPDM_HEARTBEAT ");
+
+  if (BufferSize < sizeof(SPDM_HEARTBEAT_REQUEST)) {
+    printf ("\n");
+    return ;
+  }
+
+  if (!mParamQuiteMode) {
+    printf ("() ");
+  }
+
   printf ("\n");
 }
 
@@ -1386,6 +1852,16 @@ DumpSpdmHeartbeatAck (
   )
 {
   printf ("SPDM_HEARTBEAT_ACK ");
+
+  if (BufferSize < sizeof(SPDM_HEARTBEAT_RESPONSE)) {
+    printf ("\n");
+    return ;
+  }
+
+  if (!mParamQuiteMode) {
+    printf ("() ");
+  }
+
   printf ("\n");
 }
 
@@ -1396,12 +1872,10 @@ DumpSpdmKeyUpdate (
   )
 {
   SPDM_KEY_UPDATE_REQUEST  *SpdmRequest;
-  UINTN                    MessageSize;
 
   printf ("SPDM_KEY_UPDATE ");
 
-  MessageSize = sizeof(SPDM_KEY_UPDATE_REQUEST);
-  if (BufferSize < MessageSize) {
+  if (BufferSize < sizeof(SPDM_KEY_UPDATE_REQUEST)) {
     printf ("\n");
     return ;
   }
@@ -1409,17 +1883,9 @@ DumpSpdmKeyUpdate (
   SpdmRequest = Buffer;
 
   if (!mParamQuiteMode) {
-    switch (SpdmRequest->Header.Param1) {
-    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
-      printf ("(UPDATE_KEY, Tag=0x%02x) ", SpdmRequest->Header.Param2);
-      break;
-    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
-      printf ("(UPDATE_ALL_KEYS, Tag=0x%02x) ", SpdmRequest->Header.Param2);
-      break;
-    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
-      printf ("(VERIFY_NEW_KEY, Tag=0x%02x) ", SpdmRequest->Header.Param2);
-      break;
-    }
+    printf ("(KeyOp=0x%02x(", SpdmRequest->Header.Param1);
+    DumpEntryValue (mSpdmKeyUpdateOperationStringTable, ARRAY_SIZE(mSpdmKeyUpdateOperationStringTable), SpdmRequest->Header.Param1);
+    printf ("), Tag=0x%02x) ", SpdmRequest->Header.Param2);
   }
 
   printf ("\n");
@@ -1442,12 +1908,10 @@ DumpSpdmKeyUpdateAck (
   )
 {
   SPDM_KEY_UPDATE_RESPONSE  *SpdmResponse;
-  UINTN                     MessageSize;
 
   printf ("SPDM_KEY_UPDATE_ACK ");
 
-  MessageSize = sizeof(SPDM_KEY_UPDATE_RESPONSE);
-  if (BufferSize < MessageSize) {
+  if (BufferSize < sizeof(SPDM_KEY_UPDATE_RESPONSE)) {
     printf ("\n");
     return ;
   }
@@ -1455,17 +1919,9 @@ DumpSpdmKeyUpdateAck (
   SpdmResponse = Buffer;
 
   if (!mParamQuiteMode) {
-    switch (SpdmResponse->Header.Param1) {
-    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
-      printf ("(UPDATE_KEY, Tag=0x%02x) ", SpdmResponse->Header.Param2);
-      break;
-    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
-      printf ("(UPDATE_ALL_KEYS, Tag=0x%02x) ", SpdmResponse->Header.Param2);
-      break;
-    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
-      printf ("(VERIFY_NEW_KEY, Tag=0x%02x) ", SpdmResponse->Header.Param2);
-      break;
-    }
+    printf ("(KeyOp=0x%02x(", SpdmResponse->Header.Param1);
+    DumpEntryValue (mSpdmKeyUpdateOperationStringTable, ARRAY_SIZE(mSpdmKeyUpdateOperationStringTable), SpdmResponse->Header.Param1);
+    printf ("), Tag=0x%02x) ", SpdmResponse->Header.Param2);
   }
 
   printf ("\n");
@@ -1478,6 +1934,16 @@ DumpSpdmGetEncapsulatedRequest (
   )
 {
   printf ("SPDM_GET_ENCAPSULATED_REQUEST ");
+
+  if (BufferSize < sizeof(SPDM_GET_ENCAPSULATED_REQUEST_REQUEST)) {
+    printf ("\n");
+    return ;
+  }
+
+  if (!mParamQuiteMode) {
+    printf ("() ");
+  }
+
   printf ("\n");
 }
 
@@ -1488,8 +1954,15 @@ DumpSpdmEncapsulatedRequest (
   )
 {
   SPDM_ENCAPSULATED_REQUEST_RESPONSE  *SpdmResponse;
+  UINTN                               HeaderSize;
 
   printf ("SPDM_ENCAPSULATED_REQUEST ");
+
+  HeaderSize = sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE);
+  if (BufferSize < HeaderSize) {
+    printf ("\n");
+    return ;
+  }
 
   SpdmResponse = Buffer;
   if (!mParamQuiteMode) {
@@ -1497,7 +1970,7 @@ DumpSpdmEncapsulatedRequest (
   }
 
   mEncapsulated = TRUE;
-  DumpSpdmMessage ((UINT8 *)Buffer + sizeof(SPDM_MESSAGE_HEADER), BufferSize - sizeof(SPDM_MESSAGE_HEADER));
+  DumpSpdmMessage ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
   mEncapsulated = FALSE;
 }
 
@@ -1508,16 +1981,23 @@ DumpSpdmDeliverEncapsulatedResponse (
   )
 {
   SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST  *SpdmRequest;
+  UINTN                                       HeaderSize;
 
   printf ("SPDM_DELIVER_ENCAPSULATED_RESPONSE ");
-  
+
+  HeaderSize = sizeof(SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST);
+  if (BufferSize < HeaderSize) {
+    printf ("\n");
+    return ;
+  }
+
   SpdmRequest = Buffer;
   if (!mParamQuiteMode) {
     printf ("(ReqID=0x%02x) ", SpdmRequest->Header.Param1);
   }
 
   mEncapsulated = TRUE;
-  DumpSpdmMessage ((UINT8 *)Buffer + sizeof(SPDM_MESSAGE_HEADER), BufferSize - sizeof(SPDM_MESSAGE_HEADER));
+  DumpSpdmMessage ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
   mEncapsulated = FALSE;
 }
 
@@ -1528,9 +2008,15 @@ DumpSpdmEncapsulatedResponseAck (
   )
 {
   SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE  *SpdmResponse;
-  UINTN                                    MessageSize;
+  UINTN                                    HeaderSize;
 
   printf ("SPDM_ENCAPSULATED_RESPONSE_ACK ");
+
+  HeaderSize = sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE);
+  if (BufferSize < HeaderSize) {
+    printf ("\n");
+    return ;
+  }
 
   SpdmResponse = Buffer;
   if (!mParamQuiteMode) {
@@ -1546,19 +2032,18 @@ DumpSpdmEncapsulatedResponseAck (
 
   case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_PRESENT:
     mEncapsulated = TRUE;
-    DumpSpdmMessage ((UINT8 *)Buffer + sizeof(SPDM_MESSAGE_HEADER), BufferSize - sizeof(SPDM_MESSAGE_HEADER));
+    DumpSpdmMessage ((UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
     mEncapsulated = FALSE;
     return ;
 
   case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER:
-    MessageSize = sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE) + 1;
-    if (BufferSize < MessageSize) {
+    if (BufferSize < HeaderSize + 1) {
       printf ("\n");
       return ;
     }
 
     if (!mParamQuiteMode) {
-      printf ("(Slot(%d)) ", *((UINT8 *)Buffer + sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE)));
+      printf ("(SlotID=0x%02x) ", *((UINT8 *)Buffer + HeaderSize));
     }
     break;
   }
@@ -1571,7 +2056,23 @@ DumpSpdmEndSession (
   IN UINTN   BufferSize
   )
 {
+  SPDM_END_SESSION_REQUEST  *SpdmRequest;
+
   printf ("SPDM_END_SESSION ");
+
+  if (BufferSize < sizeof(SPDM_END_SESSION_REQUEST)) {
+    printf ("\n");
+    return ;
+  }
+
+  SpdmRequest = Buffer;
+
+  if (!mParamQuiteMode) {
+    printf ("(Attr=0x%02x(", SpdmRequest->Header.Param1);
+    DumpEntryFlags (mSpdmEndSessionAttributeStringTable, ARRAY_SIZE(mSpdmEndSessionAttributeStringTable), SpdmRequest->Header.Param1);
+    printf (")) ");
+  }
+
   printf ("\n");
 }
 
@@ -1582,6 +2083,16 @@ DumpSpdmEndSessionAck (
   )
 {
   printf ("SPDM_END_SESSION_ACK ");
+
+  if (BufferSize < sizeof(SPDM_END_SESSION_RESPONSE)) {
+    printf ("\n");
+    return ;
+  }
+
+  if (!mParamQuiteMode) {
+    printf ("() ");
+  }
+
   printf ("\n");
 }
 

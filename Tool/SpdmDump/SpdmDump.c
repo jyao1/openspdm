@@ -63,6 +63,29 @@ DumpEntryFlags (
   IN UINT32              Flags
   )
 {
+  UINTN   Index;
+  BOOLEAN First;
+
+  First = TRUE;
+  for (Index = 0; Index < EntryTableCount; Index++) {
+    if ((EntryTable[Index].Value & Flags) != 0) {
+      if (First) {
+        First = FALSE;
+      } else {
+        printf (",");
+      }
+      printf ("%s", EntryTable[Index].Name);
+    }
+  }
+}
+
+VOID
+DumpEntryFlagsAll (
+  IN VALUE_STRING_ENTRY  *EntryTable,
+  IN UINTN               EntryTableCount,
+  IN UINT32              Flags
+  )
+{
   UINTN  Index;
 
   for (Index = 0; Index < EntryTableCount; Index++) {
