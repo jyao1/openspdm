@@ -26,9 +26,11 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
   )
 {
   UINTN  Size;
+
   Size = sizeof(SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER) +
          sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) +
          sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION);
+  // Add Padding
   return (Size + 3) & ~3;
 }
 
@@ -48,10 +50,12 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
   )
 {
   UINTN  Size;
+
   Size = sizeof(SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER) +
          sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) +
          sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION) +
          sizeof(SPDM_VERSION_NUMBER);
+  // Add Padding
   return (Size + 3) & ~3;
 }
 
@@ -83,6 +87,7 @@ SpdmBuildOpaqueDataSupportedVersionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
   SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION   *OpaqueElementSupportVersion;
   SPDM_VERSION_NUMBER                                *VersionsList;
+  VOID                                               *End;
 
   FinalDataSize = SpdmGetOpaqueDataSupportedVersionDataSize(SpdmContext);
   if (*DataOutSize < FinalDataSize) {
@@ -111,6 +116,10 @@ SpdmBuildOpaqueDataSupportedVersionData (
   VersionsList->UpdateVersionNumber = 0;
   VersionsList->MinorVersion = 1;
   VersionsList->MajorVersion = 1;
+
+  // Zero Padding
+  End = VersionsList + 1;
+  ZeroMem (End, (UINTN)DataOut + FinalDataSize - (UINTN)End);
 
   return RETURN_SUCCESS;
 }
@@ -198,6 +207,7 @@ SpdmBuildOpaqueDataVersionSelectionData (
   SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
   SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
   SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
+  VOID                                               *End;
 
   FinalDataSize = SpdmGetOpaqueDataVersionSelectionDataSize(SpdmContext);
   if (*DataOutSize < FinalDataSize) {
@@ -223,6 +233,10 @@ SpdmBuildOpaqueDataVersionSelectionData (
   OpaqueElementVersionSection->SelectedVersion.UpdateVersionNumber = 0;
   OpaqueElementVersionSection->SelectedVersion.MinorVersion = 1;
   OpaqueElementVersionSection->SelectedVersion.MajorVersion = 1;
+
+  // Zero Padding
+  End = OpaqueElementVersionSection + 1;
+  ZeroMem (End, (UINTN)DataOut + FinalDataSize - (UINTN)End);
 
   return RETURN_SUCCESS;
 }
