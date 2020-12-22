@@ -968,11 +968,11 @@ DumpSpdmVendorDefinedRequest (
 
   printf ("SPDM_VENDOR_DEFINED_REQUEST ");
 
-  HeaderSize = OFFSET_OF(SPDM_VENDOR_DEFINED_REQUEST_MSG, Len);
-  if (BufferSize < HeaderSize) {
+  if (BufferSize < sizeof(SPDM_VENDOR_DEFINED_REQUEST_MSG)) {
     printf ("\n");
     return ;
   }
+  HeaderSize = OFFSET_OF(SPDM_VENDOR_DEFINED_REQUEST_MSG, StandardID);
 
   SpdmRequest = Buffer;
 
@@ -997,12 +997,12 @@ DumpSpdmVendorDefinedResponse (
   UINTN                             HeaderSize;
 
   printf ("SPDM_VENDOR_DEFINED_RESPONSE ");
-  
-  HeaderSize = OFFSET_OF(SPDM_VENDOR_DEFINED_REQUEST_MSG, Len);
-  if (BufferSize < HeaderSize) {
+
+  if (BufferSize < sizeof(SPDM_VENDOR_DEFINED_REQUEST_MSG)) {
     printf ("\n");
     return ;
   }
+  HeaderSize = OFFSET_OF(SPDM_VENDOR_DEFINED_REQUEST_MSG, StandardID);
 
   SpdmResponse = Buffer;
 
@@ -1651,11 +1651,13 @@ DumpSpdmMessage (
 
   DumpDispatchMessage (mSpdmDispatch, ARRAY_SIZE(mSpdmDispatch), SpdmHeader->RequestResponseCode, (UINT8 *)Buffer, BufferSize);
 
-  if (!mEncapsulated) {
-    if (mParamDumpHex) {
+  if (mParamDumpHex) {
+    if (!mEncapsulated) {
       printf ("  SPDM Message:\n");
-      DumpHex (Buffer, BufferSize);
+    } else {
+      printf ("  Encapsulated SPDM Message:\n");
     }
+    DumpHex (Buffer, BufferSize);
   }
 }
 

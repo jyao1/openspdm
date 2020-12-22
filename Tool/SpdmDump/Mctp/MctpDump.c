@@ -40,9 +40,16 @@ DumpMctpMessage (
   printf ("MCTP(%d) ", MctpMessageHeader->MessageType);
 
   if (mParamDumpVendorApp ||
-     (MctpMessageHeader->MessageType == MCTP_MESSAGE_TYPE_SPDM) ||
-     (MctpMessageHeader->MessageType == MCTP_MESSAGE_TYPE_SECURED_MCTP)) {
+      (MctpMessageHeader->MessageType == MCTP_MESSAGE_TYPE_SPDM) ||
+      (MctpMessageHeader->MessageType == MCTP_MESSAGE_TYPE_SECURED_MCTP)) {
     DumpDispatchMessage (mMctpDispatch, ARRAY_SIZE(mMctpDispatch), MctpMessageHeader->MessageType, (UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
+
+    if (mParamDumpHex &&
+        (MctpMessageHeader->MessageType != MCTP_MESSAGE_TYPE_SPDM) &&
+        (MctpMessageHeader->MessageType != MCTP_MESSAGE_TYPE_SECURED_MCTP)) {
+      printf ("  MCTP Message:\n");
+      DumpHex (Buffer, BufferSize);
+    }
   } else {
     printf ("\n");
   }

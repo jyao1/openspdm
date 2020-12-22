@@ -16,6 +16,7 @@ DISPATCH_TABLE_ENTRY mSpdmPciProtocolDispatch[] = {
 #pragma pack(1)
 
 typedef struct {
+  UINT16               StandardID;
   UINT8                Len;
   UINT16               VendorID;
   UINT16               PayloadLength;
@@ -72,4 +73,9 @@ DumpSpdmVendorPci (
     (UINT8 *)Buffer + sizeof(SPDM_VENDOR_DEFINED_PCI_HEADER),
     VendorDefinedPciHeader->PayloadLength - sizeof(PCI_PROTOCOL_HEADER)
     );
+
+  if (mParamDumpHex) {
+    printf ("  PCI Vendor Message:\n");
+    DumpHex (Buffer, BufferSize);
+  }
 }

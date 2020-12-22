@@ -39,9 +39,16 @@ DumpPciDoePacket (
   }
   
   if (mParamDumpVendorApp ||
-     (PciDoeHeader->DataObjectType == PCI_DOE_DATA_OBJECT_TYPE_SPDM) ||
-     (PciDoeHeader->DataObjectType == PCI_DOE_DATA_OBJECT_TYPE_SECURED_SPDM)) {
+      (PciDoeHeader->DataObjectType == PCI_DOE_DATA_OBJECT_TYPE_SPDM) ||
+      (PciDoeHeader->DataObjectType == PCI_DOE_DATA_OBJECT_TYPE_SECURED_SPDM)) {
     DumpDispatchMessage (mPciDoeDispatch, ARRAY_SIZE(mPciDoeDispatch), PciDoeHeader->DataObjectType, (UINT8 *)Buffer + HeaderSize, BufferSize - HeaderSize);
+
+    if (mParamDumpHex &&
+        (PciDoeHeader->DataObjectType != PCI_DOE_DATA_OBJECT_TYPE_SPDM) &&
+        (PciDoeHeader->DataObjectType != PCI_DOE_DATA_OBJECT_TYPE_SECURED_SPDM)) {
+      printf ("  PCI_DOE Message:\n");
+      DumpHex (Buffer, BufferSize);
+    }
   } else {    
     printf ("\n");
   }
