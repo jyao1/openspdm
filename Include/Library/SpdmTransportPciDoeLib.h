@@ -89,4 +89,38 @@ SpdmTransportPciDoeDecodeMessage (
      OUT VOID                 *Message
   );
 
+/**
+  Get sequence number in an SPDM secure message.
+
+  This value is transport layer specific.
+
+  @param SequenceNumber        The current sequence number used to encode or decode message.
+  @param SequenceNumberBuffer  A buffer to hold the sequence number output used in the secured message.
+                               The size in byte of the output buffer shall be 8.
+
+  @return Size in byte of the SequenceNumberBuffer.
+          It shall be no greater than 8.
+          0 means no sequence number is required.
+**/
+UINT8
+EFIAPI
+PciDoeGetSequenceNumber (
+  IN     UINT64     SequenceNumber,
+  IN OUT UINT8      *SequenceNumberBuffer
+  );
+
+/**
+  Return max random number count in an SPDM secure message.
+
+  This value is transport layer specific.
+
+  @return Max random number count in an SPDM secured message.
+          0 means no randum number is required.
+**/
+UINT32
+EFIAPI
+PciDoeGetMaxRandomNumberCount (
+  VOID
+  );
+
 #endif

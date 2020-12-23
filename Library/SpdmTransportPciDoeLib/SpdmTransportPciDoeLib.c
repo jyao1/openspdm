@@ -11,6 +11,49 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/PciDoeBinding.h>
 
 #define PCI_DOE_ALIGNMENT 4
+#define PCI_DOE_SEQUENCE_NUMBER_COUNT 0
+#define PCI_DOE_MAX_RANDOM_NUMBER_COUNT 0
+
+/**
+  Get sequence number in an SPDM secure message.
+
+  This value is transport layer specific.
+
+  @param SequenceNumber        The current sequence number used to encode or decode message.
+  @param SequenceNumberBuffer  A buffer to hold the sequence number output used in the secured message.
+                               The size in byte of the output buffer shall be 8.
+
+  @return Size in byte of the SequenceNumberBuffer.
+          It shall be no greater than 8.
+          0 means no sequence number is required.
+**/
+UINT8
+EFIAPI
+PciDoeGetSequenceNumber (
+  IN     UINT64     SequenceNumber,
+  IN OUT UINT8      *SequenceNumberBuffer
+  )
+{
+  CopyMem (SequenceNumberBuffer, &SequenceNumber, PCI_DOE_SEQUENCE_NUMBER_COUNT);
+  return PCI_DOE_SEQUENCE_NUMBER_COUNT;
+}
+
+/**
+  Return max random number count in an SPDM secure message.
+
+  This value is transport layer specific.
+
+  @return Max random number count in an SPDM secured message.
+          0 means no randum number is required.
+**/
+UINT32
+EFIAPI
+PciDoeGetMaxRandomNumberCount (
+  VOID
+  )
+{
+  return PCI_DOE_MAX_RANDOM_NUMBER_COUNT;
+}
 
 /**
   Encode a normal message or secured message to a transport message.

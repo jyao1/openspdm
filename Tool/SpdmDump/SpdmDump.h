@@ -21,6 +21,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/LinkTypeEx.h>
 
 #include <Library/SpdmSecuredMessageLib.h>
+#include <Library/SpdmTransportMctpLib.h>
+#include <Library/SpdmTransportPciDoeLib.h>
 #include <SpdmCommonLibInternal.h>
 
 #include "OsInclude.h"

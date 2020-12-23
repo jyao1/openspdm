@@ -8,7 +8,7 @@
 
    DSP0274	Security Protocol and Data Model (SPDM) Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.0.0.pdf) and version [1.1.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.1.0.pdf))
 
-   DSP0277	Secured Messages using SPDM Specification (version [1.0.0a](https://www.dmtf.org/sites/default/files/standards/documents/DSP0277_1.0.0a.pdf))
+   DSP0277	Secured Messages using SPDM Specification (version [1.0.0b](https://www.dmtf.org/sites/default/files/standards/documents/DSP0277_1.0.0b.pdf))
 
    The MCTP and secured MCTP follow :
 

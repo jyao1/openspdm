@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //                                                                         V
 // +---------------------------------+--------------------------=-------+-------+------+---+
 // |SPDM_SECURED_MESSAGE_ADATA_HEADER|SPDM_SECURED_MESSAGE_CIPHER_HEADER|AppData|Random|MAC|
-// |   SessionId    |     Length     |     ApplicationDataLength (O)    |       |  (O) |   |
+// | SessionId | SeqNum (O) | Length |       ApplicationDataLength      |       |  (O) |   |
 // +---------------------------------+----------------------------------+-------+------+---+
 // |                                 |                                                 |   |
 //  --------------------------------- ------------------------------------------------- ---
@@ -29,7 +29,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //                  V                                         V                          V
 //            AssociatedData                            EncryptedData                 AeadTag
 //
-
+// (O) means Optional or Transport Layer Specific.
 //
 // AUTH session:
 //
@@ -39,7 +39,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //                                      V
 // +---------------------------------+-------+---+
 // |SPDM_SECURED_MESSAGE_ADATA_HEADER|AppData|MAC|
-// |   SessionId    |     Length     |       |   |
+// | SessionId | SeqNum (T) | Length |       |   |
 // +---------------------------------+-------+---+
 // |                                         |   |
 //  ----------------------------------------- ---
@@ -50,8 +50,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 typedef struct {
   UINT32   SessionId;
+} SPDM_SECURED_MESSAGE_ADATA_HEADER_1;
+
+// The length of SequenceNumber between HEADER_1 and HEADER_2 is transport specific.
+
+typedef struct {
   UINT16   Length; // The length of the remaining data, including ApplicationDataLength(O), Payload, Random(O) and MAC.
-} SPDM_SECURED_MESSAGE_ADATA_HEADER;
+} SPDM_SECURED_MESSAGE_ADATA_HEADER_2;
 
 typedef struct {
   UINT16   ApplicationDataLength; // The length of the Payload

@@ -147,6 +147,11 @@ SpdmTransportMctpEncodeMessage (
   UINTN                               AppMessageSize;
   UINT8                               SecuredMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               SecuredMessageSize;
+  SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+
+  SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
+  SpdmSecuredMessageCallbacks.GetSequenceNumber = MctpGetSequenceNumber;
+  SpdmSecuredMessageCallbacks.GetMaxRandomNumberCount = MctpGetMaxRandomNumberCount;
 
   if (IsAppMessage && (SessionId == NULL)) {
     return RETURN_UNSUPPORTED;
@@ -182,7 +187,8 @@ SpdmTransportMctpEncodeMessage (
                AppMessageSize,
                AppMessage,
                &SecuredMessageSize,
-               SecuredMessage
+               SecuredMessage,
+               &SpdmSecuredMessageCallbacks
                );
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_ERROR, "SpdmEncodeSecuredMessage - %p\n", Status));
@@ -265,6 +271,11 @@ SpdmTransportMctpDecodeMessage (
   UINTN                               SecuredMessageSize;
   UINT8                               AppMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               AppMessageSize;
+  SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+
+  SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
+  SpdmSecuredMessageCallbacks.GetSequenceNumber = MctpGetSequenceNumber;
+  SpdmSecuredMessageCallbacks.GetMaxRandomNumberCount = MctpGetMaxRandomNumberCount;
 
   if ((SessionId == NULL) || (IsAppMessage == NULL)) {
     return RETURN_UNSUPPORTED;
@@ -298,7 +309,8 @@ SpdmTransportMctpDecodeMessage (
                SecuredMessageSize,
                SecuredMessage,
                &AppMessageSize,
-               AppMessage
+               AppMessage,
+               &SpdmSecuredMessageCallbacks
                );
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_ERROR, "SpdmDecodeSecuredMessage - %p\n", Status));

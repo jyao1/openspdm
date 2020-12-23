@@ -157,28 +157,59 @@ DumpSecuredSpdmMessage (
   IN UINTN   BufferSize
   )
 {
-  SPDM_SECURED_MESSAGE_ADATA_HEADER  *SecuredMessageHeader;
+  SPDM_SECURED_MESSAGE_ADATA_HEADER_1 *RecordHeader1;
+  UINT16                              SequenceNum;
+  UINTN                               SequenceNumSize;
   RETURN_STATUS                       Status;
   UINTN                               MessageSize;
   STATIC BOOLEAN                      IsRequester = FALSE;
+  UINT32                              DataLinkType;
+  SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
 
-  if (BufferSize < sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER)) {
+  DataLinkType = GetDataLinkType();
+  switch (DataLinkType) {
+  case LINKTYPE_MCTP:
+    SequenceNumSize = sizeof(UINT16);
+    SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
+    SpdmSecuredMessageCallbacks.GetSequenceNumber = MctpGetSequenceNumber;
+    SpdmSecuredMessageCallbacks.GetMaxRandomNumberCount = MctpGetMaxRandomNumberCount;
+    break;
+  case LINKTYPE_PCI_DOE:
+    SequenceNumSize = 0;
+    SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
+    SpdmSecuredMessageCallbacks.GetSequenceNumber = PciDoeGetSequenceNumber;
+    SpdmSecuredMessageCallbacks.GetMaxRandomNumberCount = PciDoeGetMaxRandomNumberCount;
+    break;
+  default:
+    ASSERT (FALSE);
+    printf ("<UnknownTransportLayer> ");
     printf ("\n");
     return ;
   }
 
-  SecuredMessageHeader = Buffer;
+  if (BufferSize < sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_1) + SequenceNumSize + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_2)) {
+    printf ("\n");
+    return ;
+  }
+
   IsRequester = (BOOLEAN)(!IsRequester);
+
+  RecordHeader1 = Buffer;
+  SequenceNum = 0;
+  if (DataLinkType == LINKTYPE_MCTP) {
+    SequenceNum = *(UINT16 *)(RecordHeader1 + 1);
+  }
 
   MessageSize = GetMaxPacketLength();
   Status = SpdmDecodeSecuredMessage (
              mSpdmContext,
-             SecuredMessageHeader->SessionId,
+             RecordHeader1->SessionId,
              IsRequester,
              BufferSize,
              Buffer,
              &MessageSize,
-             mSpdmDecMessageBuffer
+             mSpdmDecMessageBuffer,
+             &SpdmSecuredMessageCallbacks
              );
   if (RETURN_ERROR(Status)) {
     //
@@ -186,12 +217,13 @@ DumpSecuredSpdmMessage (
     //
     Status = SpdmDecodeSecuredMessage (
               mSpdmContext,
-              SecuredMessageHeader->SessionId,
+              RecordHeader1->SessionId,
               !IsRequester,
               BufferSize,
               Buffer,
               &MessageSize,
-              mSpdmDecMessageBuffer
+              mSpdmDecMessageBuffer,
+              &SpdmSecuredMessageCallbacks
               );
     if (!RETURN_ERROR(Status)) {
       IsRequester = !IsRequester;
@@ -199,21 +231,29 @@ DumpSecuredSpdmMessage (
   }
 
   if (!RETURN_ERROR(Status)) {
-    mCurrentSessionInfo = SpdmGetSessionInfoViaSessionId (mSpdmContext, SecuredMessageHeader->SessionId);
+    mCurrentSessionInfo = SpdmGetSessionInfoViaSessionId (mSpdmContext, RecordHeader1->SessionId);
 
     if (IsRequester) {
       printf ("REQ->RSP ");
     } else {
       printf ("RSP->REQ ");
     }
-    printf ("SecuredSPDM(0x%08x) ", SecuredMessageHeader->SessionId);
+    printf ("SecuredSPDM(0x%08x", RecordHeader1->SessionId);
+    if (DataLinkType == LINKTYPE_MCTP) {
+      printf (", Seq=0x%04x", SequenceNum);
+    }
+    printf (") ");
 
     mDecrypted = TRUE;
     DumpDispatchMessage (mSecuredSpdmDispatch, ARRAY_SIZE(mSecuredSpdmDispatch), GetDataLinkType(), mSpdmDecMessageBuffer, MessageSize);
     mDecrypted = FALSE;
   } else {
     printf ("(?)->(?) ");
-    printf ("SecuredSPDM(0x%08x) ", SecuredMessageHeader->SessionId);
+    printf ("SecuredSPDM(0x%08x", RecordHeader1->SessionId);
+    if (DataLinkType == LINKTYPE_MCTP) {
+      printf (", Seq=0x%04x", SequenceNum);
+    }
+    printf (") ");
     printf ("<Unknown> ");
     printf ("\n");
   }

@@ -112,7 +112,6 @@ RETURN_STATUS
   The APP message is encoded to a secured message directly in SPDM session.
   The APP message format is defined by the transport layer.
   Take MCTP as example: APP message == MCTP header (MCTP_MESSAGE_TYPE_SPDM) + SPDM message
-  Take PCI DOE as example: APP message == vendor defined SPDM message
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
@@ -145,6 +144,11 @@ SpdmTransportPciDoeEncodeMessage (
   TRANSPORT_ENCODE_MESSAGE_FUNC       TransportEncodeMessage;
   UINT8                               SecuredMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               SecuredMessageSize;
+  SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+
+  SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
+  SpdmSecuredMessageCallbacks.GetSequenceNumber = PciDoeGetSequenceNumber;
+  SpdmSecuredMessageCallbacks.GetMaxRandomNumberCount = PciDoeGetMaxRandomNumberCount;
 
   if (IsAppMessage) {
     return RETURN_UNSUPPORTED;
@@ -161,7 +165,8 @@ SpdmTransportPciDoeEncodeMessage (
                MessageSize,
                Message,
                &SecuredMessageSize,
-               SecuredMessage
+               SecuredMessage,
+               &SpdmSecuredMessageCallbacks
                );
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_ERROR, "SpdmEncodeSecuredMessage - %p\n", Status));
@@ -208,7 +213,6 @@ SpdmTransportPciDoeEncodeMessage (
   The APP message is decoded from a secured message directly in SPDM session.
   The APP message format is defined by the transport layer.
   Take MCTP as example: APP message == MCTP header (MCTP_MESSAGE_TYPE_SPDM) + SPDM message
-  Take PCI DOE as example: APP message == vendor defined SPDM message
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
@@ -243,6 +247,11 @@ SpdmTransportPciDoeDecodeMessage (
   UINT32                              *SecuredMessageSessionId;
   UINT8                               SecuredMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               SecuredMessageSize;
+  SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+
+  SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
+  SpdmSecuredMessageCallbacks.GetSequenceNumber = PciDoeGetSequenceNumber;
+  SpdmSecuredMessageCallbacks.GetMaxRandomNumberCount = PciDoeGetMaxRandomNumberCount;
 
   if ((SessionId == NULL) || (IsAppMessage == NULL)) {
     return RETURN_UNSUPPORTED;
@@ -276,7 +285,8 @@ SpdmTransportPciDoeDecodeMessage (
                SecuredMessageSize,
                SecuredMessage,
                MessageSize,
-               Message
+               Message,
+               &SpdmSecuredMessageCallbacks
                );
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_ERROR, "SpdmDecodeSecuredMessage - %p\n", Status));

@@ -13,6 +13,48 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmCommonLib.h>
 
 /**
+  Get sequence number in an SPDM secure message.
+
+  This value is transport layer specific.
+
+  @param SequenceNumber        The current sequence number used to encode or decode message.
+  @param SequenceNumberBuffer  A buffer to hold the sequence number output used in the secured message.
+                               The size in byte of the output buffer shall be 8.
+
+  @return Size in byte of the SequenceNumberBuffer.
+          It shall be no greater than 8.
+          0 means no sequence number is required.
+**/
+typedef
+UINT8
+(EFIAPI *SPDM_SECURED_MESSAGE_GET_SEQUENCE_NUMBER) (
+  IN     UINT64     SequenceNumber,
+  IN OUT UINT8      *SequenceNumberBuffer
+  );
+
+/**
+  Return max random number count in an SPDM secure message.
+
+  This value is transport layer specific.
+
+  @return Max random number count in an SPDM secured message.
+          0 means no randum number is required.
+**/
+typedef
+UINT32
+(EFIAPI *SPDM_SECURED_MESSAGE_GET_MAX_RANDOM_NUMBER_COUNT) (
+  VOID
+  );
+
+#define SPDM_SECURED_MESSAGE_CALLBACKS_VERSION 1
+
+typedef struct {
+  UINT32                                            Version;
+  SPDM_SECURED_MESSAGE_GET_SEQUENCE_NUMBER          GetSequenceNumber;
+  SPDM_SECURED_MESSAGE_GET_MAX_RANDOM_NUMBER_COUNT  GetMaxRandomNumberCount;
+} SPDM_SECURED_MESSAGE_CALLBACKS;
+
+/**
   Encode an application message to a secured message.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -22,6 +64,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param  AppMessage                   A pointer to a source buffer to store the application message.
   @param  SecuredMessageSize           Size in bytes of the secured message data buffer.
   @param  SecuredMessage               A pointer to a destination buffer to store the secured message.
+  @param  SpdmSecuredMessageCallbacks  A pointer to a secured message callback functions structure.
 
   @retval RETURN_SUCCESS               The application message is encoded successfully.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -29,13 +72,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 EFIAPI
 SpdmEncodeSecuredMessage (
-  IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
-  IN     BOOLEAN              IsRequester,
-  IN     UINTN                AppMessageSize,
-  IN     VOID                 *AppMessage,
-  IN OUT UINTN                *SecuredMessageSize,
-     OUT VOID                 *SecuredMessage
+  IN     VOID                           *SpdmContext,
+  IN     UINT32                         SessionId,
+  IN     BOOLEAN                        IsRequester,
+  IN     UINTN                          AppMessageSize,
+  IN     VOID                           *AppMessage,
+  IN OUT UINTN                          *SecuredMessageSize,
+     OUT VOID                           *SecuredMessage,
+  IN     SPDM_SECURED_MESSAGE_CALLBACKS *SpdmSecuredMessageCallbacks
   );
 
 /**
@@ -48,6 +92,7 @@ SpdmEncodeSecuredMessage (
   @param  SecuredMessage               A pointer to a source buffer to store the secured message.
   @param  AppMessageSize               Size in bytes of the application message data buffer.
   @param  AppMessage                   A pointer to a destination buffer to store the application message.
+  @param  SpdmSecuredMessageCallbacks  A pointer to a secured message callback functions structure.
 
   @retval RETURN_SUCCESS               The application message is decoded successfully.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -56,13 +101,14 @@ SpdmEncodeSecuredMessage (
 RETURN_STATUS
 EFIAPI
 SpdmDecodeSecuredMessage (
-  IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
-  IN     BOOLEAN              IsRequester,
-  IN     UINTN                SecuredMessageSize,
-  IN     VOID                 *SecuredMessage,
-  IN OUT UINTN                *AppMessageSize,
-     OUT VOID                 *AppMessage
+  IN     VOID                           *SpdmContext,
+  IN     UINT32                         SessionId,
+  IN     BOOLEAN                        IsRequester,
+  IN     UINTN                          SecuredMessageSize,
+  IN     VOID                           *SecuredMessage,
+  IN OUT UINTN                          *AppMessageSize,
+     OUT VOID                           *AppMessage,
+  IN     SPDM_SECURED_MESSAGE_CALLBACKS *SpdmSecuredMessageCallbacks
   );
 
 /**

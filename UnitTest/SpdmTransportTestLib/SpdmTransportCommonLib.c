@@ -11,15 +11,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmSecuredMessageLib.h>
 
 /**
-  Encode a normal message or secured message to a test transport message.
+  Encode a normal message or secured message to a transport message.
 
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
                                        If SessionId is NULL, it is a normal message.
                                        If SessionId is NOT NULL, it is a secured message.
   @param  MessageSize                  Size in bytes of the message data buffer.
   @param  Message                      A pointer to a source buffer to store the message.
-  @param  TestMessageSize              Size in bytes of the transport message data buffer.
-  @param  TestMessage                  A pointer to a destination buffer to store the transport message.
+  @param  TransportMessageSize         Size in bytes of the transport message data buffer.
+  @param  TransportMessage             A pointer to a destination buffer to store the transport message.
 
   @retval RETURN_SUCCESS               The message is encoded successfully.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -29,18 +29,18 @@ TestEncodeMessage (
   IN     UINT32               *SessionId,
   IN     UINTN                MessageSize,
   IN     VOID                 *Message,
-  IN OUT UINTN                *TestMessageSize,
-     OUT VOID                 *TestMessage
+  IN OUT UINTN                *TransportMessageSize,
+     OUT VOID                 *TransportMessage
   );
 
 /**
-  Decode a test transport message to a normal message or secured message.
+  Decode a transport message to a normal message or secured message.
 
   @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
                                        If *SessionId is NULL, it is a normal message.
                                        If *SessionId is NOT NULL, it is a secured message.
-  @param  TestMessageSize              Size in bytes of the transport message data buffer.
-  @param  TestMessage                  A pointer to a source buffer to store the transport message.
+  @param  TransportMessageSize         Size in bytes of the transport message data buffer.
+  @param  TransportMessage             A pointer to a source buffer to store the transport message.
   @param  MessageSize                  Size in bytes of the message data buffer.
   @param  Message                      A pointer to a destination buffer to store the message.
   @retval RETURN_SUCCESS               The message is encoded successfully.
@@ -49,8 +49,8 @@ TestEncodeMessage (
 RETURN_STATUS
 TestDecodeMessage (
      OUT UINT32               **SessionId,
-  IN     UINTN                TestMessageSize,
-  IN     VOID                 *TestMessage,
+  IN     UINTN                TransportMessageSize,
+  IN     VOID                 *TransportMessage,
   IN OUT UINTN                *MessageSize,
      OUT VOID                 *Message
   );
@@ -147,8 +147,13 @@ SpdmTransportTestEncodeMessage (
   UINTN                               AppMessageSize;
   UINT8                               SecuredMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               SecuredMessageSize;
+  SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
 
-  if (IsAppMessage && (SessionId != NULL)) {
+  SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
+  SpdmSecuredMessageCallbacks.GetSequenceNumber = TestGetSequenceNumber;
+  SpdmSecuredMessageCallbacks.GetMaxRandomNumberCount = TestGetMaxRandomNumberCount;
+
+  if (IsAppMessage && (SessionId == NULL)) {
     return RETURN_UNSUPPORTED;
   }
 
@@ -182,7 +187,8 @@ SpdmTransportTestEncodeMessage (
                AppMessageSize,
                AppMessage,
                &SecuredMessageSize,
-               SecuredMessage
+               SecuredMessage,
+               &SpdmSecuredMessageCallbacks
                );
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_ERROR, "SpdmEncodeSecuredMessage - %p\n", Status));
@@ -265,6 +271,11 @@ SpdmTransportTestDecodeMessage (
   UINTN                               SecuredMessageSize;
   UINT8                               AppMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               AppMessageSize;
+  SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+
+  SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
+  SpdmSecuredMessageCallbacks.GetSequenceNumber = TestGetSequenceNumber;
+  SpdmSecuredMessageCallbacks.GetMaxRandomNumberCount = TestGetMaxRandomNumberCount;
 
   if ((SessionId == NULL) || (IsAppMessage == NULL)) {
     return RETURN_UNSUPPORTED;
@@ -298,7 +309,8 @@ SpdmTransportTestDecodeMessage (
                SecuredMessageSize,
                SecuredMessage,
                &AppMessageSize,
-               AppMessage
+               AppMessage,
+               &SpdmSecuredMessageCallbacks
                );
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_ERROR, "SpdmDecodeSecuredMessage - %p\n", Status));

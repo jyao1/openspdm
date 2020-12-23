@@ -137,48 +137,48 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
       ......
       39 (1608625474) MCTP(5) REQ->RSP SPDM(11, 0xe4) SPDM_KEY_EXCHANGE (HashType=0x01(TcbHash), SlotID=0x00, ReqSessionID=0xffff)
       40 (1608625474) MCTP(5) RSP->REQ SPDM(11, 0x64) SPDM_KEY_EXCHANGE_RSP (Heart=0x00, RspSessionID=0xffff, MutAuth=0x03(Requested,WithEncap), SlotID=0x00)
-      41 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xea) SPDM_GET_ENCAPSULATED_REQUEST ()
-      42 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x6a) SPDM_ENCAPSULATED_REQUEST (ReqID=0x01) SPDM(11, 0x81) SPDM_GET_DIGESTS ()
-      43 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x01) SPDM_DIGESTS (SlotMask=0x03)
-      44 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x01) SPDM(11, 0x82) SPDM_GET_CERTIFICATE (SlotID=0x00, Offset=0x0, Length=0x400)
-      45 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x02) SPDM_CERTIFICATE (SlotID=0x00, PortLen=0x400, RemLen=0x9d4)
-      46 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x01) SPDM(11, 0x82) SPDM_GET_CERTIFICATE (SlotID=0x00, Offset=0x400, Length=0x400)
-      47 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x02) SPDM_CERTIFICATE (SlotID=0x00, PortLen=0x400, RemLen=0x5d4)
-      48 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x01) SPDM(11, 0x82) SPDM_GET_CERTIFICATE (SlotID=0x00, Offset=0x800, Length=0x400)
-      49 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x02) SPDM_CERTIFICATE (SlotID=0x00, PortLen=0x400, RemLen=0x1d4)
-      50 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x01) SPDM(11, 0x82) SPDM_GET_CERTIFICATE (SlotID=0x00, Offset=0xc00, Length=0x400)
-      51 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x02) SPDM_CERTIFICATE (SlotID=0x00, PortLen=0x1d4, RemLen=0x0)
-      52 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x00) (Done)
+      41 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0000) MCTP(5) SPDM(11, 0xea) SPDM_GET_ENCAPSULATED_REQUEST ()
+      42 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0000) MCTP(5) SPDM(11, 0x6a) SPDM_ENCAPSULATED_REQUEST (ReqID=0x01) SPDM(11, 0x81) SPDM_GET_DIGESTS ()
+      43 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0001) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x01) SPDM_DIGESTS (SlotMask=0x03)
+      44 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0001) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x01) SPDM(11, 0x82) SPDM_GET_CERTIFICATE (SlotID=0x00, Offset=0x0, Length=0x400)
+      45 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0002) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x02) SPDM_CERTIFICATE (SlotID=0x00, PortLen=0x400, RemLen=0x9d4)
+      46 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0002) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x01) SPDM(11, 0x82) SPDM_GET_CERTIFICATE (SlotID=0x00, Offset=0x400, Length=0x400)
+      47 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0003) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x02) SPDM_CERTIFICATE (SlotID=0x00, PortLen=0x400, RemLen=0x5d4)
+      48 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0003) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x01) SPDM(11, 0x82) SPDM_GET_CERTIFICATE (SlotID=0x00, Offset=0x800, Length=0x400)
+      49 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0004) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x02) SPDM_CERTIFICATE (SlotID=0x00, PortLen=0x400, RemLen=0x1d4)
+      50 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0004) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x01) SPDM(11, 0x82) SPDM_GET_CERTIFICATE (SlotID=0x00, Offset=0xc00, Length=0x400)
+      51 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0005) MCTP(5) SPDM(11, 0xeb) SPDM_DELIVER_ENCAPSULATED_RESPONSE (ReqID=0x01) SPDM(11, 0x02) SPDM_CERTIFICATE (SlotID=0x00, PortLen=0x1d4, RemLen=0x0)
+      52 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0005) MCTP(5) SPDM(11, 0x6b) SPDM_ENCAPSULATED_RESPONSE_ACK (ReqID=0x00) (Done)
       53 (1608625474) MCTP(5) REQ->RSP SPDM(11, 0xe5) SPDM_FINISH (Attr=0x01 (SigIncl=1), SlotID=0x00)
       54 (1608625474) MCTP(5) RSP->REQ SPDM(11, 0x65) SPDM_FINISH_RSP ()
       55 (1608625474) MCTP(5) REQ->RSP SPDM(11, 0xe6) SPDM_PSK_EXCHANGE (HashType=0x01(TcbHash), ReqSessionID=0xfffe, PSKHint=5465737450736b48696e7400)
       56 (1608625474) MCTP(5) RSP->REQ SPDM(11, 0x66) SPDM_PSK_EXCHANGE_RSP (Heart=0x00, RspSessionID=0xfffe)
-      57 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0xe7) SPDM_PSK_FINISH ()
-      58 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0x67) SPDM_PSK_FINISH_RSP ()
-      59 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(10, 0xfe) SPDM_VENDOR_DEFINED_REQUEST (StandID=0x0003)
-      60 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(10, 0x7e) SPDM_VENDOR_DEFINED_RESPONSE (StandID=0x0003)
-      61 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(1)
-      62 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(1)
-      63 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe) MCTP(5) SPDM(10, 0xfe) SPDM_VENDOR_DEFINED_REQUEST (StandID=0x0003)
-      64 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(5) SPDM(10, 0x7e) SPDM_VENDOR_DEFINED_RESPONSE (StandID=0x0003)
-      65 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe) MCTP(1)
-      66 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(1)
-      67 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xe8) SPDM_HEARTBEAT ()
-      68 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x68) SPDM_HEARTBEAT_ACK ()
-      69 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0xe8) SPDM_HEARTBEAT ()
-      70 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0x68) SPDM_HEARTBEAT_ACK ()
-      71 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xe9) SPDM_KEY_UPDATE (KeyOp=0x01(UpdateKey), Tag=0xc0)
-      72 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x69) SPDM_KEY_UPDATE_ACK (KeyOp=0x01(UpdateKey), Tag=0xc0)
-      73 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xe9) SPDM_KEY_UPDATE (KeyOp=0x03(VerifyNewKey), Tag=0x77)
-      74 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x69) SPDM_KEY_UPDATE_ACK (KeyOp=0x03(VerifyNewKey), Tag=0x77)
-      75 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0xe9) SPDM_KEY_UPDATE (KeyOp=0x02(UpdateAllkeys), Tag=0xfc)
-      76 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0x69) SPDM_KEY_UPDATE_ACK (KeyOp=0x02(UpdateAllkeys), Tag=0xfc)
-      77 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0xe9) SPDM_KEY_UPDATE (KeyOp=0x03(VerifyNewKey), Tag=0x37)
-      78 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0x69) SPDM_KEY_UPDATE_ACK (KeyOp=0x03(VerifyNewKey), Tag=0x37)
-      79 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0xec) SPDM_END_SESSION (Attr=0x00())
-      80 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff) MCTP(5) SPDM(11, 0x6c) SPDM_END_SESSION_ACK ()
-      81 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0xec) SPDM_END_SESSION (Attr=0x00())
-      82 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0x6c) SPDM_END_SESSION_ACK ()
+      57 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe, Seq=0x0000) MCTP(5) SPDM(11, 0xe7) SPDM_PSK_FINISH ()
+      58 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0000) MCTP(5) SPDM(11, 0x67) SPDM_PSK_FINISH_RSP ()
+      59 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0000) MCTP(5) SPDM(10, 0xfe) SPDM_VENDOR_DEFINED_REQUEST (StandID=0x0003)
+      60 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0000) MCTP(5) SPDM(10, 0x7e) SPDM_VENDOR_DEFINED_RESPONSE (StandID=0x0003)
+      61 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0001) MCTP(1)
+      62 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0001) MCTP(1)
+      63 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe, Seq=0x0000) MCTP(5) SPDM(10, 0xfe) SPDM_VENDOR_DEFINED_REQUEST (StandID=0x0003)
+      64 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0000) MCTP(5) SPDM(10, 0x7e) SPDM_VENDOR_DEFINED_RESPONSE (StandID=0x0003)
+      65 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe, Seq=0x0001) MCTP(1)
+      66 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0001) MCTP(1)
+      67 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0002) MCTP(5) SPDM(11, 0xe8) SPDM_HEARTBEAT ()
+      68 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0002) MCTP(5) SPDM(11, 0x68) SPDM_HEARTBEAT_ACK ()
+      69 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe, Seq=0x0002) MCTP(5) SPDM(11, 0xe8) SPDM_HEARTBEAT ()
+      70 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0002) MCTP(5) SPDM(11, 0x68) SPDM_HEARTBEAT_ACK ()
+      71 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0003) MCTP(5) SPDM(11, 0xe9) SPDM_KEY_UPDATE (KeyOp=0x01(UpdateKey), Tag=0xc0)
+      72 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0003) MCTP(5) SPDM(11, 0x69) SPDM_KEY_UPDATE_ACK (KeyOp=0x01(UpdateKey), Tag=0xc0)
+      73 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0000) MCTP(5) SPDM(11, 0xe9) SPDM_KEY_UPDATE (KeyOp=0x03(VerifyNewKey), Tag=0x77)
+      74 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0004) MCTP(5) SPDM(11, 0x69) SPDM_KEY_UPDATE_ACK (KeyOp=0x03(VerifyNewKey), Tag=0x77)
+      75 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe, Seq=0x0003) MCTP(5) SPDM(11, 0xe9) SPDM_KEY_UPDATE (KeyOp=0x02(UpdateAllkeys), Tag=0xfc)
+      76 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0000) MCTP(5) SPDM(11, 0x69) SPDM_KEY_UPDATE_ACK (KeyOp=0x02(UpdateAllkeys), Tag=0xfc)
+      77 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe, Seq=0x0000) MCTP(5) SPDM(11, 0xe9) SPDM_KEY_UPDATE (KeyOp=0x03(VerifyNewKey), Tag=0x37)
+      78 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0001) MCTP(5) SPDM(11, 0x69) SPDM_KEY_UPDATE_ACK (KeyOp=0x03(VerifyNewKey), Tag=0x37)
+      79 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xffffffff, Seq=0x0001) MCTP(5) SPDM(11, 0xec) SPDM_END_SESSION (Attr=0x00())
+      80 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xffffffff, Seq=0x0005) MCTP(5) SPDM(11, 0x6c) SPDM_END_SESSION_ACK ()
+      81 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe, Seq=0x0001) MCTP(5) SPDM(11, 0xec) SPDM_END_SESSION (Attr=0x00())
+      82 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0002) MCTP(5) SPDM(11, 0x6c) SPDM_END_SESSION_ACK ()
    </pre>
 
 3. If GET_CERTIFICATE or encapsulated GET_CERTIFICATE is not sent, the user need use `--rsp_cert_chain` or `--req_cert_chain` to indicate the responder certificate chain or the requester certificate chain, to dump the secured session data.
@@ -195,8 +195,8 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
 
    <pre>
       ......
-      65 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe) MCTP(1) PLDM(0x80, 0x00, 0x02) (ID=0, D=0, Rq=1) ControlDiscovery GetTID_req ()
-      66 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(1) PLDM(0x00, 0x00, 0x02, 0x00) (ID=0, D=0, Rq=0) ControlDiscovery GetTID_rsp (TID=0x01)
+      65 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe, Seq=0x0001) MCTP(1) PLDM(0x80, 0x00, 0x02) (ID=0, D=0, Rq=1) ControlDiscovery GetTID_req ()
+      66 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0001) MCTP(1) PLDM(0x00, 0x00, 0x02, 0x00) (ID=0, D=0, Rq=0) ControlDiscovery GetTID_rsp (TID=0x01)
       ......
    </pre>
 
@@ -325,9 +325,9 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
             SecuredMessageOpaqueDataHeader(SpecId=0x444d5446(DMTF), Ver=0x01, TotalElem=0x01)
             SecuredMessageOpaqueElement_0(Id=0x00, Len=0x0004) Element(Ver=0x01, Id=0x00) VERSION_SELECTION (1.1.0.0)
          VerifyData(37 71 6b fa e9 da e4 82 f3 9c 05 8e d7 e8 9e fc 5f 2d 93 0c 70 49 6f b5 61 9c 66 40 ff 71 11 ce)
-      57 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0xe7) SPDM_PSK_FINISH ()
+      57 (1608625474) MCTP(6) REQ->RSP SecuredSPDM(0xfffefffe, Seq=0x0000) MCTP(5) SPDM(11, 0xe7) SPDM_PSK_FINISH ()
          VerifyData(d5 8f 55 97 8e 97 c6 f8 1a d5 0d 5f 9f da 6b 83 8e 15 5f 1b c4 0d df 7c 42 cb 79 24 89 b4 59 e0)
-      58 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0x67) SPDM_PSK_FINISH_RSP ()
+      58 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0000) MCTP(5) SPDM(11, 0x67) SPDM_PSK_FINISH_RSP ()
       ......
    </pre>
 
@@ -339,7 +339,7 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
          SPDM Message:
             0000: 10 84 00 00
       ......
-      82 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe) MCTP(5) SPDM(11, 0x6c) SPDM_END_SESSION_ACK ()
+      82 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0002) MCTP(5) SPDM(11, 0x6c) SPDM_END_SESSION_ACK ()
          SPDM Message:
             0000: 11 6c 00 00
          SecuredSPDM Message:

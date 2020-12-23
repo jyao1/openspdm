@@ -310,6 +310,7 @@ SecuredMessageGetSpdmAeadDecFunc (
   @param  AppMessage                   A pointer to a source buffer to store the application message.
   @param  SecuredMessageSize           Size in bytes of the secured message data buffer.
   @param  SecuredMessage               A pointer to a destination buffer to store the secured message.
+  @param  SpdmSecuredMessageCallbacks  A pointer to a secured message callback functions structure.
 
   @retval RETURN_SUCCESS               The application message is encoded successfully.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -317,13 +318,14 @@ SecuredMessageGetSpdmAeadDecFunc (
 RETURN_STATUS
 EFIAPI
 SpdmEncodeSecuredMessage (
-  IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
-  IN     BOOLEAN              IsRequester,
-  IN     UINTN                AppMessageSize,
-  IN     VOID                 *AppMessage,
-  IN OUT UINTN                *SecuredMessageSize,
-     OUT VOID                 *SecuredMessage
+  IN     VOID                           *SpdmContext,
+  IN     UINT32                         SessionId,
+  IN     BOOLEAN                        IsRequester,
+  IN     UINTN                          AppMessageSize,
+  IN     VOID                           *AppMessage,
+  IN OUT UINTN                          *SecuredMessageSize,
+     OUT VOID                           *SecuredMessage,
+  IN     SPDM_SECURED_MESSAGE_CALLBACKS *SpdmSecuredMessageCallbacks
   )
 {
   UINTN                              TotalSecuredMessageSize;
@@ -337,14 +339,19 @@ SpdmEncodeSecuredMessage (
   UINT8                              *EncMsg;
   UINT8                              *DecMsg;
   UINT8                              *Tag;
-  SPDM_SECURED_MESSAGE_ADATA_HEADER  *RecordHeader;
+  SPDM_SECURED_MESSAGE_ADATA_HEADER_1 *RecordHeader1;
+  SPDM_SECURED_MESSAGE_ADATA_HEADER_2 *RecordHeader2;
+  UINTN                              RecordHeaderSize;
   SPDM_SECURED_MESSAGE_CIPHER_HEADER *EncMsgHeader;
   BOOLEAN                            Result;
   UINT8                              Key[MAX_AEAD_KEY_SIZE];
   UINT8                              Salt[MAX_AEAD_IV_SIZE];
   UINT64                             SequenceNumber;
+  UINT64                             SequenceNumInHeader;
+  UINT8                              SequenceNumInHeaderSize;
   SPDM_SESSION_TYPE                  SessionType;
-  UINT8                              RandCount;
+  UINT32                             RandCount;
+  UINT32                             MaxRandCount;
   RETURN_STATUS                      Status;
   SPDM_DATA_PARAMETER                Parameter;
   UINTN                              DataSize;
@@ -422,17 +429,29 @@ SpdmEncodeSecuredMessage (
   ASSERT_RETURN_ERROR(Status);
   ASSERT (DataSize == sizeof(SequenceNumber));
   *(UINT64 *)Salt = *(UINT64 *)Salt ^ SequenceNumber;
+
+  SequenceNumInHeader = 0;
+  SequenceNumInHeaderSize = SpdmSecuredMessageCallbacks->GetSequenceNumber (SequenceNumber, (UINT8 *)&SequenceNumInHeader);
+  ASSERT (SequenceNumInHeaderSize <= sizeof(SequenceNumInHeader));
+
   SequenceNumber++;
   Status = SpdmSetData (SpdmContext, SequenceNumberDataType, &Parameter, &SequenceNumber, DataSize);
   ASSERT_RETURN_ERROR(Status);
 
+  RecordHeaderSize = sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_1) + SequenceNumInHeaderSize + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_2);
+
   if (SessionType == SpdmSessionTypeEncMac) {
-    RandomBytes (&RandCount, sizeof(RandCount));
-    RandCount = (UINT8)((RandCount % 32) + 1);
+    MaxRandCount = SpdmSecuredMessageCallbacks->GetMaxRandomNumberCount ();
+    if (MaxRandCount != 0) {
+      RandomBytes ((UINT8 *)&RandCount, sizeof(RandCount));
+      RandCount = (UINT8)((RandCount % MaxRandCount) + 1);
+    } else {
+      RandCount = 0;
+    }
 
     PlainTextSize = sizeof(SPDM_SECURED_MESSAGE_CIPHER_HEADER) + AppMessageSize + RandCount;
     CipherTextSize = (PlainTextSize + AeadBlockSize - 1) / AeadBlockSize * AeadBlockSize;
-    TotalSecuredMessageSize = sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + CipherTextSize + AeadTagSize;
+    TotalSecuredMessageSize = RecordHeaderSize + CipherTextSize + AeadTagSize;
 
     ASSERT (*SecuredMessageSize >= TotalSecuredMessageSize);
     if (*SecuredMessageSize < TotalSecuredMessageSize) {
@@ -440,18 +459,20 @@ SpdmEncodeSecuredMessage (
       return RETURN_BUFFER_TOO_SMALL;
     }
     *SecuredMessageSize = TotalSecuredMessageSize;
-    RecordHeader = (VOID *)SecuredMessage;
-    RecordHeader->SessionId = SessionId;
-    RecordHeader->Length = (UINT16)(CipherTextSize + AeadTagSize);
-    EncMsgHeader = (VOID *)(RecordHeader + 1);
+    RecordHeader1 = (VOID *)SecuredMessage;
+    RecordHeader2 = (VOID *)((UINT8 *)RecordHeader1 + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_1) + SequenceNumInHeaderSize);
+    RecordHeader1->SessionId = SessionId;
+    CopyMem (RecordHeader1 + 1, &SequenceNumInHeader, SequenceNumInHeaderSize);
+    RecordHeader2->Length = (UINT16)(CipherTextSize + AeadTagSize);
+    EncMsgHeader = (VOID *)(RecordHeader2 + 1);
     EncMsgHeader->ApplicationDataLength = (UINT16)AppMessageSize;
     CopyMem (EncMsgHeader + 1, AppMessage, AppMessageSize);
     RandomBytes ((UINT8 *)EncMsgHeader + sizeof(SPDM_SECURED_MESSAGE_CIPHER_HEADER) + AppMessageSize, RandCount);
 
-    AData = (UINT8 *)RecordHeader;
+    AData = (UINT8 *)RecordHeader1;
     EncMsg = (UINT8 *)EncMsgHeader;
     DecMsg = (UINT8 *)EncMsgHeader;
-    Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + CipherTextSize;
+    Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + CipherTextSize;
 
     Result = AeadEncFunction (
               Key,
@@ -459,7 +480,7 @@ SpdmEncodeSecuredMessage (
               Salt,
               AeadIvSize,
               (UINT8 *)AData,
-              sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER),
+              RecordHeaderSize,
               DecMsg,
               CipherTextSize,
               Tag,
@@ -468,7 +489,7 @@ SpdmEncodeSecuredMessage (
               &CipherTextSize
               );
   } else { // SessionType == SpdmSessionTypeMacOnly
-    TotalSecuredMessageSize = sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + AppMessageSize + AeadTagSize;
+    TotalSecuredMessageSize = RecordHeaderSize + AppMessageSize + AeadTagSize;
 
     ASSERT (*SecuredMessageSize >= TotalSecuredMessageSize);
     if (*SecuredMessageSize < TotalSecuredMessageSize) {
@@ -476,12 +497,14 @@ SpdmEncodeSecuredMessage (
       return RETURN_BUFFER_TOO_SMALL;
     }
     *SecuredMessageSize = TotalSecuredMessageSize;
-    RecordHeader = (VOID *)SecuredMessage;
-    RecordHeader->SessionId = SessionId;
-    RecordHeader->Length = (UINT16)(AppMessageSize + AeadTagSize);
-    CopyMem (RecordHeader + 1, AppMessage, AppMessageSize);
-    AData = (UINT8 *)RecordHeader;
-    Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + AppMessageSize;
+    RecordHeader1 = (VOID *)SecuredMessage;
+    RecordHeader2 = (VOID *)((UINT8 *)RecordHeader1 + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_1) + SequenceNumInHeaderSize);
+    RecordHeader1->SessionId = SessionId;
+    CopyMem (RecordHeader1 + 1, &SequenceNumInHeader, SequenceNumInHeaderSize);
+    RecordHeader2->Length = (UINT16)(AppMessageSize + AeadTagSize);
+    CopyMem (RecordHeader2 + 1, AppMessage, AppMessageSize);
+    AData = (UINT8 *)RecordHeader1;
+    Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + AppMessageSize;
 
     Result = AeadEncFunction (
               Key,
@@ -489,7 +512,7 @@ SpdmEncodeSecuredMessage (
               Salt,
               AeadIvSize,
               (UINT8 *)AData,
-              sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + AppMessageSize,
+              RecordHeaderSize + AppMessageSize,
               NULL,
               0,
               Tag,
@@ -514,6 +537,7 @@ SpdmEncodeSecuredMessage (
   @param  SecuredMessage               A pointer to a source buffer to store the secured message.
   @param  AppMessageSize               Size in bytes of the application message data buffer.
   @param  AppMessage                   A pointer to a destination buffer to store the application message.
+  @param  SpdmSecuredMessageCallbacks  A pointer to a secured message callback functions structure.
 
   @retval RETURN_SUCCESS               The application message is decoded successfully.
   @retval RETURN_INVALID_PARAMETER     The Message is NULL or the MessageSize is zero.
@@ -522,13 +546,14 @@ SpdmEncodeSecuredMessage (
 RETURN_STATUS
 EFIAPI
 SpdmDecodeSecuredMessage (
-  IN     VOID                 *SpdmContext,
-  IN     UINT32               SessionId,
-  IN     BOOLEAN              IsRequester,
-  IN     UINTN                SecuredMessageSize,
-  IN     VOID                 *SecuredMessage,
-  IN OUT UINTN                *AppMessageSize,
-     OUT VOID                 *AppMessage
+  IN     VOID                           *SpdmContext,
+  IN     UINT32                         SessionId,
+  IN     BOOLEAN                        IsRequester,
+  IN     UINTN                          SecuredMessageSize,
+  IN     VOID                           *SecuredMessage,
+  IN OUT UINTN                          *AppMessageSize,
+     OUT VOID                           *AppMessage,
+  IN     SPDM_SECURED_MESSAGE_CALLBACKS *SpdmSecuredMessageCallbacks
   )
 {
   UINTN                              PlainTextSize;
@@ -541,12 +566,16 @@ SpdmDecodeSecuredMessage (
   UINT8                              *EncMsg;
   UINT8                              *DecMsg;
   UINT8                              *Tag;
-  SPDM_SECURED_MESSAGE_ADATA_HEADER  *RecordHeader;
+  SPDM_SECURED_MESSAGE_ADATA_HEADER_1 *RecordHeader1;
+  SPDM_SECURED_MESSAGE_ADATA_HEADER_2 *RecordHeader2;
+  UINTN                              RecordHeaderSize;
   SPDM_SECURED_MESSAGE_CIPHER_HEADER *EncMsgHeader;
   BOOLEAN                            Result;
   UINT8                              Key[MAX_AEAD_KEY_SIZE];
   UINT8                              Salt[MAX_AEAD_IV_SIZE];
   UINT64                             SequenceNumber;
+  UINT64                             SequenceNumInHeader;
+  UINT8                              SequenceNumInHeaderSize;
   SPDM_SESSION_TYPE                  SessionType;
   RETURN_STATUS                      Status;
   SPDM_DATA_PARAMETER                Parameter;
@@ -625,37 +654,48 @@ SpdmDecodeSecuredMessage (
   ASSERT_RETURN_ERROR(Status);
   ASSERT (DataSize == sizeof(SequenceNumber));
   *(UINT64 *)Salt = *(UINT64 *)Salt ^ SequenceNumber;
+
+  SequenceNumInHeader = 0;
+  SequenceNumInHeaderSize = SpdmSecuredMessageCallbacks->GetSequenceNumber (SequenceNumber, (UINT8 *)&SequenceNumInHeader);
+  ASSERT (SequenceNumInHeaderSize <= sizeof(SequenceNumInHeader));
+
   SequenceNumber++;
   Status = SpdmSetData (SpdmContext, SequenceNumberDataType, &Parameter, &SequenceNumber, DataSize);
   ASSERT_RETURN_ERROR(Status);
 
+  RecordHeaderSize = sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_1) + SequenceNumInHeaderSize + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_2);
+
   if (SessionType == SpdmSessionTypeEncMac) {
-    if (SecuredMessageSize < sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + AeadBlockSize + AeadTagSize) {
+    if (SecuredMessageSize < RecordHeaderSize + AeadBlockSize + AeadTagSize) {
       return RETURN_DEVICE_ERROR;
     }
-    RecordHeader = (VOID *)SecuredMessage;
-    if (RecordHeader->SessionId != SessionId) {
+    RecordHeader1 = (VOID *)SecuredMessage;
+    RecordHeader2 = (VOID *)((UINT8 *)RecordHeader1 + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_1) + SequenceNumInHeaderSize);
+    if (RecordHeader1->SessionId != SessionId) {
       return RETURN_DEVICE_ERROR;
     }
-    if (RecordHeader->Length > SecuredMessageSize - sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER)) {
+    if (CompareMem (RecordHeader1 + 1, &SequenceNumInHeader, SequenceNumInHeaderSize) != 0) {
       return RETURN_DEVICE_ERROR;
     }
-    if (RecordHeader->Length < AeadTagSize) {
+    if (RecordHeader2->Length > SecuredMessageSize - RecordHeaderSize) {
       return RETURN_DEVICE_ERROR;
     }
-    CipherTextSize = (RecordHeader->Length - AeadTagSize) / AeadBlockSize * AeadBlockSize;
-    EncMsgHeader = (VOID *)(RecordHeader + 1);
-    AData = (UINT8 *)RecordHeader;
+    if (RecordHeader2->Length < AeadTagSize) {
+      return RETURN_DEVICE_ERROR;
+    }
+    CipherTextSize = (RecordHeader2->Length - AeadTagSize) / AeadBlockSize * AeadBlockSize;
+    EncMsgHeader = (VOID *)(RecordHeader2 + 1);
+    AData = (UINT8 *)RecordHeader1;
     EncMsg = (UINT8 *)EncMsgHeader;
     DecMsg = (UINT8 *)EncMsgHeader;
-    Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + CipherTextSize;
+    Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + CipherTextSize;
     Result = AeadDecFunction (
               Key,
               AeadKeySize,
               Salt,
               AeadIvSize,
               (UINT8 *)AData,
-              sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER),
+              RecordHeaderSize,
               EncMsg,
               CipherTextSize,
               Tag,
@@ -679,28 +719,32 @@ SpdmDecodeSecuredMessage (
     *AppMessageSize = PlainTextSize;
     CopyMem (AppMessage, EncMsgHeader + 1, PlainTextSize);
   } else { // SessionType == SpdmSessionTypeMacOnly
-    if (SecuredMessageSize < sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + AeadTagSize) {
+    if (SecuredMessageSize < RecordHeaderSize + AeadTagSize) {
       return RETURN_DEVICE_ERROR;
     }
-    RecordHeader = (VOID *)SecuredMessage;
-    if (RecordHeader->SessionId != SessionId) {
+    RecordHeader1 = (VOID *)SecuredMessage;
+    RecordHeader2 = (VOID *)((UINT8 *)RecordHeader1 + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_1) + SequenceNumInHeaderSize);
+    if (RecordHeader1->SessionId != SessionId) {
       return RETURN_DEVICE_ERROR;
     }
-    if (RecordHeader->Length > SecuredMessageSize - sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER)) {
+    if (CompareMem (RecordHeader1 + 1, &SequenceNumInHeader, SequenceNumInHeaderSize) != 0) {
       return RETURN_DEVICE_ERROR;
     }
-    if (RecordHeader->Length < AeadTagSize) {
+    if (RecordHeader2->Length > SecuredMessageSize - RecordHeaderSize) {
       return RETURN_DEVICE_ERROR;
     }
-    AData = (UINT8 *)RecordHeader;
-    Tag = (UINT8 *)RecordHeader + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + RecordHeader->Length - AeadTagSize;
+    if (RecordHeader2->Length < AeadTagSize) {
+      return RETURN_DEVICE_ERROR;
+    }
+    AData = (UINT8 *)RecordHeader1;
+    Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + RecordHeader2->Length - AeadTagSize;
     Result = AeadDecFunction (
               Key,
               AeadKeySize,
               Salt,
               AeadIvSize,
               (UINT8 *)AData,
-              sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER) + RecordHeader->Length - AeadTagSize,
+              RecordHeaderSize + RecordHeader2->Length - AeadTagSize,
               NULL,
               0,
               Tag,
@@ -712,14 +756,14 @@ SpdmDecodeSecuredMessage (
       return RETURN_DEVICE_ERROR;
     }
 
-    PlainTextSize = RecordHeader->Length - AeadTagSize;
+    PlainTextSize = RecordHeader2->Length - AeadTagSize;
     ASSERT (*AppMessageSize >= PlainTextSize);
     if (*AppMessageSize < PlainTextSize) {
       *AppMessageSize = PlainTextSize;
       return RETURN_BUFFER_TOO_SMALL;
     }
     *AppMessageSize = PlainTextSize;
-    CopyMem (AppMessage, RecordHeader + 1, PlainTextSize);
+    CopyMem (AppMessage, RecordHeader2 + 1, PlainTextSize);
   }
 
   return RETURN_SUCCESS;
