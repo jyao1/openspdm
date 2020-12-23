@@ -9,14 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/SpdmTransportTestLib.h>
 
-#define TEST_MESSAGE_TYPE_SPDM                0x01
-#define TEST_MESSAGE_TYPE_SECURED_TEST        0x02
-
-typedef struct {
-  UINT8    MessageType;
-} TEST_MESSAGE_HEADER;
-
-#define TEST_ALIGNMENT 1
+#define TEST_ALIGNMENT 4
 #define TEST_SEQUENCE_NUMBER_COUNT 2
 #define TEST_MAX_RANDOM_NUMBER_COUNT 32
 

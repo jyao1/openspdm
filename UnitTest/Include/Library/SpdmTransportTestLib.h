@@ -12,6 +12,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/SpdmCommonLib.h>
 
+#define TEST_MESSAGE_TYPE_SPDM                0x01
+#define TEST_MESSAGE_TYPE_SECURED_TEST        0x02
+
+typedef struct {
+  UINT8    MessageType;
+} TEST_MESSAGE_HEADER;
+
 /**
   Encode an SPDM or APP message to a transport layer message.
 

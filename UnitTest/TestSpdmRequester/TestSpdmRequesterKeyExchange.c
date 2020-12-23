@@ -19,6 +19,49 @@ STATIC UINT8                  LocalBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
 STATIC GLOBAL_REMOVE_IF_UNREFERENCED UINT8  mZeroFilledBuffer[64];
 
+UINTN
+SpdmTestGetKeyExchangeRequestSize (
+  IN VOID    *SpdmContext,
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  )
+{
+  SPDM_KEY_EXCHANGE_REQUEST  *SpdmRequest;
+  UINTN                      MessageSize;
+  UINTN                      DheKeySize;
+  UINT16                     OpaqueLength;
+
+  SpdmRequest = Buffer;
+  MessageSize = sizeof(SPDM_MESSAGE_HEADER);
+  if (BufferSize < MessageSize) {
+    return BufferSize;
+  }
+
+  if (SpdmRequest->Header.RequestResponseCode != SPDM_KEY_EXCHANGE) {
+    return BufferSize;
+  }
+
+  MessageSize = sizeof(SPDM_KEY_EXCHANGE_REQUEST);
+  if (BufferSize < MessageSize) {
+    return BufferSize;
+  }
+
+  DheKeySize = GetSpdmDheKeySize (SpdmContext);
+  MessageSize += DheKeySize + sizeof(UINT16);
+  if (BufferSize < MessageSize) {
+    return BufferSize;
+  }
+
+  OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DheKeySize);
+  MessageSize += OpaqueLength;
+  if (BufferSize < MessageSize) {
+    return BufferSize;
+  }
+
+  // Good message, return actual size
+  return MessageSize;
+}
+
 RETURN_STATUS
 EFIAPI
 SpdmRequesterKeyExchangeTestSendMessage (
@@ -29,55 +72,64 @@ SpdmRequesterKeyExchangeTestSendMessage (
   )
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
-  UINT8                   *Ptr;
+  UINTN                   HeaderSize;
+  UINTN                   MessageSize;
 
   SpdmTestContext = GetSpdmTestContext ();
-  Ptr = (UINT8 *)Request;
+  HeaderSize = sizeof(TEST_MESSAGE_HEADER);
   switch (SpdmTestContext->CaseId) {
   case 0x1:
     return RETURN_DEVICE_ERROR;
   case 0x2:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetKeyExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x3:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetKeyExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x4:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetKeyExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x5:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetKeyExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x6:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetKeyExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x7:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetKeyExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x8:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetKeyExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x9:
   {
     STATIC UINTN SubIndex = 0;
     if (SubIndex == 0) {
       LocalBufferSize = 0;
-      CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-      LocalBufferSize += (RequestSize - 1);
+      MessageSize = SpdmTestGetKeyExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+      CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+      LocalBufferSize += MessageSize;
       SubIndex ++;
     }
   }
