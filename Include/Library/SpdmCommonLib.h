@@ -77,6 +77,10 @@ typedef enum {
   SpdmDataReqBaseAsymAlg,
   SpdmDataKeySchedule,
   //
+  // Connection State
+  //
+  SpdmDataConnectionState,
+  //
   // Certificate info
   //
   SpdmDataPeerPublicRootCertHash,
@@ -84,6 +88,7 @@ typedef enum {
   SpdmDataSlotCount,
   SpdmDataPublicCertChains,
   SpdmDataMeasurementRecord,
+  SpdmDataBasicMutAuthRequested,
   SpdmDataMutAuthRequested,
   //
   // Pre-shared Key Hint
@@ -194,20 +199,43 @@ typedef enum {
   // Before send KEY_EXCHANGE/PSK_EXCHANGE
   // or after END_SESSION
   //
-  SpdmStateNotStarted,
+  SpdmSessionStateNotStarted,
   //
   // After send KEY_EXHCNAGE, before send FINISH
   //
-  SpdmStateHandshaking,
+  SpdmSessionStateHandshaking,
   //
   // After send FINISH, before END_SESSION
   //
-  SpdmStateEstablished,
+  SpdmSessionStateEstablished,
   //
   // MAX
   //
-  SpdmStateMax,
+  SpdmSessionStateMax,
 } SPDM_SESSION_STATE;
+
+typedef enum {
+  //
+  // Before send GET_VERSION
+  //
+  SpdmConnectionStateNotStarted,
+  //
+  // After send GET_VERSION, before send NEGOTIATE_ALGORITHMS
+  //
+  SpdmConnectionStateNegotiating,
+  //
+  // After send NEGOTIATE_ALGORITHMS
+  //
+  SpdmConnectionStateNegotiated,
+  //
+  // After send CHALLENGE_AUTH
+  //
+  SpdmConnectionStateAuthenticated,
+  //
+  // MAX
+  //
+  SpdmConnectionStateMax,
+} SPDM_CONNECTION_STATE;
 
 /**
   Set an SPDM context data.

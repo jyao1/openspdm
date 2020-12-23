@@ -30,6 +30,8 @@ This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be us
          [--dhe] is DHE algorithm. By default, SECP_256_R1 is used.
          [--aead] is AEAD algorithm. By default, AES_256_GCM is used.
          [--key_schedule] is key schedule algorithm. By default, HMAC_HASH is used.
+                 Above algorithms also support multiple flags. Please use ',' for them.
+                 SHA3 is not supported so far.
          [--pcap] is used to generate PCAP dump file for offline analysis.
    </pre>
 

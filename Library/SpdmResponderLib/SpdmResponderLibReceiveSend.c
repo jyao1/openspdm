@@ -232,14 +232,14 @@ SpdmBuildResponse (
     switch (SpdmResponse->RequestResponseCode) {
     case SPDM_FINISH_RSP:
       if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
-        SessionInfo->SessionState = SpdmStateEstablished;
+        SessionInfo->SessionState = SpdmSessionStateEstablished;
       }
       break;
     case SPDM_PSK_FINISH_RSP:
-      SessionInfo->SessionState = SpdmStateEstablished;
+      SessionInfo->SessionState = SpdmSessionStateEstablished;
       break;
     case SPDM_END_SESSION_ACK:
-      SessionInfo->SessionState = SpdmStateNotStarted;
+      SessionInfo->SessionState = SpdmSessionStateNotStarted;
       SpdmFreeSessionId(SpdmContext, *SessionId);
       break;
     }
@@ -252,7 +252,7 @@ SpdmBuildResponse (
           ASSERT(FALSE);
           return RETURN_SUCCESS;
         }
-        SessionInfo->SessionState = SpdmStateEstablished;
+        SessionInfo->SessionState = SpdmSessionStateEstablished;
       }
       break;
     }

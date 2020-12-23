@@ -439,7 +439,7 @@ TrySpdmSendReceiveFinish (
     return Status;
   }
 
-  SessionInfo->SessionState = SpdmStateEstablished;
+  SessionInfo->SessionState = SpdmSessionStateEstablished;
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   SpdmContext->SpdmCmdReceiveState |= SPDM_FINISH_RECEIVE_FLAG;
   

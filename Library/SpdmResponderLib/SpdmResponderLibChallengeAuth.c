@@ -236,7 +236,7 @@ SpdmGetResponseChallengeAuth (
   AuthAttribute.Reserved = 0;
   AuthAttribute.BasicMutAuthReq = 0;
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
-    AuthAttribute.BasicMutAuthReq = 1;
+    AuthAttribute.BasicMutAuthReq = SpdmContext->LocalContext.BasicMutAuthRequested;
   }
   SpdmResponse->Header.Param1 = *(UINT8 *)&AuthAttribute;
   SpdmResponse->Header.Param2 = (1 << SlotNum);
@@ -280,6 +280,10 @@ SpdmGetResponseChallengeAuth (
   //
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
   SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
+
+  if (AuthAttribute.BasicMutAuthReq == 0) {
+    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
+  }
 
   return RETURN_SUCCESS;
 }

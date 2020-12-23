@@ -383,7 +383,7 @@ SpdmEncodeSecuredMessage (
   }
 
   switch (SessionState) {
-  case SpdmStateHandshaking:
+  case SpdmSessionStateHandshaking:
     if (IsRequester) {
       EncryptionKeyDataType = SpdmDataRequestHandshakeEncryptionKey;
       SaltDataType = SpdmDataRequestHandshakeSalt;
@@ -394,7 +394,7 @@ SpdmEncodeSecuredMessage (
       SequenceNumberDataType = SpdmDataResponseHandshakeSequenceNumber;
     }
     break;
-  case SpdmStateEstablished:
+  case SpdmSessionStateEstablished:
     if (IsRequester) {
       EncryptionKeyDataType = SpdmDataRequestDataEncryptionKey;
       SaltDataType = SpdmDataRequestDataSalt;
@@ -608,7 +608,7 @@ SpdmDecodeSecuredMessage (
   }
 
   switch (SessionState) {
-  case SpdmStateHandshaking:
+  case SpdmSessionStateHandshaking:
     if (IsRequester) {
       EncryptionKeyDataType = SpdmDataRequestHandshakeEncryptionKey;
       SaltDataType = SpdmDataRequestHandshakeSalt;
@@ -619,7 +619,7 @@ SpdmDecodeSecuredMessage (
       SequenceNumberDataType = SpdmDataResponseHandshakeSequenceNumber;
     }
     break;
-  case SpdmStateEstablished:
+  case SpdmSessionStateEstablished:
     if (IsRequester) {
       EncryptionKeyDataType = SpdmDataRequestDataEncryptionKey;
       SaltDataType = SpdmDataRequestDataSalt;

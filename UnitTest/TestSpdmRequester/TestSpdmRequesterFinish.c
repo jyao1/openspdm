@@ -479,7 +479,7 @@ void TestSpdmRequesterFinishCase2(void **state) {
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmStateEstablished);
+  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateEstablished);
   free(Data);
 }
 
@@ -665,7 +665,7 @@ void TestSpdmRequesterFinishCase6(void **state) {
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmStateEstablished);
+  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateEstablished);
   free(Data);
 }
 
@@ -808,7 +808,7 @@ void TestSpdmRequesterFinishCase9(void **state) {
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
   assert_int_equal (Status, RETURN_SUCCESS); 
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmStateEstablished);
+  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateEstablished);
   free(Data);
 }
 

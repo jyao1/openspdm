@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/OsTest/SpdmResponderEmu
 
 SET(src_SpdmResponderTest
     SpdmResponder.c
-    SpdmResponderMeasurement.c
+    SpdmResponderSession.c
     SpdmResponderEmu.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuCommand.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuKey.c

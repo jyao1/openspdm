@@ -95,10 +95,15 @@ typedef struct {
   //
   // Responder policy
   //
+  BOOLEAN                         BasicMutAuthRequested;
   UINT8                           MutAuthRequested;
 } SPDM_LOCAL_CONTEXT;
 
 typedef struct {
+  //
+  // Connection State
+  //
+  SPDM_CONNECTION_STATE           ConnectionState;
   //
   // Peer device info (negotiated)
   //

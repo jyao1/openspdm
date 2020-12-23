@@ -419,6 +419,12 @@ SpdmSetData (
     SpdmContext->LocalContext.DeviceMeasurementCount = Parameter->AdditionalData[0];
     SpdmContext->LocalContext.DeviceMeasurement = Data;
     break;
+  case SpdmDataBasicMutAuthRequested:
+    if (DataSize != sizeof(BOOLEAN)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->LocalContext.BasicMutAuthRequested = *(UINT8 *)Data;
+    break;
   case SpdmDataMutAuthRequested:
     if (DataSize != sizeof(UINT8)) {
       return RETURN_INVALID_PARAMETER;
@@ -587,6 +593,13 @@ SpdmGetData (
     }
     TargetDataSize = sizeof(UINT16);
     TargetData = &SpdmContext->ConnectionInfo.Algorithm.KeySchedule;
+    break;
+  case SpdmDataConnectionState:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    TargetDataSize = sizeof(UINT32);
+    TargetData = &SpdmContext->ConnectionInfo.ConnectionState;
     break;
 
   case SpdmDataSessionType:

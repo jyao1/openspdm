@@ -34,7 +34,7 @@ SOURCE_DIR = $(WORKSPACE)\OsTest\$(MODULE_NAME)
 
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmResponder.obj \
-    $(OUTPUT_DIR)\SpdmResponderMeasurement.obj \
+    $(OUTPUT_DIR)\SpdmResponderSession.obj \
     $(OUTPUT_DIR)\SpdmResponderEmu.obj \
     $(OUTPUT_DIR)\SpdmEmuCommand.obj \
     $(OUTPUT_DIR)\SpdmTestKey.obj \
@@ -126,8 +126,8 @@ gen_libs:
 $(OUTPUT_DIR)\SpdmResponder.obj : $(SOURCE_DIR)\SpdmResponder.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponder.c
 
-$(OUTPUT_DIR)\SpdmResponderMeasurement.obj : $(SOURCE_DIR)\SpdmResponderMeasurement.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderMeasurement.c
+$(OUTPUT_DIR)\SpdmResponderSession.obj : $(SOURCE_DIR)\SpdmResponderSession.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderSession.c
 
 $(OUTPUT_DIR)\SpdmResponderEmu.obj : $(SOURCE_DIR)\SpdmResponderEmu.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderEmu.c

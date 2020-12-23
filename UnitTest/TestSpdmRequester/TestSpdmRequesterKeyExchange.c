@@ -738,7 +738,7 @@ void TestSpdmRequesterKeyExchangeCase2(void **state) {
              0, &SessionId, &HeartbeatPeriod, &SlotIdParam, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SessionId, 0xFFFFFFFF);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmStateHandshaking);
+  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
   free(Data);
 }
 
@@ -886,7 +886,7 @@ void TestSpdmRequesterKeyExchangeCase6(void **state) {
              0, &SessionId, &HeartbeatPeriod, &SlotIdParam, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SessionId, 0xFFFEFFFE);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmStateHandshaking);
+  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
   free(Data);
 }
 
@@ -1000,7 +1000,7 @@ void TestSpdmRequesterKeyExchangeCase9(void **state) {
              0, &SessionId, &HeartbeatPeriod, &SlotIdParam, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SessionId, 0xFFFDFFFD);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmStateHandshaking);
+  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
   free(Data);
 }
 

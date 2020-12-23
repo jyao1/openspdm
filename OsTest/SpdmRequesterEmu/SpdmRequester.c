@@ -119,9 +119,6 @@ SpdmClientInit (
   UINT8                        Data8;
   UINT16                       Data16;
   UINT32                       Data32;
-  BOOLEAN                      HasReqPubCert;
-  BOOLEAN                      HasReqPrivKey;
-  BOOLEAN                      HasRspPubCert;
   VOID                         *Hash;
   UINTN                        HashSize;
 
@@ -138,43 +135,6 @@ SpdmClientInit (
     SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTransportPciDoeEncodeMessage, SpdmTransportPciDoeDecodeMessage);
   } else {
     return NULL;
-  }
-
-  Res = ReadResponderRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
-  if (Res) {
-    HasRspPubCert = TRUE;
-    ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = SpdmDataLocationLocal;
-    //SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
-    SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
-    // Do not free it.
-  } else{
-    HasRspPubCert = FALSE;
-  }
-
-  Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, NULL, NULL);
-  if (Res) {
-    HasReqPubCert = TRUE;
-    ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = SpdmDataLocationLocal;
-    Data8 = SLOT_NUMBER;
-    SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &Data8, sizeof(Data8));
-
-    for (Index = 0; Index < SLOT_NUMBER; Index++) {
-      Parameter.AdditionalData[0] = Index;
-      SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, Data, DataSize);
-    }
-    // do not free it
-  } else {
-    HasReqPubCert = FALSE;
-  }
-
-  Res = ReadRequesterPrivateCertificate (&Data, &DataSize);
-  if (Res) {
-    HasReqPrivKey = TRUE;
-    SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
-  } else{
-    HasReqPrivKey = FALSE;
   }
 
   Data8 = 0;
@@ -195,49 +155,92 @@ SpdmClientInit (
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP |
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP |
            SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  if (!HasRspPubCert) {
-    Data32 &= ~SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP;
-    Data32 &= ~SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_SIG;
-    Data32 |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_NO_SIG;
-  } else {
-    Data32 |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP;
-    Data32 |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_SIG;
-    Data32 &= ~SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_NO_SIG;
-  }
-  if (!HasReqPrivKey || !HasReqPubCert) {
-    Data32 &= ~SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP;
-  } else {
-    Data32 |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP;
-  }
   if (mUseCapabilityFlags != 0) {
     Data32 = mUseCapabilityFlags;
   }
   SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &Data32, sizeof(Data32));
 
-  Data32 = mUseAsymAlgo;
+  Data32 = mSupportAsymAlgo;
   SpdmSetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, sizeof(Data32));
-  Data32 = mUseHashAlgo;
+  Data32 = mSupportHashAlgo;
   SpdmSetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &Data32, sizeof(Data32));
-  Data16 = mUseDheAlgo;
+  Data16 = mSupportDheAlgo;
   SpdmSetData (SpdmContext, SpdmDataDHENamedGroup, &Parameter, &Data16, sizeof(Data16));
-  Data16 = mUseAeadAlgo;
+  Data16 = mSupportAeadAlgo;
   SpdmSetData (SpdmContext, SpdmDataAEADCipherSuite, &Parameter, &Data16, sizeof(Data16));
-  Data16 = mUseReqAsymAlgo;
+  Data16 = mSupportReqAsymAlgo;
   SpdmSetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, sizeof(Data16));
-  Data16 = mUseKeyScheduleAlgo;
+  Data16 = mSupportKeyScheduleAlgo;
   SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
-
-  SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
-  Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmSetData - %x\n", (UINT32)Status);
-  }
 
   Status = SpdmInitConnection (SpdmContext);
   if (RETURN_ERROR(Status)) {
     printf ("SpdmInitConnection - 0x%x\n", (UINT32)Status);
     free (mSpdmContext);
     mSpdmContext = NULL;
+  }
+
+  ZeroMem (&Parameter, sizeof(Parameter));
+  Parameter.Location = SpdmDataLocationConnection;
+  
+  DataSize = sizeof(Data32);
+  SpdmGetData (SpdmContext, SpdmDataConnectionState, &Parameter, &Data32, &DataSize);
+  ASSERT (Data32 == SpdmConnectionStateNegotiated);
+
+  DataSize = sizeof(Data32);
+  SpdmGetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, &DataSize);
+  mUseAsymAlgo = Data32;
+  DataSize = sizeof(Data32);
+  SpdmGetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &Data32, &DataSize);
+  mUseHashAlgo = Data32;
+  DataSize = sizeof(Data32);
+  SpdmGetData (SpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &Data32, &DataSize);
+  mUseMeasurementHashAlgo = Data32;
+  DataSize = sizeof(Data16);
+  SpdmGetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, &DataSize);
+  mUseReqAsymAlgo = Data16;
+
+  Res = ReadResponderRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
+  if (Res) {
+    ZeroMem (&Parameter, sizeof(Parameter));
+    Parameter.Location = SpdmDataLocationLocal;
+    //SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
+    SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
+    // Do not free it.
+  }
+
+  Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  if (Res) {
+    ZeroMem (&Parameter, sizeof(Parameter));
+    Parameter.Location = SpdmDataLocationLocal;
+    Data8 = SLOT_NUMBER;
+    SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &Data8, sizeof(Data8));
+
+    for (Index = 0; Index < SLOT_NUMBER; Index++) {
+      Parameter.AdditionalData[0] = Index;
+      SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, Data, DataSize);
+    }
+    // do not free it
+  }
+
+  Res = ReadRequesterPrivateCertificate (&Data, &DataSize);
+  if (Res) {
+    SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
+  }
+
+  Res = ReadMeasurementData (&Data, &DataSize, &Data8);
+  if (Res) {
+    ZeroMem (&Parameter, sizeof(Parameter));
+    Parameter.Location = SpdmDataLocationLocal;
+    Parameter.AdditionalData[0] = Data8;
+    SpdmSetData (SpdmContext, SpdmDataMeasurementRecord, &Parameter, Data, DataSize);
+    // do not free it
+  }
+
+  SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
+  Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
+  if (RETURN_ERROR(Status)) {
+    printf ("SpdmSetData - %x\n", (UINT32)Status);
   }
 
   return mSpdmContext;

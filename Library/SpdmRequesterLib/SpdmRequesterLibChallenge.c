@@ -367,6 +367,7 @@ TrySpdmChallenge (
   }
 
   SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
 
   return RETURN_SUCCESS;
 }

@@ -99,7 +99,7 @@ void TestSpdmResponderKeyExchangeCase1(void **state) {
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);  
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmStateHandshaking);
+  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_KEY_EXCHANGE_RSP);  
   assert_int_equal (SpdmResponse->RspSessionID, 0xFFFF);

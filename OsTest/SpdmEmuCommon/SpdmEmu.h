@@ -29,13 +29,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 extern UINT32  mUseTransportLayer;
 extern UINT8   mUseVersion;
 extern UINT32  mUseCapabilityFlags;
+
 extern UINT32  mUseHashAlgo;
 extern UINT32  mUseMeasurementHashAlgo;
 extern UINT32  mUseAsymAlgo;
 extern UINT16  mUseReqAsymAlgo;
-extern UINT16  mUseDheAlgo;
-extern UINT16  mUseAeadAlgo;
-extern UINT16  mUseKeyScheduleAlgo;
+
+extern UINT32  mSupportHashAlgo;
+extern UINT32  mSupportMeasurementHashAlgo;
+extern UINT32  mSupportAsymAlgo;
+extern UINT16  mSupportReqAsymAlgo;
+extern UINT16  mSupportDheAlgo;
+extern UINT16  mSupportAeadAlgo;
+extern UINT16  mSupportKeyScheduleAlgo;
 
 #define TEST_PSK_DATA_STRING  "TestPskData"
 #define TEST_PSK_HINT_STRING  "TestPskHint"
@@ -148,6 +154,13 @@ ReadRequesterRootPublicCertificate (
   OUT UINTN   *Size,
   OUT VOID    **Hash,
   OUT UINTN   *HashSize
+  );
+
+BOOLEAN
+ReadMeasurementData (
+  OUT VOID                            **DeviceMeasurement,
+  OUT UINTN                           *DeviceMeasurementSize,
+  OUT UINT8                           *DeviceMeasurementCount
   );
 
 BOOLEAN

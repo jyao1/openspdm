@@ -11,15 +11,139 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 UINT8   mUseVersion = SPDM_MESSAGE_VERSION_11;
 UINT32  mUseCapabilityFlags = 0;
-UINT32  mUseHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
-UINT32  mUseMeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
-UINT32  mUseAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
-UINT16  mUseReqAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048;
-UINT16  mUseDheAlgo = SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1;
-UINT16  mUseAeadAlgo = SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM;
-UINT16  mUseKeyScheduleAlgo = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
 
-#define SHA256_HASH_SIZE  32
+UINT32  mUseHashAlgo;
+UINT32  mUseMeasurementHashAlgo;
+UINT32  mUseAsymAlgo;
+UINT16  mUseReqAsymAlgo;
+
+/*
+  SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512,
+  SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384,
+  SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256,
+*/
+UINT32  mSupportHashAlgo = SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256;
+/*
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_512,
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_384,
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_256,
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512,
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384,
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256,
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_RAW_BIT_STREAM_ONLY,
+*/
+UINT32  mSupportMeasurementHashAlgo = SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256;
+/*
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048,
+*/
+UINT32  mSupportAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256;
+/*
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256,
+*/
+UINT16  mSupportReqAsymAlgo = SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048;
+/*
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096,
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072,
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048,
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1,
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1,
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1,
+*/
+UINT16  mSupportDheAlgo = SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1;
+/*
+  SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM,
+  SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM,
+  SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305,
+*/
+UINT16  mSupportAeadAlgo = SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM;
+/*
+  SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH,
+*/
+UINT16  mSupportKeyScheduleAlgo = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
+
+/**
+  Computes the hash of a input data buffer.
+
+  This function performs the hash of a given data buffer, and return the hash value.
+
+  @param  Data                         Pointer to the buffer containing the data to be hashed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the hash value.
+
+  @retval TRUE   Hash computation succeeded.
+  @retval FALSE  Hash computation failed.
+**/
+typedef
+BOOLEAN
+(EFIAPI *HASH_ALL) (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  );
+
+/**
+  Computes the HMAC of a input data buffer.
+
+  This function performs the HMAC of a given data buffer, and return the hash value.
+
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  Key                          Pointer to the user-supplied key.
+  @param  KeySize                      Key size in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
+typedef
+BOOLEAN
+(EFIAPI *HMAC_ALL) (
+  IN   CONST VOID   *Data,
+  IN   UINTN        DataSize,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize,
+  OUT  UINT8        *HmacValue
+  );
+
+/**
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand.
+
+  @param  Prk                          Pointer to the user-supplied key.
+  @param  PrkSize                      Key size in bytes.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+**/
+typedef
+BOOLEAN
+(EFIAPI *HKDF_EXPAND) (
+  IN   CONST UINT8  *Prk,
+  IN   UINTN        PrkSize,
+  IN   CONST UINT8  *Info,
+  IN   UINTN        InfoSize,
+  OUT  UINT8        *Out,
+  IN   UINTN        OutSize
+  );
 
 /**
   Retrieve the Private Key from the password-protected PEM key data.
@@ -86,6 +210,263 @@ UINTN mResponderPrivateCertDataSize;
 VOID  *mRequesterPrivateCertData;
 UINTN mRequesterPrivateCertDataSize;
 
+UINT32
+TestGetSpdmHashSize (
+  IN      UINT32       HashAlgo
+  )
+{
+  switch (HashAlgo) {
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
+    return 32;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
+    return 48;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
+    return 64;
+  default:
+    ASSERT( FALSE);
+    return 0;
+  }
+}
+
+UINT32
+TestGetSpdmMeasurementHashSize (
+  IN      UINT32       HashAlgo
+  )
+{
+  switch (HashAlgo) {
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256:
+    return 32;
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384:
+    return 48;
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512:
+    return 64;
+  default:
+    ASSERT( FALSE);
+    return 0;
+  }
+}
+
+/**
+  Return hash function, based upon the negotiated hash algorithm.
+
+  @param  HashAlgo                  The hash algorithm.
+
+  @return hash function
+**/
+HASH_ALL
+TestGetSpdmHashFunc (
+  IN      UINT32       HashAlgo
+  )
+{
+  switch (HashAlgo) {
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
+    return Sha256HashAll;
+    break;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
+    return Sha384HashAll;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
+    return Sha512HashAll;
+  default:
+    return NULL;
+  }
+}
+
+/**
+  Computes the hash of a input data buffer, based upon the negotiated hash algorithm.
+
+  This function performs the hash of a given data buffer, and return the hash value.
+
+  @param  HashAlgo                     The hash algorithm.
+  @param  Data                         Pointer to the buffer containing the data to be hashed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the hash value.
+
+  @retval TRUE   Hash computation succeeded.
+  @retval FALSE  Hash computation failed.
+**/
+BOOLEAN
+TestSpdmHashAll (
+  IN   UINT32                       HashAlgo,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HashValue
+  )
+{
+  HASH_ALL   HashFunction;
+  HashFunction = TestGetSpdmHashFunc (HashAlgo);
+  if (HashFunction == NULL) {
+    return FALSE;
+  }
+  return HashFunction (Data, DataSize, HashValue);
+}
+
+/**
+  Return HMAC function, based upon the negotiated HMAC algorithm.
+
+  @param  HashAlgo                     The hash algorithm.
+
+  @return HMAC function
+**/
+HMAC_ALL
+TestGetSpdmHmacFunc (
+  IN   UINT32                       HashAlgo
+  )
+{
+  switch (HashAlgo) {
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
+    return HmacSha256All;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
+    return HmacSha384All;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
+    return HmacSha512All;
+  default:
+    return NULL;
+  }
+}
+
+/**
+  Computes the HMAC of a input data buffer, based upon the negotiated HMAC algorithm.
+
+  This function performs the HMAC of a given data buffer, and return the hash value.
+
+  @param  HashAlgo                     The hash algorithm.
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  Key                          Pointer to the user-supplied key.
+  @param  KeySize                      Key size in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
+BOOLEAN
+TestSpdmHmacAll (
+  IN   UINT32                       HashAlgo,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  IN   CONST UINT8                  *Key,
+  IN   UINTN                        KeySize,
+  OUT  UINT8                        *HmacValue
+  )
+{
+  HMAC_ALL   HmacFunction;
+  HmacFunction = TestGetSpdmHmacFunc (HashAlgo);
+  if (HmacFunction == NULL) {
+    return FALSE;
+  }
+  return HmacFunction (Data, DataSize, Key, KeySize, HmacValue);
+}
+
+/**
+  Return HKDF expand function, based upon the negotiated HKDF algorithm.
+
+  @param  HashAlgo                     The hash algorithm.
+
+  @return HKDF expand function
+**/
+HKDF_EXPAND
+TestGetSpdmHkdfExpandFunc (
+  IN   UINT32                       HashAlgo
+  )
+{
+  switch (HashAlgo) {
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
+    return HkdfSha256Expand;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
+    return HkdfSha384Expand;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
+    return HkdfSha512Expand;
+  default:
+    return NULL;
+  }
+}
+
+/**
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
+
+  @param  HashAlgo                     The hash algorithm.
+  @param  Prk                          Pointer to the user-supplied key.
+  @param  PrkSize                      Key size in bytes.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+**/
+BOOLEAN
+TestSpdmHkdfExpand (
+  IN   UINT32                       HashAlgo,
+  IN   CONST UINT8                  *Prk,
+  IN   UINTN                        PrkSize,
+  IN   CONST UINT8                  *Info,
+  IN   UINTN                        InfoSize,
+  OUT  UINT8                        *Out,
+  IN   UINTN                        OutSize
+  )
+{
+  HKDF_EXPAND   HkdfExpandFunction;
+  HkdfExpandFunction = TestGetSpdmHkdfExpandFunc (HashAlgo);
+  if (HkdfExpandFunction == NULL) {
+    return FALSE;
+  }
+  return HkdfExpandFunction (Prk, PrkSize, Info, InfoSize, Out, OutSize);
+}
+
+/**
+  Return hash function, based upon the negotiated measurement hash algorithm.
+
+  @param  HashAlgo                  The hash algorithm.
+
+  @return hash function
+**/
+HASH_ALL
+TestGetSpdmMeasurementHashFunc (
+  IN   UINT32                       HashAlgo
+  )
+{
+  switch (HashAlgo) {
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256:
+    return Sha256HashAll;
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384:
+    return Sha384HashAll;
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512:
+    return Sha512HashAll;
+  default:
+    return NULL;
+  }
+}
+
+/**
+  Computes the hash of a input data buffer, based upon the negotiated measurement hash algorithm.
+
+  This function performs the hash of a given data buffer, and return the hash value.
+
+  @param  HashAlgo                     The hash algorithm.
+  @param  Data                         Pointer to the buffer containing the data to be hashed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the hash value.
+
+  @retval TRUE   Hash computation succeeded.
+  @retval FALSE  Hash computation failed.
+**/
+BOOLEAN
+TestSpdmMeasurementHashAll (
+  IN   UINT32                       HashAlgo,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HashValue
+  )
+{
+  HASH_ALL   HashFunction;
+  HashFunction = TestGetSpdmMeasurementHashFunc (HashAlgo);
+  if (HashFunction == NULL) {
+    return FALSE;
+  }
+  return HashFunction (Data, DataSize, HashValue);
+}
+
 BOOLEAN
 ReadResponderPrivateCertificate (
   OUT VOID    **Data,
@@ -111,7 +492,7 @@ ReadResponderPrivateCertificate (
     File = "EcP384/end_responder.key";
     break;
   default:
-    assert (0);
+    ASSERT( FALSE);
     return FALSE;
   }
   Res = ReadInputFile (File, Data, Size);
@@ -147,7 +528,7 @@ ReadRequesterPrivateCertificate (
     File = "EcP384/end_requester.key";
     break;
   default:
-    assert (0);
+    ASSERT( FALSE);
     return FALSE;
   }
   Res = ReadInputFile (File, Data, Size);
@@ -173,6 +554,7 @@ ReadResponderRootPublicCertificate (
   SPDM_CERT_CHAIN     *CertChain;
   UINTN               CertChainSize;
   CHAR8               *File;
+  UINTN               DigestSize;
 
   switch (mUseAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
@@ -190,7 +572,7 @@ ReadResponderRootPublicCertificate (
     File = "EcP384/ca.cert.der";
     break;
   default:
-    assert (0);
+    ASSERT( FALSE);
     return FALSE;
   }
   Res = ReadInputFile (File, &FileData, &FileSize);
@@ -198,7 +580,9 @@ ReadResponderRootPublicCertificate (
     return Res;
   }
 
-  CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
+  DigestSize = TestGetSpdmHashSize (mUseHashAlgo);
+
+  CertChainSize = sizeof(SPDM_CERT_CHAIN) + DigestSize + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
   if (CertChain == NULL) {
     free (FileData);
@@ -207,9 +591,9 @@ ReadResponderRootPublicCertificate (
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
 
-  Sha256HashAll (FileData, FileSize, (UINT8 *)(CertChain + 1));
+  TestSpdmHashAll (mUseHashAlgo, FileData, FileSize, (UINT8 *)(CertChain + 1));
   CopyMem (
-    (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE,
+    (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + DigestSize,
     FileData,
     FileSize
     );
@@ -220,7 +604,7 @@ ReadResponderRootPublicCertificate (
     *Hash = (CertChain + 1);
   }
   if (HashSize != NULL) {
-    *HashSize = SHA256_HASH_SIZE;
+    *HashSize = DigestSize;
   }
 
   free (FileData);
@@ -241,6 +625,7 @@ ReadRequesterRootPublicCertificate (
   SPDM_CERT_CHAIN     *CertChain;
   UINTN               CertChainSize;
   CHAR8               *File;
+  UINTN               DigestSize;
 
   switch (mUseReqAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
@@ -258,16 +643,18 @@ ReadRequesterRootPublicCertificate (
     File = "EcP384/ca.cert.der";
     break;
   default:
-    assert (0);
+    ASSERT( FALSE);
     return FALSE;
   }
+
+  DigestSize = TestGetSpdmHashSize (mUseHashAlgo);
 
   Res = ReadInputFile (File, &FileData, &FileSize);
   if (!Res) {
     return Res;
   }
 
-  CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
+  CertChainSize = sizeof(SPDM_CERT_CHAIN) + DigestSize + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
   if (CertChain == NULL) {
     free (FileData);
@@ -275,9 +662,9 @@ ReadRequesterRootPublicCertificate (
   }
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
-  Sha256HashAll (FileData, FileSize, (UINT8 *)(CertChain + 1));
+  TestSpdmHashAll (mUseHashAlgo, FileData, FileSize, (UINT8 *)(CertChain + 1));
   CopyMem (
-    (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE,
+    (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + DigestSize,
     FileData,
     FileSize
     );
@@ -288,7 +675,7 @@ ReadRequesterRootPublicCertificate (
     *Hash = (CertChain + 1);
   }
   if (HashSize != NULL) {
-    *HashSize = SHA256_HASH_SIZE;
+    *HashSize = DigestSize;
   }
 
   free (FileData);
@@ -310,7 +697,8 @@ ReadResponderPublicCertificateChain (
   UINTN               CertChainSize;
   CHAR8               *File;
   UINT8               *RootCert;
-  UINTN                RootCertLen;
+  UINTN               RootCertLen;
+  UINTN               DigestSize;
 
   switch (mUseAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
@@ -328,7 +716,7 @@ ReadResponderPublicCertificateChain (
     File = "EcP384/bundle_responder.certchain.der";
     break;
   default:
-    assert (0);
+    ASSERT( FALSE);
     return FALSE;
   }
   Res = ReadInputFile (File, &FileData, &FileSize);
@@ -336,7 +724,9 @@ ReadResponderPublicCertificateChain (
     return Res;
   }
 
-  CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
+  DigestSize = TestGetSpdmHashSize (mUseHashAlgo);
+
+  CertChainSize = sizeof(SPDM_CERT_CHAIN) + DigestSize + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
   if (CertChain == NULL) {
     free (FileData);
@@ -362,9 +752,9 @@ ReadResponderPublicCertificateChain (
     return Res;
   }
 
-  Sha256HashAll (RootCert, RootCertLen, (UINT8 *)(CertChain + 1));
+  TestSpdmHashAll (mUseHashAlgo, RootCert, RootCertLen, (UINT8 *)(CertChain + 1));
   CopyMem (
-    (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE,
+    (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + DigestSize,
     FileData,
     FileSize
     );
@@ -375,7 +765,7 @@ ReadResponderPublicCertificateChain (
     *Hash = (CertChain + 1);
   }
   if (HashSize != NULL) {
-    *HashSize = SHA256_HASH_SIZE;
+    *HashSize = DigestSize;
   }
 
   free (FileData);
@@ -398,6 +788,7 @@ ReadRequesterPublicCertificateChain (
   CHAR8               *File;
   UINT8               *RootCert;
   UINTN               RootCertLen;
+  UINTN               DigestSize;
 
   switch (mUseReqAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
@@ -415,7 +806,7 @@ ReadRequesterPublicCertificateChain (
     File = "EcP384/bundle_requester.certchain.der";
     break;
   default:
-    assert (0);
+    ASSERT( FALSE);
     return FALSE;
   }
   Res = ReadInputFile (File, &FileData, &FileSize);
@@ -423,7 +814,9 @@ ReadRequesterPublicCertificateChain (
     return Res;
   }
 
-  CertChainSize = sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE + FileSize;
+  DigestSize = TestGetSpdmHashSize (mUseHashAlgo);
+
+  CertChainSize = sizeof(SPDM_CERT_CHAIN) + DigestSize + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
   if (CertChain == NULL) {
     free (FileData);
@@ -449,9 +842,9 @@ ReadRequesterPublicCertificateChain (
     return Res;
   }
 
-  Sha256HashAll (RootCert, RootCertLen, (UINT8 *)(CertChain + 1));
+  TestSpdmHashAll (mUseHashAlgo, RootCert, RootCertLen, (UINT8 *)(CertChain + 1));
   CopyMem (
-    (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + SHA256_HASH_SIZE,
+    (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + DigestSize,
     FileData,
     FileSize
     );
@@ -462,7 +855,7 @@ ReadRequesterPublicCertificateChain (
     *Hash = (CertChain + 1);
   }
   if (HashSize != NULL) {
-    *HashSize = SHA256_HASH_SIZE;
+    *HashSize = DigestSize;
   }
 
   free (FileData);
@@ -732,10 +1125,63 @@ SpdmResponderDataSignFunc (
   return SpdmDataSignFunc (TRUE, AsymAlgo, MessageHash, HashSize, Signature, SigSize);
 }
 
+#define BLOCK_NUMBER   4
+
+BOOLEAN
+ReadMeasurementData (
+  OUT VOID                            **DeviceMeasurement,
+  OUT UINTN                           *DeviceMeasurementSize,
+  OUT UINT8                           *DeviceMeasurementCount
+  )
+{
+  SPDM_MEASUREMENT_BLOCK_DMTF  *MeasurementBlock;
+  UINTN                        HashSize;
+  UINT8                        Index;
+  UINT8                        Data[64];
+
+  HashSize = TestGetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
+
+  *DeviceMeasurementCount = BLOCK_NUMBER;
+  *DeviceMeasurementSize = BLOCK_NUMBER * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize);
+  *DeviceMeasurement = (VOID *)malloc (BLOCK_NUMBER * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize));
+  if (*DeviceMeasurement == NULL) {
+    return FALSE;
+  }
+
+  MeasurementBlock = *DeviceMeasurement;
+  for (Index = 0; Index < BLOCK_NUMBER; Index++) {
+    MeasurementBlock->MeasurementBlockCommonHeader.Index = Index + 1;
+    MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
+    MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSize = (UINT16)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + HashSize);
+    switch (Index) {
+    case 0:
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_IMMUTABLE_ROM;
+      break;
+    case 1:
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MUTABLE_FIRMWARE;
+      break;
+    case 2:
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_HARDWARE_CONFIGURATION;
+      break;
+    case 3:
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_FIRMWARE_CONFIGURATION;
+      break;
+    default:
+      ASSERT(FALSE);
+      break;
+    }
+    MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize = (UINT16)HashSize;
+    SetMem (Data, sizeof(Data), (UINT8)(Index + 1));
+    TestSpdmMeasurementHashAll (mUseMeasurementHashAlgo, Data, sizeof(Data), (VOID *)(MeasurementBlock + 1));
+    MeasurementBlock = (VOID *)((UINT8 *)MeasurementBlock + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize);
+  }
+
+  return TRUE;
+}
 
 UINT8  mMyZeroFilledBuffer[64];
 UINT8  gBinStr0[0x12] = {
-       SHA256_HASH_SIZE, 0x00, // Length
+       0x00, 0x00, // Length - To be filled
        0x73, 0x70, 0x64, 0x6d, 0x31, 0x2e, 0x31, 0x00, // Version: 'spdm1.1/0'
        0x64, 0x65, 0x72, 0x69, 0x76, 0x65, 0x64, 0x00, // label: 'derived/0'
        };
@@ -770,10 +1216,11 @@ SpdmPskHandshakeSecretHkdfExpandFunc (
 {
   VOID                          *Psk;
   UINTN                         PskSize;
+  UINTN                         HashSize;
   BOOLEAN                       Result;
   UINT8                         HandshakeSecret[64];
 
-  ASSERT (HashAlgo == SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256);
+  ASSERT (HashAlgo == mUseHashAlgo);
 
   if ((PskHint == NULL) && (PskHintSize == 0)) {
     Psk = TEST_PSK_DATA_STRING;
@@ -790,14 +1237,15 @@ SpdmPskHandshakeSecretHkdfExpandFunc (
   DumpHexStr (Psk, PskSize);
   printf ("\n");
 
+  HashSize = TestGetSpdmHashSize (HashAlgo);
 
-  Result = HmacSha256All (mMyZeroFilledBuffer, SHA256_HASH_SIZE, Psk, PskSize, HandshakeSecret);
+  Result = TestSpdmHmacAll (HashAlgo, mMyZeroFilledBuffer, HashSize, Psk, PskSize, HandshakeSecret);
   if (!Result) {
     return Result;
   }
 
-  Result = HkdfSha256Expand (HandshakeSecret, SHA256_HASH_SIZE, Info, InfoSize, Out, OutSize);
-  ZeroMem (HandshakeSecret, SHA256_HASH_SIZE);
+  Result = TestSpdmHkdfExpand (HashAlgo, HandshakeSecret, HashSize, Info, InfoSize, Out, OutSize);
+  ZeroMem (HandshakeSecret, HashSize);
 
   return Result;
 }
@@ -832,12 +1280,13 @@ SpdmPskMasterSecretHkdfExpandFunc (
 {
   VOID                          *Psk;
   UINTN                         PskSize;
+  UINTN                         HashSize;
   BOOLEAN                       Result;
   UINT8                         HandshakeSecret[64];
   UINT8                         Salt1[64];
   UINT8                         MasterSecret[64];
 
-  ASSERT (HashAlgo == SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256);
+  ASSERT (HashAlgo == mUseHashAlgo);
 
   if ((PskHint == NULL) && (PskHintSize == 0)) {
     Psk = TEST_PSK_DATA_STRING;
@@ -851,25 +1300,28 @@ SpdmPskMasterSecretHkdfExpandFunc (
     return FALSE;
   }
 
-  Result = HmacSha256All (mMyZeroFilledBuffer, SHA256_HASH_SIZE, Psk, PskSize, HandshakeSecret);
+  HashSize = TestGetSpdmHashSize (HashAlgo);
+
+  Result = TestSpdmHmacAll (HashAlgo, mMyZeroFilledBuffer, HashSize, Psk, PskSize, HandshakeSecret);
   if (!Result) {
     return Result;
   }
 
-  Result = HkdfSha256Expand (HandshakeSecret, SHA256_HASH_SIZE, gBinStr0, sizeof(gBinStr0), Salt1, SHA256_HASH_SIZE);
-  ZeroMem (HandshakeSecret, SHA256_HASH_SIZE);
+  *(UINT16 *)gBinStr0 = (UINT16)HashSize;
+  Result = TestSpdmHkdfExpand (HashAlgo, HandshakeSecret, HashSize, gBinStr0, sizeof(gBinStr0), Salt1, HashSize);
+  ZeroMem (HandshakeSecret, HashSize);
   if (!Result) {
     return Result;
   }
 
-  Result = HmacSha256All (Salt1, SHA256_HASH_SIZE, mMyZeroFilledBuffer, SHA256_HASH_SIZE, MasterSecret);
-  ZeroMem (Salt1, SHA256_HASH_SIZE);
+  Result = TestSpdmHmacAll (HashAlgo, Salt1, HashSize, mMyZeroFilledBuffer, HashSize, MasterSecret);
+  ZeroMem (Salt1, HashSize);
   if (!Result) {
     return Result;
   }
 
-  Result = HkdfSha256Expand (MasterSecret, SHA256_HASH_SIZE, Info, InfoSize, Out, OutSize);
-  ZeroMem (MasterSecret, SHA256_HASH_SIZE);
+  Result = TestSpdmHkdfExpand (HashAlgo, MasterSecret, HashSize, Info, InfoSize, Out, OutSize);
+  ZeroMem (MasterSecret, HashSize);
 
   return Result;
 }

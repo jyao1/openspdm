@@ -263,7 +263,7 @@ SpdmSendReceivePskExchange (
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);
   }
 
-  SessionInfo->SessionState = SpdmStateHandshaking;
+  SessionInfo->SessionState = SpdmSessionStateHandshaking;
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   
   return RETURN_SUCCESS;

@@ -134,6 +134,7 @@ TrySpdmGetVersion (
     }
   }
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiating;
   return RETURN_SUCCESS;
 }
 

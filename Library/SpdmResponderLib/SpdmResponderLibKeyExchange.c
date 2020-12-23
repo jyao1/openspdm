@@ -373,7 +373,7 @@ SpdmGetResponseKeyExchange (
   SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
   SpdmInitEncapState (Context, SessionInfo->MutAuthRequested);
 
-  SessionInfo->SessionState = SpdmStateHandshaking;
+  SessionInfo->SessionState = SpdmSessionStateHandshaking;
   SpdmContext->SpdmCmdReceiveState |= SPDM_KEY_EXCHANGE_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;

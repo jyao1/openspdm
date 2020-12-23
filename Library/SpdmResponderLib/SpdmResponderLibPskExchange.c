@@ -219,7 +219,7 @@ SpdmGetResponsePskExchange (
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, HmacSize);
   Ptr += HmacSize;
 
-  SessionInfo->SessionState = SpdmStateHandshaking;
+  SessionInfo->SessionState = SpdmSessionStateHandshaking;
 
   return RETURN_SUCCESS;
 }

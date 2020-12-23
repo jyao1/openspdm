@@ -473,7 +473,7 @@ TrySpdmSendReceiveKeyExchange (
   }
   SessionInfo->MutAuthRequested = SpdmResponse.MutAuthRequested;
 
-  SessionInfo->SessionState = SpdmStateHandshaking;
+  SessionInfo->SessionState = SpdmSessionStateHandshaking;
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   SpdmContext->SpdmCmdReceiveState |= SPDM_KEY_EXCHANGE_RECEIVE_FLAG;
 

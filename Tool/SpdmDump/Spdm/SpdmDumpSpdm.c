@@ -1364,7 +1364,7 @@ DumpSpdmKeyExchangeRsp (
     AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageK, (UINT8 *)Buffer + MessageSize - HmacSize, HmacSize);
   }
 
-  mCurrentSessionInfo->SessionState = SpdmStateHandshaking;
+  mCurrentSessionInfo->SessionState = SpdmSessionStateHandshaking;
 }
 
 VOID
@@ -1485,7 +1485,7 @@ DumpSpdmFinishRsp (
   AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageF, Buffer, MessageSize);
 
   SpdmCalculateSessionDataKey (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE);
-  mCurrentSessionInfo->SessionState = SpdmStateEstablished;
+  mCurrentSessionInfo->SessionState = SpdmSessionStateEstablished;
 }
 
 VOID
@@ -1611,7 +1611,7 @@ DumpSpdmPskExchangeRsp (
   SpdmCalculateSessionHandshakeKey (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE);
   AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageK, (UINT8 *)Buffer + MessageSize - HmacSize, HmacSize);
 
-  mCurrentSessionInfo->SessionState = SpdmStateHandshaking;
+  mCurrentSessionInfo->SessionState = SpdmSessionStateHandshaking;
 }
 
 VOID
@@ -1685,7 +1685,7 @@ DumpSpdmPskFinishRsp (
   AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageF, Buffer, MessageSize);
 
   SpdmCalculateSessionDataKey (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE);
-  mCurrentSessionInfo->SessionState = SpdmStateEstablished;
+  mCurrentSessionInfo->SessionState = SpdmSessionStateEstablished;
 }
 
 VOID

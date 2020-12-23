@@ -142,7 +142,7 @@ SpdmSendReceivePskFinish (
     return Status;
   }
 
-  SessionInfo->SessionState = SpdmStateEstablished;
+  SessionInfo->SessionState = SpdmSessionStateEstablished;
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   
   return RETURN_SUCCESS;

@@ -318,6 +318,8 @@ SpdmGetResponseAlgorithm (
     SpdmContext->ConnectionInfo.Algorithm.KeySchedule = SpdmResponse->StructTable[3].AlgSupported;
   }
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
+
   return RETURN_SUCCESS;
 }
 

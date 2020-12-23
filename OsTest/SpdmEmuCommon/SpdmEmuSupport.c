@@ -157,6 +157,8 @@ PrintUsage (
   printf ("   [--dhe] is DHE algorithm. By default, SECP_256_R1 is used.\n");
   printf ("   [--aead] is AEAD algorithm. By default, AES_256_GCM is used.\n");
   printf ("   [--key_schedule] is key schedule algorithm. By default, HMAC_HASH is used.\n");
+  printf ("           Above algorithms also support multiple flags. Please use ',' for them.\n");
+  printf ("           SHA3 is not supported so far.\n");
   printf ("   [--pcap] is used to generate PCAP dump file for offline analysis.\n");
 }
 
@@ -422,12 +424,12 @@ ProcessArgs (
 
     if (strcmp (argv[0], "--hash") == 0) {
       if (argc >= 2) {
-        if (!GetValueFromName (mHashValueStringTable, ARRAY_SIZE(mHashValueStringTable), argv[1], &mUseHashAlgo)) {
+        if (!GetFlagsFromName (mHashValueStringTable, ARRAY_SIZE(mHashValueStringTable), argv[1], &mSupportHashAlgo)) {
           printf ("invalid --hash %s\n", argv[1]);
           PrintUsage (ProgramName);
           exit (0);
         }
-        printf ("hash - 0x%08x\n", mUseHashAlgo);
+        printf ("hash - 0x%08x\n", mSupportHashAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -440,12 +442,12 @@ ProcessArgs (
 
     if (strcmp (argv[0], "--meas_hash") == 0) {
       if (argc >= 2) {
-        if (!GetValueFromName (mMeasurementHashValueStringTable, ARRAY_SIZE(mMeasurementHashValueStringTable), argv[1], &mUseMeasurementHashAlgo)) {
+        if (!GetFlagsFromName (mMeasurementHashValueStringTable, ARRAY_SIZE(mMeasurementHashValueStringTable), argv[1], &mSupportMeasurementHashAlgo)) {
           printf ("invalid --meas_hash %s\n", argv[1]);
           PrintUsage (ProgramName);
           exit (0);
         }
-        printf ("meas_hash - 0x%08x\n", mUseMeasurementHashAlgo);
+        printf ("meas_hash - 0x%08x\n", mSupportMeasurementHashAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -458,12 +460,12 @@ ProcessArgs (
 
     if (strcmp (argv[0], "--asym") == 0) {
       if (argc >= 2) {
-        if (!GetValueFromName (mAsymValueStringTable, ARRAY_SIZE(mAsymValueStringTable), argv[1], &mUseAsymAlgo)) {
+        if (!GetFlagsFromName (mAsymValueStringTable, ARRAY_SIZE(mAsymValueStringTable), argv[1], &mSupportAsymAlgo)) {
           printf ("invalid --asym %s\n", argv[1]);
           PrintUsage (ProgramName);
           exit (0);
         }
-        printf ("asym - 0x%08x\n", mUseAsymAlgo);
+        printf ("asym - 0x%08x\n", mSupportAsymAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -476,13 +478,13 @@ ProcessArgs (
 
     if (strcmp (argv[0], "--req_asym") == 0) {
       if (argc >= 2) {
-        if (!GetValueFromName (mAsymValueStringTable, ARRAY_SIZE(mAsymValueStringTable), argv[1], &Data32)) {
+        if (!GetFlagsFromName (mAsymValueStringTable, ARRAY_SIZE(mAsymValueStringTable), argv[1], &Data32)) {
           printf ("invalid --req_asym %s\n", argv[1]);
           PrintUsage (ProgramName);
           exit (0);
         }
-        mUseReqAsymAlgo = (UINT16)Data32;
-        printf ("req_asym - 0x%04x\n", mUseReqAsymAlgo);
+        mSupportReqAsymAlgo = (UINT16)Data32;
+        printf ("req_asym - 0x%04x\n", mSupportReqAsymAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -495,13 +497,13 @@ ProcessArgs (
 
     if (strcmp (argv[0], "--dhe") == 0) {
       if (argc >= 2) {
-        if (!GetValueFromName (mDheValueStringTable, ARRAY_SIZE(mDheValueStringTable), argv[1], &Data32)) {
+        if (!GetFlagsFromName (mDheValueStringTable, ARRAY_SIZE(mDheValueStringTable), argv[1], &Data32)) {
           printf ("invalid --dhe %s\n", argv[1]);
           PrintUsage (ProgramName);
           exit (0);
         }
-        mUseDheAlgo = (UINT16)Data32;
-        printf ("dhe - 0x%04x\n", mUseDheAlgo);
+        mSupportDheAlgo = (UINT16)Data32;
+        printf ("dhe - 0x%04x\n", mSupportDheAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -514,13 +516,13 @@ ProcessArgs (
 
     if (strcmp (argv[0], "--aead") == 0) {
       if (argc >= 2) {
-        if (!GetValueFromName (mAeadValueStringTable, ARRAY_SIZE(mAeadValueStringTable), argv[1], &Data32)) {
+        if (!GetFlagsFromName (mAeadValueStringTable, ARRAY_SIZE(mAeadValueStringTable), argv[1], &Data32)) {
           printf ("invalid --aead %s\n", argv[1]);
           PrintUsage (ProgramName);
           exit (0);
         }
-        mUseAeadAlgo = (UINT16)Data32;
-        printf ("aead - 0x%04x\n", mUseAeadAlgo);
+        mSupportAeadAlgo = (UINT16)Data32;
+        printf ("aead - 0x%04x\n", mSupportAeadAlgo);
         argc -= 2;
         argv += 2;
         continue;
@@ -533,13 +535,13 @@ ProcessArgs (
 
     if (strcmp (argv[0], "--key_schedule") == 0) {
       if (argc >= 2) {
-        if (!GetValueFromName (mKeyScheduleValueStringTable, ARRAY_SIZE(mKeyScheduleValueStringTable), argv[1], &Data32)) {
+        if (!GetFlagsFromName (mKeyScheduleValueStringTable, ARRAY_SIZE(mKeyScheduleValueStringTable), argv[1], &Data32)) {
           printf ("invalid --key_schedule %s\n", argv[1]);
           PrintUsage (ProgramName);
           exit (0);
         }
-        mUseKeyScheduleAlgo = (UINT16)Data32;
-        printf ("key_schedule - 0x%04x\n", mUseKeyScheduleAlgo);
+        mSupportKeyScheduleAlgo = (UINT16)Data32;
+        printf ("key_schedule - 0x%04x\n", mSupportKeyScheduleAlgo);
         argc -= 2;
         argv += 2;
         continue;
