@@ -26,6 +26,125 @@ typedef struct {
 } SPDM_ALGORITHMS_RESPONSE_MINE;
 #pragma pack()
 
+UINT32 mHashPriorityTable[] = {
+#if OPENSPDM_SHA256_SUPPORT == 1
+  SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512,
+#endif
+#if OPENSPDM_SHA384_SUPPORT == 1
+  SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384,
+#endif
+#if OPENSPDM_SHA256_SUPPORT == 1
+  SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256,
+#endif
+};
+
+UINT32 mAsymPriorityTable[] = {
+#if OPENSPDM_ECDSA_SUPPORT == 1
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256,
+#endif
+#if OPENSPDM_RSA_PSS_SUPPORT == 1
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048,
+#endif
+#if OPENSPDM_RSA_SSA_SUPPORT == 1
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048,
+#endif
+};
+
+UINT32 mReqAsymPriorityTable[] = {
+#if OPENSPDM_RSA_PSS_SUPPORT == 1
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048,
+#endif
+#if OPENSPDM_RSA_SSA_SUPPORT == 1
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048,
+#endif
+#if OPENSPDM_ECDSA_SUPPORT == 1
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384,
+  SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256,
+#endif
+};
+
+UINT32 mDhePriorityTable[] = {
+#if OPENSPDM_ECDHE_SUPPORT == 1
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1,
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1,
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1,
+#endif
+#if OPENSPDM_FFDHE_SUPPORT == 1
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096,
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072,
+  SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048,
+#endif
+};
+
+UINT32 mAeadPriorityTable[] = {
+#if OPENSPDM_AEAD_GCM_SUPPORT == 1
+  SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM,
+  SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM,
+#endif
+#if OPENSPDM_AEAD_CHACHA20_POLY1305_SUPPORT == 1
+  SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305,
+#endif
+};
+
+UINT32 mKeySchedulePriorityTable[] = {
+  SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH,
+};
+
+UINT32 mMeasurementHashPriorityTable[] = {
+#if OPENSPDM_SHA256_SUPPORT == 1
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512,
+#endif
+#if OPENSPDM_SHA384_SUPPORT == 1
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384,
+#endif
+#if OPENSPDM_SHA256_SUPPORT == 1
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256,
+#endif
+  SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_RAW_BIT_STREAM_ONLY,
+};
+
+/**
+  Select the preferred supproted algorithm according to the PriorityTable.
+
+  @param  PriorityTable                The priority table.
+  @param  PriorityTableCount           The count of the priroty table entry.
+  @param  LocalAlgo                    Local supported algorithm.
+  @param  PeerAlgo                     Peer supported algorithm.
+
+  @return final preferred supported algorithm
+**/
+UINT32
+SpdmPrioritizeAlgorithm (
+  IN UINT32            *PriorityTable,
+  IN UINTN             PriorityTableCount,
+  IN UINT32            LocalAlgo,
+  IN UINT32            PeerAlgo
+  )
+{
+  UINT32 CommonAlgo;
+  UINTN  Index;
+
+  CommonAlgo = (LocalAlgo & PeerAlgo);
+  for (Index = 0; Index < PriorityTableCount; Index++) {
+    if ((CommonAlgo & PriorityTable[Index]) != 0) {
+      return PriorityTable[Index];
+    }
+  }
+
+  return 0;
+}
+
 /**
   Process the SPDM NEGOTIATE_ALGORITHMS request and return the response.
 
@@ -133,28 +252,56 @@ SpdmGetResponseAlgorithm (
     }
   }
 
-  SpdmResponse->MeasurementHashAlgo = SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo &
-                                      SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo;
-  SpdmResponse->BaseAsymSel = SpdmContext->LocalContext.Algorithm.BaseAsymAlgo &
-                              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo;
-  SpdmResponse->BaseHashSel = SpdmContext->LocalContext.Algorithm.BaseHashAlgo &
-                              SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo;
+  SpdmResponse->MeasurementHashAlgo = SpdmPrioritizeAlgorithm (
+                                        mMeasurementHashPriorityTable,
+                                        ARRAY_SIZE(mMeasurementHashPriorityTable),
+                                        SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo,
+                                        SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo
+                                        );
+  SpdmResponse->BaseAsymSel = SpdmPrioritizeAlgorithm (
+                                mAsymPriorityTable,
+                                ARRAY_SIZE(mAsymPriorityTable),
+                                SpdmContext->LocalContext.Algorithm.BaseAsymAlgo,
+                                SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo
+                                );
+  SpdmResponse->BaseHashSel = SpdmPrioritizeAlgorithm (
+                                mHashPriorityTable,
+                                ARRAY_SIZE(mHashPriorityTable),
+                                SpdmContext->LocalContext.Algorithm.BaseHashAlgo,
+                                SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo
+                                );
   SpdmResponse->StructTable[0].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE;
   SpdmResponse->StructTable[0].AlgCount = 0x20;
-  SpdmResponse->StructTable[0].AlgSupported = SpdmContext->LocalContext.Algorithm.DHENamedGroup &
-                                              SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup;
+  SpdmResponse->StructTable[0].AlgSupported = (UINT16)SpdmPrioritizeAlgorithm (
+                                                mDhePriorityTable,
+                                                ARRAY_SIZE(mDhePriorityTable),
+                                                SpdmContext->LocalContext.Algorithm.DHENamedGroup,
+                                                SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup
+                                                );
   SpdmResponse->StructTable[1].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD;
   SpdmResponse->StructTable[1].AlgCount = 0x20;
-  SpdmResponse->StructTable[1].AlgSupported = SpdmContext->LocalContext.Algorithm.AEADCipherSuite &
-                                              SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite;
+  SpdmResponse->StructTable[1].AlgSupported = (UINT16)SpdmPrioritizeAlgorithm (
+                                                mAeadPriorityTable,
+                                                ARRAY_SIZE(mAeadPriorityTable),
+                                                SpdmContext->LocalContext.Algorithm.AEADCipherSuite,
+                                                SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite
+                                                );
   SpdmResponse->StructTable[2].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG;
   SpdmResponse->StructTable[2].AlgCount = 0x20;
-  SpdmResponse->StructTable[2].AlgSupported = SpdmContext->LocalContext.Algorithm.ReqBaseAsymAlg &
-                                              SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg;
+  SpdmResponse->StructTable[2].AlgSupported = (UINT16)SpdmPrioritizeAlgorithm (
+                                                mReqAsymPriorityTable,
+                                                ARRAY_SIZE(mReqAsymPriorityTable),
+                                                SpdmContext->LocalContext.Algorithm.ReqBaseAsymAlg,
+                                                SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg
+                                                );
   SpdmResponse->StructTable[3].AlgType = SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE;
   SpdmResponse->StructTable[3].AlgCount = 0x20;
-  SpdmResponse->StructTable[3].AlgSupported = SpdmContext->LocalContext.Algorithm.KeySchedule &
-                                              SpdmContext->ConnectionInfo.Algorithm.KeySchedule;
+  SpdmResponse->StructTable[3].AlgSupported = (UINT16)SpdmPrioritizeAlgorithm (
+                                                mKeySchedulePriorityTable,
+                                                ARRAY_SIZE(mKeySchedulePriorityTable),
+                                                SpdmContext->LocalContext.Algorithm.KeySchedule,
+                                                SpdmContext->ConnectionInfo.Algorithm.KeySchedule
+                                                );
   //
   // Cache
   //

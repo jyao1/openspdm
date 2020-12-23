@@ -34,7 +34,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define OPENSPDM_RSA_PSS_SUPPORT                 1
 #define OPENSPDM_ECDSA_SUPPORT                   1
 
-#define OPENSPDM_DHE_SUPPORT                     1
+#define OPENSPDM_FFDHE_SUPPORT                   1
 #define OPENSPDM_ECDHE_SUPPORT                   1
 
 #define OPENSPDM_AEAD_GCM_SUPPORT                1
