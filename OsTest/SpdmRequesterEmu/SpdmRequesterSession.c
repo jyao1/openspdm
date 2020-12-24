@@ -146,8 +146,8 @@ DoSessionViaSpdm (
   Status = SpdmStartSession (
              SpdmContext,
              FALSE, // KeyExchange
-             SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH,
-             0,
+             mUseMeasurementSummaryHashType,
+             mUseSlotId,
              &SessionId,
              &HeartbeatPeriod,
              MeasurementHash
@@ -162,8 +162,8 @@ DoSessionViaSpdm (
   Status = SpdmStartSession (
              SpdmContext,
              TRUE, // PSK
-             SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH,
-             0,
+             mUseMeasurementSummaryHashType,
+             mUseSlotId,
              &SessionId2,
              &HeartbeatPeriod,
              MeasurementHash

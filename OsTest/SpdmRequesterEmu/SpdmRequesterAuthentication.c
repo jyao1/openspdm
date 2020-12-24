@@ -40,10 +40,10 @@ DoAuthenticationViaSpdm (
              SpdmContext,
              &SlotMask,
              &TotalDigestBuffer,
-             0,
+             mUseSlotId,
              &CertChainSize,
              CertChain,
-             SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH,
+             mUseMeasurementSummaryHashType,
              MeasurementHash
              );
   if (RETURN_ERROR(Status)) {

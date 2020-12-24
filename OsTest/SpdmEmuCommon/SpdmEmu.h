@@ -28,7 +28,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 extern UINT32  mUseTransportLayer;
 extern UINT8   mUseVersion;
+extern UINT32  mUseRequesterCapabilityFlags;
+extern UINT32  mUseResonderCapabilityFlags;
 extern UINT32  mUseCapabilityFlags;
+
+extern UINT8   mUseMutAuth;
+extern UINT8   mUseMeasurementSummaryHashType;
+extern UINT8   mUseMeasurementOperation;
+extern UINT8   mUseSlotId;
+extern UINT8   mUseSlotCount;
 
 extern UINT32  mUseHashAlgo;
 extern UINT32  mUseMeasurementHashAlgo;

@@ -142,6 +142,11 @@ PrintUsage (
   printf ("   [--dhe FFDHE_2048|FFDHE_3072|FFDHE_4096|SECP_256_R1|SECP_384_R1|SECP_521_R1]\n");
   printf ("   [--aead AES_128_GCM|AES_256_GCM|CHACHA20_POLY1305]\n");
   printf ("   [--key_schedule HMAC_HASH]\n");
+  printf ("   [--mut_auth BASIC|ENCAP|DIGESTS]\n");
+  printf ("   [--meas_sum NO|TCB|ALL]\n");
+  printf ("   [--meas_op ONE_BY_ONE|ALL]\n");
+  printf ("   [--slot <0~7|0xFF>]\n");
+  printf ("   [--slot_count <1~8>]\n");
   printf ("   [--pcap <PcapFileName>]\n");
   printf ("\n");
   printf ("NOTE:\n");
@@ -150,15 +155,20 @@ PrintUsage (
   printf ("   [--cap] is capability flags. Multiple flags can be set together. Please use ',' for them.\n");
   printf ("           By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Requester.\n");
   printf ("           By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Responder.\n");
-  printf ("   [--hash] is hash algorithm. By default, SHA_256 is used.\n");
-  printf ("   [--meas_hash] is measurement hash algorithm. By default, SHA_256 is used.\n");
-  printf ("   [--asym] is asym algorithm. By default, ECDSA_P256 is used.\n");
-  printf ("   [--req_asym] is requester asym algorithm. By default, RSASSA_2048 is used.\n");
-  printf ("   [--dhe] is DHE algorithm. By default, SECP_256_R1 is used.\n");
-  printf ("   [--aead] is AEAD algorithm. By default, AES_256_GCM is used.\n");
+  printf ("   [--hash] is hash algorithm. By default, SHA_384,SHA_256 is used.\n");
+  printf ("   [--meas_hash] is measurement hash algorithm. By default, SHA_512,SHA_384,SHA_256 is used.\n");
+  printf ("   [--asym] is asym algorithm. By default, ECDSA_P384,ECDSA_P256 is used.\n");
+  printf ("   [--req_asym] is requester asym algorithm. By default, RSAPSS_3072,RSAPSS_2048,RSASSA_3072,RSASSA_2048 is used.\n");
+  printf ("   [--dhe] is DHE algorithm. By default, SECP_384_R1,SECP_256_R1,FFDHE_3072,FFDHE_2048 is used.\n");
+  printf ("   [--aead] is AEAD algorithm. By default, AES_256_GCM,CHACHA20_POLY1305 is used.\n");
   printf ("   [--key_schedule] is key schedule algorithm. By default, HMAC_HASH is used.\n");
   printf ("           Above algorithms also support multiple flags. Please use ',' for them.\n");
   printf ("           SHA3 is not supported so far.\n");
+  printf ("   [--mut_auth] is the mutual authentication policy. BASIC is used in CHALLENGE_AUTH, ENCAP or DIGESTS is used in KEY_EXCHANGE_RSP. By default, BASIC,ENCAP is used.\n");
+  printf ("   [--meas_sum] is the measurment summary hash type in CHALLENGE_AUTH, KEY_EXCHANGE_RSP and PSK_EXCHANGE_RSP. By default, ALL is used.\n");
+  printf ("   [--meas_op] is the measurement operation in GET_MEASUREMEMT. By default, ONE_BY_ONE is used.\n");
+  printf ("   [--slot_id] is to select the peer slot ID in GET_MEASUREMENT, CHALLENGE_AUTH, KEY_EXCHANGE and FINISH. By default, 0 is used.\n");
+  printf ("   [--slot_count] is to select the local slot count. By default, 3 is used.\n");
   printf ("   [--pcap] is used to generate PCAP dump file for offline analysis.\n");
 }
 
@@ -262,6 +272,46 @@ VALUE_STRING_ENTRY  mAeadValueStringTable[] = {
 
 VALUE_STRING_ENTRY  mKeyScheduleValueStringTable[] = {
   {SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH,        "HMAC_HASH"},
+};
+
+VALUE_STRING_ENTRY  mMutAuthPolicyStringTable[] = {
+  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED,                    "BASIC"},
+  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST, "ENCAP"},
+  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS,   "DIGESTS"},
+};
+
+VALUE_STRING_ENTRY  mMeasurementSummaryHashTypeStringTable[] = {
+  {SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH,    "NO"},
+  {SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH, "TCB"},
+  {SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH,          "ALL"},
+};
+
+VALUE_STRING_ENTRY  mMeasurementOperationStringTable[] = {
+  {SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS, "ONE_BY_ONE"},
+  {SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS,              "ALL"},
+};
+
+VALUE_STRING_ENTRY  mSlotIdStringTable[] = {
+  {0x0, "0"},
+  {0x1, "1"},
+  {0x2, "2"},
+  {0x3, "3"},
+  {0x4, "4"},
+  {0x5, "5"},
+  {0x6, "6"},
+  {0x7, "7"},
+  {0xFF, "0xFF"},
+};
+
+VALUE_STRING_ENTRY  mSlotCountStringTable[] = {
+  {0x1, "1"},
+  {0x2, "2"},
+  {0x3, "3"},
+  {0x4, "4"},
+  {0x5, "5"},
+  {0x6, "6"},
+  {0x7, "7"},
+  {0x8, "8"},
 };
 
 BOOLEAN
@@ -547,6 +597,101 @@ ProcessArgs (
         continue;
       } else {
         printf ("invalid --key_schedule\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--mut_auth") == 0) {
+      if (argc >= 2) {
+        if (!GetFlagsFromName (mMutAuthPolicyStringTable, ARRAY_SIZE(mMutAuthPolicyStringTable), argv[1], &Data32)) {
+          printf ("invalid --mut_auth %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mUseMutAuth = (UINT8)Data32;
+        printf ("mut_auth - 0x%02x\n", mUseMutAuth);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --mut_auth\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--meas_sum") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mMeasurementSummaryHashTypeStringTable, ARRAY_SIZE(mMeasurementSummaryHashTypeStringTable), argv[1], &Data32)) {
+          printf ("invalid --meas_sum %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mUseMeasurementSummaryHashType = (UINT8)Data32;
+        printf ("meas_sum - 0x%02x\n", mUseMeasurementSummaryHashType);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --meas_sum\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--meas_op") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mMeasurementOperationStringTable, ARRAY_SIZE(mMeasurementOperationStringTable), argv[1], &Data32)) {
+          printf ("invalid --meas_op %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mUseMeasurementOperation = (UINT8)Data32;
+        printf ("meas_op - 0x%02x\n", mUseMeasurementOperation);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --meas_op\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--slot_id") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSlotIdStringTable, ARRAY_SIZE(mSlotIdStringTable), argv[1], &Data32)) {
+          printf ("invalid --slot_id %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mUseSlotId = (UINT8)Data32;
+        printf ("slot_id - 0x%02x\n", mUseSlotId);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --slot_id\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--slot_count") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSlotCountStringTable, ARRAY_SIZE(mSlotCountStringTable), argv[1], &Data32)) {
+          printf ("invalid --slot_count %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mUseSlotCount = (UINT8)Data32;
+        printf ("slot_count - 0x%02x\n", mUseSlotCount);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --slot_count\n");
         PrintUsage (ProgramName);
         exit (0);
       }

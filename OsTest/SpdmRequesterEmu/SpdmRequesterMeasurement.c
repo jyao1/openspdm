@@ -30,44 +30,64 @@ SpdmSendReceiveGetMeasurement (
   UINT8                                     Index;
   UINT8                                     RequestAttribute;
 
-  RequestAttribute = 0;
-  //
-  // 1. Query the total number of measurements available.
-  //
-  Status = SpdmGetMeasurement (
-             SpdmContext,
-             RequestAttribute,
-             SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS,
-             0,
-             &NumberOfBlocks,
-             NULL,
-             NULL
-             );
-  if (RETURN_ERROR(Status)) {
-    return Status;
-  }
-  DEBUG((DEBUG_INFO, "NumberOfBlocks - 0x%x\n", NumberOfBlocks));
-  for (Index = 1; Index <= NumberOfBlocks; Index++) {
-    DEBUG((DEBUG_INFO, "Index - 0x%x\n", Index));
+  if (mUseMeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS) {
     //
-    // 2. query measurement one by one
-    // get signature in last message only.
+    // Request all at one time.
     //
-    if (Index == NumberOfBlocks) {
-      RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
-    }
+    RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
     MeasurementRecordLength = sizeof(MeasurementRecord);
+    Status = SpdmGetMeasurement (
+               SpdmContext,
+               RequestAttribute,
+               SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS,
+               mUseSlotId,
+               &NumberOfBlock,
+               &MeasurementRecordLength,
+               MeasurementRecord
+               );
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else {
+    RequestAttribute = 0;
+    //
+    // 1. Query the total number of measurements available.
+    //
     Status = SpdmGetMeasurement (
               SpdmContext,
               RequestAttribute,
-              Index,
-              0,
-              &NumberOfBlock,
-              &MeasurementRecordLength,
-              MeasurementRecord
+              SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS,
+              mUseSlotId,
+              &NumberOfBlocks,
+              NULL,
+              NULL
               );
     if (RETURN_ERROR(Status)) {
       return Status;
+    }
+    DEBUG((DEBUG_INFO, "NumberOfBlocks - 0x%x\n", NumberOfBlocks));
+    for (Index = 1; Index <= NumberOfBlocks; Index++) {
+      DEBUG((DEBUG_INFO, "Index - 0x%x\n", Index));
+      //
+      // 2. query measurement one by one
+      // get signature in last message only.
+      //
+      if (Index == NumberOfBlocks) {
+        RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
+      }
+      MeasurementRecordLength = sizeof(MeasurementRecord);
+      Status = SpdmGetMeasurement (
+                SpdmContext,
+                RequestAttribute,
+                Index,
+                mUseSlotId,
+                &NumberOfBlock,
+                &MeasurementRecordLength,
+                MeasurementRecord
+                );
+      if (RETURN_ERROR(Status)) {
+        return Status;
+      }
     }
   }
 
