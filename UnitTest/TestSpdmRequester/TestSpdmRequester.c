@@ -19,6 +19,7 @@ int SpdmRequesterChallengeTestMain (void);
 int SpdmRequesterGetMeasurementTestMain (void);
 int SpdmRequesterKeyExchangeTestMain (void);
 int SpdmRequesterFinishTestMain (void);
+int SpdmRequesterPskExchangeTestMain (void);
 
 int main(void) {
   SpdmRequesterGetVersionTestMain();
@@ -38,5 +39,7 @@ int main(void) {
   SpdmRequesterKeyExchangeTestMain();
 
   SpdmRequesterFinishTestMain();
+
+  SpdmRequesterPskExchangeTestMain();
   return 0;
 }

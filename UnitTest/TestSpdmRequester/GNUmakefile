@@ -43,6 +43,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/TestSpdmRequesterGetMeasurement.o \
     $(OUTPUT_DIR)/TestSpdmRequesterKeyExchange.o \
     $(OUTPUT_DIR)/TestSpdmRequesterFinish.o \
+    $(OUTPUT_DIR)/TestSpdmRequesterPskExchange.o \
     $(OUTPUT_DIR)/SpdmUnitTestCommon.o \
     $(OUTPUT_DIR)/SpdmTestKey.o \
     $(OUTPUT_DIR)/SpdmTestSupport.o \
@@ -161,6 +162,9 @@ $(OUTPUT_DIR)/TestSpdmRequesterKeyExchange.o : $(SOURCE_DIR)/TestSpdmRequesterKe
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/TestSpdmRequesterFinish.o : $(SOURCE_DIR)/TestSpdmRequesterFinish.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/TestSpdmRequesterPskExchange.o : $(SOURCE_DIR)/TestSpdmRequesterPskExchange.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmUnitTestCommon.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmUnitTestCommon.c

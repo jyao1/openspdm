@@ -23,6 +23,7 @@ SET(src_TestSpdmRequester
     TestSpdmRequesterGetMeasurement.c
     TestSpdmRequesterKeyExchange.c
     TestSpdmRequesterFinish.c
+    TestSpdmRequesterPskExchange.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmUnitTestCommon.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestKey.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestSupport.c

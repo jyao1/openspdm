@@ -304,6 +304,7 @@ typedef enum {
 #define SPDM_GET_MEASUREMENTS_RECEIVE_FLAG              BIT6
 #define SPDM_KEY_EXCHANGE_RECEIVE_FLAG                  BIT7
 #define SPDM_FINISH_RECEIVE_FLAG                        BIT8
+#define SPDM_PSK_EXCHANGE_RECEIVE_FLAG                  BIT9
 
 
 

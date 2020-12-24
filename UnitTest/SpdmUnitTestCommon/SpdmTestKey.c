@@ -1287,3 +1287,82 @@ SpdmResponderDataSignFunc (
   return SpdmDataSignFunc (TRUE, AsymAlgo, MessageHash, HashSize, Signature, SigSize);
 }
 
+UINT8  mMyZeroFilledBuffer[64];
+
+VOID
+DumpHexStr (
+  IN UINT8 *Buffer,
+  IN UINTN BufferSize
+  )
+{
+  UINTN Index;
+
+  for (Index = 0; Index < BufferSize; Index++) {
+    printf ("%02x", Buffer[Index]);
+  }
+}
+
+/**
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
+
+  The PRK is PSK derived HandshakeSecret.
+
+  @param  HashAlgo                     Indicates the hash algorithm.
+  @param  PskHint                      Pointer to the user-supplied PSK Hint.
+  @param  PskHintSize                  PSK Hint size in bytes.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+**/
+BOOLEAN
+EFIAPI
+SpdmPskHandshakeSecretHkdfExpandFunc (
+  IN      UINT32       HashAlgo,
+  IN      CONST UINT8  *PskHint, OPTIONAL
+  IN      UINTN        PskHintSize, OPTIONAL
+  IN      CONST UINT8  *Info,
+  IN      UINTN        InfoSize,
+     OUT  UINT8        *Out,
+  IN      UINTN        OutSize
+  )
+{
+  VOID                          *Psk;
+  UINTN                         PskSize;
+  UINTN                         HashSize;
+  BOOLEAN                       Result;
+  UINT8                         HandshakeSecret[64];
+
+  ASSERT (HashAlgo == mUseHashAlgo);
+
+  if ((PskHint == NULL) && (PskHintSize == 0)) {
+    Psk = TEST_PSK_DATA_STRING;
+    PskSize = sizeof(TEST_PSK_DATA_STRING);
+  } else if ((PskHint != NULL) && (PskHintSize != 0) &&
+             (strcmp((const char *)PskHint, TEST_PSK_HINT_STRING) == 0) &&
+             (PskHintSize == sizeof(TEST_PSK_HINT_STRING))) {
+    Psk = TEST_PSK_DATA_STRING;
+    PskSize = sizeof(TEST_PSK_DATA_STRING);
+  } else {
+    return FALSE;
+  }
+  printf ("[PSK]: ");
+  DumpHexStr (Psk, PskSize);
+  printf ("\n");
+
+  HashSize = TestGetSpdmHashSize (HashAlgo);
+
+  Result = TestSpdmHmacAll (HashAlgo, mMyZeroFilledBuffer, HashSize, Psk, PskSize, HandshakeSecret);
+  if (!Result) {
+    return Result;
+  }
+
+  Result = TestSpdmHkdfExpand (HashAlgo, HandshakeSecret, HashSize, Info, InfoSize, Out, OutSize);
+  ZeroMem (HandshakeSecret, HashSize);
+
+  return Result;
+}
+
