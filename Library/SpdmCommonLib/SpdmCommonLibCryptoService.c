@@ -462,50 +462,43 @@ SpdmGenerateMeasurementSummaryHash (
      OUT UINT8                *MeasurementSummaryHash
   )
 {
-  UINT8                         MeasurementData[MAX_HASH_SIZE * MAX_SPDM_MEASUREMENT_BLOCK_COUNT];
+  UINT8                         MeasurementData[MAX_SPDM_MEASUREMENT_RECORD_SIZE];
   UINTN                         Index;
-  UINTN                         LocalIndex;
-  UINT32                        HashSize;
   SPDM_MEASUREMENT_BLOCK_DMTF   *CachedMeasurmentBlock;
-  
-  HashSize = GetSpdmMeasurementHashSize (SpdmContext);
+  UINTN                         MeasurmentDataSize;
+  UINTN                         MeasurmentBlockSize;
 
   ASSERT(SpdmContext->LocalContext.DeviceMeasurementCount <= MAX_SPDM_MEASUREMENT_BLOCK_COUNT);
 
+  MeasurmentDataSize = 0;
+  CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
+  for (Index = 0; Index < SpdmContext->LocalContext.DeviceMeasurementCount; Index++) {
+    MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER) + CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
+    ASSERT (CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize == sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
+    MeasurmentDataSize += CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
+    CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
+  }
+
+  ASSERT (MeasurmentDataSize <= MAX_SPDM_MEASUREMENT_RECORD_SIZE);
+
   switch (MeasurementSummaryHashType) {
   case SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH:
-    ZeroMem (MeasurementSummaryHash, HashSize);
+    ZeroMem (MeasurementSummaryHash, GetSpdmHashSize (SpdmContext));
     break;
   case SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH:
   case SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH:
     CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
-    LocalIndex = 0;
+    MeasurmentDataSize = 0;
     for (Index = 0; Index < SpdmContext->LocalContext.DeviceMeasurementCount; Index++) {
-      switch (CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType) {
-      case SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MUTABLE_FIRMWARE:
-      case SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_HARDWARE_CONFIGURATION:
-      case SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_FIRMWARE_CONFIGURATION:
-        if (MeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH) {
-          break;
-        }
-        // Pass Thru
-      case SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_IMMUTABLE_ROM:
-        CopyMem (
-          &MeasurementData[HashSize * LocalIndex],
-          (CachedMeasurmentBlock + 1),
-          HashSize
-          );
-        LocalIndex ++;
-        break;
-      default:
-        break;
+      MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER) + CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
+      if ((MeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH) ||
+          ((CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType & SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MASK) == SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_IMMUTABLE_ROM)) {
+        CopyMem (&MeasurementData[MeasurmentDataSize], &CachedMeasurmentBlock->MeasurementBlockDmtfHeader, CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize);
       }
-      CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock +
-                                       sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) +
-                                       CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize
-                                       );
+      MeasurmentDataSize += CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
+      CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
     }
-    SpdmHashAll (SpdmContext, MeasurementData, HashSize * LocalIndex, MeasurementSummaryHash);
+    SpdmHashAll (SpdmContext, MeasurementData, MeasurmentDataSize, MeasurementSummaryHash);
     break;
   default:
     return FALSE;
