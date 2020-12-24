@@ -43,6 +43,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmResponderMeasurement.obj \
     $(OUTPUT_DIR)\TestSpdmResponderKeyExchange.obj \
     $(OUTPUT_DIR)\TestSpdmResponderFinish.obj \
+    $(OUTPUT_DIR)\TestSpdmResponderPskExchange.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
     $(OUTPUT_DIR)\SpdmTestKey.obj \
     $(OUTPUT_DIR)\SpdmTestSupport.obj \
@@ -162,6 +163,9 @@ $(OUTPUT_DIR)\TestSpdmResponderKeyExchange.obj : $(SOURCE_DIR)\TestSpdmResponder
 
 $(OUTPUT_DIR)\TestSpdmResponderFinish.obj : $(SOURCE_DIR)\TestSpdmResponderFinish.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderFinish.c
+
+$(OUTPUT_DIR)\TestSpdmResponderPskExchange.obj : $(SOURCE_DIR)\TestSpdmResponderPskExchange.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderPskExchange.c
 
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c

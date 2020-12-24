@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #undef NULL
 #include <Base.h>
@@ -41,6 +42,9 @@ extern UINT16  mUseKeyScheduleAlgo;
 #define TEST_CERT_MAXUINT16 2
 #define TEST_CERT_MAXUINT16_LARGER 3
 #define TEST_CERT_SMALL 4
+
+#define TEST_PSK_DATA_STRING  "TestPskData"
+#define TEST_PSK_HINT_STRING  "TestPskHint"
 
 typedef struct {
   UINT32                            Signature;
@@ -180,6 +184,19 @@ SpdmResponderDataSignFunc (
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
+  );
+
+
+BOOLEAN
+EFIAPI
+SpdmPskHandshakeSecretHkdfExpandFunc (
+  IN      UINT32       HashAlgo,
+  IN      CONST UINT8  *PskHint, OPTIONAL
+  IN      UINTN        PskHintSize, OPTIONAL
+  IN      CONST UINT8  *Info,
+  IN      UINTN        InfoSize,
+     OUT  UINT8        *Out,
+  IN      UINTN        OutSize
   );
 
 #endif

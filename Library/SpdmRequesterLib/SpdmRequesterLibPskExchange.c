@@ -49,7 +49,7 @@ typedef struct {
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
-SpdmSendReceivePskExchange (
+TrySpdmSendReceivePskExchange (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MeasurementHashType,
      OUT UINT32               *SessionId,
@@ -73,6 +73,11 @@ SpdmSendReceivePskExchange (
   SPDM_SESSION_INFO                         *SessionInfo;
   UINTN                                     OpaquePskExchangeReqSize;
 
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
   }
@@ -120,13 +125,18 @@ SpdmSendReceivePskExchange (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, NULL, 0, &SpdmResponseSize, &SpdmResponse, SPDM_PSK_EXCHANGE, SPDM_PSK_EXCHANGE_RSP, sizeof(SPDM_PSK_EXCHANGE_RESPONSE_MAX));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_PSK_EXCHANGE_RSP) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_PSK_EXCHANGE_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_PSK_EXCHANGE_RSP) {
     return RETURN_DEVICE_ERROR;
   }
   if (HeartbeatPeriod != NULL) {
@@ -213,7 +223,31 @@ SpdmSendReceivePskExchange (
 
   SessionInfo->SessionState = SpdmSessionStateHandshaking;
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
   
   return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+SpdmSendReceivePskExchange (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                MeasurementHashType,
+     OUT UINT32               *SessionId,
+     OUT UINT8                *HeartbeatPeriod,
+     OUT VOID                 *MeasurementHash
+  )
+{
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+
+  Retry = SpdmContext->RetryTimes;
+  do {
+    Status = TrySpdmSendReceivePskExchange(SpdmContext, MeasurementHashType, SessionId, HeartbeatPeriod, MeasurementHash);
+    if (RETURN_NO_RESPONSE != Status) {
+      return Status;
+    }
+  } while (Retry-- != 0);
+
+  return Status;
 }
 
