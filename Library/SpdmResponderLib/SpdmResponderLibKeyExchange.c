@@ -156,7 +156,11 @@ SpdmGetResponseKeyExchange (
   SpdmResponse->RspSessionID = RspSessionId;
 
   SpdmResponse->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
-  SpdmResponse->SlotIDParam = 0;
+  if (SpdmResponse->MutAuthRequested != 0) {
+    SpdmResponse->SlotIDParam = SpdmContext->EncapContext.SlotNum;
+  } else {
+    SpdmResponse->SlotIDParam = 0;
+  }
 
   SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
 

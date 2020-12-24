@@ -127,6 +127,7 @@ SpdmGetResponseMeasurement (
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
           return RETURN_SUCCESS;
         }
+        SpdmResponse->Header.Param2 = SlotIdParam;
       }
       Status = SpdmGenerateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
@@ -182,6 +183,7 @@ SpdmGetResponseMeasurement (
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
           return RETURN_SUCCESS;
         }
+        SpdmResponse->Header.Param2 = SlotIdParam;
       }
       Status = SpdmGenerateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
@@ -243,6 +245,7 @@ SpdmGetResponseMeasurement (
             SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
             return RETURN_SUCCESS;
           }
+          SpdmResponse->Header.Param2 = SlotIdParam;
         }
         Status = SpdmGenerateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
         if (RETURN_ERROR(Status)) {
