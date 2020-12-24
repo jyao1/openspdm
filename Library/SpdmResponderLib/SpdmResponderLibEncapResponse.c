@@ -229,6 +229,13 @@ SpdmInitEncapState (
     SpdmContext->EncapContext.EncapState = SpdmEncapResponseStateWaitForDigest;
   }
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
+
+  //
+  // Clear Cache
+  //
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
+  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
 }
 
 /**
@@ -270,13 +277,6 @@ SpdmGetResponseEncapsulatedRequest (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-
-  //
-  // Cache
-  //
-  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
-  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
 
   ASSERT (*ResponseSize > sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE));
   ZeroMem (Response, *ResponseSize);
