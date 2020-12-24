@@ -10,100 +10,6 @@
 #include "SpdmResponderLibInternal.h"
 
 /**
-  This function generates the measurement signature based upon L1L2.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  ResponseMessage              The measurement response message without signature.
-  @param  ResponseMessageSize          Size in bytes of the response message without signature.
-  @param  Signature                    The buffer to store the measurement signature.
-
-  @retval TRUE  measurement signature is generated.
-  @retval FALSE measurement signature is not generated.
-**/
-BOOLEAN
-SpdmResponderGenerateSpdmMeasurementSignature (
-  IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN  VOID                      *ResponseMessage,
-  IN  UINTN                     ResponseMessageSize,
-  OUT UINT8                     *Signature
-  )
-{
-  UINT8                         HashData[MAX_HASH_SIZE];
-  BOOLEAN                       Result;
-  UINTN                         SignatureSize;
-  UINT32                        HashSize;
-
-  if (SpdmContext->LocalContext.SpdmResponderDataSignFunc == NULL) {
-    return FALSE;
-  }
-
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  AppendManagedBuffer (&SpdmContext->Transcript.L1L2, ResponseMessage, ResponseMessageSize);
-  
-  DEBUG((DEBUG_INFO, "Calc L1L2 Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
-
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
-  DEBUG((DEBUG_INFO, "Calc L1L2 Hash - "));
-  InternalDumpData (HashData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-  
-  Result = SpdmContext->LocalContext.SpdmResponderDataSignFunc (
-             SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
-             HashData,
-             HashSize,
-             Signature,
-             &SignatureSize
-             );
-
-  return Result;
-}
-
-/**
-  This function creates the measurement signature to response message.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  ResponseMessage              The measurement response message with empty signature to be filled.
-  @param  ResponseMessageSize          Total size in bytes of the response message including signature.
-
-  @retval TRUE  measurement signature is created.
-  @retval FALSE measurement signature is not created.
-**/
-BOOLEAN
-SpdmResponderCreateMeasurementSig (
-  IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN OUT VOID                   *ResponseMessage,
-  IN     UINTN                  ResponseMessageSize
-  )
-{
-  UINT8                         *Ptr;
-  UINTN                         MeasurmentSigSize;
-  UINTN                         SignatureSize;
-  BOOLEAN                       Result;
-  
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
-  MeasurmentSigSize = SPDM_NONCE_SIZE +
-                      sizeof(UINT16) +
-                      SpdmContext->LocalContext.OpaqueMeasurementRspSize +
-                      SignatureSize;
-  ASSERT (ResponseMessageSize > MeasurmentSigSize);
-  Ptr = (VOID *)((UINT8 *)ResponseMessage + ResponseMessageSize - MeasurmentSigSize);
-  
-  SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
-  Ptr += SPDM_NONCE_SIZE;
-
-  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueMeasurementRspSize;
-  Ptr += sizeof(UINT16);
-  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueMeasurementRsp, SpdmContext->LocalContext.OpaqueMeasurementRspSize);
-  Ptr += SpdmContext->LocalContext.OpaqueMeasurementRspSize;
-  
-  Result = SpdmResponderGenerateSpdmMeasurementSignature (SpdmContext, ResponseMessage, ResponseMessageSize - SignatureSize, (VOID *)Ptr);
-  return Result;
-}
-
-/**
   Process the SPDM GET_MEASUREMENT request and return the response.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -222,7 +128,7 @@ SpdmGetResponseMeasurement (
           return RETURN_SUCCESS;
         }
       }
-      Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
+      Status = SpdmGenerateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
         return RETURN_SUCCESS;
@@ -277,7 +183,7 @@ SpdmGetResponseMeasurement (
           return RETURN_SUCCESS;
         }
       }
-      Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
+      Status = SpdmGenerateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
         return RETURN_SUCCESS;
@@ -338,7 +244,7 @@ SpdmGetResponseMeasurement (
             return RETURN_SUCCESS;
           }
         }
-        Status = SpdmResponderCreateMeasurementSig (SpdmContext, SpdmResponse, SpdmResponseSize);
+        Status = SpdmGenerateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
         if (RETURN_ERROR(Status)) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
           return RETURN_SUCCESS;

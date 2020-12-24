@@ -19,45 +19,6 @@ typedef struct {
 #pragma pack()
 
 /**
-  This function verifies the digest.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Digest                       The digest data buffer.
-  @param  DigestSize                   Size in bytes of the digest data buffer.
-
-  @retval TRUE  digest verification pass.
-  @retval FALSE digest verification fail.
-**/
-BOOLEAN
-SpdmRequesterVerifyDigest (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *Digest,
-  UINTN                           DigestSize
-  )
-{
-  UINTN                                     HashSize;
-  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-
-  CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
-  CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
-  if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
-    HashSize = GetSpdmHashSize (SpdmContext);
-    SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
-
-    if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! VerifyDigest - FAIL !!!\n"));
-      return FALSE;
-    }
-  }
-
-  DEBUG((DEBUG_INFO, "!!! VerifyDigest - PASS !!!\n"));
-
-  return TRUE;
-}
-
-/**
   This function sends GET_DIGEST
   to get all digest of the certificate chains from device.
 
@@ -165,7 +126,7 @@ TrySpdmGetDigest (
     DEBUG((DEBUG_INFO, "\n"));
   }
 
-  Result = SpdmRequesterVerifyDigest (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
+  Result = SpdmVerifyDigest (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
   if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;

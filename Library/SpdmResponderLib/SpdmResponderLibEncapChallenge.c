@@ -10,130 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmResponderLibInternal.h"
 
 /**
-  This function verifies the certificate chain hash.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  CertificateChainHash         The certificate chain hash data buffer.
-  @param  CertificateChainHashSize     Size in bytes of the certificate chain hash data buffer.
-
-  @retval TRUE  hash verification pass.
-  @retval FALSE hash verification fail.
-**/
-BOOLEAN
-SpdmEncapRequesterVerifyCertificateChainHash (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *CertificateChainHash,
-  UINTN                           CertificateChainHashSize
-  )
-{
-  UINTN                                     HashSize;
-  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-
-  CertBuffer = SpdmContext->ConnectionInfo.PeerCertChainBuffer;
-  CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize;
-  if (CertBufferSize == 0) {
-    return FALSE;
-  }
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
-
-  if (HashSize != CertificateChainHashSize) {
-    DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChainHash - FAIL !!!\n"));
-    return FALSE;
-  }
-  if (CompareMem (CertificateChainHash, CertBufferHash, CertificateChainHashSize) != 0) {
-    DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChainHash - FAIL !!!\n"));
-    return FALSE;
-  }
-  DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - PASS !!!\n"));
-  return TRUE;
-}
-
-/**
-  This function verifies the challenge signature based upon M1M2.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SignData                     The signature data buffer.
-  @param  SignDataSize                 Size in bytes of the signature data buffer.
-
-  @retval TRUE  signature verification pass.
-  @retval FALSE signature verification fail.
-**/
-BOOLEAN
-SpdmEncapRequesterVerifyChallengeSignature (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *SignData,
-  UINTN                           SignDataSize
-  )
-{
-  UINTN                                     HashSize;
-  UINT8                                     HashData[MAX_HASH_SIZE];
-  BOOLEAN                                   Result;
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  VOID                                      *Context;
-  UINT8                                     *CertChainBuffer;
-  UINTN                                     CertChainBufferSize;
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  DEBUG((DEBUG_INFO, "Encap MessageA Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-
-  DEBUG((DEBUG_INFO, "Encap MessageB Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageB), GetManagedBufferSize(&SpdmContext->Transcript.MessageB));
-
-  DEBUG((DEBUG_INFO, "Encap MessageC Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
-
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
-  DEBUG((DEBUG_INFO, "Encap M1M2 Hash - "));
-  InternalDumpData (HashData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
-    return FALSE;
-  }
-
-  CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-
-  //
-  // Get leaf cert from cert chain
-  //
-  Result = X509GetCertFromCertChain (CertChainBuffer, CertChainBufferSize, -1,  &CertBuffer, &CertBufferSize);
-  if (!Result) {
-    return FALSE;
-  }
-
-  Result = SpdmReqAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
-  if (!Result) {
-    return FALSE;
-  }
-
-  Result = SpdmReqAsymVerify (
-             SpdmContext,
-             Context,
-             HashData,
-             HashSize,
-             SignData,
-             SignDataSize
-             );
-  SpdmReqAsymFree (SpdmContext, Context);
-  if (!Result) {
-    DEBUG((DEBUG_INFO, "!!! EncapVerifyChallengeSignature - FAIL !!!\n"));
-    return FALSE;
-  }
-  DEBUG((DEBUG_INFO, "!!! EncapVerifyChallengeSignature - PASS !!!\n"));
-
-  return TRUE;
-}
-
-/**
   Get the SPDM encapsulated CHALLENGE request.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -262,7 +138,7 @@ SpdmProcessEncapResponseChallengeAuth (
   DEBUG((DEBUG_INFO, "Encap CertChainHash (0x%x) - ", HashSize));
   InternalDumpData (CertChainHash, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
-  Result = SpdmEncapRequesterVerifyCertificateChainHash (SpdmContext, CertChainHash, HashSize);
+  Result = SpdmVerifyCertificateChainHash (SpdmContext, CertChainHash, HashSize);
   if (!Result) {
     SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
@@ -311,7 +187,7 @@ SpdmProcessEncapResponseChallengeAuth (
   Signature = Ptr;
   DEBUG((DEBUG_INFO, "Encap Signature (0x%x):\n", SignatureSize));
   InternalDumpHex (Signature, SignatureSize);
-  Result = SpdmEncapRequesterVerifyChallengeSignature (SpdmContext, Signature, SignatureSize);
+  Result = SpdmVerifyChallengeAuthSignature (SpdmContext, FALSE, Signature, SignatureSize);
   if (!Result) {
     SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;

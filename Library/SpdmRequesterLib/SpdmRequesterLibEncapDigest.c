@@ -80,7 +80,7 @@ SpdmGetEncapResponseDigest (
   Digest = (VOID *)(SpdmResponse + 1);
   for (Index = 0; Index < SpdmContext->LocalContext.SlotCount; Index++) {
     SpdmResponse->Header.Param2 |= (1 << Index);
-    SpdmHashAll (SpdmContext, SpdmContext->LocalContext.CertificateChain[Index], SpdmContext->LocalContext.CertificateChainSize[Index], &Digest[HashSize * Index]);
+    SpdmGenerateCertChainHash (SpdmContext, Index, &Digest[HashSize * Index]);
   }
   //
   // Cache

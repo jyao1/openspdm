@@ -34,6 +34,7 @@ SOURCE_DIR = $(WORKSPACE)/Library/$(MODULE_NAME)
 OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmCommonLibContextData.o \
     $(OUTPUT_DIR)/SpdmCommonLibCrypto.o \
+    $(OUTPUT_DIR)/SpdmCommonLibCryptoService.o \
     $(OUTPUT_DIR)/SpdmCommonLibSessionKeys.o \
     $(OUTPUT_DIR)/SpdmCommonLibSupport.o \
 
@@ -75,6 +76,9 @@ $(OUTPUT_DIR)/SpdmCommonLibContextData.o : $(SOURCE_DIR)/SpdmCommonLibContextDat
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmCommonLibCrypto.o : $(SOURCE_DIR)/SpdmCommonLibCrypto.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmCommonLibCryptoService.o : $(SOURCE_DIR)/SpdmCommonLibCryptoService.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmCommonLibSessionKeys.o : $(SOURCE_DIR)/SpdmCommonLibSessionKeys.c

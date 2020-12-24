@@ -10,45 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmResponderLibInternal.h"
 
 /**
-  This function verifies the digest.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Digest                       The digest data buffer.
-  @param  DigestSize                   Size in bytes of the digest data buffer.
-
-  @retval TRUE  digest verification pass.
-  @retval FALSE digest verification fail.
-**/
-BOOLEAN
-SpdmEncapRequesterVerifyDigest (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *Digest,
-  UINTN                           DigestSize
-  )
-{
-  UINTN                                     HashSize;
-  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  
-  CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
-  CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
-  if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
-    HashSize = GetSpdmHashSize (SpdmContext);
-    SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
-
-    if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! EncapVerifyDigest - FAIL !!!\n"));
-      return FALSE;
-    }
-  }
-
-  DEBUG((DEBUG_INFO, "!!! EncapVerifyDigest - PASS !!!\n"));
-
-  return TRUE;
-}
-
-/**
   Get the SPDM encapsulated GET_DIGESTS request.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -153,7 +114,7 @@ SpdmProcessEncapResponseDigest (
     DEBUG((DEBUG_INFO, "\n"));
   }
 
-  Result = SpdmEncapRequesterVerifyDigest (SpdmContext, Digest, DigestCount * DigestSize);
+  Result = SpdmVerifyDigest (SpdmContext, Digest, DigestCount * DigestSize);
   if (!Result) {
     return RETURN_SECURITY_VIOLATION;
   }

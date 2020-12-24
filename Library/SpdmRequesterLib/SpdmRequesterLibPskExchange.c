@@ -37,58 +37,6 @@ typedef struct {
 #pragma pack()
 
 /**
-  This function verifies the PSK exchange HMAC based upon TH.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionInfo                  The session info of an SPDM session.
-  @param  HmacData                     The HMAC data buffer.
-  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
-
-  @retval TRUE  HMAC verification pass.
-  @retval FALSE HMAC verification fail.
-**/
-BOOLEAN
-SpdmRequesterVerifyPskExchangeHmac (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     SPDM_SESSION_INFO    *SessionInfo,
-  IN     VOID                 *HmacData,
-  IN     UINTN                HmacDataSize
-  )
-{
-  UINTN                                     HashSize;
-  UINT8                                     CalcHmacData[MAX_HASH_SIZE];
-  LARGE_MANAGED_BUFFER                      THCurr;
-
-  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-  ASSERT(HashSize == HmacDataSize);
-
-  DEBUG((DEBUG_INFO, "MessageA Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-
-  DEBUG((DEBUG_INFO, "MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  ASSERT(SessionInfo->HashSize != 0);
-  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseFinishedKey, SessionInfo->HashSize, CalcHmacData);
-  DEBUG((DEBUG_INFO, "THCurr Hmac - "));
-  InternalDumpData (CalcHmacData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  if (CompareMem (CalcHmacData, HmacData, HashSize) != 0) {
-    DEBUG((DEBUG_INFO, "!!! VerifyPskExchangeHmac - FAIL !!!\n"));
-    return FALSE;
-  }
-  DEBUG((DEBUG_INFO, "!!! VerifyPskExchangeHmac - PASS !!!\n"));
-
-  return TRUE;
-}
-
-/**
   This function sends PSK_EXCHANGE and receives PSK_EXCHANGE_RSP for SPDM PSK exchange.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -250,7 +198,7 @@ SpdmSendReceivePskExchange (
   VerifyData = Ptr;
   DEBUG((DEBUG_INFO, "VerifyData (0x%x):\n", HmacSize));
   InternalDumpHex (VerifyData, HmacSize);
-  Result = SpdmRequesterVerifyPskExchangeHmac (SpdmContext, SessionInfo, VerifyData, HmacSize);
+  Result = SpdmVerifyPskExchangeRspHmac (SpdmContext, SessionInfo, VerifyData, HmacSize);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;

@@ -10,155 +10,6 @@
 #include "SpdmResponderLibInternal.h"
 
 /**
-  This function calculate the measurement summary hash.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  MeasurementSummaryHashType   The type of the measurement summary hash.
-  @param  MeasurementSummaryHash       The buffer to store the measurement summary hash.
-
-  @retval TRUE  measurement summary hash is generated.
-  @retval FALSE measurement summary hash is not generated.
-**/
-BOOLEAN
-SpdmResponderCalculateMeasurementSummaryHash (
-  IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN  UINT8                MeasurementSummaryHashType,
-  OUT UINT8                *MeasurementSummaryHash
-  );
-
-/**
-  This function generates the key exchange signature based upon TH.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionInfo                  The session info of an SPDM session.
-  @param  Signature                    The buffer to store the key exchange signature.
-
-  @retval TRUE  key exchange signature is generated.
-  @retval FALSE key exchange signature is not generated.
-**/
-BOOLEAN
-SpdmResponderGenerateKeyExchangeSignature (
-  IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN  SPDM_SESSION_INFO         *SessionInfo,
-  OUT UINT8                     *Signature
-  )
-{
-  UINT8                         HashData[MAX_HASH_SIZE];
-  UINT8                         *CertBuffer;
-  UINTN                         CertBufferSize;
-  UINT8                         CertBufferHash[MAX_HASH_SIZE];
-  BOOLEAN                       Result;
-  UINTN                         SignatureSize;
-  UINT32                        HashSize;
-  LARGE_MANAGED_BUFFER          THCurr;
-
-  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-
-  if (SpdmContext->LocalContext.SpdmResponderDataSignFunc == NULL) {
-    return FALSE;
-  }
-
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
-    return FALSE;
-  }
-  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
-
-  DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-
-  DEBUG((DEBUG_INFO, "Calc THMessageCt Data :\n"));
-  InternalDumpHex (CertBuffer, CertBufferSize);
-
-  DEBUG((DEBUG_INFO, "Calc MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
-  DEBUG((DEBUG_INFO, "Calc THCurr Hash - "));
-  InternalDumpData (HashData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  Result = SpdmContext->LocalContext.SpdmResponderDataSignFunc (
-             SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
-             HashData,
-             HashSize,
-             Signature,
-             &SignatureSize
-             );
-
-  return Result;
-}
-
-/**
-  This function generates the key exchange HMAC based upon TH.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionInfo                  The session info of an SPDM session.
-  @param  Hmac                         The buffer to store the key exchange HMAC.
-
-  @retval TRUE  key exchange HMAC is generated.
-  @retval FALSE key exchange HMAC is not generated.
-**/
-BOOLEAN
-SpdmResponderGenerateKeyExchangeHmac (
-  IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN  SPDM_SESSION_INFO         *SessionInfo,
-  OUT UINT8                     *Hmac
-  )
-{
-  UINT8                         HmacData[MAX_HASH_SIZE];
-  UINT8                         *CertBuffer;
-  UINTN                         CertBufferSize;
-  UINT8                         CertBufferHash[MAX_HASH_SIZE];
-  UINT32                        HashSize;
-  LARGE_MANAGED_BUFFER          THCurr;
-
-  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-
-  if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
-    return FALSE;
-  }
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
-
-  DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-
-  DEBUG((DEBUG_INFO, "Calc THMessageCt Data :\n"));
-  InternalDumpHex (CertBuffer, CertBufferSize);
-
-  DEBUG((DEBUG_INFO, "Calc MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  ASSERT(SessionInfo->HashSize != 0);
-  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseHandshakeSecret, SessionInfo->HashSize, HmacData);
-  DEBUG((DEBUG_INFO, "Calc THCurr Hmac - "));
-  InternalDumpData (HmacData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  CopyMem (Hmac, HmacData, HashSize);
-
-  return TRUE;
-}
-
-/**
   Process the SPDM KEY_EXCHANGE request and return the response.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -330,7 +181,7 @@ SpdmGetResponseKeyExchange (
 
   Ptr += DheKeySize;
 
-  Result = SpdmResponderCalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param1, Ptr);
+  Result = SpdmGenerateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param1, Ptr);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
@@ -348,7 +199,7 @@ SpdmGetResponseKeyExchange (
   SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum];
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
-  Result = SpdmResponderGenerateKeyExchangeSignature (SpdmContext, SessionInfo, Ptr);
+  Result = SpdmGenerateKeyExchangeRspSignature (SpdmContext, SessionInfo, Ptr);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE_RSP, ResponseSize, Response);
@@ -360,7 +211,7 @@ SpdmGetResponseKeyExchange (
   Ptr += SignatureSize;
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
-    Result = SpdmResponderGenerateKeyExchangeHmac (SpdmContext, SessionInfo, Ptr);
+    Result = SpdmGenerateKeyExchangeRspHmac (SpdmContext, SessionInfo, Ptr);
     if (!Result) {
       SpdmFreeSessionId (SpdmContext, SessionId);
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE_RSP, ResponseSize, Response);

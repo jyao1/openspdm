@@ -10,137 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmResponderLibInternal.h"
 
 /**
-  This function verifies the integrity of certificate chain.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  CertificateChain             The certificate chain data buffer.
-  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
-
-  @retval TRUE  certificate chain integrity verification pass.
-  @retval FALSE certificate chain integrity verification fail.
-**/
-BOOLEAN
-SpdmEncapRequesterVerifyCertificateChainData (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *CertificateChain,
-  UINTN                           CertificateChainSize
-  )
-{
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  UINT8                                     *RootCertBuffer;
-  UINTN                                     RootCertBufferSize;
-  UINTN                                     HashSize;
-  UINT8                                     CalcRootCertHash[MAX_HASH_SIZE];
-  UINT8                                     *LeafCertBuffer;
-  UINTN                                     LeafCertBufferSize;
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  if (CertificateChainSize > MAX_SPDM_MESSAGE_BUFFER_SIZE) {
-    DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (buffer too large) !!!\n"));
-    return FALSE;
-  }
-
-  if (CertificateChainSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
-    DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (buffer too small) !!!\n"));
-    return FALSE;
-  }
-
-  CertBuffer = (UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = CertificateChainSize - sizeof(SPDM_CERT_CHAIN) - HashSize;
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get root certificate failed)!!!\n"));
-    return FALSE;
-  }
-
-  SpdmHashAll (SpdmContext, RootCertBuffer, RootCertBufferSize, CalcRootCertHash);
-  if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), CalcRootCertHash, HashSize) != 0) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert root hash mismatch) !!!\n"));
-    return FALSE;
-  }
-
-  if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertBuffer, CertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert chain verify failed)!!!\n"));
-    return FALSE;
-  }
-
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, -1, &LeafCertBuffer, &LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get leaf certificate failed)!!!\n"));
-    return FALSE;
-  }
-
-  if(!SpdmX509CertificateCheck (LeafCertBuffer, LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (leaf certificate check failed)!!!\n"));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-/**
-  This function verifies the certificate chain.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  CertificateChain             The certificate chain data buffer.
-  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
-
-  @retval TRUE  certificate chain verification pass.
-  @retval FALSE certificate chain verification fail.
-**/
-BOOLEAN
-SpdmEncapRequesterVerifyCertificateChain (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *CertificateChain,
-  UINTN                           CertificateChainSize
-  )
-{
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  UINTN                                     HashSize;
-  UINT8                                     *RootCertHash;
-  UINTN                                     RootCertHashSize;
-  BOOLEAN                                   Result;
-
-  Result = SpdmEncapRequesterVerifyCertificateChainData(SpdmContext, CertificateChain, CertificateChainSize);
-  if (!Result) {
-    return FALSE;
-  }
-
-  RootCertHash = SpdmContext->LocalContext.PeerRootCertHashProvision;
-  RootCertHashSize = SpdmContext->LocalContext.PeerRootCertHashProvisionSize;
-  CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
-  CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
-
-  if ((RootCertHash != NULL) && (RootCertHashSize != 0)) {
-    HashSize = GetSpdmHashSize (SpdmContext);
-    if (RootCertHashSize != HashSize) {
-      DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (hash size mismatch) !!!\n"));
-      return FALSE;
-    }
-    if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), RootCertHash, HashSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL (root hash mismatch) !!!\n"));
-      return FALSE;
-    }
-  } else if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
-    if (CertBufferSize != CertificateChainSize) {
-      DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL !!!\n"));
-      return FALSE;
-    }
-    if (CompareMem (CertificateChain, CertBuffer, CertificateChainSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - FAIL !!!\n"));
-      return FALSE;
-    }
-  }
-
-  DEBUG((DEBUG_INFO, "!!! EncapVerifyCertificateChain - PASS !!!\n"));
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = CertificateChainSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, CertificateChain, CertificateChainSize);
-
-  return TRUE;
-}
-
-/**
   Get the SPDM encapsulated GET_CERTIFICATE request.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -250,7 +119,7 @@ SpdmProcessEncapResponseCertificate (
   }
 
   *Continue = FALSE;
-  Result = SpdmEncapRequesterVerifyCertificateChain (SpdmContext, GetManagedBuffer(&SpdmContext->EncapContext.CertificateChainBuffer), GetManagedBufferSize(&SpdmContext->EncapContext.CertificateChainBuffer));
+  Result = SpdmVerifyCertificateChain (SpdmContext, GetManagedBuffer(&SpdmContext->EncapContext.CertificateChainBuffer), GetManagedBufferSize(&SpdmContext->EncapContext.CertificateChainBuffer));
   if (!Result) {
     SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;

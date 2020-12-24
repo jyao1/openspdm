@@ -1258,4 +1258,415 @@ SpdmX509CertificateCheck (
   IN   UINTN        CertSize
   );
 
+/**
+  This function generates the certificate chain hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SlotIndex                    The slot index of the certificate chain.
+  @param  Signature                    The buffer to store the certificate chain hash.
+
+  @retval TRUE  certificate chain hash is generated.
+  @retval FALSE certificate chain hash is not generated.
+**/
+BOOLEAN
+SpdmGenerateCertChainHash (
+  IN     SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN     UINTN                        SlotIndex,
+     OUT UINT8                        *Hash
+  );
+
+/**
+  This function verifies the digest.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Digest                       The digest data buffer.
+  @param  DigestSize                   Size in bytes of the digest data buffer.
+
+  @retval TRUE  digest verification pass.
+  @retval FALSE digest verification fail.
+**/
+BOOLEAN
+SpdmVerifyDigest (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *Digest,
+  IN UINTN                        DigestSize
+  );
+
+/**
+  This function verifies the certificate chain.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertificateChain             The certificate chain data buffer.
+  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+
+  @retval TRUE  certificate chain verification pass.
+  @retval FALSE certificate chain verification fail.
+**/
+BOOLEAN
+SpdmVerifyCertificateChain (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *CertificateChain,
+  IN UINTN                        CertificateChainSize
+  );
+
+/**
+  This function generates the challenge signature based upon M1M2 for authentication.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsRequester                  Indicate of the signature generation for a requester or a responder.
+  @param  ResponseMessage              The response message buffer.
+  @param  ResponseMessageSize          Size in bytes of the response message buffer.
+  @param  Signature                    The buffer to store the challenge signature.
+
+  @retval TRUE  challenge signature is generated.
+  @retval FALSE challenge signature is not generated.
+**/
+BOOLEAN
+SpdmGenerateChallengeAuthSignature (
+  IN     SPDM_DEVICE_CONTEXT        *SpdmContext,
+  IN     BOOLEAN                    IsRequester,
+  IN     VOID                       *ResponseMessage,
+  IN     UINTN                      ResponseMessageSize,
+     OUT UINT8                      *Signature
+  );
+
+/**
+  This function verifies the certificate chain hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertificateChainHash         The certificate chain hash data buffer.
+  @param  CertificateChainHashSize     Size in bytes of the certificate chain hash data buffer.
+
+  @retval TRUE  hash verification pass.
+  @retval FALSE hash verification fail.
+**/
+BOOLEAN
+SpdmVerifyCertificateChainHash (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *CertificateChainHash,
+  IN UINTN                        CertificateChainHashSize
+  );
+
+/**
+  This function verifies the challenge signature based upon M1M2.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsRequester                  Indicate of the signature verification for a requester or a responder.
+  @param  SignData                     The signature data buffer.
+  @param  SignDataSize                 Size in bytes of the signature data buffer.
+
+  @retval TRUE  signature verification pass.
+  @retval FALSE signature verification fail.
+**/
+BOOLEAN
+SpdmVerifyChallengeAuthSignature (
+  IN  SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN  BOOLEAN                      IsRequester,
+  IN  VOID                         *SignData,
+  IN  UINTN                        SignDataSize
+  );
+
+/**
+  This function calculate the measurement summary hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MeasurementSummaryHashType   The type of the measurement summary hash.
+  @param  MeasurementSummaryHash       The buffer to store the measurement summary hash.
+
+  @retval TRUE  measurement summary hash is generated.
+  @retval FALSE measurement summary hash is not generated.
+**/
+BOOLEAN
+SpdmGenerateMeasurementSummaryHash (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                MeasurementSummaryHashType,
+     OUT UINT8                *MeasurementSummaryHash
+  );
+
+/**
+  This function creates the measurement signature to response message based upon L1L2.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ResponseMessage              The measurement response message with empty signature to be filled.
+  @param  ResponseMessageSize          Total size in bytes of the response message including signature.
+
+  @retval TRUE  measurement signature is created.
+  @retval FALSE measurement signature is not created.
+**/
+BOOLEAN
+SpdmGenerateMeasurementSignature (
+  IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
+  IN OUT VOID                   *ResponseMessage,
+  IN     UINTN                  ResponseMessageSize
+  );
+
+/**
+  This function verifies the measurement signature based upon L1L2.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SignData                     The signature data buffer.
+  @param  SignDataSize                 Size in bytes of the signature data buffer.
+
+  @retval TRUE  signature verification pass.
+  @retval FALSE signature verification fail.
+**/
+BOOLEAN
+SpdmVerifyMeasurementSignature (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *SignData,
+  IN UINTN                        SignDataSize
+  );
+
+/**
+  This function generates the key exchange signature based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Signature                    The buffer to store the key exchange signature.
+
+  @retval TRUE  key exchange signature is generated.
+  @retval FALSE key exchange signature is not generated.
+**/
+BOOLEAN
+SpdmGenerateKeyExchangeRspSignature (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     SPDM_SESSION_INFO         *SessionInfo,
+     OUT UINT8                     *Signature
+  );
+
+/**
+  This function generates the key exchange HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Hmac                         The buffer to store the key exchange HMAC.
+
+  @retval TRUE  key exchange HMAC is generated.
+  @retval FALSE key exchange HMAC is not generated.
+**/
+BOOLEAN
+SpdmGenerateKeyExchangeRspHmac (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     SPDM_SESSION_INFO         *SessionInfo,
+     OUT UINT8                     *Hmac
+  );
+
+/**
+  This function verifies the key exchange signature based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  SignData                     The signature data buffer.
+  @param  SignDataSize                 Size in bytes of the signature data buffer.
+
+  @retval TRUE  signature verification pass.
+  @retval FALSE signature verification fail.
+**/
+BOOLEAN
+SpdmVerifyKeyExchangeRspSignature (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN SPDM_SESSION_INFO            *SessionInfo,
+  IN VOID                         *SignData,
+  IN INTN                         SignDataSize
+  );
+
+/**
+  This function verifies the key exchange HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  HmacData                     The HMAC data buffer.
+  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
+
+  @retval TRUE  HMAC verification pass.
+  @retval FALSE HMAC verification fail.
+**/
+BOOLEAN
+SpdmVerifyKeyExchangeRspHmac (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     SPDM_SESSION_INFO    *SessionInfo,
+  IN     VOID                 *HmacData,
+  IN     UINTN                HmacDataSize
+  );
+
+/**
+  This function generates the finish signature based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Signature                    The buffer to store the finish signature.
+
+  @retval TRUE  finish signature is generated.
+  @retval FALSE finish signature is not generated.
+**/
+BOOLEAN
+SpdmGenerateFinishReqSignature (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     SPDM_SESSION_INFO         *SessionInfo,
+     OUT UINT8                     *Signature
+  );
+
+/**
+  This function generates the finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Hmac                         The buffer to store the finish HMAC.
+
+  @retval TRUE  finish HMAC is generated.
+  @retval FALSE finish HMAC is not generated.
+**/
+BOOLEAN
+SpdmGenerateFinishReqHmac (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     SPDM_SESSION_INFO    *SessionInfo,
+     OUT VOID                 *Hmac
+  );
+
+/**
+  This function verifies the finish signature based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  SignData                     The signature data buffer.
+  @param  SignDataSize                 Size in bytes of the signature data buffer.
+
+  @retval TRUE  signature verification pass.
+  @retval FALSE signature verification fail.
+**/
+BOOLEAN
+SpdmVerifyFinishReqSignature (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN SPDM_SESSION_INFO            *SessionInfo,
+  IN VOID                         *SignData,
+  IN INTN                         SignDataSize
+  );
+
+/**
+  This function verifies the finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  HmacData                     The HMAC data buffer.
+  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
+
+  @retval TRUE  HMAC verification pass.
+  @retval FALSE HMAC verification fail.
+**/
+BOOLEAN
+SpdmVerifyFinishReqHmac (
+  IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN  SPDM_SESSION_INFO    *SessionInfo,
+  IN  UINT8                *Hmac,
+  IN  UINTN                HmacSize
+  );
+
+/**
+  This function generates the finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Hmac                         The buffer to store the finish HMAC.
+
+  @retval TRUE  finish HMAC is generated.
+  @retval FALSE finish HMAC is not generated.
+**/
+BOOLEAN
+SpdmGenerateFinishRspHmac (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     SPDM_SESSION_INFO         *SessionInfo,
+     OUT UINT8                     *Hmac
+  );
+
+/**
+  This function verifies the finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  HmacData                     The HMAC data buffer.
+  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
+
+  @retval TRUE  HMAC verification pass.
+  @retval FALSE HMAC verification fail.
+**/
+BOOLEAN
+SpdmVerifyFinishRspHmac (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     SPDM_SESSION_INFO    *SessionInfo,
+  IN     VOID                 *HmacData,
+  IN     UINTN                HmacDataSize
+  );
+
+/**
+  This function generates the PSK exchange HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Hmac                         The buffer to store the PSK exchange HMAC.
+
+  @retval TRUE  PSK exchange HMAC is generated.
+  @retval FALSE PSK exchange HMAC is not generated.
+**/
+BOOLEAN
+SpdmGeneratePskExchangeRspHmac (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     SPDM_SESSION_INFO         *SessionInfo,
+     OUT UINT8                     *Hmac
+  );
+
+/**
+  This function verifies the PSK exchange HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  HmacData                     The HMAC data buffer.
+  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
+
+  @retval TRUE  HMAC verification pass.
+  @retval FALSE HMAC verification fail.
+**/
+BOOLEAN
+SpdmVerifyPskExchangeRspHmac (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     SPDM_SESSION_INFO    *SessionInfo,
+  IN     VOID                 *HmacData,
+  IN     UINTN                HmacDataSize
+  );
+
+/**
+  This function generates the PSK finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  Hmac                         The buffer to store the finish HMAC.
+
+  @retval TRUE  PSK finish HMAC is generated.
+  @retval FALSE PSK finish HMAC is not generated.
+**/
+BOOLEAN
+SpdmGeneratePskFinishReqHmac (
+  IN     SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN     SPDM_SESSION_INFO            *SessionInfo,
+     OUT VOID                         *Hmac
+  );
+
+/**
+  This function verifies the PSK finish HMAC based upon TH.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The session info of an SPDM session.
+  @param  HmacData                     The HMAC data buffer.
+  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
+
+  @retval TRUE  HMAC verification pass.
+  @retval FALSE HMAC verification fail.
+**/
+BOOLEAN
+SpdmVerifyPskFinishReqHmac (
+  IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN  SPDM_SESSION_INFO         *SessionInfo,
+  IN  UINT8                     *Hmac,
+  IN  UINTN                     HmacSize
+  );
+
 #endif

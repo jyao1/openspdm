@@ -19,55 +19,6 @@ typedef struct {
 #pragma pack()
 
 /**
-  This function generates the PSK finish HMAC based upon TH.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionInfo                  The session info of an SPDM session.
-  @param  Hmac                         The buffer to store the finish HMAC.
-
-  @retval TRUE  PSK finish HMAC is generated.
-  @retval FALSE PSK finish HMAC is not generated.
-**/
-BOOLEAN
-SpdmRequesterGeneratePskFinishHmac (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN SPDM_SESSION_INFO            *SessionInfo,
-  OUT VOID                        *Hmac
-  )
-{
-  UINTN                                     HashSize;
-  UINT8                                     CalcHmacData[MAX_HASH_SIZE];
-  LARGE_MANAGED_BUFFER                      THCurr;
-
-  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  DEBUG((DEBUG_INFO, "MessageA Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-
-  DEBUG((DEBUG_INFO, "MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  DEBUG((DEBUG_INFO, "MessageF Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
-
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
-
-  ASSERT(SessionInfo->HashSize != 0);
-  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.RequestFinishedKey, SessionInfo->HashSize, CalcHmacData);
-  DEBUG((DEBUG_INFO, "THCurr Hmac - "));
-  InternalDumpData (CalcHmacData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  CopyMem (Hmac, CalcHmacData, HashSize);
-
-  return TRUE;
-}
-
-/**
   This function sends PSK_FINISH and receives PSK_FINISH_RSP for SPDM PSK finish.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -112,7 +63,7 @@ SpdmSendReceivePskFinish (
   
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
 
-  SpdmRequesterGeneratePskFinishHmac (SpdmContext, SessionInfo, SpdmRequest.VerifyData);
+  SpdmGeneratePskFinishReqHmac (SpdmContext, SessionInfo, SpdmRequest.VerifyData);
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest + SpdmRequestSize - HmacSize, HmacSize);
 

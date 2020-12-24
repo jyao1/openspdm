@@ -21,137 +21,6 @@ typedef struct {
 #pragma pack()
 
 /**
-  This function verifies the integrity of certificate chain.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  CertificateChain             The certificate chain data buffer.
-  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
-
-  @retval TRUE  certificate chain integrity verification pass.
-  @retval FALSE certificate chain integrity verification fail.
-**/
-BOOLEAN
-SpdmRequesterVerifyCertificateChainData (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *CertificateChain,
-  UINTN                           CertificateChainSize
-  )
-{
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  UINT8                                     *RootCertBuffer;
-  UINTN                                     RootCertBufferSize;
-  UINTN                                     HashSize;
-  UINT8                                     CalcRootCertHash[MAX_HASH_SIZE];
-  UINT8                                     *LeafCertBuffer;
-  UINTN                                     LeafCertBufferSize;
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  if (CertificateChainSize > MAX_SPDM_MESSAGE_BUFFER_SIZE) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (buffer too large) !!!\n"));
-    return FALSE;
-  }
-
-  if (CertificateChainSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (buffer too small) !!!\n"));
-    return FALSE;
-  }
-
-  CertBuffer = (UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = CertificateChainSize - sizeof(SPDM_CERT_CHAIN) - HashSize;
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get root certificate failed)!!!\n"));
-    return FALSE;
-  }
-
-  SpdmHashAll (SpdmContext, RootCertBuffer, RootCertBufferSize, CalcRootCertHash);
-  if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), CalcRootCertHash, HashSize) != 0) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert root hash mismatch) !!!\n"));
-    return FALSE;
-  }
-
-  if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertBuffer, CertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert chain verify failed)!!!\n"));
-    return FALSE;
-  }
-
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, -1, &LeafCertBuffer, &LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get leaf certificate failed)!!!\n"));
-    return FALSE;
-  }
-
-  if(!SpdmX509CertificateCheck (LeafCertBuffer, LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (leaf certificate check failed)!!!\n"));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-/**
-  This function verifies the certificate chain.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  CertificateChain             The certificate chain data buffer.
-  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
-
-  @retval TRUE  certificate chain verification pass.
-  @retval FALSE certificate chain verification fail.
-**/
-BOOLEAN
-SpdmRequesterVerifyCertificateChain (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *CertificateChain,
-  UINTN                           CertificateChainSize
-  )
-{
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  UINTN                                     HashSize;
-  UINT8                                     *RootCertHash;
-  UINTN                                     RootCertHashSize;
-  BOOLEAN                                   Result;
-
-  Result = SpdmRequesterVerifyCertificateChainData(SpdmContext, CertificateChain, CertificateChainSize);
-  if (!Result) {
-    return FALSE;
-  }
-
-  RootCertHash = SpdmContext->LocalContext.PeerRootCertHashProvision;
-  RootCertHashSize = SpdmContext->LocalContext.PeerRootCertHashProvisionSize;
-  CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
-  CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
-
-  if ((RootCertHash != NULL) && (RootCertHashSize != 0)) {
-    HashSize = GetSpdmHashSize (SpdmContext);
-    if (RootCertHashSize != HashSize) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (hash size mismatch) !!!\n"));
-      return FALSE;
-    }
-    if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), RootCertHash, HashSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (root hash mismatch) !!!\n"));
-      return FALSE;
-    }
-  } else if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
-    if (CertBufferSize != CertificateChainSize) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL !!!\n"));
-      return FALSE;
-    }
-    if (CompareMem (CertificateChain, CertBuffer, CertificateChainSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL !!!\n"));
-      return FALSE;
-    }
-  }
-
-  DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - PASS !!!\n"));
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = CertificateChainSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, CertificateChain, CertificateChainSize);
-
-  return TRUE;
-}
-
-/**
   This function sends GET_CERTIFICATE
   to get certificate chain in one slot from device.
 
@@ -284,7 +153,7 @@ TrySpdmGetCertificate (
 
   } while (SpdmResponse.RemainderLength != 0);
 
-  Result = SpdmRequesterVerifyCertificateChain (SpdmContext, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
+  Result = SpdmVerifyCertificateChain (SpdmContext, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
   if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     Status = RETURN_SECURITY_VIOLATION;

@@ -23,80 +23,6 @@ typedef struct {
 #pragma pack()
 
 /**
-  This function verifies the measurement signature based upon L1L2.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SignData                     The signature data buffer.
-  @param  SignDataSize                 Size in bytes of the signature data buffer.
-
-  @retval TRUE  signature verification pass.
-  @retval FALSE signature verification fail.
-**/
-BOOLEAN
-SpdmRequesterVerifyMeasurementSignature (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *SignData,
-  UINTN                           SignDataSize
-  )
-{
-  UINTN                                     HashSize;
-  UINT8                                     HashData[MAX_HASH_SIZE];
-  BOOLEAN                                   Result;
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  VOID                                      *Context;
-  UINT8                                     *CertChainBuffer;
-  UINTN                                     CertChainBufferSize;
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  DEBUG((DEBUG_INFO, "L1L2 Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
-
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
-  DEBUG((DEBUG_INFO, "L1L2 Hash - "));
-  InternalDumpData (HashData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
-    return FALSE;
-  }
-
-  CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-
-  //
-  // Get leaf cert from cert chain
-  //
-  Result = X509GetCertFromCertChain (CertChainBuffer, CertChainBufferSize, -1,  &CertBuffer, &CertBufferSize);
-  if (!Result) {
-    return FALSE;
-  }
-
-  Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
-  if (!Result) {
-    return FALSE;
-  }
-
-  Result = SpdmAsymVerify (
-             SpdmContext,
-             Context,
-             HashData,
-             HashSize,
-             SignData,
-             SignDataSize
-             );
-  SpdmAsymFree (SpdmContext, Context);
-  if (!Result) {
-    DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - FAIL !!!\n"));
-    return FALSE;
-  }
-
-  DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - PASS !!!\n"));
-  return TRUE;
-}
-
-/**
   This function sends GET_MEASUREMENT
   to get measurement from the device.
 
@@ -302,7 +228,7 @@ TrySpdmGetMeasurement (
     DEBUG((DEBUG_INFO, "Signature (0x%x):\n", SignatureSize));
     InternalDumpHex (Signature, SignatureSize);
 
-    Result = SpdmRequesterVerifyMeasurementSignature (SpdmContext, Signature, SignatureSize);
+    Result = SpdmVerifyMeasurementSignature (SpdmContext, Signature, SignatureSize);
     if (!Result) {
       SpdmContext->ErrorState = SPDM_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE;
       return RETURN_SECURITY_VIOLATION;

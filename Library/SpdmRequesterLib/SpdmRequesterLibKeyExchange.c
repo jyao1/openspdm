@@ -38,164 +38,6 @@ typedef struct {
 #pragma pack()
 
 /**
-  This function verifies the key exchange signature based upon TH.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionInfo                  The session info of an SPDM session.
-  @param  SignData                     The signature data buffer.
-  @param  SignDataSize                 Size in bytes of the signature data buffer.
-
-  @retval TRUE  signature verification pass.
-  @retval FALSE signature verification fail.
-**/
-BOOLEAN
-SpdmRequesterVerifyKeyExchangeSignature (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN SPDM_SESSION_INFO            *SessionInfo,
-  IN VOID                         *SignData,
-  IN INTN                         SignDataSize
-  )
-{
-  UINTN                                     HashSize;
-  UINT8                                     HashData[MAX_HASH_SIZE];
-  BOOLEAN                                   Result;
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
-  VOID                                      *Context;
-  LARGE_MANAGED_BUFFER                      THCurr;
-  UINT8                                     *CertChainBuffer;
-  UINTN                                     CertChainBufferSize;
-
-  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
-    return FALSE;
-  }
-
-  CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-
-  SpdmHashAll (SpdmContext, CertChainBuffer, CertChainBufferSize, CertBufferHash);
-
-  DEBUG((DEBUG_INFO, "MessageA Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-
-  DEBUG((DEBUG_INFO, "THMessageCt Data :\n"));
-  InternalDumpHex (CertChainBuffer, CertChainBufferSize);
-
-  DEBUG((DEBUG_INFO, "MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
-  DEBUG((DEBUG_INFO, "THCurr Hash - "));
-  InternalDumpData (HashData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  //
-  // Get leaf cert from cert chain
-  //
-  Result = X509GetCertFromCertChain (CertChainBuffer, CertChainBufferSize, -1,  &CertBuffer, &CertBufferSize);
-  if (!Result) {
-    return FALSE;
-  }
-
-  Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
-  if (!Result) {
-    return FALSE;
-  }
-
-  Result = SpdmAsymVerify (
-             SpdmContext,
-             Context,
-             HashData,
-             HashSize,
-             SignData,
-             SignDataSize
-             );
-  SpdmAsymFree (SpdmContext, Context);
-  if (!Result) {
-    DEBUG((DEBUG_INFO, "!!! VerifyKeyExchangeSignature - FAIL !!!\n"));
-    return FALSE;
-  }
-  DEBUG((DEBUG_INFO, "!!! VerifyKeyExchangeSignature - PASS !!!\n"));
-
-  return TRUE;
-}
-
-/**
-  This function verifies the key exchange HMAC based upon TH.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionInfo                  The session info of an SPDM session.
-  @param  HmacData                     The HMAC data buffer.
-  @param  HmacDataSize                 Size in bytes of the HMAC data buffer.
-
-  @retval TRUE  HMAC verification pass.
-  @retval FALSE HMAC verification fail.
-**/
-BOOLEAN
-SpdmRequesterVerifyKeyExchangeHmac (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     SPDM_SESSION_INFO    *SessionInfo,
-  IN     VOID                 *HmacData,
-  IN     UINTN                HmacDataSize
-  )
-{
-  UINTN                                     HashSize;
-  UINT8                                     CalcHmacData[MAX_HASH_SIZE];
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
-  LARGE_MANAGED_BUFFER                      THCurr;
-
-  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-  ASSERT(HashSize == HmacDataSize);
-
-  if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize == 0) {
-    return FALSE;
-  }
-  CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
-
-  DEBUG((DEBUG_INFO, "MessageA Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-
-  DEBUG((DEBUG_INFO, "THMessageCt Data :\n"));
-  InternalDumpHex (CertBuffer, CertBufferSize);
-
-  DEBUG((DEBUG_INFO, "MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  ASSERT(SessionInfo->HashSize != 0);
-  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseHandshakeSecret, SessionInfo->HashSize, CalcHmacData);
-  DEBUG((DEBUG_INFO, "THCurr Hmac - "));
-  InternalDumpData (CalcHmacData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  if (CompareMem (CalcHmacData, HmacData, HashSize) != 0) {
-    DEBUG((DEBUG_INFO, "!!! VerifyKeyExchangeHmac - FAIL !!!\n"));
-    return FALSE;
-  }
-  DEBUG((DEBUG_INFO, "!!! VerifyKeyExchangeHmac - PASS !!!\n"));
-
-  return TRUE;
-}
-
-/**
   This function sends KEY_EXCHANGE and receives KEY_EXCHANGE_RSP for SPDM key exchange.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -423,7 +265,7 @@ TrySpdmSendReceiveKeyExchange (
   DEBUG((DEBUG_INFO, "Signature (0x%x):\n", SignatureSize));
   InternalDumpHex (Signature, SignatureSize);
   Ptr += SignatureSize;
-  Result = SpdmRequesterVerifyKeyExchangeSignature (SpdmContext, SessionInfo, Signature, SignatureSize);
+  Result = SpdmVerifyKeyExchangeRspSignature (SpdmContext, SessionInfo, Signature, SignatureSize);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmDheFree (SpdmContext, DHEContext);
@@ -457,7 +299,7 @@ TrySpdmSendReceiveKeyExchange (
     VerifyData = Ptr;
     DEBUG((DEBUG_INFO, "VerifyData (0x%x):\n", HmacSize));
     InternalDumpHex (VerifyData, HmacSize);
-    Result = SpdmRequesterVerifyKeyExchangeHmac (SpdmContext, SessionInfo, VerifyData, HmacSize);
+    Result = SpdmVerifyKeyExchangeRspHmac (SpdmContext, SessionInfo, VerifyData, HmacSize);
     if (!Result) {
       SpdmFreeSessionId (SpdmContext, *SessionId);
       SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;

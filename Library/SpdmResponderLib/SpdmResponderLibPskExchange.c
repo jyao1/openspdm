@@ -10,68 +10,6 @@
 #include "SpdmResponderLibInternal.h"
 
 /**
-  This function calculate the measurement summary hash.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  MeasurementSummaryHashType   The type of the measurement summary hash.
-  @param  MeasurementSummaryHash       The buffer to store the measurement summary hash.
-
-  @retval TRUE  measurement summary hash is generated.
-  @retval FALSE measurement summary hash is not generated.
-**/
-BOOLEAN
-SpdmResponderCalculateMeasurementSummaryHash (
-  IN  SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN  UINT8                MeasurementSummaryHashType,
-  OUT UINT8                *MeasurementSummaryHash
-  );
-
-/**
-  This function generates the PSK exchange HMAC based upon TH.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionInfo                  The session info of an SPDM session.
-  @param  Hmac                         The buffer to store the PSK exchange HMAC.
-
-  @retval TRUE  PSK exchange HMAC is generated.
-  @retval FALSE PSK exchange HMAC is not generated.
-**/
-BOOLEAN
-SpdmResponderGeneratePskExchangeHmac (
-  IN  SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN  SPDM_SESSION_INFO         *SessionInfo,
-  OUT UINT8                     *Hmac
-  )
-{
-  UINT8                         HmacData[MAX_HASH_SIZE];
-  UINT32                        HashSize;
-  LARGE_MANAGED_BUFFER          THCurr;
-
-  InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-
-  HashSize = GetSpdmHashSize (SpdmContext);
-
-  DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-
-  DEBUG((DEBUG_INFO, "Calc MessageK Data :\n"));
-  InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
-
-  ASSERT(SessionInfo->HashSize != 0);
-  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), SessionInfo->HandshakeSecret.ResponseFinishedKey, SessionInfo->HashSize, HmacData);
-  DEBUG((DEBUG_INFO, "Calc THCurr Hmac - "));
-  InternalDumpData (HmacData, HashSize);
-  DEBUG((DEBUG_INFO, "\n"));
-
-  CopyMem (Hmac, HmacData, HashSize);
-
-  return TRUE;
-}
-
-/**
   Process the SPDM PSK_EXCHANGE request and return the response.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -192,7 +130,7 @@ SpdmGetResponsePskExchange (
 
   Ptr = (VOID *)(SpdmResponse + 1);
   
-  Result = SpdmResponderCalculateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param1, Ptr);
+  Result = SpdmGenerateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param1, Ptr);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
@@ -210,7 +148,7 @@ SpdmGetResponsePskExchange (
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
   SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);
   
-  Result = SpdmResponderGeneratePskExchangeHmac (SpdmContext, SessionInfo, Ptr);
+  Result = SpdmGeneratePskExchangeRspHmac (SpdmContext, SessionInfo, Ptr);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_PSK_EXCHANGE_RSP, ResponseSize, Response);
