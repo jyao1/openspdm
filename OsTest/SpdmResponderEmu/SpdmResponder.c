@@ -219,14 +219,25 @@ SpdmServerCallback (
     SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
   }
 
-  Res = ReadRequesterRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
-  if (Res) {
-    ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = SpdmDataLocationLocal;
-    //SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
-    SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
-    // Do not free it.
+  if (mUseSlotId == 0xFF) {
+    Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+    if (Res) {
+      ZeroMem (&Parameter, sizeof(Parameter));
+      Parameter.Location = SpdmDataLocationLocal;
+      SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
+      // Do not free it.
+    }
+  } else {
+    Res = ReadRequesterRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
+    if (Res) {
+      ZeroMem (&Parameter, sizeof(Parameter));
+      Parameter.Location = SpdmDataLocationLocal;
+      SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
+      // Do not free it.
+    }
+  }
 
+  if (Res) {
     Data8 = mUseMutAuth;
     if (Data8 != 0) {
       Data8 |= SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED;

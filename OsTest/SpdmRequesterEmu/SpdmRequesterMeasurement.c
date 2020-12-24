@@ -40,7 +40,7 @@ SpdmSendReceiveGetMeasurement (
                SpdmContext,
                RequestAttribute,
                SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS,
-               mUseSlotId,
+               mUseSlotId & 0xF,
                &NumberOfBlock,
                &MeasurementRecordLength,
                MeasurementRecord
@@ -57,7 +57,7 @@ SpdmSendReceiveGetMeasurement (
               SpdmContext,
               RequestAttribute,
               SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS,
-              mUseSlotId,
+              mUseSlotId & 0xF,
               &NumberOfBlocks,
               NULL,
               NULL
@@ -80,7 +80,7 @@ SpdmSendReceiveGetMeasurement (
                 SpdmContext,
                 RequestAttribute,
                 Index,
-                mUseSlotId,
+                mUseSlotId & 0xF,
                 &NumberOfBlock,
                 &MeasurementRecordLength,
                 MeasurementRecord

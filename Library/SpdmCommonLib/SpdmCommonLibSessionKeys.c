@@ -192,9 +192,15 @@ SpdmCalculateTh1 (
   HashSize = GetSpdmHashSize (SpdmContext);
 
   if (IsRequester) {
-    ASSERT (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0);
-    CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-    CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
+      CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+      CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    } else if (SpdmContext->LocalContext.PeerCertChainProvisionSize != 0) {
+      CertBuffer = (UINT8 *)SpdmContext->LocalContext.PeerCertChainProvision + sizeof(SPDM_CERT_CHAIN) + HashSize;
+      CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    } else {
+      ASSERT (FALSE);
+    }
   } else {
     ASSERT (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize != 0);
     CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
@@ -406,9 +412,15 @@ SpdmCalculateTh2 (
   HashSize = GetSpdmHashSize (SpdmContext);
 
   if (IsRequester) {
-    ASSERT (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0);
-    CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-    CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
+      CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+      CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    } else if (SpdmContext->LocalContext.PeerCertChainProvisionSize != 0) {
+      CertBuffer = (UINT8 *)SpdmContext->LocalContext.PeerCertChainProvision + sizeof(SPDM_CERT_CHAIN) + HashSize;
+      CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+    } else {
+      ASSERT (FALSE);
+    }
   } else {
     ASSERT (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize != 0);
     CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
@@ -421,9 +433,15 @@ SpdmCalculateTh2 (
       MutCertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
       MutCertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
     } else {
-      ASSERT (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0);
-      MutCertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-      MutCertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+      if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
+        MutCertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+        MutCertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+      } else if (SpdmContext->LocalContext.PeerCertChainProvisionSize != 0) {
+        MutCertBuffer = (UINT8 *)SpdmContext->LocalContext.PeerCertChainProvision + sizeof(SPDM_CERT_CHAIN) + HashSize;
+        MutCertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+      } else {
+        ASSERT (FALSE);
+      }
     }
     SpdmHashAll (SpdmContext, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
   }

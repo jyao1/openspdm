@@ -64,27 +64,35 @@ typedef struct {
   SPDM_PROCESS_ENCAP_RESPONSE     ProcessEncapResponse;
   SPDM_GET_ENCAP_REQUEST          ContinueGetEncapRequest;
   SPDM_GET_ENCAP_REQUEST          NextGetEncapRequest;
+  SPDM_ENCAP_RESPONSE_STATE       NextEncapState;
 } SPDM_ENCAP_RESPONSE_STRUCT;
 
 //
 // Basic Mutual Auth
 //
 SPDM_ENCAP_RESPONSE_STRUCT  mSpdmEncapStruct[] = {
-  {SpdmEncapResponseStateNotStarted,           NULL,                                  NULL,                             SpdmGetEncapReqestGetDigest     },
-  {SpdmEncapResponseStateWaitForDigest,        SpdmProcessEncapResponseDigest,        NULL,                             SpdmGetEncapReqestGetCertificate},
-  {SpdmEncapResponseStateWaitForCertificate,   SpdmProcessEncapResponseCertificate,   SpdmGetEncapReqestGetCertificate, SpdmGetEncapReqestChallenge     },
-  {SpdmEncapResponseStateWaitForChallengeAuth, SpdmProcessEncapResponseChallengeAuth, NULL,                             NULL                            },
-  {SpdmEncapResponseStateMax,                  NULL,                                  NULL,                             NULL                            },
+  {SpdmEncapResponseStateNotStarted,           NULL,                                  NULL,                             SpdmGetEncapReqestGetDigest,      SpdmEncapResponseStateWaitForDigest},
+  {SpdmEncapResponseStateWaitForDigest,        SpdmProcessEncapResponseDigest,        NULL,                             SpdmGetEncapReqestGetCertificate, SpdmEncapResponseStateWaitForCertificate},
+  {SpdmEncapResponseStateWaitForCertificate,   SpdmProcessEncapResponseCertificate,   SpdmGetEncapReqestGetCertificate, SpdmGetEncapReqestChallenge,      SpdmEncapResponseStateWaitForChallengeAuth},
+  {SpdmEncapResponseStateWaitForChallengeAuth, SpdmProcessEncapResponseChallengeAuth, NULL,                             NULL,                             SpdmEncapResponseStateNotStarted},
+};
+SPDM_ENCAP_RESPONSE_STRUCT  mSpdmEncapNoCertStruct[] = {
+  {SpdmEncapResponseStateNotStarted,           NULL,                                  NULL,                             SpdmGetEncapReqestGetDigest,      SpdmEncapResponseStateWaitForDigest},
+  {SpdmEncapResponseStateWaitForDigest,        SpdmProcessEncapResponseDigest,        NULL,                             SpdmGetEncapReqestChallenge,      SpdmEncapResponseStateWaitForChallengeAuth},
+  {SpdmEncapResponseStateWaitForChallengeAuth, SpdmProcessEncapResponseChallengeAuth, NULL,                             NULL,                             SpdmEncapResponseStateNotStarted},
 };
 
 //
 // Session Mutual Auth
 //
 SPDM_ENCAP_RESPONSE_STRUCT  mSpdmEncapSessionStruct[] = {
-  {SpdmEncapResponseStateNotStarted,           NULL,                                  NULL,                             SpdmGetEncapReqestGetDigest     },
-  {SpdmEncapResponseStateWaitForDigest,        SpdmProcessEncapResponseDigest,        NULL,                             SpdmGetEncapReqestGetCertificate},
-  {SpdmEncapResponseStateWaitForCertificate,   SpdmProcessEncapResponseCertificate,   SpdmGetEncapReqestGetCertificate, NULL                            },
-  {SpdmEncapResponseStateMax,                  NULL,                                  NULL,                             NULL                            },
+  {SpdmEncapResponseStateNotStarted,           NULL,                                  NULL,                             SpdmGetEncapReqestGetDigest,      SpdmEncapResponseStateWaitForDigest},
+  {SpdmEncapResponseStateWaitForDigest,        SpdmProcessEncapResponseDigest,        NULL,                             SpdmGetEncapReqestGetCertificate, SpdmEncapResponseStateWaitForCertificate},
+  {SpdmEncapResponseStateWaitForCertificate,   SpdmProcessEncapResponseCertificate,   SpdmGetEncapReqestGetCertificate, NULL,                             SpdmEncapResponseStateNotStarted},
+};
+SPDM_ENCAP_RESPONSE_STRUCT  mSpdmEncapSessionNoCertStruct[] = {
+  {SpdmEncapResponseStateNotStarted,           NULL,                                  NULL,                             SpdmGetEncapReqestGetDigest,      SpdmEncapResponseStateWaitForDigest},
+  {SpdmEncapResponseStateWaitForDigest,        SpdmProcessEncapResponseDigest,        NULL,                             NULL,                             SpdmEncapResponseStateNotStarted},
 };
 
 /**
@@ -101,19 +109,31 @@ SpdmGetEncapStructViaState (
   IN     SPDM_ENCAP_RESPONSE_STATE       EncapState
   )
 {
-  UINTN                Index;
+  UINTN                       Index;
+  SPDM_ENCAP_RESPONSE_STRUCT  *EncapResponseStruct;
+  UINTN                       Count;
 
   if (SpdmContext->LastSpdmRequestSessionIdValid) {
-    for (Index = 0; Index < sizeof(mSpdmEncapSessionStruct)/sizeof(mSpdmEncapSessionStruct[0]); Index++) {
-      if (EncapState == mSpdmEncapSessionStruct[Index].EncapState) {
-        return &mSpdmEncapSessionStruct[Index];
-      }
+    if (SpdmContext->EncapContext.SlotNum != 0xFF) {
+      EncapResponseStruct = mSpdmEncapSessionStruct;
+      Count = ARRAY_SIZE(mSpdmEncapSessionStruct);
+    } else {
+      EncapResponseStruct = mSpdmEncapSessionNoCertStruct;
+      Count = ARRAY_SIZE(mSpdmEncapSessionNoCertStruct);
     }
   } else {
-    for (Index = 0; Index < sizeof(mSpdmEncapStruct)/sizeof(mSpdmEncapStruct[0]); Index++) {
-      if (EncapState == mSpdmEncapStruct[Index].EncapState) {
-        return &mSpdmEncapStruct[Index];
-      }
+    if (SpdmContext->EncapContext.SlotNum != 0xFF) {
+      EncapResponseStruct = mSpdmEncapStruct;
+      Count = ARRAY_SIZE(mSpdmEncapStruct);
+    } else {
+      EncapResponseStruct = mSpdmEncapNoCertStruct;
+      Count = ARRAY_SIZE(mSpdmEncapNoCertStruct);
+    }
+  }
+
+  for (Index = 0; Index < Count; Index++) {
+    if (EncapState == EncapResponseStruct[Index].EncapState) {
+      return &EncapResponseStruct[Index];
     }
   }
   return NULL;
@@ -185,7 +205,7 @@ SpdmProcessEncapsulatedResponse (
 
   *RequestId = *RequestId + 1;
   if (!Continue) {
-    SpdmContext->EncapContext.EncapState ++;
+    SpdmContext->EncapContext.EncapState = EncapResponseStruct->NextEncapState;
   }
 
   return RETURN_SUCCESS;
@@ -204,9 +224,9 @@ SpdmInitEncapState (
   )
 {
   SpdmContext->EncapContext.ErrorState = 0;
-  SpdmContext->EncapContext.EncapState = 0;
+  SpdmContext->EncapContext.EncapState = SpdmEncapResponseStateNotStarted;
   if (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)) {
-    SpdmContext->EncapContext.EncapState = 1;
+    SpdmContext->EncapContext.EncapState = SpdmEncapResponseStateWaitForDigest;
   }
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
 }

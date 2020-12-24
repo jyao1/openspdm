@@ -157,7 +157,7 @@ SpdmGetResponseKeyExchange (
 
   SpdmResponse->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
   if (SpdmResponse->MutAuthRequested != 0) {
-    SpdmResponse->SlotIDParam = SpdmContext->EncapContext.SlotNum;
+    SpdmResponse->SlotIDParam = (SpdmContext->EncapContext.SlotNum & 0xF);
   } else {
     SpdmResponse->SlotIDParam = 0;
   }

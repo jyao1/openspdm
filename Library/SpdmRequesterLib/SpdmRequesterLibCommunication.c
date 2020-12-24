@@ -103,9 +103,11 @@ SpdmAuthentication (
       return Status;
     }
 
-    Status = SpdmGetCertificate (SpdmContext, SlotNum, CertChainSize, CertChain);
-    if (RETURN_ERROR(Status)) {
-      return Status;
+    if (SlotNum != 0xFF) {
+      Status = SpdmGetCertificate (SpdmContext, SlotNum, CertChainSize, CertChain);
+      if (RETURN_ERROR(Status)) {
+        return Status;
+      }
     }
   }
 
@@ -186,6 +188,9 @@ SpdmStartSession (
       return RETURN_UNSUPPORTED;
     }
 
+    if (SlotIdParam == 0xF) {
+      SlotIdParam = 0xFF;
+    }
     Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, SlotIdParam);
     DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceiveFinish - %p\n", Status));
   } else {

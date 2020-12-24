@@ -181,9 +181,9 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
       82 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0002) MCTP(5) SPDM(11, 0x6c) SPDM_END_SESSION_ACK ()
    </pre>
 
-3. If GET_CERTIFICATE or encapsulated GET_CERTIFICATE is not sent, the user need use `--rsp_cert_chain` or `--req_cert_chain` to indicate the responder certificate chain or the requester certificate chain, to dump the secured session data.
+3. If GET_CERTIFICATE or encapsulated GET_CERTIFICATE is not sent (e.g. when SlotId 0xFF is used), the user need use `--rsp_cert_chain` or `--req_cert_chain` to indicate the responder certificate chain or the requester certificate chain, to dump the secured session data.
 
-   For example, `SpdmDump -r SpdmRequester.pcap --psk 5465737450736b4461746100 --dhe_secret c7ac17ee29b6a4f84e978223040b7eddff792477a6f7fc0f51faa553fee58175 --req_cert_chain Rsa2048/bundle_requester.certchain.der --rsp_cert_chain EcP256/bundle_responder.certchain.der`
+   For example, `SpdmDump -r SpdmRequester.pcap --psk 5465737450736b4461746100 --dhe_secret c7ac17ee29b6a4f84e978223040b7eddff792477a6f7fc0f51faa553fee58175 --req_cert_chain Rsa3072/bundle_requester.certchain.der --rsp_cert_chain EcP384/bundle_responder.certchain.der`
 
    If GET_CERTIFICATE or encapsulated GET_CERTIFICATE is sent, the user may use `--out_rsp_cert_chain` or `--out_req_cert_chain` to get the responder certificate chain or the requester certificate chain.
    

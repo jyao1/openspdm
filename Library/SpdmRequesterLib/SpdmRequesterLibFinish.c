@@ -69,7 +69,7 @@ TrySpdmSendReceiveFinish (
   }
 
   if (SessionInfo->MutAuthRequested != 0) {
-    if ((SlotIdParam >= SpdmContext->LocalContext.SlotCount) && (SlotIdParam != 0xF)) {
+    if ((SlotIdParam >= SpdmContext->LocalContext.SlotCount) && (SlotIdParam != 0xFF)) {
       return RETURN_INVALID_PARAMETER;
     }
   } else {
@@ -92,7 +92,7 @@ TrySpdmSendReceiveFinish (
     SignatureSize = 0;
   }
   
-  if (SlotIdParam == 0xF) {
+  if (SlotIdParam == 0xFF) {
     SlotIdParam = SpdmContext->LocalContext.ProvisionedSlotNum;
   }
 

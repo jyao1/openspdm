@@ -186,14 +186,24 @@ SpdmClientInit (
   SpdmGetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, &DataSize);
   mUseReqAsymAlgo = Data16;
 
-  Res = ReadResponderRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
-  if (Res) {
-    ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = SpdmDataLocationLocal;
-    //SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
-    SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
-    // Do not free it.
+  if (mUseSlotId == 0xFF) {
+    Res = ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+    if (Res) {
+      ZeroMem (&Parameter, sizeof(Parameter));
+      Parameter.Location = SpdmDataLocationLocal;
+      SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
+      // Do not free it.
+    }
+  } else {
+    Res = ReadResponderRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
+    if (Res) {
+      ZeroMem (&Parameter, sizeof(Parameter));
+      Parameter.Location = SpdmDataLocationLocal;
+      SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
+      // Do not free it.
+    }
   }
+
 
   Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, NULL, NULL);
   if (Res) {
