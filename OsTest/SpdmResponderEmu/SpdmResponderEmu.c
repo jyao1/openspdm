@@ -120,6 +120,10 @@ PlatformServer (
     if (Status != RETURN_UNSUPPORTED) {
       continue;
     }
+    if (Status == RETURN_DEVICE_ERROR) {
+      printf ("Server Critical Error - STOP\n");
+      return FALSE;
+    }
     switch(mCommand) {
     case SOCKET_SPDM_COMMAND_TEST:
       Result = SendPlatformData (

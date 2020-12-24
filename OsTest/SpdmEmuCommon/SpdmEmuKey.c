@@ -1125,7 +1125,7 @@ SpdmResponderDataSignFunc (
   return SpdmDataSignFunc (TRUE, AsymAlgo, MessageHash, HashSize, Signature, SigSize);
 }
 
-#define BLOCK_NUMBER   4
+#define BLOCK_NUMBER   5
 
 BOOLEAN
 ReadMeasurementData (
@@ -1137,13 +1137,14 @@ ReadMeasurementData (
   SPDM_MEASUREMENT_BLOCK_DMTF  *MeasurementBlock;
   UINTN                        HashSize;
   UINT8                        Index;
-  UINT8                        Data[64];
+  UINT8                        Data[128];
 
   HashSize = TestGetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
 
   *DeviceMeasurementCount = BLOCK_NUMBER;
-  *DeviceMeasurementSize = BLOCK_NUMBER * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize);
-  *DeviceMeasurement = (VOID *)malloc (BLOCK_NUMBER * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize));
+  *DeviceMeasurementSize = (BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize) +
+                           (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + sizeof(Data));
+  *DeviceMeasurement = (VOID *)malloc (*DeviceMeasurementSize);
   if (*DeviceMeasurement == NULL) {
     return FALSE;
   }
@@ -1152,28 +1153,23 @@ ReadMeasurementData (
   for (Index = 0; Index < BLOCK_NUMBER; Index++) {
     MeasurementBlock->MeasurementBlockCommonHeader.Index = Index + 1;
     MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
-    MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSize = (UINT16)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + HashSize);
-    switch (Index) {
-    case 0:
-      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_IMMUTABLE_ROM;
-      break;
-    case 1:
-      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MUTABLE_FIRMWARE;
-      break;
-    case 2:
-      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_HARDWARE_CONFIGURATION;
-      break;
-    case 3:
-      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_FIRMWARE_CONFIGURATION;
-      break;
-    default:
-      ASSERT(FALSE);
+    if (Index < 4) {
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = Index;
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize = (UINT16)HashSize;
+    } else {
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = Index | SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_RAW_BIT_STREAM;
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize = (UINT16)sizeof(Data);
+    }
+    MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSize = (UINT16)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + 
+                                                                     MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
+    SetMem (Data, sizeof(Data), (UINT8)(Index + 1));
+    if (Index < 4) {
+      TestSpdmMeasurementHashAll (mUseMeasurementHashAlgo, Data, sizeof(Data), (VOID *)(MeasurementBlock + 1));
+      MeasurementBlock = (VOID *)((UINT8 *)MeasurementBlock + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize);
+    } else {
+      CopyMem ((VOID *)(MeasurementBlock + 1), Data, sizeof(Data));
       break;
     }
-    MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize = (UINT16)HashSize;
-    SetMem (Data, sizeof(Data), (UINT8)(Index + 1));
-    TestSpdmMeasurementHashAll (mUseMeasurementHashAlgo, Data, sizeof(Data), (VOID *)(MeasurementBlock + 1));
-    MeasurementBlock = (VOID *)((UINT8 *)MeasurementBlock + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize);
   }
 
   return TRUE;
