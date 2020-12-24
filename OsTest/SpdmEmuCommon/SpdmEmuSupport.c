@@ -153,8 +153,8 @@ PrintUsage (
   printf ("   [--trans] is used to select transport layer message. By default, MCTP is used.\n");
   printf ("   [--ver] is version. By default, 1.1 is used.\n");
   printf ("   [--cap] is capability flags. Multiple flags can be set together. Please use ',' for them.\n");
-  printf ("           By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Requester.\n");
-  printf ("           By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Responder.\n");
+  printf ("           By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR,PUB_KEY_ID is used for Requester.\n");
+  printf ("           By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR,PUB_KEY_ID is used for Responder.\n");
   printf ("   [--hash] is hash algorithm. By default, SHA_384,SHA_256 is used.\n");
   printf ("   [--meas_hash] is measurement hash algorithm. By default, SHA_512,SHA_384,SHA_256 is used.\n");
   printf ("   [--asym] is asym algorithm. By default, ECDSA_P384,ECDSA_P256 is used.\n");
@@ -168,6 +168,7 @@ PrintUsage (
   printf ("   [--meas_sum] is the measurment summary hash type in CHALLENGE_AUTH, KEY_EXCHANGE_RSP and PSK_EXCHANGE_RSP. By default, ALL is used.\n");
   printf ("   [--meas_op] is the measurement operation in GET_MEASUREMEMT. By default, ONE_BY_ONE is used.\n");
   printf ("   [--slot_id] is to select the peer slot ID in GET_MEASUREMENT, CHALLENGE_AUTH, KEY_EXCHANGE and FINISH. By default, 0 is used.\n");
+  printf ("           0xFF can be used to indicate provisioned certificate chain. No GET_CERTIFICATE is needed.\n");
   printf ("   [--slot_count] is to select the local slot count. By default, 3 is used.\n");
   printf ("   [--pcap] is used to generate PCAP dump file for offline analysis.\n");
 }

@@ -26,8 +26,8 @@ This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be us
          [--trans] is used to select transport layer message. By default, MCTP is used.
          [--ver] is version. By default, 1.1 is used.
          [--cap] is capability flags. Multiple flags can be set together. Please use ',' for them.
-                 By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Requester.
-                 By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Responder.
+                 By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR,PUB_KEY_ID is used for Requester.
+                 By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR,PUB_KEY_ID is used for Responder.
          [--hash] is hash algorithm. By default, SHA_384,SHA_256 is used.
          [--meas_hash] is measurement hash algorithm. By default, SHA_512,SHA_384,SHA_256 is used.
          [--asym] is asym algorithm. By default, ECDSA_P384,ECDSA_P256 is used.
@@ -41,6 +41,7 @@ This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be us
          [--meas_sum] is the measurment summary hash type in CHALLENGE_AUTH, KEY_EXCHANGE_RSP and PSK_EXCHANGE_RSP. By default, ALL is used.
          [--meas_op] is the measurement operation in GET_MEASUREMEMT. By default, ONE_BY_ONE is used.
          [--slot_id] is to select the peer slot ID in GET_MEASUREMENT, CHALLENGE_AUTH, KEY_EXCHANGE and FINISH. By default, 0 is used.
+                 0xFF can be used to indicate provisioned certificate chain. No GET_CERTIFICATE is needed.
          [--slot_count] is to select the local slot count. By default, 3 is used.
          [--pcap] is used to generate PCAP dump file for offline analysis.
    </pre>
