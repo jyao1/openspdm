@@ -224,8 +224,6 @@ SpdmClientInit (
     SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
   }
 
-  SpdmRegisterMeasurementCollectionFunc (SpdmContext, SpdmMeasurementCollectionFunc);
-
   SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
   Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   if (RETURN_ERROR(Status)) {

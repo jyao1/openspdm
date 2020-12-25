@@ -480,40 +480,42 @@ SpdmGenerateMeasurementSummaryHash (
   UINTN                         DeviceMeasurementSize;
   BOOLEAN                       Ret;
 
-  if (SpdmContext->LocalContext.SpdmMeasurementCollectionFunc == NULL) {
-    return FALSE;
-  }
-  DeviceMeasurementSize = sizeof(DeviceMeasurement);
-  Ret = SpdmContext->LocalContext.SpdmMeasurementCollectionFunc (
-          SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
-          SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo,
-          &DeviceMeasurementCount,
-          DeviceMeasurement,
-          &DeviceMeasurementSize
-          );
-  if (!Ret) {
-    return Ret;
-  }
-
-  ASSERT(DeviceMeasurementCount <= MAX_SPDM_MEASUREMENT_BLOCK_COUNT);
-
-  MeasurmentDataSize = 0;
-  CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
-  for (Index = 0; Index < DeviceMeasurementCount; Index++) {
-    MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER) + CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
-    ASSERT (CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize == sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
-    MeasurmentDataSize += CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
-    CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
-  }
-
-  ASSERT (MeasurmentDataSize <= MAX_SPDM_MEASUREMENT_RECORD_SIZE);
-
   switch (MeasurementSummaryHashType) {
   case SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH:
     ZeroMem (MeasurementSummaryHash, GetSpdmHashSize (SpdmContext));
     break;
+
   case SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH:
   case SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH:
+
+    if (SpdmContext->LocalContext.SpdmMeasurementCollectionFunc == NULL) {
+      return FALSE;
+    }
+    DeviceMeasurementSize = sizeof(DeviceMeasurement);
+    Ret = SpdmContext->LocalContext.SpdmMeasurementCollectionFunc (
+            SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
+            SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo,
+            &DeviceMeasurementCount,
+            DeviceMeasurement,
+            &DeviceMeasurementSize
+            );
+    if (!Ret) {
+      return Ret;
+    }
+
+    ASSERT(DeviceMeasurementCount <= MAX_SPDM_MEASUREMENT_BLOCK_COUNT);
+
+    MeasurmentDataSize = 0;
+    CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
+    for (Index = 0; Index < DeviceMeasurementCount; Index++) {
+      MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER) + CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
+      ASSERT (CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize == sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
+      MeasurmentDataSize += CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
+      CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
+    }
+
+    ASSERT (MeasurmentDataSize <= MAX_SPDM_MEASUREMENT_RECORD_SIZE);
+
     CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
     MeasurmentDataSize = 0;
     for (Index = 0; Index < DeviceMeasurementCount; Index++) {

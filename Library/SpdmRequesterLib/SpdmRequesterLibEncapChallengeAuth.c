@@ -46,6 +46,7 @@ SpdmGetEncapResponseChallengeAuth (
   UINTN                                     TotalSize;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
   SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE    AuthAttribute;
+  UINT8                                     MeasurementHashType;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -105,7 +106,12 @@ SpdmGetEncapResponseChallengeAuth (
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
   Ptr += SPDM_NONCE_SIZE;
 
-  Result = SpdmGenerateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param2, Ptr);
+  if (SpdmContext->LocalContext.SpdmMeasurementCollectionFunc != NULL) {
+    MeasurementHashType = SpdmRequest->Header.Param2;
+  } else {
+    MeasurementHashType = SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH;
+  }
+  Result = SpdmGenerateMeasurementSummaryHash (SpdmContext, MeasurementHashType, Ptr);
   if (!Result) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
