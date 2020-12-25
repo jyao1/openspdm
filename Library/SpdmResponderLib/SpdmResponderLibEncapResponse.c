@@ -143,7 +143,6 @@ SpdmGetEncapStructViaState (
   Process a SPDM encapsulated response.
 
   @param  SpdmContext                  The SPDM context for the device.
-  @param  RequestId                    Indicate if the request ID for the encapsulated message.
   @param  EncapResponseSize            Size in bytes of the request data.
   @param  EncapResponse                A pointer to the request data.
   @param  EncapRequestSize             Size in bytes of the response data.
@@ -155,7 +154,6 @@ SpdmGetEncapStructViaState (
 RETURN_STATUS
 SpdmProcessEncapsulatedResponse (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN OUT UINT8                *RequestId,
   IN     UINTN                EncapResponseSize,
   IN     VOID                 *EncapResponse,
   IN OUT UINTN                *EncapRequestSize,
@@ -180,6 +178,8 @@ SpdmProcessEncapsulatedResponse (
     }
   }
 
+  SpdmContext->EncapContext.RequestId += 1;
+
   if (Continue) {
     ASSERT (EncapResponseStruct->ContinueGetEncapRequest != NULL);
     if (EncapResponseStruct->ContinueGetEncapRequest) {
@@ -192,7 +192,6 @@ SpdmProcessEncapsulatedResponse (
       Status = EncapResponseStruct->NextGetEncapRequest (SpdmContext, EncapRequestSize, EncapRequest);
     } else {
       // Done
-      *RequestId = 0;
       *EncapRequestSize = 0;
       SpdmContext->EncapContext.EncapState = SpdmEncapResponseStateNotStarted;
       return RETURN_SUCCESS;
@@ -203,7 +202,6 @@ SpdmProcessEncapsulatedResponse (
     return Status;
   }
 
-  *RequestId = *RequestId + 1;
   if (!Continue) {
     SpdmContext->EncapContext.EncapState = EncapResponseStruct->NextEncapState;
   }
@@ -228,6 +226,7 @@ SpdmInitEncapState (
   if (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)) {
     SpdmContext->EncapContext.EncapState = SpdmEncapResponseStateWaitForDigest;
   }
+  SpdmContext->EncapContext.RequestId = 0;
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
 
   //
@@ -269,7 +268,6 @@ SpdmGetResponseEncapsulatedRequest (
   SPDM_DEVICE_CONTEXT                    *SpdmContext;
   VOID                                   *EncapRequest;
   UINTN                                  EncapRequestSize;
-  UINT8                                  RequestId;
   RETURN_STATUS                          Status;
 
   SpdmContext = Context;
@@ -290,15 +288,14 @@ SpdmGetResponseEncapsulatedRequest (
   EncapRequestSize = *ResponseSize - sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE);
   EncapRequest = SpdmResponse + 1;
 
-  RequestId = 0;
   SpdmInitEncapState (Context, 0);
-  Status = SpdmProcessEncapsulatedResponse (Context, &RequestId, 0, NULL, &EncapRequestSize, EncapRequest);
+  Status = SpdmProcessEncapsulatedResponse (Context, 0, NULL, &EncapRequestSize, EncapRequest);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   *ResponseSize = sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE) + EncapRequestSize;
-  SpdmResponse->Header.Param1 = RequestId;
+  SpdmResponse->Header.Param1 = SpdmContext->EncapContext.RequestId;
 
   return RETURN_SUCCESS;
 }
@@ -338,7 +335,6 @@ SpdmGetResponseEncapsulatedResponseAck (
   UINTN                                       EncapResponseSize;
   VOID                                        *EncapRequest;
   UINTN                                       EncapRequestSize;
-  UINT8                                       RequestId;
   RETURN_STATUS                               Status;
 
   SpdmContext = Context;
@@ -350,9 +346,13 @@ SpdmGetResponseEncapsulatedResponseAck (
   SpdmRequest = Request;
   SpdmRequestSize = RequestSize;
 
+  if (SpdmRequest->Header.Param1 != SpdmContext->EncapContext.RequestId) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   EncapResponse = (SpdmRequest + 1);
   EncapResponseSize = SpdmRequestSize - sizeof(SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST);
-  RequestId = SpdmRequest->Header.Param1;
 
   ASSERT (*ResponseSize > sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE));
   ZeroMem (Response, *ResponseSize);
@@ -366,15 +366,14 @@ SpdmGetResponseEncapsulatedResponseAck (
   EncapRequestSize = *ResponseSize - sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE);
   EncapRequest = SpdmResponse + 1;
 
-  RequestId = 0;
-  Status = SpdmProcessEncapsulatedResponse (Context, &RequestId, EncapResponseSize, EncapResponse, &EncapRequestSize, EncapRequest);
+  Status = SpdmProcessEncapsulatedResponse (Context, EncapResponseSize, EncapResponse, &EncapRequestSize, EncapRequest);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
   *ResponseSize = sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE) + EncapRequestSize;
-  SpdmResponse->Header.Param1 = RequestId;
+  SpdmResponse->Header.Param1 = SpdmContext->EncapContext.RequestId;
   if (EncapRequestSize == 0) {
     SpdmResponse->Header.Param2 = SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_ABSENT;
     if (SpdmContext->EncapContext.SlotNum != 0) {

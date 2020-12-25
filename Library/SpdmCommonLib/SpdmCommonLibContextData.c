@@ -218,6 +218,8 @@ SpdmInitEncapEnv (
   )
 {
   SpdmContext->EncapContext.ErrorState = 0;
+  SpdmContext->EncapContext.EncapState = 0;
+  SpdmContext->EncapContext.RequestId = 0;
   SpdmContext->EncapContext.SlotNum = SlotNum;
   SpdmContext->EncapContext.MeasurementHashType = MeasurementHashType;
 }

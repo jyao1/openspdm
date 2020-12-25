@@ -184,7 +184,7 @@ SpdmEncapsulatedRequest (
     EncapsulatedRequest = (VOID *)&GetDigests;
     EncapsulatedRequestSize = sizeof(GetDigests);
 
-    RequestId = 0; // TBD
+    RequestId = 0;
   } else {
     SpdmGetEncapsulatedRequestRequest = (VOID *)Request;
     SpdmGetEncapsulatedRequestRequest->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
