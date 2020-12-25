@@ -283,14 +283,6 @@ typedef struct {
   LARGE_MANAGED_BUFFER                 CertificateChainBuffer;
 } SPDM_ENCAP_CONTEXT;
 
-typedef enum {
-  SpdmResponseStateNormal,
-  SpdmResponseStateBusy,
-  SpdmResponseStateNotReady,
-  SpdmResponseStateNeedResync,
-  SpdmResponseStateMax,
-} SPDM_RESPONSE_STATE;
-
 #define SPDM_DEVICE_CONTEXT_VERSION 0x1
 
 ///

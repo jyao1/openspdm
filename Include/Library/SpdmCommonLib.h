@@ -81,6 +81,10 @@ typedef enum {
   //
   SpdmDataConnectionState,
   //
+  // ResponseState
+  //
+  SpdmDataResponseState,
+  //
   // Certificate info
   //
   SpdmDataPeerPublicRootCertHash,
@@ -236,6 +240,29 @@ typedef enum {
   //
   SpdmConnectionStateMax,
 } SPDM_CONNECTION_STATE;
+
+typedef enum {
+  //
+  // Normal response.
+  //
+  SpdmResponseStateNormal,
+  //
+  // Other component is busy.
+  //
+  SpdmResponseStateBusy,
+  //
+  // Hardware is not ready.
+  //
+  SpdmResponseStateNotReady,
+  //
+  // Firmware Update is done. Need resync.
+  //
+  SpdmResponseStateNeedResync,
+  //
+  // MAX
+  //
+  SpdmResponseStateMax,
+} SPDM_RESPONSE_STATE;
 
 /**
   Set an SPDM context data.

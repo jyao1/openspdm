@@ -391,6 +391,12 @@ SpdmSetData (
     }
     SpdmContext->LocalContext.Algorithm.KeySchedule = *(UINT16 *)Data;
     break;
+  case SpdmDataResponseState:
+    if (DataSize != sizeof(UINT32)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->ResponseState = *(UINT32 *)Data;
+    break;
   case SpdmDataPeerPublicRootCertHash:
     SpdmContext->LocalContext.PeerRootCertHashProvisionSize = DataSize;
     SpdmContext->LocalContext.PeerRootCertHashProvision = Data;
@@ -602,6 +608,10 @@ SpdmGetData (
     }
     TargetDataSize = sizeof(UINT32);
     TargetData = &SpdmContext->ConnectionInfo.ConnectionState;
+    break;
+  case SpdmDataResponseState:
+    TargetDataSize = sizeof(UINT32);
+    TargetData = &SpdmContext->ResponseState;
     break;
 
   case SpdmDataSessionType:
