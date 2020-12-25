@@ -24,27 +24,7 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTransportMctpEncodeMessage, SpdmTransportMctpDecodeMessage);
    ```
 
-   1.3, if responder verification is required, deploy the peer public root hash.
-   ```
-   Parameter.Location = SpdmDataLocationLocal;
-   SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, PeerRootCertHash, PeerRootCertHashSize);
-   ```
-
-   1.4, if mutual authentication is supported, deploy slot number, public certificate chain and measurement, then register signing function.
-   ```
-   Parameter.Location = SpdmDataLocationLocal;
-   SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
-
-   Parameter.AdditionalData[0] = SlotIndex;
-   SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
-
-   Parameter.AdditionalData[0] = MeasurementCount;
-   SpdmSetData (SpdmContext, SpdmDataMeasurementRecord, &Parameter, Measurement, MeasurementSize);
-
-   SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
-   ```
-
-   1.5, set capabilities and choose algorithms, based upon need.
+   1.3, set capabilities and choose algorithms, based upon need.
    ```
    Parameter.Location = SpdmDataLocationLocal;
    SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &CTExponent, sizeof(CTExponent));
@@ -56,6 +36,27 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataAEADCipherSuite, &Parameter, &AEADCipherSuite, sizeof(AEADCipherSuite));
    SpdmSetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &ReqBaseAsymAlg, sizeof(ReqBaseAsymAlg));
    SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &KeySchedule, sizeof(KeySchedule));
+   ```
+
+   1.4, if responder verification is required, deploy the peer public root hash or peer public certificate chain.
+   ```
+   Parameter.Location = SpdmDataLocationLocal;
+   if (!DeployCertChain) {
+     SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, PeerRootCertHash, PeerRootCertHashSize);
+   } else {
+     SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, PeerCertChain, PeerCertChainSize);
+   }
+   ```
+
+   1.5, if mutual authentication is supported, deploy slot number, public certificate chain, then register signing function.
+   ```
+   Parameter.Location = SpdmDataLocationLocal;
+   SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
+
+   Parameter.AdditionalData[0] = SlotIndex;
+   SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
+
+   SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
    ```
 
    1.6, if PSK is required, register PSK HKDF_EXPAND function, and optionally deploy PSK Hint.
@@ -191,27 +192,7 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTransportMctpEncodeMessage, SpdmTransportMctpDecodeMessage);
    ```
 
-   1.3, if mutual authentication (requester verification) is required, deploy the peer public root hash.
-   ```
-   Parameter.Location = SpdmDataLocationLocal;
-   SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, PeerRootCertHash, PeerRootCertHashSize);
-   ```
-
-   1.4, deploy slot number, public certificate chain and measurement, then register signing function.
-   ```
-   Parameter.Location = SpdmDataLocationLocal;
-   SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
-
-   Parameter.AdditionalData[0] = SlotIndex;
-   SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
-
-   Parameter.AdditionalData[0] = MeasurementCount;
-   SpdmSetData (SpdmContext, SpdmDataMeasurementRecord, &Parameter, Measurement, MeasurementSize);
-
-   SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
-   ```
-
-   1.5, set capabilities and choose algorithms, based upon need.
+   1.3, set capabilities and choose algorithms, based upon need.
    ```
    Parameter.Location = SpdmDataLocationLocal;
    SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &CTExponent, sizeof(CTExponent));
@@ -225,7 +206,33 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &KeySchedule, sizeof(KeySchedule));
    ```
 
-   1.6, if PSK is required, register PSK HKDF_EXPAND function, and optionally deploy PSK Hint.
+   1.4, deploy slot number, public certificate chain, then register signing function.
+   ```
+   Parameter.Location = SpdmDataLocationLocal;
+   SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
+
+   Parameter.AdditionalData[0] = SlotIndex;
+   SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
+
+   SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
+   ```
+
+   1.5, if mutual authentication (requester verification) is required, deploy the peer public root hash or peer public certificate chain.
+   ```
+   Parameter.Location = SpdmDataLocationLocal;
+   if (!DeployCertChain) {
+     SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, PeerRootCertHash, PeerRootCertHashSize);
+   } else {
+     SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, PeerCertChain, PeerCertChainSize);
+   }
+   ```
+
+   1.7, register measurement collection function.
+   ```
+   SpdmRegisterMeasurementCollectionFunc (SpdmContext, SpdmMeasurrementCollectionFunc);
+   ```
+
+   1.8, if PSK is required, register PSK HKDF_EXPAND function, and optionally deploy PSK Hint.
    ```
    SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
    SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, PskHint, PskHintSize);

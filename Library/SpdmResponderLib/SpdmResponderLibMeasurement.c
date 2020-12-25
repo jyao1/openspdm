@@ -49,6 +49,10 @@ SpdmGetResponseMeasurement (
   SPDM_MEASUREMENT_BLOCK_DMTF    *CachedMeasurmentBlock;
   SPDM_DEVICE_CONTEXT            *SpdmContext;
   UINT8                          SlotIdParam;
+  UINT8                          DeviceMeasurement[MAX_SPDM_MEASUREMENT_RECORD_SIZE];
+  UINT8                          DeviceMeasurementCount;
+  UINTN                          DeviceMeasurementSize;
+  BOOLEAN                        Ret;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -82,6 +86,24 @@ SpdmGetResponseMeasurement (
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
 
+  if (SpdmContext->LocalContext.SpdmMeasurementCollectionFunc == NULL) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  DeviceMeasurementSize = sizeof(DeviceMeasurement);
+  Ret = SpdmContext->LocalContext.SpdmMeasurementCollectionFunc (
+          SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
+          SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo,
+          &DeviceMeasurementCount,
+          DeviceMeasurement,
+          &DeviceMeasurementSize
+          );
+  if (!Ret) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  ASSERT(DeviceMeasurementCount <= MAX_SPDM_MEASUREMENT_BLOCK_COUNT);
+
   //
   // Cache
   //
@@ -93,8 +115,6 @@ SpdmGetResponseMeasurement (
                       sizeof(UINT16) +
                       SpdmContext->LocalContext.OpaqueMeasurementRspSize +
                       SignatureSize;
-
-  ASSERT(SpdmContext->LocalContext.DeviceMeasurementCount <= MAX_SPDM_MEASUREMENT_BLOCK_COUNT);
 
   switch (SpdmRequest->Header.Param2) {
   case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS:
@@ -115,7 +135,7 @@ SpdmGetResponseMeasurement (
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     }
     SpdmResponse->Header.RequestResponseCode = SPDM_MEASUREMENTS;
-    SpdmResponse->Header.Param1 = SpdmContext->LocalContext.DeviceMeasurementCount;
+    SpdmResponse->Header.Param1 = DeviceMeasurementCount;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 0;
     SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, 0);
@@ -139,8 +159,8 @@ SpdmGetResponseMeasurement (
 
   case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS:
     MeasurmentRecordSize = 0;
-    CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
-    for (Index = 0; Index < SpdmContext->LocalContext.DeviceMeasurementCount; Index++) {
+    CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
+    for (Index = 0; Index < DeviceMeasurementCount; Index++) {
       MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize;
       MeasurmentRecordSize += MeasurmentBlockSize;
       CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
@@ -164,12 +184,12 @@ SpdmGetResponseMeasurement (
     SpdmResponse->Header.RequestResponseCode = SPDM_MEASUREMENTS;
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
-    SpdmResponse->NumberOfBlocks = SpdmContext->LocalContext.DeviceMeasurementCount;
+    SpdmResponse->NumberOfBlocks = DeviceMeasurementCount;
     SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)MeasurmentRecordSize);
 
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
-    CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
-    for (Index = 0; Index < SpdmContext->LocalContext.DeviceMeasurementCount; Index++) {
+    CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
+    for (Index = 0; Index < DeviceMeasurementCount; Index++) {
       MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize;
       CopyMem (MeasurmentBlock, CachedMeasurmentBlock, MeasurmentBlockSize);
       CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
@@ -194,10 +214,10 @@ SpdmGetResponseMeasurement (
     break;
 
   default:
-    if (SpdmRequest->Header.Param2 <= SpdmContext->LocalContext.DeviceMeasurementCount) {
+    if (SpdmRequest->Header.Param2 <= DeviceMeasurementCount) {
       MeasurmentRecordSize = 0;
-      CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
-      for (Index = 0; Index < SpdmContext->LocalContext.DeviceMeasurementCount; Index++) {
+      CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
+      for (Index = 0; Index < DeviceMeasurementCount; Index++) {
         MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize;
         if (Index + 1 == SpdmRequest->Header.Param2) {
           MeasurmentRecordSize = MeasurmentBlockSize;
@@ -228,8 +248,8 @@ SpdmGetResponseMeasurement (
       SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)MeasurmentRecordSize);
 
       MeasurmentBlock = (VOID *)(SpdmResponse + 1);
-      CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
-      for (Index = 0; Index < SpdmContext->LocalContext.DeviceMeasurementCount; Index++) {
+      CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
+      for (Index = 0; Index < DeviceMeasurementCount; Index++) {
         MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize;
         if (Index + 1 == SpdmRequest->Header.Param2) {
           CopyMem (MeasurmentBlock, CachedMeasurmentBlock, MeasurmentBlockSize);

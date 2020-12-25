@@ -56,6 +56,7 @@ void TestSpdmResponderChallengeAuthCase1(void **state) {
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data2, &DataSize2);
@@ -99,6 +100,7 @@ void TestSpdmResponderChallengeAuthCase2(void **state) {
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data2, &DataSize2);
@@ -143,6 +145,7 @@ void TestSpdmResponderChallengeAuthCase3(void **state) {
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data2, &DataSize2);
@@ -188,6 +191,7 @@ void TestSpdmResponderChallengeAuthCase4(void **state) {
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data2, &DataSize2);
@@ -234,6 +238,7 @@ void TestSpdmResponderChallengeAuthCase5(void **state) {
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data2, &DataSize2);
@@ -278,6 +283,7 @@ void TestSpdmResponderChallengeAuthCase6(void **state) {
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data2, &DataSize2);

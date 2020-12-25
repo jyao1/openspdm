@@ -26,8 +26,8 @@ This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be us
          [--trans] is used to select transport layer message. By default, MCTP is used.
          [--ver] is version. By default, 1.1 is used.
          [--cap] is capability flags. Multiple flags can be set together. Please use ',' for them.
-                 By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR,PUB_KEY_ID is used for Requester.
-                 By default, CERT,CHAL,MEAS_SIG,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR,PUB_KEY_ID is used for Responder.
+                 By default, CERT,CHAL,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR,PUB_KEY_ID is used for Requester.
+                 By default, CERT,CHAL,MEAS_SIG,MEAS_FRESH,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR,PUB_KEY_ID is used for Responder.
          [--hash] is hash algorithm. By default, SHA_384,SHA_256 is used.
          [--meas_hash] is measurement hash algorithm. By default, SHA_512,SHA_384,SHA_256 is used.
          [--asym] is asym algorithm. By default, ECDSA_P384,ECDSA_P256 is used.

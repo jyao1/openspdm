@@ -90,30 +90,6 @@ SPDM_GET_MEASUREMENTS_REQUEST    mSpdmGetMeasurementRequest8 = {
 };
 UINTN mSpdmGetMeasurementRequest8Size = sizeof(mSpdmGetMeasurementRequest8) - sizeof(UINT8);
 
-VOID
-PatchDeviceMeasurement (
-  IN VOID   *DeviceMeasurement,
-  IN UINT8  DeviceMeasurementCount,
-  IN UINT32 HashSize
-  )
-{
-  SPDM_MEASUREMENT_BLOCK_DMTF  *MeasurementBlock;
-  UINT8                        Index;
-
-  MeasurementBlock = DeviceMeasurement;
-  for (Index = 0; Index < DeviceMeasurementCount; Index++) {
-    MeasurementBlock->MeasurementBlockCommonHeader.Index = (UINT8)(Index + 1);
-    MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
-    MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSize = (UINT16)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + HashSize);
-    MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = Index;
-    MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize = (UINT16)HashSize;
-
-    MeasurementBlock = (VOID *)((UINTN)MeasurementBlock +
-                                sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) +
-                                MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
-  }
-}
-
 void TestSpdmResponderMeasurementCase1(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -137,10 +113,7 @@ void TestSpdmResponderMeasurementCase1(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -152,10 +125,9 @@ void TestSpdmResponderMeasurementCase1(void **state) {
   assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE));
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
-  assert_int_equal (SpdmResponse->Header.Param1, 4);
+  assert_int_equal (SpdmResponse->Header.Param1, MEASUREMENT_BLOCK_NUMBER);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, mSpdmGetMeasurementRequest1Size + sizeof(SPDM_MEASUREMENTS_RESPONSE));
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase2(void **state) {
@@ -181,10 +153,7 @@ void TestSpdmResponderMeasurementCase2(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -200,7 +169,6 @@ void TestSpdmResponderMeasurementCase2(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase3(void **state) {
@@ -227,10 +195,7 @@ void TestSpdmResponderMeasurementCase3(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -247,7 +212,6 @@ void TestSpdmResponderMeasurementCase3(void **state) {
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateBusy);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase4(void **state) {
@@ -274,10 +238,7 @@ void TestSpdmResponderMeasurementCase4(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -294,7 +255,6 @@ void TestSpdmResponderMeasurementCase4(void **state) {
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase5(void **state) {
@@ -322,10 +282,7 @@ void TestSpdmResponderMeasurementCase5(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -344,7 +301,6 @@ void TestSpdmResponderMeasurementCase5(void **state) {
   assert_int_equal (ErrorData->RequestCode, SPDM_GET_MEASUREMENTS);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase6(void **state) {
@@ -368,10 +324,7 @@ void TestSpdmResponderMeasurementCase6(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -387,7 +340,6 @@ void TestSpdmResponderMeasurementCase6(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase7(void **state) {
@@ -414,10 +366,7 @@ void TestSpdmResponderMeasurementCase7(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -430,10 +379,9 @@ void TestSpdmResponderMeasurementCase7(void **state) {
   assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurmentSigSize);
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
-  assert_int_equal (SpdmResponse->Header.Param1, 4);
+  assert_int_equal (SpdmResponse->Header.Param1, MEASUREMENT_BLOCK_NUMBER);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase8(void **state) {
@@ -460,10 +408,7 @@ void TestSpdmResponderMeasurementCase8(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -477,7 +422,6 @@ void TestSpdmResponderMeasurementCase8(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase9(void **state) {
@@ -503,10 +447,7 @@ void TestSpdmResponderMeasurementCase9(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -522,7 +463,6 @@ void TestSpdmResponderMeasurementCase9(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase10(void **state) {
@@ -548,10 +488,7 @@ void TestSpdmResponderMeasurementCase10(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -565,7 +502,6 @@ void TestSpdmResponderMeasurementCase10(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext));
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase11(void **state) {
@@ -592,10 +528,7 @@ void TestSpdmResponderMeasurementCase11(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -605,13 +538,12 @@ void TestSpdmResponderMeasurementCase11(void **state) {
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest8.Nonce);
   Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest8Size, &mSpdmGetMeasurementRequest8, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)) + MeasurmentSigSize);
+  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)) + (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MEASUREMENT_MANIFEST_SIZE) + MeasurmentSigSize);
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
-  assert_int_equal (SpdmResponse->NumberOfBlocks, 4);
+  assert_int_equal (SpdmResponse->NumberOfBlocks, MEASUREMENT_BLOCK_NUMBER);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase12(void **state) {
@@ -637,10 +569,7 @@ void TestSpdmResponderMeasurementCase12(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  PatchDeviceMeasurement (SpdmContext->LocalContext.DeviceMeasurement, SpdmContext->LocalContext.DeviceMeasurementCount, GetSpdmMeasurementHashSize(SpdmContext));
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
   SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
   ReadResponderPrivateCertificate (&Data, &DataSize);
@@ -649,13 +578,12 @@ void TestSpdmResponderMeasurementCase12(void **state) {
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest7.Nonce);
   Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest7Size, &mSpdmGetMeasurementRequest7, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)));
+  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)) + (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MEASUREMENT_MANIFEST_SIZE));
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
-  assert_int_equal (SpdmResponse->NumberOfBlocks, 4);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, mSpdmGetMeasurementRequest7Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)));
+  assert_int_equal (SpdmResponse->NumberOfBlocks, MEASUREMENT_BLOCK_NUMBER);
+  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, mSpdmGetMeasurementRequest7Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)) + (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MEASUREMENT_MANIFEST_SIZE));
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 SPDM_TEST_CONTEXT       mSpdmResponderMeasurementTestContext = {

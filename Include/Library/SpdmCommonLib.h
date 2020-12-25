@@ -91,7 +91,6 @@ typedef enum {
   SpdmDataPeerPublicCertChains,
   SpdmDataSlotCount,
   SpdmDataPublicCertChains,
-  SpdmDataMeasurementRecord,
   SpdmDataBasicMutAuthRequested,
   SpdmDataMutAuthRequested,
   //
@@ -356,6 +355,44 @@ SpdmGetContextSize (
   );
 
 /**
+  Collect the device measurement.
+
+  @param  MeasurementSpecification     Indicates the measurement specification.
+                                       It must align with MeasurementSpecification (SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_*)
+  @param  MeasurementHashAlgo          Indicates the measurement hash algorithm.
+                                       It must align with MeasurementHashAlgo (SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_*)
+  @param  DeviceMeasurementCount       The count of the device measurement block.
+  @param  DeviceMeasurement            A pointer to a destination buffer to store the concatenation of all device measurement blocks.
+  @param  DeviceMeasurementSize        On input, indicates the size in bytes of the destination buffer.
+                                       On output, indicates the size in bytes of all device measurement blocks in the buffer.
+
+  @retval TRUE  the device measurement collection success and measurement is returned.
+  @retval FALSE the device measurement collection fail.
+**/
+typedef
+BOOLEAN
+(EFIAPI *SPDM_MEASUREMENT_COLLECTION_FUNC) (
+  IN      UINT8        MeasurementSpecification,
+  IN      UINT32       MeasurementHashAlgo,
+     OUT  UINT8        *DeviceMeasurementCount,
+     OUT  VOID         *DeviceMeasurement,
+  IN OUT  UINTN        *DeviceMeasurementSize
+  );
+
+/**
+  Register SPDM measurement collection function.
+
+  @param  SpdmContext                      A pointer to the SPDM context.
+  @param  SpdmMeasurementCollectionFunc    The fuction to collect the device measurement.
+**/
+VOID
+EFIAPI
+SpdmRegisterMeasurementCollectionFunc (
+  IN     VOID                              *SpdmContext,
+  IN     SPDM_MEASUREMENT_COLLECTION_FUNC  SpdmMeasurementCollectionFunc
+  );
+
+/**
   Sign an SPDM message data.
 
   @param  AsymAlgo                     Indicates the signing algorithm.
@@ -399,6 +436,7 @@ SpdmRegisterDataSignFunc (
   Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
 
   @param  HashAlgo                     Indicates the hash algorithm.
+                                       It must align with BaseHashAlgo (SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_*)
   @param  PskHint                      Pointer to the user-supplied PSK Hint.
   @param  PskHintSize                  PSK Hint size in bytes.
   @param  Info                         Pointer to the application specific info.

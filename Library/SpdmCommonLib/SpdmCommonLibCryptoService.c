@@ -475,12 +475,31 @@ SpdmGenerateMeasurementSummaryHash (
   SPDM_MEASUREMENT_BLOCK_DMTF   *CachedMeasurmentBlock;
   UINTN                         MeasurmentDataSize;
   UINTN                         MeasurmentBlockSize;
+  UINT8                         DeviceMeasurement[MAX_SPDM_MEASUREMENT_RECORD_SIZE];
+  UINT8                         DeviceMeasurementCount;
+  UINTN                         DeviceMeasurementSize;
+  BOOLEAN                       Ret;
 
-  ASSERT(SpdmContext->LocalContext.DeviceMeasurementCount <= MAX_SPDM_MEASUREMENT_BLOCK_COUNT);
+  if (SpdmContext->LocalContext.SpdmMeasurementCollectionFunc == NULL) {
+    return FALSE;
+  }
+  DeviceMeasurementSize = sizeof(DeviceMeasurement);
+  Ret = SpdmContext->LocalContext.SpdmMeasurementCollectionFunc (
+          SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
+          SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo,
+          &DeviceMeasurementCount,
+          DeviceMeasurement,
+          &DeviceMeasurementSize
+          );
+  if (!Ret) {
+    return Ret;
+  }
+
+  ASSERT(DeviceMeasurementCount <= MAX_SPDM_MEASUREMENT_BLOCK_COUNT);
 
   MeasurmentDataSize = 0;
-  CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
-  for (Index = 0; Index < SpdmContext->LocalContext.DeviceMeasurementCount; Index++) {
+  CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
+  for (Index = 0; Index < DeviceMeasurementCount; Index++) {
     MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER) + CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
     ASSERT (CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize == sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
     MeasurmentDataSize += CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
@@ -495,9 +514,9 @@ SpdmGenerateMeasurementSummaryHash (
     break;
   case SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH:
   case SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH:
-    CachedMeasurmentBlock = SpdmContext->LocalContext.DeviceMeasurement;
+    CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
     MeasurmentDataSize = 0;
-    for (Index = 0; Index < SpdmContext->LocalContext.DeviceMeasurementCount; Index++) {
+    for (Index = 0; Index < DeviceMeasurementCount; Index++) {
       MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER) + CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
       if ((MeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH) ||
           ((CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType & SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MASK) == SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_IMMUTABLE_ROM)) {

@@ -70,11 +70,9 @@ typedef struct {
   VOID                            *PeerCertChainProvision;
   UINTN                           PeerCertChainProvisionSize;
   //
-  // measurement collected in the responder
-  // SPDM_MEASUREMENT_BLOCK + Hash
+  // Collect all measurement blocks
   //
-  VOID                            *DeviceMeasurement;
-  UINT8                           DeviceMeasurementCount;
+  SPDM_MEASUREMENT_COLLECTION_FUNC SpdmMeasurementCollectionFunc;
   //
   // PSK provision locally
   //

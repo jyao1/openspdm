@@ -423,10 +423,6 @@ SpdmSetData (
     SpdmContext->LocalContext.CertificateChainSize[SlotNum] = DataSize;
     SpdmContext->LocalContext.CertificateChain[SlotNum] = Data;
     break;
-  case SpdmDataMeasurementRecord:
-    SpdmContext->LocalContext.DeviceMeasurementCount = Parameter->AdditionalData[0];
-    SpdmContext->LocalContext.DeviceMeasurement = Data;
-    break;
   case SpdmDataBasicMutAuthRequested:
     if (DataSize != sizeof(BOOLEAN)) {
       return RETURN_INVALID_PARAMETER;
@@ -770,6 +766,26 @@ SpdmIsVersionSupported (
     }
   }
   return FALSE;
+}
+
+/**
+  Register SPDM measurement collection function.
+
+  @param  SpdmContext                      A pointer to the SPDM context.
+  @param  SpdmMeasurementCollectionFunc    The fuction to collect the device measurement.
+**/
+VOID
+EFIAPI
+SpdmRegisterMeasurementCollectionFunc (
+  IN     VOID                              *Context,
+  IN     SPDM_MEASUREMENT_COLLECTION_FUNC  SpdmMeasurementCollectionFunc
+  )
+{
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
+
+  SpdmContext = Context;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
+  return ;
 }
 
 /**

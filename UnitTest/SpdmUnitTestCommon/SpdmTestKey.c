@@ -1287,20 +1287,65 @@ SpdmResponderDataSignFunc (
   return SpdmDataSignFunc (TRUE, AsymAlgo, MessageHash, HashSize, Signature, SigSize);
 }
 
-UINT8  mMyZeroFilledBuffer[64];
-
-VOID
-DumpHexStr (
-  IN UINT8 *Buffer,
-  IN UINTN BufferSize
+BOOLEAN
+EFIAPI
+SpdmMeasurementCollectionFunc (
+  IN      UINT8        MeasurementSpecification,
+  IN      UINT32       MeasurementHashAlgo,
+     OUT  UINT8        *DeviceMeasurementCount,
+     OUT  VOID         *DeviceMeasurement,
+  IN OUT  UINTN        *DeviceMeasurementSize
   )
 {
-  UINTN Index;
+  SPDM_MEASUREMENT_BLOCK_DMTF  *MeasurementBlock;
+  UINTN                        HashSize;
+  UINT8                        Index;
+  UINT8                        Data[MEASUREMENT_MANIFEST_SIZE];
+  UINTN                        TotalSize;
 
-  for (Index = 0; Index < BufferSize; Index++) {
-    printf ("%02x", Buffer[Index]);
+  ASSERT (MeasurementSpecification == SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF);
+  ASSERT (MeasurementHashAlgo == mUseMeasurementHashAlgo);
+
+  HashSize = TestGetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
+
+  *DeviceMeasurementCount = MEASUREMENT_BLOCK_NUMBER;
+  TotalSize = (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize) +
+                           (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + sizeof(Data));
+  ASSERT (*DeviceMeasurementSize >= TotalSize);
+  *DeviceMeasurementSize = TotalSize;
+
+  MeasurementBlock = DeviceMeasurement;
+  for (Index = 0; Index < MEASUREMENT_BLOCK_NUMBER; Index++) {
+    MeasurementBlock->MeasurementBlockCommonHeader.Index = Index + 1;
+    MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
+    if (Index < 4) {
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = Index;
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize = (UINT16)HashSize;
+    } else {
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = Index | SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_RAW_BIT_STREAM;
+      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize = (UINT16)sizeof(Data);
+    }
+    MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSize = (UINT16)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + 
+                                                                     MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
+    SetMem (Data, sizeof(Data), (UINT8)(Index + 1));
+    if (Index < 4) {
+      TestSpdmMeasurementHashAll (mUseMeasurementHashAlgo, Data, sizeof(Data), (VOID *)(MeasurementBlock + 1));
+      MeasurementBlock = (VOID *)((UINT8 *)MeasurementBlock + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize);
+    } else {
+      CopyMem ((VOID *)(MeasurementBlock + 1), Data, sizeof(Data));
+      break;
+    }
   }
+
+  return TRUE;
 }
+
+UINT8  mMyZeroFilledBuffer[64];
+UINT8  gBinStr0[0x12] = {
+       0x00, 0x00, // Length - To be filled
+       0x73, 0x70, 0x64, 0x6d, 0x31, 0x2e, 0x31, 0x00, // Version: 'spdm1.1/0'
+       0x64, 0x65, 0x72, 0x69, 0x76, 0x65, 0x64, 0x00, // label: 'derived/0'
+       };
 
 /**
   Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
@@ -1365,4 +1410,80 @@ SpdmPskHandshakeSecretHkdfExpandFunc (
 
   return Result;
 }
-
+
+
+/**
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
+
+  The PRK is PSK derived MasterSecret.
+
+  @param  HashAlgo                     Indicates the hash algorithm.
+  @param  PskHint                      Pointer to the user-supplied PSK Hint.
+  @param  PskHintSize                  PSK Hint size in bytes.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+**/
+BOOLEAN
+EFIAPI
+SpdmPskMasterSecretHkdfExpandFunc (
+  IN      UINT32       HashAlgo,
+  IN      CONST UINT8  *PskHint, OPTIONAL
+  IN      UINTN        PskHintSize, OPTIONAL
+  IN      CONST UINT8  *Info,
+  IN      UINTN        InfoSize,
+     OUT  UINT8        *Out,
+  IN      UINTN        OutSize
+  )
+{
+  VOID                          *Psk;
+  UINTN                         PskSize;
+  UINTN                         HashSize;
+  BOOLEAN                       Result;
+  UINT8                         HandshakeSecret[64];
+  UINT8                         Salt1[64];
+  UINT8                         MasterSecret[64];
+
+  ASSERT (HashAlgo == mUseHashAlgo);
+
+  if ((PskHint == NULL) && (PskHintSize == 0)) {
+    Psk = TEST_PSK_DATA_STRING;
+    PskSize = sizeof(TEST_PSK_DATA_STRING);
+  } else if ((PskHint != NULL) && (PskHintSize != 0) &&
+             (strcmp((const char *)PskHint, TEST_PSK_HINT_STRING) == 0) &&
+             (PskHintSize == sizeof(TEST_PSK_HINT_STRING))) {
+    Psk = TEST_PSK_DATA_STRING;
+    PskSize = sizeof(TEST_PSK_DATA_STRING);
+  } else {
+    return FALSE;
+  }
+
+  HashSize = TestGetSpdmHashSize (HashAlgo);
+
+  Result = TestSpdmHmacAll (HashAlgo, mMyZeroFilledBuffer, HashSize, Psk, PskSize, HandshakeSecret);
+  if (!Result) {
+    return Result;
+  }
+
+  *(UINT16 *)gBinStr0 = (UINT16)HashSize;
+  Result = TestSpdmHkdfExpand (HashAlgo, HandshakeSecret, HashSize, gBinStr0, sizeof(gBinStr0), Salt1, HashSize);
+  ZeroMem (HandshakeSecret, HashSize);
+  if (!Result) {
+    return Result;
+  }
+
+  Result = TestSpdmHmacAll (HashAlgo, Salt1, HashSize, mMyZeroFilledBuffer, HashSize, MasterSecret);
+  ZeroMem (Salt1, HashSize);
+  if (!Result) {
+    return Result;
+  }
+
+  Result = TestSpdmHkdfExpand (HashAlgo, MasterSecret, HashSize, Info, InfoSize, Out, OutSize);
+  ZeroMem (MasterSecret, HashSize);
+
+  return Result;
+}

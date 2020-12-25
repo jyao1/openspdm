@@ -82,6 +82,7 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
@@ -141,6 +142,7 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest2.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
@@ -202,6 +204,7 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
@@ -264,6 +267,7 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
@@ -327,6 +331,7 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
@@ -388,6 +393,7 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
+  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
   SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;

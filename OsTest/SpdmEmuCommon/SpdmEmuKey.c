@@ -12,8 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 UINT8   mUseVersion = SPDM_MESSAGE_VERSION_11;
 UINT32  mUseRequesterCapabilityFlags = (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP | \
                                         SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP | \
-                                        // SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG |
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MEAS_CAP_SIG | \
                                         SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | \
                                         SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP | \
                                         SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP | \
@@ -28,6 +26,7 @@ UINT32  mUseResonderCapabilityFlags =  (SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CER
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP |
                                         // SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG |
+                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_FRESH_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP |
@@ -1248,32 +1247,35 @@ SpdmResponderDataSignFunc (
   return SpdmDataSignFunc (TRUE, AsymAlgo, MessageHash, HashSize, Signature, SigSize);
 }
 
-#define BLOCK_NUMBER   5
-
 BOOLEAN
-ReadMeasurementData (
-  OUT VOID                            **DeviceMeasurement,
-  OUT UINTN                           *DeviceMeasurementSize,
-  OUT UINT8                           *DeviceMeasurementCount
+EFIAPI
+SpdmMeasurementCollectionFunc (
+  IN      UINT8        MeasurementSpecification,
+  IN      UINT32       MeasurementHashAlgo,
+     OUT  UINT8        *DeviceMeasurementCount,
+     OUT  VOID         *DeviceMeasurement,
+  IN OUT  UINTN        *DeviceMeasurementSize
   )
 {
   SPDM_MEASUREMENT_BLOCK_DMTF  *MeasurementBlock;
   UINTN                        HashSize;
   UINT8                        Index;
-  UINT8                        Data[128];
+  UINT8                        Data[MEASUREMENT_MANIFEST_SIZE];
+  UINTN                        TotalSize;
+
+  ASSERT (MeasurementSpecification == SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF);
+  ASSERT (MeasurementHashAlgo == mUseMeasurementHashAlgo);
 
   HashSize = TestGetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
 
-  *DeviceMeasurementCount = BLOCK_NUMBER;
-  *DeviceMeasurementSize = (BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize) +
+  *DeviceMeasurementCount = MEASUREMENT_BLOCK_NUMBER;
+  TotalSize = (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize) +
                            (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + sizeof(Data));
-  *DeviceMeasurement = (VOID *)malloc (*DeviceMeasurementSize);
-  if (*DeviceMeasurement == NULL) {
-    return FALSE;
-  }
+  ASSERT (*DeviceMeasurementSize >= TotalSize);
+  *DeviceMeasurementSize = TotalSize;
 
-  MeasurementBlock = *DeviceMeasurement;
-  for (Index = 0; Index < BLOCK_NUMBER; Index++) {
+  MeasurementBlock = DeviceMeasurement;
+  for (Index = 0; Index < MEASUREMENT_BLOCK_NUMBER; Index++) {
     MeasurementBlock->MeasurementBlockCommonHeader.Index = Index + 1;
     MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
     if (Index < 4) {

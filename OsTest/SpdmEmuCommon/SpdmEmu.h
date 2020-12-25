@@ -51,6 +51,9 @@ extern UINT16  mSupportDheAlgo;
 extern UINT16  mSupportAeadAlgo;
 extern UINT16  mSupportKeyScheduleAlgo;
 
+#define MEASUREMENT_BLOCK_NUMBER   5
+#define MEASUREMENT_MANIFEST_SIZE  128
+
 #define TEST_PSK_DATA_STRING  "TestPskData"
 #define TEST_PSK_HINT_STRING  "TestPskHint"
 
@@ -165,13 +168,6 @@ ReadRequesterRootPublicCertificate (
   );
 
 BOOLEAN
-ReadMeasurementData (
-  OUT VOID                            **DeviceMeasurement,
-  OUT UINTN                           *DeviceMeasurementSize,
-  OUT UINT8                           *DeviceMeasurementCount
-  );
-
-BOOLEAN
 TestSpdmAsymGetPrivateKeyFromPem (
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *PemData,
@@ -194,6 +190,16 @@ VOID
 TestSpdmAsymFree (
   IN      UINT32       AsymAlgo,
   IN      VOID         *Context
+  );
+
+BOOLEAN
+EFIAPI
+SpdmMeasurementCollectionFunc (
+  IN      UINT8        MeasurementSpecification,
+  IN      UINT32       MeasurementHashAlgo,
+     OUT  UINT8        *DeviceMeasurementCount,
+     OUT  VOID         *DeviceMeasurement,
+  IN OUT  UINTN        *DeviceMeasurementSize
   );
 
 BOOLEAN

@@ -224,14 +224,7 @@ SpdmClientInit (
     SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
   }
 
-  Res = ReadMeasurementData (&Data, &DataSize, &Data8);
-  if (Res) {
-    ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = SpdmDataLocationLocal;
-    Parameter.AdditionalData[0] = Data8;
-    SpdmSetData (SpdmContext, SpdmDataMeasurementRecord, &Parameter, Data, DataSize);
-    // do not free it
-  }
+  SpdmRegisterMeasurementCollectionFunc (SpdmContext, SpdmMeasurementCollectionFunc);
 
   SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
   Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
