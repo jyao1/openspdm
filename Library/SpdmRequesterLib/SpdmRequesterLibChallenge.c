@@ -146,9 +146,10 @@ TrySpdmChallenge (
       return RETURN_DEVICE_ERROR;
     }
   }
-  if (((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) &&
-      (AuthAttribute.BasicMutAuthReq != 1)) {
-    return RETURN_DEVICE_ERROR;
+  if (AuthAttribute.BasicMutAuthReq == 1) {
+    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) == 0) {
+      return RETURN_DEVICE_ERROR;
+    }
   }
   HashSize = GetSpdmHashSize (SpdmContext);
   SignatureSize = GetSpdmAsymSize (SpdmContext);
