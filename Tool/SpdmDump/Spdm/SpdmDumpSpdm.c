@@ -1272,6 +1272,7 @@ DumpSpdmKeyExchangeRsp (
   UINT8                       *OpaqueData;
   UINT8                       *Signature;
   UINT8                       *VerifyData;
+  UINT8                       TH1HashData[64];
 
   printf ("SPDM_KEY_EXCHANGE_RSP ");
 
@@ -1344,9 +1345,8 @@ DumpSpdmKeyExchangeRsp (
   printf ("\n");
 
   mCachedSessionId = mCachedSessionId | SpdmResponse->RspSessionID;
-  mCurrentSessionInfo = SpdmAssignSessionId (mSpdmContext, mCachedSessionId);
+  mCurrentSessionInfo = SpdmAssignSessionId (mSpdmContext, mCachedSessionId, FALSE);
   ASSERT (mCurrentSessionInfo != NULL);
-  mCurrentSessionInfo->UsePsk = FALSE;
   mCurrentSessionInfo->MutAuthRequested = SpdmResponse->MutAuthRequested;
 
   HmacSize = GetSpdmHashSize (mSpdmContext);
@@ -1356,12 +1356,18 @@ DumpSpdmKeyExchangeRsp (
   } else {
     AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageK, Buffer, MessageSize);
   }
-  SpdmCalculateSessionHandshakeKey (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE);
+
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", mCurrentSessionInfo->SessionId));
+  if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE) != RETURN_SUCCESS) {
+    return ;
+  }
+  SpdmCalculateTh1 (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE, TH1HashData);
+  SpdmGenerateSessionHandshakeKey (mCurrentSessionInfo->SecuredMessageContext, TH1HashData);
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
     AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageK, (UINT8 *)Buffer + MessageSize - HmacSize, HmacSize);
   }
 
-  mCurrentSessionInfo->SessionState = SpdmSessionStateHandshaking;
+  SpdmSecuredMessageSetSessionState (mCurrentSessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 }
 
 VOID
@@ -1441,6 +1447,7 @@ DumpSpdmFinishRsp (
   UINTN                 HmacSize;
   BOOLEAN               IncludeHmac;
   UINT8                 *VerifyData;
+  UINT8                 TH2HashData[64];
 
   printf ("SPDM_FINISH_RSP ");
 
@@ -1481,8 +1488,13 @@ DumpSpdmFinishRsp (
   ASSERT (mCurrentSessionInfo != NULL);
   AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageF, Buffer, MessageSize);
 
-  SpdmCalculateSessionDataKey (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE);
-  mCurrentSessionInfo->SessionState = SpdmSessionStateEstablished;
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", mCurrentSessionInfo->SessionId));
+  if (SpdmDumpSessionDataCheck (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE) != RETURN_SUCCESS) {
+    return ;
+  }
+  SpdmCalculateTh2 (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE, TH2HashData);
+  SpdmGenerateSessionDataKey (mCurrentSessionInfo->SecuredMessageContext, TH2HashData);
+  SpdmSecuredMessageSetSessionState (mCurrentSessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
 }
 
 VOID
@@ -1554,6 +1566,7 @@ DumpSpdmPskExchangeRsp (
   UINT8                       *ResponderContext;
   UINT8                       *OpaqueData;
   UINT8                       *VerifyData;
+  UINT8                       TH1HashData[64];
 
   printf ("SPDM_PSK_EXCHANGE_RSP ");
 
@@ -1599,16 +1612,25 @@ DumpSpdmPskExchangeRsp (
   printf ("\n");
 
   mCachedSessionId = mCachedSessionId | SpdmResponse->RspSessionID;
-  mCurrentSessionInfo = SpdmAssignSessionId (mSpdmContext, mCachedSessionId);
+  mCurrentSessionInfo = SpdmAssignSessionId (mSpdmContext, mCachedSessionId, TRUE);
   ASSERT (mCurrentSessionInfo != NULL);
-  mCurrentSessionInfo->UsePsk = TRUE;
 
   AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageK, mSpdmLastMessageBuffer, mSpdmLastMessageBufferSize);
   AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageK, Buffer, MessageSize - HmacSize);
-  SpdmCalculateSessionHandshakeKey (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE);
+
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", mCurrentSessionInfo->SessionId));
+  if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE) != RETURN_SUCCESS) {
+    return ;
+  }
+  SpdmCalculateTh1 (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE, TH1HashData);
+  SpdmSecuredMessageSetUsePsk (mCurrentSessionInfo->SecuredMessageContext, FALSE);
+  mCurrentSessionInfo->UsePsk = FALSE;
+  SpdmGenerateSessionHandshakeKey (mCurrentSessionInfo->SecuredMessageContext, TH1HashData);
+  mCurrentSessionInfo->UsePsk = TRUE;
+  SpdmSecuredMessageSetUsePsk (mCurrentSessionInfo->SecuredMessageContext, TRUE);
   AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageK, (UINT8 *)Buffer + MessageSize - HmacSize, HmacSize);
 
-  mCurrentSessionInfo->SessionState = SpdmSessionStateHandshaking;
+  SpdmSecuredMessageSetSessionState (mCurrentSessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 }
 
 VOID
@@ -1663,6 +1685,7 @@ DumpSpdmPskFinishRsp (
   )
 {
   UINTN                       MessageSize;
+  UINT8                       TH2HashData[64];
 
   printf ("SPDM_PSK_FINISH_RSP ");
 
@@ -1681,8 +1704,17 @@ DumpSpdmPskFinishRsp (
   ASSERT (mCurrentSessionInfo != NULL);
   AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageF, Buffer, MessageSize);
 
-  SpdmCalculateSessionDataKey (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE);
-  mCurrentSessionInfo->SessionState = SpdmSessionStateEstablished;
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", mCurrentSessionInfo->SessionId));
+  if (SpdmDumpSessionDataCheck (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE) != RETURN_SUCCESS) {
+    return ;
+  }
+  SpdmCalculateTh2 (mSpdmContext, mCurrentSessionInfo->SessionId, TRUE, TH2HashData);
+  SpdmSecuredMessageSetUsePsk (mCurrentSessionInfo->SecuredMessageContext, FALSE);
+  mCurrentSessionInfo->UsePsk = FALSE;
+  SpdmGenerateSessionDataKey (mCurrentSessionInfo->SecuredMessageContext, TH2HashData);
+  mCurrentSessionInfo->UsePsk = TRUE;
+  SpdmSecuredMessageSetUsePsk (mCurrentSessionInfo->SecuredMessageContext, TRUE);
+  SpdmSecuredMessageSetSessionState (mCurrentSessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
 }
 
 VOID
@@ -1753,10 +1785,10 @@ DumpSpdmKeyUpdate (
   ASSERT (mCurrentSessionInfo != NULL);
   switch (((SPDM_MESSAGE_HEADER *)Buffer)->Param1) {
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
-    SpdmCreateUpdateSessionDataKey (mSpdmContext, mCurrentSessionInfo->SessionId, SpdmKeyUpdateActionRequester);
+    SpdmCreateUpdateSessionDataKey (mCurrentSessionInfo->SecuredMessageContext, SpdmKeyUpdateActionRequester);
     break;
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
-    SpdmCreateUpdateSessionDataKey (mSpdmContext, mCurrentSessionInfo->SessionId, SpdmKeyUpdateActionAll);
+    SpdmCreateUpdateSessionDataKey (mCurrentSessionInfo->SecuredMessageContext, SpdmKeyUpdateActionAll);
     break;
   }
 }

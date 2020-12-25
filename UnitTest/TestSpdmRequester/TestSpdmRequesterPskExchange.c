@@ -71,7 +71,7 @@ SpdmRequesterPskExchangeTestSendMessage (
     return RETURN_DEVICE_ERROR;
   case 0x2:
     LocalBufferSize = 0;
-	MessageSize = SpdmTestGetPskExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    MessageSize = SpdmTestGetPskExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
     CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
     LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
@@ -160,10 +160,10 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     LARGE_MANAGED_BUFFER          THCurr;
     UINT8                         BinStr2[128];
     UINTN                         BinStr2Size;
-	UINT8                         BinStr7[128];
+    UINT8                         BinStr7[128];
     UINTN                         BinStr7Size;
     UINT8                         ResponseHandshakeSecret[MAX_HASH_SIZE];
-	UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
+    UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
 
@@ -173,7 +173,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
     HashSize = GetSpdmHashSize (SpdmContext);
     HmacSize = GetSpdmHashSize (SpdmContext);
-    OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+    OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
     TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
@@ -184,24 +184,24 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
     SpdmResponse->Header.RequestResponseCode = SPDM_PSK_EXCHANGE_RSP;
     SpdmResponse->Header.Param1 = 0;
-	SpdmResponse->Header.Param2 = 0;
+    SpdmResponse->Header.Param2 = 0;
     SpdmResponse->RspSessionID = SpdmAllocateRspSessionId (SpdmContext);
     SpdmResponse->Reserved = 0;
     SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
     SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
-	Ptr = (VOID *)(SpdmResponse + 1);
-	ZeroMem (Ptr, HashSize);
+    Ptr = (VOID *)(SpdmResponse + 1);
+    ZeroMem (Ptr, HashSize);
     Ptr += HashSize;
-	SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
+    SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
     Ptr += DEFAULT_CONTEXT_LENGTH;
-	SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
+    SpdmBuildOpaqueDataVersionSelectionData (&OpaquePskExchangeRspSize, Ptr);
     Ptr += OpaquePskExchangeRspSize;
-	CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
+    CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
     LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
     DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-	ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+    ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
     CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
     SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
@@ -209,16 +209,16 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
     SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
     free(Data);
-	BinStr2Size = sizeof(BinStr2);
-    BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
-	ZeroMem (LocalPskHint, 32);
-	CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
-	SpdmPskHandshakeSecretHkdfExpandFunc (mUseHashAlgo, LocalPskHint, sizeof(TEST_PSK_HINT_STRING), BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
-	BinStr7Size = sizeof(BinStr7);
-    BinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+    BinStr2Size = sizeof(BinStr2);
+    SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+    ZeroMem (LocalPskHint, 32);
+    CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
+    SpdmPskHandshakeSecretHkdfExpandFunc (mUseHashAlgo, LocalPskHint, sizeof(TEST_PSK_HINT_STRING), BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
+    BinStr7Size = sizeof(BinStr7);
+    SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
     SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
-	SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
-	Ptr += HmacSize;
+    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+    Ptr += HmacSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
@@ -240,10 +240,10 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     LARGE_MANAGED_BUFFER          THCurr;
     UINT8                         BinStr2[128];
     UINTN                         BinStr2Size;
-	UINT8                         BinStr7[128];
+    UINT8                         BinStr7[128];
     UINTN                         BinStr7Size;
     UINT8                         ResponseHandshakeSecret[MAX_HASH_SIZE];
-	UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
+    UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
 
@@ -253,7 +253,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
     HashSize = GetSpdmHashSize (SpdmContext);
     HmacSize = GetSpdmHashSize (SpdmContext);
-    OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+    OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
     TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
@@ -264,24 +264,24 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
     SpdmResponse->Header.RequestResponseCode = SPDM_PSK_EXCHANGE_RSP;
     SpdmResponse->Header.Param1 = 0;
-	SpdmResponse->Header.Param2 = 0;
+    SpdmResponse->Header.Param2 = 0;
     SpdmResponse->RspSessionID = SpdmAllocateRspSessionId (SpdmContext);
     SpdmResponse->Reserved = 0;
     SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
     SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
-	Ptr = (VOID *)(SpdmResponse + 1);
-	ZeroMem (Ptr, HashSize);
+    Ptr = (VOID *)(SpdmResponse + 1);
+    ZeroMem (Ptr, HashSize);
     Ptr += HashSize;
-	SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
+    SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
     Ptr += DEFAULT_CONTEXT_LENGTH;
-	SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
+    SpdmBuildOpaqueDataVersionSelectionData (&OpaquePskExchangeRspSize, Ptr);
     Ptr += OpaquePskExchangeRspSize;
-	CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
+    CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
     LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
     DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-	ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+    ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
     CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
     SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
@@ -289,16 +289,16 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
     SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
     free(Data);
-	BinStr2Size = sizeof(BinStr2);
-    BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
-	ZeroMem (LocalPskHint, 32);
-	CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
-	SpdmPskHandshakeSecretHkdfExpandFunc (mUseHashAlgo, LocalPskHint, sizeof(TEST_PSK_HINT_STRING), BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
-	BinStr7Size = sizeof(BinStr7);
-    BinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+    BinStr2Size = sizeof(BinStr2);
+    SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+    ZeroMem (LocalPskHint, 32);
+    CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
+    SpdmPskHandshakeSecretHkdfExpandFunc (mUseHashAlgo, LocalPskHint, sizeof(TEST_PSK_HINT_STRING), BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
+    BinStr7Size = sizeof(BinStr7);
+    SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
     SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
-	SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
-	Ptr += HmacSize;
+    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+    Ptr += HmacSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
@@ -358,10 +358,10 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       LARGE_MANAGED_BUFFER          THCurr;
       UINT8                         BinStr2[128];
       UINTN                         BinStr2Size;
-	  UINT8                         BinStr7[128];
+      UINT8                         BinStr7[128];
       UINTN                         BinStr7Size;
       UINT8                         ResponseHandshakeSecret[MAX_HASH_SIZE];
-	  UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
+      UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
 
@@ -371,7 +371,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
       HashSize = GetSpdmHashSize (SpdmContext);
       HmacSize = GetSpdmHashSize (SpdmContext);
-      OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+      OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
       TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
@@ -382,24 +382,24 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
       SpdmResponse->Header.RequestResponseCode = SPDM_PSK_EXCHANGE_RSP;
       SpdmResponse->Header.Param1 = 0;
-	  SpdmResponse->Header.Param2 = 0;
+      SpdmResponse->Header.Param2 = 0;
       SpdmResponse->RspSessionID = SpdmAllocateRspSessionId (SpdmContext);
       SpdmResponse->Reserved = 0;
       SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
       SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
-	  Ptr = (VOID *)(SpdmResponse + 1);
-	  ZeroMem (Ptr, HashSize);
+      Ptr = (VOID *)(SpdmResponse + 1);
+      ZeroMem (Ptr, HashSize);
       Ptr += HashSize;
-	  SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
+      SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
       Ptr += DEFAULT_CONTEXT_LENGTH;
-	  SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
+      SpdmBuildOpaqueDataVersionSelectionData (&OpaquePskExchangeRspSize, Ptr);
       Ptr += OpaquePskExchangeRspSize;
-	  CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
+      CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
       DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
       InternalDumpHex (LocalBuffer, LocalBufferSize);
       InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-	  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+      ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
       CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
       CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
       SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
@@ -407,16 +407,16 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
       SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
       free(Data);
-	  BinStr2Size = sizeof(BinStr2);
-      BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
-	  ZeroMem (LocalPskHint, 32);
-	  CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
-	  SpdmPskHandshakeSecretHkdfExpandFunc (mUseHashAlgo, LocalPskHint, sizeof(TEST_PSK_HINT_STRING), BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
-	  BinStr7Size = sizeof(BinStr7);
-      BinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+      BinStr2Size = sizeof(BinStr2);
+      SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+      ZeroMem (LocalPskHint, 32);
+      CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
+      SpdmPskHandshakeSecretHkdfExpandFunc (mUseHashAlgo, LocalPskHint, sizeof(TEST_PSK_HINT_STRING), BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
+      BinStr7Size = sizeof(BinStr7);
+      SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
       SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
-	  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
-	  Ptr += HmacSize;
+      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+      Ptr += HmacSize;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
@@ -485,10 +485,10 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       LARGE_MANAGED_BUFFER          THCurr;
       UINT8                         BinStr2[128];
       UINTN                         BinStr2Size;
-	  UINT8                         BinStr7[128];
+      UINT8                         BinStr7[128];
       UINTN                         BinStr7Size;
       UINT8                         ResponseHandshakeSecret[MAX_HASH_SIZE];
-	  UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
+      UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
 
@@ -498,7 +498,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
       HashSize = GetSpdmHashSize (SpdmContext);
       HmacSize = GetSpdmHashSize (SpdmContext);
-      OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+      OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
       TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
@@ -509,24 +509,24 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
       SpdmResponse->Header.RequestResponseCode = SPDM_PSK_EXCHANGE_RSP;
       SpdmResponse->Header.Param1 = 0;
-	  SpdmResponse->Header.Param2 = 0;
+      SpdmResponse->Header.Param2 = 0;
       SpdmResponse->RspSessionID = SpdmAllocateRspSessionId (SpdmContext);
       SpdmResponse->Reserved = 0;
       SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
       SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
-	  Ptr = (VOID *)(SpdmResponse + 1);
-	  ZeroMem (Ptr, HashSize);
+      Ptr = (VOID *)(SpdmResponse + 1);
+      ZeroMem (Ptr, HashSize);
       Ptr += HashSize;
-	  SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
+      SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
       Ptr += DEFAULT_CONTEXT_LENGTH;
-	  SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
+      SpdmBuildOpaqueDataVersionSelectionData (&OpaquePskExchangeRspSize, Ptr);
       Ptr += OpaquePskExchangeRspSize;
-	  CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
+      CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
       DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
       InternalDumpHex (LocalBuffer, LocalBufferSize);
       InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-	  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+      ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
       CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
       CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
       SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
@@ -534,16 +534,16 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
       SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
       free(Data);
-	  BinStr2Size = sizeof(BinStr2);
-      BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
-	  ZeroMem (LocalPskHint, 32);
-	  CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
-	  SpdmPskHandshakeSecretHkdfExpandFunc (mUseHashAlgo, LocalPskHint, sizeof(TEST_PSK_HINT_STRING), BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
-	  BinStr7Size = sizeof(BinStr7);
-      BinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+      BinStr2Size = sizeof(BinStr2);
+      SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+      ZeroMem (LocalPskHint, 32);
+      CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
+      SpdmPskHandshakeSecretHkdfExpandFunc (mUseHashAlgo, LocalPskHint, sizeof(TEST_PSK_HINT_STRING), BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
+      BinStr7Size = sizeof(BinStr7);
+      SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
       SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
-	  SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
-	  Ptr += HmacSize;
+      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+      Ptr += HmacSize;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
@@ -568,7 +568,7 @@ void TestSpdmRequesterPskExchangeCase1(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -609,7 +609,7 @@ void TestSpdmRequesterPskExchangeCase2(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -635,7 +635,7 @@ void TestSpdmRequesterPskExchangeCase2(void **state) {
            &SessionId, &HeartbeatPeriod, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SessionId, 0xFFFFFFFF);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateHandshaking);
   free(Data);
 }
 
@@ -652,7 +652,7 @@ void TestSpdmRequesterPskExchangeCase3(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
@@ -691,7 +691,7 @@ void TestSpdmRequesterPskExchangeCase4(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -732,7 +732,7 @@ void TestSpdmRequesterPskExchangeCase5(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -773,7 +773,7 @@ void TestSpdmRequesterPskExchangeCase6(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -799,7 +799,7 @@ void TestSpdmRequesterPskExchangeCase6(void **state) {
            &SessionId, &HeartbeatPeriod, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SessionId, 0xFFFEFFFE);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateHandshaking);
   free(Data);
 }
 
@@ -816,7 +816,7 @@ void TestSpdmRequesterPskExchangeCase7(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -858,7 +858,7 @@ void TestSpdmRequesterPskExchangeCase8(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -899,7 +899,7 @@ void TestSpdmRequesterPskExchangeCase9(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -925,7 +925,7 @@ void TestSpdmRequesterPskExchangeCase9(void **state) {
            &SessionId, &HeartbeatPeriod, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SessionId, 0xFFFDFFFD);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateHandshaking);
   free(Data);
 }
 

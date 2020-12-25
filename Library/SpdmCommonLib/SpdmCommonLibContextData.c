@@ -17,12 +17,54 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 SpdmSessionInfoInit (
+  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
   IN     SPDM_SESSION_INFO       *SessionInfo,
-  IN     UINT32                  SessionId
+  IN     UINT32                  SessionId,
+  IN     BOOLEAN                 UsePsk
   )
 {
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
+  SPDM_SESSION_TYPE          SessionType;
+
+  switch (SpdmContext->ConnectionInfo.Capability.Flags &
+          (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP)) {
+  case 0:
+    SessionType = SpdmSessionTypeNone;
+    break;
+  case (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP) :
+    SessionType = SpdmSessionTypeEncMac;
+    break;
+  case SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP :
+    SessionType = SpdmSessionTypeMacOnly;
+    break;
+  default:
+    ASSERT(FALSE);
+    SessionType = SpdmSessionTypeMax;
+    break;
+  }
+
+  ZeroMem (SessionInfo, OFFSET_OF(SPDM_SESSION_INFO, SecuredMessageContext));
+  SpdmSecuredMessageInitContext (SessionInfo->SecuredMessageContext);
   SessionInfo->SessionId = SessionId;
+  SessionInfo->UsePsk    = UsePsk;
+  SpdmSecuredMessageSetUsePsk (SessionInfo->SecuredMessageContext, UsePsk);
+  SpdmSecuredMessageSetSessionType (SessionInfo->SecuredMessageContext, SessionType);
+  SpdmSecuredMessageSetAlgorithms (
+    SessionInfo->SecuredMessageContext,
+    SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
+    SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup,
+    SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite,
+    SpdmContext->ConnectionInfo.Algorithm.KeySchedule
+    );
+  SpdmSecuredMessageSetPskHint (
+    SessionInfo->SecuredMessageContext,
+    SpdmContext->LocalContext.PskHint,
+    SpdmContext->LocalContext.PskHintSize
+    );
+  SpdmSecuredMessageRegisterPskHkdfExpandFunc (
+    SessionInfo->SecuredMessageContext,
+    SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc,
+    SpdmContext->LocalContext.SpdmPskMasterSecretHkdfExpandFunc
+    );
   SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 }
@@ -62,6 +104,30 @@ SpdmGetSessionInfoViaSessionId (
 }
 
 /**
+  This function gets the session key info via session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return session key info.
+**/
+VOID *
+SpdmGetSessionKeyInfoViaSessionId (
+  IN     VOID                      *SpdmContext,
+  IN     UINT32                    SessionId
+  )
+{
+  SPDM_SESSION_INFO          *SessionInfo;
+
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    return NULL;
+  } else {
+    return SessionInfo->SecuredMessageContext;
+  }
+}
+
+/**
   This function assigns a new session ID.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -72,7 +138,8 @@ SpdmGetSessionInfoViaSessionId (
 SPDM_SESSION_INFO *
 SpdmAssignSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     UINT32                    SessionId
+  IN     UINT32                    SessionId,
+  IN     BOOLEAN                   UsePsk
   )
 {
   SPDM_SESSION_INFO          *SessionInfo;
@@ -96,7 +163,7 @@ SpdmAssignSessionId (
 
   for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
     if (SessionInfo[Index].SessionId == INVALID_SESSION_ID) {
-      SpdmSessionInfoInit (&SessionInfo[Index], SessionId);
+      SpdmSessionInfoInit (SpdmContext, &SessionInfo[Index], SessionId, UsePsk);
       SpdmContext->LatestSessionId = SessionId;
       return &SessionInfo[Index];
     }
@@ -191,7 +258,7 @@ SpdmFreeSessionId (
   SessionInfo = SpdmContext->SessionInfo;
   for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
     if (SessionInfo[Index].SessionId == SessionId) {
-      SpdmSessionInfoInit (&SessionInfo[Index], INVALID_SESSION_ID);
+      SpdmSessionInfoInit (SpdmContext, &SessionInfo[Index], INVALID_SESSION_ID, FALSE);
       return &SessionInfo[Index];
     }
   }
@@ -257,34 +324,6 @@ NeedSessionInfoForData (
   IN     SPDM_DATA_TYPE      DataType
   )
 {
-  switch (DataType) {
-  case SpdmDataDheSecret:
-  case SpdmDataHandshakeSecret:
-  case SpdmDataMasterSecret:
-  case SpdmDataRequestHandshakeSecret:
-  case SpdmDataResponseHandshakeSecret:
-  case SpdmDataRequestDataSecret:
-  case SpdmDataResponseDataSecret:
-  case SpdmDataRequestFinishedKey:
-  case SpdmDataResponseFinishedKey:
-    return TRUE;
-
-  case SpdmDataSessionState:
-  case SpdmDataExportMasterSecret:
-  case SpdmDataRequestHandshakeEncryptionKey:
-  case SpdmDataRequestHandshakeSalt:
-  case SpdmDataResponseHandshakeEncryptionKey:
-  case SpdmDataResponseHandshakeSalt:
-  case SpdmDataRequestDataEncryptionKey:
-  case SpdmDataRequestDataSalt:
-  case SpdmDataResponseDataEncryptionKey:
-  case SpdmDataResponseDataSalt:
-  case SpdmDataRequestHandshakeSequenceNumber:
-  case SpdmDataResponseHandshakeSequenceNumber:
-  case SpdmDataRequestDataSequenceNumber:
-  case SpdmDataResponseDataSequenceNumber:
-    return TRUE;
-  }
   return FALSE;
 }
 
@@ -449,30 +488,6 @@ SpdmSetData (
     SpdmContext->LocalContext.PskHintSize = DataSize;
     SpdmContext->LocalContext.PskHint = Data;
     break;
-  case SpdmDataRequestHandshakeSequenceNumber:
-    if (DataSize != sizeof(SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber)) {
-      return RETURN_INVALID_PARAMETER;
-    }
-    SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber = *(UINT64 *)Data;
-    break;
-  case SpdmDataResponseHandshakeSequenceNumber:
-    if (DataSize != sizeof(SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber)) {
-      return RETURN_INVALID_PARAMETER;
-    }
-    SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber = *(UINT64 *)Data;
-    break;
-  case SpdmDataRequestDataSequenceNumber:
-    if (DataSize != sizeof(SessionInfo->ApplicationSecret.RequestDataSequenceNumber)) {
-      return RETURN_INVALID_PARAMETER;
-    }
-    SessionInfo->ApplicationSecret.RequestDataSequenceNumber = *(UINT64 *)Data;
-    break;
-  case SpdmDataResponseDataSequenceNumber:
-    if (DataSize != sizeof(SessionInfo->ApplicationSecret.ResponseDataSequenceNumber)) {
-      return RETURN_INVALID_PARAMETER;
-    }
-    SessionInfo->ApplicationSecret.ResponseDataSequenceNumber = *(UINT64 *)Data;
-    break;
   default:
     return RETURN_UNSUPPORTED;
     break;
@@ -515,7 +530,6 @@ SpdmGetData (
   VOID                       *TargetData;
   UINT32                     SessionId;
   SPDM_SESSION_INFO          *SessionInfo;
-  SPDM_SESSION_TYPE          SessionType;
 
   if (IsDebugOnlyData (DataType)) {
     return RETURN_UNSUPPORTED;
@@ -608,125 +622,6 @@ SpdmGetData (
   case SpdmDataResponseState:
     TargetDataSize = sizeof(UINT32);
     TargetData = &SpdmContext->ResponseState;
-    break;
-
-  case SpdmDataSessionType:
-    if (Parameter->Location != SpdmDataLocationConnection) {
-      return RETURN_INVALID_PARAMETER;
-    }
-    switch (SpdmContext->ConnectionInfo.Capability.Flags &
-            (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP)) {
-    case 0:
-      SessionType = SpdmSessionTypeNone;
-      break;
-    case (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP) :
-      SessionType = SpdmSessionTypeEncMac;
-      break;
-    case SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP :
-      SessionType = SpdmSessionTypeMacOnly;
-      break;
-    default:
-      ASSERT(FALSE);
-      SessionType = SpdmSessionTypeMax;
-      break;
-    }
-    TargetDataSize = sizeof(UINT32);
-    TargetData = &SessionType;
-    break;
-  case SpdmDataSessionState:
-    TargetDataSize = sizeof(UINT32);
-    TargetData = &SessionInfo->SessionState;
-    break;
-  case SpdmDataExportMasterSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.ExportMasterSecret;
-    break;
-  case SpdmDataRequestHandshakeEncryptionKey:
-    TargetDataSize = SessionInfo->AeadKeySize;
-    TargetData = SessionInfo->HandshakeSecret.RequestHandshakeEncryptionKey;
-    break;
-  case SpdmDataRequestHandshakeSalt:
-    TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->HandshakeSecret.RequestHandshakeSalt;
-    break;
-  case SpdmDataResponseHandshakeEncryptionKey:
-    TargetDataSize = SessionInfo->AeadKeySize;
-    TargetData = SessionInfo->HandshakeSecret.ResponseHandshakeEncryptionKey;
-    break;
-  case SpdmDataResponseHandshakeSalt:
-    TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->HandshakeSecret.ResponseHandshakeSalt;
-    break;
-  case SpdmDataRequestDataEncryptionKey:
-    TargetDataSize = SessionInfo->AeadKeySize;
-    TargetData = SessionInfo->ApplicationSecret.RequestDataEncryptionKey;
-    break;
-  case SpdmDataRequestDataSalt:
-    TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->ApplicationSecret.RequestDataSalt;
-    break;
-  case SpdmDataResponseDataEncryptionKey:
-    TargetDataSize = SessionInfo->AeadKeySize;
-    TargetData = SessionInfo->ApplicationSecret.ResponseDataEncryptionKey;
-    break;
-  case SpdmDataResponseDataSalt:
-    TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->ApplicationSecret.ResponseDataSalt;
-    break;
-  case SpdmDataRequestHandshakeSequenceNumber:
-    TargetDataSize = sizeof(SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber);
-    TargetData = &SessionInfo->HandshakeSecret.RequestHandshakeSequenceNumber;
-    break;
-  case SpdmDataResponseHandshakeSequenceNumber:
-    TargetDataSize = sizeof(SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber);
-    TargetData = &SessionInfo->HandshakeSecret.ResponseHandshakeSequenceNumber;
-    break;
-  case SpdmDataRequestDataSequenceNumber:
-    TargetDataSize = sizeof(SessionInfo->ApplicationSecret.RequestDataSequenceNumber);
-    TargetData = &SessionInfo->ApplicationSecret.RequestDataSequenceNumber;
-    break;
-  case SpdmDataResponseDataSequenceNumber:
-    TargetDataSize = sizeof(SessionInfo->ApplicationSecret.ResponseDataSequenceNumber);
-    TargetData = &SessionInfo->ApplicationSecret.ResponseDataSequenceNumber;
-    break;
-  //
-  // Debug Data only
-  //
-  case SpdmDataDheSecret:
-    TargetDataSize = SessionInfo->DheKeySize;
-    TargetData = SessionInfo->MasterSecret.DheSecret;
-    break;
-  case SpdmDataHandshakeSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->MasterSecret.HandshakeSecret;
-    break;
-  case SpdmDataMasterSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->MasterSecret.MasterSecret;
-    break;
-  case SpdmDataRequestHandshakeSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.RequestHandshakeSecret;
-    break;
-  case SpdmDataResponseHandshakeSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.ResponseHandshakeSecret;
-    break;
-  case SpdmDataRequestDataSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->ApplicationSecret.RequestDataSecret;
-    break;
-  case SpdmDataResponseDataSecret:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->ApplicationSecret.ResponseDataSecret;
-    break;
-  case SpdmDataRequestFinishedKey:
-    TargetDataSize = SessionInfo->HashSize;
-    TargetData = SessionInfo->HandshakeSecret.RequestFinishedKey;
-    break;
-  case SpdmDataResponseFinishedKey:
-    TargetDataSize = SessionInfo->AeadIvSize;
-    TargetData = SessionInfo->HandshakeSecret.ResponseFinishedKey;
     break;
   default:
     return RETURN_UNSUPPORTED;
@@ -917,6 +812,9 @@ SpdmInitContext (
   )
 {
   SPDM_DEVICE_CONTEXT       *SpdmContext;
+  VOID                      *SecuredMessageContext;
+  UINTN                     SecuredMessageContextSize;
+  UINTN                     Index;
 
   SpdmContext = Context;
   ZeroMem (SpdmContext, sizeof(SPDM_DEVICE_CONTEXT));
@@ -933,6 +831,13 @@ SpdmInitContext (
   SpdmContext->CurrentToken                         = 0;
   SpdmContext->EncapContext.CertificateChainBuffer.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 
+  SecuredMessageContext = (VOID *)((UINTN)(SpdmContext + 1));
+  SecuredMessageContextSize = SpdmSecuredMessageGetContextSize();
+  for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
+    SpdmContext->SessionInfo[Index].SecuredMessageContext = (VOID *)((UINTN)SecuredMessageContext + SecuredMessageContextSize * Index);
+    SpdmSecuredMessageInitContext (SpdmContext->SessionInfo[Index].SecuredMessageContext);
+  }
+
   RandomSeed (NULL, 0);
   return ;
 }
@@ -948,5 +853,5 @@ SpdmGetContextSize (
   VOID
   )
 {
-  return sizeof(SPDM_DEVICE_CONTEXT);
+  return sizeof(SPDM_DEVICE_CONTEXT) + SpdmSecuredMessageGetContextSize() * MAX_SPDM_SESSION_COUNT;
 }

@@ -467,7 +467,7 @@ void TestSpdmRequesterGetMeasurementCase1(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -503,7 +503,7 @@ void TestSpdmRequesterGetMeasurementCase2(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -539,7 +539,7 @@ void TestSpdmRequesterGetMeasurementCase3(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
@@ -573,7 +573,7 @@ void TestSpdmRequesterGetMeasurementCase4(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -609,7 +609,7 @@ void TestSpdmRequesterGetMeasurementCase5(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -645,7 +645,7 @@ void TestSpdmRequesterGetMeasurementCase6(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -681,7 +681,7 @@ void TestSpdmRequesterGetMeasurementCase7(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -718,7 +718,7 @@ void TestSpdmRequesterGetMeasurementCase8(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -753,7 +753,7 @@ void TestSpdmRequesterGetMeasurementCase9(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -787,7 +787,7 @@ void TestSpdmRequesterGetMeasurementCase10(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xA;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -826,7 +826,7 @@ void TestSpdmRequesterGetMeasurementCase11(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xB;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;

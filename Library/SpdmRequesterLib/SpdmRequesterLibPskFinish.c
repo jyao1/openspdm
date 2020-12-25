@@ -40,6 +40,7 @@ SpdmSendReceivePskFinish (
   SPDM_PSK_FINISH_RESPONSE                  SpdmResponse;
   UINTN                                     SpdmResponseSize;
   SPDM_SESSION_INFO                         *SessionInfo;
+  UINT8                                     TH2HashData[64];
   
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
@@ -87,13 +88,11 @@ SpdmSendReceivePskFinish (
   
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, &SpdmResponse, SpdmResponseSize);
 
-  Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId, TRUE);
-  if (RETURN_ERROR(Status)) {
-    SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
-    return Status;
-  }
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
+  SpdmCalculateTh2 (SpdmContext, SessionId, TRUE, TH2HashData);
+  SpdmGenerateSessionDataKey (SessionInfo->SecuredMessageContext, TH2HashData);
 
-  SessionInfo->SessionState = SpdmSessionStateEstablished;
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   
   return RETURN_SUCCESS;

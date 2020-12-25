@@ -40,14 +40,22 @@ SpdmGetResponseKeyUpdate (
   SPDM_KEY_UPDATE_RESPONSE     *SpdmResponse;
   SPDM_KEY_UPDATE_REQUEST      *SpdmRequest;
   SPDM_DEVICE_CONTEXT          *SpdmContext;
+  SPDM_SESSION_INFO            *SessionInfo;
 
   SpdmContext = Context;
+
   ASSERT (SpdmContext->LastSpdmRequestSessionIdValid);
   if (!SpdmContext->LastSpdmRequestSessionIdValid) {
     SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   SessionId = SpdmContext->LastSpdmRequestSessionId;
+
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   SpdmRequest = Request;
   if (RequestSize != sizeof(SPDM_KEY_UPDATE_REQUEST)) {
@@ -57,14 +65,18 @@ SpdmGetResponseKeyUpdate (
 
   switch (SpdmRequest->Header.Param1) {
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
-    SpdmCreateUpdateSessionDataKey (Context, SessionId, SpdmKeyUpdateActionRequester);
+    DEBUG ((DEBUG_INFO, "SpdmCreateUpdateSessionDataKey[%x]\n", SessionId));
+    SpdmCreateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, SpdmKeyUpdateActionRequester);
     break;
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
-    SpdmCreateUpdateSessionDataKey (Context, SessionId, SpdmKeyUpdateActionAll);
-    SpdmActivateUpdateSessionDataKey (Context, SessionId, SpdmKeyUpdateActionResponder, TRUE);
+    DEBUG ((DEBUG_INFO, "SpdmCreateUpdateSessionDataKey[%x]\n", SessionId));
+    SpdmCreateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, SpdmKeyUpdateActionAll);
+    DEBUG ((DEBUG_INFO, "SpdmActivateUpdateSessionDataKey[%x]\n", SessionId));
+    SpdmActivateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, SpdmKeyUpdateActionResponder, TRUE);
     break;
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
-    SpdmActivateUpdateSessionDataKey (Context, SessionId, SpdmKeyUpdateActionRequester, TRUE);
+    DEBUG ((DEBUG_INFO, "SpdmActivateUpdateSessionDataKey[%x]\n", SessionId));
+    SpdmActivateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, SpdmKeyUpdateActionRequester, TRUE);
     break;
   default:
     SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);

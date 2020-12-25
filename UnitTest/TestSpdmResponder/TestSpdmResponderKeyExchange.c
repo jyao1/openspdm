@@ -61,7 +61,7 @@ void TestSpdmResponderKeyExchangeCase1(void **state) {
   UINTN                OpaqueKeyExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -92,15 +92,15 @@ void TestSpdmResponderKeyExchangeCase1(void **state) {
   SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (SpdmContext, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);  
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateHandshaking);
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_KEY_EXCHANGE_RSP);  
   assert_int_equal (SpdmResponse->RspSessionID, 0xFFFF);
@@ -125,7 +125,7 @@ void TestSpdmResponderKeyExchangeCase2(void **state) {
   UINTN                OpaqueKeyExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -156,10 +156,10 @@ void TestSpdmResponderKeyExchangeCase2(void **state) {
   SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (SpdmContext, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest2Size, &mSpdmKeyExchangeRequest2, &ResponseSize, Response);
@@ -190,7 +190,7 @@ void TestSpdmResponderKeyExchangeCase3(void **state) {
   UINTN                OpaqueKeyExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->ResponseState = SpdmResponseStateBusy;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
@@ -222,10 +222,10 @@ void TestSpdmResponderKeyExchangeCase3(void **state) {
   SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (SpdmContext, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);
@@ -257,7 +257,7 @@ void TestSpdmResponderKeyExchangeCase4(void **state) {
   UINTN                OpaqueKeyExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
@@ -289,10 +289,10 @@ void TestSpdmResponderKeyExchangeCase4(void **state) {
   SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (SpdmContext, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);
@@ -325,7 +325,7 @@ void TestSpdmResponderKeyExchangeCase5(void **state) {
   UINTN                OpaqueKeyExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
@@ -357,10 +357,10 @@ void TestSpdmResponderKeyExchangeCase5(void **state) {
   SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (SpdmContext, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);
@@ -394,7 +394,7 @@ void TestSpdmResponderKeyExchangeCase6(void **state) {
   UINTN                OpaqueKeyExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
@@ -423,10 +423,10 @@ void TestSpdmResponderKeyExchangeCase6(void **state) {
   SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (SpdmContext, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);

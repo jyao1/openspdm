@@ -180,8 +180,11 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     UINTN                         BinStr0Size;
     UINT8                         BinStr2[128];
     UINTN                         BinStr2Size;
+    UINT8                         BinStr7[128];
+    UINTN                         BinStr7Size;
     UINT8                         HandshakeSecret[MAX_HASH_SIZE];
     UINT8                         ResponseHandshakeSecret[MAX_HASH_SIZE];
+    UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
 
@@ -193,7 +196,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     HashSize = GetSpdmHashSize (SpdmContext);
     HmacSize = GetSpdmHashSize (SpdmContext);
     DheKeySize = GetSpdmDheKeySize (SpdmContext);
-    OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+    OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
     TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
               HashSize +
@@ -221,7 +224,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     Ptr += HashSize;
     *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
     Ptr += sizeof(UINT16);
-    SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
+    SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
     Ptr += OpaqueKeyExchangeRspSize;
     ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -248,12 +251,15 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     Ptr += SignatureSize;
     SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
     BinStr0Size = sizeof(BinStr0);
-    BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+    SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
     SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
     BinStr2Size = sizeof(BinStr2);
-    BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+    SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
     SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
-    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseHandshakeSecret, HashSize, Ptr);
+    BinStr7Size = sizeof(BinStr7);
+    SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+    SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
+    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
     Ptr += HmacSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -285,8 +291,11 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     UINTN                         BinStr0Size;
     UINT8                         BinStr2[128];
     UINTN                         BinStr2Size;
+    UINT8                         BinStr7[128];
+    UINTN                         BinStr7Size;
     UINT8                         HandshakeSecret[MAX_HASH_SIZE];
     UINT8                         ResponseHandshakeSecret[MAX_HASH_SIZE];
+    UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
 
@@ -298,7 +307,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     HashSize = GetSpdmHashSize (SpdmContext);
     HmacSize = GetSpdmHashSize (SpdmContext);
     DheKeySize = GetSpdmDheKeySize (SpdmContext);
-    OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+    OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
     TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
               HashSize +
@@ -326,7 +335,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     Ptr += HashSize;
     *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
     Ptr += sizeof(UINT16);
-    SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
+    SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
     Ptr += OpaqueKeyExchangeRspSize;
     ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -353,12 +362,15 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     Ptr += SignatureSize;
     SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
     BinStr0Size = sizeof(BinStr0);
-    BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+    SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
     SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
     BinStr2Size = sizeof(BinStr2);
-    BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+    SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
     SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
-    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseHandshakeSecret, HashSize, Ptr);
+    BinStr7Size = sizeof(BinStr7);
+    SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+    SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
+    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
     Ptr += HmacSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -428,8 +440,11 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       UINTN                         BinStr0Size;
       UINT8                         BinStr2[128];
       UINTN                         BinStr2Size;
+      UINT8                         BinStr7[128];
+      UINTN                         BinStr7Size;
       UINT8                         HandshakeSecret[MAX_HASH_SIZE];
       UINT8                         ResponseHandshakeSecret[MAX_HASH_SIZE];
+      UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
 
@@ -441,7 +456,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       HashSize = GetSpdmHashSize (SpdmContext);
       HmacSize = GetSpdmHashSize (SpdmContext);
       DheKeySize = GetSpdmDheKeySize (SpdmContext);
-      OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+      OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
       TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
               HashSize +
@@ -469,7 +484,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       Ptr += HashSize;
       *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
       Ptr += sizeof(UINT16);
-      SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
+      SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
       Ptr += OpaqueKeyExchangeRspSize;
       ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -496,12 +511,15 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       Ptr += SignatureSize;
       SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
       BinStr0Size = sizeof(BinStr0);
-      BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+      SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
       SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
       BinStr2Size = sizeof(BinStr2);
-      BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+      SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
       SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
-      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseHandshakeSecret, HashSize, Ptr);
+      BinStr7Size = sizeof(BinStr7);
+      SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+      SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
+      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
       Ptr += HmacSize;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -580,8 +598,11 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       UINTN                         BinStr0Size;
       UINT8                         BinStr2[128];
       UINTN                         BinStr2Size;
+      UINT8                         BinStr7[128];
+      UINTN                         BinStr7Size;
       UINT8                         HandshakeSecret[MAX_HASH_SIZE];
       UINT8                         ResponseHandshakeSecret[MAX_HASH_SIZE];
+      UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
 
@@ -593,7 +614,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       HashSize = GetSpdmHashSize (SpdmContext);
       HmacSize = GetSpdmHashSize (SpdmContext);
       DheKeySize = GetSpdmDheKeySize (SpdmContext);
-      OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+      OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
       TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
               HashSize +
@@ -621,7 +642,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       Ptr += HashSize;
       *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
       Ptr += sizeof(UINT16);
-      SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
+      SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
       Ptr += OpaqueKeyExchangeRspSize;
       ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -648,12 +669,15 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       Ptr += SignatureSize;
       SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
       BinStr0Size = sizeof(BinStr0);
-      BinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+      SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
       SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
       BinStr2Size = sizeof(BinStr2);
-      BinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+      SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
       SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
-      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseHandshakeSecret, HashSize, Ptr);
+      BinStr7Size = sizeof(BinStr7);
+      SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+      SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
+      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
       Ptr += HmacSize;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -680,7 +704,7 @@ void TestSpdmRequesterKeyExchangeCase1(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -717,7 +741,7 @@ void TestSpdmRequesterKeyExchangeCase2(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -738,7 +762,7 @@ void TestSpdmRequesterKeyExchangeCase2(void **state) {
              0, &SessionId, &HeartbeatPeriod, &SlotIdParam, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SessionId, 0xFFFFFFFF);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateHandshaking);
   free(Data);
 }
 
@@ -756,7 +780,7 @@ void TestSpdmRequesterKeyExchangeCase3(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
@@ -791,7 +815,7 @@ void TestSpdmRequesterKeyExchangeCase4(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -828,7 +852,7 @@ void TestSpdmRequesterKeyExchangeCase5(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -865,7 +889,7 @@ void TestSpdmRequesterKeyExchangeCase6(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -886,7 +910,7 @@ void TestSpdmRequesterKeyExchangeCase6(void **state) {
              0, &SessionId, &HeartbeatPeriod, &SlotIdParam, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SessionId, 0xFFFEFFFE);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateHandshaking);
   free(Data);
 }
 
@@ -904,7 +928,7 @@ void TestSpdmRequesterKeyExchangeCase7(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -942,7 +966,7 @@ void TestSpdmRequesterKeyExchangeCase8(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -979,7 +1003,7 @@ void TestSpdmRequesterKeyExchangeCase9(void **state) {
   UINTN                HashSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -1000,7 +1024,7 @@ void TestSpdmRequesterKeyExchangeCase9(void **state) {
              0, &SessionId, &HeartbeatPeriod, &SlotIdParam, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SessionId, 0xFFFDFFFD);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateHandshaking);
   free(Data);
 }
 

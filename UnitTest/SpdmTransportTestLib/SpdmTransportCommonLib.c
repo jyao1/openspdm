@@ -148,6 +148,7 @@ SpdmTransportTestEncodeMessage (
   UINT8                               SecuredMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               SecuredMessageSize;
   SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+  VOID                                *SecuredMessageContext;
 
   SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
   SpdmSecuredMessageCallbacks.GetSequenceNumber = TestGetSequenceNumber;
@@ -159,6 +160,12 @@ SpdmTransportTestEncodeMessage (
 
   TransportEncodeMessage = TestEncodeMessage;
   if (SessionId != NULL) {
+    
+    SecuredMessageContext = SpdmGetSessionKeyInfoViaSessionId (SpdmContext, *SessionId);
+    if (SecuredMessageContext == NULL) {
+      return RETURN_UNSUPPORTED;
+    }
+
     if (!IsAppMessage) {
       // SPDM message to APP message
       AppMessage = AppMessageBuffer;
@@ -181,7 +188,7 @@ SpdmTransportTestEncodeMessage (
     // APP message to secured message
     SecuredMessageSize = sizeof(SecuredMessage);
     Status = SpdmEncodeSecuredMessage (
-               SpdmContext,
+               SecuredMessageContext,
                *SessionId,
                IsRequester,
                AppMessageSize,
@@ -272,6 +279,7 @@ SpdmTransportTestDecodeMessage (
   UINT8                               AppMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               AppMessageSize;
   SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+  VOID                                *SecuredMessageContext;
 
   SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
   SpdmSecuredMessageCallbacks.GetSequenceNumber = TestGetSequenceNumber;
@@ -300,10 +308,16 @@ SpdmTransportTestDecodeMessage (
 
   if (SecuredMessageSessionId != NULL) {
     *SessionId = SecuredMessageSessionId;
+    
+    SecuredMessageContext = SpdmGetSessionKeyInfoViaSessionId (SpdmContext, *SecuredMessageSessionId);
+    if (SecuredMessageContext == NULL) {
+      return RETURN_UNSUPPORTED;
+    }
+
     // Secured message to APP message
     AppMessageSize = sizeof(AppMessage);
     Status = SpdmDecodeSecuredMessage (
-               SpdmContext,
+               SecuredMessageContext,
                *SecuredMessageSessionId,
                IsRequester,
                SecuredMessageSize,

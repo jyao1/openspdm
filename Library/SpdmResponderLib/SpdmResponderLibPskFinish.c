@@ -42,6 +42,7 @@ SpdmGetResponsePskFinish (
   SPDM_PSK_FINISH_RESPONSE     *SpdmResponse;
   SPDM_DEVICE_CONTEXT          *SpdmContext;
   SPDM_SESSION_INFO            *SessionInfo;
+  UINT8                        TH2HashData[64];
 
   SpdmContext = Context;
 
@@ -86,7 +87,10 @@ SpdmGetResponsePskFinish (
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)Request + RequestSize - HmacSize, HmacSize);
   
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, *ResponseSize);
-  SpdmGenerateSessionDataKey (SpdmContext, SessionId, FALSE);
+
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
+  SpdmCalculateTh2 (SpdmContext, SessionId, FALSE, TH2HashData);
+  SpdmGenerateSessionDataKey (SessionInfo->SecuredMessageContext, TH2HashData);
 
   return RETURN_SUCCESS;
 }

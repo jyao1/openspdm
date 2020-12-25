@@ -65,7 +65,7 @@ void TestSpdmResponderVersionCase1(void **state) {
   SPDM_VERSION_RESPONSE *SpdmResponse;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
 
   ResponseSize = sizeof(Response);
@@ -91,7 +91,7 @@ void TestSpdmResponderVersionCase2(void **state) {
   SPDM_VERSION_RESPONSE *SpdmResponse;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
 
   ResponseSize = sizeof(Response);
@@ -119,7 +119,7 @@ void TestSpdmResponderVersionCase3(void **state) {
   SPDM_VERSION_RESPONSE *SpdmResponse;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->ResponseState = SpdmResponseStateBusy;
 
@@ -149,7 +149,7 @@ void TestSpdmResponderVersionCase4(void **state) {
   SPDM_VERSION_RESPONSE *SpdmResponse;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
 
@@ -178,7 +178,7 @@ void TestSpdmResponderVersionCase5(void **state) {
   SPDM_ERROR_DATA_RESPONSE_NOT_READY *ErrorData;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
 
@@ -210,7 +210,7 @@ void TestSpdmResponderVersionCase6(void **state) {
   SPDM_VERSION_RESPONSE *SpdmResponse;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
 
   ResponseSize = sizeof(Response);
@@ -238,7 +238,7 @@ void TestSpdmResponderVersionCase7(void **state) {
   SPDM_VERSION_RESPONSE *SpdmResponse;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
 
   ResponseSize = sizeof(Response);

@@ -145,6 +145,7 @@ SpdmTransportPciDoeEncodeMessage (
   UINT8                               SecuredMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               SecuredMessageSize;
   SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+  VOID                                *SecuredMessageContext;
 
   SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
   SpdmSecuredMessageCallbacks.GetSequenceNumber = PciDoeGetSequenceNumber;
@@ -156,10 +157,16 @@ SpdmTransportPciDoeEncodeMessage (
 
   TransportEncodeMessage = PciDoeEncodeMessage;
   if (SessionId != NULL) {
+    
+    SecuredMessageContext = SpdmGetSessionKeyInfoViaSessionId (SpdmContext, *SessionId);
+    if (SecuredMessageContext == NULL) {
+      return RETURN_UNSUPPORTED;
+    }
+
     // message to secured message
     SecuredMessageSize = sizeof(SecuredMessage);
     Status = SpdmEncodeSecuredMessage (
-               SpdmContext,
+               SecuredMessageContext,
                *SessionId,
                IsRequester,
                MessageSize,
@@ -248,6 +255,7 @@ SpdmTransportPciDoeDecodeMessage (
   UINT8                               SecuredMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                               SecuredMessageSize;
   SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+  VOID                                *SecuredMessageContext;
 
   SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
   SpdmSecuredMessageCallbacks.GetSequenceNumber = PciDoeGetSequenceNumber;
@@ -277,9 +285,15 @@ SpdmTransportPciDoeDecodeMessage (
 
   if (SecuredMessageSessionId != NULL) {
     *SessionId = SecuredMessageSessionId;
+    
+    SecuredMessageContext = SpdmGetSessionKeyInfoViaSessionId (SpdmContext, *SecuredMessageSessionId);
+    if (SecuredMessageContext == NULL) {
+      return RETURN_UNSUPPORTED;
+    }
+
     // Secured message to message
     Status = SpdmDecodeSecuredMessage (
-               SpdmContext,
+               SecuredMessageContext,
                *SecuredMessageSessionId,
                IsRequester,
                SecuredMessageSize,

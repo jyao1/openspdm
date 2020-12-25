@@ -45,6 +45,7 @@ SpdmGetResponseFinish (
   SPDM_FINISH_RESPONSE     *SpdmResponse;
   SPDM_DEVICE_CONTEXT      *SpdmContext;
   SPDM_SESSION_INFO        *SessionInfo;
+  UINT8                    TH2HashData[64];
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -145,7 +146,10 @@ SpdmGetResponseFinish (
     AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST), HmacSize);
   }
 
-  SpdmGenerateSessionDataKey (SpdmContext, SessionId, FALSE);
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
+  SpdmCalculateTh2 (SpdmContext, SessionId, FALSE, TH2HashData);
+  SpdmGenerateSessionDataKey (SessionInfo->SecuredMessageContext, TH2HashData);
+
   SpdmContext->SpdmCmdReceiveState |= SPDM_FINISH_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;

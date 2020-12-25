@@ -7,22 +7,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Library/SpdmSecuredMessageLib.h>
-#include <IndustryStandard/SpdmSecuredMessage.h>
+#include "SpdmSecuredMessageLibInternal.h"
 
 /**
   Return the size in bytes of opaque data version selection.
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response generation.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
-
   @return the size in bytes of opaque data version selection.
 **/
 UINTN
 EFIAPI
 SpdmGetOpaqueDataVersionSelectionDataSize (
-  IN     VOID                 *SpdmContext
+  VOID
   )
 {
   UINTN  Size;
@@ -39,14 +36,12 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request generation.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
-
   @return the size in bytes of opaque data supproted version.
 **/
 UINTN
 EFIAPI
 SpdmGetOpaqueDataSupportedVersionDataSize (
-  IN     VOID                 *SpdmContext
+  VOID
   )
 {
   UINTN  Size;
@@ -64,7 +59,6 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request generation.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  DataOutSize                  Size in bytes of the DataOut.
                                        On input, it means the size in bytes of DataOut buffer.
                                        On output, it means the size in bytes of copied DataOut buffer if RETURN_SUCCESS is returned,
@@ -77,7 +71,6 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
 RETURN_STATUS
 EFIAPI
 SpdmBuildOpaqueDataSupportedVersionData (
-  IN     VOID                 *SpdmContext,
   IN OUT UINTN                *DataOutSize,
      OUT VOID                 *DataOut
   )
@@ -89,7 +82,7 @@ SpdmBuildOpaqueDataSupportedVersionData (
   SPDM_VERSION_NUMBER                                *VersionsList;
   VOID                                               *End;
 
-  FinalDataSize = SpdmGetOpaqueDataSupportedVersionDataSize(SpdmContext);
+  FinalDataSize = SpdmGetOpaqueDataSupportedVersionDataSize();
   if (*DataOutSize < FinalDataSize) {
     *DataOutSize = FinalDataSize;
     return RETURN_BUFFER_TOO_SMALL;
@@ -129,7 +122,6 @@ SpdmBuildOpaqueDataSupportedVersionData (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request parsing in responder.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  DataInSize                   Size in bytes of the DataIn.
   @param  DataIn                       A pointer to the buffer to store the opaque data supported version.
 
@@ -139,7 +131,6 @@ SpdmBuildOpaqueDataSupportedVersionData (
 RETURN_STATUS
 EFIAPI
 SpdmProcessOpaqueDataSupportedVersionData (
-  IN     VOID                 *SpdmContext,
   IN     UINTN                DataInSize,
   IN     VOID                 *DataIn
   )
@@ -149,7 +140,7 @@ SpdmProcessOpaqueDataSupportedVersionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION   *OpaqueElementSupportVersion;
   SPDM_VERSION_NUMBER                                *VersionsList;
 
-  if (DataInSize != SpdmGetOpaqueDataSupportedVersionDataSize(SpdmContext)) {
+  if (DataInSize != SpdmGetOpaqueDataSupportedVersionDataSize()) {
     return RETURN_UNSUPPORTED;
   }
   GeneralOpaqueDataTableHeader = DataIn;
@@ -185,7 +176,6 @@ SpdmProcessOpaqueDataSupportedVersionData (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response generation.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  DataOutSize                  Size in bytes of the DataOut.
                                        On input, it means the size in bytes of DataOut buffer.
                                        On output, it means the size in bytes of copied DataOut buffer if RETURN_SUCCESS is returned,
@@ -198,7 +188,6 @@ SpdmProcessOpaqueDataSupportedVersionData (
 RETURN_STATUS
 EFIAPI
 SpdmBuildOpaqueDataVersionSelectionData (
-  IN     VOID                 *SpdmContext,
   IN OUT UINTN                *DataOutSize,
      OUT VOID                 *DataOut
   )
@@ -209,7 +198,7 @@ SpdmBuildOpaqueDataVersionSelectionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
   VOID                                               *End;
 
-  FinalDataSize = SpdmGetOpaqueDataVersionSelectionDataSize(SpdmContext);
+  FinalDataSize = SpdmGetOpaqueDataVersionSelectionDataSize();
   if (*DataOutSize < FinalDataSize) {
     *DataOutSize = FinalDataSize;
     return RETURN_BUFFER_TOO_SMALL;
@@ -246,7 +235,6 @@ SpdmBuildOpaqueDataVersionSelectionData (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response parsing in requester.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  DataInSize                   Size in bytes of the DataIn.
   @param  DataIn                       A pointer to the buffer to store the opaque data version selection.
 
@@ -256,7 +244,6 @@ SpdmBuildOpaqueDataVersionSelectionData (
 RETURN_STATUS
 EFIAPI
 SpdmProcessOpaqueDataVersionSelectionData (
-  IN     VOID                 *SpdmContext,
   IN     UINTN                DataInSize,
   IN     VOID                 *DataIn
   )
@@ -265,7 +252,7 @@ SpdmProcessOpaqueDataVersionSelectionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
   SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
 
-  if (DataInSize != SpdmGetOpaqueDataVersionSelectionDataSize(SpdmContext)) {
+  if (DataInSize != SpdmGetOpaqueDataVersionSelectionDataSize()) {
     return RETURN_UNSUPPORTED;
   }
   GeneralOpaqueDataTableHeader = DataIn;

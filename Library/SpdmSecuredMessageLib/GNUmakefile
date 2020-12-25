@@ -34,6 +34,7 @@ SOURCE_DIR = $(WORKSPACE)/Library/$(MODULE_NAME)
 OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmSecuredMessageLib.o \
     $(OUTPUT_DIR)/SpdmSecuredMessageLibOpaqueData.o \
+    $(OUTPUT_DIR)/SpdmSecuredMessageLibSessionKeys.o \
 
 
 INC =  \
@@ -73,6 +74,9 @@ $(OUTPUT_DIR)/SpdmSecuredMessageLib.o : $(SOURCE_DIR)/SpdmSecuredMessageLib.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmSecuredMessageLibOpaqueData.o : $(SOURCE_DIR)/SpdmSecuredMessageLibOpaqueData.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmSecuredMessageLibSessionKeys.o : $(SOURCE_DIR)/SpdmSecuredMessageLibSessionKeys.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

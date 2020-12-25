@@ -72,7 +72,7 @@ SpdmSendReceiveEndSession (
 
   SpdmFreeSessionId (SpdmContext, SessionId);
  
-  SessionInfo->SessionState = SpdmSessionStateNotStarted;
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateNotStarted);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   
   return RETURN_SUCCESS;

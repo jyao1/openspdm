@@ -35,7 +35,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmCommonLibContextData.o \
     $(OUTPUT_DIR)/SpdmCommonLibCrypto.o \
     $(OUTPUT_DIR)/SpdmCommonLibCryptoService.o \
-    $(OUTPUT_DIR)/SpdmCommonLibSessionKeys.o \
+    $(OUTPUT_DIR)/SpdmCommonLibSession.o \
     $(OUTPUT_DIR)/SpdmCommonLibSupport.o \
 
 
@@ -81,7 +81,7 @@ $(OUTPUT_DIR)/SpdmCommonLibCrypto.o : $(SOURCE_DIR)/SpdmCommonLibCrypto.c
 $(OUTPUT_DIR)/SpdmCommonLibCryptoService.o : $(SOURCE_DIR)/SpdmCommonLibCryptoService.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmCommonLibSessionKeys.o : $(SOURCE_DIR)/SpdmCommonLibSessionKeys.c
+$(OUTPUT_DIR)/SpdmCommonLibSession.o : $(SOURCE_DIR)/SpdmCommonLibSession.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmCommonLibSupport.o : $(SOURCE_DIR)/SpdmCommonLibSupport.c

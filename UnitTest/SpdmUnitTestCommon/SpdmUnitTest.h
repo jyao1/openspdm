@@ -54,7 +54,7 @@ typedef struct {
   BOOLEAN                           IsRequester;
   SPDM_DEVICE_SEND_MESSAGE_FUNC     SendMessage;
   SPDM_DEVICE_RECEIVE_MESSAGE_FUNC  ReceiveMessage;
-  SPDM_DEVICE_CONTEXT               SpdmContext;
+  VOID                              *SpdmContext;
   UINT32                            CaseId;
 } SPDM_TEST_CONTEXT;
 

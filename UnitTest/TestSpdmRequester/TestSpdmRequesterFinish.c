@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 STATIC UINTN                  LocalBufferSize;
 STATIC UINT8                  LocalBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
+UINT8 mDummyBuffer[MAX_HASH_SIZE];
+
 RETURN_STATUS
 EFIAPI
 SpdmRequesterFinishTestSendMessage (
@@ -121,7 +123,7 @@ SpdmRequesterFinishTestReceiveMessage (
     HmacSize = GetSpdmHashSize (SpdmContext);
     TempBufSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
     SpdmResponse = (VOID *)TempBuf;
- 
+
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
     SpdmResponse->Header.RequestResponseCode = SPDM_FINISH_RSP;
     SpdmResponse->Header.Param1 = 0;
@@ -162,7 +164,7 @@ SpdmRequesterFinishTestReceiveMessage (
     UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;    
-    
+
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
@@ -250,7 +252,7 @@ SpdmRequesterFinishTestReceiveMessage (
       UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
-      
+
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
@@ -280,7 +282,7 @@ SpdmRequesterFinishTestReceiveMessage (
       SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
       Ptr += HmacSize;
       free(Data);
- 
+
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
   }
@@ -347,7 +349,7 @@ SpdmRequesterFinishTestReceiveMessage (
       UINT8                         ResponseFinishedKey[MAX_HASH_SIZE];
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
-      
+
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
@@ -401,7 +403,7 @@ void TestSpdmRequesterFinishCase1(void **state) {
   SPDM_SESSION_INFO    *SessionInfo;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -419,15 +421,11 @@ void TestSpdmRequesterFinishCase1(void **state) {
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
-  SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->MutAuthRequested = 0;
-  SessionInfo->SessionTranscript.MessageF.BufferSize = 0;
-  SessionInfo->HashSize = GetSpdmHashSize (SpdmContext);
-  SessionInfo->DheKeySize = GetSpdmDheKeySize (SpdmContext);  
-  SetMem (SessionInfo->HandshakeSecret.ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
+  SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
+  HashSize = GetSpdmHashSize(SpdmContext);
+  SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
+  SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
@@ -448,7 +446,7 @@ void TestSpdmRequesterFinishCase2(void **state) {
   SPDM_SESSION_INFO    *SessionInfo;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -466,20 +464,16 @@ void TestSpdmRequesterFinishCase2(void **state) {
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
-  SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->MutAuthRequested = 0;
-  SessionInfo->SessionTranscript.MessageF.BufferSize = 0;
-  SessionInfo->HashSize = GetSpdmHashSize (SpdmContext);
-  SessionInfo->DheKeySize = GetSpdmDheKeySize (SpdmContext);  
-  SetMem (SessionInfo->HandshakeSecret.ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
+  SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
+  HashSize = GetSpdmHashSize(SpdmContext);
+  SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
+  SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateEstablished);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateEstablished);
   free(Data);
 }
 
@@ -496,7 +490,7 @@ void TestSpdmRequesterFinishCase3(void **state) {
   SPDM_SESSION_INFO    *SessionInfo;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;  
@@ -511,15 +505,11 @@ void TestSpdmRequesterFinishCase3(void **state) {
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
-  SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->MutAuthRequested = 0;
-  SessionInfo->SessionTranscript.MessageF.BufferSize = 0;
-  SessionInfo->HashSize = GetSpdmHashSize (SpdmContext);
-  SessionInfo->DheKeySize = GetSpdmDheKeySize (SpdmContext);  
-  SetMem (SessionInfo->HandshakeSecret.ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
+  SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
+  HashSize = GetSpdmHashSize(SpdmContext);
+  SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
+  SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
@@ -540,7 +530,7 @@ void TestSpdmRequesterFinishCase4(void **state) {
   SPDM_SESSION_INFO    *SessionInfo;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -558,15 +548,11 @@ void TestSpdmRequesterFinishCase4(void **state) {
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
-  SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->MutAuthRequested = 0;
-  SessionInfo->SessionTranscript.MessageF.BufferSize = 0;
-  SessionInfo->HashSize = GetSpdmHashSize (SpdmContext);
-  SessionInfo->DheKeySize = GetSpdmDheKeySize (SpdmContext);  
-  SetMem (SessionInfo->HandshakeSecret.ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
+  SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
+  HashSize = GetSpdmHashSize(SpdmContext);
+  SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
+  SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
@@ -587,7 +573,7 @@ void TestSpdmRequesterFinishCase5(void **state) {
   SPDM_SESSION_INFO    *SessionInfo;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -605,15 +591,11 @@ void TestSpdmRequesterFinishCase5(void **state) {
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
-  SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->MutAuthRequested = 0;
-  SessionInfo->SessionTranscript.MessageF.BufferSize = 0;
-  SessionInfo->HashSize = GetSpdmHashSize (SpdmContext);
-  SessionInfo->DheKeySize = GetSpdmDheKeySize (SpdmContext);  
-  SetMem (SessionInfo->HandshakeSecret.ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
+  SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
+  HashSize = GetSpdmHashSize(SpdmContext);
+  SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
+  SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
@@ -634,7 +616,7 @@ void TestSpdmRequesterFinishCase6(void **state) {
   SPDM_SESSION_INFO    *SessionInfo;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -652,20 +634,16 @@ void TestSpdmRequesterFinishCase6(void **state) {
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
-  SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->MutAuthRequested = 0;
-  SessionInfo->SessionTranscript.MessageF.BufferSize = 0;
-  SessionInfo->HashSize = GetSpdmHashSize (SpdmContext);
-  SessionInfo->DheKeySize = GetSpdmDheKeySize (SpdmContext);  
-  SetMem (SessionInfo->HandshakeSecret.ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
+  SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
+  HashSize = GetSpdmHashSize(SpdmContext);
+  SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
+  SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateEstablished);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateEstablished);
   free(Data);
 }
 
@@ -682,7 +660,7 @@ void TestSpdmRequesterFinishCase7(void **state) {
   SPDM_SESSION_INFO    *SessionInfo;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -700,15 +678,11 @@ void TestSpdmRequesterFinishCase7(void **state) {
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
-  SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->MutAuthRequested = 0;
-  SessionInfo->SessionTranscript.MessageF.BufferSize = 0;
-  SessionInfo->HashSize = GetSpdmHashSize (SpdmContext);
-  SessionInfo->DheKeySize = GetSpdmDheKeySize (SpdmContext);  
-  SetMem (SessionInfo->HandshakeSecret.ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
+  SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
+  HashSize = GetSpdmHashSize(SpdmContext);
+  SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
+  SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
@@ -730,7 +704,7 @@ void TestSpdmRequesterFinishCase8(void **state) {
   SPDM_SESSION_INFO    *SessionInfo;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -748,15 +722,11 @@ void TestSpdmRequesterFinishCase8(void **state) {
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
-  SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->MutAuthRequested = 0;
-  SessionInfo->SessionTranscript.MessageF.BufferSize = 0;
-  SessionInfo->HashSize = GetSpdmHashSize (SpdmContext);
-  SessionInfo->DheKeySize = GetSpdmDheKeySize (SpdmContext);  
-  SetMem (SessionInfo->HandshakeSecret.ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
+  SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
+  HashSize = GetSpdmHashSize(SpdmContext);
+  SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
+  SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
@@ -777,7 +747,7 @@ void TestSpdmRequesterFinishCase9(void **state) {
   SPDM_SESSION_INFO    *SessionInfo;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -795,20 +765,16 @@ void TestSpdmRequesterFinishCase9(void **state) {
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
-  ZeroMem (SessionInfo, sizeof(*SessionInfo));
-  SessionInfo->SessionId = SessionId;
-  SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
-  SessionInfo->MutAuthRequested = 0;
-  SessionInfo->SessionTranscript.MessageF.BufferSize = 0;
-  SessionInfo->HashSize = GetSpdmHashSize (SpdmContext);
-  SessionInfo->DheKeySize = GetSpdmDheKeySize (SpdmContext);  
-  SetMem (SessionInfo->HandshakeSecret.ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
+  SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
+  HashSize = GetSpdmHashSize(SpdmContext);
+  SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
+  SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SlotIdParam = 0;
   Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
   assert_int_equal (Status, RETURN_SUCCESS); 
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateEstablished);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateEstablished);
   free(Data);
 }
 

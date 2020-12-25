@@ -34,6 +34,7 @@ SOURCE_DIR = $(WORKSPACE)\Library\$(MODULE_NAME)
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmSecuredMessageLib.obj \
     $(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj \
+    $(OUTPUT_DIR)\SpdmSecuredMessageLibSessionKeys.obj \
 
 
 INC =  \
@@ -74,6 +75,9 @@ $(OUTPUT_DIR)\SpdmSecuredMessageLib.obj : $(SOURCE_DIR)\SpdmSecuredMessageLib.c
 
 $(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
+
+$(OUTPUT_DIR)\SpdmSecuredMessageLibSessionKeys.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibSessionKeys.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibSessionKeys.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

@@ -30,10 +30,11 @@ SetupSpdmTestContext (
 int SpdmUnitTestGroupSetup(void **state)
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
-  SPDM_DEVICE_CONTEXT     *SpdmContext;
+  VOID                    *SpdmContext;
 
   SpdmTestContext = mSpdmTestContext;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmTestContext->SpdmContext = (VOID *)malloc (SpdmGetContextSize());
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xFFFFFFFF;
 
   SpdmInitContext (SpdmContext);
@@ -49,6 +50,8 @@ int SpdmUnitTestGroupTeardown(void **state)
   SPDM_TEST_CONTEXT       *SpdmTestContext;
 
   SpdmTestContext = *state;
+  free (SpdmTestContext->SpdmContext);
+  SpdmTestContext->SpdmContext = NULL;
   SpdmTestContext->CaseId = 0xFFFFFFFF;
   return 0;
 }

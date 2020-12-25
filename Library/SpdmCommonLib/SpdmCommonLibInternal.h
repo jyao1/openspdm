@@ -11,18 +11,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define __SPDM_COMMON_LIB_INTERNAL_H__
 
 #include <Library/SpdmCommonLib.h>
+#include <Library/SpdmSecuredMessageLib.h>
 
-#define BIN_CONCAT_LABEL "spdm1.1"
-#define BIN_STR_0_LABEL  "derived"
-#define BIN_STR_1_LABEL  "req hs data"
-#define BIN_STR_2_LABEL  "rsp hs data"
-#define BIN_STR_3_LABEL  "req app data"
-#define BIN_STR_4_LABEL  "rsp app data"
-#define BIN_STR_5_LABEL  "key"
-#define BIN_STR_6_LABEL  "iv"
-#define BIN_STR_7_LABEL  "finished"
-#define BIN_STR_8_LABEL  "exp master"
-#define BIN_STR_9_LABEL  "traffic upd"
+#define INVALID_SESSION_ID  0
 
 typedef struct {
   UINT8                CTExponent;
@@ -77,7 +68,7 @@ typedef struct {
   // PSK provision locally
   //
   UINTN                           PskHintSize;
-  UINT8                           *PskHint;
+  VOID                            *PskHint;
   //
   // Use my PSK to HKDF
   //
@@ -223,53 +214,12 @@ typedef struct {
   //
 } SPDM_SESSION_TRANSCRIPT;
 
-#define INVALID_SESSION_ID  0
-
-typedef struct {
-  UINT8                DheSecret[MAX_DHE_KEY_SIZE];
-  UINT8                HandshakeSecret[MAX_HASH_SIZE];
-  UINT8                MasterSecret[MAX_HASH_SIZE];
-} SPDM_SESSION_INFO_MASTER_SECRET;
-
-typedef struct {
-  UINT8                RequestHandshakeSecret[MAX_HASH_SIZE];
-  UINT8                ResponseHandshakeSecret[MAX_HASH_SIZE];
-  UINT8                ExportMasterSecret[MAX_HASH_SIZE];
-  UINT8                RequestFinishedKey[MAX_HASH_SIZE];
-  UINT8                ResponseFinishedKey[MAX_HASH_SIZE];
-  UINT8                RequestHandshakeEncryptionKey[MAX_AEAD_KEY_SIZE];
-  UINT8                RequestHandshakeSalt[MAX_AEAD_IV_SIZE];
-  UINT64               RequestHandshakeSequenceNumber;
-  UINT8                ResponseHandshakeEncryptionKey[MAX_AEAD_KEY_SIZE];
-  UINT8                ResponseHandshakeSalt[MAX_AEAD_IV_SIZE];
-  UINT64               ResponseHandshakeSequenceNumber;
-} SPDM_SESSION_INFO_HANDSHAKE_SECRET;
-
-typedef struct {
-  UINT8                RequestDataSecret[MAX_HASH_SIZE];
-  UINT8                ResponseDataSecret[MAX_HASH_SIZE];
-  UINT8                RequestDataEncryptionKey[MAX_AEAD_KEY_SIZE];
-  UINT8                RequestDataSalt[MAX_AEAD_IV_SIZE];
-  UINT64               RequestDataSequenceNumber;
-  UINT8                ResponseDataEncryptionKey[MAX_AEAD_KEY_SIZE];
-  UINT8                ResponseDataSalt[MAX_AEAD_IV_SIZE];
-  UINT64               ResponseDataSequenceNumber;
-} SPDM_SESSION_INFO_APPLICATION_SECRET;
-
 typedef struct {
   UINT32                               SessionId;
   BOOLEAN                              UsePsk;
   UINT8                                MutAuthRequested;
-  SPDM_SESSION_STATE                   SessionState;
-  UINTN                                DheKeySize;
-  UINTN                                HashSize;
-  UINTN                                AeadKeySize;
-  UINTN                                AeadIvSize;
-  SPDM_SESSION_INFO_MASTER_SECRET      MasterSecret;
-  SPDM_SESSION_INFO_HANDSHAKE_SECRET   HandshakeSecret;
-  SPDM_SESSION_INFO_APPLICATION_SECRET ApplicationSecret;
-  SPDM_SESSION_INFO_APPLICATION_SECRET ApplicationSecretBackup;
   SPDM_SESSION_TRANSCRIPT              SessionTranscript;
+  VOID                                 *SecuredMessageContext;
 } SPDM_SESSION_INFO;
 
 typedef struct {
@@ -997,89 +947,6 @@ InitManagedBuffer (
   IN UINTN               MaxBufferSize
   );
 
-RETURN_STATUS
-BinConcat (
-  IN CHAR8     *Label,
-  IN UINTN     LabelSize,
-  IN UINT8     *Context,
-  IN UINT16    Length,
-  IN UINTN     HashSize,
-  OUT UINT8    *OutBin,
-  IN OUT UINTN *OutBinSize
-  );
-
-/**
-  This function generates SPDM HandshakeKey for a session.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionId                    The SPDM session ID.
-  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
-
-  @retval RETURN_SUCCESS  SPDM HandshakeKey for a session is generated.
-**/
-RETURN_STATUS
-SpdmGenerateSessionHandshakeKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT32                       SessionId,
-  IN BOOLEAN                      IsRequester
-  );
-
-/**
-  This function generates SPDM DataKey for a session.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionId                    The SPDM session ID.
-  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
-
-  @retval RETURN_SUCCESS  SPDM DataKey for a session is generated.
-**/
-RETURN_STATUS
-SpdmGenerateSessionDataKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT32                       SessionId,
-  IN BOOLEAN                      IsRequester
-  );
-
-typedef enum {
-  SpdmKeyUpdateActionRequester = 0x1,
-  SpdmKeyUpdateActionResponder = 0x2,
-  SpdmKeyUpdateActionAll       = 0x3,
-} SPDM_KEY_UPDATE_ACTION;
-
-/**
-  This function creates the updates of SPDM DataKey for a session.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionId                    The SPDM session ID.
-  @param  Action                       Indicate of the key update action.
-
-  @retval RETURN_SUCCESS  SPDM DataKey update is created.
-**/
-RETURN_STATUS
-SpdmCreateUpdateSessionDataKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT32                       SessionId,
-  IN SPDM_KEY_UPDATE_ACTION       Action
-  );
-
-/**
-  This function activates the update of SPDM DataKey for a session.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionId                    The SPDM session ID.
-  @param  Action                       Indicate of the key update action.
-  @param  UseNewKey                    Indicate if the new key should be used.
-
-  @retval RETURN_SUCCESS  SPDM DataKey update is activated.
-**/
-RETURN_STATUS
-SpdmActivateUpdateSessionDataKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN UINT32                       SessionId,
-  IN SPDM_KEY_UPDATE_ACTION       Action,
-  IN BOOLEAN                      UseNewKey
-  );
-
 /**
   This function gets the session info via session ID.
 
@@ -1095,6 +962,20 @@ SpdmGetSessionInfoViaSessionId (
   );
 
 /**
+  This function initializes the session info.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+**/
+VOID
+SpdmSessionInfoInit (
+  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
+  IN     SPDM_SESSION_INFO       *SessionInfo,
+  IN     UINT32                  SessionId,
+  IN     BOOLEAN                 UsePsk
+  );
+
+/**
   This function assigns a new session ID.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -1105,7 +986,8 @@ SpdmGetSessionInfoViaSessionId (
 SPDM_SESSION_INFO *
 SpdmAssignSessionId (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     UINT32                    SessionId
+  IN     UINT32                    SessionId,
+  IN     BOOLEAN                   UsePsk
   );
 
 /**
@@ -1659,6 +1541,42 @@ SpdmVerifyPskFinishReqHmac (
   IN  SPDM_SESSION_INFO         *SessionInfo,
   IN  UINT8                     *Hmac,
   IN  UINTN                     HmacSize
+  );
+
+/*
+  This function calculates TH1 hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
+  @param  TH1HashData                  TH1 hash
+
+  @retval RETURN_SUCCESS  TH1 hash is calculated.
+*/
+RETURN_STATUS
+SpdmCalculateTh1 (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN UINT32                       SessionId,
+  IN BOOLEAN                      IsRequester,
+  OUT UINT8                       *TH1HashData
+  );
+
+/*
+  This function calculates TH2 hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
+  @param  TH1HashData                  TH2 hash
+
+  @retval RETURN_SUCCESS  TH2 hash is calculated.
+*/
+RETURN_STATUS
+SpdmCalculateTh2 (
+  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN UINT32                       SessionId,
+  IN BOOLEAN                      IsRequester,
+  OUT UINT8                       *TH2HashData
   );
 
 #endif

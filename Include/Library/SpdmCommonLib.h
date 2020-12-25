@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
+#include <Library/SpdmSecuredMessageLib.h>
 
 //
 // Connection: When a host sends messgages to a device, they create a connection.
@@ -37,12 +38,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define SPDM_NONCE_SIZE           32
 #define SPDM_RANDOM_DATA_SIZE     32
-
-#define MAX_DHE_KEY_SIZE    512
-#define MAX_ASYM_KEY_SIZE   512
-#define MAX_HASH_SIZE       64
-#define MAX_AEAD_KEY_SIZE   32
-#define MAX_AEAD_IV_SIZE    12
 
 #define SPDM_STATUS_SUCCESS                          0
 #define SPDM_STATUS_ERROR                            BIT31
@@ -100,36 +95,6 @@ typedef enum {
   //
   SpdmDataPskHint,
   //
-  // Session Type
-  //
-  SpdmDataSessionType,
-  //
-  // Session State
-  //
-  SpdmDataSessionState,
-  //
-  // Export Master Secret
-  //
-  SpdmDataExportMasterSecret,
-  //
-  // Derived Key & Salt
-  //
-  SpdmDataRequestHandshakeEncryptionKey,
-  SpdmDataRequestHandshakeSalt,
-  SpdmDataResponseHandshakeEncryptionKey,
-  SpdmDataResponseHandshakeSalt,
-  SpdmDataRequestDataEncryptionKey,
-  SpdmDataRequestDataSalt,
-  SpdmDataResponseDataEncryptionKey,
-  SpdmDataResponseDataSalt,
-  //
-  // Sequence Number
-  //
-  SpdmDataRequestHandshakeSequenceNumber,
-  SpdmDataResponseHandshakeSequenceNumber,
-  SpdmDataRequestDataSequenceNumber,
-  SpdmDataResponseDataSequenceNumber,
-  //
   // OpaqueData
   //
   SpdmDataOpaqueChallengeAuthRsp,
@@ -146,35 +111,6 @@ typedef enum {
 } SPDM_DATA_TYPE;
 
 typedef enum {
-  //
-  // Below per session data is defined for debug purpose
-  // GET-only for debug purpose.
-  //
-  // NOTE: This is persession data. Need input SessionId in the input buffer
-  //
-
-  //
-  // Master Secret
-  //
-  SpdmDataDheSecret = 0x80000000, // No DHE secret if PSK is used.
-  SpdmDataHandshakeSecret,
-  SpdmDataMasterSecret,
-  //
-  // Major secret
-  //
-  SpdmDataRequestHandshakeSecret,
-  SpdmDataResponseHandshakeSecret,
-  SpdmDataRequestDataSecret,
-  SpdmDataResponseDataSecret,
-  SpdmDataRequestFinishedKey,
-  SpdmDataResponseFinishedKey,
-  //
-  // MAX
-  //
-  SpdmDataDebugDataMax,
-} SPDM_DEBUG_DATA_TYPE;
-
-typedef enum {
   SpdmDataLocationLocal,
   SpdmDataLocationConnection,
   SpdmDataLocationSession,
@@ -189,33 +125,6 @@ typedef struct {
   //   SlotNum + MeasurementHashType for SpdmDataMutAuthRequested
   UINT8                AdditionalData[4];
 } SPDM_DATA_PARAMETER;
-
-typedef enum {
-  SpdmSessionTypeNone,
-  SpdmSessionTypeMacOnly,
-  SpdmSessionTypeEncMac,
-  SpdmSessionTypeMax,
-} SPDM_SESSION_TYPE;
-
-typedef enum {
-  //
-  // Before send KEY_EXCHANGE/PSK_EXCHANGE
-  // or after END_SESSION
-  //
-  SpdmSessionStateNotStarted,
-  //
-  // After send KEY_EXHCNAGE, before send FINISH
-  //
-  SpdmSessionStateHandshaking,
-  //
-  // After send FINISH, before END_SESSION
-  //
-  SpdmSessionStateEstablished,
-  //
-  // MAX
-  //
-  SpdmSessionStateMax,
-} SPDM_SESSION_STATE;
 
 typedef enum {
   //
@@ -433,33 +342,6 @@ SpdmRegisterDataSignFunc (
   );
 
 /**
-  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
-
-  @param  HashAlgo                     Indicates the hash algorithm.
-                                       It must align with BaseHashAlgo (SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_*)
-  @param  PskHint                      Pointer to the user-supplied PSK Hint.
-  @param  PskHintSize                  PSK Hint size in bytes.
-  @param  Info                         Pointer to the application specific info.
-  @param  InfoSize                     Info size in bytes.
-  @param  Out                          Pointer to buffer to receive hkdf value.
-  @param  OutSize                      Size of hkdf bytes to generate.
-
-  @retval TRUE   Hkdf generated successfully.
-  @retval FALSE  Hkdf generation failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *SPDM_PSK_HKDF_EXPAND_FUNC) (
-  IN      UINT32       HashAlgo,
-  IN      CONST UINT8  *PskHint, OPTIONAL
-  IN      UINTN        PskHintSize, OPTIONAL
-  IN      CONST UINT8  *Info,
-  IN      UINTN        InfoSize,
-     OUT  UINT8        *Out,
-  IN      UINTN        OutSize
-  );
-
-/**
   Register SPDM PSK HKDF_EXPAND function.
 
   @param  SpdmContext                             A pointer to the SPDM context.
@@ -658,6 +540,20 @@ SpdmRegisterTransportLayerFunc (
   IN     VOID                                *SpdmContext,
   IN     SPDM_TRANSPORT_ENCODE_MESSAGE_FUNC  TransportEncodeMessage,
   IN     SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  TransportDecodeMessage
+  );
+
+/**
+  This function gets the session key info via session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return session key info.
+**/
+VOID *
+SpdmGetSessionKeyInfoViaSessionId (
+  IN     VOID                      *SpdmContext,
+  IN     UINT32                    SessionId
   );
 
 #endif

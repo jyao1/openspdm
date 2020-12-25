@@ -10,7 +10,257 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __SPDM_SECURED_MESSAGE_LIB_H__
 #define __SPDM_SECURED_MESSAGE_LIB_H__
 
-#include <Library/SpdmCommonLib.h>
+#include "SpdmLibConfig.h"
+
+#include <Base.h>
+#include <IndustryStandard/Spdm.h>
+#include <IndustryStandard/SpdmSecuredMessage.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/BaseCryptLib.h>
+
+#define MAX_DHE_KEY_SIZE    512
+#define MAX_ASYM_KEY_SIZE   512
+#define MAX_HASH_SIZE       64
+#define MAX_AEAD_KEY_SIZE   32
+#define MAX_AEAD_IV_SIZE    12
+
+#define BIN_CONCAT_LABEL "spdm1.1"
+#define BIN_STR_0_LABEL  "derived"
+#define BIN_STR_1_LABEL  "req hs data"
+#define BIN_STR_2_LABEL  "rsp hs data"
+#define BIN_STR_3_LABEL  "req app data"
+#define BIN_STR_4_LABEL  "rsp app data"
+#define BIN_STR_5_LABEL  "key"
+#define BIN_STR_6_LABEL  "iv"
+#define BIN_STR_7_LABEL  "finished"
+#define BIN_STR_8_LABEL  "exp master"
+#define BIN_STR_9_LABEL  "traffic upd"
+
+typedef enum {
+  SpdmSessionTypeNone,
+  SpdmSessionTypeMacOnly,
+  SpdmSessionTypeEncMac,
+  SpdmSessionTypeMax,
+} SPDM_SESSION_TYPE;
+
+typedef enum {
+  //
+  // Before send KEY_EXCHANGE/PSK_EXCHANGE
+  // or after END_SESSION
+  //
+  SpdmSessionStateNotStarted,
+  //
+  // After send KEY_EXHCNAGE, before send FINISH
+  //
+  SpdmSessionStateHandshaking,
+  //
+  // After send FINISH, before END_SESSION
+  //
+  SpdmSessionStateEstablished,
+  //
+  // MAX
+  //
+  SpdmSessionStateMax,
+} SPDM_SESSION_STATE;
+
+/**
+  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
+
+  @param  HashAlgo                     Indicates the hash algorithm.
+                                       It must align with BaseHashAlgo (SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_*)
+  @param  PskHint                      Pointer to the user-supplied PSK Hint.
+  @param  PskHintSize                  PSK Hint size in bytes.
+  @param  Info                         Pointer to the application specific info.
+  @param  InfoSize                     Info size in bytes.
+  @param  Out                          Pointer to buffer to receive hkdf value.
+  @param  OutSize                      Size of hkdf bytes to generate.
+
+  @retval TRUE   Hkdf generated successfully.
+  @retval FALSE  Hkdf generation failed.
+**/
+typedef
+BOOLEAN
+(EFIAPI *SPDM_PSK_HKDF_EXPAND_FUNC) (
+  IN      UINT32       HashAlgo,
+  IN      CONST UINT8  *PskHint, OPTIONAL
+  IN      UINTN        PskHintSize, OPTIONAL
+  IN      CONST UINT8  *Info,
+  IN      UINTN        InfoSize,
+     OUT  UINT8        *Out,
+  IN      UINTN        OutSize
+  );
+
+UINTN
+EFIAPI
+SpdmSecuredMessageGetContextSize (
+  VOID
+  );
+
+VOID
+EFIAPI
+SpdmSecuredMessageInitContext (
+  IN     VOID                     *SpdmSecuredMessageContext
+  );
+
+VOID
+SpdmSecuredMessageSetUsePsk (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN BOOLEAN                      UsePsk
+  );
+
+VOID
+SpdmSecuredMessageSetSessionState (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN SPDM_SESSION_STATE           SessionState
+  );
+
+SPDM_SESSION_STATE
+SpdmSecuredMessageGetSessionState (
+  IN VOID                         *SpdmSecuredMessageContext
+  );
+
+VOID
+SpdmSecuredMessageSetSessionType (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN SPDM_SESSION_TYPE            SessionType
+  );
+
+VOID
+SpdmSecuredMessageSetAlgorithms (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN UINT32                       BaseHashAlgo,
+  IN UINT16                       DHENamedGroup,
+  IN UINT16                       AEADCipherSuite,
+  IN UINT16                       KeySchedule
+  );
+
+VOID
+SpdmSecuredMessageSetPskHint (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN VOID                         *PskHint,
+  IN UINTN                        PskHintSize
+  );
+
+VOID
+EFIAPI
+SpdmSecuredMessageRegisterPskHkdfExpandFunc (
+  IN VOID                      *SpdmSecuredMessageContext,
+  IN SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskHandshakeSecretHkdfExpandFunc,
+  IN SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskMasterSecretHkdfExpandFunc
+  );
+
+VOID
+SpdmSecuredMessageSetDheSecret (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN VOID                         *DheSecret,
+  IN UINTN                        DheSecretSize
+  );
+
+VOID
+SpdmSecuredMessageSetRequestFinishedKey (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN VOID                         *RequestFinishedKey,
+  IN UINTN                        HashSize
+  );
+
+VOID
+SpdmSecuredMessageSetResponseFinishedKey (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN VOID                         *Key,
+  IN UINTN                        KeySize
+  );
+
+BOOLEAN
+SpdmHmacAllWithRequestFinishedKey (
+  IN   VOID                         *SpdmSecuredMessageContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HmacValue
+  );
+
+BOOLEAN
+SpdmHmacAllWithResponseFinishedKey (
+  IN   VOID                         *SpdmSecuredMessageContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HmacValue
+  );
+
+RETURN_STATUS
+SpdmBinConcat (
+  IN CHAR8     *Label,
+  IN UINTN     LabelSize,
+  IN UINT8     *Context,
+  IN UINT16    Length,
+  IN UINTN     HashSize,
+  OUT UINT8    *OutBin,
+  IN OUT UINTN *OutBinSize
+  );
+
+/**
+  This function generates SPDM HandshakeKey for a session.
+
+  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  TH1HashData                  TH1 hash
+
+  @retval RETURN_SUCCESS  SPDM HandshakeKey for a session is generated.
+**/
+RETURN_STATUS
+SpdmGenerateSessionHandshakeKey (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN UINT8                        *TH1HashData
+  );
+
+/**
+  This function generates SPDM DataKey for a session.
+
+  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  TH2HashData                  TH2 hash
+
+  @retval RETURN_SUCCESS  SPDM DataKey for a session is generated.
+**/
+RETURN_STATUS
+SpdmGenerateSessionDataKey (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN UINT8                        *TH2HashData
+  );
+
+typedef enum {
+  SpdmKeyUpdateActionRequester = 0x1,
+  SpdmKeyUpdateActionResponder = 0x2,
+  SpdmKeyUpdateActionAll       = 0x3,
+} SPDM_KEY_UPDATE_ACTION;
+
+/**
+  This function creates the updates of SPDM DataKey for a session.
+
+  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  Action                       Indicate of the key update action.
+
+  @retval RETURN_SUCCESS  SPDM DataKey update is created.
+**/
+RETURN_STATUS
+SpdmCreateUpdateSessionDataKey (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN SPDM_KEY_UPDATE_ACTION       Action
+  );
+
+/**
+  This function activates the update of SPDM DataKey for a session.
+
+  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  Action                       Indicate of the key update action.
+  @param  UseNewKey                    Indicate if the new key should be used.
+
+  @retval RETURN_SUCCESS  SPDM DataKey update is activated.
+**/
+RETURN_STATUS
+SpdmActivateUpdateSessionDataKey (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN SPDM_KEY_UPDATE_ACTION       Action,
+  IN BOOLEAN                      UseNewKey
+  );
 
 /**
   Get sequence number in an SPDM secure message.
@@ -57,7 +307,7 @@ typedef struct {
 /**
   Encode an application message to a secured message.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SecuredMessageContext               A pointer to the SPDM context.
   @param  SessionId                    The session ID of the SPDM session.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  AppMessageSize               Size in bytes of the application message data buffer.
@@ -72,7 +322,7 @@ typedef struct {
 RETURN_STATUS
 EFIAPI
 SpdmEncodeSecuredMessage (
-  IN     VOID                           *SpdmContext,
+  IN     VOID                           *SpdmSecuredMessageContext,
   IN     UINT32                         SessionId,
   IN     BOOLEAN                        IsRequester,
   IN     UINTN                          AppMessageSize,
@@ -85,7 +335,7 @@ SpdmEncodeSecuredMessage (
 /**
   Decode an application message from a secured message.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SecuredMessageContext               A pointer to the SPDM context.
   @param  SessionId                    The session ID of the SPDM session.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  SecuredMessageSize           Size in bytes of the secured message data buffer.
@@ -101,7 +351,7 @@ SpdmEncodeSecuredMessage (
 RETURN_STATUS
 EFIAPI
 SpdmDecodeSecuredMessage (
-  IN     VOID                           *SpdmContext,
+  IN     VOID                           *SpdmSecuredMessageContext,
   IN     UINT32                         SessionId,
   IN     BOOLEAN                        IsRequester,
   IN     UINTN                          SecuredMessageSize,
@@ -116,14 +366,12 @@ SpdmDecodeSecuredMessage (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request generation.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
-
   @return the size in bytes of opaque data supproted version.
 **/
 UINTN
 EFIAPI
 SpdmGetOpaqueDataSupportedVersionDataSize (
-  IN     VOID                 *SpdmContext
+  VOID
   );
 
 /**
@@ -131,7 +379,6 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request generation.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  DataOutSize                  Size in bytes of the DataOut.
                                        On input, it means the size in bytes of DataOut buffer.
                                        On output, it means the size in bytes of copied DataOut buffer if RETURN_SUCCESS is returned,
@@ -144,7 +391,6 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
 RETURN_STATUS
 EFIAPI
 SpdmBuildOpaqueDataSupportedVersionData (
-  IN     VOID                 *SpdmContext,
   IN OUT UINTN                *DataOutSize,
      OUT VOID                 *DataOut
   );
@@ -154,7 +400,6 @@ SpdmBuildOpaqueDataSupportedVersionData (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response parsing in requester.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  DataInSize                   Size in bytes of the DataIn.
   @param  DataIn                       A pointer to the buffer to store the opaque data version selection.
 
@@ -164,7 +409,6 @@ SpdmBuildOpaqueDataSupportedVersionData (
 RETURN_STATUS
 EFIAPI
 SpdmProcessOpaqueDataVersionSelectionData (
-  IN     VOID                 *SpdmContext,
   IN     UINTN                DataInSize,
   IN     VOID                 *DataIn
   );
@@ -174,14 +418,12 @@ SpdmProcessOpaqueDataVersionSelectionData (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response generation.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
-
   @return the size in bytes of opaque data version selection.
 **/
 UINTN
 EFIAPI
 SpdmGetOpaqueDataVersionSelectionDataSize (
-  IN     VOID                 *SpdmContext
+  VOID
   );
 
 /**
@@ -189,7 +431,6 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response generation.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  DataOutSize                  Size in bytes of the DataOut.
                                        On input, it means the size in bytes of DataOut buffer.
                                        On output, it means the size in bytes of copied DataOut buffer if RETURN_SUCCESS is returned,
@@ -202,7 +443,6 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
 RETURN_STATUS
 EFIAPI
 SpdmBuildOpaqueDataVersionSelectionData (
-  IN     VOID                 *SpdmContext,
   IN OUT UINTN                *DataOutSize,
      OUT VOID                 *DataOut
   );
@@ -212,7 +452,6 @@ SpdmBuildOpaqueDataVersionSelectionData (
 
   This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request parsing in responder.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
   @param  DataInSize                   Size in bytes of the DataIn.
   @param  DataIn                       A pointer to the buffer to store the opaque data supported version.
 
@@ -222,7 +461,6 @@ SpdmBuildOpaqueDataVersionSelectionData (
 RETURN_STATUS
 EFIAPI
 SpdmProcessOpaqueDataSupportedVersionData (
-  IN     VOID                 *SpdmContext,
   IN     UINTN                DataInSize,
   IN     VOID                 *DataIn
   );

@@ -199,14 +199,14 @@ DumpPciIdeKmMessage (
   );
 
 RETURN_STATUS
-SpdmCalculateSessionHandshakeKey (
+SpdmDumpSessionDataProvision (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester
   );
 
 RETURN_STATUS
-SpdmCalculateSessionDataKey (
+SpdmDumpSessionDataCheck (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester

@@ -51,6 +51,7 @@ TrySpdmSendReceiveFinish (
   SPDM_SESSION_INFO                         *SessionInfo;
   UINT8                                     *Ptr;
   BOOLEAN                                   Result;
+  UINT8                                     TH2HashData[64];
 
   if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
       ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
@@ -171,13 +172,11 @@ TrySpdmSendReceiveFinish (
     AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmResponse + sizeof(SPDM_FINISH_RESPONSE), HmacSize);
   }
 
-  Status = SpdmGenerateSessionDataKey (SpdmContext, SessionId, TRUE);
-  if (RETURN_ERROR(Status)) {
-    SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
-    return Status;
-  }
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
+  SpdmCalculateTh2 (SpdmContext, SessionId, TRUE, TH2HashData);
+  SpdmGenerateSessionDataKey (SessionInfo->SecuredMessageContext, TH2HashData);
 
-  SessionInfo->SessionState = SpdmSessionStateEstablished;
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   SpdmContext->SpdmCmdReceiveState |= SPDM_FINISH_RECEIVE_FLAG;
   

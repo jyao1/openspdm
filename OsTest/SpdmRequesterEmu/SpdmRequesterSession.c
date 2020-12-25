@@ -12,36 +12,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 extern VOID          *mSpdmContext;
 
 typedef struct {
-  SPDM_DEBUG_DATA_TYPE  DataType;
+  SPDM_DATA_TYPE        DataType;
   CHAR8                 *String;
 } DATA_TYPE_STRING;
-
-DATA_TYPE_STRING  mDataTypeString[] = {
-#if 0
-  {SpdmDataDheSecret,                       "DheSecret"},
-  {SpdmDataHandshakeSecret,                 "HandshakeSecret"},
-  {SpdmDataMasterSecret,                    "MasterSecret"},
-  {SpdmDataRequestHandshakeSecret,          "RequestHandshakeSecret"},
-  {SpdmDataResponseHandshakeSecret,         "ResponseHandshakeSecret"},
-  {SpdmDataRequestDataSecret,               "RequestDataSecret"},
-  {SpdmDataResponseDataSecret,              "ResponseDataSecret"},
-  {SpdmDataRequestFinishedKey,              "RequestFinishedKey"},
-  {SpdmDataResponseFinishedKey,             "ResponseFinishedKey"},
-#endif
-  {SpdmDataExportMasterSecret,              "ExportMasterSecret"},
-  {SpdmDataRequestHandshakeEncryptionKey,   "RequestHandshakeEncryptionKey"},
-  {SpdmDataRequestHandshakeSalt,            "RequestHandshakeSalt"},
-  {SpdmDataResponseHandshakeEncryptionKey,  "ResponseHandshakeEncryptionKey"},
-  {SpdmDataResponseHandshakeSalt,           "ResponseHandshakeSalt"},
-  {SpdmDataRequestDataEncryptionKey,        "RequestDataEncryptionKey"},
-  {SpdmDataRequestDataSalt,                 "RequestDataSalt"},
-  {SpdmDataResponseDataEncryptionKey,       "ResponseDataEncryptionKey"},
-  {SpdmDataResponseDataSalt,                "ResponseDataSalt"},
-  {SpdmDataRequestHandshakeSequenceNumber,  "RequestHandshakeSequenceNumber"},
-  {SpdmDataResponseHandshakeSequenceNumber, "ResponseHandshakeSequenceNumber"},
-  {SpdmDataRequestDataSequenceNumber,       "RequestDataSequenceNumber"},
-  {SpdmDataResponseDataSequenceNumber,      "ResponseDataSequenceNumber"},
-};
 
 SPDM_VENDOR_DEFINED_REQUEST_MINE  mVendorDefinedRequest = {
   {
@@ -130,12 +103,8 @@ DoSessionViaSpdm (
 {
   VOID                             *SpdmContext;
   RETURN_STATUS                    Status;
-  UINTN                            DataSize;
-  UINT8                            Data[MAX_DHE_KEY_SIZE];
-  UINTN                            Index;
   UINT32                           SessionId;
   UINT32                           SessionId2;
-  SPDM_DATA_PARAMETER              Parameter;
   UINT8                            HeartbeatPeriod;
   UINT8                            MeasurementHash[MAX_HASH_SIZE];
 
@@ -171,22 +140,6 @@ DoSessionViaSpdm (
   if (RETURN_ERROR(Status)) {
     printf ("SpdmStartSession - %x\n", (UINT32)Status);
     return Status;
-  }
-
-  ZeroMem (&Parameter, sizeof(Parameter));
-  Parameter.Location = SpdmDataLocationSession;
-  *(UINT32 *)Parameter.AdditionalData = SessionId;
-  for (Index = 0; Index < ARRAY_SIZE(mDataTypeString); Index++) {
-    DataSize = sizeof(Data);
-    ZeroMem (Data, sizeof(Data));
-    Status = SpdmGetData (SpdmContext, (SPDM_DATA_TYPE)mDataTypeString[Index].DataType, &Parameter, Data, &DataSize);
-    if (!RETURN_ERROR(Status)) {
-      printf ("%s (%d) - ", mDataTypeString[Index].String, (UINT32)DataSize);
-      DumpData (Data, DataSize);
-      printf ("\n");
-    } else {
-      printf ("%s - %x\n", mDataTypeString[Index].String, (UINT32)Status);
-    }
   }
 
   DoAppSessionViaSpdm (SessionId);

@@ -10,7 +10,7 @@ SET(src_SpdmCommonLib
     SpdmCommonLibContextData.c
     SpdmCommonLibCrypto.c
     SpdmCommonLibCryptoService.c
-    SpdmCommonLibSessionKeys.c
+    SpdmCommonLibSession.c
     SpdmCommonLibSupport.c
 )
 

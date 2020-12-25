@@ -57,6 +57,7 @@ SpdmGetResponseKeyExchange (
   UINT16                        RspSessionId;
   RETURN_STATUS                 Status;
   UINTN                         OpaqueKeyExchangeRspSize;
+  UINT8                         TH1HashData[64];
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -112,13 +113,13 @@ SpdmGetResponseKeyExchange (
                 OpaqueDataLength;
 
   Ptr = (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DheKeySize + sizeof(UINT16);
-  Status = SpdmProcessOpaqueDataSupportedVersionData (SpdmContext, OpaqueDataLength, Ptr);
+  Status = SpdmProcessOpaqueDataSupportedVersionData (OpaqueDataLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+  OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
     HmacSize = 0;
@@ -144,12 +145,11 @@ SpdmGetResponseKeyExchange (
   ReqSessionId = SpdmRequest->ReqSessionID;
   RspSessionId = SpdmAllocateRspSessionId (SpdmContext);
   SessionId = (ReqSessionId << 16) | RspSessionId;
-  SessionInfo = SpdmAssignSessionId (SpdmContext, SessionId);
+  SessionInfo = SpdmAssignSessionId (SpdmContext, SessionId, FALSE);
   if (SessionInfo == NULL) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  SessionInfo->UsePsk = FALSE;
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
 
@@ -178,10 +178,7 @@ SpdmGetResponseKeyExchange (
   SpdmDheFree (SpdmContext, DHEContext);
   DEBUG((DEBUG_INFO, "Calc FinalKey (0x%x):\n", FinalKeySize));
   InternalDumpHex (FinalKey, FinalKeySize);
-
-  ASSERT (FinalKeySize <= sizeof(SessionInfo->MasterSecret.DheSecret));
-  SessionInfo->DheKeySize = FinalKeySize;
-  CopyMem (SessionInfo->MasterSecret.DheSecret, FinalKey, FinalKeySize);
+  SpdmSecuredMessageSetDheSecret (SessionInfo->SecuredMessageContext, FinalKey, FinalKeySize);
 
   Ptr += DheKeySize;
 
@@ -195,7 +192,7 @@ SpdmGetResponseKeyExchange (
 
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
   Ptr += sizeof(UINT16);
-  Status = SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
+  Status = SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
   ASSERT_RETURN_ERROR(Status);
   Ptr += OpaqueKeyExchangeRspSize;
 
@@ -211,7 +208,10 @@ SpdmGetResponseKeyExchange (
   }
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, SignatureSize);
-  SpdmGenerateSessionHandshakeKey (SpdmContext, SessionId, FALSE);
+
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", SessionId));
+  SpdmCalculateTh1 (SpdmContext, SessionId, FALSE, TH1HashData);
+  SpdmGenerateSessionHandshakeKey (SessionInfo->SecuredMessageContext, TH1HashData);
   Ptr += SignatureSize;
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
@@ -228,7 +228,7 @@ SpdmGetResponseKeyExchange (
   SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
   SpdmInitEncapState (Context, SessionInfo->MutAuthRequested);
 
-  SessionInfo->SessionState = SpdmSessionStateHandshaking;
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
   SpdmContext->SpdmCmdReceiveState |= SPDM_KEY_EXCHANGE_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;

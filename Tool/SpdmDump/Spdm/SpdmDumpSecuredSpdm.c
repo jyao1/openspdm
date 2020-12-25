@@ -200,39 +200,42 @@ DumpSecuredSpdmMessage (
     SequenceNum = *(UINT16 *)(RecordHeader1 + 1);
   }
 
-  MessageSize = GetMaxPacketLength();
-  Status = SpdmDecodeSecuredMessage (
-             mSpdmContext,
-             RecordHeader1->SessionId,
-             IsRequester,
-             BufferSize,
-             Buffer,
-             &MessageSize,
-             mSpdmDecMessageBuffer,
-             &SpdmSecuredMessageCallbacks
-             );
-  if (RETURN_ERROR(Status)) {
-    //
-    // Try other direction, because a responder might initiate a message in Session.
-    //
+  mCurrentSessionInfo = SpdmGetSessionInfoViaSessionId (mSpdmContext, RecordHeader1->SessionId);
+  if (mCurrentSessionInfo != NULL) {
+    MessageSize = GetMaxPacketLength();
     Status = SpdmDecodeSecuredMessage (
-              mSpdmContext,
+              mCurrentSessionInfo->SecuredMessageContext,
               RecordHeader1->SessionId,
-              !IsRequester,
+              IsRequester,
               BufferSize,
               Buffer,
               &MessageSize,
               mSpdmDecMessageBuffer,
               &SpdmSecuredMessageCallbacks
               );
-    if (!RETURN_ERROR(Status)) {
-      IsRequester = !IsRequester;
+    if (RETURN_ERROR(Status)) {
+      //
+      // Try other direction, because a responder might initiate a message in Session.
+      //
+      Status = SpdmDecodeSecuredMessage (
+                mCurrentSessionInfo->SecuredMessageContext,
+                RecordHeader1->SessionId,
+                !IsRequester,
+                BufferSize,
+                Buffer,
+                &MessageSize,
+                mSpdmDecMessageBuffer,
+                &SpdmSecuredMessageCallbacks
+                );
+      if (!RETURN_ERROR(Status)) {
+        IsRequester = !IsRequester;
+      }
     }
+  } else {
+    Status = RETURN_UNSUPPORTED;
   }
 
   if (!RETURN_ERROR(Status)) {
-    mCurrentSessionInfo = SpdmGetSessionInfoViaSessionId (mSpdmContext, RecordHeader1->SessionId);
-
     if (IsRequester) {
       printf ("REQ->RSP ");
     } else {

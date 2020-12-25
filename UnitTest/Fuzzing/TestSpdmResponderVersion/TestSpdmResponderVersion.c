@@ -27,7 +27,7 @@ VOID TestSpdmResponderVersion(VOID **State) {
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
   SpdmTestContext = *State;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
 
   ResponseSize = sizeof(Response);
   SpdmGetResponseVersion (SpdmContext, SpdmTestContext->TestBufferSize, SpdmTestContext->TestBuffer, &ResponseSize, Response);

@@ -72,6 +72,7 @@ TrySpdmSendReceivePskExchange (
   UINT16                                    RspSessionId;
   SPDM_SESSION_INFO                         *SessionInfo;
   UINTN                                     OpaquePskExchangeReqSize;
+  UINT8                                     TH1HashData[64];
 
   if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
       ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
@@ -90,7 +91,7 @@ TrySpdmSendReceivePskExchange (
   SpdmRequest.Header.Param2 = 0;
   SpdmRequest.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   SpdmRequest.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   SpdmRequest.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
 
   ReqSessionId = SpdmAllocateReqSessionId (SpdmContext);
@@ -109,7 +110,7 @@ TrySpdmSendReceivePskExchange (
   DEBUG((DEBUG_INFO, "\n"));
   Ptr += SpdmRequest.RequesterContextLength;
 
-  Status = SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
+  Status = SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
   ASSERT_RETURN_ERROR(Status);
   Ptr += OpaquePskExchangeReqSize;
 
@@ -144,11 +145,10 @@ TrySpdmSendReceivePskExchange (
   }
   RspSessionId = SpdmResponse.RspSessionID;
   *SessionId = (ReqSessionId << 16) | RspSessionId;
-  SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId);
+  SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId, TRUE);
   if (SessionInfo == NULL) {
     return RETURN_DEVICE_ERROR;
   }
-  SessionInfo->UsePsk = TRUE;
 
   //
   // Cache session data
@@ -168,7 +168,7 @@ TrySpdmSendReceivePskExchange (
   }
 
   Ptr = (UINT8 *)&SpdmResponse + sizeof(SPDM_PSK_EXCHANGE_RESPONSE) + HashSize + SpdmResponse.ResponderContextLength;
-  Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmContext, SpdmResponse.OpaqueLength, Ptr);
+  Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmResponse.OpaqueLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_UNSUPPORTED;
@@ -198,12 +198,9 @@ TrySpdmSendReceivePskExchange (
 
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - HmacSize);
 
-  Status = SpdmGenerateSessionHandshakeKey (SpdmContext, *SessionId, TRUE);
-  if (RETURN_ERROR(Status)) {
-    SpdmFreeSessionId (SpdmContext, *SessionId);
-    SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
-    return Status;
-  }
+  DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", *SessionId));
+  SpdmCalculateTh1 (SpdmContext, *SessionId, TRUE, TH1HashData);
+  SpdmGenerateSessionHandshakeKey (SessionInfo->SecuredMessageContext, TH1HashData);
 
   VerifyData = Ptr;
   DEBUG((DEBUG_INFO, "VerifyData (0x%x):\n", HmacSize));
@@ -221,7 +218,7 @@ TrySpdmSendReceivePskExchange (
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);
   }
 
-  SessionInfo->SessionState = SpdmSessionStateHandshaking;
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
   

@@ -60,7 +60,7 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
   UINTN                OpaquePskExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -87,7 +87,7 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -95,12 +95,12 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);  
-  assert_int_equal (SpdmContext->SessionInfo[0].SessionState, SpdmSessionStateHandshaking);
+  assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateHandshaking);
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_PSK_EXCHANGE_RSP);  
   assert_int_equal (SpdmResponse->RspSessionID, 0xFFFF);
@@ -120,7 +120,7 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
   UINTN                OpaquePskExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
@@ -147,7 +147,7 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
 
   mSpdmPskExchangeRequest2.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest2.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   mSpdmPskExchangeRequest2.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest2.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest2.PSKHint;
@@ -155,7 +155,7 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
   Ptr += mSpdmPskExchangeRequest2.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest2.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest2Size, &mSpdmPskExchangeRequest2, &ResponseSize, Response);
@@ -181,7 +181,7 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
   UINTN                OpaquePskExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->ResponseState = SpdmResponseStateBusy;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
@@ -209,7 +209,7 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -217,7 +217,7 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);
@@ -244,7 +244,7 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
   UINTN                OpaquePskExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
@@ -272,7 +272,7 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -280,7 +280,7 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);
@@ -308,7 +308,7 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
   SPDM_ERROR_DATA_RESPONSE_NOT_READY *ErrorData;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
@@ -336,7 +336,7 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -344,7 +344,7 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);
@@ -373,7 +373,7 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
   UINTN                OpaquePskExchangeReqSize;
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
@@ -398,7 +398,7 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -406,7 +406,7 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);

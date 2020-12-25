@@ -30,10 +30,11 @@ SetupSpdmTestContext (
 UINTN SpdmUnitTestGroupSetup(VOID **State)
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
-  SPDM_DEVICE_CONTEXT     *SpdmContext;
+  VOID                    *SpdmContext;
 
   SpdmTestContext = mSpdmTestContext;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmTestContext->SpdmContext = (VOID *)malloc (SpdmGetContextSize());
+  SpdmContext = SpdmTestContext->SpdmContext;
 
   SpdmInitContext (SpdmContext);
   SpdmRegisterDeviceIoFunc (SpdmContext, SpdmTestContext->SendMessage, SpdmTestContext->ReceiveMessage);
@@ -45,5 +46,10 @@ UINTN SpdmUnitTestGroupSetup(VOID **State)
 
 UINTN SpdmUnitTestGroupTeardown(VOID **State)
 {
+  SPDM_TEST_CONTEXT       *SpdmTestContext;
+
+  SpdmTestContext = *state;
+  free (SpdmTestContext->SpdmContext);
+  SpdmTestContext->SpdmContext = NULL;
   return 0;
 }

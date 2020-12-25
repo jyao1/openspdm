@@ -336,7 +336,7 @@ void TestSpdmRequesterGetVersionCase1(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -357,7 +357,7 @@ void TestSpdmRequesterGetVersionCase2(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -378,7 +378,7 @@ void TestSpdmRequesterGetVersionCase3(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -399,7 +399,7 @@ void TestSpdmRequesterGetVersionCase4(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -420,7 +420,7 @@ void TestSpdmRequesterGetVersionCase5(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -442,7 +442,7 @@ void TestSpdmRequesterGetVersionCase6(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -466,7 +466,7 @@ void TestSpdmRequesterGetVersionCase7(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -490,7 +490,7 @@ void TestSpdmRequesterGetVersionCase8(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -514,7 +514,7 @@ void TestSpdmRequesterGetVersionCase9(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -538,7 +538,7 @@ void TestSpdmRequesterGetVersionCase10(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xA;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -561,7 +561,7 @@ void TestSpdmRequesterGetVersionCase11(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xB;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -583,7 +583,7 @@ void TestSpdmRequesterGetVersionCase12(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xC;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
@@ -606,7 +606,7 @@ void TestSpdmRequesterGetVersionCase13(void **state) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xD;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;

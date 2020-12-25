@@ -38,8 +38,13 @@ SpdmKeyUpdate (
   UINTN                              SpdmResponseSize;
   SPDM_KEY_UPDATE_ACTION             Action;
   SPDM_DEVICE_CONTEXT                *SpdmContext;
+  SPDM_SESSION_INFO                  *SessionInfo;
 
   SpdmContext = Context;
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    return RETURN_UNSUPPORTED;
+  }
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
@@ -69,33 +74,24 @@ SpdmKeyUpdate (
   }
 
   // Create new key
-  SpdmCreateUpdateSessionDataKey (SpdmContext, SessionId, Action);
+  DEBUG ((DEBUG_INFO, "SpdmCreateUpdateSessionDataKey[%x]\n", SessionId));
+  SpdmCreateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, Action);
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   Status = SpdmReceiveSpdmResponse (SpdmContext, &SessionId, &SpdmResponseSize, &SpdmResponse);
-  if (RETURN_ERROR(Status)) {
-    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponseSize != sizeof(SPDM_KEY_UPDATE_RESPONSE)) {
-    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_UPDATE_ACK) {
-    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.Param1 != SpdmRequest.Header.Param1) {
-    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponse.Header.Param2 != SpdmRequest.Header.Param2) {
-    SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, FALSE);
+  if (RETURN_ERROR(Status) ||
+     (SpdmResponseSize != sizeof(SPDM_KEY_UPDATE_RESPONSE)) ||
+     (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_UPDATE_ACK) ||
+     (SpdmResponse.Header.Param1 != SpdmRequest.Header.Param1) ||
+     (SpdmResponse.Header.Param2 != SpdmRequest.Header.Param2) ) {
+    DEBUG ((DEBUG_INFO, "SpdmActivateUpdateSessionDataKey[%x]\n", SessionId));
+    SpdmActivateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, Action, FALSE);
     return RETURN_DEVICE_ERROR;
   }
 
-  SpdmActivateUpdateSessionDataKey (SpdmContext, SessionId, Action, TRUE);
+  DEBUG ((DEBUG_INFO, "SpdmActivateUpdateSessionDataKey[%x]\n", SessionInfo->SessionId));
+  SpdmActivateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, Action, TRUE);
 
   //
   // Verify Key

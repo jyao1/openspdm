@@ -57,7 +57,7 @@ VOID TestSpdmRequesterGetVersion (VOID **State) {
   SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *State;
-  SpdmContext = &SpdmTestContext->SpdmContext;
+  SpdmContext = SpdmTestContext->SpdmContext;
 
   VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
   ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));

@@ -458,10 +458,10 @@ SpdmMeasurementHashAll (
 **/
 HMAC_ALL
 GetSpdmHmacFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT32                       BaseHashAlgo
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo) {
+  switch (BaseHashAlgo) {
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
 #if OPENSPDM_SHA256_SUPPORT == 1
     return HmacSha256All;
@@ -519,7 +519,7 @@ SpdmHmacAll (
   )
 {
   HMAC_ALL   HmacFunction;
-  HmacFunction = GetSpdmHmacFunc (SpdmContext);
+  HmacFunction = GetSpdmHmacFunc (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   if (HmacFunction == NULL) {
     return FALSE;
   }
@@ -535,10 +535,10 @@ SpdmHmacAll (
 **/
 HKDF_EXPAND
 GetSpdmHkdfExpandFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT32                       BaseHashAlgo
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo) {
+  switch (BaseHashAlgo) {
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
 #if OPENSPDM_SHA256_SUPPORT == 1
     return HkdfSha256Expand;
@@ -596,7 +596,7 @@ SpdmHkdfExpand (
   )
 {
   HKDF_EXPAND   HkdfExpandFunction;
-  HkdfExpandFunction = GetSpdmHkdfExpandFunc (SpdmContext);
+  HkdfExpandFunction = GetSpdmHkdfExpandFunc (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   if (HkdfExpandFunction == NULL) {
     return FALSE;
   }
