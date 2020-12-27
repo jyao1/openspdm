@@ -91,6 +91,7 @@ INC =  \
     -I$(WORKSPACE)/UnitTest/Include \
     -I$(WORKSPACE)/Library/SpdmCommonLib \
     -I$(WORKSPACE)/Library/SpdmResponderLib \
+    -I$(WORKSPACE)/Library/SpdmSecuredMessageLib \
     -I$(WORKSPACE)/OsTest/SpdmDeviceSecretLib \
     -I$(WORKSPACE)/UnitTest/CmockaLib/cmocka/include \
     -I$(WORKSPACE)/UnitTest/CmockaLib/cmocka/include/cmockery \

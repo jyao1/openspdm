@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmUnitTest.h"
 #include <SpdmResponderLibInternal.h>
+#include <SpdmSecuredMessageLibInternal.h>
 
 #pragma pack(1)
 
@@ -41,6 +42,20 @@ SPDM_FINISH_REQUEST_MINE    mSpdmFinishRequest2 = {
 UINTN mSpdmFinishRequest2Size = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 
 UINT8 mDummyBuffer[MAX_HASH_SIZE];
+
+VOID
+SpdmSecuredMessageSetRequestFinishedKey (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN VOID                         *Key,
+  IN UINTN                        KeySize
+  )
+{
+  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
+
+  SecuredMessageContext = SpdmSecuredMessageContext;
+  ASSERT (KeySize == SecuredMessageContext->HashSize);
+  CopyMem (SecuredMessageContext->HandshakeSecret.RequestFinishedKey, Key, SecuredMessageContext->HashSize);
+}
 
 void TestSpdmResponderFinishCase1(void **state) {
   RETURN_STATUS        Status;

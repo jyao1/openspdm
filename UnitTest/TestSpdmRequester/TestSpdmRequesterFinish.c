@@ -9,11 +9,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmUnitTest.h"
 #include <SpdmRequesterLibInternal.h>
+#include <SpdmSecuredMessageLibInternal.h>
 
 STATIC UINTN                  LocalBufferSize;
 STATIC UINT8                  LocalBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
 UINT8 mDummyBuffer[MAX_HASH_SIZE];
+
+VOID
+SpdmSecuredMessageSetResponseFinishedKey (
+  IN VOID                         *SpdmSecuredMessageContext,
+  IN VOID                         *Key,
+  IN UINTN                        KeySize
+  )
+{
+  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
+
+  SecuredMessageContext = SpdmSecuredMessageContext;
+  ASSERT (KeySize == SecuredMessageContext->HashSize);
+  CopyMem (SecuredMessageContext->HandshakeSecret.ResponseFinishedKey, Key, SecuredMessageContext->HashSize);
+}
 
 RETURN_STATUS
 EFIAPI

@@ -118,20 +118,6 @@ SpdmSecuredMessageImportDheSecret (
   IN UINTN                        DheSecretSize
   );
 
-VOID
-SpdmSecuredMessageSetRequestFinishedKey ( // BUGBUG: Remove me.
-  IN VOID                         *SpdmSecuredMessageContext,
-  IN VOID                         *RequestFinishedKey,
-  IN UINTN                        HashSize
-  );
-
-VOID
-SpdmSecuredMessageSetResponseFinishedKey ( // BUGBUG: Remove me.
-  IN VOID                         *SpdmSecuredMessageContext,
-  IN VOID                         *Key,
-  IN UINTN                        KeySize
-  );
-
 /**
   Allocates and Initializes one Diffie-Hellman Ephemeral (DHE) Context for subsequent use,
   based upon negotiated DHE algorithm.

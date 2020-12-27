@@ -171,34 +171,6 @@ SpdmSecuredMessageImportDheSecret (
   CopyMem (SecuredMessageContext->MasterSecret.DheSecret, DheSecret, DheSecretSize);
 }
 
-VOID
-SpdmSecuredMessageSetRequestFinishedKey (
-  IN VOID                         *SpdmSecuredMessageContext,
-  IN VOID                         *Key,
-  IN UINTN                        KeySize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (KeySize == SecuredMessageContext->HashSize);
-  CopyMem (SecuredMessageContext->HandshakeSecret.RequestFinishedKey, Key, SecuredMessageContext->HashSize);
-}
-
-VOID
-SpdmSecuredMessageSetResponseFinishedKey (
-  IN VOID                         *SpdmSecuredMessageContext,
-  IN VOID                         *Key,
-  IN UINTN                        KeySize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (KeySize == SecuredMessageContext->HashSize);
-  CopyMem (SecuredMessageContext->HandshakeSecret.ResponseFinishedKey, Key, SecuredMessageContext->HashSize);
-}
-
 BOOLEAN
 SpdmHmacAllWithRequestFinishedKey (
   IN   VOID                         *SpdmSecuredMessageContext,
