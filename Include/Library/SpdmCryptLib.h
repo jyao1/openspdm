@@ -18,6 +18,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
 
+#define MAX_DHE_KEY_SIZE    512
+#define MAX_ASYM_KEY_SIZE   512
+#define MAX_HASH_SIZE       64
+#define MAX_AEAD_KEY_SIZE   32
+#define MAX_AEAD_IV_SIZE    12
+
 /**
   Computes the hash of a input data buffer.
 
@@ -1008,6 +1014,38 @@ SpdmGetDMTFSubjectAltName (
   IN OUT  UINTN         *NameBufferSize,
   OUT     UINT8         *Oid,         OPTIONAL
   IN OUT  UINTN         *OidSize
+  );
+
+/**
+  This function verifies the integrity of certificate buffer.
+
+  @param  CertBuffer             The certificate data buffer.
+  @param  CertBufferSize         Size in bytes of the certificate data buffer.
+
+  @retval TRUE  certificate buffer integrity verification pass.
+  @retval FALSE certificate buffer integrity verification fail.
+**/
+BOOLEAN
+SpdmVerifyCertificateBuffer (
+  IN UINT8                        *CertBuffer,
+  IN UINTN                        CertBufferSize
+  );
+
+/**
+  This function verifies the integrity of certificate chain.
+
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
+  @param  CertificateChain             The certificate chain data buffer.
+  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+
+  @retval TRUE  certificate chain integrity verification pass.
+  @retval FALSE certificate chain integrity verification fail.
+**/
+BOOLEAN
+SpdmVerifyCertificateChainData (
+  IN UINT32                       BaseHashAlgo,
+  IN VOID                         *CertificateChain,
+  IN UINTN                        CertificateChainSize
   );
 
 #endif

@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/TestSpdmRequester
                     ${PROJECT_SOURCE_DIR}/UnitTest/Include
                     ${PROJECT_SOURCE_DIR}/Library/SpdmCommonLib
                     ${PROJECT_SOURCE_DIR}/Library/SpdmRequesterLib
+                    ${PROJECT_SOURCE_DIR}/OsTest/SpdmDeviceSecretLib
                     ${PROJECT_SOURCE_DIR}/UnitTest/CmockaLib/cmocka/include
                     ${PROJECT_SOURCE_DIR}/UnitTest/CmockaLib/cmocka/include/cmockery
                     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon
@@ -40,6 +41,7 @@ SET(TestSpdmRequester_LIBRARY
     MemoryAllocationLib
     SpdmCryptLib
     SpdmSecuredMessageLib
+    SpdmDeviceSecretLib
     SpdmTransportTestLib
     CmockaLib
 )
@@ -57,6 +59,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:MemoryAllocationLib>
                    $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
+                   $<TARGET_OBJECTS:SpdmDeviceSecretLib>
                    $<TARGET_OBJECTS:SpdmTransportTestLib>
                    $<TARGET_OBJECTS:CmockaLib>
     ) 

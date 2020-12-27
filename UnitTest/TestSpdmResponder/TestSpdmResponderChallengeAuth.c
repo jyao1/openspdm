@@ -39,8 +39,6 @@ void TestSpdmResponderChallengeAuthCase1(void **state) {
   SPDM_CHALLENGE_AUTH_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -52,14 +50,10 @@ void TestSpdmResponderChallengeAuthCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmChallengeRequest1.Nonce);
@@ -71,7 +65,6 @@ void TestSpdmResponderChallengeAuthCase1(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, 0);
   assert_int_equal (SpdmResponse->Header.Param2, 1 << 0);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderChallengeAuthCase2(void **state) {
@@ -83,8 +76,6 @@ void TestSpdmResponderChallengeAuthCase2(void **state) {
   SPDM_CHALLENGE_AUTH_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -96,14 +87,10 @@ void TestSpdmResponderChallengeAuthCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmChallengeRequest2.Nonce);
@@ -115,7 +102,6 @@ void TestSpdmResponderChallengeAuthCase2(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderChallengeAuthCase3(void **state) {
@@ -127,8 +113,6 @@ void TestSpdmResponderChallengeAuthCase3(void **state) {
   SPDM_CHALLENGE_AUTH_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -141,14 +125,10 @@ void TestSpdmResponderChallengeAuthCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmChallengeRequest1.Nonce);
@@ -161,7 +141,6 @@ void TestSpdmResponderChallengeAuthCase3(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateBusy);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderChallengeAuthCase4(void **state) {
@@ -173,8 +152,6 @@ void TestSpdmResponderChallengeAuthCase4(void **state) {
   SPDM_CHALLENGE_AUTH_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -187,14 +164,10 @@ void TestSpdmResponderChallengeAuthCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmChallengeRequest1.Nonce);
@@ -207,7 +180,6 @@ void TestSpdmResponderChallengeAuthCase4(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderChallengeAuthCase5(void **state) {
@@ -219,8 +191,6 @@ void TestSpdmResponderChallengeAuthCase5(void **state) {
   SPDM_CHALLENGE_AUTH_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
   SPDM_ERROR_DATA_RESPONSE_NOT_READY *ErrorData;
 
   SpdmTestContext = *state;
@@ -234,14 +204,10 @@ void TestSpdmResponderChallengeAuthCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmChallengeRequest1.Nonce);
@@ -256,7 +222,6 @@ void TestSpdmResponderChallengeAuthCase5(void **state) {
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
   assert_int_equal (ErrorData->RequestCode, SPDM_CHALLENGE);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderChallengeAuthCase6(void **state) {
@@ -268,8 +233,6 @@ void TestSpdmResponderChallengeAuthCase6(void **state) {
   SPDM_CHALLENGE_AUTH_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -279,14 +242,10 @@ void TestSpdmResponderChallengeAuthCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmChallengeRequest1.Nonce);
@@ -298,7 +257,6 @@ void TestSpdmResponderChallengeAuthCase6(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_UNEXPECTED_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   free(Data1);
-  free(Data2);
 }
 
 SPDM_TEST_CONTEXT       mSpdmResponderChallengeAuthTestContext = {

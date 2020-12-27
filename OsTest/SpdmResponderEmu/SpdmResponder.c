@@ -200,7 +200,7 @@ SpdmServerCallback (
   SpdmGetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, &DataSize);
   mUseReqAsymAlgo = Data16;
 
-  Res = ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  Res = ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   if (Res) {
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
@@ -214,13 +214,8 @@ SpdmServerCallback (
     // do not free it
   }
 
-  Res = ReadResponderPrivateCertificate (&Data, &DataSize);
-  if (Res) {
-    SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
-  }
-
   if (mUseSlotId == 0xFF) {
-    Res = ReadRequesterPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+    Res = ReadRequesterPublicCertificateChain (mUseHashAlgo, mUseReqAsymAlgo, &Data, &DataSize, NULL, NULL);
     if (Res) {
       ZeroMem (&Parameter, sizeof(Parameter));
       Parameter.Location = SpdmDataLocationLocal;
@@ -228,7 +223,7 @@ SpdmServerCallback (
       // Do not free it.
     }
   } else {
-    Res = ReadRequesterRootPublicCertificate (&Data, &DataSize, &Hash, &HashSize);
+    Res = ReadRequesterRootPublicCertificate (mUseHashAlgo, mUseReqAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
     if (Res) {
       ZeroMem (&Parameter, sizeof(Parameter));
       Parameter.Location = SpdmDataLocationLocal;
@@ -250,9 +245,6 @@ SpdmServerCallback (
     SpdmSetData (SpdmContext, SpdmDataBasicMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
   }
 
-  SpdmRegisterMeasurementCollectionFunc (SpdmContext, SpdmMeasurementCollectionFunc);
-
-  SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
   Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);

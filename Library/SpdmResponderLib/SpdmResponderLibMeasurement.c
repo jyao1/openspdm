@@ -86,12 +86,8 @@ SpdmGetResponseMeasurement (
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
 
-  if (SpdmContext->LocalContext.SpdmMeasurementCollectionFunc == NULL) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
   DeviceMeasurementSize = sizeof(DeviceMeasurement);
-  Ret = SpdmContext->LocalContext.SpdmMeasurementCollectionFunc (
+  Ret = SpdmMeasurementCollectionFunc (
           SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
           SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo,
           &DeviceMeasurementCount,

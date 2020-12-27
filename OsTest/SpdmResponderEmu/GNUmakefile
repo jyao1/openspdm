@@ -55,6 +55,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/Library/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a \
     $(BIN_DIR)/Library/SpdmTransportMctpLib/SpdmTransportMctpLib.a \
     $(BIN_DIR)/Library/SpdmTransportPciDoeLib/SpdmTransportPciDoeLib.a \
+    $(BIN_DIR)/OsTest/SpdmDeviceSecretLib/SpdmDeviceSecretLib.a \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
 
 
@@ -71,12 +72,14 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/Library/SpdmSecuredMessageLib/*.o \
     $(BIN_DIR)/Library/SpdmTransportMctpLib/*.o \
     $(BIN_DIR)/Library/SpdmTransportPciDoeLib/*.o \
+    $(BIN_DIR)/OsTest/SpdmDeviceSecretLib/*.o \
     $(OUTPUT_DIR)/*.o \
 
 
 INC =  \
     -I$(SOURCE_DIR) \
     -I$(WORKSPACE)/OsTest/SpdmEmuCommon \
+    -I$(WORKSPACE)/OsTest/SpdmDeviceSecretLib \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
     -I$(WORKSPACE)/Include/Hal/$(ARCH) \
@@ -122,6 +125,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmSecuredMessageLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmTransportMctpLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmTransportPciDoeLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsTest/SpdmDeviceSecretLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
@@ -164,6 +168,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/Library/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmTransportMctpLib/SpdmTransportMctpLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmTransportPciDoeLib/SpdmTransportPciDoeLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsTest/SpdmDeviceSecretLib/SpdmDeviceSecretLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
 	$(DLINK) $(DLINK_FLAGS) $(DLINK_SPATH) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS2)
 

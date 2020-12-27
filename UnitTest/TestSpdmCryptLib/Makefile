@@ -70,6 +70,7 @@ INC =  \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \
     -I$(WORKSPACE)\UnitTest\Include \
     -I$(WORKSPACE)\Library\SpdmCommonLib \
+    -I$(WORKSPACE)\OsTest\SpdmDeviceSecretLib \
     -I$(WORKSPACE)\UnitTest\CmockaLib\cmocka\include \
     -I$(WORKSPACE)\UnitTest\CmockaLib\cmocka\include\cmockery \
     -I$(WORKSPACE)\UnitTest\SpdmUnitTestCommon \

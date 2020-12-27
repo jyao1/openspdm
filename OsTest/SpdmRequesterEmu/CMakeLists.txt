@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/OsTest/SpdmRequesterEmu
                     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon
+                    ${PROJECT_SOURCE_DIR}/OsTest/SpdmDeviceSecretLib
                     ${PROJECT_SOURCE_DIR}/Include
                     ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
@@ -22,17 +23,18 @@ SET(src_SpdmRequesterTest
 
 SET(SpdmRequesterTest_LIBRARY
     BaseMemoryLib
-    DebugLib  
+    DebugLib
     SpdmRequesterLib
     SpdmCommonLib
     ${CRYPTO}Lib
     RngLib
-    BaseCryptLib${CRYPTO}   
+    BaseCryptLib${CRYPTO}
     MemoryAllocationLib
     SpdmCryptLib
     SpdmSecuredMessageLib
     SpdmTransportMctpLib
     SpdmTransportPciDoeLib
+    SpdmDeviceSecretLib
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
@@ -50,6 +52,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportMctpLib>
                    $<TARGET_OBJECTS:SpdmTransportPciDoeLib>
+                   $<TARGET_OBJECTS:SpdmDeviceSecretLib>
     ) 
 else()
     ADD_EXECUTABLE(SpdmRequesterEmu ${src_SpdmRequesterTest})

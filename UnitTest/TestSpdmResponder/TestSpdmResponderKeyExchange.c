@@ -53,8 +53,6 @@ void TestSpdmResponderKeyExchangeCase1(void **state) {
   SPDM_KEY_EXCHANGE_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
   UINT8                *Ptr;
   UINTN                DheKeySize;
   VOID                 *DHEContext;
@@ -72,14 +70,10 @@ void TestSpdmResponderKeyExchangeCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->LocalContext.MutAuthRequested = 0;
 
@@ -105,7 +99,6 @@ void TestSpdmResponderKeyExchangeCase1(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_KEY_EXCHANGE_RSP);  
   assert_int_equal (SpdmResponse->RspSessionID, 0xFFFF);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderKeyExchangeCase2(void **state) {
@@ -117,8 +110,6 @@ void TestSpdmResponderKeyExchangeCase2(void **state) {
   SPDM_KEY_EXCHANGE_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
   UINT8                *Ptr;
   UINTN                DheKeySize;
   VOID                 *DHEContext;
@@ -136,14 +127,10 @@ void TestSpdmResponderKeyExchangeCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->LocalContext.MutAuthRequested = 0;
 
@@ -170,7 +157,6 @@ void TestSpdmResponderKeyExchangeCase2(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderKeyExchangeCase3(void **state) {
@@ -182,8 +168,6 @@ void TestSpdmResponderKeyExchangeCase3(void **state) {
   SPDM_KEY_EXCHANGE_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
   UINT8                *Ptr;
   UINTN                DheKeySize;
   VOID                 *DHEContext;
@@ -202,14 +186,10 @@ void TestSpdmResponderKeyExchangeCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->LocalContext.MutAuthRequested = 0;
 
@@ -237,7 +217,6 @@ void TestSpdmResponderKeyExchangeCase3(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateBusy);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderKeyExchangeCase4(void **state) {
@@ -249,8 +228,6 @@ void TestSpdmResponderKeyExchangeCase4(void **state) {
   SPDM_KEY_EXCHANGE_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
   UINT8                *Ptr;
   UINTN                DheKeySize;
   VOID                 *DHEContext;
@@ -269,14 +246,10 @@ void TestSpdmResponderKeyExchangeCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->LocalContext.MutAuthRequested = 0;
 
@@ -304,7 +277,6 @@ void TestSpdmResponderKeyExchangeCase4(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderKeyExchangeCase5(void **state) {
@@ -316,8 +288,6 @@ void TestSpdmResponderKeyExchangeCase5(void **state) {
   SPDM_KEY_EXCHANGE_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
   SPDM_ERROR_DATA_RESPONSE_NOT_READY *ErrorData;
   UINT8                *Ptr;
   UINTN                DheKeySize;
@@ -337,14 +307,10 @@ void TestSpdmResponderKeyExchangeCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->LocalContext.MutAuthRequested = 0;
 
@@ -374,7 +340,6 @@ void TestSpdmResponderKeyExchangeCase5(void **state) {
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
   assert_int_equal (ErrorData->RequestCode, SPDM_KEY_EXCHANGE);
   free(Data1);
-  free(Data2);
 }
 
 void TestSpdmResponderKeyExchangeCase6(void **state) {
@@ -386,8 +351,6 @@ void TestSpdmResponderKeyExchangeCase6(void **state) {
   SPDM_KEY_EXCHANGE_RESPONSE *SpdmResponse;
   VOID                 *Data1;
   UINTN                DataSize1;
-  VOID                 *Data2;
-  UINTN                DataSize2;
   UINT8                *Ptr;
   UINTN                DheKeySize;
   VOID                 *DHEContext;
@@ -403,14 +366,10 @@ void TestSpdmResponderKeyExchangeCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->LocalContext.SlotCount = 1;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data2, &DataSize2);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->LocalContext.MutAuthRequested = 0;
 
@@ -437,7 +396,6 @@ void TestSpdmResponderKeyExchangeCase6(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_UNEXPECTED_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   free(Data1);
-  free(Data2);
 }
 
 SPDM_TEST_CONTEXT       mSpdmResponderKeyExchangeTestContext = {

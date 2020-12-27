@@ -201,7 +201,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-    ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+    ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
     CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
     SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
@@ -281,7 +281,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-    ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+    ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
     CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
     SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
@@ -399,7 +399,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
       InternalDumpHex (LocalBuffer, LocalBufferSize);
       InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-      ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+      ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
       CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
       CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
       SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
@@ -526,7 +526,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
       InternalDumpHex (LocalBuffer, LocalBufferSize);
       InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
-      ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+      ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
       CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
       CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
       SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
@@ -574,7 +574,7 @@ void TestSpdmRequesterPskExchangeCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -586,7 +586,6 @@ void TestSpdmRequesterPskExchangeCase1(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -615,7 +614,7 @@ void TestSpdmRequesterPskExchangeCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -627,7 +626,6 @@ void TestSpdmRequesterPskExchangeCase2(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
   
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -656,7 +654,7 @@ void TestSpdmRequesterPskExchangeCase3(void **state) {
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -668,7 +666,6 @@ void TestSpdmRequesterPskExchangeCase3(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
   
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -697,7 +694,7 @@ void TestSpdmRequesterPskExchangeCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -709,7 +706,6 @@ void TestSpdmRequesterPskExchangeCase4(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
   
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -738,7 +734,7 @@ void TestSpdmRequesterPskExchangeCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -750,7 +746,6 @@ void TestSpdmRequesterPskExchangeCase5(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -779,7 +774,7 @@ void TestSpdmRequesterPskExchangeCase6(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -791,7 +786,6 @@ void TestSpdmRequesterPskExchangeCase6(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -822,7 +816,7 @@ void TestSpdmRequesterPskExchangeCase7(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -834,7 +828,6 @@ void TestSpdmRequesterPskExchangeCase7(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -864,7 +857,7 @@ void TestSpdmRequesterPskExchangeCase8(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -876,7 +869,6 @@ void TestSpdmRequesterPskExchangeCase8(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -905,7 +897,7 @@ void TestSpdmRequesterPskExchangeCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;  
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -917,7 +909,6 @@ void TestSpdmRequesterPskExchangeCase9(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));

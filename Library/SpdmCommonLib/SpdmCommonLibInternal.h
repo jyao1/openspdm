@@ -46,11 +46,6 @@ typedef struct {
   // My provisioned certificate (for SlotNum - 0xFF, default 0)
   UINT8                           ProvisionedSlotNum;
   //
-  // Use my Private Certificate to sign
-  //
-  SPDM_DATA_SIGN_FUNC             SpdmRequesterDataSignFunc;
-  SPDM_DATA_SIGN_FUNC             SpdmResponderDataSignFunc;
-  //
   // Peer Root Certificate Hash
   //
   VOID                            *PeerRootCertHashProvision;
@@ -61,19 +56,10 @@ typedef struct {
   VOID                            *PeerCertChainProvision;
   UINTN                           PeerCertChainProvisionSize;
   //
-  // Collect all measurement blocks
-  //
-  SPDM_MEASUREMENT_COLLECTION_FUNC SpdmMeasurementCollectionFunc;
-  //
   // PSK provision locally
   //
   UINTN                           PskHintSize;
   VOID                            *PskHint;
-  //
-  // Use my PSK to HKDF
-  //
-  SPDM_PSK_HKDF_EXPAND_FUNC       SpdmPskHandshakeSecretHkdfExpandFunc;
-  SPDM_PSK_HKDF_EXPAND_FUNC       SpdmPskMasterSecretHkdfExpandFunc;
   //
   // OpaqueData provision locally
   //

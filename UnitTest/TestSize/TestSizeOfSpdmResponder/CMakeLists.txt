@@ -10,7 +10,7 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
     endif()
 endif()
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/TestSizeOfSpdmResponder
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/TestSize/TestSizeOfSpdmResponder
                     ${PROJECT_SOURCE_DIR}/Include
                     ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
@@ -32,10 +32,11 @@ SET(TestSizeOfSpdmResponder_LIBRARY
     RngLib
     BaseCryptLib${CRYPTO}
     MemoryAllocationLibNull
-    IntrinsicLib
     SpdmCryptLib
     SpdmSecuredMessageLib
-    SpdmTransportMctpLib 
+    SpdmTransportMctpLib
+    SpdmDeviceSecretLibNull
+    IntrinsicLib
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
@@ -53,6 +54,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportMctpLib>
+                   $<TARGET_OBJECTS:SpdmDeviceSecretLibNull>
                    $<TARGET_OBJECTS:IntrinsicLib>
     ) 
 else()

@@ -71,7 +71,7 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -82,8 +82,6 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
@@ -131,7 +129,7 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -142,8 +140,6 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest2.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest2.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
@@ -193,7 +189,7 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -204,8 +200,6 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
@@ -256,7 +250,7 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -267,8 +261,6 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
@@ -320,7 +312,7 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -331,8 +323,6 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
@@ -382,7 +372,7 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -393,8 +383,6 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
   SpdmContext->LocalContext.PskHint = LocalPskHint;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;

@@ -88,7 +88,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       STATIC UINTN                  CallingIndex = 0;
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
       }
       Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
       if (CallingIndex != Count - 1) {
@@ -133,7 +133,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       STATIC UINTN                  CallingIndex = 0;
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
       }
       Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
       if (CallingIndex != Count - 1) {
@@ -216,7 +216,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       STATIC UINTN                  CallingIndex = 0;
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
       }
       Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
       if (CallingIndex != Count - 1) {
@@ -308,7 +308,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       STATIC UINTN                  CallingIndex = 0;
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
       }
       Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
       if (CallingIndex != Count - 1) {
@@ -354,7 +354,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       STATIC UINTN                  CallingIndex = 0;
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
       }
       Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
       if (CallingIndex != Count - 1) {
@@ -406,7 +406,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
 
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
 
         // load certificate
         HashSize = GetSpdmHashSize (mUseHashAlgo);
@@ -463,7 +463,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       STATIC UINTN                  CallingIndex = 0;
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
       }
       Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
       if (CallingIndex != Count - 1) {
@@ -508,7 +508,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       STATIC UINTN                  CallingIndex = 0;
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChainBySize (TEST_CERT_SMALL, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChainBySize (mUseHashAlgo, mUseAsymAlgo, TEST_CERT_SMALL, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
       }
       Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
       if (CallingIndex != Count - 1) {
@@ -557,7 +557,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       GetCertLength = 1;
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
       }
       Count = (LocalCertificateChainSize + GetCertLength + 1) / GetCertLength;
       if (CallingIndex != Count - 1) {
@@ -602,7 +602,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
       STATIC UINTN                  CallingIndex = 0;
 
       if (LocalCertificateChain == NULL) {
-        ReadResponderPublicCertificateChainBySize (TEST_CERT_MAXUINT16, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
+        ReadResponderPublicCertificateChainBySize (mUseHashAlgo, mUseAsymAlgo, TEST_CERT_MAXUINT16, &LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
       }
       Count = (LocalCertificateChainSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN + 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
       if (CallingIndex != Count - 1) {
@@ -662,7 +662,7 @@ void TestSpdmRequesterGetCertificateCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
@@ -700,7 +700,7 @@ void TestSpdmRequesterGetCertificateCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   Count = (DataSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN - 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
@@ -737,7 +737,7 @@ void TestSpdmRequesterGetCertificateCase3(void **state) {
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
@@ -774,7 +774,7 @@ void TestSpdmRequesterGetCertificateCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
@@ -811,7 +811,7 @@ void TestSpdmRequesterGetCertificateCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
@@ -849,7 +849,7 @@ void TestSpdmRequesterGetCertificateCase6(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   Count = (DataSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN - 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
@@ -887,7 +887,7 @@ void TestSpdmRequesterGetCertificateCase7(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
@@ -925,7 +925,7 @@ void TestSpdmRequesterGetCertificateCase8(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
@@ -962,7 +962,7 @@ void TestSpdmRequesterGetCertificateCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   Count = (DataSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN - 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
@@ -1001,7 +1001,7 @@ void TestSpdmRequesterGetCertificateCase10(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   Count = (DataSize + MAX_SPDM_CERT_CHAIN_BLOCK_LEN - 1) / MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = 0;
   SpdmContext->LocalContext.PeerRootCertHashProvision = NULL;
@@ -1042,7 +1042,7 @@ void TestSpdmRequesterGetCertificateCase11(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   // Loading certificate chain and saving root certificate hash
-  ReadResponderPublicCertificateChain(&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
@@ -1084,7 +1084,7 @@ void TestSpdmRequesterGetCertificateCase12(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain(&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   // arbitrarily changes the root certificate hash on purpose
   ((UINT8*)Hash)[0]++;
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
@@ -1129,7 +1129,7 @@ void TestSpdmRequesterGetCertificateCase13(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   // Loading Root certificate and saving its hash
-  ReadResponderPublicCertificateChainBySize (TEST_CERT_SMALL, &Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChainBySize (mUseHashAlgo, mUseAsymAlgo, TEST_CERT_SMALL, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
@@ -1176,7 +1176,7 @@ void TestSpdmRequesterGetCertificateCase14(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   // Loading Root certificate and saving its hash
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;
@@ -1219,7 +1219,7 @@ void TestSpdmRequesterGetCertificateCase15(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   // Loading Root certificate and saving its hash
-  ReadResponderPublicCertificateChainBySize (TEST_CERT_MAXUINT16, &Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChainBySize (mUseHashAlgo, mUseAsymAlgo, TEST_CERT_MAXUINT16, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
   SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
   SpdmContext->LocalContext.PeerCertChainProvision = NULL;

@@ -71,75 +71,6 @@ SpdmVerifyDigest (
 }
 
 /**
-  This function verifies the integrity of certificate chain.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  CertificateChain             The certificate chain data buffer.
-  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
-
-  @retval TRUE  certificate chain integrity verification pass.
-  @retval FALSE certificate chain integrity verification fail.
-**/
-BOOLEAN
-SpdmVerifyCertificateChainData (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *CertificateChain,
-  IN UINTN                        CertificateChainSize
-  )
-{
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
-  UINT8                                     *RootCertBuffer;
-  UINTN                                     RootCertBufferSize;
-  UINTN                                     HashSize;
-  UINT8                                     CalcRootCertHash[MAX_HASH_SIZE];
-  UINT8                                     *LeafCertBuffer;
-  UINTN                                     LeafCertBufferSize;
-
-  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
-
-  if (CertificateChainSize > MAX_SPDM_MESSAGE_BUFFER_SIZE) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (buffer too large) !!!\n"));
-    return FALSE;
-  }
-
-  if (CertificateChainSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (buffer too small) !!!\n"));
-    return FALSE;
-  }
-
-  CertBuffer = (UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = CertificateChainSize - sizeof(SPDM_CERT_CHAIN) - HashSize;
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get root certificate failed)!!!\n"));
-    return FALSE;
-  }
-
-  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, RootCertBuffer, RootCertBufferSize, CalcRootCertHash);
-  if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), CalcRootCertHash, HashSize) != 0) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert root hash mismatch) !!!\n"));
-    return FALSE;
-  }
-
-  if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertBuffer, CertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert chain verify failed)!!!\n"));
-    return FALSE;
-  }
-
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, -1, &LeafCertBuffer, &LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get leaf certificate failed)!!!\n"));
-    return FALSE;
-  }
-
-  if(!SpdmX509CertificateCheck (LeafCertBuffer, LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (leaf certificate check failed)!!!\n"));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-/**
   This function verifies the certificate chain.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -163,7 +94,7 @@ SpdmVerifyCertificateChain (
   UINTN                                     RootCertHashSize;
   BOOLEAN                                   Result;
 
-  Result = SpdmVerifyCertificateChainData (SpdmContext, CertificateChain, CertificateChainSize);
+  Result = SpdmVerifyCertificateChainData (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertificateChain, CertificateChainSize);
   if (!Result) {
     return FALSE;
   }
@@ -231,10 +162,6 @@ SpdmGenerateChallengeAuthSignature (
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (IsRequester) {
-    if (SpdmContext->LocalContext.SpdmRequesterDataSignFunc == NULL) {
-      return FALSE;
-    }
-
     AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, ResponseMessage, ResponseMessageSize);
     AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutB), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutB));
     AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
@@ -250,7 +177,7 @@ SpdmGenerateChallengeAuthSignature (
     InternalDumpData (HashData, HashSize);
     DEBUG((DEBUG_INFO, "\n"));
     
-    Result = SpdmContext->LocalContext.SpdmRequesterDataSignFunc (
+    Result = SpdmRequesterDataSignFunc (
               SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
               HashData,
               HashSize,
@@ -258,10 +185,6 @@ SpdmGenerateChallengeAuthSignature (
               &SignatureSize
               );
   } else {
-    if (SpdmContext->LocalContext.SpdmResponderDataSignFunc == NULL) {
-      return FALSE;
-    }
-
     AppendManagedBuffer (&SpdmContext->Transcript.MessageC, ResponseMessage, ResponseMessageSize);
     AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
     AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageB), GetManagedBufferSize(&SpdmContext->Transcript.MessageB));
@@ -281,7 +204,7 @@ SpdmGenerateChallengeAuthSignature (
     InternalDumpData (HashData, HashSize);
     DEBUG((DEBUG_INFO, "\n"));
     
-    Result = SpdmContext->LocalContext.SpdmResponderDataSignFunc (
+    Result = SpdmResponderDataSignFunc (
               SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
               HashData,
               HashSize,
@@ -488,11 +411,8 @@ SpdmGenerateMeasurementSummaryHash (
   case SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH:
   case SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH:
 
-    if (SpdmContext->LocalContext.SpdmMeasurementCollectionFunc == NULL) {
-      return FALSE;
-    }
     DeviceMeasurementSize = sizeof(DeviceMeasurement);
-    Ret = SpdmContext->LocalContext.SpdmMeasurementCollectionFunc (
+    Ret = SpdmMeasurementCollectionFunc (
             SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
             SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo,
             &DeviceMeasurementCount,
@@ -575,10 +495,6 @@ SpdmGenerateMeasurementSignature (
   Ptr += sizeof(UINT16);
   CopyMem (Ptr, SpdmContext->LocalContext.OpaqueMeasurementRsp, SpdmContext->LocalContext.OpaqueMeasurementRspSize);
   Ptr += SpdmContext->LocalContext.OpaqueMeasurementRspSize;
-  
-  if (SpdmContext->LocalContext.SpdmResponderDataSignFunc == NULL) {
-    return FALSE;
-  }
 
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
@@ -592,7 +508,7 @@ SpdmGenerateMeasurementSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   
-  Result = SpdmContext->LocalContext.SpdmResponderDataSignFunc (
+  Result = SpdmResponderDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
              HashData,
              HashSize,
@@ -707,10 +623,6 @@ SpdmGenerateKeyExchangeRspSignature (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  if (SpdmContext->LocalContext.SpdmResponderDataSignFunc == NULL) {
-    return FALSE;
-  }
-
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
@@ -740,7 +652,7 @@ SpdmGenerateKeyExchangeRspSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  Result = SpdmContext->LocalContext.SpdmResponderDataSignFunc (
+  Result = SpdmResponderDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
              HashData,
              HashSize,
@@ -1006,9 +918,6 @@ SpdmGenerateFinishReqSignature (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  if (SpdmContext->LocalContext.SpdmRequesterDataSignFunc == NULL) {
-    return FALSE;
-  }
   if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
     return FALSE;
   }
@@ -1058,7 +967,7 @@ SpdmGenerateFinishReqSignature (
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  Result = SpdmContext->LocalContext.SpdmRequesterDataSignFunc (
+  Result = SpdmRequesterDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
              HashData,
              HashSize,

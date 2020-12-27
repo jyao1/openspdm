@@ -157,21 +157,6 @@ SpdmSecuredMessageSetPskHint (
 }
 
 VOID
-EFIAPI
-SpdmSecuredMessageRegisterPskHkdfExpandFunc (
-  IN VOID                      *SpdmSecuredMessageContext,
-  IN SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskHandshakeSecretHkdfExpandFunc,
-  IN SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskMasterSecretHkdfExpandFunc
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  SecuredMessageContext->SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
-  SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc    = SpdmPskMasterSecretHkdfExpandFunc;
-}
-
-VOID
 SpdmSecuredMessageSetDheSecret (
   IN VOID                         *SpdmSecuredMessageContext,
   IN VOID                         *DheSecret,
@@ -453,11 +438,10 @@ SpdmGenerateSessionHandshakeKey (
   DEBUG((DEBUG_INFO, "BinStr1 (0x%x):\n", BinStr1Size));
   InternalDumpHex (BinStr1, BinStr1Size);
   if (SecuredMessageContext->UsePsk) {
-    ASSERT (SecuredMessageContext->SpdmPskHandshakeSecretHkdfExpandFunc != NULL);
-    if (SecuredMessageContext->SpdmPskHandshakeSecretHkdfExpandFunc == NULL) {
+    RetVal = SpdmPskHandshakeSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr1, BinStr1Size, SecuredMessageContext->HandshakeSecret.RequestHandshakeSecret, HashSize);
+    if (!RetVal) {
       return RETURN_UNSUPPORTED;
     }
-    RetVal = SecuredMessageContext->SpdmPskHandshakeSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr1, BinStr1Size, SecuredMessageContext->HandshakeSecret.RequestHandshakeSecret, HashSize);
   } else {
     RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize, BinStr1, BinStr1Size, SecuredMessageContext->HandshakeSecret.RequestHandshakeSecret, HashSize);
   }
@@ -471,11 +455,10 @@ SpdmGenerateSessionHandshakeKey (
   DEBUG((DEBUG_INFO, "BinStr2 (0x%x):\n", BinStr2Size));
   InternalDumpHex (BinStr2, BinStr2Size);
   if (SecuredMessageContext->UsePsk) {
-    ASSERT (SecuredMessageContext->SpdmPskHandshakeSecretHkdfExpandFunc != NULL);
-    if (SecuredMessageContext->SpdmPskHandshakeSecretHkdfExpandFunc == NULL) {
+    RetVal = SpdmPskHandshakeSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr2, BinStr2Size, SecuredMessageContext->HandshakeSecret.ResponseHandshakeSecret, HashSize);
+    if (!RetVal) {
       return RETURN_UNSUPPORTED;
     }
-    RetVal = SecuredMessageContext->SpdmPskHandshakeSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr2, BinStr2Size, SecuredMessageContext->HandshakeSecret.ResponseHandshakeSecret, HashSize);
   } else {
     RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize, BinStr2, BinStr2Size, SecuredMessageContext->HandshakeSecret.ResponseHandshakeSecret, HashSize);
   }
@@ -572,11 +555,10 @@ SpdmGenerateSessionDataKey (
   DEBUG((DEBUG_INFO, "BinStr3 (0x%x):\n", BinStr3Size));
   InternalDumpHex (BinStr3, BinStr3Size);
   if (SecuredMessageContext->UsePsk) {
-    ASSERT (SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc != NULL);
-    if (SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc == NULL) {
+    RetVal = SpdmPskMasterSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr3, BinStr3Size, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
+    if (!RetVal) {
       return RETURN_UNSUPPORTED;
     }
-    RetVal = SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr3, BinStr3Size, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
   } else {
     RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.MasterSecret, HashSize, BinStr3, BinStr3Size, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
   }
@@ -590,11 +572,10 @@ SpdmGenerateSessionDataKey (
   DEBUG((DEBUG_INFO, "BinStr4 (0x%x):\n", BinStr4Size));
   InternalDumpHex (BinStr4, BinStr4Size);
   if (SecuredMessageContext->UsePsk) {
-    ASSERT (SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc != NULL);
-    if (SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc == NULL) {
+    RetVal = SpdmPskMasterSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr4, BinStr4Size, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize);
+    if (!RetVal) {
       return RETURN_UNSUPPORTED;
     }
-    RetVal = SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr4, BinStr4Size, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize);
   } else {
     RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.MasterSecret, HashSize, BinStr4, BinStr4Size, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize);
   }
@@ -609,11 +590,10 @@ SpdmGenerateSessionDataKey (
   DEBUG((DEBUG_INFO, "BinStr8 (0x%x):\n", BinStr8Size));
   InternalDumpHex (BinStr8, BinStr8Size);
   if (SecuredMessageContext->UsePsk) {
-    ASSERT (SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc != NULL);
-    if (SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc == NULL) {
+    RetVal = SpdmPskMasterSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr8, BinStr8Size, SecuredMessageContext->HandshakeSecret.ExportMasterSecret, HashSize);
+    if (!RetVal) {
       return RETURN_UNSUPPORTED;
     }
-    RetVal = SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr8, BinStr8Size, SecuredMessageContext->HandshakeSecret.ExportMasterSecret, HashSize);
   } else {
     RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.MasterSecret, HashSize, BinStr8, BinStr8Size, SecuredMessageContext->HandshakeSecret.ExportMasterSecret, HashSize);
   }

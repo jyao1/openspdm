@@ -73,7 +73,7 @@ void TestSpdmResponderCertificateCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -110,7 +110,7 @@ void TestSpdmResponderCertificateCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -147,7 +147,7 @@ void TestSpdmResponderCertificateCase3(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -185,7 +185,7 @@ void TestSpdmResponderCertificateCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -224,7 +224,7 @@ void TestSpdmResponderCertificateCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -262,7 +262,7 @@ void TestSpdmResponderCertificateCase6(void **state) {
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -303,7 +303,7 @@ void TestSpdmResponderCertificateCase7(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -357,7 +357,7 @@ void TestSpdmResponderCertificateCase8(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -431,7 +431,7 @@ void TestSpdmResponderCertificateCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -511,7 +511,7 @@ void TestSpdmResponderCertificateCase10(void **state) {
   mSpdmGetCertificateRequest3.Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
 
   for(int i=0; i<sizeof(TestCases)/sizeof(TestCases[0]); i++) {
-    ReadResponderPublicCertificateChainBySize (TestCases[i], &Data, &DataSize, NULL, NULL);
+    ReadResponderPublicCertificateChainBySize (mUseHashAlgo, mUseAsymAlgo, TestCases[i], &Data, &DataSize, NULL, NULL);
 
     SpdmContext->LocalContext.CertificateChain[0] = Data;
     SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
@@ -589,7 +589,7 @@ void TestSpdmResponderCertificateCase11(void **state) {
   mSpdmGetCertificateRequest3.Offset = 0;
 
   for(int i=0; i<sizeof(TestCases)/sizeof(TestCases[0]); i++) {
-    ReadResponderPublicCertificateChainBySize (TestCases[i], &Data, &DataSize, NULL, NULL);
+    ReadResponderPublicCertificateChainBySize (mUseHashAlgo, mUseAsymAlgo, TestCases[i], &Data, &DataSize, NULL, NULL);
     SpdmContext->LocalContext.CertificateChain[0] = Data;
     SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
     SpdmContext->LocalContext.SlotCount = 1;
@@ -657,7 +657,7 @@ void TestSpdmResponderCertificateCase12(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;

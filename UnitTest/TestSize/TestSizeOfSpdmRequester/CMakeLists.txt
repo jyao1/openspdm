@@ -37,6 +37,7 @@ SET(TestSizeOfSpdmRequester_LIBRARY
     SpdmCryptLib
     SpdmSecuredMessageLib
     SpdmTransportMctpLib
+    SpdmDeviceSecretLibNull
     IntrinsicLib
 )
 
@@ -55,6 +56,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportMctpLib>
+                   $<TARGET_OBJECTS:SpdmDeviceSecretLibNull>
                    $<TARGET_OBJECTS:IntrinsicLib>
     ) 
 else()

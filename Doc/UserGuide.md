@@ -6,6 +6,14 @@ This document provides the general information on how to write an SPDM requester
 
 Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmRequesterEmu/SpdmRequester.c)
 
+0. Choose a proper SpdmDeviceSecretLib.
+
+   0.1, if the requester supports mutual authentication, implement SpdmRequesterDataSignFunc().
+
+   0.2, if the requester supports measurement, implement SpdmMeasurementCollectionFunc().
+
+   0.3, if the requester supports PSK exchange, implement SpdmPskHandshakeSecretHkdfExpandFunc() and SpdmPskMasterSecretHkdfExpandFunc().
+
 1. Initialize SPDM context
 
    1.1, allocate buffer for the SpdmContext and initialize it.
@@ -48,20 +56,17 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    }
    ```
 
-   1.5, if mutual authentication is supported, deploy slot number, public certificate chain, then register signing function.
+   1.5, if mutual authentication is supported, deploy slot number, public certificate chain.
    ```
    Parameter.Location = SpdmDataLocationLocal;
    SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
 
    Parameter.AdditionalData[0] = SlotIndex;
    SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
-
-   SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
    ```
 
-   1.6, if PSK is required, register PSK HKDF_EXPAND function, and optionally deploy PSK Hint.
+   1.6, if PSK is required, optionally deploy PSK Hint.
    ```
-   SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
    SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, PskHint, PskHintSize);
    ```
 
@@ -174,6 +179,14 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
 
 Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmResponderEmu/SpdmResponder.c)
 
+0. Choose a proper SpdmDeviceSecretLib.
+
+   0.1, if the responder supports signing, implement SpdmResponderDataSignFunc().
+
+   0.2, if the responder supports measurement, implement SpdmMeasurementCollectionFunc().
+
+   0.3, if the responder supports PSK exchange, implement SpdmPskHandshakeSecretHkdfExpandFunc() and SpdmPskMasterSecretHkdfExpandFunc().
+
 1. Initialize SPDM context (similar to SPDM requester)
 
    1.1, allocate buffer for the SpdmContext and initialize it.
@@ -206,15 +219,13 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &KeySchedule, sizeof(KeySchedule));
    ```
 
-   1.4, deploy slot number, public certificate chain, then register signing function.
+   1.4, deploy slot number, public certificate chain.
    ```
    Parameter.Location = SpdmDataLocationLocal;
    SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
 
    Parameter.AdditionalData[0] = SlotIndex;
    SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
-
-   SpdmRegisterDataSignFunc (SpdmContext, SpdmRequesterDataSignFunc, SpdmResponderDataSignFunc);
    ```
 
    1.5, if mutual authentication (requester verification) is required, deploy the peer public root hash or peer public certificate chain.
@@ -227,14 +238,8 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    }
    ```
 
-   1.7, register measurement collection function.
+   1.7, if PSK is required, optionally deploy PSK Hint.
    ```
-   SpdmRegisterMeasurementCollectionFunc (SpdmContext, SpdmMeasurrementCollectionFunc);
-   ```
-
-   1.8, if PSK is required, register PSK HKDF_EXPAND function, and optionally deploy PSK Hint.
-   ```
-   SpdmRegisterPskHkdfExpandFunc (SpdmContext, SpdmPskHandshakeSecretHkdfExpandFunc, SpdmPskMasterSecretHkdfExpandFunc);
    SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, PskHint, PskHintSize);
    ```
 

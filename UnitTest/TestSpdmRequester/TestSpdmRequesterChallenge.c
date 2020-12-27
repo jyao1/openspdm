@@ -104,12 +104,11 @@ SpdmRequesterChallengeTestReceiveMessage (
     UINTN                         DataSize;  
     UINT8                         *Ptr;
     UINT8                         HashData[MAX_HASH_SIZE];
-    VOID                          *Context;
     UINTN                         SigSize;
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
 
-    ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+    ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -144,12 +143,8 @@ SpdmRequesterChallengeTestReceiveMessage (
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
     InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
     SigSize = GetSpdmAsymSize (mUseAsymAlgo);
-    ReadResponderPrivateCertificate (&Data, &DataSize);
-    SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-    SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
-    SpdmAsymFree (mUseAsymAlgo, Context);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
     Ptr += SigSize;
-    free(Data);
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
@@ -162,12 +157,11 @@ SpdmRequesterChallengeTestReceiveMessage (
     UINTN                         DataSize;  
     UINT8                         *Ptr;
     UINT8                         HashData[MAX_HASH_SIZE];
-    VOID                          *Context;
     UINTN                         SigSize;
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
 
-    ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+    ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -198,12 +192,8 @@ SpdmRequesterChallengeTestReceiveMessage (
     LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     SigSize = GetSpdmAsymSize (mUseAsymAlgo);
-    ReadResponderPrivateCertificate (&Data, &DataSize);
-    SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-    SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
-    SpdmAsymFree (mUseAsymAlgo, Context);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
     Ptr += SigSize;
-    free(Data);
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
@@ -254,12 +244,11 @@ SpdmRequesterChallengeTestReceiveMessage (
       UINTN                         DataSize;  
       UINT8                         *Ptr;
       UINT8                         HashData[MAX_HASH_SIZE];
-      VOID                          *Context;
       UINTN                         SigSize;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
 
-      ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+      ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -290,12 +279,8 @@ SpdmRequesterChallengeTestReceiveMessage (
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
       SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
       SigSize = GetSpdmAsymSize (mUseAsymAlgo);
-      ReadResponderPrivateCertificate (&Data, &DataSize);
-      SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-      SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
-      SpdmAsymFree (mUseAsymAlgo, Context);
+      SpdmResponderDataSignFunc (mUseAsymAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
       Ptr += SigSize;
-      free(Data);
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
@@ -355,12 +340,11 @@ SpdmRequesterChallengeTestReceiveMessage (
       UINTN                         DataSize;  
       UINT8                         *Ptr;
       UINT8                         HashData[MAX_HASH_SIZE];
-      VOID                          *Context;
       UINTN                         SigSize;
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
 
-      ReadResponderPublicCertificateChain (&Data, &DataSize, NULL, NULL);
+      ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
@@ -391,12 +375,8 @@ SpdmRequesterChallengeTestReceiveMessage (
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
       SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
       SigSize = GetSpdmAsymSize (mUseAsymAlgo);
-      ReadResponderPrivateCertificate (&Data, &DataSize);
-      SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-      SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
-      SpdmAsymFree (mUseAsymAlgo, Context);
+      SpdmResponderDataSignFunc (mUseAsymAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
       Ptr += SigSize;
-      free(Data);
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
@@ -425,7 +405,7 @@ void TestSpdmRequesterChallengeCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
@@ -458,7 +438,7 @@ void TestSpdmRequesterChallengeCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
@@ -489,7 +469,7 @@ void TestSpdmRequesterChallengeCase3(void **state) {
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
@@ -522,7 +502,7 @@ void TestSpdmRequesterChallengeCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
@@ -555,7 +535,7 @@ void TestSpdmRequesterChallengeCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
@@ -588,7 +568,7 @@ void TestSpdmRequesterChallengeCase6(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
@@ -621,7 +601,7 @@ void TestSpdmRequesterChallengeCase7(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
@@ -655,7 +635,7 @@ void TestSpdmRequesterChallengeCase8(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;
@@ -687,7 +667,7 @@ void TestSpdmRequesterChallengeCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
-  ReadResponderPublicCertificateChain (&Data, &DataSize, &Hash, &HashSize);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->Transcript.MessageB.BufferSize = 0;
   SpdmContext->Transcript.MessageC.BufferSize = 0;

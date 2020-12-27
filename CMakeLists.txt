@@ -429,6 +429,7 @@ if(TESTTYPE STREQUAL "OsTest")
             OsStub/DebugLib
             OsStub/RngLib
             OsStub/MemoryAllocationLib
+            OsTest/SpdmDeviceSecretLib
     )
             
     SUBDIRS(OsTest/SpdmRequesterEmu
@@ -448,13 +449,13 @@ elseif(TESTTYPE STREQUAL "UnitTest")
             OsStub/DebugLib
             OsStub/RngLib
             OsStub/MemoryAllocationLib
+            OsTest/SpdmDeviceSecretLib
             UnitTest/SpdmTransportTestLib
             UnitTest/CmockaLib
             UnitTest/TestSize/BaseCryptLibDummy
             UnitTest/TestSize/BaseCryptStubLibDummy
             UnitTest/TestSize/IntrinsicLib
-            UnitTest/TestSize/MemoryAllocationLibNull
-            
+            UnitTest/TestSize/MemoryAllocationLibNull            
     )
             
     SUBDIRS(UnitTest/TestSpdmRequester
@@ -475,6 +476,7 @@ elseif(TESTTYPE STREQUAL "UnitFuzzing")
             OsStub/RngLib
             OsStub/MemoryAllocationLib
             UnitTest/SpdmTransportTestLib
+            OsTest/SpdmDeviceSecretLib
     )
     
     SUBDIRS(UnitTest/Fuzzing/TestSpdmRequesterGetVersion

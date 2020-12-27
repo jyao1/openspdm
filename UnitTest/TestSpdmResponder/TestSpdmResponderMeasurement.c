@@ -97,8 +97,6 @@ void TestSpdmResponderMeasurementCase1(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -113,10 +111,6 @@ void TestSpdmResponderMeasurementCase1(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest1.Nonce);
@@ -127,7 +121,6 @@ void TestSpdmResponderMeasurementCase1(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
   assert_int_equal (SpdmResponse->Header.Param1, MEASUREMENT_BLOCK_NUMBER);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, mSpdmGetMeasurementRequest1Size + sizeof(SPDM_MEASUREMENTS_RESPONSE));
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase2(void **state) {
@@ -137,8 +130,6 @@ void TestSpdmResponderMeasurementCase2(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -153,10 +144,6 @@ void TestSpdmResponderMeasurementCase2(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
   
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest2.Nonce);
@@ -168,7 +155,6 @@ void TestSpdmResponderMeasurementCase2(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase3(void **state) {
@@ -178,8 +164,6 @@ void TestSpdmResponderMeasurementCase3(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -195,10 +179,6 @@ void TestSpdmResponderMeasurementCase3(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest1.Nonce);
@@ -211,7 +191,6 @@ void TestSpdmResponderMeasurementCase3(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateBusy);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase4(void **state) {
@@ -221,8 +200,6 @@ void TestSpdmResponderMeasurementCase4(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -238,10 +215,6 @@ void TestSpdmResponderMeasurementCase4(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest1.Nonce);
@@ -254,7 +227,6 @@ void TestSpdmResponderMeasurementCase4(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase5(void **state) {
@@ -264,8 +236,6 @@ void TestSpdmResponderMeasurementCase5(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   SPDM_ERROR_DATA_RESPONSE_NOT_READY *ErrorData;
 
   SpdmTestContext = *state;
@@ -282,10 +252,6 @@ void TestSpdmResponderMeasurementCase5(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest1.Nonce);
@@ -300,7 +266,6 @@ void TestSpdmResponderMeasurementCase5(void **state) {
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
   assert_int_equal (ErrorData->RequestCode, SPDM_GET_MEASUREMENTS);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase6(void **state) {
@@ -310,8 +275,6 @@ void TestSpdmResponderMeasurementCase6(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -324,10 +287,6 @@ void TestSpdmResponderMeasurementCase6(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest1.Nonce);
@@ -339,7 +298,6 @@ void TestSpdmResponderMeasurementCase6(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_UNEXPECTED_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase7(void **state) {
@@ -349,8 +307,6 @@ void TestSpdmResponderMeasurementCase7(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
@@ -366,10 +322,6 @@ void TestSpdmResponderMeasurementCase7(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
   MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
@@ -381,7 +333,6 @@ void TestSpdmResponderMeasurementCase7(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
   assert_int_equal (SpdmResponse->Header.Param1, MEASUREMENT_BLOCK_NUMBER);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase8(void **state) {
@@ -391,8 +342,6 @@ void TestSpdmResponderMeasurementCase8(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
@@ -408,10 +357,6 @@ void TestSpdmResponderMeasurementCase8(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
   MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest3.Nonce);
@@ -421,7 +366,6 @@ void TestSpdmResponderMeasurementCase8(void **state) {
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase9(void **state) {
@@ -431,8 +375,6 @@ void TestSpdmResponderMeasurementCase9(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -447,10 +389,6 @@ void TestSpdmResponderMeasurementCase9(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest4.Nonce);
@@ -462,7 +400,6 @@ void TestSpdmResponderMeasurementCase9(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase10(void **state) {
@@ -472,8 +409,6 @@ void TestSpdmResponderMeasurementCase10(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -488,10 +423,6 @@ void TestSpdmResponderMeasurementCase10(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest6.Nonce);
@@ -501,7 +432,6 @@ void TestSpdmResponderMeasurementCase10(void **state) {
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase11(void **state) {
@@ -511,8 +441,6 @@ void TestSpdmResponderMeasurementCase11(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
@@ -528,10 +456,6 @@ void TestSpdmResponderMeasurementCase11(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
   MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
@@ -543,7 +467,6 @@ void TestSpdmResponderMeasurementCase11(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
   assert_int_equal (SpdmResponse->NumberOfBlocks, MEASUREMENT_BLOCK_NUMBER);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase12(void **state) {
@@ -553,8 +476,6 @@ void TestSpdmResponderMeasurementCase12(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -569,10 +490,6 @@ void TestSpdmResponderMeasurementCase12(void **state) {
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest7.Nonce);
@@ -583,7 +500,6 @@ void TestSpdmResponderMeasurementCase12(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
   assert_int_equal (SpdmResponse->NumberOfBlocks, MEASUREMENT_BLOCK_NUMBER);
   assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, mSpdmGetMeasurementRequest7Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)) + (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MEASUREMENT_MANIFEST_SIZE));
-  free(Data);
 }
 
 SPDM_TEST_CONTEXT       mSpdmResponderMeasurementTestContext = {

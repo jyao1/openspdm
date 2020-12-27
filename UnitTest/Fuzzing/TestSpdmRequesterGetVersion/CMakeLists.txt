@@ -9,7 +9,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/TestSpdmRequesterGetV
                         ${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/SpdmUnitFuzzingCommon
 )
 
-if(TOOLCHAIN STREQUAL "KLEE")  
+if(TOOLCHAIN STREQUAL "KLEE")
     INCLUDE_DIRECTORIES($ENV{KLEE_SRC_PATH}/include)
 endif()
 
@@ -31,6 +31,7 @@ SET(TestSpdmRequesterGetVersion_LIBRARY
     SpdmCryptLib
     SpdmSecuredMessageLib
     SpdmTransportTestLib
+    SpdmDeviceSecretLibNull
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
@@ -47,6 +48,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportTestLib>
+                   $<TARGET_OBJECTS:SpdmDeviceSecretLibNull>
     ) 
 else()
     ADD_EXECUTABLE(TestSpdmRequesterGetVersion ${src_TestSpdmRequesterGetVersion})

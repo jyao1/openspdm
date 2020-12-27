@@ -57,6 +57,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
     $(BIN_DIR)\Library\SpdmTransportMctpLib\SpdmTransportMctpLib.lib \
     $(BIN_DIR)\Library\SpdmTransportPciDoeLib\SpdmTransportPciDoeLib.lib \
+    $(BIN_DIR)\OsTest\SpdmDeviceSecretLib\SpdmDeviceSecretLib.lib \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
 
 
@@ -74,11 +75,13 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\*.obj \
     $(BIN_DIR)\Library\SpdmTransportMctpLib\*.obj \
     $(BIN_DIR)\Library\SpdmTransportPciDoeLib\*.obj \
+    $(BIN_DIR)\OsTest\SpdmDeviceSecretLib\*.obj \
 
 
 INC =  \
     -I$(SOURCE_DIR) \
     -I$(WORKSPACE)\OsTest\SpdmEmuCommon \
+    -I$(WORKSPACE)\OsTest\SpdmDeviceSecretLib \
     -I$(WORKSPACE)\Include \
     -I$(WORKSPACE)\Include\Hal \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \
@@ -124,6 +127,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmTransportMctpLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmTransportPciDoeLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsTest\SpdmDeviceSecretLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets

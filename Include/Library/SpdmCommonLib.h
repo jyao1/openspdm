@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseCryptLib.h>
 #include <Library/SpdmCryptLib.h>
 #include <Library/SpdmSecuredMessageLib.h>
+#include <Library/SpdmDeviceSecretLib.h>
 
 //
 // Connection: When a host sends messgages to a device, they create a connection.
@@ -262,99 +263,6 @@ UINTN
 EFIAPI
 SpdmGetContextSize (
   VOID
-  );
-
-/**
-  Collect the device measurement.
-
-  @param  MeasurementSpecification     Indicates the measurement specification.
-                                       It must align with MeasurementSpecification (SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_*)
-  @param  MeasurementHashAlgo          Indicates the measurement hash algorithm.
-                                       It must align with MeasurementHashAlgo (SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_*)
-  @param  DeviceMeasurementCount       The count of the device measurement block.
-  @param  DeviceMeasurement            A pointer to a destination buffer to store the concatenation of all device measurement blocks.
-  @param  DeviceMeasurementSize        On input, indicates the size in bytes of the destination buffer.
-                                       On output, indicates the size in bytes of all device measurement blocks in the buffer.
-
-  @retval TRUE  the device measurement collection success and measurement is returned.
-  @retval FALSE the device measurement collection fail.
-**/
-typedef
-BOOLEAN
-(EFIAPI *SPDM_MEASUREMENT_COLLECTION_FUNC) (
-  IN      UINT8        MeasurementSpecification,
-  IN      UINT32       MeasurementHashAlgo,
-     OUT  UINT8        *DeviceMeasurementCount,
-     OUT  VOID         *DeviceMeasurement,
-  IN OUT  UINTN        *DeviceMeasurementSize
-  );
-
-/**
-  Register SPDM measurement collection function.
-
-  @param  SpdmContext                      A pointer to the SPDM context.
-  @param  SpdmMeasurementCollectionFunc    The fuction to collect the device measurement.
-**/
-VOID
-EFIAPI
-SpdmRegisterMeasurementCollectionFunc (
-  IN     VOID                              *SpdmContext,
-  IN     SPDM_MEASUREMENT_COLLECTION_FUNC  SpdmMeasurementCollectionFunc
-  );
-
-/**
-  Sign an SPDM message data.
-
-  @param  AsymAlgo                     Indicates the signing algorithm.
-                                       For responder, it must align with BaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
-                                       For requester, it must align with ReqBaseAsymAlg (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
-  @param  MessageHash                  A pointer to a message hash to be signed.
-  @param  HashSize                     The size in bytes of the message hash to be signed.
-  @param  Signature                    A pointer to a destination buffer to store the signature.
-  @param  SigSize                      On input, indicates the size in bytes of the destination buffer to store the signature.
-                                       On output, indicates the size in bytes of the signature in the buffer.
-
-  @retval TRUE  signing success.
-  @retval FALSE signing fail.
-**/
-typedef
-BOOLEAN
-(EFIAPI *SPDM_DATA_SIGN_FUNC) (
-  IN      UINT32       AsymAlgo,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
-     OUT  UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
-  );
-
-/**
-  Register SPDM data signing function.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SpdmRequesterDataSignFunc    The fuction to sign the SPDM data from a requester.
-  @param  SpdmResponderDataSignFunc    The fuction to sign the SPDM data from a responder.
-**/
-VOID
-EFIAPI
-SpdmRegisterDataSignFunc (
-  IN     VOID                      *SpdmContext,
-  IN     SPDM_DATA_SIGN_FUNC       SpdmRequesterDataSignFunc,
-  IN     SPDM_DATA_SIGN_FUNC       SpdmResponderDataSignFunc
-  );
-
-/**
-  Register SPDM PSK HKDF_EXPAND function.
-
-  @param  SpdmContext                             A pointer to the SPDM context.
-  @param  SpdmPskHandshakeSecretHkdfExpandFunc    The fuction to HKDF_EXPAND key with PSK derived HandshakeSecret.
-  @param  SpdmPskMasterSecretHkdfExpandFunc       The fuction to HKDF_EXPAND key with PSK derived MasterSecret.
-**/
-VOID
-EFIAPI
-SpdmRegisterPskHkdfExpandFunc (
-  IN     VOID                      *SpdmContext,
-  IN     SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskHandshakeSecretHkdfExpandFunc,
-  IN     SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskMasterSecretHkdfExpandFunc
   );
 
 /**

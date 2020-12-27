@@ -75,7 +75,7 @@ void TestSpdmResponderFinishCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -148,7 +148,7 @@ void TestSpdmResponderFinishCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -223,7 +223,7 @@ void TestSpdmResponderFinishCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -301,7 +301,7 @@ void TestSpdmResponderFinishCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -380,7 +380,7 @@ void TestSpdmResponderFinishCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
@@ -456,7 +456,7 @@ void TestSpdmResponderFinishCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  ReadResponderPublicCertificateChain (&Data1, &DataSize1, NULL, NULL);
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
   SpdmContext->LocalContext.CertificateChain[0] = Data1;
   SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;

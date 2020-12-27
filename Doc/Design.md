@@ -1,4 +1,10 @@
-# openspdm library design. 
+# openspdm library design.
+
+1. Use static link (Library), when there is one instance can be linked to the device.
+   For example, crypto engine.
+
+2. Use dynamic link (function registration), when there are multiple instances can be linked to the device.
+   For example, transport layer.
 
 ## SPDM library layer
 
@@ -13,8 +19,11 @@
    +------------------+  +---------------+  +------------------+
    | SpdmRequesterLib |->| SpdmCommonLib |<-| SpdmResponderLib |  // DSP0274 - SPDM
    +------------------+  +---------------+  +------------------+
-          | | |                  ^                  | | |
-          | | |                  |                  | | |
+          | | |             |         V             | | |
+          | | |             | +-------------------+ | | |
+          | | |             | |SpdmDeviceSecretLib| | | |         // Device Secret handling (PrivateKey)
+          | | |             | +-------------------+ | | |
+          | | |             V         ^             | | |
           | | |      +-----------------------+      | | |
           | |  ----->| SpdmSecuredMessageLib |<-----  | |         // DSP0277 - Secured Message in SPDM session
           | |        +-----------------------+        | |
@@ -50,9 +59,21 @@
 
 4) [SpdmSecuredMessageLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmSecuredMessageLib.h) (follows DSP0277)
 
-   This library encrypts and decrypts secured messages.
+   This library handles the session key generation and secured messages encryption and decryption.
 
-5.1) [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) (follows DSP0275 and DSP0276)
+   This can be implemented in a confidential environment, if the session keys are considered as secret.
+
+5) [SpdmDeviceSecretLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmDeviceSecretLib.h)
+
+   This library handles the private key singing, PSK HMAC operation and measurement collection.
+
+   This must be implemented in a confidential environment, because the private key and PSK are secret.
+
+6) [SpdmCryptLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmCryptLib.h)
+
+   This library provides SPDM related crypto function. It is based upon [BaseCryptLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h).
+
+7.1) [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) (follows DSP0275 and DSP0276)
 
    This library encodes and decodes MCTP message header.
 
@@ -61,7 +82,7 @@
 
    These two APIs encode and decode transport layer messages to or from a SPDM device.
 
-5.2) [SpdmTransportPciDoeLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportPciDoeLib.h) (follows PCI DOE)
+7.2) [SpdmTransportPciDoeLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportPciDoeLib.h) (follows PCI DOE)
 
    This library encodes and decodes PCI DOE message header.
 
@@ -70,21 +91,21 @@
 
    These two APIs encode and decode transport layer messages to or from a SPDM device.
 
-6) SPDM_DEVICE_SEND_MESSAGE_FUNC and SPDM_DEVICE_RECEIVE_MESSAGE_FUNC
+8) SPDM_DEVICE_SEND_MESSAGE_FUNC and SPDM_DEVICE_RECEIVE_MESSAGE_FUNC
 
    SPDM requester/responder need register SPDM_DEVICE_SEND_MESSAGE_FUNC
    and SPDM_DEVICE_RECEIVE_MESSAGE_FUNC to the SpdmRequesterLib/SpdmResponderLib.
 
    These APIs send and receive transport layer messages to or from a SPDM device.
 
-7) [SpdmLibConfig.h](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmLibConfig.h) provides the configuration to the openspdm library.
+9) [SpdmLibConfig.h](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmLibConfig.h) provides the configuration to the openspdm library.
 
-8) SPDM library depends upon the [HAL library](https://github.com/jyao1/openspdm/tree/master/Include/Hal).
+10) SPDM library depends upon the [HAL library](https://github.com/jyao1/openspdm/tree/master/Include/Hal).
 
    The sample implementation can be found at [OsStub](https://github.com/jyao1/openspdm/tree/master/OsStub)
 
-   8.1) [BaseCryptLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h) provides crypto functions.
+   10.1) [BaseCryptLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h) provides crypto functions.
 
-   8.2) [BaseMemoryLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseMemoryLib.h) provides memory operation.
+   10.2) [BaseMemoryLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseMemoryLib.h) provides memory operation.
 
-   8.3) [DebugLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/DebugLib.h) provides debug functions.
+   10.3) [DebugLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/DebugLib.h) provides debug functions.

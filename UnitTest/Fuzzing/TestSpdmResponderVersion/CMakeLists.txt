@@ -7,11 +7,11 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/TestSpdmResponderVers
                         ${PROJECT_SOURCE_DIR}/Library/SpdmCommonLib
                         ${PROJECT_SOURCE_DIR}/Library/SpdmResponderLib
                         ${PROJECT_SOURCE_DIR}/UnitTest/Include
-                        ${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/SpdmUnitFuzzingCommon                 
+                        ${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/SpdmUnitFuzzingCommon
 )
 
 if(TOOLCHAIN STREQUAL "KLEE")
-    INCLUDE_DIRECTORIES($ENV{KLEE_SRC_PATH}/include) 
+    INCLUDE_DIRECTORIES($ENV{KLEE_SRC_PATH}/include)
 endif()
 
 SET(src_TestSpdmResponderVersion
@@ -32,6 +32,7 @@ SET(TestSpdmResponderVersion_LIBRARY
     SpdmCryptLib
     SpdmSecuredMessageLib
     SpdmTransportTestLib
+    SpdmDeviceSecretLibNull
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
@@ -48,6 +49,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportTestLib>
+                   $<TARGET_OBJECTS:SpdmDeviceSecretLibNull>
     ) 
 else()
     ADD_EXECUTABLE(TestSpdmResponderVersion ${src_TestSpdmResponderVersion})

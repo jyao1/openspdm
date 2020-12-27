@@ -63,8 +63,6 @@ typedef struct {
   SPDM_SESSION_INFO_APPLICATION_SECRET ApplicationSecretBackup;
   UINTN                                PskHintSize;
   VOID                                 *PskHint;
-  SPDM_PSK_HKDF_EXPAND_FUNC            SpdmPskHandshakeSecretHkdfExpandFunc;
-  SPDM_PSK_HKDF_EXPAND_FUNC            SpdmPskMasterSecretHkdfExpandFunc;
 } SPDM_SECURED_MESSAGE_CONTEXT;
 
 #endif

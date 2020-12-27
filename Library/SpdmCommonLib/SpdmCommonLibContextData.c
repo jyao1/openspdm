@@ -60,11 +60,6 @@ SpdmSessionInfoInit (
     SpdmContext->LocalContext.PskHint,
     SpdmContext->LocalContext.PskHintSize
     );
-  SpdmSecuredMessageRegisterPskHkdfExpandFunc (
-    SessionInfo->SecuredMessageContext,
-    SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc,
-    SpdmContext->LocalContext.SpdmPskMasterSecretHkdfExpandFunc
-    );
   SessionInfo->SessionTranscript.MessageK.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
   SessionInfo->SessionTranscript.MessageF.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 }
@@ -661,72 +656,6 @@ SpdmIsVersionSupported (
     }
   }
   return FALSE;
-}
-
-/**
-  Register SPDM measurement collection function.
-
-  @param  SpdmContext                      A pointer to the SPDM context.
-  @param  SpdmMeasurementCollectionFunc    The fuction to collect the device measurement.
-**/
-VOID
-EFIAPI
-SpdmRegisterMeasurementCollectionFunc (
-  IN     VOID                              *Context,
-  IN     SPDM_MEASUREMENT_COLLECTION_FUNC  SpdmMeasurementCollectionFunc
-  )
-{
-  SPDM_DEVICE_CONTEXT       *SpdmContext;
-
-  SpdmContext = Context;
-  SpdmContext->LocalContext.SpdmMeasurementCollectionFunc = SpdmMeasurementCollectionFunc;
-  return ;
-}
-
-/**
-  Register SPDM data signing function.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SpdmRequesterDataSignFunc    The fuction to sign the SPDM data from a requester.
-  @param  SpdmResponderDataSignFunc    The fuction to sign the SPDM data from a responder.
-**/
-VOID
-EFIAPI
-SpdmRegisterDataSignFunc (
-  IN     VOID                      *Context,
-  IN     SPDM_DATA_SIGN_FUNC       SpdmRequesterDataSignFunc,
-  IN     SPDM_DATA_SIGN_FUNC       SpdmResponderDataSignFunc
-  )
-{
-  SPDM_DEVICE_CONTEXT       *SpdmContext;
-
-  SpdmContext = Context;
-  SpdmContext->LocalContext.SpdmRequesterDataSignFunc = SpdmRequesterDataSignFunc;
-  SpdmContext->LocalContext.SpdmResponderDataSignFunc = SpdmResponderDataSignFunc;
-  return ;
-}
-
-/**
-  Register SPDM PSK HKDF_EXPAND function.
-
-  @param  SpdmContext                             A pointer to the SPDM context.
-  @param  SpdmPskHandshakeSecretHkdfExpandFunc    The fuction to HKDF_EXPAND key with PSK derived HandshakeSecret.
-  @param  SpdmPskMasterSecretHkdfExpandFunc       The fuction to HKDF_EXPAND key with PSK derived MasterSecret.
-**/
-VOID
-EFIAPI
-SpdmRegisterPskHkdfExpandFunc (
-  IN     VOID                      *Context,
-  IN     SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskHandshakeSecretHkdfExpandFunc,
-  IN     SPDM_PSK_HKDF_EXPAND_FUNC SpdmPskMasterSecretHkdfExpandFunc
-  )
-{
-  SPDM_DEVICE_CONTEXT       *SpdmContext;
-
-  SpdmContext = Context;
-  SpdmContext->LocalContext.SpdmPskHandshakeSecretHkdfExpandFunc = SpdmPskHandshakeSecretHkdfExpandFunc;
-  SpdmContext->LocalContext.SpdmPskMasterSecretHkdfExpandFunc = SpdmPskMasterSecretHkdfExpandFunc;
-  return ;
 }
 
 /**

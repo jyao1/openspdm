@@ -29,12 +29,13 @@ SET(SpdmDump_LIBRARY
     SpdmCommonLib
     ${CRYPTO}Lib
     RngLib
-    BaseCryptLib${CRYPTO}   
+    BaseCryptLib${CRYPTO}
     MemoryAllocationLib
     SpdmCryptLib
     SpdmSecuredMessageLib
     SpdmTransportMctpLib
     SpdmTransportPciDoeLib
+    SpdmDeviceSecretLibNull
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
@@ -51,6 +52,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportMctpLib>
                    $<TARGET_OBJECTS:SpdmTransportPciDoeLib>
+                   $<TARGET_OBJECTS:SpdmDeviceSecretLibNull>
     ) 
 else()
     ADD_EXECUTABLE(SpdmDump ${src_SpdmDump})
