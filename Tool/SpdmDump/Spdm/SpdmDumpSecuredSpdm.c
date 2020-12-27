@@ -11,7 +11,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 extern VOID               *mSpdmDecMessageBuffer;
 extern VOID               *mSpdmContext;
-extern SPDM_SESSION_INFO  *mCurrentSessionInfo;
+extern VOID               *mCurrentSessionInfo;
+extern UINT32             mCurrentSessionId;
 extern BOOLEAN            mDecrypted;
 
 VOID
@@ -165,6 +166,7 @@ DumpSecuredSpdmMessage (
   STATIC BOOLEAN                      IsRequester = FALSE;
   UINT32                              DataLinkType;
   SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
+  VOID                                *SecuredMessageContext;
 
   DataLinkType = GetDataLinkType();
   switch (DataLinkType) {
@@ -201,10 +203,12 @@ DumpSecuredSpdmMessage (
   }
 
   mCurrentSessionInfo = SpdmGetSessionInfoViaSessionId (mSpdmContext, RecordHeader1->SessionId);
+  mCurrentSessionId = RecordHeader1->SessionId;
   if (mCurrentSessionInfo != NULL) {
+    SecuredMessageContext = SpdmGetSecuredMessageContextViaSessionId (mSpdmContext, RecordHeader1->SessionId);
     MessageSize = GetMaxPacketLength();
     Status = SpdmDecodeSecuredMessage (
-              mCurrentSessionInfo->SecuredMessageContext,
+              SecuredMessageContext,
               RecordHeader1->SessionId,
               IsRequester,
               BufferSize,
@@ -218,7 +222,7 @@ DumpSecuredSpdmMessage (
       // Try other direction, because a responder might initiate a message in Session.
       //
       Status = SpdmDecodeSecuredMessage (
-                mCurrentSessionInfo->SecuredMessageContext,
+                SecuredMessageContext,
                 RecordHeader1->SessionId,
                 !IsRequester,
                 BufferSize,

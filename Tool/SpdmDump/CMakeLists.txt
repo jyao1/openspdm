@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Tool/SpdmDump
-                    ${PROJECT_SOURCE_DIR}/Library/SpdmCommonLib
                     ${PROJECT_SOURCE_DIR}/Include
                     ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
@@ -11,10 +10,10 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Tool/SpdmDump
 SET(src_SpdmDump
     SpdmDump.c
     SpdmDumpPcap.c
-    SpdmDumpSession.c
     SpdmDumpSupport.c
     Spdm/SpdmDumpSpdm.c
     Spdm/SpdmDumpSecuredSpdm.c
+    Spdm/SpdmDumpSession.c
     Mctp/MctpDump.c
     Mctp/Pldm/MctpDumpPldm.c
     Pci/PciDoeDump.c

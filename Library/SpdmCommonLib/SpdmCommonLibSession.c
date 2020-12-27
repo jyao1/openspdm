@@ -21,18 +21,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 */
 RETURN_STATUS
 SpdmCalculateTh1 (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *Context,
   IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester,
   OUT UINT8                       *TH1HashData
   )
 {
+  SPDM_DEVICE_CONTEXT            *SpdmContext;
   UINTN                          HashSize;
   UINT8                          *CertBuffer;
   UINTN                          CertBufferSize;
   UINT8                          CertBufferHash[MAX_HASH_SIZE];
   LARGE_MANAGED_BUFFER           TH1;
   SPDM_SESSION_INFO              *SessionInfo;
+
+  SpdmContext = Context;
 
   DEBUG((DEBUG_INFO, "Calc TH1 Hash ...\n"));
 
@@ -105,12 +108,13 @@ SpdmCalculateTh1 (
 */
 RETURN_STATUS
 SpdmCalculateTh2 (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *Context,
   IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester,
   OUT UINT8                       *TH2HashData
   )
 {
+  SPDM_DEVICE_CONTEXT            *SpdmContext;
   UINTN                          HashSize;
   UINT8                          *CertBuffer;
   UINTN                          CertBufferSize;
@@ -120,6 +124,8 @@ SpdmCalculateTh2 (
   UINT8                          MutCertBufferHash[MAX_HASH_SIZE];
   LARGE_MANAGED_BUFFER           TH2;
   SPDM_SESSION_INFO              *SessionInfo;
+
+  SpdmContext = Context;
 
   DEBUG((DEBUG_INFO, "Calc TH2 Hash ...\n"));
 

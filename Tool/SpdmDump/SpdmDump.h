@@ -20,10 +20,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Pcap.h>
 #include <IndustryStandard/LinkTypeEx.h>
 
-#include <Library/SpdmSecuredMessageLib.h>
+#include <Library/SpdmCommonLib.h>
 #include <Library/SpdmTransportMctpLib.h>
 #include <Library/SpdmTransportPciDoeLib.h>
-#include <SpdmCommonLibInternal.h>
 
 #include "OsInclude.h"
 #include "stdio.h"
@@ -200,14 +199,14 @@ DumpPciIdeKmMessage (
 
 RETURN_STATUS
 SpdmDumpSessionDataProvision (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *SpdmContext,
   IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester
   );
 
 RETURN_STATUS
 SpdmDumpSessionDataCheck (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN VOID                         *SpdmContext,
   IN UINT32                       SessionId,
   IN BOOLEAN                      IsRequester
   );

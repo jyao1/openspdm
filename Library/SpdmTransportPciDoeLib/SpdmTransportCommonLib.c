@@ -158,7 +158,7 @@ SpdmTransportPciDoeEncodeMessage (
   TransportEncodeMessage = PciDoeEncodeMessage;
   if (SessionId != NULL) {
     
-    SecuredMessageContext = SpdmGetSessionKeyInfoViaSessionId (SpdmContext, *SessionId);
+    SecuredMessageContext = SpdmGetSecuredMessageContextViaSessionId (SpdmContext, *SessionId);
     if (SecuredMessageContext == NULL) {
       return RETURN_UNSUPPORTED;
     }
@@ -286,7 +286,7 @@ SpdmTransportPciDoeDecodeMessage (
   if (SecuredMessageSessionId != NULL) {
     *SessionId = SecuredMessageSessionId;
     
-    SecuredMessageContext = SpdmGetSessionKeyInfoViaSessionId (SpdmContext, *SecuredMessageSessionId);
+    SecuredMessageContext = SpdmGetSecuredMessageContextViaSessionId (SpdmContext, *SecuredMessageSessionId);
     if (SecuredMessageContext == NULL) {
       return RETURN_UNSUPPORTED;
     }

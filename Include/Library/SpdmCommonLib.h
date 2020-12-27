@@ -91,6 +91,11 @@ typedef enum {
   SpdmDataBasicMutAuthRequested,
   SpdmDataMutAuthRequested,
   //
+  // Negotiated result
+  //
+  SpdmDataLocalUsedCertChainBuffer,
+  SpdmDataPeerCertChainBuffer,
+  //
   // Pre-shared Key Hint
   // If PSK is present, then PSK_EXCHANGE is used.
   // Otherwise, the KEY_EXCHANGE is used.
@@ -105,6 +110,11 @@ typedef enum {
   SpdmDataOpaqueKeyExchangeRsp,
   SpdmDataOpaquePskExchangeReq,
   SpdmDataOpaquePskExchangeRsp,
+  //
+  // SessionData
+  //
+  SpdmDataSessionUsePsk,
+  SpdmDataSessionMutAuthRequested,
 
   //
   // MAX
@@ -451,18 +461,94 @@ SpdmRegisterTransportLayerFunc (
   IN     SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  TransportDecodeMessage
   );
 
+VOID
+SpdmResetMessageA (
+  IN     VOID                                *SpdmContext
+  );
+
+VOID
+SpdmResetMessageB (
+  IN     VOID                                *SpdmContext
+  );
+
+VOID
+SpdmResetMessageC (
+  IN     VOID                                *SpdmContext
+  );
+
+VOID
+SpdmAppendMessageA (
+  IN     VOID                                *SpdmContext,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  );
+
+VOID
+SpdmAppendMessageB (
+  IN     VOID                                *SpdmContext,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  );
+
+VOID
+SpdmAppendMessageC (
+  IN     VOID                                *SpdmContext,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  );
+
+VOID
+SpdmAppendMessageK (
+  IN     VOID                                *SpdmSessionInfo,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  );
+
+VOID
+SpdmAppendMessageF (
+  IN     VOID                                *SpdmSessionInfo,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  );
+
 /**
-  This function gets the session key info via session ID.
+  This function gets the session info via session ID.
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    The SPDM session ID.
 
-  @return session key info.
+  @return session info.
 **/
 VOID *
-SpdmGetSessionKeyInfoViaSessionId (
+SpdmGetSessionInfoViaSessionId (
   IN     VOID                      *SpdmContext,
   IN     UINT32                    SessionId
+  );
+
+/**
+  This function gets the secured message context via session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return secured message context.
+**/
+VOID *
+SpdmGetSecuredMessageContextViaSessionId (
+  IN     VOID                      *SpdmContext,
+  IN     UINT32                    SessionId
+  );
+
+/**
+  This function gets the secured message context via session ID.
+
+  @param  SpdmSessionInfo              A pointer to the SPDM context.
+
+  @return secured message context.
+**/
+VOID *
+SpdmGetSecuredMessageContextViaSessionInfo (
+  IN     VOID                      *SpdmSessionInfo
   );
 
 /**
@@ -476,6 +562,97 @@ UINTN
 EFIAPI
 SpdmGetOpaqueDataSupportedVersionDataSize (
   VOID
+  );
+
+/**
+  This function assigns a new session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return session info associated with this new session ID.
+**/
+VOID *
+SpdmAssignSessionId (
+  IN     VOID                      *SpdmContext,
+  IN     UINT32                    SessionId,
+  IN     BOOLEAN                   UsePsk
+  );
+
+/**
+  This function frees a session ID.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+
+  @return freed session info assicated with this session ID.
+**/
+VOID *
+SpdmFreeSessionId (
+  IN     VOID                      *SpdmContext,
+  IN     UINT32                    SessionId
+  );
+
+/*
+  This function calculates TH1 hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
+  @param  TH1HashData                  TH1 hash
+
+  @retval RETURN_SUCCESS  TH1 hash is calculated.
+*/
+RETURN_STATUS
+SpdmCalculateTh1 (
+  IN VOID                         *SpdmContext,
+  IN UINT32                       SessionId,
+  IN BOOLEAN                      IsRequester,
+  OUT UINT8                       *TH1HashData
+  );
+
+/*
+  This function calculates TH2 hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SPDM session ID.
+  @param  IsRequester                  Indicate of the key generation for a requester or a responder.
+  @param  TH1HashData                  TH2 hash
+
+  @retval RETURN_SUCCESS  TH2 hash is calculated.
+*/
+RETURN_STATUS
+SpdmCalculateTh2 (
+  IN VOID                        *SpdmContext,
+  IN UINT32                       SessionId,
+  IN BOOLEAN                      IsRequester,
+  OUT UINT8                       *TH2HashData
+  );
+
+/**
+  Reads a 24-bit value from memory that may be unaligned.
+
+  @param  Buffer  The pointer to a 24-bit value that may be unaligned.
+
+  @return The 24-bit value read from Buffer.
+**/
+UINT32
+SpdmReadUint24 (
+  IN UINT8  *Buffer
+  );
+
+/**
+  Writes a 24-bit value to memory that may be unaligned.
+
+  @param  Buffer  The pointer to a 24-bit value that may be unaligned.
+  @param  Value   24-bit value to write to Buffer.
+
+  @return The 24-bit value to write to Buffer.
+**/
+UINT32
+SpdmWriteUint24 (
+  IN UINT8  *Buffer,
+  IN UINT32 Value
   );
 
 /**

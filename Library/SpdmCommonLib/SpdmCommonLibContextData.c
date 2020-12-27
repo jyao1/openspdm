@@ -72,12 +72,13 @@ SpdmSessionInfoInit (
 
   @return session info.
 **/
-SPDM_SESSION_INFO *
+VOID *
 SpdmGetSessionInfoViaSessionId (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     VOID                      *Context,
   IN     UINT32                    SessionId
   )
 {
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
   SPDM_SESSION_INFO          *SessionInfo;
   UINTN                      Index;
 
@@ -86,6 +87,8 @@ SpdmGetSessionInfoViaSessionId (
     ASSERT(FALSE);
     return NULL;
   }
+
+  SpdmContext = Context;
 
   SessionInfo = SpdmContext->SessionInfo;
   for (Index = 0; Index < MAX_SPDM_SESSION_COUNT; Index++) {
@@ -99,15 +102,15 @@ SpdmGetSessionInfoViaSessionId (
 }
 
 /**
-  This function gets the session key info via session ID.
+  This function gets the secured message context via session ID.
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    The SPDM session ID.
 
-  @return session key info.
+  @return secured message context.
 **/
 VOID *
-SpdmGetSessionKeyInfoViaSessionId (
+SpdmGetSecuredMessageContextViaSessionId (
   IN     VOID                      *SpdmContext,
   IN     UINT32                    SessionId
   )
@@ -123,6 +126,28 @@ SpdmGetSessionKeyInfoViaSessionId (
 }
 
 /**
+  This function gets the secured message context via session ID.
+
+  @param  SpdmSessionInfo              A pointer to the SPDM context.
+
+  @return secured message context.
+**/
+VOID *
+SpdmGetSecuredMessageContextViaSessionInfo (
+  IN     VOID                      *SpdmSessionInfo
+  )
+{
+  SPDM_SESSION_INFO          *SessionInfo;
+
+  SessionInfo = SpdmSessionInfo;
+  if (SessionInfo == NULL) {
+    return NULL;
+  } else {
+    return SessionInfo->SecuredMessageContext;
+  }
+}
+
+/**
   This function assigns a new session ID.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -130,15 +155,18 @@ SpdmGetSessionKeyInfoViaSessionId (
 
   @return session info associated with this new session ID.
 **/
-SPDM_SESSION_INFO *
+VOID *
 SpdmAssignSessionId (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     VOID                      *Context,
   IN     UINT32                    SessionId,
   IN     BOOLEAN                   UsePsk
   )
 {
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
   SPDM_SESSION_INFO          *SessionInfo;
   UINTN                      Index;
+
+  SpdmContext = Context;
 
   if (SessionId == INVALID_SESSION_ID) {
     DEBUG ((DEBUG_ERROR, "SpdmAssignSessionId - Invalid SessionId\n"));
@@ -235,14 +263,17 @@ SpdmAllocateRspSessionId (
 
   @return freed session info assicated with this session ID.
 **/
-SPDM_SESSION_INFO *
+VOID *
 SpdmFreeSessionId (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     VOID                      *Context,
   IN     UINT32                    SessionId
   )
 {
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
   SPDM_SESSION_INFO          *SessionInfo;
   UINTN                      Index;
+
+  SpdmContext = Context;
 
   if (SessionId == INVALID_SESSION_ID) {
     DEBUG ((DEBUG_ERROR, "SpdmFreeSessionId - Invalid SessionId\n"));
@@ -287,26 +318,6 @@ SpdmInitEncapEnv (
 }
 
 /**
-  Returns if an SPDM DataType is debug only.
-
-  @param DataType  SPDM data type.
-
-  @retval TRUE  This is debug only SPDM data type.
-  @retval FALSE This is not debug only SPDM data type.
-**/
-BOOLEAN
-IsDebugOnlyData (
-  IN     SPDM_DATA_TYPE      DataType
-  )
-{
-  if ((UINT32)DataType >= 0x80000000) {
-    return TRUE;
-  } else {
-    return FALSE;
-  }
-}
-
-/**
   Returns if an SPDM DataType requires session info.
 
   @param DataType  SPDM data type.
@@ -319,6 +330,11 @@ NeedSessionInfoForData (
   IN     SPDM_DATA_TYPE      DataType
   )
 {
+  switch (DataType) {
+  case SpdmDataSessionUsePsk:
+  case SpdmDataSessionMutAuthRequested:
+    return TRUE;
+  }
   return FALSE;
 }
 
@@ -353,10 +369,6 @@ SpdmSetData (
   UINT8                      SlotNum;
   UINT8                      MutAuthRequested;
 
-  if (IsDebugOnlyData (DataType)) {
-    return RETURN_UNSUPPORTED;
-  }
-
   SpdmContext = Context;
 
   if (NeedSessionInfoForData (DataType)) {
@@ -375,7 +387,11 @@ SpdmSetData (
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.Capability.Flags = *(UINT32 *)Data;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Capability.Flags = *(UINT32 *)Data;
+    } else {
+      SpdmContext->LocalContext.Capability.Flags = *(UINT32 *)Data;
+    }
     break;
   case SpdmDataCapabilityCTExponent:
     if (DataSize != sizeof(UINT8)) {
@@ -387,43 +403,71 @@ SpdmSetData (
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = *(UINT32 *)Data;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = *(UINT32 *)Data;
+    } else {
+      SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = *(UINT32 *)Data;
+    }
     break;
   case SpdmDataBaseAsymAlgo:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = *(UINT32 *)Data;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = *(UINT32 *)Data;
+    } else {
+      SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = *(UINT32 *)Data;
+    }
     break;
   case SpdmDataBaseHashAlgo:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.Algorithm.BaseHashAlgo = *(UINT32 *)Data;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = *(UINT32 *)Data;
+    } else {
+      SpdmContext->LocalContext.Algorithm.BaseHashAlgo = *(UINT32 *)Data;
+    }
     break;
   case SpdmDataDHENamedGroup:
     if (DataSize != sizeof(UINT16)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.Algorithm.DHENamedGroup = *(UINT16 *)Data;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = *(UINT16 *)Data;
+    } else {
+      SpdmContext->LocalContext.Algorithm.DHENamedGroup = *(UINT16 *)Data;
+    }
     break;
   case SpdmDataAEADCipherSuite:
     if (DataSize != sizeof(UINT16)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.Algorithm.AEADCipherSuite = *(UINT16 *)Data;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = *(UINT16 *)Data;
+    } else {
+      SpdmContext->LocalContext.Algorithm.AEADCipherSuite = *(UINT16 *)Data;
+    }
     break;
   case SpdmDataReqBaseAsymAlg:
     if (DataSize != sizeof(UINT16)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.Algorithm.ReqBaseAsymAlg = *(UINT16 *)Data;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = *(UINT16 *)Data;
+    } else {
+      SpdmContext->LocalContext.Algorithm.ReqBaseAsymAlg = *(UINT16 *)Data;
+    }
     break;
   case SpdmDataKeySchedule:
     if (DataSize != sizeof(UINT16)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.Algorithm.KeySchedule = *(UINT16 *)Data;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Algorithm.KeySchedule = *(UINT16 *)Data;
+    } else {
+      SpdmContext->LocalContext.Algorithm.KeySchedule = *(UINT16 *)Data;
+    }
     break;
   case SpdmDataResponseState:
     if (DataSize != sizeof(UINT32)) {
@@ -457,6 +501,20 @@ SpdmSetData (
     SpdmContext->LocalContext.CertificateChainSize[SlotNum] = DataSize;
     SpdmContext->LocalContext.CertificateChain[SlotNum] = Data;
     break;
+  case SpdmDataLocalUsedCertChainBuffer:
+    if (DataSize > MAX_SPDM_CERT_CHAIN_SIZE) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
+    SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = DataSize;
+    SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data;
+    break;
+  case SpdmDataPeerCertChainBuffer:
+    if (DataSize > MAX_SPDM_CERT_CHAIN_SIZE) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
+    SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
+    CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+    break;
   case SpdmDataBasicMutAuthRequested:
     if (DataSize != sizeof(BOOLEAN)) {
       return RETURN_INVALID_PARAMETER;
@@ -482,6 +540,18 @@ SpdmSetData (
     }
     SpdmContext->LocalContext.PskHintSize = DataSize;
     SpdmContext->LocalContext.PskHint = Data;
+    break;
+  case SpdmDataSessionUsePsk:
+    if (DataSize != sizeof(BOOLEAN)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SessionInfo->UsePsk = *(BOOLEAN *)Data;
+    break;
+  case SpdmDataSessionMutAuthRequested:
+    if (DataSize != sizeof(UINT8)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SessionInfo->MutAuthRequested = *(UINT8 *)Data;
     break;
   default:
     return RETURN_UNSUPPORTED;
@@ -525,10 +595,6 @@ SpdmGetData (
   VOID                       *TargetData;
   UINT32                     SessionId;
   SPDM_SESSION_INFO          *SessionInfo;
-
-  if (IsDebugOnlyData (DataType)) {
-    return RETURN_UNSUPPORTED;
-  }
 
   SpdmContext = Context;
 
@@ -618,6 +684,14 @@ SpdmGetData (
     TargetDataSize = sizeof(UINT32);
     TargetData = &SpdmContext->ResponseState;
     break;
+  case SpdmDataSessionUsePsk:
+    TargetDataSize = sizeof(BOOLEAN);
+    TargetData = &SessionInfo->UsePsk;
+    break;
+  case SpdmDataSessionMutAuthRequested:
+    TargetDataSize = sizeof(UINT8);
+    TargetData = &SessionInfo->MutAuthRequested;
+    break;
   default:
     return RETURN_UNSUPPORTED;
     break;
@@ -631,6 +705,104 @@ SpdmGetData (
   CopyMem (Data, TargetData, TargetDataSize);
 
   return RETURN_SUCCESS;
+}
+
+VOID
+SpdmResetMessageA (
+  IN     VOID                                *Context
+  )
+{
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
+
+  SpdmContext = Context;
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageA);
+}
+
+VOID
+SpdmResetMessageB (
+  IN     VOID                                *Context
+  )
+{
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
+
+  SpdmContext = Context;
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
+}
+
+VOID
+SpdmResetMessageC (
+  IN     VOID                                *Context
+  )
+{
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
+
+  SpdmContext = Context;
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
+}
+
+VOID
+SpdmAppendMessageA (
+  IN     VOID                                *Context,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  )
+{
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
+
+  SpdmContext = Context;
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, Message, MessageSize);
+}
+
+VOID
+SpdmAppendMessageB (
+  IN     VOID                                *Context,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  )
+{
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
+
+  SpdmContext = Context;
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, Message, MessageSize);
+}
+
+VOID
+SpdmAppendMessageC (
+  IN     VOID                                *Context,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  )
+{
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
+
+  SpdmContext = Context;
+  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, Message, MessageSize);
+}
+
+VOID
+SpdmAppendMessageK (
+  IN     VOID                                *SessionInfo,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  )
+{
+  SPDM_SESSION_INFO       *SpdmSessionInfo;
+
+  SpdmSessionInfo = SessionInfo;
+  AppendManagedBuffer (&SpdmSessionInfo->SessionTranscript.MessageK, Message, MessageSize);
+}
+
+VOID
+SpdmAppendMessageF (
+  IN     VOID                                *SessionInfo,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  )
+{
+  SPDM_SESSION_INFO       *SpdmSessionInfo;
+
+  SpdmSessionInfo = SessionInfo;
+  AppendManagedBuffer (&SpdmSessionInfo->SessionTranscript.MessageF, Message, MessageSize);
 }
 
 /**

@@ -81,7 +81,6 @@ STATIC_LIBRARY_OBJECT_FILES =  \
 
 INC =  \
     -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)/Library/SpdmCommonLib \
     -I$(WORKSPACE)/Include \
     -I$(WORKSPACE)/Include/Hal \
     -I$(WORKSPACE)/Include/Hal/$(ARCH) \
@@ -137,9 +136,6 @@ $(OUTPUT_DIR)/SpdmDump.o : $(SOURCE_DIR)/SpdmDump.c
 $(OUTPUT_DIR)/SpdmDumpPcap.o : $(SOURCE_DIR)/SpdmDumpPcap.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmDumpSession.o : $(SOURCE_DIR)/SpdmDumpSession.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
 $(OUTPUT_DIR)/SpdmDumpSupport.o : $(SOURCE_DIR)/SpdmDumpSupport.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
@@ -147,6 +143,9 @@ $(OUTPUT_DIR)/SpdmDumpSpdm.o : $(SOURCE_DIR)/Spdm/SpdmDumpSpdm.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmDumpSecuredSpdm.o : $(SOURCE_DIR)/Spdm/SpdmDumpSecuredSpdm.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmDumpSession.o : $(SOURCE_DIR)/Spdm/SpdmDumpSession.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/MctpDump.o : $(SOURCE_DIR)/Mctp/MctpDump.c
