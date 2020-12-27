@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "SpdmSecuredMessageLibInternal.h"
+#include "SpdmCommonLibInternal.h"
 
 /**
   Return the size in bytes of opaque data version selection.

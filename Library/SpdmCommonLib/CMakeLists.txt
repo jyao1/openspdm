@@ -9,6 +9,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Library/SpdmCommonLib
 SET(src_SpdmCommonLib
     SpdmCommonLibContextData.c
     SpdmCommonLibCryptoService.c
+    SpdmCommonLibOpaqueData.c
     SpdmCommonLibSession.c
     SpdmCommonLibSupport.c
 )

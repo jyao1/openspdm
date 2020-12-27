@@ -34,7 +34,6 @@ SOURCE_DIR = $(WORKSPACE)\Library\$(MODULE_NAME)
 OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmSecuredMessageLibEncodeDecode.obj \
     $(OUTPUT_DIR)\SpdmSecuredMessageLibKeyExchange.obj \
-    $(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj \
     $(OUTPUT_DIR)\SpdmSecuredMessageLibSessionKeys.obj \
 
 
@@ -76,9 +75,6 @@ $(OUTPUT_DIR)\SpdmSecuredMessageLibEncodeDecode.obj : $(SOURCE_DIR)\SpdmSecuredM
 
 $(OUTPUT_DIR)\SpdmSecuredMessageLibKeyExchange.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibKeyExchange.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibKeyExchange.c
-
-$(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
 
 $(OUTPUT_DIR)\SpdmSecuredMessageLibSessionKeys.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibSessionKeys.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibSessionKeys.c
