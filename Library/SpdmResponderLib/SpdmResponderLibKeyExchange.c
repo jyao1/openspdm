@@ -48,8 +48,6 @@ SpdmGetResponseKeyExchange (
   UINT8                         SlotNum;
   UINT32                        SessionId;
   VOID                          *DHEContext;
-  UINT8                         FinalKey[MAX_DHE_KEY_SIZE];
-  UINTN                         FinalKeySize;
   SPDM_SESSION_INFO             *SessionInfo;
   UINTN                         TotalSize;
   SPDM_DEVICE_CONTEXT           *SpdmContext;
@@ -165,20 +163,16 @@ SpdmGetResponseKeyExchange (
   SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
 
   Ptr = (VOID *)(SpdmResponse + 1);
-  DHEContext = SpdmDheNew (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
-  SpdmDheGenerateKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, Ptr, &DheKeySize);
+  DHEContext = SpdmSecuredMessageDheNew (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+  SpdmSecuredMessageDheGenerateKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, Ptr, &DheKeySize);
   DEBUG((DEBUG_INFO, "Calc SelfKey (0x%x):\n", DheKeySize));
   InternalDumpHex (Ptr, DheKeySize);
 
   DEBUG((DEBUG_INFO, "Calc PeerKey (0x%x):\n", DheKeySize));
   InternalDumpHex ((UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize);
 
-  FinalKeySize = sizeof(FinalKey);
-  SpdmDheComputeKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
-  SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
-  DEBUG((DEBUG_INFO, "Calc FinalKey (0x%x):\n", FinalKeySize));
-  InternalDumpHex (FinalKey, FinalKeySize);
-  SpdmSecuredMessageSetDheSecret (SessionInfo->SecuredMessageContext, FinalKey, FinalKeySize);
+  SpdmSecuredMessageDheComputeKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, SessionInfo->SecuredMessageContext);
+  SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
 
   Ptr += DheKeySize;
 

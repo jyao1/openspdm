@@ -40,7 +40,7 @@ SpdmDumpSessionDataProvision (
     if (mDheSecretBuffer == NULL || mDheSecretBufferSize == 0) {
       return RETURN_UNSUPPORTED;
     }
-    SpdmSecuredMessageSetDheSecret (SessionInfo->SecuredMessageContext, mDheSecretBuffer, mDheSecretBufferSize);
+    SpdmSecuredMessageImportDheSecret (SessionInfo->SecuredMessageContext, mDheSecretBuffer, mDheSecretBufferSize);
 
     if (IsRequester) {
       if (SessionInfo->MutAuthRequested) {
@@ -77,7 +77,7 @@ SpdmDumpSessionDataProvision (
       printf ("BUGBUG: PSK size is too large. It will be supported later.\n");
       return RETURN_UNSUPPORTED;
     }
-    SpdmSecuredMessageSetDheSecret (SessionInfo->SecuredMessageContext, mPskBuffer, mPskBufferSize);
+    SpdmSecuredMessageImportDheSecret (SessionInfo->SecuredMessageContext, mPskBuffer, mPskBufferSize);
   }
 
   return RETURN_SUCCESS;

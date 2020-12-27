@@ -6,13 +6,27 @@ This document provides the general information on how to write an SPDM requester
 
 Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmRequesterEmu/SpdmRequester.c)
 
-0. Choose a proper SpdmDeviceSecretLib.
+0. Choose proper SPDM libraries.
 
-   0.1, if the requester supports mutual authentication, implement SpdmRequesterDataSignFunc().
+   0.1, implement a proper [SpdmDeviceSecretLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmDeviceSecretLib.h).
 
-   0.2, if the requester supports measurement, implement SpdmMeasurementCollectionFunc().
+   If the requester supports mutual authentication, implement SpdmRequesterDataSignFunc().
 
-   0.3, if the requester supports PSK exchange, implement SpdmPskHandshakeSecretHkdfExpandFunc() and SpdmPskMasterSecretHkdfExpandFunc().
+   If the requester supports measurement, implement SpdmMeasurementCollectionFunc().
+
+   If the requester supports PSK exchange, implement SpdmPskHandshakeSecretHkdfExpandFunc() and SpdmPskMasterSecretHkdfExpandFunc().
+
+   SpdmDeviceSecretLib must be in a secure environment.
+
+   0.2, choose a proper [SpdmSecuredMessageLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmSecuredMessageLib.h).
+
+   If SPDM session key requires confidentiality, implement SpdmSecuredMessageLib in a secure environment.
+
+   0.3, choose a proper crypto engine [BaseCryptLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h).
+
+   0.4, choose required SPDM transport libs, such as [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) and [SpdmTransportPciDoeLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportPciDoeLib.h)
+
+   0.5, implement required SPDM device IO functions - SPDM_DEVICE_SEND_MESSAGE_FUNC and SPDM_DEVICE_RECEIVE_MESSAGE_FUNC. 
 
 1. Initialize SPDM context
 
@@ -24,8 +38,8 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    ```
 
    1.2, register the device io functions and transport layer functions.
-   The openspdm provides the default transport layer MCTP encode/decode function.
-   The SPDM device driver need provide device send/receive function.
+   The openspdm provides the default [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) and [SpdmTransportPciDoeLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportPciDoeLib.h).
+   The SPDM device driver need provide device IO send/receive function.
 
    ```
    SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);
@@ -179,13 +193,29 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
 
 Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/openspdm/blob/master/OsTest/SpdmResponderEmu/SpdmResponder.c)
 
-0. Choose a proper SpdmDeviceSecretLib.
+0. Choose proper SPDM libraries.
 
-   0.1, if the responder supports signing, implement SpdmResponderDataSignFunc().
+   0.1, implement a proper [SpdmDeviceSecretLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmDeviceSecretLib.h).
 
-   0.2, if the responder supports measurement, implement SpdmMeasurementCollectionFunc().
+   If the responder supports signing, implement SpdmResponderDataSignFunc().
 
-   0.3, if the responder supports PSK exchange, implement SpdmPskHandshakeSecretHkdfExpandFunc() and SpdmPskMasterSecretHkdfExpandFunc().
+   If the responder supports measurement, implement SpdmMeasurementCollectionFunc().
+
+   If the responder supports PSK exchange, implement SpdmPskHandshakeSecretHkdfExpandFunc() and SpdmPskMasterSecretHkdfExpandFunc().
+
+   SpdmDeviceSecretLib must be in a secure environment.
+
+   0.2, choose a proper [SpdmSecuredMessageLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmSecuredMessageLib.h).
+
+   If SPDM session key requires confidentiality, implement SpdmSecuredMessageLib in a secure environment.
+
+   0.3, choose a proper crypto engine [BaseCryptLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h).
+
+   0.4, choose required SPDM transport libs, such as [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) and [SpdmTransportPciDoeLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportPciDoeLib.h)
+
+   0.5, implement required SPDM device IO functions - SPDM_DEVICE_SEND_MESSAGE_FUNC and SPDM_DEVICE_RECEIVE_MESSAGE_FUNC. 
+
+0. Implement a proper SpdmDeviceSecretLib.
 
 1. Initialize SPDM context (similar to SPDM requester)
 
@@ -197,8 +227,8 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    ```
 
    1.2, register the device io functions and transport layer functions.
-   The openspdm provides the default transport layer MCTP encode/decode function.
-   The SPDM device driver need provide device send/receive function.
+   The openspdm provides the default [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) and [SpdmTransportPciDoeLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportPciDoeLib.h).
+   The SPDM device driver need provide device IO send/receive function.
 
    ```
    SpdmRegisterDeviceIoFunc (SpdmContext, SpdmDeviceSendMessage, SpdmDeviceReceiveMessage);

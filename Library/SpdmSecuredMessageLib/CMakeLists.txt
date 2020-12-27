@@ -7,7 +7,8 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Library/SpdmSecuredMessageLib
 )
 
 SET(src_SpdmSecuredMessageLib
-    SpdmSecuredMessageLib.c
+    SpdmSecuredMessageLibEncodeDecode.c
+    SpdmSecuredMessageLibKeyExchange.c
     SpdmSecuredMessageLibOpaqueData.c
     SpdmSecuredMessageLibSessionKeys.c
 )

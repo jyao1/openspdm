@@ -61,17 +61,19 @@
 
    This library handles the session key generation and secured messages encryption and decryption.
 
-   This can be implemented in a confidential environment, if the session keys are considered as secret.
+   This can be implemented in a secure environment, if the session keys are considered as secret.
 
 5) [SpdmDeviceSecretLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmDeviceSecretLib.h)
 
    This library handles the private key singing, PSK HMAC operation and measurement collection.
 
-   This must be implemented in a confidential environment, because the private key and PSK are secret.
+   This must be implemented in a secure environment, because the private key and PSK are secret.
 
 6) [SpdmCryptLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmCryptLib.h)
 
    This library provides SPDM related crypto function. It is based upon [BaseCryptLib](https://github.com/jyao1/openspdm/blob/master/Include/Hal/Library/BaseCryptLib.h).
+
+7) SpdmTransportLib
 
 7.1) [SpdmTransportMctpLib](https://github.com/jyao1/openspdm/blob/master/Include/Library/SpdmTransportMctpLib.h) (follows DSP0275 and DSP0276)
 

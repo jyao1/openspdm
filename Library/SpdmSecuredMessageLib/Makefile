@@ -32,7 +32,8 @@ SOURCE_DIR = $(WORKSPACE)\Library\$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\SpdmSecuredMessageLib.obj \
+    $(OUTPUT_DIR)\SpdmSecuredMessageLibEncodeDecode.obj \
+    $(OUTPUT_DIR)\SpdmSecuredMessageLibKeyExchange.obj \
     $(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj \
     $(OUTPUT_DIR)\SpdmSecuredMessageLibSessionKeys.obj \
 
@@ -70,8 +71,11 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\SpdmSecuredMessageLib.obj : $(SOURCE_DIR)\SpdmSecuredMessageLib.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLib.c
+$(OUTPUT_DIR)\SpdmSecuredMessageLibEncodeDecode.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibEncodeDecode.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibEncodeDecode.c
+
+$(OUTPUT_DIR)\SpdmSecuredMessageLibKeyExchange.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibKeyExchange.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibKeyExchange.c
 
 $(OUTPUT_DIR)\SpdmSecuredMessageLibOpaqueData.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibOpaqueData.c

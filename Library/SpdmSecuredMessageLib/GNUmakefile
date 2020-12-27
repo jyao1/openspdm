@@ -32,7 +32,8 @@ SOURCE_DIR = $(WORKSPACE)/Library/$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)/SpdmSecuredMessageLib.o \
+    $(OUTPUT_DIR)/SpdmSecuredMessageLibEncodeDecode.o \
+    $(OUTPUT_DIR)/SpdmSecuredMessageLibKeyExchange.o \
     $(OUTPUT_DIR)/SpdmSecuredMessageLibOpaqueData.o \
     $(OUTPUT_DIR)/SpdmSecuredMessageLibSessionKeys.o \
 
@@ -70,7 +71,10 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)/SpdmSecuredMessageLib.o : $(SOURCE_DIR)/SpdmSecuredMessageLib.c
+$(OUTPUT_DIR)/SpdmSecuredMessageLibEncodeDecode.o : $(SOURCE_DIR)/SpdmSecuredMessageLibEncodeDecode.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmSecuredMessageLibKeyExchange.o : $(SOURCE_DIR)/SpdmSecuredMessageLibKeyExchange.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmSecuredMessageLibOpaqueData.o : $(SOURCE_DIR)/SpdmSecuredMessageLibOpaqueData.c

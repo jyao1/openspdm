@@ -157,7 +157,7 @@ SpdmSecuredMessageSetPskHint (
 }
 
 VOID
-SpdmSecuredMessageSetDheSecret (
+SpdmSecuredMessageImportDheSecret (
   IN VOID                         *SpdmSecuredMessageContext,
   IN VOID                         *DheSecret,
   IN UINTN                        DheSecretSize
@@ -292,7 +292,7 @@ SpdmBinConcat (
 /**
   This function generates SPDM AEAD Key and IV for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SecuredMessageContext        A pointer to the SPDM session context.
   @param  MajorSecret                  The major secret.
   @param  Key                          The buffer to store the AEAD key.
   @param  Iv                           The buffer to store the AEAD IV.
@@ -301,7 +301,7 @@ SpdmBinConcat (
 **/
 RETURN_STATUS
 SpdmGenerateAeadKeyAndIv (
-  IN SPDM_SECURED_MESSAGE_CONTEXT        *SecuredMessageContext,
+  IN SPDM_SECURED_MESSAGE_CONTEXT *SecuredMessageContext,
   IN UINT8                        *MajorSecret,
   OUT UINT8                       *Key,
   OUT UINT8                       *Iv
@@ -349,7 +349,7 @@ SpdmGenerateAeadKeyAndIv (
 /**
   This function generates SPDM FinishedKey for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SecuredMessageContext        A pointer to the SPDM session context.
   @param  HandshakeSecret              The handshake secret.
   @param  FinishedKey                  The buffer to store the finished key.
 
@@ -357,7 +357,7 @@ SpdmGenerateAeadKeyAndIv (
 **/
 RETURN_STATUS
 SpdmGenerateFinishedKey (
-  IN SPDM_SECURED_MESSAGE_CONTEXT        *SecuredMessageContext,
+  IN SPDM_SECURED_MESSAGE_CONTEXT *SecuredMessageContext,
   IN UINT8                        *HandshakeSecret,
   OUT UINT8                       *FinishedKey
   )
@@ -387,7 +387,7 @@ SpdmGenerateFinishedKey (
 /**
   This function generates SPDM HandshakeKey for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SecuredMessageContext        A pointer to the SPDM session context.
   @param  TH1HashData                  TH1 hash
 
   @retval RETURN_SUCCESS  SPDM HandshakeKey for a session is generated.
@@ -407,7 +407,7 @@ SpdmGenerateSessionHandshakeKey (
   UINTN                          BinStr1Size;
   UINT8                          BinStr2[128];
   UINTN                          BinStr2Size;
-  SPDM_SECURED_MESSAGE_CONTEXT          *SecuredMessageContext;
+  SPDM_SECURED_MESSAGE_CONTEXT   *SecuredMessageContext;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
 
@@ -501,7 +501,7 @@ SpdmGenerateSessionHandshakeKey (
 /**
   This function generates SPDM DataKey for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SecuredMessageContext        A pointer to the SPDM session context.
   @param  TH2HashData                  TH2 hash
 
   @retval RETURN_SUCCESS  SPDM DataKey for a session is generated.
@@ -524,7 +524,7 @@ SpdmGenerateSessionDataKey (
   UINTN                          BinStr4Size;
   UINT8                          BinStr8[128];
   UINTN                          BinStr8Size;
-  SPDM_SECURED_MESSAGE_CONTEXT          *SecuredMessageContext;
+  SPDM_SECURED_MESSAGE_CONTEXT   *SecuredMessageContext;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
 
@@ -624,7 +624,7 @@ SpdmGenerateSessionDataKey (
 /**
   This function creates the updates of SPDM DataKey for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SecuredMessageContext        A pointer to the SPDM session context.
   @param  Action                       Indicate of the key update action.
 
   @retval RETURN_SUCCESS  SPDM DataKey update is created.
@@ -640,7 +640,7 @@ SpdmCreateUpdateSessionDataKey (
   UINTN                          HashSize;
   UINT8                          BinStr9[128];
   UINTN                          BinStr9Size;
-  SPDM_SECURED_MESSAGE_CONTEXT          *SecuredMessageContext;
+  SPDM_SECURED_MESSAGE_CONTEXT   *SecuredMessageContext;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
 
@@ -699,7 +699,7 @@ SpdmCreateUpdateSessionDataKey (
 /**
   This function activates the update of SPDM DataKey for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SecuredMessageContext        A pointer to the SPDM session context.
   @param  Action                       Indicate of the key update action.
   @param  UseNewKey                    Indicate if the new key should be used.
 
@@ -712,7 +712,7 @@ SpdmActivateUpdateSessionDataKey (
   IN BOOLEAN                      UseNewKey
   )
 {
-  SPDM_SECURED_MESSAGE_CONTEXT          *SecuredMessageContext;
+  SPDM_SECURED_MESSAGE_CONTEXT   *SecuredMessageContext;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
 
