@@ -58,6 +58,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\MemoryAllocationLib.lib \
     $(BIN_DIR)\Library\SpdmCommonLib\SpdmCommonLib.lib \
     $(BIN_DIR)\Library\SpdmResponderLib\SpdmResponderLib.lib \
+    $(BIN_DIR)\Library\SpdmCryptLib\SpdmCryptLib.lib \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
     $(BIN_DIR)\UnitTest\SpdmTransportTestLib\SpdmTransportTestLib.lib \
     $(BIN_DIR)\UnitTest\CmockaLib\CmockaLib.lib \
@@ -74,6 +75,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\*.obj \
     $(BIN_DIR)\Library\SpdmCommonLib\*.obj \
     $(BIN_DIR)\Library\SpdmResponderLib\*.obj \
+    $(BIN_DIR)\Library\SpdmCryptLib\*.obj \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\*.obj \
     $(BIN_DIR)\UnitTest\SpdmTransportTestLib\*.obj \
     $(BIN_DIR)\UnitTest\CmockaLib\*.obj \
@@ -127,6 +129,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCommonLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmResponderLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCryptLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\SpdmTransportTestLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\CmockaLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)

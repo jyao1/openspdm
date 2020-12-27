@@ -88,10 +88,10 @@ SpdmGetResponseKeyExchange (
     SlotNum = SpdmContext->LocalContext.ProvisionedSlotNum;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
-  HashSize = GetSpdmHashSize (SpdmContext);
-  HmacSize = GetSpdmHashSize (SpdmContext);
-  DheKeySize = GetSpdmDheKeySize (SpdmContext);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  DheKeySize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
 
   if (RequestSize < sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
                     DheKeySize +
@@ -165,8 +165,8 @@ SpdmGetResponseKeyExchange (
   SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
 
   Ptr = (VOID *)(SpdmResponse + 1);
-  DHEContext = SpdmDheNew (SpdmContext);
-  SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
+  DHEContext = SpdmDheNew (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+  SpdmDheGenerateKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, Ptr, &DheKeySize);
   DEBUG((DEBUG_INFO, "Calc SelfKey (0x%x):\n", DheKeySize));
   InternalDumpHex (Ptr, DheKeySize);
 
@@ -174,8 +174,8 @@ SpdmGetResponseKeyExchange (
   InternalDumpHex ((UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize);
 
   FinalKeySize = sizeof(FinalKey);
-  SpdmDheComputeKey (SpdmContext, DHEContext, (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
-  SpdmDheFree (SpdmContext, DHEContext);
+  SpdmDheComputeKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
+  SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
   DEBUG((DEBUG_INFO, "Calc FinalKey (0x%x):\n", FinalKeySize));
   InternalDumpHex (FinalKey, FinalKeySize);
   SpdmSecuredMessageSetDheSecret (SessionInfo->SecuredMessageContext, FinalKey, FinalKeySize);

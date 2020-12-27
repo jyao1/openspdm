@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmCommonLib
+MODULE_NAME = SpdmCryptLib
 
 #
 # Build Directory Macro Definition
@@ -32,10 +32,7 @@ SOURCE_DIR = $(WORKSPACE)/Library/$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)/SpdmCommonLibContextData.o \
-    $(OUTPUT_DIR)/SpdmCommonLibCryptoService.o \
-    $(OUTPUT_DIR)/SpdmCommonLibSession.o \
-    $(OUTPUT_DIR)/SpdmCommonLibSupport.o \
+    $(OUTPUT_DIR)/SpdmCryptLib.o \
 
 
 INC =  \
@@ -71,16 +68,7 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)/SpdmCommonLibContextData.o : $(SOURCE_DIR)/SpdmCommonLibContextData.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/SpdmCommonLibCryptoService.o : $(SOURCE_DIR)/SpdmCommonLibCryptoService.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/SpdmCommonLibSession.o : $(SOURCE_DIR)/SpdmCommonLibSession.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/SpdmCommonLibSupport.o : $(SOURCE_DIR)/SpdmCommonLibSupport.c
+$(OUTPUT_DIR)/SpdmCryptLib.o : $(SOURCE_DIR)/SpdmCryptLib.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

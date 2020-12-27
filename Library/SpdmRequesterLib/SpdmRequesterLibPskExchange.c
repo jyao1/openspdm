@@ -155,8 +155,8 @@ TrySpdmSendReceivePskExchange (
   //
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
-  HmacSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (SpdmResponseSize < sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
                          SpdmResponse.ResponderContextLength +

@@ -110,7 +110,7 @@ SpdmGetResponseMeasurement (
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
   AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmRequest, RequestSize);
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   MeasurmentSigSize = SPDM_NONCE_SIZE +
                       sizeof(UINT16) +
                       SpdmContext->LocalContext.OpaqueMeasurementRspSize +

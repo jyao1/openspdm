@@ -58,6 +58,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\MemoryAllocationLib.lib \
     $(BIN_DIR)\Library\SpdmCommonLib\SpdmCommonLib.lib \
     $(BIN_DIR)\Library\SpdmRequesterLib\SpdmRequesterLib.lib \
+    $(BIN_DIR)\Library\SpdmCryptLib\SpdmCryptLib.lib \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
     $(BIN_DIR)\UnitTest\SpdmTransportTestLib\SpdmTransportTestLib.lib \
     $(BIN_DIR)\UnitTest\CmockaLib\CmockaLib.lib \
@@ -74,6 +75,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\*.obj \
     $(BIN_DIR)\Library\SpdmCommonLib\*.obj \
     $(BIN_DIR)\Library\SpdmRequesterLib\*.obj \
+    $(BIN_DIR)\Library\SpdmCryptLib\*.obj \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\*.obj \
     $(BIN_DIR)\UnitTest\SpdmTransportTestLib\*.obj \
     $(BIN_DIR)\UnitTest\CmockaLib\*.obj \
@@ -127,6 +129,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCommonLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmRequesterLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCryptLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\SpdmTransportTestLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\CmockaLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
@@ -172,7 +175,7 @@ $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmU
 
 $(OUTPUT_DIR)\SpdmTestKey.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestKey.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestKey.c
-	
+
 $(OUTPUT_DIR)\SpdmTestSupport.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestSupport.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmTestSupport.c
 

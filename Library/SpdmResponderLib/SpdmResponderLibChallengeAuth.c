@@ -76,8 +76,8 @@ SpdmGetResponseChallengeAuth (
     return RETURN_SUCCESS;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
-  HashSize = GetSpdmHashSize (SpdmContext);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   TotalSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
               HashSize +

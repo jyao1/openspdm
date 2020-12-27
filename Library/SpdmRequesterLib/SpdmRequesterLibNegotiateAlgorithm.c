@@ -148,15 +148,15 @@ TrySpdmNegotiateAlgorithms (
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse.BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse.BaseHashSel;
 
-  AlgoSize = GetSpdmMeasurementHashSize (SpdmContext);
+  AlgoSize = GetSpdmMeasurementHashSize (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo);
   if (AlgoSize == 0) {
     return RETURN_SECURITY_VIOLATION;
   }
-  AlgoSize = GetSpdmHashSize (SpdmContext);
+  AlgoSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   if (AlgoSize == 0) {
     return RETURN_SECURITY_VIOLATION;
   }
-  AlgoSize = GetSpdmAsymSize (SpdmContext);
+  AlgoSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   if (AlgoSize == 0) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -184,16 +184,16 @@ TrySpdmNegotiateAlgorithms (
       }
     }
 
-    AlgoSize = GetSpdmDheKeySize (SpdmContext);
+    AlgoSize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
     if (AlgoSize == 0) {
       return RETURN_SECURITY_VIOLATION;
     }
-    AlgoSize = GetSpdmAeadKeySize (SpdmContext);
+    AlgoSize = GetSpdmAeadKeySize (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite);
     if (AlgoSize == 0) {
       return RETURN_SECURITY_VIOLATION;
     }
     if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
-      AlgoSize = GetSpdmReqAsymSize (SpdmContext);
+      AlgoSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
       if (AlgoSize == 0) {
         return RETURN_SECURITY_VIOLATION;
       }

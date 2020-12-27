@@ -541,6 +541,7 @@ DumpSpdmDigests (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DEVICE_CONTEXT    *SpdmContext;
   SPDM_DIGESTS_RESPONSE  *SpdmResponse;
   UINTN                  MessageSize;
   UINTN                  HashSize;
@@ -557,6 +558,7 @@ DumpSpdmDigests (
   }
 
   SpdmResponse = Buffer;
+  SpdmContext = mSpdmContext;
 
   SlotCount = 0;
   for (Index = 0; Index < 8; Index++) {
@@ -565,7 +567,7 @@ DumpSpdmDigests (
     }
   }
 
-  HashSize = GetSpdmHashSize (mSpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   MessageSize += SlotCount * HashSize;
   if (BufferSize < MessageSize) {
@@ -624,6 +626,7 @@ DumpSpdmCertificate (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
   SPDM_CERTIFICATE_RESPONSE  *SpdmResponse;
   UINTN                      MessageSize;
   VOID                       *CertChain;
@@ -641,6 +644,7 @@ DumpSpdmCertificate (
   }
 
   SpdmResponse = Buffer;
+  SpdmContext = mSpdmContext;
   MessageSize += SpdmResponse->PortionLength;
   if (BufferSize < MessageSize) {
     printf ("\n");
@@ -662,7 +666,7 @@ DumpSpdmCertificate (
     );
   mSpdmCertChainBufferSize = mCachedSpdmCertChainBufferOffset + SpdmResponse->PortionLength;
 
-  HashSize = GetSpdmHashSize (mSpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (SpdmResponse->RemainderLength == 0) {
     if (mSpdmCertChainBufferSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
@@ -773,6 +777,7 @@ DumpSpdmChallengeAuth (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
   SPDM_CHALLENGE_AUTH_RESPONSE  *SpdmResponse;
   UINTN                         MessageSize;
   UINTN                         HashSize;
@@ -785,9 +790,11 @@ DumpSpdmChallengeAuth (
   UINT8                         *Signature;
 
   printf ("SPDM_CHALLENGE_AUTH ");
+  
+  SpdmContext = mSpdmContext;
 
-  HashSize = GetSpdmHashSize (mSpdmContext);
-  SignatureSize = GetSpdmAsymSize (mSpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
 
   MessageSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + HashSize + 32 + HashSize + sizeof(UINT16);
   if (BufferSize < MessageSize) {
@@ -973,6 +980,7 @@ DumpSpdmMeasurements (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DEVICE_CONTEXT         *SpdmContext;
   SPDM_MEASUREMENTS_RESPONSE  *SpdmResponse;
   UINTN                       MessageSize;
   UINT32                      MeasurementRecordLength;
@@ -995,6 +1003,7 @@ DumpSpdmMeasurements (
   IncludeSignature = ((mCachedGetMeasurementRequestAttribute & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0);
 
   SpdmResponse = Buffer;
+  SpdmContext = mSpdmContext;
 
   MeasurementRecordLength = SpdmReadUint24 (SpdmResponse->MeasurementRecordLength);
   MessageSize += MeasurementRecordLength;
@@ -1004,7 +1013,7 @@ DumpSpdmMeasurements (
   }
 
   if (IncludeSignature) {
-    SignatureSize = GetSpdmAsymSize (mSpdmContext);
+    SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
 
     MessageSize += 32 + sizeof(UINT16);
     if (BufferSize < MessageSize) {
@@ -1193,6 +1202,7 @@ DumpSpdmKeyExchange (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
   SPDM_KEY_EXCHANGE_REQUEST  *SpdmRequest;
   UINTN                      MessageSize;
   UINTN                      DheKeySize;
@@ -1209,7 +1219,8 @@ DumpSpdmKeyExchange (
   }
 
   SpdmRequest = Buffer;
-  DheKeySize = GetSpdmDheKeySize (mSpdmContext);
+  SpdmContext = mSpdmContext;
+  DheKeySize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
   MessageSize += DheKeySize + sizeof(UINT16);
   if (BufferSize < MessageSize) {
     printf ("\n");
@@ -1284,10 +1295,10 @@ DumpSpdmKeyExchangeRsp (
 
   SpdmResponse = Buffer;
   SpdmContext = mSpdmContext;
-  DheKeySize = GetSpdmDheKeySize (mSpdmContext);
-  SignatureSize = GetSpdmAsymSize (mSpdmContext);
-  HashSize = GetSpdmHashSize (mSpdmContext);
-  HmacSize = GetSpdmHashSize (mSpdmContext);
+  DheKeySize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   MessageSize += DheKeySize + HashSize + sizeof(UINT16);
   if (BufferSize < MessageSize) {
@@ -1349,7 +1360,7 @@ DumpSpdmKeyExchangeRsp (
   ASSERT (mCurrentSessionInfo != NULL);
   mCurrentSessionInfo->MutAuthRequested = SpdmResponse->MutAuthRequested;
 
-  HmacSize = GetSpdmHashSize (mSpdmContext);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageK, mSpdmLastMessageBuffer, mSpdmLastMessageBufferSize);
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
     AppendManagedBuffer (&mCurrentSessionInfo->SessionTranscript.MessageK, Buffer, MessageSize - HmacSize);
@@ -1376,6 +1387,7 @@ DumpSpdmFinish (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
   SPDM_FINISH_REQUEST  *SpdmRequest;
   UINTN                MessageSize;
   UINTN                SignatureSize;
@@ -1393,8 +1405,9 @@ DumpSpdmFinish (
   }
 
   SpdmRequest = Buffer;
-  SignatureSize = GetSpdmReqAsymSize (mSpdmContext);
-  HmacSize = GetSpdmHashSize (mSpdmContext);
+  SpdmContext = mSpdmContext;
+  SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   IncludeSignature = ((SpdmRequest->Header.Param1 & SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED) != 0);
   if (IncludeSignature) {
@@ -1457,9 +1470,9 @@ DumpSpdmFinishRsp (
     return ;
   }
 
-  SpdmContext = mSpdmContext;
   SpdmResponse = Buffer;
-  HmacSize = GetSpdmHashSize (mSpdmContext);
+  SpdmContext = mSpdmContext;
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   IncludeHmac = ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0);
   if (IncludeHmac) {
@@ -1558,6 +1571,7 @@ DumpSpdmPskExchangeRsp (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DEVICE_CONTEXT         *SpdmContext;
   SPDM_PSK_EXCHANGE_RESPONSE  *SpdmResponse;
   UINTN                       MessageSize;
   UINTN                       HashSize;
@@ -1577,8 +1591,9 @@ DumpSpdmPskExchangeRsp (
   }
 
   SpdmResponse = Buffer;
-  HashSize = GetSpdmHashSize (mSpdmContext);
-  HmacSize = GetSpdmHashSize (mSpdmContext);
+  SpdmContext = mSpdmContext;
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   MessageSize += HashSize + SpdmResponse->ResponderContextLength + SpdmResponse->OpaqueLength + HmacSize;
   if (BufferSize < MessageSize) {
     printf ("\n");
@@ -1639,6 +1654,7 @@ DumpSpdmPskFinish (
   IN UINTN   BufferSize
   )
 {
+  SPDM_DEVICE_CONTEXT         *SpdmContext;
   SPDM_PSK_FINISH_REQUEST     *SpdmRequest;
   UINTN                       MessageSize;
   UINTN                       HmacSize;
@@ -1653,8 +1669,8 @@ DumpSpdmPskFinish (
   }
 
   SpdmRequest = Buffer;
-
-  HmacSize = GetSpdmHashSize (mSpdmContext);
+  SpdmContext = mSpdmContext;
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   MessageSize += HmacSize;
   if (BufferSize < MessageSize) {
     printf ("\n");

@@ -106,7 +106,7 @@ TrySpdmGetDigest (
     return RETURN_DEVICE_ERROR;
   }
 
-  DigestSize = GetSpdmHashSize (SpdmContext);
+  DigestSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   DigestCount = (SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE)) / DigestSize;
   if (DigestCount == 0) {
     return RETURN_DEVICE_ERROR;

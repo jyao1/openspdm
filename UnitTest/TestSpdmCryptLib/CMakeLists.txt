@@ -11,17 +11,17 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/TestSpdmRequester
                     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon
 )
 
-SET(src_TestSpdmCommonLibCrypto
-    TestSpdmCommonLibCrypto.c
+SET(src_TestSpdmCryptLib
+    TestSpdmCryptLib.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmUnitTestCommon.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestKey.c
     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon/SpdmTestSupport.c
 )
 
-SET(TestSpdmCommonLibCrypto_LIBRARY
+SET(TestSpdmCryptLib_LIBRARY
     BaseMemoryLib
     DebugLib
-    SpdmCommonLib
+    SpdmCryptLib
     ${CRYPTO}Lib
     BaseCryptLib${CRYPTO}
     RngLib
@@ -30,11 +30,11 @@ SET(TestSpdmCommonLibCrypto_LIBRARY
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
-    ADD_EXECUTABLE(TestSpdmCommonLibCrypto 
-                   ${src_TestSpdmCommonLibCrypto}
+    ADD_EXECUTABLE(TestSpdmCryptLib 
+                   ${src_TestSpdmCryptLib}
                    $<TARGET_OBJECTS:BaseMemoryLib>
                    $<TARGET_OBJECTS:DebugLib>
-                   $<TARGET_OBJECTS:SpdmCommonLib>
+                   $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:${CRYPTO}Lib>
                    $<TARGET_OBJECTS:RngLib>
                    $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
@@ -42,8 +42,8 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:CmockaLib>
     ) 
 else()
-    ADD_EXECUTABLE(TestSpdmCommonLibCrypto ${src_TestSpdmCommonLibCrypto})
-    TARGET_LINK_LIBRARIES(TestSpdmCommonLibCrypto ${TestSpdmCommonLibCrypto_LIBRARY})
+    ADD_EXECUTABLE(TestSpdmCryptLib ${src_TestSpdmCryptLib})
+    TARGET_LINK_LIBRARIES(TestSpdmCryptLib ${TestSpdmCryptLib_LIBRARY})
 endif()
 
 

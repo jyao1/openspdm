@@ -120,8 +120,8 @@ SpdmProcessEncapResponseChallengeAuth (
       return RETURN_DEVICE_ERROR;
     }
   }
-  HashSize = GetSpdmHashSize (SpdmContext);
-  SignatureSize = GetSpdmReqAsymSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
 
   if (SpdmResponseSize <= sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
                           HashSize +

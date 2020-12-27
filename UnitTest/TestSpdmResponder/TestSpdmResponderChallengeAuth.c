@@ -65,7 +65,7 @@ void TestSpdmResponderChallengeAuthCase1(void **state) {
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmChallengeRequest1.Nonce);
   Status = SpdmGetResponseChallengeAuth (SpdmContext, mSpdmChallengeRequest1Size, &mSpdmChallengeRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + GetSpdmHashSize(SpdmContext) + SPDM_NONCE_SIZE + GetSpdmHashSize(SpdmContext) + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext));
+  assert_int_equal (ResponseSize, sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + GetSpdmHashSize (mUseHashAlgo) + SPDM_NONCE_SIZE + GetSpdmHashSize (mUseHashAlgo) + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo));
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_CHALLENGE_AUTH);
   assert_int_equal (SpdmResponse->Header.Param1, 0);

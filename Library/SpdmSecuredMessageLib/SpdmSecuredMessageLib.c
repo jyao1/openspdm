@@ -10,365 +10,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmSecuredMessageLibInternal.h"
 
 /**
-  Performs AEAD authenticated encryption on a data buffer and additional authenticated data (AAD),
-  based upon negotiated AEAD algorithm.
-
-  @param  Key                          Pointer to the encryption key.
-  @param  KeySize                      Size of the encryption key in bytes.
-  @param  Iv                           Pointer to the IV value.
-  @param  IvSize                       Size of the IV value in bytes.
-  @param  AData                        Pointer to the additional authenticated data (AAD).
-  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
-  @param  DataIn                       Pointer to the input data buffer to be encrypted.
-  @param  DataInSize                   Size of the input data buffer in bytes.
-  @param  TagOut                       Pointer to a buffer that receives the authentication tag output.
-  @param  TagSize                      Size of the authentication tag in bytes.
-  @param  DataOut                      Pointer to a buffer that receives the encryption output.
-  @param  DataOutSize                  Size of the output data buffer in bytes.
-
-  @retval TRUE   AEAD authenticated encryption succeeded.
-  @retval FALSE  AEAD authenticated encryption failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *AEAD_ENCRYPT) (
-  IN   CONST UINT8* Key,
-  IN   UINTN        KeySize,
-  IN   CONST UINT8* Iv,
-  IN   UINTN        IvSize,
-  IN   CONST UINT8* AData,
-  IN   UINTN        ADataSize,
-  IN   CONST UINT8* DataIn,
-  IN   UINTN        DataInSize,
-  OUT  UINT8*       TagOut,
-  IN   UINTN        TagSize,
-  OUT  UINT8*       DataOut,
-  OUT  UINTN*       DataOutSize
-  );
-
-/**
-  Performs AEAD authenticated decryption on a data buffer and additional authenticated data (AAD),
-  based upon negotiated AEAD algorithm.
-
-  @param  Key                          Pointer to the encryption key.
-  @param  KeySize                      Size of the encryption key in bytes.
-  @param  Iv                           Pointer to the IV value.
-  @param  IvSize                       Size of the IV value in bytes.
-  @param  AData                        Pointer to the additional authenticated data (AAD).
-  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
-  @param  DataIn                       Pointer to the input data buffer to be decrypted.
-  @param  DataInSize                   Size of the input data buffer in bytes.
-  @param  Tag                          Pointer to a buffer that contains the authentication tag.
-  @param  TagSize                      Size of the authentication tag in bytes.
-  @param  DataOut                      Pointer to a buffer that receives the decryption output.
-  @param  DataOutSize                  Size of the output data buffer in bytes.
-
-  @retval TRUE   AEAD authenticated decryption succeeded.
-  @retval FALSE  AEAD authenticated decryption failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *AEAD_DECRYPT) (
-  IN   CONST UINT8* Key,
-  IN   UINTN        KeySize,
-  IN   CONST UINT8* Iv,
-  IN   UINTN        IvSize,
-  IN   CONST UINT8* AData,
-  IN   UINTN        ADataSize,
-  IN   CONST UINT8* DataIn,
-  IN   UINTN        DataInSize,
-  IN   CONST UINT8* Tag,
-  IN   UINTN        TagSize,
-  OUT  UINT8*       DataOut,
-  OUT  UINTN*       DataOutSize
-  );
-
-/**
-  Return AEAD encryption function, based upon the negotiated AEAD algorithm.
-
-  @param  SecuredMessageContext                  A pointer to the SPDM context.
-
-  @return AEAD encryption function
-**/
-AEAD_ENCRYPT
-SecuredMessageGetSpdmAeadEncFunc (
-  IN SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext
-  )
-{
-  switch (SecuredMessageContext->AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-#if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return AeadAesGcmEncrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-#if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return AeadAesGcmEncrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-#if OPENSPDM_AEAD_CHACHA20_POLY1305_SUPPORT == 1
-    return AeadChaCha20Poly1305Encrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Return AEAD decryption function, based upon the negotiated AEAD algorithm.
-
-  @param  SecuredMessageContext                  A pointer to the SPDM context.
-
-  @return AEAD decryption function
-**/
-AEAD_DECRYPT
-SecuredMessageGetSpdmAeadDecFunc (
-  IN SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext
-  )
-{
-  switch (SecuredMessageContext->AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-#if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return AeadAesGcmDecrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-#if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return AeadAesGcmDecrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-#if OPENSPDM_AEAD_CHACHA20_POLY1305_SUPPORT == 1
-    return AeadChaCha20Poly1305Decrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-VOID
-SpdmSecuredMessageGetRequestHandshakeEncryptionKey (
-  IN VOID                         *SpdmSecuredMessageContext,
-  OUT VOID                        *Key,
-  IN UINTN                        KeySize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (KeySize == SecuredMessageContext->AeadKeySize);
-  CopyMem (Key, SecuredMessageContext->HandshakeSecret.RequestHandshakeEncryptionKey, SecuredMessageContext->AeadKeySize);
-}
-
-VOID
-SpdmSecuredMessageGetRequestHandshakeSalt (
-  IN VOID                         *SpdmSecuredMessageContext,
-  OUT VOID                        *Salt,
-  IN UINTN                        SaltSize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (SaltSize == SecuredMessageContext->AeadIvSize);
-  CopyMem (Salt, SecuredMessageContext->HandshakeSecret.RequestHandshakeSalt, SecuredMessageContext->AeadIvSize);
-}
-
-UINT64
-SpdmSecuredMessageGetRequestHandshakeSequenceNumber (
-  IN VOID                         *SpdmSecuredMessageContext
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  return SecuredMessageContext->HandshakeSecret.RequestHandshakeSequenceNumber;
-}
-
-VOID
-SpdmSecuredMessageSetRequestHandshakeSequenceNumber (
-  IN VOID                         *SpdmSecuredMessageContext,
-  IN UINT64                       SequenceNumber
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  SecuredMessageContext->HandshakeSecret.RequestHandshakeSequenceNumber = SequenceNumber;
-}
-
-VOID
-SpdmSecuredMessageGetResponseHandshakeEncryptionKey (
-  IN VOID                         *SpdmSecuredMessageContext,
-  OUT VOID                        *Key,
-  IN UINTN                        KeySize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (KeySize == SecuredMessageContext->AeadKeySize);
-  CopyMem (Key, SecuredMessageContext->HandshakeSecret.ResponseHandshakeEncryptionKey, SecuredMessageContext->AeadKeySize);
-}
-
-VOID
-SpdmSecuredMessageGetResponseHandshakeSalt (
-  IN VOID                         *SpdmSecuredMessageContext,
-  OUT VOID                        *Salt,
-  IN UINTN                        SaltSize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (SaltSize == SecuredMessageContext->AeadIvSize);
-  CopyMem (Salt, SecuredMessageContext->HandshakeSecret.ResponseHandshakeSalt, SecuredMessageContext->AeadIvSize);
-}
-
-UINT64
-SpdmSecuredMessageGetResponseHandshakeSequenceNumber (
-  IN VOID                         *SpdmSecuredMessageContext
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  return SecuredMessageContext->HandshakeSecret.ResponseHandshakeSequenceNumber;
-}
-
-VOID
-SpdmSecuredMessageSetResponseHandshakeSequenceNumber (
-  IN VOID                         *SpdmSecuredMessageContext,
-  IN UINT64                       SequenceNumber
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  SecuredMessageContext->HandshakeSecret.ResponseHandshakeSequenceNumber = SequenceNumber;
-}
-
-VOID
-SpdmSecuredMessageGetRequestDataEncryptionKey (
-  IN VOID                         *SpdmSecuredMessageContext,
-  OUT VOID                        *Key,
-  IN UINTN                        KeySize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (KeySize == SecuredMessageContext->AeadKeySize);
-  CopyMem (Key, SecuredMessageContext->ApplicationSecret.RequestDataEncryptionKey, SecuredMessageContext->AeadKeySize);
-}
-
-VOID
-SpdmSecuredMessageGetRequestDataSalt (
-  IN VOID                         *SpdmSecuredMessageContext,
-  OUT VOID                        *Salt,
-  IN UINTN                        SaltSize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (SaltSize == SecuredMessageContext->AeadIvSize);
-  CopyMem (Salt, SecuredMessageContext->ApplicationSecret.RequestDataSalt, SecuredMessageContext->AeadIvSize);
-}
-
-UINT64
-SpdmSecuredMessageGetRequestDataSequenceNumber (
-  IN VOID                         *SpdmSecuredMessageContext
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  return SecuredMessageContext->ApplicationSecret.RequestDataSequenceNumber;
-}
-
-VOID
-SpdmSecuredMessageSetRequestDataSequenceNumber (
-  IN VOID                         *SpdmSecuredMessageContext,
-  IN UINT64                       SequenceNumber
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  SecuredMessageContext->ApplicationSecret.RequestDataSequenceNumber = SequenceNumber;
-}
-
-VOID
-SpdmSecuredMessageGetResponseDataEncryptionKey (
-  IN VOID                         *SpdmSecuredMessageContext,
-  OUT VOID                        *Key,
-  IN UINTN                        KeySize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (KeySize == SecuredMessageContext->AeadKeySize);
-  CopyMem (Key, SecuredMessageContext->ApplicationSecret.ResponseDataEncryptionKey, SecuredMessageContext->AeadKeySize);
-}
-
-VOID
-SpdmSecuredMessageGetResponseDataSalt (
-  IN VOID                         *SpdmSecuredMessageContext,
-  OUT VOID                        *Salt,
-  IN UINTN                        SaltSize
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (SaltSize == SecuredMessageContext->AeadIvSize);
-  CopyMem (Salt, SecuredMessageContext->ApplicationSecret.ResponseDataSalt, SecuredMessageContext->AeadIvSize);
-}
-
-UINT64
-SpdmSecuredMessageGetResponseDataSequenceNumber (
-  IN VOID                         *SpdmSecuredMessageContext
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  return SecuredMessageContext->ApplicationSecret.ResponseDataSequenceNumber;
-}
-
-VOID
-SpdmSecuredMessageSetResponseDataSequenceNumber (
-  IN VOID                         *SpdmSecuredMessageContext,
-  IN UINT64                       SequenceNumber
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  SecuredMessageContext->ApplicationSecret.ResponseDataSequenceNumber = SequenceNumber;
-}
-
-/**
   Encode an application message to a secured message.
 
-  @param  SecuredMessageContext               A pointer to the SPDM context.
+  @param  SecuredMessageContext        A pointer to the SPDM context.
   @param  SessionId                    The session ID of the SPDM session.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  AppMessageSize               Size in bytes of the application message data buffer.
@@ -393,7 +37,7 @@ SpdmEncodeSecuredMessage (
   IN     SPDM_SECURED_MESSAGE_CALLBACKS *SpdmSecuredMessageCallbacks
   )
 {
-  SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext;
+  SPDM_SECURED_MESSAGE_CONTEXT       *SecuredMessageContext;
   UINTN                              TotalSecuredMessageSize;
   UINTN                              PlainTextSize;
   UINTN                              CipherTextSize;
@@ -419,14 +63,8 @@ SpdmEncodeSecuredMessage (
   UINT32                             RandCount;
   UINT32                             MaxRandCount;
   SPDM_SESSION_STATE                 SessionState;
-  AEAD_ENCRYPT                       AeadEncFunction;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
-
-  AeadEncFunction = SecuredMessageGetSpdmAeadEncFunc (SecuredMessageContext);
-  if (AeadEncFunction == NULL) {
-    return RETURN_UNSUPPORTED;
-  }
 
   SessionType = SecuredMessageContext->SessionType;
   ASSERT ((SessionType == SpdmSessionTypeMacOnly) || (SessionType == SpdmSessionTypeEncMac));
@@ -441,24 +79,24 @@ SpdmEncodeSecuredMessage (
   switch (SessionState) {
   case SpdmSessionStateHandshaking:
     if (IsRequester) {
-      SpdmSecuredMessageGetRequestHandshakeEncryptionKey (SecuredMessageContext, Key, AeadKeySize);
-      SpdmSecuredMessageGetRequestHandshakeSalt (SecuredMessageContext, Salt, AeadIvSize);
-      SequenceNumber = SpdmSecuredMessageGetRequestHandshakeSequenceNumber (SecuredMessageContext);
+      CopyMem (Key, SecuredMessageContext->HandshakeSecret.RequestHandshakeEncryptionKey, SecuredMessageContext->AeadKeySize);
+      CopyMem (Salt, SecuredMessageContext->HandshakeSecret.RequestHandshakeSalt, SecuredMessageContext->AeadIvSize);
+      SequenceNumber = SecuredMessageContext->HandshakeSecret.RequestHandshakeSequenceNumber;
     } else {
-      SpdmSecuredMessageGetResponseHandshakeEncryptionKey (SecuredMessageContext, Key, AeadKeySize);
-      SpdmSecuredMessageGetResponseHandshakeSalt (SecuredMessageContext, Salt, AeadIvSize);
-      SequenceNumber = SpdmSecuredMessageGetResponseHandshakeSequenceNumber (SecuredMessageContext);
+      CopyMem (Key, SecuredMessageContext->HandshakeSecret.ResponseHandshakeEncryptionKey, SecuredMessageContext->AeadKeySize);
+      CopyMem (Salt, SecuredMessageContext->HandshakeSecret.ResponseHandshakeSalt, SecuredMessageContext->AeadIvSize);
+      SequenceNumber = SecuredMessageContext->HandshakeSecret.ResponseHandshakeSequenceNumber;
     }
     break;
   case SpdmSessionStateEstablished:
     if (IsRequester) {
-      SpdmSecuredMessageGetRequestDataEncryptionKey (SecuredMessageContext, Key, AeadKeySize);
-      SpdmSecuredMessageGetRequestDataSalt (SecuredMessageContext, Salt, AeadIvSize);
-      SequenceNumber = SpdmSecuredMessageGetRequestDataSequenceNumber (SecuredMessageContext);
+      CopyMem (Key, SecuredMessageContext->ApplicationSecret.RequestDataEncryptionKey, SecuredMessageContext->AeadKeySize);
+      CopyMem (Salt, SecuredMessageContext->ApplicationSecret.RequestDataSalt, SecuredMessageContext->AeadIvSize);
+      SequenceNumber = SecuredMessageContext->ApplicationSecret.RequestDataSequenceNumber;
     } else {
-      SpdmSecuredMessageGetResponseDataEncryptionKey (SecuredMessageContext, Key, AeadKeySize);
-      SpdmSecuredMessageGetResponseDataSalt (SecuredMessageContext, Salt, AeadIvSize);
-      SequenceNumber = SpdmSecuredMessageGetResponseDataSequenceNumber (SecuredMessageContext);
+      CopyMem (Key, SecuredMessageContext->ApplicationSecret.ResponseDataEncryptionKey, SecuredMessageContext->AeadKeySize);
+      CopyMem (Salt, SecuredMessageContext->ApplicationSecret.ResponseDataSalt, SecuredMessageContext->AeadIvSize);
+      SequenceNumber = SecuredMessageContext->ApplicationSecret.ResponseDataSequenceNumber;
     }
     break;
   default:
@@ -476,16 +114,16 @@ SpdmEncodeSecuredMessage (
   switch (SessionState) {
   case SpdmSessionStateHandshaking:
     if (IsRequester) {
-      SpdmSecuredMessageSetRequestHandshakeSequenceNumber (SecuredMessageContext, SequenceNumber);
+      SecuredMessageContext->HandshakeSecret.RequestHandshakeSequenceNumber = SequenceNumber;
     } else {
-      SpdmSecuredMessageSetResponseHandshakeSequenceNumber (SecuredMessageContext, SequenceNumber);
+      SecuredMessageContext->HandshakeSecret.ResponseHandshakeSequenceNumber = SequenceNumber;
     }
     break;
   case SpdmSessionStateEstablished:
     if (IsRequester) {
-      SpdmSecuredMessageSetRequestDataSequenceNumber (SecuredMessageContext, SequenceNumber);
+      SecuredMessageContext->ApplicationSecret.RequestDataSequenceNumber = SequenceNumber;
     } else {
-      SpdmSecuredMessageSetResponseDataSequenceNumber (SecuredMessageContext, SequenceNumber);
+      SecuredMessageContext->ApplicationSecret.ResponseDataSequenceNumber = SequenceNumber;
     }
     break;
   }
@@ -527,7 +165,8 @@ SpdmEncodeSecuredMessage (
     DecMsg = (UINT8 *)EncMsgHeader;
     Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + CipherTextSize;
 
-    Result = AeadEncFunction (
+    Result = SpdmAeadEncryption (
+              SecuredMessageContext->AEADCipherSuite,
               Key,
               AeadKeySize,
               Salt,
@@ -561,7 +200,8 @@ SpdmEncodeSecuredMessage (
     AData = (UINT8 *)RecordHeader1;
     Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + AppMessageSize;
 
-    Result = AeadEncFunction (
+    Result = SpdmAeadEncryption (
+              SecuredMessageContext->AEADCipherSuite,
               Key,
               AeadKeySize,
               Salt,
@@ -590,7 +230,7 @@ SpdmEncodeSecuredMessage (
 /**
   Decode an application message from a secured message.
 
-  @param  SecuredMessageContext               A pointer to the SPDM context.
+  @param  SecuredMessageContext        A pointer to the SPDM context.
   @param  SessionId                    The session ID of the SPDM session.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  SecuredMessageSize           Size in bytes of the secured message data buffer.
@@ -616,7 +256,7 @@ SpdmDecodeSecuredMessage (
   IN     SPDM_SECURED_MESSAGE_CALLBACKS *SpdmSecuredMessageCallbacks
   )
 {
-  SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext;
+  SPDM_SECURED_MESSAGE_CONTEXT       *SecuredMessageContext;
   UINTN                              PlainTextSize;
   UINTN                              CipherTextSize;
   UINTN                              AeadBlockSize;
@@ -639,14 +279,8 @@ SpdmDecodeSecuredMessage (
   UINT8                              SequenceNumInHeaderSize;
   SPDM_SESSION_TYPE                  SessionType;
   SPDM_SESSION_STATE                 SessionState;
-  AEAD_DECRYPT                       AeadDecFunction;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
-
-  AeadDecFunction = SecuredMessageGetSpdmAeadDecFunc (SecuredMessageContext);
-  if (AeadDecFunction == NULL) {
-    return RETURN_UNSUPPORTED;
-  }
 
   SessionType = SecuredMessageContext->SessionType;
   ASSERT ((SessionType == SpdmSessionTypeMacOnly) || (SessionType == SpdmSessionTypeEncMac));
@@ -661,24 +295,24 @@ SpdmDecodeSecuredMessage (
   switch (SessionState) {
   case SpdmSessionStateHandshaking:
     if (IsRequester) {
-      SpdmSecuredMessageGetRequestHandshakeEncryptionKey (SecuredMessageContext, Key, AeadKeySize);
-      SpdmSecuredMessageGetRequestHandshakeSalt (SecuredMessageContext, Salt, AeadIvSize);
-      SequenceNumber = SpdmSecuredMessageGetRequestHandshakeSequenceNumber (SecuredMessageContext);
+      CopyMem (Key, SecuredMessageContext->HandshakeSecret.RequestHandshakeEncryptionKey, SecuredMessageContext->AeadKeySize);
+      CopyMem (Salt, SecuredMessageContext->HandshakeSecret.RequestHandshakeSalt, SecuredMessageContext->AeadIvSize);
+      SequenceNumber = SecuredMessageContext->HandshakeSecret.RequestHandshakeSequenceNumber;
     } else {
-      SpdmSecuredMessageGetResponseHandshakeEncryptionKey (SecuredMessageContext, Key, AeadKeySize);
-      SpdmSecuredMessageGetResponseHandshakeSalt (SecuredMessageContext, Salt, AeadIvSize);
-      SequenceNumber = SpdmSecuredMessageGetResponseHandshakeSequenceNumber (SecuredMessageContext);
+      CopyMem (Key, SecuredMessageContext->HandshakeSecret.ResponseHandshakeEncryptionKey, SecuredMessageContext->AeadKeySize);
+      CopyMem (Salt, SecuredMessageContext->HandshakeSecret.ResponseHandshakeSalt, SecuredMessageContext->AeadIvSize);
+      SequenceNumber = SecuredMessageContext->HandshakeSecret.ResponseHandshakeSequenceNumber;
     }
     break;
   case SpdmSessionStateEstablished:
     if (IsRequester) {
-      SpdmSecuredMessageGetRequestDataEncryptionKey (SecuredMessageContext, Key, AeadKeySize);
-      SpdmSecuredMessageGetRequestDataSalt (SecuredMessageContext, Salt, AeadIvSize);
-      SequenceNumber = SpdmSecuredMessageGetRequestDataSequenceNumber (SecuredMessageContext);
+      CopyMem (Key, SecuredMessageContext->ApplicationSecret.RequestDataEncryptionKey, SecuredMessageContext->AeadKeySize);
+      CopyMem (Salt, SecuredMessageContext->ApplicationSecret.RequestDataSalt, SecuredMessageContext->AeadIvSize);
+      SequenceNumber = SecuredMessageContext->ApplicationSecret.RequestDataSequenceNumber;
     } else {
-      SpdmSecuredMessageGetResponseDataEncryptionKey (SecuredMessageContext, Key, AeadKeySize);
-      SpdmSecuredMessageGetResponseDataSalt (SecuredMessageContext, Salt, AeadIvSize);
-      SequenceNumber = SpdmSecuredMessageGetResponseDataSequenceNumber (SecuredMessageContext);
+      CopyMem (Key, SecuredMessageContext->ApplicationSecret.ResponseDataEncryptionKey, SecuredMessageContext->AeadKeySize);
+      CopyMem (Salt, SecuredMessageContext->ApplicationSecret.ResponseDataSalt, SecuredMessageContext->AeadIvSize);
+      SequenceNumber = SecuredMessageContext->ApplicationSecret.ResponseDataSequenceNumber;
     }
     break;
   default:
@@ -695,16 +329,16 @@ SpdmDecodeSecuredMessage (
   switch (SessionState) {
   case SpdmSessionStateHandshaking:
     if (IsRequester) {
-      SpdmSecuredMessageSetRequestHandshakeSequenceNumber (SecuredMessageContext, SequenceNumber);
+      SecuredMessageContext->HandshakeSecret.RequestHandshakeSequenceNumber = SequenceNumber;
     } else {
-      SpdmSecuredMessageSetResponseHandshakeSequenceNumber (SecuredMessageContext, SequenceNumber);
+      SecuredMessageContext->HandshakeSecret.ResponseHandshakeSequenceNumber = SequenceNumber;
     }
     break;
   case SpdmSessionStateEstablished:
     if (IsRequester) {
-      SpdmSecuredMessageSetRequestDataSequenceNumber (SecuredMessageContext, SequenceNumber);
+      SecuredMessageContext->ApplicationSecret.RequestDataSequenceNumber = SequenceNumber;
     } else {
-      SpdmSecuredMessageSetResponseDataSequenceNumber (SecuredMessageContext, SequenceNumber);
+      SecuredMessageContext->ApplicationSecret.ResponseDataSequenceNumber = SequenceNumber;
     }
     break;
   }
@@ -736,7 +370,8 @@ SpdmDecodeSecuredMessage (
     EncMsg = (UINT8 *)EncMsgHeader;
     DecMsg = (UINT8 *)EncMsgHeader;
     Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + CipherTextSize;
-    Result = AeadDecFunction (
+    Result = SpdmAeadDecryption (
+              SecuredMessageContext->AEADCipherSuite,
               Key,
               AeadKeySize,
               Salt,
@@ -787,7 +422,8 @@ SpdmDecodeSecuredMessage (
     }
     AData = (UINT8 *)RecordHeader1;
     Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + RecordHeader2->Length - AeadTagSize;
-    Result = AeadDecFunction (
+    Result = SpdmAeadDecryption (
+              SecuredMessageContext->AEADCipherSuite,
               Key,
               AeadKeySize,
               Salt,

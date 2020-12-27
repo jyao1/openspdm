@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
+#include <Library/SpdmCryptLib.h>
 
 #define MAX_DHE_KEY_SIZE    512
 #define MAX_ASYM_KEY_SIZE   512

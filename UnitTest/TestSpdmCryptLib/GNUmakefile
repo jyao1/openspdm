@@ -16,7 +16,7 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = TestSpdmCommonLibCrypto
+MODULE_NAME = TestSpdmCryptLib
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -33,7 +33,7 @@ SOURCE_DIR = $(WORKSPACE)/UnitTest/$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)/TestSpdmCommonLibCrypto.o \
+    $(OUTPUT_DIR)/TestSpdmCryptLib.o \
     $(OUTPUT_DIR)/SpdmUnitTestCommon.o \
     $(OUTPUT_DIR)/SpdmTestKey.o \
     $(OUTPUT_DIR)/SpdmTestSupport.o \
@@ -46,7 +46,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a \
     $(BIN_DIR)/OsStub/RngLib/RngLib.a \
     $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a \
-    $(BIN_DIR)/Library/SpdmCommonLib/SpdmCommonLib.a \
+    $(BIN_DIR)/Library/SpdmCryptLib/SpdmCryptLib.a \
     $(BIN_DIR)/UnitTest/CmockaLib/CmockaLib.a \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
 
@@ -58,7 +58,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/OsStub/$(CRYPTO)Lib/*.o \
     $(BIN_DIR)/OsStub/RngLib/*.o \
     $(BIN_DIR)/OsStub/MemoryAllocationLib/*.o \
-    $(BIN_DIR)/Library/SpdmCommonLib/*.o \
+    $(BIN_DIR)/Library/SpdmCryptLib/*.o \
     $(BIN_DIR)/UnitTest/CmockaLib/*.o \
     $(OUTPUT_DIR)/*.o \
 
@@ -108,13 +108,13 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/$(CRYPTO)Lib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/RngLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/MemoryAllocationLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmCommonLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmCryptLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/UnitTest/CmockaLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)/TestSpdmCommonLibCrypto.o : $(SOURCE_DIR)/TestSpdmCommonLibCrypto.c
+$(OUTPUT_DIR)/TestSpdmCryptLib.o : $(SOURCE_DIR)/TestSpdmCryptLib.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmUnitTestCommon.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmUnitTestCommon.c
@@ -137,7 +137,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/RngLib/RngLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/OsStub/MemoryAllocationLib/MemoryAllocationLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/Library/SpdmCommonLib/SpdmCommonLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/Library/SpdmCryptLib/SpdmCryptLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/UnitTest/CmockaLib/CmockaLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
 	$(DLINK) $(DLINK_FLAGS) $(DLINK_SPATH) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS2)

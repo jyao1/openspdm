@@ -78,8 +78,8 @@ SpdmGetResponsePskExchange (
     return RETURN_SUCCESS;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
-  HmacSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (RequestSize < sizeof(SPDM_PSK_EXCHANGE_REQUEST)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);

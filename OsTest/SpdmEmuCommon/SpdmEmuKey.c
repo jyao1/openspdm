@@ -136,410 +136,11 @@ UINT16  mSupportAeadAlgo = SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM |
 */
 UINT16  mSupportKeyScheduleAlgo = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
 
-/**
-  Computes the hash of a input data buffer.
-
-  This function performs the hash of a given data buffer, and return the hash value.
-
-  @param  Data                         Pointer to the buffer containing the data to be hashed.
-  @param  DataSize                     Size of Data buffer in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the hash value.
-
-  @retval TRUE   Hash computation succeeded.
-  @retval FALSE  Hash computation failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *HASH_ALL) (
-  IN   CONST VOID  *Data,
-  IN   UINTN       DataSize,
-  OUT  UINT8       *HashValue
-  );
-
-/**
-  Computes the HMAC of a input data buffer.
-
-  This function performs the HMAC of a given data buffer, and return the hash value.
-
-  @param  Data                         Pointer to the buffer containing the data to be HMACed.
-  @param  DataSize                     Size of Data buffer in bytes.
-  @param  Key                          Pointer to the user-supplied key.
-  @param  KeySize                      Key size in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
-
-  @retval TRUE   HMAC computation succeeded.
-  @retval FALSE  HMAC computation failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *HMAC_ALL) (
-  IN   CONST VOID   *Data,
-  IN   UINTN        DataSize,
-  IN   CONST UINT8  *Key,
-  IN   UINTN        KeySize,
-  OUT  UINT8        *HmacValue
-  );
-
-/**
-  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand.
-
-  @param  Prk                          Pointer to the user-supplied key.
-  @param  PrkSize                      Key size in bytes.
-  @param  Info                         Pointer to the application specific info.
-  @param  InfoSize                     Info size in bytes.
-  @param  Out                          Pointer to buffer to receive hkdf value.
-  @param  OutSize                      Size of hkdf bytes to generate.
-
-  @retval TRUE   Hkdf generated successfully.
-  @retval FALSE  Hkdf generation failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *HKDF_EXPAND) (
-  IN   CONST UINT8  *Prk,
-  IN   UINTN        PrkSize,
-  IN   CONST UINT8  *Info,
-  IN   UINTN        InfoSize,
-  OUT  UINT8        *Out,
-  IN   UINTN        OutSize
-  );
-
-/**
-  Retrieve the Private Key from the password-protected PEM key data.
-
-  @param  PemData                      Pointer to the PEM-encoded key data to be retrieved.
-  @param  PemSize                      Size of the PEM key data in bytes.
-  @param  Password                     NULL-terminated passphrase used for encrypted PEM key data.
-  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved private key component.
-                                       Use SpdmAsymFree() function to free the resource.
-
-  @retval  TRUE   Private Key was retrieved successfully.
-  @retval  FALSE  Invalid PEM key data or incorrect password.
-**/
-typedef
-BOOLEAN
-(EFIAPI *ASYM_GET_PRIVATE_KEY_FROM_PEM) (
-  IN   CONST UINT8  *PemData,
-  IN   UINTN        PemSize,
-  IN   CONST CHAR8  *Password,
-  OUT  VOID         **Context
-  );
-
-/**
-  Release the specified asymmetric context
-
-  @param  Context                      Pointer to the asymmetric context to be released.
-**/
-typedef
-VOID
-(EFIAPI *ASYM_FREE) (
-  IN  VOID         *Context
-  );
-
-/**
-  Carries out the signature generation.
-
-  If the Signature buffer is too small to hold the contents of signature, FALSE
-  is returned and SigSize is set to the required buffer size to obtain the signature.
-
-  @param  Context                      Pointer to asymmetric context for signature generation.
-  @param  MessageHash                  Pointer to octet message hash to be signed.
-  @param  HashSize                     Size of the message hash in bytes.
-  @param  Signature                    Pointer to buffer to receive signature.
-  @param  SigSize                      On input, the size of Signature buffer in bytes.
-                                       On output, the size of data returned in Signature buffer in bytes.
-
-  @retval  TRUE   Signature successfully generated.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-**/
-typedef
-BOOLEAN
-(EFIAPI *ASYM_SIGN) (
-  IN      VOID         *Context,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
-  );
-
 VOID  *mResponderPrivateCertData;
 UINTN mResponderPrivateCertDataSize;
 
 VOID  *mRequesterPrivateCertData;
 UINTN mRequesterPrivateCertDataSize;
-
-UINT32
-TestGetSpdmHashSize (
-  IN      UINT32       HashAlgo
-  )
-{
-  switch (HashAlgo) {
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
-    return 32;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
-    return 48;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
-    return 64;
-  default:
-    ASSERT( FALSE);
-    return 0;
-  }
-}
-
-UINT32
-TestGetSpdmMeasurementHashSize (
-  IN      UINT32       HashAlgo
-  )
-{
-  switch (HashAlgo) {
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256:
-    return 32;
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384:
-    return 48;
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512:
-    return 64;
-  default:
-    ASSERT( FALSE);
-    return 0;
-  }
-}
-
-/**
-  Return hash function, based upon the negotiated hash algorithm.
-
-  @param  HashAlgo                  The hash algorithm.
-
-  @return hash function
-**/
-HASH_ALL
-TestGetSpdmHashFunc (
-  IN      UINT32       HashAlgo
-  )
-{
-  switch (HashAlgo) {
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
-    return Sha256HashAll;
-    break;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
-    return Sha384HashAll;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
-    return Sha512HashAll;
-  default:
-    return NULL;
-  }
-}
-
-/**
-  Computes the hash of a input data buffer, based upon the negotiated hash algorithm.
-
-  This function performs the hash of a given data buffer, and return the hash value.
-
-  @param  HashAlgo                     The hash algorithm.
-  @param  Data                         Pointer to the buffer containing the data to be hashed.
-  @param  DataSize                     Size of Data buffer in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the hash value.
-
-  @retval TRUE   Hash computation succeeded.
-  @retval FALSE  Hash computation failed.
-**/
-BOOLEAN
-TestSpdmHashAll (
-  IN   UINT32                       HashAlgo,
-  IN   CONST VOID                   *Data,
-  IN   UINTN                        DataSize,
-  OUT  UINT8                        *HashValue
-  )
-{
-  HASH_ALL   HashFunction;
-  HashFunction = TestGetSpdmHashFunc (HashAlgo);
-  if (HashFunction == NULL) {
-    return FALSE;
-  }
-  return HashFunction (Data, DataSize, HashValue);
-}
-
-/**
-  Return HMAC function, based upon the negotiated HMAC algorithm.
-
-  @param  HashAlgo                     The hash algorithm.
-
-  @return HMAC function
-**/
-HMAC_ALL
-TestGetSpdmHmacFunc (
-  IN   UINT32                       HashAlgo
-  )
-{
-  switch (HashAlgo) {
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
-    return HmacSha256All;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
-    return HmacSha384All;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
-    return HmacSha512All;
-  default:
-    return NULL;
-  }
-}
-
-/**
-  Computes the HMAC of a input data buffer, based upon the negotiated HMAC algorithm.
-
-  This function performs the HMAC of a given data buffer, and return the hash value.
-
-  @param  HashAlgo                     The hash algorithm.
-  @param  Data                         Pointer to the buffer containing the data to be HMACed.
-  @param  DataSize                     Size of Data buffer in bytes.
-  @param  Key                          Pointer to the user-supplied key.
-  @param  KeySize                      Key size in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
-
-  @retval TRUE   HMAC computation succeeded.
-  @retval FALSE  HMAC computation failed.
-**/
-BOOLEAN
-TestSpdmHmacAll (
-  IN   UINT32                       HashAlgo,
-  IN   CONST VOID                   *Data,
-  IN   UINTN                        DataSize,
-  IN   CONST UINT8                  *Key,
-  IN   UINTN                        KeySize,
-  OUT  UINT8                        *HmacValue
-  )
-{
-  HMAC_ALL   HmacFunction;
-  HmacFunction = TestGetSpdmHmacFunc (HashAlgo);
-  if (HmacFunction == NULL) {
-    return FALSE;
-  }
-  return HmacFunction (Data, DataSize, Key, KeySize, HmacValue);
-}
-
-/**
-  Return HKDF expand function, based upon the negotiated HKDF algorithm.
-
-  @param  HashAlgo                     The hash algorithm.
-
-  @return HKDF expand function
-**/
-HKDF_EXPAND
-TestGetSpdmHkdfExpandFunc (
-  IN   UINT32                       HashAlgo
-  )
-{
-  switch (HashAlgo) {
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
-    return HkdfSha256Expand;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
-    return HkdfSha384Expand;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
-    return HkdfSha512Expand;
-  default:
-    return NULL;
-  }
-}
-
-/**
-  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
-
-  @param  HashAlgo                     The hash algorithm.
-  @param  Prk                          Pointer to the user-supplied key.
-  @param  PrkSize                      Key size in bytes.
-  @param  Info                         Pointer to the application specific info.
-  @param  InfoSize                     Info size in bytes.
-  @param  Out                          Pointer to buffer to receive hkdf value.
-  @param  OutSize                      Size of hkdf bytes to generate.
-
-  @retval TRUE   Hkdf generated successfully.
-  @retval FALSE  Hkdf generation failed.
-**/
-BOOLEAN
-TestSpdmHkdfExpand (
-  IN   UINT32                       HashAlgo,
-  IN   CONST UINT8                  *Prk,
-  IN   UINTN                        PrkSize,
-  IN   CONST UINT8                  *Info,
-  IN   UINTN                        InfoSize,
-  OUT  UINT8                        *Out,
-  IN   UINTN                        OutSize
-  )
-{
-  HKDF_EXPAND   HkdfExpandFunction;
-  HkdfExpandFunction = TestGetSpdmHkdfExpandFunc (HashAlgo);
-  if (HkdfExpandFunction == NULL) {
-    return FALSE;
-  }
-  return HkdfExpandFunction (Prk, PrkSize, Info, InfoSize, Out, OutSize);
-}
-
-/**
-  Return hash function, based upon the negotiated measurement hash algorithm.
-
-  @param  HashAlgo                  The hash algorithm.
-
-  @return hash function
-**/
-HASH_ALL
-TestGetSpdmMeasurementHashFunc (
-  IN   UINT32                       HashAlgo
-  )
-{
-  switch (HashAlgo) {
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256:
-    return Sha256HashAll;
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384:
-    return Sha384HashAll;
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512:
-    return Sha512HashAll;
-  default:
-    return NULL;
-  }
-}
-
-/**
-  Computes the hash of a input data buffer, based upon the negotiated measurement hash algorithm.
-
-  This function performs the hash of a given data buffer, and return the hash value.
-
-  @param  HashAlgo                     The hash algorithm.
-  @param  Data                         Pointer to the buffer containing the data to be hashed.
-  @param  DataSize                     Size of Data buffer in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the hash value.
-
-  @retval TRUE   Hash computation succeeded.
-  @retval FALSE  Hash computation failed.
-**/
-BOOLEAN
-TestSpdmMeasurementHashAll (
-  IN   UINT32                       HashAlgo,
-  IN   CONST VOID                   *Data,
-  IN   UINTN                        DataSize,
-  OUT  UINT8                        *HashValue
-  )
-{
-  HASH_ALL   HashFunction;
-  HashFunction = TestGetSpdmMeasurementHashFunc (HashAlgo);
-  if (HashFunction == NULL) {
-    return FALSE;
-  }
-  return HashFunction (Data, DataSize, HashValue);
-}
-
-/**
-  Certificate Check for SPDM leaf cert.
-
-  @param[in]  Cert            Pointer to the DER-encoded certificate data.
-  @param[in]  CertSize        The size of certificate data in bytes.
-
-  @retval  TRUE   Success.
-  @retval  FALSE  Certificate is not valid
-**/
-BOOLEAN
-SpdmX509CertificateCheck (
-  IN   CONST UINT8  *Cert,
-  IN   UINTN        CertSize
-  );
 
 /**
   This function verifies the integrity of a certificate chain
@@ -702,7 +303,7 @@ ReadResponderRootPublicCertificate (
     return Res;
   }
 
-  DigestSize = TestGetSpdmHashSize (mUseHashAlgo);
+  DigestSize = GetSpdmHashSize (mUseHashAlgo);
 
   CertChainSize = sizeof(SPDM_CERT_CHAIN) + DigestSize + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
@@ -713,7 +314,7 @@ ReadResponderRootPublicCertificate (
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
 
-  TestSpdmHashAll (mUseHashAlgo, FileData, FileSize, (UINT8 *)(CertChain + 1));
+  SpdmHashAll (mUseHashAlgo, FileData, FileSize, (UINT8 *)(CertChain + 1));
   CopyMem (
     (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + DigestSize,
     FileData,
@@ -769,7 +370,7 @@ ReadRequesterRootPublicCertificate (
     return FALSE;
   }
 
-  DigestSize = TestGetSpdmHashSize (mUseHashAlgo);
+  DigestSize = GetSpdmHashSize (mUseHashAlgo);
 
   Res = ReadInputFile (File, &FileData, &FileSize);
   if (!Res) {
@@ -784,7 +385,7 @@ ReadRequesterRootPublicCertificate (
   }
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
-  TestSpdmHashAll (mUseHashAlgo, FileData, FileSize, (UINT8 *)(CertChain + 1));
+  SpdmHashAll (mUseHashAlgo, FileData, FileSize, (UINT8 *)(CertChain + 1));
   CopyMem (
     (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + DigestSize,
     FileData,
@@ -846,7 +447,7 @@ ReadResponderPublicCertificateChain (
     return Res;
   }
 
-  DigestSize = TestGetSpdmHashSize (mUseHashAlgo);
+  DigestSize = GetSpdmHashSize (mUseHashAlgo);
 
   CertChainSize = sizeof(SPDM_CERT_CHAIN) + DigestSize + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
@@ -874,7 +475,7 @@ ReadResponderPublicCertificateChain (
     return Res;
   }
 
-  TestSpdmHashAll (mUseHashAlgo, RootCert, RootCertLen, (UINT8 *)(CertChain + 1));
+  SpdmHashAll (mUseHashAlgo, RootCert, RootCertLen, (UINT8 *)(CertChain + 1));
   CopyMem (
     (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + DigestSize,
     FileData,
@@ -936,7 +537,7 @@ ReadRequesterPublicCertificateChain (
     return Res;
   }
 
-  DigestSize = TestGetSpdmHashSize (mUseHashAlgo);
+  DigestSize = GetSpdmHashSize (mUseHashAlgo);
 
   CertChainSize = sizeof(SPDM_CERT_CHAIN) + DigestSize + FileSize;
   CertChain = (VOID *)malloc (CertChainSize);
@@ -964,7 +565,7 @@ ReadRequesterPublicCertificateChain (
     return Res;
   }
 
-  TestSpdmHashAll (mUseHashAlgo, RootCert, RootCertLen, (UINT8 *)(CertChain + 1));
+  SpdmHashAll (mUseHashAlgo, RootCert, RootCertLen, (UINT8 *)(CertChain + 1));
   CopyMem (
     (UINT8 *)CertChain + sizeof(SPDM_CERT_CHAIN) + DigestSize,
     FileData,
@@ -984,196 +585,9 @@ ReadRequesterPublicCertificateChain (
   return TRUE;
 }
 
-/**
-  Return asymmetric GET_PRIVATE_KEY_FROM_PEM function, based upon the asymmetric algorithm.
-
-  @param  AsymAlgo                     The asymmetric algorithm.
-
-  @return asymmetric GET_PRIVATE_KEY_FROM_PEM function
-**/
-ASYM_GET_PRIVATE_KEY_FROM_PEM
-TestGetSpdmAsymGetPrivateKeyFromPem (
-  IN      UINT32       AsymAlgo
-  )
-{
-  switch (AsymAlgo) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-    return RsaGetPrivateKeyFromPem;
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-    return EcGetPrivateKeyFromPem;
-  }
-  return NULL;
-}
-
-/**
-  Retrieve the Private Key from the password-protected PEM key data.
-
-  @param  AsymAlgo                     The asymmetric algorithm.
-  @param  PemData                      Pointer to the PEM-encoded key data to be retrieved.
-  @param  PemSize                      Size of the PEM key data in bytes.
-  @param  Password                     NULL-terminated passphrase used for encrypted PEM key data.
-  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved private key component.
-                                       Use SpdmAsymFree() function to free the resource.
-
-  @retval  TRUE   Private Key was retrieved successfully.
-  @retval  FALSE  Invalid PEM key data or incorrect password.
-**/
 BOOLEAN
-TestSpdmAsymGetPrivateKeyFromPem (
-  IN      UINT32       AsymAlgo,
-  IN      CONST UINT8  *PemData,
-  IN      UINTN        PemSize,
-  IN      CONST CHAR8  *Password,
-  OUT     VOID         **Context
-  )
-{
-  ASYM_GET_PRIVATE_KEY_FROM_PEM   AsymGetPrivateKeyFromPem;
-  AsymGetPrivateKeyFromPem = TestGetSpdmAsymGetPrivateKeyFromPem (AsymAlgo);
-  if (AsymGetPrivateKeyFromPem == NULL) {
-    return FALSE;
-  }
-  return AsymGetPrivateKeyFromPem (PemData, PemSize, Password, Context);
-}
-
-/**
-  Return asymmetric free function, based upon the asymmetric algorithm.
-
-  @param  AsymAlgo                     The asymmetric algorithm.
-
-  @return asymmetric free function
-**/
-ASYM_FREE
-TestGetSpdmAsymFree (
-  IN      UINT32       AsymAlgo
-  )
-{
-  switch (AsymAlgo) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-    return RsaFree;
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-    return EcFree;
-  }
-  return NULL;
-}
-
-/**
-  Release the specified asymmetric context
-
-  @param  AsymAlgo                     The asymmetric algorithm.
-  @param  Context                      Pointer to the asymmetric context to be released.
-**/
-VOID
-TestSpdmAsymFree (
-  IN      UINT32       AsymAlgo,
-  IN      VOID         *Context
-  )
-{
-  ASYM_FREE   AsymFree;
-  AsymFree = TestGetSpdmAsymFree (AsymAlgo);
-  if (AsymFree == NULL) {
-    return ;
-  }
-  AsymFree (Context);
-}
-
-/**
-  Return asymmetric sign function, based upon the asymmetric algorithm.
-
-  @param  AsymAlgo                     The asymmetric algorithm.
-
-  @return asymmetric sign function
-**/
-ASYM_SIGN
-TestGetSpdmAsymSign (
-  IN      UINT32       AsymAlgo
-  )
-{
-  switch (AsymAlgo) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-    return RsaPkcs1Sign;
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-    return RsaPssSign;
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-    return EcDsaSign;
-  }
-  return NULL;
-}
-
-/**
-  Carries out the signature generation.
-
-  If the Signature buffer is too small to hold the contents of signature, FALSE
-  is returned and SigSize is set to the required buffer size to obtain the signature.
-
-  @param  AsymAlgo                     The asymmetric algorithm.
-  @param  Context                      Pointer to asymmetric context for signature generation.
-  @param  MessageHash                  Pointer to octet message hash to be signed.
-  @param  HashSize                     Size of the message hash in bytes.
-  @param  Signature                    Pointer to buffer to receive signature.
-  @param  SigSize                      On input, the size of Signature buffer in bytes.
-                                       On output, the size of data returned in Signature buffer in bytes.
-
-  @retval  TRUE   Signature successfully generated.
-  @retval  FALSE  Signature generation failed.
-  @retval  FALSE  SigSize is too small.
-**/
-BOOLEAN
-TestSpdmAsymSign (
-  IN      UINT32       AsymAlgo,
-  IN      VOID         *Context,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
-  )
-{
-  ASYM_SIGN   AsymSign;
-  AsymSign = TestGetSpdmAsymSign (AsymAlgo);
-  if (AsymSign == NULL) {
-    return FALSE;
-  }
-  return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
-}
-
-/**
-  Sign an SPDM message data.
-
-  @param  IsResponder                  Indicates if it is a responder message.
-  @param  AsymAlgo                     Indicates the signing algorithm.
-                                       For responder, it must align with BaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
-                                       For requester, it must align with ReqBaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
-  @param  MessageHash                  A pointer to a message hash to be signed.
-  @param  HashSize                     The size in bytes of the message hash to be signed.
-  @param  Signature                    A pointer to a destination buffer to store the signature.
-  @param  SigSize                      On input, indicates the size in bytes of the destination buffer to store the signature.
-                                       On output, indicates the size in bytes of the signature in the buffer.
-
-  @retval TRUE  signing success.
-  @retval FALSE signing fail.
-**/
-BOOLEAN
-SpdmDataSignFunc (
-  IN      BOOLEAN      IsResponder,
+EFIAPI
+SpdmRequesterDataSignFunc (
   IN      UINT32       AsymAlgo,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
@@ -1186,52 +600,26 @@ SpdmDataSignFunc (
   UINTN                         PrivatePemSize;
   BOOLEAN                       Result;
 
-  if (IsResponder) {
-    if (AsymAlgo != mUseAsymAlgo) {
-      return FALSE;
-    }
-  } else {
-    if (AsymAlgo != mUseReqAsymAlgo) {
-      return FALSE;
-    }
+  if (AsymAlgo != mUseReqAsymAlgo) {
+    return FALSE;
   }
-
-  if (IsResponder) {
-    PrivatePem = mResponderPrivateCertData;
-    PrivatePemSize = mResponderPrivateCertDataSize;
-  } else {
-    PrivatePem = mRequesterPrivateCertData;
-    PrivatePemSize = mRequesterPrivateCertDataSize;
-  }
-
-  Result = TestSpdmAsymGetPrivateKeyFromPem (AsymAlgo, PrivatePem, PrivatePemSize, NULL, &Context);
+  PrivatePem = mRequesterPrivateCertData;
+  PrivatePemSize = mRequesterPrivateCertDataSize;
+  Result = SpdmReqAsymGetPrivateKeyFromPem (mUseReqAsymAlgo, PrivatePem, PrivatePemSize, NULL, &Context);
   if (!Result) {
     return FALSE;
   }
-  Result = TestSpdmAsymSign (
-             AsymAlgo,
+  Result = SpdmReqAsymSign (
+             mUseReqAsymAlgo,
              Context,
              MessageHash,
              HashSize,
              Signature,
              SigSize
              );
-  TestSpdmAsymFree (AsymAlgo, Context);
+  SpdmReqAsymFree (mUseReqAsymAlgo, Context);
 
   return Result;
-}
-
-BOOLEAN
-EFIAPI
-SpdmRequesterDataSignFunc (
-  IN      UINT32       AsymAlgo,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
-  OUT     UINT8        *Signature,
-  IN OUT  UINTN        *SigSize
-  )
-{
-  return SpdmDataSignFunc (FALSE, AsymAlgo, MessageHash, HashSize, Signature, SigSize);
 }
 
 BOOLEAN
@@ -1244,7 +632,31 @@ SpdmResponderDataSignFunc (
   IN OUT  UINTN        *SigSize
   )
 {
-  return SpdmDataSignFunc (TRUE, AsymAlgo, MessageHash, HashSize, Signature, SigSize);
+  VOID                          *Context;
+  VOID                          *PrivatePem;
+  UINTN                         PrivatePemSize;
+  BOOLEAN                       Result;
+
+  if (AsymAlgo != mUseAsymAlgo) {
+    return FALSE;
+  }
+  PrivatePem = mResponderPrivateCertData;
+  PrivatePemSize = mResponderPrivateCertDataSize;
+  Result = SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, PrivatePem, PrivatePemSize, NULL, &Context);
+  if (!Result) {
+    return FALSE;
+  }
+  Result = SpdmAsymSign (
+             mUseAsymAlgo,
+             Context,
+             MessageHash,
+             HashSize,
+             Signature,
+             SigSize
+             );
+  SpdmAsymFree (mUseAsymAlgo, Context);
+
+  return Result;
 }
 
 BOOLEAN
@@ -1266,7 +678,7 @@ SpdmMeasurementCollectionFunc (
   ASSERT (MeasurementSpecification == SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF);
   ASSERT (MeasurementHashAlgo == mUseMeasurementHashAlgo);
 
-  HashSize = TestGetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
+  HashSize = GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
 
   *DeviceMeasurementCount = MEASUREMENT_BLOCK_NUMBER;
   TotalSize = (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize) +
@@ -1289,7 +701,7 @@ SpdmMeasurementCollectionFunc (
                                                                      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
     SetMem (Data, sizeof(Data), (UINT8)(Index + 1));
     if (Index < 4) {
-      TestSpdmMeasurementHashAll (mUseMeasurementHashAlgo, Data, sizeof(Data), (VOID *)(MeasurementBlock + 1));
+      SpdmMeasurementHashAll (mUseMeasurementHashAlgo, Data, sizeof(Data), (VOID *)(MeasurementBlock + 1));
       MeasurementBlock = (VOID *)((UINT8 *)MeasurementBlock + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize);
     } else {
       CopyMem ((VOID *)(MeasurementBlock + 1), Data, sizeof(Data));
@@ -1358,14 +770,14 @@ SpdmPskHandshakeSecretHkdfExpandFunc (
   DumpHexStr (Psk, PskSize);
   printf ("\n");
 
-  HashSize = TestGetSpdmHashSize (HashAlgo);
+  HashSize = GetSpdmHashSize (HashAlgo);
 
-  Result = TestSpdmHmacAll (HashAlgo, mMyZeroFilledBuffer, HashSize, Psk, PskSize, HandshakeSecret);
+  Result = SpdmHmacAll (HashAlgo, mMyZeroFilledBuffer, HashSize, Psk, PskSize, HandshakeSecret);
   if (!Result) {
     return Result;
   }
 
-  Result = TestSpdmHkdfExpand (HashAlgo, HandshakeSecret, HashSize, Info, InfoSize, Out, OutSize);
+  Result = SpdmHkdfExpand (HashAlgo, HandshakeSecret, HashSize, Info, InfoSize, Out, OutSize);
   ZeroMem (HandshakeSecret, HashSize);
 
   return Result;
@@ -1421,27 +833,27 @@ SpdmPskMasterSecretHkdfExpandFunc (
     return FALSE;
   }
 
-  HashSize = TestGetSpdmHashSize (HashAlgo);
+  HashSize = GetSpdmHashSize (HashAlgo);
 
-  Result = TestSpdmHmacAll (HashAlgo, mMyZeroFilledBuffer, HashSize, Psk, PskSize, HandshakeSecret);
+  Result = SpdmHmacAll (HashAlgo, mMyZeroFilledBuffer, HashSize, Psk, PskSize, HandshakeSecret);
   if (!Result) {
     return Result;
   }
 
   *(UINT16 *)gBinStr0 = (UINT16)HashSize;
-  Result = TestSpdmHkdfExpand (HashAlgo, HandshakeSecret, HashSize, gBinStr0, sizeof(gBinStr0), Salt1, HashSize);
+  Result = SpdmHkdfExpand (HashAlgo, HandshakeSecret, HashSize, gBinStr0, sizeof(gBinStr0), Salt1, HashSize);
   ZeroMem (HandshakeSecret, HashSize);
   if (!Result) {
     return Result;
   }
 
-  Result = TestSpdmHmacAll (HashAlgo, Salt1, HashSize, mMyZeroFilledBuffer, HashSize, MasterSecret);
+  Result = SpdmHmacAll (HashAlgo, Salt1, HashSize, mMyZeroFilledBuffer, HashSize, MasterSecret);
   ZeroMem (Salt1, HashSize);
   if (!Result) {
     return Result;
   }
 
-  Result = TestSpdmHkdfExpand (HashAlgo, MasterSecret, HashSize, Info, InfoSize, Out, OutSize);
+  Result = SpdmHkdfExpand (HashAlgo, MasterSecret, HashSize, Info, InfoSize, Out, OutSize);
   ZeroMem (MasterSecret, HashSize);
 
   return Result;

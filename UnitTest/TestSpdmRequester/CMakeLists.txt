@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 2.6)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/TestSpdmRequester
                     ${PROJECT_SOURCE_DIR}/Include
-                    ${PROJECT_SOURCE_DIR}/Include/Hal 
-                    ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH} 
-                    ${PROJECT_SOURCE_DIR}/UnitTest/Include                    
+                    ${PROJECT_SOURCE_DIR}/Include/Hal
+                    ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
+                    ${PROJECT_SOURCE_DIR}/UnitTest/Include
                     ${PROJECT_SOURCE_DIR}/Library/SpdmCommonLib
                     ${PROJECT_SOURCE_DIR}/Library/SpdmRequesterLib
                     ${PROJECT_SOURCE_DIR}/UnitTest/CmockaLib/cmocka/include
                     ${PROJECT_SOURCE_DIR}/UnitTest/CmockaLib/cmocka/include/cmockery
-                    ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon            
+                    ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon
 )
 
 SET(src_TestSpdmRequester
@@ -36,8 +36,9 @@ SET(TestSpdmRequester_LIBRARY
     SpdmCommonLib
     ${CRYPTO}Lib
     RngLib
-    BaseCryptLib${CRYPTO} 
+    BaseCryptLib${CRYPTO}
     MemoryAllocationLib
+    SpdmCryptLib
     SpdmSecuredMessageLib
     SpdmTransportTestLib
     CmockaLib
@@ -54,6 +55,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:RngLib>
                    $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
                    $<TARGET_OBJECTS:MemoryAllocationLib>
+                   $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportTestLib>
                    $<TARGET_OBJECTS:CmockaLib>

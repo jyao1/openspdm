@@ -59,7 +59,7 @@ SpdmSendReceivePskFinish (
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;
   
-  HmacSize = GetSpdmHashSize (SpdmContext);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + HmacSize;
   
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);

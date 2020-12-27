@@ -118,9 +118,9 @@ TrySpdmSendReceiveKeyExchange (
   SpdmRequest.Reserved = 0;
 
   Ptr = SpdmRequest.ExchangeData;
-  DheKeySize = GetSpdmDheKeySize (SpdmContext);
-  DHEContext = SpdmDheNew (SpdmContext);
-  SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
+  DheKeySize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+  DHEContext = SpdmDheNew (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+  SpdmDheGenerateKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, Ptr, &DheKeySize);
   DEBUG((DEBUG_INFO, "ClientKey (0x%x):\n", DheKeySize));
   InternalDumpHex (Ptr, DheKeySize);
   Ptr += DheKeySize;
@@ -135,7 +135,7 @@ TrySpdmSendReceiveKeyExchange (
   SpdmRequestSize = (UINTN)Ptr - (UINTN)&SpdmRequest;
   Status = SpdmSendSpdmRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -143,25 +143,25 @@ TrySpdmSendReceiveKeyExchange (
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
   Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
     Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, NULL, 0, &SpdmResponseSize, &SpdmResponse, SPDM_KEY_EXCHANGE, SPDM_KEY_EXCHANGE_RSP, sizeof(SPDM_KEY_EXCHANGE_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {
-      SpdmDheFree (SpdmContext, DHEContext);
+      SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
       return Status;
     }
   } else if (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_EXCHANGE_RSP) {
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize < sizeof(SPDM_KEY_EXCHANGE_RESPONSE)) {
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -171,12 +171,12 @@ TrySpdmSendReceiveKeyExchange (
   *SlotIdParam = SpdmResponse.SlotIDParam;
   if (SpdmResponse.MutAuthRequested != 0) {
     if ((*SlotIdParam != 0xF) && (*SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
-      SpdmDheFree (SpdmContext, DHEContext);
+      SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
       return RETURN_DEVICE_ERROR;
     }
   } else {
     if (*SlotIdParam != 0) {
-      SpdmDheFree (SpdmContext, DHEContext);
+      SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
       return RETURN_DEVICE_ERROR;
     }
   }
@@ -184,7 +184,7 @@ TrySpdmSendReceiveKeyExchange (
   *SessionId = (ReqSessionId << 16) | RspSessionId;
   SessionInfo = SpdmAssignSessionId (SpdmContext, *SessionId, FALSE);
   if (SessionInfo == NULL) {
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -193,9 +193,9 @@ TrySpdmSendReceiveKeyExchange (
   //
   AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
-  HashSize = GetSpdmHashSize (SpdmContext);
-  HmacSize = GetSpdmHashSize (SpdmContext);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
     HmacSize = 0;
@@ -208,7 +208,7 @@ TrySpdmSendReceiveKeyExchange (
                           SignatureSize +
                           HmacSize) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
 
@@ -239,13 +239,13 @@ TrySpdmSendReceiveKeyExchange (
                          SignatureSize +
                          HmacSize) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
   Status = SpdmProcessOpaqueDataVersionSelectionData (OpaqueLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_UNSUPPORTED;
   }
 
@@ -268,7 +268,7 @@ TrySpdmSendReceiveKeyExchange (
   Result = SpdmVerifyKeyExchangeRspSignature (SpdmContext, SessionInfo, Signature, SignatureSize);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_KEY_EXCHANGE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
@@ -279,8 +279,8 @@ TrySpdmSendReceiveKeyExchange (
   // Fill data to calc Secret for HMAC verification
   //
   FinalKeySize = sizeof(FinalKey);
-  SpdmDheComputeKey (SpdmContext, DHEContext, SpdmResponse.ExchangeData, DheKeySize, FinalKey, &FinalKeySize);
-  SpdmDheFree (SpdmContext, DHEContext);
+  SpdmDheComputeKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, SpdmResponse.ExchangeData, DheKeySize, FinalKey, &FinalKeySize);
+  SpdmDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
   DEBUG((DEBUG_INFO, "FinalKey (0x%x):\n", FinalKeySize));
   InternalDumpHex (FinalKey, FinalKeySize);
   SpdmSecuredMessageSetDheSecret (SessionInfo->SecuredMessageContext, FinalKey, FinalKeySize);

@@ -124,8 +124,8 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-    MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
-    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext) + MeasurmentSigSize;
+    MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + MeasurmentSigSize;
     SpdmResponse = (VOID *)TempBuf;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -133,9 +133,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext));
+    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
-    SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext), 1);
+    SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
     SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
     Ptr += SPDM_NONCE_SIZE;
@@ -145,14 +145,14 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
     DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
     InternalDumpHex (LocalBuffer, LocalBufferSize);
-    SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
-    DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize(SpdmContext)));
-    InternalDumpHex (HashData, GetSpdmHashSize(SpdmContext));
-    SigSize = GetSpdmAsymSize (SpdmContext);
+    SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
+    DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
+    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+    SigSize = GetSpdmAsymSize (mUseAsymAlgo);
     ReadResponderPrivateCertificate (&Data, &DataSize);
-    TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-    TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
-    TestSpdmAsymFree (mUseAsymAlgo, Context);
+    SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+    SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    SpdmAsymFree (mUseAsymAlgo, Context);
     Ptr += SigSize;
     free(Data);
 
@@ -177,8 +177,8 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-    MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
-    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext) + MeasurmentSigSize;
+    MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + MeasurmentSigSize;
     SpdmResponse = (VOID *)TempBuf;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -186,9 +186,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext));
+    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
-    SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext), 1);
+    SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
     SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
     Ptr += SPDM_NONCE_SIZE;
@@ -198,14 +198,14 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
     DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
     InternalDumpHex (LocalBuffer, LocalBufferSize);
-    SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
-    DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize(SpdmContext)));
-    InternalDumpHex (HashData, GetSpdmHashSize(SpdmContext));
-    SigSize = GetSpdmAsymSize (SpdmContext);
+    SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
+    DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
+    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+    SigSize = GetSpdmAsymSize (mUseAsymAlgo);
     ReadResponderPrivateCertificate (&Data, &DataSize);
-    TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-    TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
-    TestSpdmAsymFree (mUseAsymAlgo, Context);
+    SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+    SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    SpdmAsymFree (mUseAsymAlgo, Context);
     Ptr += SigSize;
     free(Data); 
 
@@ -268,8 +268,8 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-      MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
-      TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext) + MeasurmentSigSize;
+      MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+      TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + MeasurmentSigSize;
       SpdmResponse = (VOID *)TempBuf;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -277,9 +277,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = 0;
       SpdmResponse->NumberOfBlocks = 1;
-      *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext));
+      *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
       MeasurmentBlock = (VOID *)(SpdmResponse + 1);
-      SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext), 1);
+      SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
       Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
       SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
       Ptr += SPDM_NONCE_SIZE;
@@ -289,14 +289,14 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
       DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
       InternalDumpHex (LocalBuffer, LocalBufferSize);
-      SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
-      DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize(SpdmContext)));
-      InternalDumpHex (HashData, GetSpdmHashSize(SpdmContext));
-      SigSize = GetSpdmAsymSize (SpdmContext);
+      SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
+      DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
+      InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+      SigSize = GetSpdmAsymSize (mUseAsymAlgo);
       ReadResponderPrivateCertificate (&Data, &DataSize);
-      TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-      TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
-      TestSpdmAsymFree (mUseAsymAlgo, Context);
+      SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+      SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+      SpdmAsymFree (mUseAsymAlgo, Context);
       Ptr += SigSize;
       free(Data);
 
@@ -368,8 +368,8 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-      MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
-      TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext) + MeasurmentSigSize;
+      MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+      TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + MeasurmentSigSize;
       SpdmResponse = (VOID *)TempBuf;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -377,9 +377,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = 0;
       SpdmResponse->NumberOfBlocks = 1;
-      *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext));
+      *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
       MeasurmentBlock = (VOID *)(SpdmResponse + 1);
-      SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext), 1);
+      SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
       Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
       SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
       Ptr += SPDM_NONCE_SIZE;
@@ -389,14 +389,14 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
       DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
       InternalDumpHex (LocalBuffer, LocalBufferSize);
-      SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
-      DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize(SpdmContext)));
-      InternalDumpHex (HashData, GetSpdmHashSize(SpdmContext));
-      SigSize = GetSpdmAsymSize (SpdmContext);
+      SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
+      DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
+      InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+      SigSize = GetSpdmAsymSize (mUseAsymAlgo);
       ReadResponderPrivateCertificate (&Data, &DataSize);
-      TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-      TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
-      TestSpdmAsymFree (mUseAsymAlgo, Context);
+      SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+      SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+      SpdmAsymFree (mUseAsymAlgo, Context);
       Ptr += SigSize;
       free(Data);
 
@@ -432,7 +432,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     UINTN                         TempBufSize;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext);
+    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
     SpdmResponse = (VOID *)TempBuf;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -440,9 +440,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext));
+    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
-    SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext), 1);
+    SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
@@ -844,7 +844,7 @@ void TestSpdmRequesterGetMeasurementCase11(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_SUCCESS);  
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext));
+  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
   free(Data);
 }
 

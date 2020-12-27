@@ -60,7 +60,7 @@ SpdmGetResponsePskFinish (
   }
   
   // remove HMAC
-  HmacSize = GetSpdmHashSize (SpdmContext);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (RequestSize != sizeof(SPDM_PSK_FINISH_REQUEST) + HmacSize) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);

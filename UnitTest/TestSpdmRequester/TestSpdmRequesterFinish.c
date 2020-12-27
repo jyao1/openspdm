@@ -119,8 +119,8 @@ SpdmRequesterFinishTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-    HashSize = GetSpdmHashSize (SpdmContext);
-    HmacSize = GetSpdmHashSize (SpdmContext);
+    HashSize = GetSpdmHashSize (mUseHashAlgo);
+    HmacSize = GetSpdmHashSize (mUseHashAlgo);
     TempBufSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
     SpdmResponse = (VOID *)TempBuf;
 
@@ -135,13 +135,13 @@ SpdmRequesterFinishTestReceiveMessage (
     InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
     CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-    SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+    SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
     // Transcript.MessageA size is 0
     AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
     // SessionTranscript.MessageK is 0 
     AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
     SetMem (ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
-    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+    SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
     Ptr += HmacSize;
     free(Data);
 
@@ -169,8 +169,8 @@ SpdmRequesterFinishTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-    HashSize = GetSpdmHashSize (SpdmContext);
-    HmacSize = GetSpdmHashSize (SpdmContext);
+    HashSize = GetSpdmHashSize (mUseHashAlgo);
+    HmacSize = GetSpdmHashSize (mUseHashAlgo);
     TempBufSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
     SpdmResponse = (VOID *)TempBuf;
     
@@ -185,13 +185,13 @@ SpdmRequesterFinishTestReceiveMessage (
     InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
     CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-    SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+    SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
     // Transcript.MessageA size is 0
     AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
     // SessionTranscript.MessageK is 0 
     AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
     SetMem (ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
-    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+    SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
     Ptr += HmacSize;
     free(Data);
 
@@ -257,8 +257,8 @@ SpdmRequesterFinishTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-      HashSize = GetSpdmHashSize (SpdmContext);
-      HmacSize = GetSpdmHashSize (SpdmContext);
+      HashSize = GetSpdmHashSize (mUseHashAlgo);
+      HmacSize = GetSpdmHashSize (mUseHashAlgo);
       TempBufSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
       SpdmResponse = (VOID *)TempBuf;
 
@@ -273,13 +273,13 @@ SpdmRequesterFinishTestReceiveMessage (
       InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
       CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
       CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-      SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+      SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
       // Transcript.MessageA size is 0
       AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
       // SessionTranscript.MessageK is 0 
       AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
       SetMem (ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
-      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+      SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
       Ptr += HmacSize;
       free(Data);
 
@@ -354,8 +354,8 @@ SpdmRequesterFinishTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-      HashSize = GetSpdmHashSize (SpdmContext);
-      HmacSize = GetSpdmHashSize (SpdmContext);
+      HashSize = GetSpdmHashSize (mUseHashAlgo);
+      HmacSize = GetSpdmHashSize (mUseHashAlgo);
       TempBufSize = sizeof(SPDM_FINISH_RESPONSE) + HmacSize;
       SpdmResponse = (VOID *)TempBuf;
       
@@ -370,13 +370,13 @@ SpdmRequesterFinishTestReceiveMessage (
       InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
       CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
       CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-      SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+      SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
       // Transcript.MessageA size is 0
       AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
       // SessionTranscript.MessageK is 0 
       AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
       SetMem (ResponseFinishedKey, MAX_HASH_SIZE, (UINT8)(0xFF));
-      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+      SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
       Ptr += HmacSize;
       free(Data);
 
@@ -422,7 +422,7 @@ void TestSpdmRequesterFinishCase1(void **state) {
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
-  HashSize = GetSpdmHashSize(SpdmContext);
+  HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
@@ -465,7 +465,7 @@ void TestSpdmRequesterFinishCase2(void **state) {
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
-  HashSize = GetSpdmHashSize(SpdmContext);
+  HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
@@ -506,7 +506,7 @@ void TestSpdmRequesterFinishCase3(void **state) {
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
-  HashSize = GetSpdmHashSize(SpdmContext);
+  HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
@@ -549,7 +549,7 @@ void TestSpdmRequesterFinishCase4(void **state) {
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
-  HashSize = GetSpdmHashSize(SpdmContext);
+  HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
@@ -592,7 +592,7 @@ void TestSpdmRequesterFinishCase5(void **state) {
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
-  HashSize = GetSpdmHashSize(SpdmContext);
+  HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
@@ -635,7 +635,7 @@ void TestSpdmRequesterFinishCase6(void **state) {
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
-  HashSize = GetSpdmHashSize(SpdmContext);
+  HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
@@ -679,7 +679,7 @@ void TestSpdmRequesterFinishCase7(void **state) {
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
-  HashSize = GetSpdmHashSize(SpdmContext);
+  HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
@@ -723,7 +723,7 @@ void TestSpdmRequesterFinishCase8(void **state) {
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
-  HashSize = GetSpdmHashSize(SpdmContext);
+  HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
@@ -766,7 +766,7 @@ void TestSpdmRequesterFinishCase9(void **state) {
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, FALSE);
-  HashSize = GetSpdmHashSize(SpdmContext);
+  HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 

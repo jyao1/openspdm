@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
+#include <Library/SpdmCryptLib.h>
 #include <Library/SpdmSecuredMessageLib.h>
 
 //
@@ -306,7 +307,7 @@ SpdmRegisterMeasurementCollectionFunc (
 
   @param  AsymAlgo                     Indicates the signing algorithm.
                                        For responder, it must align with BaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
-                                       For requester, it must align with ReqBaseAsymAlgo (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
+                                       For requester, it must align with ReqBaseAsymAlg (SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_*)
   @param  MessageHash                  A pointer to a message hash to be signed.
   @param  HashSize                     The size in bytes of the message hash to be signed.
   @param  Signature                    A pointer to a destination buffer to store the signature.

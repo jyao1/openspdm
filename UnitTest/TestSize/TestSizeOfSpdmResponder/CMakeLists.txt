@@ -12,9 +12,9 @@ endif()
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/TestSizeOfSpdmResponder
                     ${PROJECT_SOURCE_DIR}/Include
-                    ${PROJECT_SOURCE_DIR}/Include/Hal 
+                    ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
-                    ${PROJECT_SOURCE_DIR}/OsStub/Include                    
+                    ${PROJECT_SOURCE_DIR}/OsStub/Include
 )
 
 SET(src_TestSizeOfSpdmResponder
@@ -25,14 +25,15 @@ SET(src_TestSizeOfSpdmResponder
 SET(TestSizeOfSpdmResponder_LIBRARY
     BaseMemoryLib
     DebugLib
-    SpdmResponderLib    
+    SpdmResponderLib
     SpdmCommonLib
     BaseCryptStubLibDummy
     ${CRYPTO}Lib
     RngLib
-    BaseCryptLib${CRYPTO}   
+    BaseCryptLib${CRYPTO}
     MemoryAllocationLibNull
     IntrinsicLib
+    SpdmCryptLib
     SpdmSecuredMessageLib
     SpdmTransportMctpLib 
 )
@@ -49,6 +50,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:RngLib>
                    $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
                    $<TARGET_OBJECTS:MemoryAllocationLibNull>
+                   $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportMctpLib>
                    $<TARGET_OBJECTS:IntrinsicLib>

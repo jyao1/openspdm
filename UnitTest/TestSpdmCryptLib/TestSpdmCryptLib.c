@@ -1,6 +1,6 @@
 /**
 @file
-SpdmCommonLibCryptoLib Tests
+SpdmCryptLib Tests
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -35,7 +35,7 @@ CONST UINT8 DMTF_OID[] = {
 };
 
 
-void TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltNameFromBytes(void **state) {
+void TestSpdmCryptLib_SpdmGetDMTFSubjectAltNameFromBytes(void **state) {
   UINTN         CommonNameSize;
   CHAR8         CommonName[64];
   UINTN         DMTFOidSize;
@@ -70,7 +70,7 @@ void TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltNameFromBytes(void **state) {
   assert_string_equal(CommonName, "ACME:WIDGET:1234567890");
 }
 
-void TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltName(void **state) {
+void TestSpdmCryptLib_SpdmGetDMTFSubjectAltName(void **state) {
   UINTN         CommonNameSize;
   CHAR8         CommonName[64];
   UINTN         DMTFOidSize;
@@ -121,7 +121,7 @@ void TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltName(void **state) {
   free (FileBuffer);
 }
 
-void TestSpdmCommonLibCrypto_SpdmX509CertificateCheck(void **state) {
+void TestSpdmCryptLib_SpdmX509CertificateCheck(void **state) {
   BOOLEAN       Status;
   UINT8         *FileBuffer;
   UINTN         FileBufferSize;
@@ -161,17 +161,17 @@ int TearDown(void **state)
   return 0;
 }
 
-int SpdmCommonLibCryptoTestMain(void) {
-  const struct CMUnitTest SpdmCommonLibCryptoTests[] = {
-      cmocka_unit_test(TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltNameFromBytes),
-      cmocka_unit_test(TestSpdmCommonLibCrypto_SpdmGetDMTFSubjectAltName),
-      cmocka_unit_test(TestSpdmCommonLibCrypto_SpdmX509CertificateCheck)
+int SpdmCryptLibTestMain(void) {
+  const struct CMUnitTest SpdmCryptLibTests[] = {
+      cmocka_unit_test(TestSpdmCryptLib_SpdmGetDMTFSubjectAltNameFromBytes),
+      cmocka_unit_test(TestSpdmCryptLib_SpdmGetDMTFSubjectAltName),
+      cmocka_unit_test(TestSpdmCryptLib_SpdmX509CertificateCheck)
   };
 
-  return cmocka_run_group_tests(SpdmCommonLibCryptoTests, Setup, TearDown);
+  return cmocka_run_group_tests(SpdmCryptLibTests, Setup, TearDown);
 }
 
 int main(void) {
-  SpdmCommonLibCryptoTestMain();
+  SpdmCryptLibTestMain();
   return 0;
 }

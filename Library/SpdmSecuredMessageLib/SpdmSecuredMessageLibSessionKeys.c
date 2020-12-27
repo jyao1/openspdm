@@ -117,153 +117,6 @@ SpdmSecuredMessageSetSessionType (
   SecuredMessageContext->SessionType = SessionType;
 }
 
-/**
-  This function returns the SPDM hash algorithm size.
-
-  @param  SecuredMessageContext                  A pointer to the SPDM context.
-
-  @return SPDM hash algorithm size.
-**/
-UINT32
-SpdmSecuredMessageGetSpdmHashSize (
-  IN SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext
-  )
-{
-  switch (SecuredMessageContext->BaseHashAlgo) {
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_256:
-    return 32;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_384:
-    return 48;
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512:
-    return 64;
-  }
-  return 0;
-}
-
-/**
-  This function returns the SPDM DHE algorithm key size.
-
-  @param  SecuredMessageContext                  A pointer to the SPDM context.
-
-  @return SPDM DHE algorithm key size.
-**/
-UINT32
-SpdmSecuredMessageGetSpdmDheKeySize (
-  IN SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext
-  )
-{
-  switch (SecuredMessageContext->DHENamedGroup) {
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
-    return 256;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
-    return 384;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
-    return 512;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_256_R1:
-    return 32 * 2;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1:
-    return 48 * 2;
-  case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1:
-    return 66 * 2;
-  }
-  return 0;
-}
-
-/**
-  This function returns the SPDM AEAD algorithm key size.
-
-  @param  SecuredMessageContext                  A pointer to the SPDM context.
-
-  @return SPDM AEAD algorithm key size.
-**/
-UINT32
-SpdmSecuredMessageGetSpdmAeadKeySize (
-  IN SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext
-  )
-{
-  switch (SecuredMessageContext->AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-    return 32;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-    return 32;
-  }
-  return 0;
-}
-
-/**
-  This function returns the SPDM AEAD algorithm iv size.
-
-  @param  SecuredMessageContext                  A pointer to the SPDM context.
-
-  @return SPDM AEAD algorithm iv size.
-**/
-UINT32
-SpdmSecuredMessageGetSpdmAeadIvSize (
-  IN SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext
-  )
-{
-  switch (SecuredMessageContext->AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-    return 12;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-    return 12;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-    return 12;
-  }
-  return 0;
-}
-
-/**
-  This function returns the SPDM AEAD algorithm tag size.
-
-  @param  SecuredMessageContext                  A pointer to the SPDM context.
-
-  @return SPDM AEAD algorithm tag size.
-**/
-UINT32
-SpdmSecuredMessageGetSpdmAeadTagSize (
-  IN SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext
-  )
-{
-  switch (SecuredMessageContext->AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-    return 16;
-  }
-  return 0;
-}
-
-/**
-  This function returns the SPDM AEAD algorithm block size.
-
-  @param  SecuredMessageContext                  A pointer to the SPDM context.
-
-  @return SPDM AEAD algorithm block size.
-**/
-UINT32
-SpdmSecuredMessageGetSpdmAeadBlockSize (
-  IN SPDM_SECURED_MESSAGE_CONTEXT              *SecuredMessageContext
-  )
-{
-  switch (SecuredMessageContext->AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-    return 16;
-  }
-  return 0;
-}
-
 VOID
 SpdmSecuredMessageSetAlgorithms (
   IN VOID                         *SpdmSecuredMessageContext,
@@ -281,12 +134,12 @@ SpdmSecuredMessageSetAlgorithms (
   SecuredMessageContext->AEADCipherSuite = AEADCipherSuite;
   SecuredMessageContext->KeySchedule = KeySchedule;
   
-  SecuredMessageContext->HashSize      = SpdmSecuredMessageGetSpdmHashSize (SecuredMessageContext);
-  SecuredMessageContext->DheKeySize    = SpdmSecuredMessageGetSpdmDheKeySize (SecuredMessageContext);
-  SecuredMessageContext->AeadKeySize   = SpdmSecuredMessageGetSpdmAeadKeySize (SecuredMessageContext);
-  SecuredMessageContext->AeadIvSize    = SpdmSecuredMessageGetSpdmAeadIvSize (SecuredMessageContext);
-  SecuredMessageContext->AeadBlockSize = SpdmSecuredMessageGetSpdmAeadBlockSize (SecuredMessageContext);
-  SecuredMessageContext->AeadTagSize   = SpdmSecuredMessageGetSpdmAeadTagSize (SecuredMessageContext);
+  SecuredMessageContext->HashSize      = GetSpdmHashSize (SecuredMessageContext->BaseHashAlgo);
+  SecuredMessageContext->DheKeySize    = GetSpdmDheKeySize (SecuredMessageContext->DHENamedGroup);
+  SecuredMessageContext->AeadKeySize   = GetSpdmAeadKeySize (SecuredMessageContext->AEADCipherSuite);
+  SecuredMessageContext->AeadIvSize    = GetSpdmAeadIvSize (SecuredMessageContext->AEADCipherSuite);
+  SecuredMessageContext->AeadBlockSize = GetSpdmAeadBlockSize (SecuredMessageContext->AEADCipherSuite);
+  SecuredMessageContext->AeadTagSize   = GetSpdmAeadTagSize (SecuredMessageContext->AEADCipherSuite);
 }
 
 VOID
@@ -361,179 +214,6 @@ SpdmSecuredMessageSetResponseFinishedKey (
   CopyMem (SecuredMessageContext->HandshakeSecret.ResponseFinishedKey, Key, SecuredMessageContext->HashSize);
 }
 
-/**
-  Computes the HMAC of a input data buffer.
-
-  This function performs the HMAC of a given data buffer, and return the hash value.
-
-  @param  Data                         Pointer to the buffer containing the data to be HMACed.
-  @param  DataSize                     Size of Data buffer in bytes.
-  @param  Key                          Pointer to the user-supplied key.
-  @param  KeySize                      Key size in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
-
-  @retval TRUE   HMAC computation succeeded.
-  @retval FALSE  HMAC computation failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *HMAC_ALL) (
-  IN   CONST VOID   *Data,
-  IN   UINTN        DataSize,
-  IN   CONST UINT8  *Key,
-  IN   UINTN        KeySize,
-  OUT  UINT8        *HmacValue
-  );
-
-/**
-  Return HMAC function, based upon the negotiated HMAC algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return HMAC function
-**/
-HMAC_ALL
-SpdmSecuredMessageGetSpdmHmacFunc (
-  IN   UINT32                       BaseHashAlgo
-  )
-{
-  switch (BaseHashAlgo) {
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
-#if OPENSPDM_SHA256_SUPPORT == 1
-    return HmacSha256All;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
-#if OPENSPDM_SHA384_SUPPORT == 1
-    return HmacSha384All;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
-#if OPENSPDM_SHA512_SUPPORT == 1
-    return HmacSha512All;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_256:
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_384:
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512:
-    ASSERT (FALSE);
-    break;
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-BOOLEAN
-SpdmSecuredMessageHmacAll (
-  IN   UINT32                       BaseHashAlgo,
-  IN   CONST VOID                   *Data,
-  IN   UINTN                        DataSize,
-  IN   CONST UINT8                  *Key,
-  IN   UINTN                        KeySize,
-  OUT  UINT8                        *HmacValue
-  )
-{
-  HMAC_ALL   HmacFunction;
-  HmacFunction = SpdmSecuredMessageGetSpdmHmacFunc (BaseHashAlgo);
-  if (HmacFunction == NULL) {
-    return FALSE;
-  }
-  return HmacFunction (Data, DataSize, Key, KeySize, HmacValue);
-}
-
-/**
-  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand.
-
-  @param  Prk                          Pointer to the user-supplied key.
-  @param  PrkSize                      Key size in bytes.
-  @param  Info                         Pointer to the application specific info.
-  @param  InfoSize                     Info size in bytes.
-  @param  Out                          Pointer to buffer to receive hkdf value.
-  @param  OutSize                      Size of hkdf bytes to generate.
-
-  @retval TRUE   Hkdf generated successfully.
-  @retval FALSE  Hkdf generation failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *HKDF_EXPAND) (
-  IN   CONST UINT8  *Prk,
-  IN   UINTN        PrkSize,
-  IN   CONST UINT8  *Info,
-  IN   UINTN        InfoSize,
-  OUT  UINT8        *Out,
-  IN   UINTN        OutSize
-  );
-
-/**
-  Return HKDF expand function, based upon the negotiated HKDF algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return HKDF expand function
-**/
-HKDF_EXPAND
-SpdmSecuredMessageGetSpdmHkdfExpandFunc (
-  IN   UINT32                       BaseHashAlgo
-  )
-{
-  switch (BaseHashAlgo) {
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
-#if OPENSPDM_SHA256_SUPPORT == 1
-    return HkdfSha256Expand;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
-#if OPENSPDM_SHA384_SUPPORT == 1
-    return HkdfSha384Expand;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
-#if OPENSPDM_SHA512_SUPPORT == 1
-    return HkdfSha512Expand;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_256:
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_384:
-  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512:
-    ASSERT (FALSE);
-    break;
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-BOOLEAN
-SpdmSecuredMessageSpdmHkdfExpand (
-  IN   UINT32                       BaseHashAlgo,
-  IN   CONST UINT8                  *Prk,
-  IN   UINTN                        PrkSize,
-  IN   CONST UINT8                  *Info,
-  IN   UINTN                        InfoSize,
-  OUT  UINT8                        *Out,
-  IN   UINTN                        OutSize
-  )
-{
-  HKDF_EXPAND   HkdfExpandFunction;
-  HkdfExpandFunction = SpdmSecuredMessageGetSpdmHkdfExpandFunc (BaseHashAlgo);
-  if (HkdfExpandFunction == NULL) {
-    return FALSE;
-  }
-  return HkdfExpandFunction (Prk, PrkSize, Info, InfoSize, Out, OutSize);
-}
-
 BOOLEAN
 SpdmHmacAllWithRequestFinishedKey (
   IN   VOID                         *SpdmSecuredMessageContext,
@@ -545,7 +225,7 @@ SpdmHmacAllWithRequestFinishedKey (
   SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
-  return SpdmSecuredMessageHmacAll (
+  return SpdmHmacAll (
           SecuredMessageContext->BaseHashAlgo,
           Data,
           DataSize,
@@ -566,7 +246,7 @@ SpdmHmacAllWithResponseFinishedKey (
   SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
-  return SpdmSecuredMessageHmacAll (
+  return SpdmHmacAll (
           SecuredMessageContext->BaseHashAlgo,
           Data,
           DataSize,
@@ -661,7 +341,7 @@ SpdmGenerateAeadKeyAndIv (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr5 (0x%x):\n", BinStr5Size));
   InternalDumpHex (BinStr5, BinStr5Size);
-  RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, MajorSecret, HashSize, BinStr5, BinStr5Size, Key, KeyLength);
+  RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, MajorSecret, HashSize, BinStr5, BinStr5Size, Key, KeyLength);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "Key (0x%x) - ", KeyLength));
   InternalDumpData (Key, KeyLength);
@@ -672,7 +352,7 @@ SpdmGenerateAeadKeyAndIv (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr6 (0x%x):\n", BinStr6Size));
   InternalDumpHex (BinStr6, BinStr6Size);
-  RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, MajorSecret, HashSize, BinStr6, BinStr6Size, Iv, IvLength);
+  RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, MajorSecret, HashSize, BinStr6, BinStr6Size, Iv, IvLength);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "Iv (0x%x) - ", IvLength));
   InternalDumpData (Iv, IvLength);
@@ -710,7 +390,7 @@ SpdmGenerateFinishedKey (
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr7 (0x%x):\n", BinStr7Size));
   InternalDumpHex (BinStr7, BinStr7Size);
-  RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, HandshakeSecret, HashSize, BinStr7, BinStr7Size, FinishedKey, HashSize);
+  RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, HandshakeSecret, HashSize, BinStr7, BinStr7Size, FinishedKey, HashSize);
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "FinishedKey (0x%x) - ", HashSize));
   InternalDumpData (FinishedKey, HashSize);
@@ -760,7 +440,7 @@ SpdmGenerateSessionHandshakeKey (
     DEBUG((DEBUG_INFO, "[DHE Secret]: "));
     InternalDumpHexStr (SecuredMessageContext->MasterSecret.DheSecret, SecuredMessageContext->DheKeySize);
     DEBUG((DEBUG_INFO, "\n"));
-    RetVal = SpdmSecuredMessageHmacAll (SecuredMessageContext->BaseHashAlgo, mZeroFilledBuffer, HashSize, SecuredMessageContext->MasterSecret.DheSecret, SecuredMessageContext->DheKeySize, SecuredMessageContext->MasterSecret.HandshakeSecret);
+    RetVal = SpdmHmacAll (SecuredMessageContext->BaseHashAlgo, mZeroFilledBuffer, HashSize, SecuredMessageContext->MasterSecret.DheSecret, SecuredMessageContext->DheKeySize, SecuredMessageContext->MasterSecret.HandshakeSecret);
     ASSERT (RetVal);
     DEBUG((DEBUG_INFO, "HandshakeSecret (0x%x) - ", HashSize));
     InternalDumpData (SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize);
@@ -779,7 +459,7 @@ SpdmGenerateSessionHandshakeKey (
     }
     RetVal = SecuredMessageContext->SpdmPskHandshakeSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr1, BinStr1Size, SecuredMessageContext->HandshakeSecret.RequestHandshakeSecret, HashSize);
   } else {
-    RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize, BinStr1, BinStr1Size, SecuredMessageContext->HandshakeSecret.RequestHandshakeSecret, HashSize);
+    RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize, BinStr1, BinStr1Size, SecuredMessageContext->HandshakeSecret.RequestHandshakeSecret, HashSize);
   }
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "RequestHandshakeSecret (0x%x) - ", HashSize));
@@ -797,7 +477,7 @@ SpdmGenerateSessionHandshakeKey (
     }
     RetVal = SecuredMessageContext->SpdmPskHandshakeSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr2, BinStr2Size, SecuredMessageContext->HandshakeSecret.ResponseHandshakeSecret, HashSize);
   } else {
-    RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize, BinStr2, BinStr2Size, SecuredMessageContext->HandshakeSecret.ResponseHandshakeSecret, HashSize);
+    RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize, BinStr2, BinStr2Size, SecuredMessageContext->HandshakeSecret.ResponseHandshakeSecret, HashSize);
   }
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "ResponseHandshakeSecret (0x%x) - ", HashSize));
@@ -873,13 +553,13 @@ SpdmGenerateSessionDataKey (
     BinStr0Size = sizeof(BinStr0);
     Status = SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
     ASSERT_RETURN_ERROR (Status);
-    RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize, BinStr0, BinStr0Size, Salt1, HashSize);
+    RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize, BinStr0, BinStr0Size, Salt1, HashSize);
     ASSERT (RetVal);
     DEBUG((DEBUG_INFO, "Salt1 (0x%x) - ", HashSize));
     InternalDumpData (Salt1, HashSize);
     DEBUG((DEBUG_INFO, "\n"));
 
-    RetVal = SpdmSecuredMessageHmacAll (SecuredMessageContext->BaseHashAlgo, Salt1, HashSize, mZeroFilledBuffer, HashSize, SecuredMessageContext->MasterSecret.MasterSecret);
+    RetVal = SpdmHmacAll (SecuredMessageContext->BaseHashAlgo, Salt1, HashSize, mZeroFilledBuffer, HashSize, SecuredMessageContext->MasterSecret.MasterSecret);
     ASSERT (RetVal);
     DEBUG((DEBUG_INFO, "MasterSecret (0x%x) - ", HashSize));
     InternalDumpData (SecuredMessageContext->MasterSecret.MasterSecret, HashSize);
@@ -898,7 +578,7 @@ SpdmGenerateSessionDataKey (
     }
     RetVal = SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr3, BinStr3Size, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
   } else {
-    RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.MasterSecret, HashSize, BinStr3, BinStr3Size, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
+    RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.MasterSecret, HashSize, BinStr3, BinStr3Size, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
   }
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "RequestDataSecret (0x%x) - ", HashSize));
@@ -916,7 +596,7 @@ SpdmGenerateSessionDataKey (
     }
     RetVal = SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr4, BinStr4Size, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize);
   } else {
-    RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.MasterSecret, HashSize, BinStr4, BinStr4Size, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize);
+    RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.MasterSecret, HashSize, BinStr4, BinStr4Size, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize);
   }
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "ResponseDataSecret (0x%x) - ", HashSize));
@@ -935,7 +615,7 @@ SpdmGenerateSessionDataKey (
     }
     RetVal = SecuredMessageContext->SpdmPskMasterSecretHkdfExpandFunc (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->PskHint, SecuredMessageContext->PskHintSize, BinStr8, BinStr8Size, SecuredMessageContext->HandshakeSecret.ExportMasterSecret, HashSize);
   } else {
-    RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.MasterSecret, HashSize, BinStr8, BinStr8Size, SecuredMessageContext->HandshakeSecret.ExportMasterSecret, HashSize);
+    RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.MasterSecret, HashSize, BinStr8, BinStr8Size, SecuredMessageContext->HandshakeSecret.ExportMasterSecret, HashSize);
   }
   ASSERT (RetVal);
   DEBUG((DEBUG_INFO, "ExportMasterSecret (0x%x) - ", HashSize));
@@ -998,7 +678,7 @@ SpdmCreateUpdateSessionDataKey (
     CopyMem (&SecuredMessageContext->ApplicationSecretBackup.RequestDataSalt, &SecuredMessageContext->ApplicationSecret.RequestDataSalt, MAX_AEAD_IV_SIZE);
     SecuredMessageContext->ApplicationSecretBackup.RequestDataSequenceNumber = SecuredMessageContext->ApplicationSecret.RequestDataSequenceNumber;
 
-    RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize, BinStr9, BinStr9Size, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
+    RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize, BinStr9, BinStr9Size, SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
     ASSERT (RetVal);
     DEBUG((DEBUG_INFO, "RequestDataSecretUpdate (0x%x) - ", HashSize));
     InternalDumpData (SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
@@ -1019,7 +699,7 @@ SpdmCreateUpdateSessionDataKey (
     CopyMem (&SecuredMessageContext->ApplicationSecretBackup.ResponseDataSalt, &SecuredMessageContext->ApplicationSecret.ResponseDataSalt, MAX_AEAD_IV_SIZE);
     SecuredMessageContext->ApplicationSecretBackup.ResponseDataSequenceNumber = SecuredMessageContext->ApplicationSecret.ResponseDataSequenceNumber;
 
-    RetVal = SpdmSecuredMessageSpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize, BinStr9, BinStr9Size, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize);
+    RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize, BinStr9, BinStr9Size, SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize);
     ASSERT (RetVal);
     DEBUG((DEBUG_INFO, "ResponseDataSecretUpdate (0x%x) - ", HashSize));
     InternalDumpData (SecuredMessageContext->ApplicationSecret.ResponseDataSecret, HashSize);

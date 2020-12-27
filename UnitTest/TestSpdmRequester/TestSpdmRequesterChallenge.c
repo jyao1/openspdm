@@ -115,11 +115,11 @@ SpdmRequesterChallengeTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
-              GetSpdmHashSize (SpdmContext) +
+              GetSpdmHashSize (mUseHashAlgo) +
               SPDM_NONCE_SIZE +
-              GetSpdmHashSize (SpdmContext) +
+              GetSpdmHashSize (mUseHashAlgo) +
               sizeof(UINT16) + 0 +
-              GetSpdmAsymSize (SpdmContext);
+              GetSpdmAsymSize (mUseAsymAlgo);
     SpdmResponse = (VOID *)TempBuf;
     
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -127,27 +127,27 @@ SpdmRequesterChallengeTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = (1 << 0);
     Ptr = (VOID *)(SpdmResponse + 1);
-    SpdmHashAll (SpdmContext, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
+    SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
     free(Data);
-    Ptr += GetSpdmHashSize (SpdmContext);
+    Ptr += GetSpdmHashSize (mUseHashAlgo);
     SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
     Ptr += SPDM_NONCE_SIZE;
-    ZeroMem (Ptr, GetSpdmHashSize (SpdmContext));
-    Ptr += GetSpdmHashSize (SpdmContext);
+    ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
+    Ptr += GetSpdmHashSize (mUseHashAlgo);
     *(UINT16 *)Ptr = 0;
     Ptr += sizeof(UINT16);
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
     LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
     DEBUG((DEBUG_INFO, "LocalBufferSize (0x%x):\n", LocalBufferSize));
     InternalDumpHex (LocalBuffer, LocalBufferSize);
-    SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
-    DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize(SpdmContext)));
-    InternalDumpHex (HashData, GetSpdmHashSize(SpdmContext));
-    SigSize = GetSpdmAsymSize (SpdmContext);
+    SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
+    DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
+    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+    SigSize = GetSpdmAsymSize (mUseAsymAlgo);
     ReadResponderPrivateCertificate (&Data, &DataSize);
-    TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-    TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
-    TestSpdmAsymFree (mUseAsymAlgo, Context);
+    SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+    SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    SpdmAsymFree (mUseAsymAlgo, Context);
     Ptr += SigSize;
     free(Data);
 
@@ -173,11 +173,11 @@ SpdmRequesterChallengeTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
-              GetSpdmHashSize (SpdmContext) +
+              GetSpdmHashSize (mUseHashAlgo) +
               SPDM_NONCE_SIZE +
-              GetSpdmHashSize (SpdmContext) +
+              GetSpdmHashSize (mUseHashAlgo) +
               sizeof(UINT16) + 0 +
-              GetSpdmAsymSize (SpdmContext);
+              GetSpdmAsymSize (mUseAsymAlgo);
     SpdmResponse = (VOID *)TempBuf;
     
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -185,23 +185,23 @@ SpdmRequesterChallengeTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = (1 << 0);
     Ptr = (VOID *)(SpdmResponse + 1);
-    SpdmHashAll (SpdmContext, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
+    SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
     free(Data);
-    Ptr += GetSpdmHashSize (SpdmContext);
+    Ptr += GetSpdmHashSize (mUseHashAlgo);
     SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
     Ptr += SPDM_NONCE_SIZE;
-    ZeroMem (Ptr, GetSpdmHashSize (SpdmContext));
-    Ptr += GetSpdmHashSize (SpdmContext);
+    ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
+    Ptr += GetSpdmHashSize (mUseHashAlgo);
     *(UINT16 *)Ptr = 0;
     Ptr += sizeof(UINT16);
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
     LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
-    SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
-    SigSize = GetSpdmAsymSize (SpdmContext);
+    SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
+    SigSize = GetSpdmAsymSize (mUseAsymAlgo);
     ReadResponderPrivateCertificate (&Data, &DataSize);
-    TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-    TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
-    TestSpdmAsymFree (mUseAsymAlgo, Context);
+    SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+    SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    SpdmAsymFree (mUseAsymAlgo, Context);
     Ptr += SigSize;
     free(Data);
 
@@ -265,11 +265,11 @@ SpdmRequesterChallengeTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
-              GetSpdmHashSize (SpdmContext) +
+              GetSpdmHashSize (mUseHashAlgo) +
               SPDM_NONCE_SIZE +
-              GetSpdmHashSize (SpdmContext) +
+              GetSpdmHashSize (mUseHashAlgo) +
               sizeof(UINT16) + 0 +
-              GetSpdmAsymSize (SpdmContext);
+              GetSpdmAsymSize (mUseAsymAlgo);
       SpdmResponse = (VOID *)TempBuf;
     
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -277,23 +277,23 @@ SpdmRequesterChallengeTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = (1 << 0);
       Ptr = (VOID *)(SpdmResponse + 1);
-      SpdmHashAll (SpdmContext, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
+      SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
       free(Data);
-      Ptr += GetSpdmHashSize (SpdmContext);
+      Ptr += GetSpdmHashSize (mUseHashAlgo);
       SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
       Ptr += SPDM_NONCE_SIZE;
-      ZeroMem (Ptr, GetSpdmHashSize (SpdmContext));
-      Ptr += GetSpdmHashSize (SpdmContext);
+      ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
+      Ptr += GetSpdmHashSize (mUseHashAlgo);
       *(UINT16 *)Ptr = 0;
       Ptr += sizeof(UINT16);
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
-      SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
-      SigSize = GetSpdmAsymSize (SpdmContext);
+      SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
+      SigSize = GetSpdmAsymSize (mUseAsymAlgo);
       ReadResponderPrivateCertificate (&Data, &DataSize);
-      TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-      TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
-      TestSpdmAsymFree (mUseAsymAlgo, Context);
+      SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+      SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+      SpdmAsymFree (mUseAsymAlgo, Context);
       Ptr += SigSize;
       free(Data);
 
@@ -366,11 +366,11 @@ SpdmRequesterChallengeTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
-              GetSpdmHashSize (SpdmContext) +
+              GetSpdmHashSize (mUseHashAlgo) +
               SPDM_NONCE_SIZE +
-              GetSpdmHashSize (SpdmContext) +
+              GetSpdmHashSize (mUseHashAlgo) +
               sizeof(UINT16) + 0 +
-              GetSpdmAsymSize (SpdmContext);
+              GetSpdmAsymSize (mUseAsymAlgo);
       SpdmResponse = (VOID *)TempBuf;
     
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -378,23 +378,23 @@ SpdmRequesterChallengeTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = (1 << 0);
       Ptr = (VOID *)(SpdmResponse + 1);
-      SpdmHashAll (SpdmContext, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
+      SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
       free(Data);
-      Ptr += GetSpdmHashSize (SpdmContext);
+      Ptr += GetSpdmHashSize (mUseHashAlgo);
       SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
       Ptr += SPDM_NONCE_SIZE;
-      ZeroMem (Ptr, GetSpdmHashSize (SpdmContext));
-      Ptr += GetSpdmHashSize (SpdmContext);
+      ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
+      Ptr += GetSpdmHashSize (mUseHashAlgo);
       *(UINT16 *)Ptr = 0;
       Ptr += sizeof(UINT16);
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
-      SpdmHashAll (SpdmContext, LocalBuffer, LocalBufferSize, HashData);
-      SigSize = GetSpdmAsymSize (SpdmContext);
+      SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
+      SigSize = GetSpdmAsymSize (mUseAsymAlgo);
       ReadResponderPrivateCertificate (&Data, &DataSize);
-      TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-      TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SigSize);
-      TestSpdmAsymFree (mUseAsymAlgo, Context);
+      SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+      SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+      SpdmAsymFree (mUseAsymAlgo, Context);
       Ptr += SigSize;
       free(Data);
 

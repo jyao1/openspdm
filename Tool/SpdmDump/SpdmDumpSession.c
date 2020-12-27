@@ -34,7 +34,7 @@ SpdmDumpSessionDataProvision (
     return RETURN_UNSUPPORTED;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (!SessionInfo->UsePsk) {
     if (mDheSecretBuffer == NULL || mDheSecretBufferSize == 0) {

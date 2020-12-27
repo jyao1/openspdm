@@ -44,7 +44,7 @@ SpdmCalculateTh1 (
     return RETURN_UNSUPPORTED;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (IsRequester) {
     if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
@@ -61,7 +61,7 @@ SpdmCalculateTh1 (
     CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   }
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SessionInfo->UsePsk) {
     AppendManagedBuffer (&TH1, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -85,7 +85,7 @@ SpdmCalculateTh1 (
     InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
   }
   
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&TH1), GetManagedBufferSize(&TH1), TH1HashData);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&TH1), GetManagedBufferSize(&TH1), TH1HashData);
   DEBUG((DEBUG_INFO, "TH1 Hash - "));
   InternalDumpData (TH1HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -131,7 +131,7 @@ SpdmCalculateTh2 (
     return RETURN_UNSUPPORTED;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (IsRequester) {
     if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
@@ -148,7 +148,7 @@ SpdmCalculateTh2 (
     CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
   }
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
   if (SessionInfo->MutAuthRequested) {
     if (IsRequester) {
       ASSERT (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize != 0);
@@ -165,7 +165,7 @@ SpdmCalculateTh2 (
         ASSERT (FALSE);
       }
     }
-    SpdmHashAll (SpdmContext, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
   }
 
   if (SessionInfo->UsePsk) {
@@ -203,7 +203,7 @@ SpdmCalculateTh2 (
     DEBUG((DEBUG_INFO, "MessageF Data :\n"));
     InternalDumpHex (GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
   }
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&TH2), GetManagedBufferSize(&TH2), TH2HashData);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&TH2), GetManagedBufferSize(&TH2), TH2HashData);
   DEBUG((DEBUG_INFO, "TH2 Hash - "));
   InternalDumpData (TH2HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));

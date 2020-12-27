@@ -409,7 +409,7 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         ReadResponderPublicCertificateChain (&LocalCertificateChain, &LocalCertificateChainSize, NULL, NULL);
 
         // load certificate
-        HashSize = GetSpdmHashSize (SpdmContext);
+        HashSize = GetSpdmHashSize (mUseHashAlgo);
         CertBuffer = (UINT8 *)LocalCertificateChain + sizeof(SPDM_CERT_CHAIN) + HashSize;
         CertBufferSize = LocalCertificateChainSize - sizeof(SPDM_CERT_CHAIN) - HashSize;
         if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, -1, &LeafCertBuffer, &LeafCertBufferSize)) {

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/TestSpdmRequesterGetVersion
                         ${PROJECT_SOURCE_DIR}/Include
-                        ${PROJECT_SOURCE_DIR}/Include/Hal 
+                        ${PROJECT_SOURCE_DIR}/Include/Hal
                         ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
                         ${PROJECT_SOURCE_DIR}/Library/SpdmCommonLib
                         ${PROJECT_SOURCE_DIR}/Library/SpdmRequesterLib
@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/Fuzzing/TestSpdmRequesterGetV
 )
 
 if(TOOLCHAIN STREQUAL "KLEE")  
-    INCLUDE_DIRECTORIES($ENV{KLEE_SRC_PATH}/include)        
+    INCLUDE_DIRECTORIES($ENV{KLEE_SRC_PATH}/include)
 endif()
 
 SET(src_TestSpdmRequesterGetVersion
@@ -21,15 +21,16 @@ SET(src_TestSpdmRequesterGetVersion
 
 SET(TestSpdmRequesterGetVersion_LIBRARY
     BaseMemoryLib
-    DebugLib  
+    DebugLib
     SpdmRequesterLib
     SpdmCommonLib
     ${CRYPTO}Lib
     RngLib
-    BaseCryptLib${CRYPTO}   
+    BaseCryptLib${CRYPTO}
     MemoryAllocationLib
+    SpdmCryptLib
     SpdmSecuredMessageLib
-    SpdmTransportTestLib 
+    SpdmTransportTestLib
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
@@ -43,6 +44,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:RngLib>
                    $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
                    $<TARGET_OBJECTS:MemoryAllocationLib>
+                   $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportTestLib>
     ) 

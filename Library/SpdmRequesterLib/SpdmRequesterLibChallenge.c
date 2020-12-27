@@ -151,8 +151,8 @@ TrySpdmChallenge (
       return RETURN_DEVICE_ERROR;
     }
   }
-  HashSize = GetSpdmHashSize (SpdmContext);
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
 
   if (SpdmResponseSize <= sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
                           HashSize +

@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmCommonLib
+MODULE_NAME = SpdmCryptLib
 
 #
 # Build Directory Macro Definition
@@ -32,10 +32,7 @@ SOURCE_DIR = $(WORKSPACE)\Library\$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\SpdmCommonLibContextData.obj \
-    $(OUTPUT_DIR)\SpdmCommonLibCryptoService.obj \
-    $(OUTPUT_DIR)\SpdmCommonLibSession.obj \
-    $(OUTPUT_DIR)\SpdmCommonLibSupport.obj \
+    $(OUTPUT_DIR)\SpdmCryptLib.obj \
 
 
 INC =  \
@@ -71,17 +68,8 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\SpdmCommonLibContextData.obj : $(SOURCE_DIR)\SpdmCommonLibContextData.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmCommonLibContextData.c
-
-$(OUTPUT_DIR)\SpdmCommonLibCryptoService.obj : $(SOURCE_DIR)\SpdmCommonLibCryptoService.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmCommonLibCryptoService.c
-
-$(OUTPUT_DIR)\SpdmCommonLibSession.obj : $(SOURCE_DIR)\SpdmCommonLibSession.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmCommonLibSession.c
-
-$(OUTPUT_DIR)\SpdmCommonLibSupport.obj : $(SOURCE_DIR)\SpdmCommonLibSupport.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmCommonLibSupport.c
+$(OUTPUT_DIR)\SpdmCryptLib.obj : $(SOURCE_DIR)\SpdmCryptLib.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmCryptLib.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

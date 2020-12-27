@@ -86,7 +86,7 @@ TrySpdmSendReceiveFinish (
   if (SessionInfo->MutAuthRequested) {
     SpdmRequest.Header.Param1 = SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED;
     SpdmRequest.Header.Param2 = SlotIdParam;
-    SignatureSize = GetSpdmReqAsymSize (SpdmContext);
+    SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
   } else {
     SpdmRequest.Header.Param1 = 0;
     SpdmRequest.Header.Param2 = 0;
@@ -102,7 +102,7 @@ TrySpdmSendReceiveFinish (
     SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotIdParam];
   }
 
-  HmacSize = GetSpdmHashSize (SpdmContext);
+  HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + SignatureSize + HmacSize;
   Ptr = SpdmRequest.Signature;
   

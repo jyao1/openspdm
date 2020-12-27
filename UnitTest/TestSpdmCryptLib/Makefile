@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = TestSpdmCommonLibCrypto
+MODULE_NAME = TestSpdmCryptLib
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -33,7 +33,7 @@ SOURCE_DIR = $(WORKSPACE)\UnitTest\$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\TestSpdmCommonLibCrypto.obj \
+    $(OUTPUT_DIR)\TestSpdmCryptLib.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
     $(OUTPUT_DIR)\SpdmTestKey.obj \
     $(OUTPUT_DIR)\SpdmTestSupport.obj \
@@ -46,7 +46,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\$(CRYPTO)Lib.lib \
     $(BIN_DIR)\OsStub\RngLib\RngLib.lib \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\MemoryAllocationLib.lib \
-    $(BIN_DIR)\Library\SpdmCommonLib\SpdmCommonLib.lib \
+    $(BIN_DIR)\Library\SpdmCryptLib\SpdmCryptLib.lib \
     $(BIN_DIR)\UnitTest\CmockaLib\CmockaLib.lib \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
 
@@ -59,7 +59,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\OsStub\$(CRYPTO)Lib\*.obj \
     $(BIN_DIR)\OsStub\RngLib\*.obj \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\*.obj \
-    $(BIN_DIR)\Library\SpdmCommonLib\*.obj \
+    $(BIN_DIR)\Library\SpdmCryptLib\*.obj \
     $(BIN_DIR)\UnitTest\CmockaLib\*.obj \
 
 
@@ -108,14 +108,14 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\$(CRYPTO)Lib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\RngLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCommonLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCryptLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\CmockaLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\TestSpdmCommonLibCrypto.obj : $(SOURCE_DIR)\TestSpdmCommonLibCrypto.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmCommonLibCrypto.c
+$(OUTPUT_DIR)\TestSpdmCryptLib.obj : $(SOURCE_DIR)\TestSpdmCryptLib.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmCryptLib.c
 
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c

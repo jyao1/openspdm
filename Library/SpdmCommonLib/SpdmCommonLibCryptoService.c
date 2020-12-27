@@ -27,7 +27,7 @@ SpdmGenerateCertChainHash (
   )
 {
   ASSERT (SlotIndex < SpdmContext->LocalContext.SlotCount);
-  SpdmHashAll (SpdmContext, SpdmContext->LocalContext.CertificateChain[SlotIndex], SpdmContext->LocalContext.CertificateChainSize[SlotIndex], Hash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, SpdmContext->LocalContext.CertificateChain[SlotIndex], SpdmContext->LocalContext.CertificateChainSize[SlotIndex], Hash);
   return TRUE;
 }
 
@@ -56,8 +56,8 @@ SpdmVerifyDigest (
   CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
   CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
   if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
-    HashSize = GetSpdmHashSize (SpdmContext);
-    SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+    HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
     if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
       DEBUG((DEBUG_INFO, "!!! VerifyDigest - FAIL !!!\n"));
@@ -96,7 +96,7 @@ SpdmVerifyCertificateChainData (
   UINT8                                     *LeafCertBuffer;
   UINTN                                     LeafCertBufferSize;
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (CertificateChainSize > MAX_SPDM_MESSAGE_BUFFER_SIZE) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (buffer too large) !!!\n"));
@@ -115,7 +115,7 @@ SpdmVerifyCertificateChainData (
     return FALSE;
   }
 
-  SpdmHashAll (SpdmContext, RootCertBuffer, RootCertBufferSize, CalcRootCertHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, RootCertBuffer, RootCertBufferSize, CalcRootCertHash);
   if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), CalcRootCertHash, HashSize) != 0) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert root hash mismatch) !!!\n"));
     return FALSE;
@@ -174,7 +174,7 @@ SpdmVerifyCertificateChain (
   CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
 
   if ((RootCertHash != NULL) && (RootCertHashSize != 0)) {
-    HashSize = GetSpdmHashSize (SpdmContext);
+    HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
     if (RootCertHashSize != HashSize) {
       DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (hash size mismatch) !!!\n"));
       return FALSE;
@@ -227,8 +227,8 @@ SpdmGenerateChallengeAuthSignature (
   UINTN                         SignatureSize;
   UINT32                        HashSize;
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
-  HashSize = GetSpdmHashSize (SpdmContext);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (IsRequester) {
     if (SpdmContext->LocalContext.SpdmRequesterDataSignFunc == NULL) {
@@ -245,7 +245,7 @@ SpdmGenerateChallengeAuthSignature (
     DEBUG((DEBUG_INFO, "Calc MessageMutC Data :\n"));
     InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
 
-    SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
     DEBUG((DEBUG_INFO, "Calc M1M2 Hash - "));
     InternalDumpData (HashData, HashSize);
     DEBUG((DEBUG_INFO, "\n"));
@@ -276,7 +276,7 @@ SpdmGenerateChallengeAuthSignature (
     DEBUG((DEBUG_INFO, "Calc MessageC Data :\n"));
     InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
 
-    SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
     DEBUG((DEBUG_INFO, "Calc M1M2 Hash - "));
     InternalDumpData (HashData, HashSize);
     DEBUG((DEBUG_INFO, "\n"));
@@ -325,9 +325,9 @@ SpdmVerifyCertificateChainHash (
     return FALSE;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (HashSize != CertificateChainHashSize) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - FAIL !!!\n"));
@@ -369,7 +369,7 @@ SpdmVerifyChallengeAuthSignature (
   UINT8                                     *CertChainBuffer;
   UINTN                                     CertChainBufferSize;
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (IsRequester) {
     DEBUG((DEBUG_INFO, "MessageA Data :\n"));
@@ -388,7 +388,7 @@ SpdmVerifyChallengeAuthSignature (
     InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
   }
 
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&SpdmContext->Transcript.M1M2), GetManagedBufferSize(&SpdmContext->Transcript.M1M2), HashData);
   DEBUG((DEBUG_INFO, "M1M2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -413,35 +413,35 @@ SpdmVerifyChallengeAuthSignature (
   }
 
   if (IsRequester) {
-    Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
+    Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo, CertBuffer, CertBufferSize, &Context);
     if (!Result) {
       return FALSE;
     }
 
     Result = SpdmAsymVerify (
-              SpdmContext,
+              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
               Context,
               HashData,
               HashSize,
               SignData,
               SignDataSize
               );
-    SpdmAsymFree (SpdmContext, Context);
+    SpdmAsymFree (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo, Context);
   } else {
-    Result = SpdmReqAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
+    Result = SpdmReqAsymGetPublicKeyFromX509 (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg, CertBuffer, CertBufferSize, &Context);
     if (!Result) {
       return FALSE;
     }
 
     Result = SpdmReqAsymVerify (
-              SpdmContext,
+              SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
               Context,
               HashData,
               HashSize,
               SignData,
               SignDataSize
               );
-    SpdmReqAsymFree (SpdmContext, Context);
+    SpdmReqAsymFree (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg, Context);
   }
 
   if (!Result) {
@@ -482,7 +482,7 @@ SpdmGenerateMeasurementSummaryHash (
 
   switch (MeasurementSummaryHashType) {
   case SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH:
-    ZeroMem (MeasurementSummaryHash, GetSpdmHashSize (SpdmContext));
+    ZeroMem (MeasurementSummaryHash, GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo));
     break;
 
   case SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH:
@@ -527,7 +527,7 @@ SpdmGenerateMeasurementSummaryHash (
       MeasurmentDataSize += CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
       CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
     }
-    SpdmHashAll (SpdmContext, MeasurementData, MeasurmentDataSize, MeasurementSummaryHash);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, MeasurementData, MeasurmentDataSize, MeasurementSummaryHash);
     break;
   default:
     return FALSE;
@@ -560,7 +560,7 @@ SpdmGenerateMeasurementSignature (
   UINT8                         HashData[MAX_HASH_SIZE];
   UINT32                        HashSize;
   
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   MeasurmentSigSize = SPDM_NONCE_SIZE +
                       sizeof(UINT16) +
                       SpdmContext->LocalContext.OpaqueMeasurementRspSize +
@@ -580,14 +580,14 @@ SpdmGenerateMeasurementSignature (
     return FALSE;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   AppendManagedBuffer (&SpdmContext->Transcript.L1L2, ResponseMessage, ResponseMessageSize - SignatureSize);
   
   DEBUG((DEBUG_INFO, "Calc L1L2 Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
 
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
   DEBUG((DEBUG_INFO, "Calc L1L2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -628,12 +628,12 @@ SpdmVerifyMeasurementSignature (
   UINT8                                     *CertChainBuffer;
   UINTN                                     CertChainBufferSize;
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   DEBUG((DEBUG_INFO, "L1L2 Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
 
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2), HashData);
   DEBUG((DEBUG_INFO, "L1L2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -656,20 +656,20 @@ SpdmVerifyMeasurementSignature (
     return FALSE;
   }
 
-  Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
+  Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo, CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return FALSE;
   }
 
   Result = SpdmAsymVerify (
-             SpdmContext,
+             SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
              Context,
              HashData,
              HashSize,
              SignData,
              SignDataSize
              );
-  SpdmAsymFree (SpdmContext, Context);
+  SpdmAsymFree (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo, Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyMeasurementSignature - FAIL !!!\n"));
     return FALSE;
@@ -711,8 +711,8 @@ SpdmGenerateKeyExchangeRspSignature (
     return FALSE;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext);
-  HashSize = GetSpdmHashSize (SpdmContext);
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
     return FALSE;
@@ -720,7 +720,7 @@ SpdmGenerateKeyExchangeRspSignature (
   CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
 
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -735,7 +735,7 @@ SpdmGenerateKeyExchangeRspSignature (
   AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
   DEBUG((DEBUG_INFO, "Calc THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -781,11 +781,11 @@ SpdmGenerateKeyExchangeRspHmac (
     return FALSE;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -842,7 +842,7 @@ SpdmVerifyKeyExchangeRspSignature (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
     CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
@@ -854,7 +854,7 @@ SpdmVerifyKeyExchangeRspSignature (
     return FALSE;
   }
 
-  SpdmHashAll (SpdmContext, CertChainBuffer, CertChainBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertChainBuffer, CertChainBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -869,7 +869,7 @@ SpdmVerifyKeyExchangeRspSignature (
   AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageK), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageK));
 
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -882,20 +882,20 @@ SpdmVerifyKeyExchangeRspSignature (
     return FALSE;
   }
 
-  Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext, CertBuffer, CertBufferSize, &Context);
+  Result = SpdmAsymGetPublicKeyFromX509 (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo, CertBuffer, CertBufferSize, &Context);
   if (!Result) {
     return FALSE;
   }
 
   Result = SpdmAsymVerify (
-             SpdmContext,
+             SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
              Context,
              HashData,
              HashSize,
              SignData,
              SignDataSize
              );
-  SpdmAsymFree (SpdmContext, Context);
+  SpdmAsymFree (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo, Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyKeyExchangeSignature - FAIL !!!\n"));
     return FALSE;
@@ -933,7 +933,7 @@ SpdmVerifyKeyExchangeRspHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   ASSERT(HashSize == HmacDataSize);
 
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
@@ -946,7 +946,7 @@ SpdmVerifyKeyExchangeRspHmac (
     return FALSE;
   }
 
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -1013,8 +1013,8 @@ SpdmGenerateFinishReqSignature (
     return FALSE;
   }
 
-  SignatureSize = GetSpdmReqAsymSize (SpdmContext);
-  HashSize = GetSpdmHashSize (SpdmContext);
+  SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
     CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
@@ -1026,11 +1026,11 @@ SpdmGenerateFinishReqSignature (
     return FALSE;
   }
 
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   MutCertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   MutCertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  SpdmHashAll (SpdmContext, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -1053,7 +1053,7 @@ SpdmGenerateFinishReqSignature (
   AppendManagedBuffer (&THCurr, MutCertBufferHash, HashSize);
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -1098,7 +1098,7 @@ SpdmGenerateFinishReqHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
     CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
@@ -1110,7 +1110,7 @@ SpdmGenerateFinishReqHmac (
     return FALSE;
   }
 
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SessionInfo->MutAuthRequested) {
     if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
@@ -1118,7 +1118,7 @@ SpdmGenerateFinishReqHmac (
     }
     MutCertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
     MutCertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-    SpdmHashAll (SpdmContext, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
   }
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
@@ -1191,14 +1191,14 @@ SpdmVerifyFinishReqSignature (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
     return FALSE;
   }
   CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
     MutCertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
@@ -1210,7 +1210,7 @@ SpdmVerifyFinishReqSignature (
     return FALSE;
   }
 
-  SpdmHashAll (SpdmContext, MutCertChainBuffer, MutCertChainBufferSize, MutCertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, MutCertChainBuffer, MutCertChainBufferSize, MutCertBufferHash);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -1233,7 +1233,7 @@ SpdmVerifyFinishReqSignature (
   AppendManagedBuffer (&THCurr, MutCertBufferHash, HashSize);
   AppendManagedBuffer (&THCurr, GetManagedBuffer(&SessionInfo->SessionTranscript.MessageF), GetManagedBufferSize(&SessionInfo->SessionTranscript.MessageF));
 
-  SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
@@ -1246,20 +1246,20 @@ SpdmVerifyFinishReqSignature (
     return FALSE;
   }
 
-  Result = SpdmReqAsymGetPublicKeyFromX509 (SpdmContext, MutCertBuffer, MutCertBufferSize, &Context);
+  Result = SpdmReqAsymGetPublicKeyFromX509 (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg, MutCertBuffer, MutCertBufferSize, &Context);
   if (!Result) {
     return FALSE;
   }
 
   Result = SpdmReqAsymVerify (
-             SpdmContext,
+             SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
              Context,
              HashData,
              HashSize,
              SignData,
              SignDataSize
              );
-  SpdmReqAsymFree (SpdmContext, Context);
+  SpdmReqAsymFree (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg, Context);
   if (!Result) {
     DEBUG((DEBUG_INFO, "!!! VerifyFinishSignature - FAIL !!!\n"));
     return FALSE;
@@ -1300,7 +1300,7 @@ SpdmVerifyFinishReqHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   ASSERT (HmacSize == HashSize);
 
   if ((SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer == NULL) || (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0)) {
@@ -1308,7 +1308,7 @@ SpdmVerifyFinishReqHmac (
   }
   CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SessionInfo->MutAuthRequested) {
     if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
@@ -1320,7 +1320,7 @@ SpdmVerifyFinishReqHmac (
     } else {
       return FALSE;
     }
-    SpdmHashAll (SpdmContext, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
   }
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
@@ -1394,11 +1394,11 @@ SpdmGenerateFinishRspHmac (
     return FALSE;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   CertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
   CertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SessionInfo->MutAuthRequested) {
     if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
@@ -1410,7 +1410,7 @@ SpdmGenerateFinishRspHmac (
     } else {
       return FALSE;
     }
-    SpdmHashAll (SpdmContext, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
   }
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
@@ -1479,7 +1479,7 @@ SpdmVerifyFinishRspHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   ASSERT(HashSize == HmacDataSize);
 
   if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
@@ -1491,7 +1491,7 @@ SpdmVerifyFinishRspHmac (
   } else {
     return FALSE;
   }
-  SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
 
   if (SessionInfo->MutAuthRequested) {
     if (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize == 0) {
@@ -1499,7 +1499,7 @@ SpdmVerifyFinishRspHmac (
     }
     MutCertBuffer = (UINT8 *)SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
     MutCertBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-    SpdmHashAll (SpdmContext, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, MutCertBuffer, MutCertBufferSize, MutCertBufferHash);
   }
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
@@ -1564,7 +1564,7 @@ SpdmGeneratePskExchangeRspHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -1610,7 +1610,7 @@ SpdmVerifyPskExchangeRspHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   ASSERT(HashSize == HmacDataSize);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
@@ -1659,7 +1659,7 @@ SpdmGeneratePskFinishReqHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   DEBUG((DEBUG_INFO, "MessageA Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -1709,7 +1709,7 @@ SpdmVerifyPskFinishReqHmac (
 
   InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
-  HashSize = GetSpdmHashSize (SpdmContext);
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   ASSERT (HmacSize == HashSize);
 
   DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));

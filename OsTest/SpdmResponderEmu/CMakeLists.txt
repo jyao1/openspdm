@@ -27,6 +27,7 @@ SET(SpdmResponderTest_LIBRARY
     RngLib
     BaseCryptLib${CRYPTO}   
     MemoryAllocationLib
+    SpdmCryptLib
     SpdmSecuredMessageLib
     SpdmTransportMctpLib
     SpdmTransportPciDoeLib
@@ -43,6 +44,7 @@ if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
                    $<TARGET_OBJECTS:RngLib>
                    $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
                    $<TARGET_OBJECTS:MemoryAllocationLib>
+                   $<TARGET_OBJECTS:SpdmCryptLib>
                    $<TARGET_OBJECTS:SpdmSecuredMessageLib>
                    $<TARGET_OBJECTS:SpdmTransportMctpLib>
                    $<TARGET_OBJECTS:SpdmTransportPciDoeLib>

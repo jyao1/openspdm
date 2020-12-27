@@ -421,6 +421,7 @@ if(TESTTYPE STREQUAL "OsTest")
     SUBDIRS(Library/SpdmCommonLib
             Library/SpdmRequesterLib
             Library/SpdmResponderLib
+            Library/SpdmCryptLib
             Library/SpdmSecuredMessageLib
             Library/SpdmTransportMctpLib
             Library/SpdmTransportPciDoeLib
@@ -439,6 +440,7 @@ elseif(TESTTYPE STREQUAL "UnitTest")
     SUBDIRS(Library/SpdmCommonLib
             Library/SpdmRequesterLib
             Library/SpdmResponderLib
+            Library/SpdmCryptLib
             Library/SpdmSecuredMessageLib
             Library/SpdmTransportMctpLib
             Library/SpdmTransportPciDoeLib
@@ -466,6 +468,7 @@ elseif(TESTTYPE STREQUAL "UnitFuzzing")
     SUBDIRS(Library/SpdmCommonLib
             Library/SpdmRequesterLib
             Library/SpdmResponderLib
+            Library/SpdmCryptLib
             Library/SpdmSecuredMessageLib
             OsStub/BaseMemoryLib
             OsStub/DebugLib

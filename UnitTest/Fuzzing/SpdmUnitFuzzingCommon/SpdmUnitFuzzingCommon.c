@@ -48,7 +48,7 @@ UINTN SpdmUnitTestGroupTeardown(VOID **State)
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
 
-  SpdmTestContext = *state;
+  SpdmTestContext = *State;
   free (SpdmTestContext->SpdmContext);
   SpdmTestContext->SpdmContext = NULL;
   return 0;

@@ -7,289 +7,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "SpdmCommonLibInternal.h"
-
-/**
-  Computes the hash of a input data buffer.
-
-  This function performs the hash of a given data buffer, and return the hash value.
-
-  @param  Data                         Pointer to the buffer containing the data to be hashed.
-  @param  DataSize                     Size of Data buffer in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the hash value.
-
-  @retval TRUE   Hash computation succeeded.
-  @retval FALSE  Hash computation failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *HASH_ALL) (
-  IN   CONST VOID  *Data,
-  IN   UINTN       DataSize,
-  OUT  UINT8       *HashValue
-  );
-
-/**
-  Computes the HMAC of a input data buffer.
-
-  This function performs the HMAC of a given data buffer, and return the hash value.
-
-  @param  Data                         Pointer to the buffer containing the data to be HMACed.
-  @param  DataSize                     Size of Data buffer in bytes.
-  @param  Key                          Pointer to the user-supplied key.
-  @param  KeySize                      Key size in bytes.
-  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
-
-  @retval TRUE   HMAC computation succeeded.
-  @retval FALSE  HMAC computation failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *HMAC_ALL) (
-  IN   CONST VOID   *Data,
-  IN   UINTN        DataSize,
-  IN   CONST UINT8  *Key,
-  IN   UINTN        KeySize,
-  OUT  UINT8        *HmacValue
-  );
-
-/**
-  Derive HMAC-based Expand Key Derivation Function (HKDF) Expand.
-
-  @param  Prk                          Pointer to the user-supplied key.
-  @param  PrkSize                      Key size in bytes.
-  @param  Info                         Pointer to the application specific info.
-  @param  InfoSize                     Info size in bytes.
-  @param  Out                          Pointer to buffer to receive hkdf value.
-  @param  OutSize                      Size of hkdf bytes to generate.
-
-  @retval TRUE   Hkdf generated successfully.
-  @retval FALSE  Hkdf generation failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *HKDF_EXPAND) (
-  IN   CONST UINT8  *Prk,
-  IN   UINTN        PrkSize,
-  IN   CONST UINT8  *Info,
-  IN   UINTN        InfoSize,
-  OUT  UINT8        *Out,
-  IN   UINTN        OutSize
-  );
-
-/**
-  Performs AEAD authenticated encryption on a data buffer and additional authenticated data (AAD).
-
-  @param  Key                          Pointer to the encryption key.
-  @param  KeySize                      Size of the encryption key in bytes.
-  @param  Iv                           Pointer to the IV value.
-  @param  IvSize                       Size of the IV value in bytes.
-  @param  AData                        Pointer to the additional authenticated data (AAD).
-  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
-  @param  DataIn                       Pointer to the input data buffer to be encrypted.
-  @param  DataInSize                   Size of the input data buffer in bytes.
-  @param  TagOut                       Pointer to a buffer that receives the authentication tag output.
-  @param  TagSize                      Size of the authentication tag in bytes.
-  @param  DataOut                      Pointer to a buffer that receives the encryption output.
-  @param  DataOutSize                  Size of the output data buffer in bytes.
-
-  @retval TRUE   AEAD authenticated encryption succeeded.
-  @retval FALSE  AEAD authenticated encryption failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *AEAD_ENCRYPT) (
-  IN   CONST UINT8* Key,
-  IN   UINTN        KeySize,
-  IN   CONST UINT8* Iv,
-  IN   UINTN        IvSize,
-  IN   CONST UINT8* AData,
-  IN   UINTN        ADataSize,
-  IN   CONST UINT8* DataIn,
-  IN   UINTN        DataInSize,
-  OUT  UINT8*       TagOut,
-  IN   UINTN        TagSize,
-  OUT  UINT8*       DataOut,
-  OUT  UINTN*       DataOutSize
-  );
-
-/**
-  Performs AEAD authenticated decryption on a data buffer and additional authenticated data (AAD).
-
-  @param  Key                          Pointer to the encryption key.
-  @param  KeySize                      Size of the encryption key in bytes.
-  @param  Iv                           Pointer to the IV value.
-  @param  IvSize                       Size of the IV value in bytes.
-  @param  AData                        Pointer to the additional authenticated data (AAD).
-  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
-  @param  DataIn                       Pointer to the input data buffer to be decrypted.
-  @param  DataInSize                   Size of the input data buffer in bytes.
-  @param  Tag                          Pointer to a buffer that contains the authentication tag.
-  @param  TagSize                      Size of the authentication tag in bytes.
-  @param  DataOut                      Pointer to a buffer that receives the decryption output.
-  @param  DataOutSize                  Size of the output data buffer in bytes.
-
-  @retval TRUE   AEAD authenticated decryption succeeded.
-  @retval FALSE  AEAD authenticated decryption failed.
-**/
-typedef
-BOOLEAN
-(EFIAPI *AEAD_DECRYPT) (
-  IN   CONST UINT8* Key,
-  IN   UINTN        KeySize,
-  IN   CONST UINT8* Iv,
-  IN   UINTN        IvSize,
-  IN   CONST UINT8* AData,
-  IN   UINTN        ADataSize,
-  IN   CONST UINT8* DataIn,
-  IN   UINTN        DataInSize,
-  IN   CONST UINT8* Tag,
-  IN   UINTN        TagSize,
-  OUT  UINT8*       DataOut,
-  OUT  UINTN*       DataOutSize
-  );
-
-/**
-  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate.
-
-  @param  Cert                         Pointer to the DER-encoded X509 certificate.
-  @param  CertSize                     Size of the X509 certificate in bytes.
-  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
-                                       Use SpdmAsymFree() function to free the resource.
-
-  @retval  TRUE   Public Key was retrieved successfully.
-  @retval  FALSE  Fail to retrieve public key from X509 certificate.
-**/
-typedef
-BOOLEAN
-(EFIAPI *ASYM_GET_PUBLIC_KEY_FROM_X509) (
-  IN   CONST UINT8  *Cert,
-  IN   UINTN        CertSize,
-  OUT  VOID         **Context
-  );
-
-/**
-  Release the specified asymmetric context.
-
-  @param  Context                      Pointer to the asymmetric context to be released.
-**/
-typedef
-VOID
-(EFIAPI *ASYM_FREE) (
-  IN  VOID         *Context
-  );
-
-/**
-  Verifies the asymmetric signature.
-
-  @param  Context                      Pointer to asymmetric context for signature verification.
-  @param  MessageHash                  Pointer to octet message hash to be checked.
-  @param  HashSize                     Size of the message hash in bytes.
-  @param  Signature                    Pointer to asymmetric signature to be verified.
-  @param  SigSize                      Size of signature in bytes.
-
-  @retval  TRUE   Valid asymmetric signature.
-  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
-**/
-typedef
-BOOLEAN
-(EFIAPI *ASYM_VERIFY) (
-  IN  VOID         *Context,
-  IN  CONST UINT8  *MessageHash,
-  IN  UINTN        HashSize,
-  IN  CONST UINT8  *Signature,
-  IN  UINTN        SigSize
-  );
-
-/**
-  Allocates and Initializes one Diffie-Hellman Ephemeral (DHE) Context for subsequent use.
-
-  @param Nid cipher NID
-
-  @return  Pointer to the Diffie-Hellman Context that has been initialized.
-**/
-typedef
-VOID *
-(EFIAPI *DHE_NEW_BY_NID) (
-  IN UINTN  Nid
-  );
-
-/**
-  Generates DHE public key.
-
-  This function generates random secret exponent, and computes the public key, which is
-  returned via parameter PublicKey and PublicKeySize. DH context is updated accordingly.
-  If the PublicKey buffer is too small to hold the public key, FALSE is returned and
-  PublicKeySize is set to the required buffer size to obtain the public key.
-
-  @param  Context                      Pointer to the DHE context.
-  @param  PublicKey                    Pointer to the buffer to receive generated public key.
-  @param  PublicKeySize                On input, the size of PublicKey buffer in bytes.
-                                       On output, the size of data returned in PublicKey buffer in bytes.
-
-  @retval TRUE   DHE public key generation succeeded.
-  @retval FALSE  DHE public key generation failed.
-  @retval FALSE  PublicKeySize is not large enough.
-**/
-typedef
-BOOLEAN
-(EFIAPI *DHE_GENERATE_KEY) (
-  IN OUT  VOID   *Context,
-  OUT     UINT8  *PublicKey,
-  IN OUT  UINTN  *PublicKeySize
-  );
-
-/**
-  Computes exchanged common key.
-
-  Given peer's public key, this function computes the exchanged common key, based on its own
-  context including value of prime modulus and random secret exponent.
-
-  @param  Context                      Pointer to the DHE context.
-  @param  PeerPublicKey                Pointer to the peer's public key.
-  @param  PeerPublicKeySize            Size of peer's public key in bytes.
-  @param  Key                          Pointer to the buffer to receive generated key.
-  @param  KeySize                      On input, the size of Key buffer in bytes.
-                                       On output, the size of data returned in Key buffer in bytes.
-
-  @retval TRUE   DHE exchanged key generation succeeded.
-  @retval FALSE  DHE exchanged key generation failed.
-  @retval FALSE  KeySize is not large enough.
-**/
-typedef
-BOOLEAN
-(EFIAPI *DHE_COMPUTE_KEY) (
-  IN OUT  VOID         *Context,
-  IN      CONST UINT8  *PeerPublic,
-  IN      UINTN        PeerPublicSize,
-  OUT     UINT8        *Key,
-  IN OUT  UINTN        *KeySize
-  );
-
-/**
-  Release the specified DHE context.
-
-  @param  Context                      Pointer to the DHE context to be released.
-**/
-typedef
-VOID
-(EFIAPI *DHE_FREE) (
-  IN  VOID  *Context
-  );
+#include <Library/SpdmCryptLib.h>
 
 /**
   This function returns the SPDM hash algorithm size.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BaseHashAlgo                  SPDM BaseHashAlgo
 
   @return SPDM hash algorithm size.
 **/
 UINT32
 GetSpdmHashSize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN      UINT32       BaseHashAlgo
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo) {
+  switch (BaseHashAlgo) {
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_256:
     return 32;
@@ -306,16 +38,16 @@ GetSpdmHashSize (
 /**
   Return hash function, based upon the negotiated hash algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BaseHashAlgo                  SPDM BaseHashAlgo
 
   @return hash function
 **/
 HASH_ALL
 GetSpdmHashFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN      UINT32       BaseHashAlgo
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo) {
+  switch (BaseHashAlgo) {
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
 #if OPENSPDM_SHA256_SUPPORT == 1
     return Sha256HashAll;
@@ -352,7 +84,7 @@ GetSpdmHashFunc (
 
   This function performs the hash of a given data buffer, and return the hash value.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Data                         Pointer to the buffer containing the data to be hashed.
   @param  DataSize                     Size of Data buffer in bytes.
   @param  HashValue                    Pointer to a buffer that receives the hash value.
@@ -362,14 +94,14 @@ GetSpdmHashFunc (
 **/
 BOOLEAN
 SpdmHashAll (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   UINT32                       BaseHashAlgo,
   IN   CONST VOID                   *Data,
   IN   UINTN                        DataSize,
   OUT  UINT8                        *HashValue
   )
 {
   HASH_ALL   HashFunction;
-  HashFunction = GetSpdmHashFunc (SpdmContext);
+  HashFunction = GetSpdmHashFunc (BaseHashAlgo);
   if (HashFunction == NULL) {
     return FALSE;
   }
@@ -377,18 +109,46 @@ SpdmHashAll (
 }
 
 /**
+  This function returns the SPDM measurement hash algorithm size.
+
+  @param  MeasurementHashAlgo          SPDM MeasurementHashAlgo
+
+  @return SPDM measurement hash algorithm size.
+**/
+UINT32
+GetSpdmMeasurementHashSize (
+  IN   UINT32                       MeasurementHashAlgo
+  )
+{
+  switch (MeasurementHashAlgo) {
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256:
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_256:
+    return 32;
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384:
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_384:
+    return 48;
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512:
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_512:
+    return 64;
+  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_RAW_BIT_STREAM_ONLY:
+    return 0;
+  }
+  return 0;
+}
+
+/**
   Return hash function, based upon the negotiated measurement hash algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MeasurementHashAlgo          SPDM MeasurementHashAlgo
 
   @return hash function
 **/
 HASH_ALL
 GetSpdmMeasurementHashFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT32                       MeasurementHashAlgo
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo) {
+  switch (MeasurementHashAlgo) {
   case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256:
 #if OPENSPDM_SHA256_SUPPORT == 1
     return Sha256HashAll;
@@ -425,7 +185,7 @@ GetSpdmMeasurementHashFunc (
 
   This function performs the hash of a given data buffer, and return the hash value.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MeasurementHashAlgo          SPDM MeasurementHashAlgo
   @param  Data                         Pointer to the buffer containing the data to be hashed.
   @param  DataSize                     Size of Data buffer in bytes.
   @param  HashValue                    Pointer to a buffer that receives the hash value.
@@ -435,14 +195,14 @@ GetSpdmMeasurementHashFunc (
 **/
 BOOLEAN
 SpdmMeasurementHashAll (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   UINT32                       MeasurementHashAlgo,
   IN   CONST VOID                   *Data,
   IN   UINTN                        DataSize,
   OUT  UINT8                        *HashValue
   )
 {
   HASH_ALL   HashFunction;
-  HashFunction = GetSpdmMeasurementHashFunc (SpdmContext);
+  HashFunction = GetSpdmMeasurementHashFunc (MeasurementHashAlgo);
   if (HashFunction == NULL) {
     return FALSE;
   }
@@ -452,7 +212,7 @@ SpdmMeasurementHashAll (
 /**
   Return HMAC function, based upon the negotiated HMAC algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
 
   @return HMAC function
 **/
@@ -498,7 +258,7 @@ GetSpdmHmacFunc (
 
   This function performs the HMAC of a given data buffer, and return the hash value.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Data                         Pointer to the buffer containing the data to be HMACed.
   @param  DataSize                     Size of Data buffer in bytes.
   @param  Key                          Pointer to the user-supplied key.
@@ -510,7 +270,7 @@ GetSpdmHmacFunc (
 **/
 BOOLEAN
 SpdmHmacAll (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   UINT32                       BaseHashAlgo,
   IN   CONST VOID                   *Data,
   IN   UINTN                        DataSize,
   IN   CONST UINT8                  *Key,
@@ -519,7 +279,7 @@ SpdmHmacAll (
   )
 {
   HMAC_ALL   HmacFunction;
-  HmacFunction = GetSpdmHmacFunc (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  HmacFunction = GetSpdmHmacFunc (BaseHashAlgo);
   if (HmacFunction == NULL) {
     return FALSE;
   }
@@ -529,7 +289,7 @@ SpdmHmacAll (
 /**
   Return HKDF expand function, based upon the negotiated HKDF algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
 
   @return HKDF expand function
 **/
@@ -573,7 +333,7 @@ GetSpdmHkdfExpandFunc (
 /**
   Derive HMAC-based Expand Key Derivation Function (HKDF) Expand, based upon the negotiated HKDF algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Prk                          Pointer to the user-supplied key.
   @param  PrkSize                      Key size in bytes.
   @param  Info                         Pointer to the application specific info.
@@ -586,7 +346,7 @@ GetSpdmHkdfExpandFunc (
 **/
 BOOLEAN
 SpdmHkdfExpand (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   UINT32                       BaseHashAlgo,
   IN   CONST UINT8                  *Prk,
   IN   UINTN                        PrkSize,
   IN   CONST UINT8                  *Info,
@@ -596,7 +356,7 @@ SpdmHkdfExpand (
   )
 {
   HKDF_EXPAND   HkdfExpandFunction;
-  HkdfExpandFunction = GetSpdmHkdfExpandFunc (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  HkdfExpandFunction = GetSpdmHkdfExpandFunc (BaseHashAlgo);
   if (HkdfExpandFunction == NULL) {
     return FALSE;
   }
@@ -606,16 +366,16 @@ SpdmHkdfExpand (
 /**
   This function returns the SPDM asymmetric algorithm size.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
 
   @return SPDM asymmetric algorithm size.
 **/
 UINT32
 GetSpdmAsymSize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT32                       BaseAsymAlgo
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo) {
+  switch (BaseAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
     return 256;
@@ -633,81 +393,614 @@ GetSpdmAsymSize (
     return 66 * 2;
   }
   return 0;
+}
+
+/**
+  Return asymmetric GET_PUBLIC_KEY_FROM_X509 function, based upon the negotiated asymmetric algorithm.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+
+  @return asymmetric GET_PUBLIC_KEY_FROM_X509 function
+**/
+ASYM_GET_PUBLIC_KEY_FROM_X509
+GetSpdmAsymGetPublicKeyFromX509 (
+  IN   UINT32                       BaseAsymAlgo
+  )
+{
+  switch (BaseAsymAlgo) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
+#if (OPENSPDM_RSA_SSA_SUPPORT == 1) || (OPENSPDM_RSA_PSS_SUPPORT == 1)
+    return RsaGetPublicKeyFromX509;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
+#if OPENSPDM_ECDSA_SUPPORT == 1
+    return EcGetPublicKeyFromX509;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
+  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate,
+  based upon negotiated asymmetric algorithm.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+  @param  Cert                         Pointer to the DER-encoded X509 certificate.
+  @param  CertSize                     Size of the X509 certificate in bytes.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve public key from X509 certificate.
+**/
+BOOLEAN
+SpdmAsymGetPublicKeyFromX509 (
+  IN   UINT32                       BaseAsymAlgo,
+  IN   CONST UINT8                  *Cert,
+  IN   UINTN                        CertSize,
+  OUT  VOID                         **Context
+  )
+{
+  ASYM_GET_PUBLIC_KEY_FROM_X509   GetPublicKeyFromX509Function;
+  GetPublicKeyFromX509Function = GetSpdmAsymGetPublicKeyFromX509 (BaseAsymAlgo);
+  if (GetPublicKeyFromX509Function == NULL) {
+    return FALSE;
+  }
+  return GetPublicKeyFromX509Function (Cert, CertSize, Context);
+}
+
+/**
+  Return asymmetric free function, based upon the negotiated asymmetric algorithm.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+
+  @return asymmetric free function
+**/
+ASYM_FREE
+GetSpdmAsymFree (
+  IN   UINT32                       BaseAsymAlgo
+  )
+{
+  switch (BaseAsymAlgo) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
+#if (OPENSPDM_RSA_SSA_SUPPORT == 1) || (OPENSPDM_RSA_PSS_SUPPORT == 1)
+    return RsaFree;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
+#if OPENSPDM_ECDSA_SUPPORT == 1
+    return EcFree;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
+  Release the specified asymmetric context,
+  based upon negotiated asymmetric algorithm.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+  @param  Context                      Pointer to the asymmetric context to be released.
+**/
+VOID
+SpdmAsymFree (
+  IN   UINT32                       BaseAsymAlgo,
+  IN   VOID                         *Context
+  )
+{
+  ASYM_FREE   FreeFunction;
+  FreeFunction = GetSpdmAsymFree (BaseAsymAlgo);
+  if (FreeFunction == NULL) {
+    return ;
+  }
+  FreeFunction (Context);
+}
+
+/**
+  Return asymmetric verify function, based upon the negotiated asymmetric algorithm.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+
+  @return asymmetric verify function
+**/
+ASYM_VERIFY
+GetSpdmAsymVerify (
+  IN   UINT32                       BaseAsymAlgo
+  )
+{
+  switch (BaseAsymAlgo) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
+#if OPENSPDM_RSA_SSA_SUPPORT == 1
+    return RsaPkcs1Verify;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
+#if OPENSPDM_RSA_PSS_SUPPORT == 1
+    return RsaPssVerify;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
+#if OPENSPDM_ECDSA_SUPPORT == 1
+    return EcDsaVerify;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
+  Verifies the asymmetric signature,
+  based upon negotiated asymmetric algorithm.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+  @param  Context                      Pointer to asymmetric context for signature verification.
+  @param  MessageHash                  Pointer to octet message hash to be checked.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to asymmetric signature to be verified.
+  @param  SigSize                      Size of signature in bytes.
+
+  @retval  TRUE   Valid asymmetric signature.
+  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
+**/
+BOOLEAN
+SpdmAsymVerify (
+  IN   UINT32                       BaseAsymAlgo,
+  IN   VOID                         *Context,
+  IN   CONST UINT8                  *MessageHash,
+  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Signature,
+  IN   UINTN                        SigSize
+  )
+{
+  ASYM_VERIFY   VerifyFunction;
+  VerifyFunction = GetSpdmAsymVerify (BaseAsymAlgo);
+  if (VerifyFunction == NULL) {
+    return FALSE;
+  }
+  return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
+}
+
+/**
+  Return asymmetric GET_PRIVATE_KEY_FROM_PEM function, based upon the asymmetric algorithm.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+
+  @return asymmetric GET_PRIVATE_KEY_FROM_PEM function
+**/
+ASYM_GET_PRIVATE_KEY_FROM_PEM
+GetSpdmAsymGetPrivateKeyFromPem (
+  IN   UINT32                       BaseAsymAlgo
+  )
+{
+  switch (BaseAsymAlgo) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
+#if (OPENSPDM_RSA_SSA_SUPPORT == 1) || (OPENSPDM_RSA_PSS_SUPPORT == 1)
+    return RsaGetPrivateKeyFromPem;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
+#if OPENSPDM_ECDSA_SUPPORT == 1
+    return EcGetPrivateKeyFromPem;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
+  Retrieve the Private Key from the password-protected PEM key data.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+  @param  PemData                      Pointer to the PEM-encoded key data to be retrieved.
+  @param  PemSize                      Size of the PEM key data in bytes.
+  @param  Password                     NULL-terminated passphrase used for encrypted PEM key data.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved private key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+**/
+BOOLEAN
+SpdmAsymGetPrivateKeyFromPem (
+  IN   UINT32                       BaseAsymAlgo,
+  IN   CONST UINT8                  *PemData,
+  IN   UINTN                        PemSize,
+  IN   CONST CHAR8                  *Password,
+  OUT  VOID                         **Context
+  )
+{
+  ASYM_GET_PRIVATE_KEY_FROM_PEM   AsymGetPrivateKeyFromPem;
+  AsymGetPrivateKeyFromPem = GetSpdmAsymGetPrivateKeyFromPem (BaseAsymAlgo);
+  if (AsymGetPrivateKeyFromPem == NULL) {
+    return FALSE;
+  }
+  return AsymGetPrivateKeyFromPem (PemData, PemSize, Password, Context);
+}
+
+/**
+  Return asymmetric sign function, based upon the asymmetric algorithm.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+
+  @return asymmetric sign function
+**/
+ASYM_SIGN
+GetSpdmAsymSign (
+  IN   UINT32                       BaseAsymAlgo
+  )
+{
+  switch (BaseAsymAlgo) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
+#if OPENSPDM_RSA_SSA_SUPPORT == 1
+    return RsaPkcs1Sign;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
+#if OPENSPDM_RSA_PSS_SUPPORT == 1
+    return RsaPssSign;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
+#if OPENSPDM_ECDSA_SUPPORT == 1
+    return EcDsaSign;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
+  Carries out the signature generation.
+
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+  @param  Context                      Pointer to asymmetric context for signature generation.
+  @param  MessageHash                  Pointer to octet message hash to be signed.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to buffer to receive signature.
+  @param  SigSize                      On input, the size of Signature buffer in bytes.
+                                       On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+**/
+BOOLEAN
+SpdmAsymSign (
+  IN      UINT32                       BaseAsymAlgo,
+  IN      VOID                         *Context,
+  IN      CONST UINT8                  *MessageHash,
+  IN      UINTN                        HashSize,
+  OUT     UINT8                        *Signature,
+  IN OUT  UINTN                        *SigSize
+  )
+{
+  ASYM_SIGN   AsymSign;
+  AsymSign = GetSpdmAsymSign (BaseAsymAlgo);
+  if (AsymSign == NULL) {
+    return FALSE;
+  }
+  return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
 }
 
 /**
   This function returns the SPDM requester asymmetric algorithm size.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
 
   @return SPDM requester asymmetric algorithm size.
 **/
 UINT32
 GetSpdmReqAsymSize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT16                       ReqBaseAsymAlg
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-    return 256;
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-    return 384;
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-    return 512;
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-    return 32 * 2;
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-    return 48 * 2;
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-    return 66 * 2;
-  }
-  return 0;
+  return GetSpdmAsymSize (ReqBaseAsymAlg);
 }
 
 /**
-  This function returns the SPDM measurement hash algorithm size.
+  Return requester asymmetric GET_PUBLIC_KEY_FROM_X509 function, based upon the negotiated requester asymmetric algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
 
-  @return SPDM measurement hash algorithm size.
+  @return requester asymmetric GET_PUBLIC_KEY_FROM_X509 function
 **/
-UINT32
-GetSpdmMeasurementHashSize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+ASYM_GET_PUBLIC_KEY_FROM_X509
+GetSpdmReqAsymGetPublicKeyFromX509 (
+  IN   UINT16                       ReqBaseAsymAlg
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo) {
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256:
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_256:
-    return 32;
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384:
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_384:
-    return 48;
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512:
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_512:
-    return 64;
-  case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_RAW_BIT_STREAM_ONLY:
-    return 0;
+  return GetSpdmAsymGetPublicKeyFromX509 (ReqBaseAsymAlg);
+}
+
+/**
+  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate,
+  based upon negotiated requester asymmetric algorithm.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+  @param  Cert                         Pointer to the DER-encoded X509 certificate.
+  @param  CertSize                     Size of the X509 certificate in bytes.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve public key from X509 certificate.
+**/
+BOOLEAN
+SpdmReqAsymGetPublicKeyFromX509 (
+  IN   UINT16                       ReqBaseAsymAlg,
+  IN   CONST UINT8                  *Cert,
+  IN   UINTN                        CertSize,
+  OUT  VOID                         **Context
+  )
+{
+  ASYM_GET_PUBLIC_KEY_FROM_X509   GetPublicKeyFromX509Function;
+  GetPublicKeyFromX509Function = GetSpdmReqAsymGetPublicKeyFromX509 (ReqBaseAsymAlg);
+  if (GetPublicKeyFromX509Function == NULL) {
+    return FALSE;
   }
-  return 0;
+  return GetPublicKeyFromX509Function (Cert, CertSize, Context);
+}
+
+/**
+  Return requester asymmetric free function, based upon the negotiated requester asymmetric algorithm.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+
+  @return requester asymmetric free function
+**/
+ASYM_FREE
+GetSpdmReqAsymFree (
+  IN   UINT16                       ReqBaseAsymAlg
+  )
+{
+  return GetSpdmAsymFree (ReqBaseAsymAlg);
+}
+
+/**
+  Release the specified asymmetric context,
+  based upon negotiated requester asymmetric algorithm.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+  @param  Context                      Pointer to the asymmetric context to be released.
+**/
+VOID
+SpdmReqAsymFree (
+  IN   UINT16                       ReqBaseAsymAlg,
+  IN   VOID                         *Context
+  )
+{
+  ASYM_FREE   FreeFunction;
+  FreeFunction = GetSpdmReqAsymFree (ReqBaseAsymAlg);
+  if (FreeFunction == NULL) {
+    return ;
+  }
+  FreeFunction (Context);
+}
+
+/**
+  Return requester asymmetric verify function, based upon the negotiated requester asymmetric algorithm.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+
+  @return requester asymmetric verify function
+**/
+ASYM_VERIFY
+GetSpdmReqAsymVerify (
+  IN   UINT16                       ReqBaseAsymAlg
+  )
+{
+  return GetSpdmAsymVerify (ReqBaseAsymAlg);
+}
+
+/**
+  Verifies the asymmetric signature,
+  based upon negotiated requester asymmetric algorithm.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+  @param  Context                      Pointer to asymmetric context for signature verification.
+  @param  MessageHash                  Pointer to octet message hash to be checked.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to asymmetric signature to be verified.
+  @param  SigSize                      Size of signature in bytes.
+
+  @retval  TRUE   Valid asymmetric signature.
+  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
+**/
+BOOLEAN
+SpdmReqAsymVerify (
+  IN   UINT16                       ReqBaseAsymAlg,
+  IN   VOID                         *Context,
+  IN   CONST UINT8                  *MessageHash,
+  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Signature,
+  IN   UINTN                        SigSize
+  )
+{
+  ASYM_VERIFY   VerifyFunction;
+  VerifyFunction = GetSpdmReqAsymVerify (ReqBaseAsymAlg);
+  if (VerifyFunction == NULL) {
+    return FALSE;
+  }
+  return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
+}
+
+/**
+  Return asymmetric GET_PRIVATE_KEY_FROM_PEM function, based upon the asymmetric algorithm.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+
+  @return asymmetric GET_PRIVATE_KEY_FROM_PEM function
+**/
+ASYM_GET_PRIVATE_KEY_FROM_PEM
+GetSpdmReqAsymGetPrivateKeyFromPem (
+  IN   UINT16                       ReqBaseAsymAlg
+  )
+{
+  return GetSpdmAsymGetPrivateKeyFromPem (ReqBaseAsymAlg);
+}
+
+/**
+  Retrieve the Private Key from the password-protected PEM key data.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+  @param  PemData                      Pointer to the PEM-encoded key data to be retrieved.
+  @param  PemSize                      Size of the PEM key data in bytes.
+  @param  Password                     NULL-terminated passphrase used for encrypted PEM key data.
+  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved private key component.
+                                       Use SpdmAsymFree() function to free the resource.
+
+  @retval  TRUE   Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+**/
+BOOLEAN
+SpdmReqAsymGetPrivateKeyFromPem (
+  IN   UINT16                       ReqBaseAsymAlg,
+  IN   CONST UINT8                  *PemData,
+  IN   UINTN                        PemSize,
+  IN   CONST CHAR8                  *Password,
+  OUT  VOID                         **Context
+  )
+{
+  ASYM_GET_PRIVATE_KEY_FROM_PEM   AsymGetPrivateKeyFromPem;
+  AsymGetPrivateKeyFromPem = GetSpdmReqAsymGetPrivateKeyFromPem (ReqBaseAsymAlg);
+  if (AsymGetPrivateKeyFromPem == NULL) {
+    return FALSE;
+  }
+  return AsymGetPrivateKeyFromPem (PemData, PemSize, Password, Context);
+}
+
+/**
+  Return asymmetric sign function, based upon the asymmetric algorithm.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+
+  @return asymmetric sign function
+**/
+ASYM_SIGN
+GetSpdmReqAsymSign (
+  IN   UINT16                       ReqBaseAsymAlg
+  )
+{
+  return GetSpdmAsymSign (ReqBaseAsymAlg);
+}
+
+/**
+  Carries out the signature generation.
+
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+  @param  Context                      Pointer to asymmetric context for signature generation.
+  @param  MessageHash                  Pointer to octet message hash to be signed.
+  @param  HashSize                     Size of the message hash in bytes.
+  @param  Signature                    Pointer to buffer to receive signature.
+  @param  SigSize                      On input, the size of Signature buffer in bytes.
+                                       On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+**/
+BOOLEAN
+SpdmReqAsymSign (
+  IN      UINT16                       ReqBaseAsymAlg,
+  IN      VOID                         *Context,
+  IN      CONST UINT8                  *MessageHash,
+  IN      UINTN                        HashSize,
+  OUT     UINT8                        *Signature,
+  IN OUT  UINTN                        *SigSize
+  )
+{
+  ASYM_SIGN   AsymSign;
+  AsymSign = GetSpdmReqAsymSign (ReqBaseAsymAlg);
+  if (AsymSign == NULL) {
+    return FALSE;
+  }
+  return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
 }
 
 /**
   This function returns the SPDM DHE algorithm key size.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DHENamedGroup                SPDM DHENamedGroup
 
   @return SPDM DHE algorithm key size.
 **/
 UINT32
 GetSpdmDheKeySize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT16                       DHENamedGroup
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  switch (DHENamedGroup) {
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
     return 256;
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
@@ -727,16 +1020,16 @@ GetSpdmDheKeySize (
 /**
   Return cipher ID, based upon the negotiated HKDF algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DHENamedGroup                SPDM DHENamedGroup
 
   @return HKDF expand function
 **/
 UINTN
 GetSpdmDheNid (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT16                       DHENamedGroup
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  switch (DHENamedGroup) {
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
     return CRYPTO_NID_FFDHE2048;
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
@@ -754,690 +1047,18 @@ GetSpdmDheNid (
 }
 
 /**
-  This function returns the SPDM AEAD algorithm key size.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return SPDM AEAD algorithm key size.
-**/
-UINT32
-GetSpdmAeadKeySize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-    return 32;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-    return 32;
-  }
-  return 0;
-}
-
-/**
-  This function returns the SPDM AEAD algorithm iv size.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return SPDM AEAD algorithm iv size.
-**/
-UINT32
-GetSpdmAeadIvSize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-    return 12;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-    return 12;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-    return 12;
-  }
-  return 0;
-}
-
-/**
-  This function returns the SPDM AEAD algorithm tag size.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return SPDM AEAD algorithm tag size.
-**/
-UINT32
-GetSpdmAeadTagSize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-    return 16;
-  }
-  return 0;
-}
-
-/**
-  This function returns the SPDM AEAD algorithm block size.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return SPDM AEAD algorithm block size.
-**/
-UINT32
-GetSpdmAeadBlockSize (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-    return 16;
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-    return 16;
-  }
-  return 0;
-}
-
-/**
-  Return AEAD encryption function, based upon the negotiated AEAD algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return AEAD encryption function
-**/
-AEAD_ENCRYPT
-GetSpdmAeadEncFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-#if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return AeadAesGcmEncrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-#if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return AeadAesGcmEncrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-#if OPENSPDM_AEAD_CHACHA20_POLY1305_SUPPORT == 1
-    return AeadChaCha20Poly1305Encrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Performs AEAD authenticated encryption on a data buffer and additional authenticated data (AAD),
-  based upon negotiated AEAD algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Key                          Pointer to the encryption key.
-  @param  KeySize                      Size of the encryption key in bytes.
-  @param  Iv                           Pointer to the IV value.
-  @param  IvSize                       Size of the IV value in bytes.
-  @param  AData                        Pointer to the additional authenticated data (AAD).
-  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
-  @param  DataIn                       Pointer to the input data buffer to be encrypted.
-  @param  DataInSize                   Size of the input data buffer in bytes.
-  @param  TagOut                       Pointer to a buffer that receives the authentication tag output.
-  @param  TagSize                      Size of the authentication tag in bytes.
-  @param  DataOut                      Pointer to a buffer that receives the encryption output.
-  @param  DataOutSize                  Size of the output data buffer in bytes.
-
-  @retval TRUE   AEAD authenticated encryption succeeded.
-  @retval FALSE  AEAD authenticated encryption failed.
-**/
-BOOLEAN
-SpdmAeadEncryption (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN   CONST UINT8*                 Key,
-  IN   UINTN                        KeySize,
-  IN   CONST UINT8*                 Iv,
-  IN   UINTN                        IvSize,
-  IN   CONST UINT8*                 AData,
-  IN   UINTN                        ADataSize,
-  IN   CONST UINT8*                 DataIn,
-  IN   UINTN                        DataInSize,
-  OUT  UINT8*                       TagOut,
-  IN   UINTN                        TagSize,
-  OUT  UINT8*                       DataOut,
-  OUT  UINTN*                       DataOutSize
-  )
-{
-  AEAD_ENCRYPT   AeadEncFunction;
-  AeadEncFunction = GetSpdmAeadEncFunc (SpdmContext);
-  if (AeadEncFunction == NULL) {
-    return FALSE;
-  }
-  return AeadEncFunction (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, TagOut, TagSize, DataOut, DataOutSize);
-}
-
-/**
-  Return AEAD decryption function, based upon the negotiated AEAD algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return AEAD decryption function
-**/
-AEAD_DECRYPT
-GetSpdmAeadDecFunc (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite) {
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
-#if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return AeadAesGcmDecrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
-#if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return AeadAesGcmDecrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
-#if OPENSPDM_AEAD_CHACHA20_POLY1305_SUPPORT == 1
-    return AeadChaCha20Poly1305Decrypt;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Performs AEAD authenticated decryption on a data buffer and additional authenticated data (AAD),
-  based upon negotiated AEAD algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Key                          Pointer to the encryption key.
-  @param  KeySize                      Size of the encryption key in bytes.
-  @param  Iv                           Pointer to the IV value.
-  @param  IvSize                       Size of the IV value in bytes.
-  @param  AData                        Pointer to the additional authenticated data (AAD).
-  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
-  @param  DataIn                       Pointer to the input data buffer to be decrypted.
-  @param  DataInSize                   Size of the input data buffer in bytes.
-  @param  Tag                          Pointer to a buffer that contains the authentication tag.
-  @param  TagSize                      Size of the authentication tag in bytes.
-  @param  DataOut                      Pointer to a buffer that receives the decryption output.
-  @param  DataOutSize                  Size of the output data buffer in bytes.
-
-  @retval TRUE   AEAD authenticated decryption succeeded.
-  @retval FALSE  AEAD authenticated decryption failed.
-**/
-BOOLEAN
-SpdmAeadDecryption (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN   CONST UINT8*                 Key,
-  IN   UINTN                        KeySize,
-  IN   CONST UINT8*                 Iv,
-  IN   UINTN                        IvSize,
-  IN   CONST UINT8*                 AData,
-  IN   UINTN                        ADataSize,
-  IN   CONST UINT8*                 DataIn,
-  IN   UINTN                        DataInSize,
-  IN   CONST UINT8*                 Tag,
-  IN   UINTN                        TagSize,
-  OUT  UINT8*                       DataOut,
-  OUT  UINTN*                       DataOutSize
-  )
-{
-  AEAD_DECRYPT   AeadDecFunction;
-  AeadDecFunction = GetSpdmAeadDecFunc (SpdmContext);
-  if (AeadDecFunction == NULL) {
-    return FALSE;
-  }
-  return AeadDecFunction (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, Tag, TagSize, DataOut, DataOutSize);
-}
-
-/**
-  Return asymmetric GET_PUBLIC_KEY_FROM_X509 function, based upon the negotiated asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return asymmetric GET_PUBLIC_KEY_FROM_X509 function
-**/
-ASYM_GET_PUBLIC_KEY_FROM_X509
-GetSpdmAsymGetPublicKeyFromX509 (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if (OPENSPDM_RSA_SSA_SUPPORT == 1) || (OPENSPDM_RSA_PSS_SUPPORT == 1)
-    return RsaGetPublicKeyFromX509;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcGetPublicKeyFromX509;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate,
-  based upon negotiated asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Cert                         Pointer to the DER-encoded X509 certificate.
-  @param  CertSize                     Size of the X509 certificate in bytes.
-  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
-                                       Use SpdmAsymFree() function to free the resource.
-
-  @retval  TRUE   Public Key was retrieved successfully.
-  @retval  FALSE  Fail to retrieve public key from X509 certificate.
-**/
-BOOLEAN
-SpdmAsymGetPublicKeyFromX509 (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN   CONST UINT8                  *Cert,
-  IN   UINTN                        CertSize,
-  OUT  VOID                         **Context
-  )
-{
-  ASYM_GET_PUBLIC_KEY_FROM_X509   GetPublicKeyFromX509Function;
-  GetPublicKeyFromX509Function = GetSpdmAsymGetPublicKeyFromX509 (SpdmContext);
-  if (GetPublicKeyFromX509Function == NULL) {
-    return FALSE;
-  }
-  return GetPublicKeyFromX509Function (Cert, CertSize, Context);
-}
-
-/**
-  Return asymmetric free function, based upon the negotiated asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return asymmetric free function
-**/
-ASYM_FREE
-GetSpdmAsymFree (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if (OPENSPDM_RSA_SSA_SUPPORT == 1) || (OPENSPDM_RSA_PSS_SUPPORT == 1)
-    return RsaFree;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcFree;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Release the specified asymmetric context,
-  based upon negotiated asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Context                      Pointer to the asymmetric context to be released.
-**/
-VOID
-SpdmAsymFree (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN   VOID                         *Context
-  )
-{
-  ASYM_FREE   FreeFunction;
-  FreeFunction = GetSpdmAsymFree (SpdmContext);
-  if (FreeFunction == NULL) {
-    return ;
-  }
-  FreeFunction (Context);
-}
-
-/**
-  Return asymmetric verify function, based upon the negotiated asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return asymmetric verify function
-**/
-ASYM_VERIFY
-GetSpdmAsymVerify (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-#if OPENSPDM_RSA_SSA_SUPPORT == 1
-    return RsaPkcs1Verify;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if OPENSPDM_RSA_PSS_SUPPORT == 1
-    return RsaPssVerify;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcDsaVerify;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Verifies the asymmetric signature,
-  based upon negotiated asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Context                      Pointer to asymmetric context for signature verification.
-  @param  MessageHash                  Pointer to octet message hash to be checked.
-  @param  HashSize                     Size of the message hash in bytes.
-  @param  Signature                    Pointer to asymmetric signature to be verified.
-  @param  SigSize                      Size of signature in bytes.
-
-  @retval  TRUE   Valid asymmetric signature.
-  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
-**/
-BOOLEAN
-SpdmAsymVerify (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN   VOID                         *Context,
-  IN   CONST UINT8                  *MessageHash,
-  IN   UINTN                        HashSize,
-  IN   CONST UINT8                  *Signature,
-  IN   UINTN                        SigSize
-  )
-{
-  ASYM_VERIFY   VerifyFunction;
-  VerifyFunction = GetSpdmAsymVerify (SpdmContext);
-  if (VerifyFunction == NULL) {
-    return FALSE;
-  }
-  return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
-}
-
-/**
-  Return requester asymmetric GET_PUBLIC_KEY_FROM_X509 function, based upon the negotiated requester asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return requester asymmetric GET_PUBLIC_KEY_FROM_X509 function
-**/
-ASYM_GET_PUBLIC_KEY_FROM_X509
-GetSpdmReqAsymGetPublicKeyFromX509 (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if (OPENSPDM_RSA_SSA_SUPPORT == 1) || (OPENSPDM_RSA_PSS_SUPPORT == 1)
-    return RsaGetPublicKeyFromX509;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcGetPublicKeyFromX509;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Retrieve the asymmetric Public Key from one DER-encoded X509 certificate,
-  based upon negotiated requester asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Cert                         Pointer to the DER-encoded X509 certificate.
-  @param  CertSize                     Size of the X509 certificate in bytes.
-  @param  Context                      Pointer to new-generated asymmetric context which contain the retrieved public key component.
-                                       Use SpdmAsymFree() function to free the resource.
-
-  @retval  TRUE   Public Key was retrieved successfully.
-  @retval  FALSE  Fail to retrieve public key from X509 certificate.
-**/
-BOOLEAN
-SpdmReqAsymGetPublicKeyFromX509 (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN   CONST UINT8                  *Cert,
-  IN   UINTN                        CertSize,
-  OUT  VOID                         **Context
-  )
-{
-  ASYM_GET_PUBLIC_KEY_FROM_X509   GetPublicKeyFromX509Function;
-  GetPublicKeyFromX509Function = GetSpdmReqAsymGetPublicKeyFromX509 (SpdmContext);
-  if (GetPublicKeyFromX509Function == NULL) {
-    return FALSE;
-  }
-  return GetPublicKeyFromX509Function (Cert, CertSize, Context);
-}
-
-/**
-  Return requester asymmetric free function, based upon the negotiated requester asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return requester asymmetric free function
-**/
-ASYM_FREE
-GetSpdmReqAsymFree (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if (OPENSPDM_RSA_SSA_SUPPORT == 1) || (OPENSPDM_RSA_PSS_SUPPORT == 1)
-    return RsaFree;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcFree;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Release the specified asymmetric context,
-  based upon negotiated requester asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Context                      Pointer to the asymmetric context to be released.
-**/
-VOID
-SpdmReqAsymFree (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN   VOID                         *Context
-  )
-{
-  ASYM_FREE   FreeFunction;
-  FreeFunction = GetSpdmReqAsymFree (SpdmContext);
-  if (FreeFunction == NULL) {
-    return ;
-  }
-  FreeFunction (Context);
-}
-
-/**
-  Return requester asymmetric verify function, based upon the negotiated requester asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-
-  @return requester asymmetric verify function
-**/
-ASYM_VERIFY
-GetSpdmReqAsymVerify (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
-  )
-{
-  switch (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg) {
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
-#if OPENSPDM_RSA_SSA_SUPPORT == 1
-    return RsaPkcs1Verify;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
-#if OPENSPDM_RSA_PSS_SUPPORT == 1
-    return RsaPssVerify;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
-  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
-#if OPENSPDM_ECDSA_SUPPORT == 1
-    return EcDsaVerify;
-#else
-    ASSERT (FALSE);
-    break;
-#endif
-  }
-  ASSERT (FALSE);
-  return NULL;
-}
-
-/**
-  Verifies the asymmetric signature,
-  based upon negotiated requester asymmetric algorithm.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  Context                      Pointer to asymmetric context for signature verification.
-  @param  MessageHash                  Pointer to octet message hash to be checked.
-  @param  HashSize                     Size of the message hash in bytes.
-  @param  Signature                    Pointer to asymmetric signature to be verified.
-  @param  SigSize                      Size of signature in bytes.
-
-  @retval  TRUE   Valid asymmetric signature.
-  @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
-**/
-BOOLEAN
-SpdmReqAsymVerify (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN   VOID                         *Context,
-  IN   CONST UINT8                  *MessageHash,
-  IN   UINTN                        HashSize,
-  IN   CONST UINT8                  *Signature,
-  IN   UINTN                        SigSize
-  )
-{
-  ASYM_VERIFY   VerifyFunction;
-  VerifyFunction = GetSpdmReqAsymVerify (SpdmContext);
-  if (VerifyFunction == NULL) {
-    return FALSE;
-  }
-  return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
-}
-
-/**
   Return DHE new by NID function, based upon the negotiated DHE algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DHENamedGroup                SPDM DHENamedGroup
 
   @return DHE new by NID function
 **/
 DHE_NEW_BY_NID
 GetSpdmDheNew (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT16                       DHENamedGroup
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  switch (DHENamedGroup) {
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
@@ -1464,22 +1085,24 @@ GetSpdmDheNew (
 /**
   Allocates and Initializes one Diffie-Hellman Ephemeral (DHE) Context for subsequent use,
   based upon negotiated DHE algorithm.
+  
+  @param  DHENamedGroup                SPDM DHENamedGroup
 
   @return  Pointer to the Diffie-Hellman Context that has been initialized.
 **/
 VOID *
 SpdmDheNew (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT16                       DHENamedGroup
   )
 {
   DHE_NEW_BY_NID   NewFunction;
   UINTN            Nid;
 
-  NewFunction = GetSpdmDheNew (SpdmContext);
+  NewFunction = GetSpdmDheNew (DHENamedGroup);
   if (NewFunction == NULL) {
     return NULL;
   }
-  Nid = GetSpdmDheNid (SpdmContext);
+  Nid = GetSpdmDheNid (DHENamedGroup);
   if (Nid == 0) {
     return NULL;
   }
@@ -1489,16 +1112,16 @@ SpdmDheNew (
 /**
   Return DHE free function, based upon the negotiated DHE algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DHENamedGroup                SPDM DHENamedGroup
 
   @return DHE free function
 **/
 DHE_FREE
 GetSpdmDheFree (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT16                       DHENamedGroup
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  switch (DHENamedGroup) {
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
@@ -1526,17 +1149,17 @@ GetSpdmDheFree (
   Release the specified DHE context,
   based upon negotiated DHE algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DHENamedGroup                SPDM DHENamedGroup
   @param  Context                      Pointer to the DHE context to be released.
 **/
 VOID
 SpdmDheFree (
-  IN   SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN   UINT16                       DHENamedGroup,
   IN   VOID                         *Context
   )
 {
   DHE_FREE   FreeFunction;
-  FreeFunction = GetSpdmDheFree (SpdmContext);
+  FreeFunction = GetSpdmDheFree (DHENamedGroup);
   if (FreeFunction == NULL) {
     return ;
   }
@@ -1546,16 +1169,16 @@ SpdmDheFree (
 /**
   Return DHE generate key function, based upon the negotiated DHE algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DHENamedGroup                SPDM DHENamedGroup
 
   @return DHE generate key function
 **/
 DHE_GENERATE_KEY
 GetSpdmDheGenerateKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN   UINT16                       DHENamedGroup
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  switch (DHENamedGroup) {
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
@@ -1588,7 +1211,7 @@ GetSpdmDheGenerateKey (
   If the PublicKey buffer is too small to hold the public key, FALSE is returned and
   PublicKeySize is set to the required buffer size to obtain the public key.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DHENamedGroup                SPDM DHENamedGroup
   @param  Context                      Pointer to the DHE context.
   @param  PublicKey                    Pointer to the buffer to receive generated public key.
   @param  PublicKeySize                On input, the size of PublicKey buffer in bytes.
@@ -1600,14 +1223,14 @@ GetSpdmDheGenerateKey (
 **/
 BOOLEAN
 SpdmDheGenerateKey (
-  IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN      UINT16                       DHENamedGroup,
   IN OUT  VOID                         *Context,
   OUT     UINT8                        *PublicKey,
   IN OUT  UINTN                        *PublicKeySize
   )
 {
   DHE_GENERATE_KEY   GenerateKeyFunction;
-  GenerateKeyFunction = GetSpdmDheGenerateKey (SpdmContext);
+  GenerateKeyFunction = GetSpdmDheGenerateKey (DHENamedGroup);
   if (GenerateKeyFunction == NULL) {
     return FALSE;
   }
@@ -1617,16 +1240,16 @@ SpdmDheGenerateKey (
 /**
   Return DHE compute key function, based upon the negotiated DHE algorithm.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DHENamedGroup                SPDM DHENamedGroup
 
   @return DHE compute key function
 **/
 DHE_COMPUTE_KEY
 GetSpdmDheComputeKey (
-  IN SPDM_DEVICE_CONTEXT          *SpdmContext
+  IN      UINT16                       DHENamedGroup
   )
 {
-  switch (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup) {
+  switch (DHENamedGroup) {
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048:
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_3072:
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_4096:
@@ -1657,7 +1280,7 @@ GetSpdmDheComputeKey (
   Given peer's public key, this function computes the exchanged common key, based on its own
   context including value of prime modulus and random secret exponent.
 
-  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  DHENamedGroup                SPDM DHENamedGroup
   @param  Context                      Pointer to the DHE context.
   @param  PeerPublicKey                Pointer to the peer's public key.
   @param  PeerPublicKeySize            Size of peer's public key in bytes.
@@ -1671,7 +1294,7 @@ GetSpdmDheComputeKey (
 **/
 BOOLEAN
 SpdmDheComputeKey (
-  IN      SPDM_DEVICE_CONTEXT          *SpdmContext,
+  IN      UINT16                       DHENamedGroup,
   IN OUT  VOID                         *Context,
   IN      CONST UINT8                  *PeerPublic,
   IN      UINTN                        PeerPublicSize,
@@ -1680,11 +1303,273 @@ SpdmDheComputeKey (
   )
 {
   DHE_COMPUTE_KEY   ComputeKeyFunction;
-  ComputeKeyFunction = GetSpdmDheComputeKey (SpdmContext);
+  ComputeKeyFunction = GetSpdmDheComputeKey (DHENamedGroup);
   if (ComputeKeyFunction == NULL) {
     return FALSE;
   }
   return ComputeKeyFunction (Context, PeerPublic, PeerPublicSize, Key, KeySize);
+}
+
+/**
+  This function returns the SPDM AEAD algorithm key size.
+
+  @param  AEADCipherSuite              SPDM AEADCipherSuite
+
+  @return SPDM AEAD algorithm key size.
+**/
+UINT32
+GetSpdmAeadKeySize (
+  IN   UINT16                       AEADCipherSuite
+  )
+{
+  switch (AEADCipherSuite) {
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
+    return 16;
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
+    return 32;
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
+    return 32;
+  }
+  return 0;
+}
+
+/**
+  This function returns the SPDM AEAD algorithm iv size.
+
+  @param  AEADCipherSuite              SPDM AEADCipherSuite
+
+  @return SPDM AEAD algorithm iv size.
+**/
+UINT32
+GetSpdmAeadIvSize (
+  IN   UINT16                       AEADCipherSuite
+  )
+{
+  switch (AEADCipherSuite) {
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
+    return 12;
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
+    return 12;
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
+    return 12;
+  }
+  return 0;
+}
+
+/**
+  This function returns the SPDM AEAD algorithm tag size.
+
+  @param  AEADCipherSuite              SPDM AEADCipherSuite
+
+  @return SPDM AEAD algorithm tag size.
+**/
+UINT32
+GetSpdmAeadTagSize (
+  IN   UINT16                       AEADCipherSuite
+  )
+{
+  switch (AEADCipherSuite) {
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
+    return 16;
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
+    return 16;
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
+    return 16;
+  }
+  return 0;
+}
+
+/**
+  This function returns the SPDM AEAD algorithm block size.
+
+  @param  AEADCipherSuite              SPDM AEADCipherSuite
+
+  @return SPDM AEAD algorithm block size.
+**/
+UINT32
+GetSpdmAeadBlockSize (
+  IN   UINT16                       AEADCipherSuite
+  )
+{
+  switch (AEADCipherSuite) {
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
+    return 16;
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
+    return 16;
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
+    return 16;
+  }
+  return 0;
+}
+
+/**
+  Return AEAD encryption function, based upon the negotiated AEAD algorithm.
+
+  @param  AEADCipherSuite              SPDM AEADCipherSuite
+
+  @return AEAD encryption function
+**/
+AEAD_ENCRYPT
+GetSpdmAeadEncFunc (
+  IN   UINT16                       AEADCipherSuite
+  )
+{
+  switch (AEADCipherSuite) {
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
+#if OPENSPDM_AEAD_GCM_SUPPORT == 1
+    return AeadAesGcmEncrypt;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
+#if OPENSPDM_AEAD_GCM_SUPPORT == 1
+    return AeadAesGcmEncrypt;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
+#if OPENSPDM_AEAD_CHACHA20_POLY1305_SUPPORT == 1
+    return AeadChaCha20Poly1305Encrypt;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
+  Performs AEAD authenticated encryption on a data buffer and additional authenticated data (AAD),
+  based upon negotiated AEAD algorithm.
+
+  @param  AEADCipherSuite              SPDM AEADCipherSuite
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be encrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  TagOut                       Pointer to a buffer that receives the authentication tag output.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the encryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated encryption succeeded.
+  @retval FALSE  AEAD authenticated encryption failed.
+**/
+BOOLEAN
+SpdmAeadEncryption (
+  IN   UINT16                       AEADCipherSuite,
+  IN   CONST UINT8*                 Key,
+  IN   UINTN                        KeySize,
+  IN   CONST UINT8*                 Iv,
+  IN   UINTN                        IvSize,
+  IN   CONST UINT8*                 AData,
+  IN   UINTN                        ADataSize,
+  IN   CONST UINT8*                 DataIn,
+  IN   UINTN                        DataInSize,
+  OUT  UINT8*                       TagOut,
+  IN   UINTN                        TagSize,
+  OUT  UINT8*                       DataOut,
+  OUT  UINTN*                       DataOutSize
+  )
+{
+  AEAD_ENCRYPT   AeadEncFunction;
+  AeadEncFunction = GetSpdmAeadEncFunc (AEADCipherSuite);
+  if (AeadEncFunction == NULL) {
+    return FALSE;
+  }
+  return AeadEncFunction (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, TagOut, TagSize, DataOut, DataOutSize);
+}
+
+/**
+  Return AEAD decryption function, based upon the negotiated AEAD algorithm.
+
+  @param  AEADCipherSuite              SPDM AEADCipherSuite
+
+  @return AEAD decryption function
+**/
+AEAD_DECRYPT
+GetSpdmAeadDecFunc (
+  IN   UINT16                       AEADCipherSuite
+  )
+{
+  switch (AEADCipherSuite) {
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
+#if OPENSPDM_AEAD_GCM_SUPPORT == 1
+    return AeadAesGcmDecrypt;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
+#if OPENSPDM_AEAD_GCM_SUPPORT == 1
+    return AeadAesGcmDecrypt;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305:
+#if OPENSPDM_AEAD_CHACHA20_POLY1305_SUPPORT == 1
+    return AeadChaCha20Poly1305Decrypt;
+#else
+    ASSERT (FALSE);
+    break;
+#endif
+  }
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
+  Performs AEAD authenticated decryption on a data buffer and additional authenticated data (AAD),
+  based upon negotiated AEAD algorithm.
+
+  @param  AEADCipherSuite              SPDM AEADCipherSuite
+  @param  Key                          Pointer to the encryption key.
+  @param  KeySize                      Size of the encryption key in bytes.
+  @param  Iv                           Pointer to the IV value.
+  @param  IvSize                       Size of the IV value in bytes.
+  @param  AData                        Pointer to the additional authenticated data (AAD).
+  @param  ADataSize                    Size of the additional authenticated data (AAD) in bytes.
+  @param  DataIn                       Pointer to the input data buffer to be decrypted.
+  @param  DataInSize                   Size of the input data buffer in bytes.
+  @param  Tag                          Pointer to a buffer that contains the authentication tag.
+  @param  TagSize                      Size of the authentication tag in bytes.
+  @param  DataOut                      Pointer to a buffer that receives the decryption output.
+  @param  DataOutSize                  Size of the output data buffer in bytes.
+
+  @retval TRUE   AEAD authenticated decryption succeeded.
+  @retval FALSE  AEAD authenticated decryption failed.
+**/
+BOOLEAN
+SpdmAeadDecryption (
+  IN   UINT16                       AEADCipherSuite,
+  IN   CONST UINT8*                 Key,
+  IN   UINTN                        KeySize,
+  IN   CONST UINT8*                 Iv,
+  IN   UINTN                        IvSize,
+  IN   CONST UINT8*                 AData,
+  IN   UINTN                        ADataSize,
+  IN   CONST UINT8*                 DataIn,
+  IN   UINTN                        DataInSize,
+  IN   CONST UINT8*                 Tag,
+  IN   UINTN                        TagSize,
+  OUT  UINT8*                       DataOut,
+  OUT  UINTN*                       DataOutSize
+  )
+{
+  AEAD_DECRYPT   AeadDecFunction;
+  AeadDecFunction = GetSpdmAeadDecFunc (AEADCipherSuite);
+  if (AeadDecFunction == NULL) {
+    return FALSE;
+  }
+  return AeadDecFunction (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, Tag, TagSize, DataOut, DataOutSize);
 }
 
 /**

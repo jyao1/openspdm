@@ -46,7 +46,7 @@ SpdmTestGetKeyExchangeRequestSize (
     return BufferSize;
   }
 
-  DheKeySize = GetSpdmDheKeySize (SpdmContext);
+  DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
   MessageSize += DheKeySize + sizeof(UINT16);
   if (BufferSize < MessageSize) {
     return BufferSize;
@@ -192,10 +192,10 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-    SignatureSize = GetSpdmAsymSize (SpdmContext);
-    HashSize = GetSpdmHashSize (SpdmContext);
-    HmacSize = GetSpdmHashSize (SpdmContext);
-    DheKeySize = GetSpdmDheKeySize (SpdmContext);
+    SignatureSize = GetSpdmAsymSize (mUseAsymAlgo);
+    HashSize = GetSpdmHashSize (mUseHashAlgo);
+    HmacSize = GetSpdmHashSize (mUseHashAlgo);
+    DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
     OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
     TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
@@ -214,11 +214,11 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     SpdmResponse->SlotIDParam = 0;
     SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
     Ptr = (VOID *)(SpdmResponse + 1);
-    DHEContext = SpdmDheNew (SpdmContext);
-    SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
+    DHEContext = SpdmDheNew (mUseDheAlgo);
+    SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
     FinalKeySize = sizeof(FinalKey);
-    SpdmDheComputeKey (SpdmContext, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheComputeKey (mUseDheAlgo, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
+    SpdmDheFree (mUseDheAlgo, DHEContext);
     Ptr += DheKeySize;
     ZeroMem (Ptr, HashSize);
     Ptr += HashSize;
@@ -234,32 +234,32 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
     CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-    SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+    SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
     // Transcript.MessageA size is 0
     AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
     AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
-    SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+    SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
     free(Data);
     ReadResponderPrivateCertificate (&Data, &DataSize);
-    TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-    TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SignatureSize);
-    TestSpdmAsymFree (mUseAsymAlgo, Context);
+    SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+    SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SignatureSize);
+    SpdmAsymFree (mUseAsymAlgo, Context);
     free(Data);
     CopyMem (&LocalBuffer[LocalBufferSize], Ptr, SignatureSize);
     LocalBufferSize += SignatureSize;
     AppendManagedBuffer (&THCurr, Ptr, SignatureSize);
     Ptr += SignatureSize;
-    SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
+    SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
     BinStr0Size = sizeof(BinStr0);
     SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
-    SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
+    SpdmHmacAll (mUseHashAlgo, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
     BinStr2Size = sizeof(BinStr2);
     SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
-    SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
+    SpdmHkdfExpand (mUseHashAlgo, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
     BinStr7Size = sizeof(BinStr7);
     SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
-    SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
-    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+    SpdmHkdfExpand (mUseHashAlgo, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
+    SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
     Ptr += HmacSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -303,10 +303,10 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-    SignatureSize = GetSpdmAsymSize (SpdmContext);
-    HashSize = GetSpdmHashSize (SpdmContext);
-    HmacSize = GetSpdmHashSize (SpdmContext);
-    DheKeySize = GetSpdmDheKeySize (SpdmContext);
+    SignatureSize = GetSpdmAsymSize (mUseAsymAlgo);
+    HashSize = GetSpdmHashSize (mUseHashAlgo);
+    HmacSize = GetSpdmHashSize (mUseHashAlgo);
+    DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
     OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
     TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
@@ -325,11 +325,11 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     SpdmResponse->SlotIDParam = 0;
     SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
     Ptr = (VOID *)(SpdmResponse + 1);
-    DHEContext = SpdmDheNew (SpdmContext);
-    SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
+    DHEContext = SpdmDheNew (mUseDheAlgo);
+    SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
     FinalKeySize = sizeof(FinalKey);
-    SpdmDheComputeKey (SpdmContext, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
-    SpdmDheFree (SpdmContext, DHEContext);
+    SpdmDheComputeKey (mUseDheAlgo, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
+    SpdmDheFree (mUseDheAlgo, DHEContext);
     Ptr += DheKeySize;
     ZeroMem (Ptr, HashSize);
     Ptr += HashSize;
@@ -345,32 +345,32 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
     CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
     CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-    SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+    SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
     // Transcript.MessageA size is 0
     AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
     AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
-    SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+    SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
     free(Data);
     ReadResponderPrivateCertificate (&Data, &DataSize);
-    TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-    TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SignatureSize);
-    TestSpdmAsymFree (mUseAsymAlgo, Context);
+    SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+    SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SignatureSize);
+    SpdmAsymFree (mUseAsymAlgo, Context);
     free(Data);
     CopyMem (&LocalBuffer[LocalBufferSize], Ptr, SignatureSize);
     LocalBufferSize += SignatureSize;
     AppendManagedBuffer (&THCurr, Ptr, SignatureSize);
     Ptr += SignatureSize;
-    SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
+    SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
     BinStr0Size = sizeof(BinStr0);
     SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
-    SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
+    SpdmHmacAll (mUseHashAlgo, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
     BinStr2Size = sizeof(BinStr2);
     SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
-    SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
+    SpdmHkdfExpand (mUseHashAlgo, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
     BinStr7Size = sizeof(BinStr7);
     SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
-    SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
-    SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+    SpdmHkdfExpand (mUseHashAlgo, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
+    SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
     Ptr += HmacSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -452,10 +452,10 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-      SignatureSize = GetSpdmAsymSize (SpdmContext);
-      HashSize = GetSpdmHashSize (SpdmContext);
-      HmacSize = GetSpdmHashSize (SpdmContext);
-      DheKeySize = GetSpdmDheKeySize (SpdmContext);
+      SignatureSize = GetSpdmAsymSize (mUseAsymAlgo);
+      HashSize = GetSpdmHashSize (mUseHashAlgo);
+      HmacSize = GetSpdmHashSize (mUseHashAlgo);
+      DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
       OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
       TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
@@ -474,11 +474,11 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       SpdmResponse->SlotIDParam = 0;
       SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
       Ptr = (VOID *)(SpdmResponse + 1);
-      DHEContext = SpdmDheNew (SpdmContext);
-      SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
+      DHEContext = SpdmDheNew (mUseDheAlgo);
+      SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
       FinalKeySize = sizeof(FinalKey);
-      SpdmDheComputeKey (SpdmContext, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
-      SpdmDheFree (SpdmContext, DHEContext);
+      SpdmDheComputeKey (mUseDheAlgo, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
+      SpdmDheFree (mUseDheAlgo, DHEContext);
       Ptr += DheKeySize;
       ZeroMem (Ptr, HashSize);
       Ptr += HashSize;
@@ -494,32 +494,32 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
       CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
       CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-      SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+      SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
       // Transcript.MessageA size is 0
       AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
       AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
-      SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+      SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
       free(Data);
       ReadResponderPrivateCertificate (&Data, &DataSize);
-      TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-      TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SignatureSize);
-      TestSpdmAsymFree (mUseAsymAlgo, Context);
+      SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+      SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SignatureSize);
+      SpdmAsymFree (mUseAsymAlgo, Context);
       free(Data);
       CopyMem (&LocalBuffer[LocalBufferSize], Ptr, SignatureSize);
       LocalBufferSize += SignatureSize;
       AppendManagedBuffer (&THCurr, Ptr, SignatureSize);
       Ptr += SignatureSize;
-      SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
+      SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
       BinStr0Size = sizeof(BinStr0);
       SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
-      SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
+      SpdmHmacAll (mUseHashAlgo, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
       BinStr2Size = sizeof(BinStr2);
       SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
-      SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
+      SpdmHkdfExpand (mUseHashAlgo, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
       BinStr7Size = sizeof(BinStr7);
       SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
-      SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
-      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+      SpdmHkdfExpand (mUseHashAlgo, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
+      SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
       Ptr += HmacSize;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -610,10 +610,10 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-      SignatureSize = GetSpdmAsymSize (SpdmContext);
-      HashSize = GetSpdmHashSize (SpdmContext);
-      HmacSize = GetSpdmHashSize (SpdmContext);
-      DheKeySize = GetSpdmDheKeySize (SpdmContext);
+      SignatureSize = GetSpdmAsymSize (mUseAsymAlgo);
+      HashSize = GetSpdmHashSize (mUseHashAlgo);
+      HmacSize = GetSpdmHashSize (mUseHashAlgo);
+      DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
       OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
       TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
@@ -632,11 +632,11 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       SpdmResponse->SlotIDParam = 0;
       SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
       Ptr = (VOID *)(SpdmResponse + 1);
-      DHEContext = SpdmDheNew (SpdmContext);
-      SpdmDheGenerateKey (SpdmContext, DHEContext, Ptr, &DheKeySize);
+      DHEContext = SpdmDheNew (mUseDheAlgo);
+      SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
       FinalKeySize = sizeof(FinalKey);
-      SpdmDheComputeKey (SpdmContext, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
-      SpdmDheFree (SpdmContext, DHEContext);
+      SpdmDheComputeKey (mUseDheAlgo, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
+      SpdmDheFree (mUseDheAlgo, DHEContext);
       Ptr += DheKeySize;
       ZeroMem (Ptr, HashSize);
       Ptr += HashSize;
@@ -652,32 +652,32 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       InitManagedBuffer (&THCurr, MAX_SPDM_MESSAGE_BUFFER_SIZE);
       CertBuffer = (UINT8 *)Data + sizeof(SPDM_CERT_CHAIN) + HashSize;
       CertBufferSize = DataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-      SpdmHashAll (SpdmContext, CertBuffer, CertBufferSize, CertBufferHash);
+      SpdmHashAll (mUseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
       // Transcript.MessageA size is 0
       AppendManagedBuffer (&THCurr, CertBufferHash, HashSize);
       AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
-      SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
+      SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
       free(Data);
       ReadResponderPrivateCertificate (&Data, &DataSize);
-      TestSpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
-      TestSpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize(SpdmContext), Ptr, &SignatureSize);
-      TestSpdmAsymFree (mUseAsymAlgo, Context);
+      SpdmAsymGetPrivateKeyFromPem (mUseAsymAlgo, Data, DataSize, NULL, &Context);
+      SpdmAsymSign (mUseAsymAlgo, Context, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SignatureSize);
+      SpdmAsymFree (mUseAsymAlgo, Context);
       free(Data);
       CopyMem (&LocalBuffer[LocalBufferSize], Ptr, SignatureSize);
       LocalBufferSize += SignatureSize;
       AppendManagedBuffer (&THCurr, Ptr, SignatureSize);
       Ptr += SignatureSize;
-      SpdmHashAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
+      SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
       BinStr0Size = sizeof(BinStr0);
       SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
-      SpdmHmacAll (SpdmContext, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
+      SpdmHmacAll (mUseHashAlgo, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
       BinStr2Size = sizeof(BinStr2);
       SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
-      SpdmHkdfExpand (SpdmContext, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
+      SpdmHkdfExpand (mUseHashAlgo, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
       BinStr7Size = sizeof(BinStr7);
       SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
-      SpdmHkdfExpand (SpdmContext, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
-      SpdmHmacAll (SpdmContext, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
+      SpdmHkdfExpand (mUseHashAlgo, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
+      SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
       Ptr += HmacSize;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);

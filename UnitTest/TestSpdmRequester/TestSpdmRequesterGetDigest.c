@@ -72,7 +72,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     UINTN                    TempBufSize;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
-    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (mUseHashAlgo);
     SpdmResponse = (VOID *)TempBuf;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -82,7 +82,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
 
     Digest = (VOID *)(SpdmResponse + 1);
-    SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -97,7 +97,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     UINTN                    TempBufSize;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
-    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (mUseHashAlgo);
     SpdmResponse = (VOID *)TempBuf;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -107,7 +107,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
 
     Digest = (VOID *)(SpdmResponse + 1);
-    SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
     SpdmResponse->Header.Param2 |= (1 << 0);
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -159,7 +159,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       UINTN                    TempBufSize;
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
-      TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+      TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (mUseHashAlgo);
       SpdmResponse = (VOID *)TempBuf;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -169,7 +169,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
 
       Digest = (VOID *)(SpdmResponse + 1);
-      SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+      SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -231,7 +231,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       UINTN                    TempBufSize;
 
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
-      TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext);
+      TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (mUseHashAlgo);
       SpdmResponse = (VOID *)TempBuf;
 
       SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -241,7 +241,7 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
 
       Digest = (VOID *)(SpdmResponse + 1);
-      SpdmHashAll (SpdmContext, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+      SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
       SpdmResponse->Header.Param2 |= (1 << 0);
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
