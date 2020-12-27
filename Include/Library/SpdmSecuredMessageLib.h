@@ -111,11 +111,48 @@ SpdmSecuredMessageSetPskHint (
   IN UINTN                        PskHintSize
   );
 
-VOID
+RETURN_STATUS
 SpdmSecuredMessageImportDheSecret (
   IN VOID                         *SpdmSecuredMessageContext,
   IN VOID                         *DheSecret,
   IN UINTN                        DheSecretSize
+  );
+
+RETURN_STATUS
+SpdmSecuredMessageExportMasterSecret (
+  IN     VOID                         *SpdmSecuredMessageContext,
+     OUT VOID                         *ExportMasterSecret,
+  IN OUT UINTN                        *ExportMasterSecretSize
+  );
+
+#define SPDM_SECURE_SESSION_KEYS_STRUCT_VERSION  1
+
+#pragma pack(1)
+typedef struct {
+  UINT32               Version;
+  UINT32               AeadKeySize;
+  UINT32               AeadIvSize;
+//  UINT8                RequestDataEncryptionKey[AeadKeySize];
+//  UINT8                RequestDataSalt[AeadIvSize];
+//  UINT64               RequestDataSequenceNumber;
+//  UINT8                ResponseDataEncryptionKey[AeadKeySize];
+//  UINT8                ResponseDataSalt[AeadIvSize];
+//  UINT64               ResponseDataSequenceNumber;
+} SPDM_SECURE_SESSION_KEYS_STRUCT;
+#pragma pack()
+
+RETURN_STATUS
+SpdmSecuredMessageExportSessionKeys (
+  IN     VOID                         *SpdmSecuredMessageContext,
+     OUT VOID                         *SessionKeys,
+  IN OUT UINTN                        *SessionKeysSize
+  );
+
+RETURN_STATUS
+SpdmSecuredMessageImportSessionKeys (
+  IN     VOID                         *SpdmSecuredMessageContext,
+  IN     VOID                         *SessionKeys,
+  IN     UINTN                        SessionKeysSize
   );
 
 /**

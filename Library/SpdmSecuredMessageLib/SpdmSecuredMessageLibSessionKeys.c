@@ -156,7 +156,7 @@ SpdmSecuredMessageSetPskHint (
   SecuredMessageContext->PskHintSize = PskHintSize;
 }
 
-VOID
+RETURN_STATUS
 SpdmSecuredMessageImportDheSecret (
   IN VOID                         *SpdmSecuredMessageContext,
   IN VOID                         *DheSecret,
@@ -166,9 +166,114 @@ SpdmSecuredMessageImportDheSecret (
   SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
-  ASSERT (DheSecretSize <= SecuredMessageContext->DheKeySize);
+  if (DheSecretSize > SecuredMessageContext->DheKeySize) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
   SecuredMessageContext->DheKeySize = DheSecretSize;
   CopyMem (SecuredMessageContext->MasterSecret.DheSecret, DheSecret, DheSecretSize);
+  return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+SpdmSecuredMessageExportMasterSecret (
+  IN     VOID                         *SpdmSecuredMessageContext,
+     OUT VOID                         *ExportMasterSecret,
+  IN OUT UINTN                        *ExportMasterSecretSize
+  )
+{
+  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
+
+  SecuredMessageContext = SpdmSecuredMessageContext;
+  if (*ExportMasterSecretSize < SecuredMessageContext->HashSize) {
+    *ExportMasterSecretSize = SecuredMessageContext->HashSize;
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+  *ExportMasterSecretSize = SecuredMessageContext->HashSize;
+  CopyMem (ExportMasterSecret, SecuredMessageContext->HandshakeSecret.ExportMasterSecret, SecuredMessageContext->HashSize);
+  return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+SpdmSecuredMessageExportSessionKeys (
+  IN     VOID                         *SpdmSecuredMessageContext,
+     OUT VOID                         *SessionKeys,
+  IN OUT UINTN                        *SessionKeysSize
+  )
+{
+  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
+  UINTN                                  StructSize;
+  SPDM_SECURE_SESSION_KEYS_STRUCT        *SessionkeysStruct;
+  UINT8                                  *Ptr;
+
+  SecuredMessageContext = SpdmSecuredMessageContext;
+  StructSize = sizeof(SPDM_SECURE_SESSION_KEYS_STRUCT) + (SecuredMessageContext->AeadKeySize + SecuredMessageContext->AeadIvSize + sizeof(UINT64)) * 2;
+
+  if (*SessionKeysSize < StructSize) {
+    *SessionKeysSize = StructSize;
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  SessionkeysStruct = SessionKeys;
+  SessionkeysStruct->Version = SPDM_SECURE_SESSION_KEYS_STRUCT_VERSION;
+  SessionkeysStruct->AeadKeySize = (UINT32)SecuredMessageContext->AeadKeySize;
+  SessionkeysStruct->AeadIvSize = (UINT32)SecuredMessageContext->AeadIvSize;
+
+  Ptr = (VOID *)(SessionkeysStruct + 1);
+  CopyMem (Ptr, SecuredMessageContext->ApplicationSecret.RequestDataEncryptionKey, SecuredMessageContext->AeadKeySize);
+  Ptr += SecuredMessageContext->AeadKeySize;
+  CopyMem (Ptr, SecuredMessageContext->ApplicationSecret.RequestDataSalt, SecuredMessageContext->AeadIvSize);
+  Ptr += SecuredMessageContext->AeadIvSize;
+  CopyMem (Ptr, &SecuredMessageContext->ApplicationSecret.RequestDataSequenceNumber, sizeof(UINT64));
+  Ptr += sizeof(UINT64);
+  CopyMem (Ptr, SecuredMessageContext->ApplicationSecret.ResponseDataEncryptionKey, SecuredMessageContext->AeadKeySize);
+  Ptr += SecuredMessageContext->AeadKeySize;
+  CopyMem (Ptr, SecuredMessageContext->ApplicationSecret.ResponseDataSalt, SecuredMessageContext->AeadIvSize);
+  Ptr += SecuredMessageContext->AeadIvSize;
+  CopyMem (Ptr, &SecuredMessageContext->ApplicationSecret.ResponseDataSequenceNumber, sizeof(UINT64));
+  Ptr += sizeof(UINT64);
+  return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+SpdmSecuredMessageImportSessionKeys (
+  IN     VOID                         *SpdmSecuredMessageContext,
+  IN     VOID                         *SessionKeys,
+  IN     UINTN                        SessionKeysSize
+  )
+{
+  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
+  UINTN                                  StructSize;
+  SPDM_SECURE_SESSION_KEYS_STRUCT        *SessionkeysStruct;
+  UINT8                                  *Ptr;
+
+  SecuredMessageContext = SpdmSecuredMessageContext;
+  StructSize = sizeof(SPDM_SECURE_SESSION_KEYS_STRUCT) + (SecuredMessageContext->AeadKeySize + SecuredMessageContext->AeadIvSize + sizeof(UINT64)) * 2;
+
+  if (SessionKeysSize != StructSize) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  SessionkeysStruct = SessionKeys;
+  if ((SessionkeysStruct->Version != SPDM_SECURE_SESSION_KEYS_STRUCT_VERSION) ||
+      (SessionkeysStruct->AeadKeySize != SecuredMessageContext->AeadKeySize) ||
+      (SessionkeysStruct->AeadIvSize != SecuredMessageContext->AeadIvSize) ) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Ptr = (VOID *)(SessionkeysStruct + 1);
+  CopyMem (SecuredMessageContext->ApplicationSecret.RequestDataEncryptionKey, Ptr, SecuredMessageContext->AeadKeySize);
+  Ptr += SecuredMessageContext->AeadKeySize;
+  CopyMem (SecuredMessageContext->ApplicationSecret.RequestDataSalt, Ptr, SecuredMessageContext->AeadIvSize);
+  Ptr += SecuredMessageContext->AeadIvSize;
+  CopyMem (&SecuredMessageContext->ApplicationSecret.RequestDataSequenceNumber, Ptr, sizeof(UINT64));
+  Ptr += sizeof(UINT64);
+  CopyMem (SecuredMessageContext->ApplicationSecret.ResponseDataEncryptionKey, Ptr, SecuredMessageContext->AeadKeySize);
+  Ptr += SecuredMessageContext->AeadKeySize;
+  CopyMem (SecuredMessageContext->ApplicationSecret.ResponseDataSalt, Ptr, SecuredMessageContext->AeadIvSize);
+  Ptr += SecuredMessageContext->AeadIvSize;
+  CopyMem (&SecuredMessageContext->ApplicationSecret.ResponseDataSequenceNumber, Ptr, sizeof(UINT64));
+  Ptr += sizeof(UINT64);
+  return RETURN_SUCCESS;
 }
 
 BOOLEAN
