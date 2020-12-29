@@ -886,4 +886,24 @@ SpdmVerifyPskFinishReqHmac (
   IN  UINTN                     HmacSize
   );
 
+BOOLEAN
+SpdmCalculateTHCurrAK (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     SPDM_SESSION_INFO         *SessionInfo,
+  IN     UINT8                     *CertBuffer, OPTIONAL
+  IN     UINTN                     CertBufferSize, OPTIONAL
+     OUT LARGE_MANAGED_BUFFER      *THCurr
+  );
+
+BOOLEAN
+SpdmCalculateTHCurrAKF (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     SPDM_SESSION_INFO         *SessionInfo,
+  IN     UINT8                     *CertBuffer, OPTIONAL
+  IN     UINTN                     CertBufferSize, OPTIONAL
+  IN     UINT8                     *MutCertBuffer, OPTIONAL
+  IN     UINTN                     MutCertBufferSize, OPTIONAL
+     OUT LARGE_MANAGED_BUFFER      *THCurr
+  );
+
 #endif

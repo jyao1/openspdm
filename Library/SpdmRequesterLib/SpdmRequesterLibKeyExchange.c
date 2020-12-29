@@ -189,7 +189,12 @@ TrySpdmSendReceiveKeyExchange (
   //
   // Cache session data
   //
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
@@ -257,7 +262,12 @@ TrySpdmSendReceiveKeyExchange (
                      SignatureSize +
                      HmacSize;
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - SignatureSize - HmacSize);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - SignatureSize - HmacSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   Signature = Ptr;
   DEBUG((DEBUG_INFO, "Signature (0x%x):\n", SignatureSize));
@@ -271,17 +281,34 @@ TrySpdmSendReceiveKeyExchange (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Signature, SignatureSize);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Signature, SignatureSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   //
   // Fill data to calc Secret for HMAC verification
   //
-  SpdmSecuredMessageDheComputeKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, SpdmResponse.ExchangeData, DheKeySize, SessionInfo->SecuredMessageContext);
+  Result = SpdmSecuredMessageDheComputeKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, SpdmResponse.ExchangeData, DheKeySize, SessionInfo->SecuredMessageContext);
   SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
+  if (!Result) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", *SessionId));
-  SpdmCalculateTh1 (SpdmContext, *SessionId, TRUE, TH1HashData);
-  SpdmGenerateSessionHandshakeKey (SessionInfo->SecuredMessageContext, TH1HashData);
+  Status = SpdmCalculateTh1 (SpdmContext, SessionInfo, TRUE, TH1HashData);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_SECURITY_VIOLATION;
+  }
+  Status = SpdmGenerateSessionHandshakeKey (SessionInfo->SecuredMessageContext, TH1HashData);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
     VerifyData = Ptr;
@@ -295,7 +322,11 @@ TrySpdmSendReceiveKeyExchange (
     }
     Ptr += HmacSize;
 
-    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, VerifyData, HmacSize);
+    Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, VerifyData, HmacSize);
+    if (RETURN_ERROR(Status)) {
+      SpdmFreeSessionId (SpdmContext, *SessionId);
+      return RETURN_SECURITY_VIOLATION;
+    }
   }
 
   if (MeasurementHash != NULL) {

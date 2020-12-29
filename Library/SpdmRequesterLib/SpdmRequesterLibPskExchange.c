@@ -153,7 +153,10 @@ TrySpdmSendReceivePskExchange (
   //
   // Cache session data
   //
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
@@ -196,11 +199,23 @@ TrySpdmSendReceivePskExchange (
 
   Ptr += SpdmResponse.OpaqueLength;
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - HmacSize);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - HmacSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", *SessionId));
-  SpdmCalculateTh1 (SpdmContext, *SessionId, TRUE, TH1HashData);
-  SpdmGenerateSessionHandshakeKey (SessionInfo->SecuredMessageContext, TH1HashData);
+  Status = SpdmCalculateTh1 (SpdmContext, SessionInfo, TRUE, TH1HashData);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_SECURITY_VIOLATION;
+  }
+  Status = SpdmGenerateSessionHandshakeKey (SessionInfo->SecuredMessageContext, TH1HashData);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   VerifyData = Ptr;
   DEBUG((DEBUG_INFO, "VerifyData (0x%x):\n", HmacSize));
@@ -212,7 +227,11 @@ TrySpdmSendReceivePskExchange (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, VerifyData, HmacSize);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, VerifyData, HmacSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, *SessionId);
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   if (MeasurementHash != NULL) {
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);

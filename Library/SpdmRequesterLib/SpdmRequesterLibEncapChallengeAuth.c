@@ -46,6 +46,7 @@ SpdmGetEncapResponseChallengeAuth (
   UINTN                                     TotalSize;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
   SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE    AuthAttribute;
+  RETURN_STATUS                             Status;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -56,7 +57,11 @@ SpdmGetEncapResponseChallengeAuth (
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, SpdmRequest, RequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, SpdmRequest, RequestSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   SlotNum = SpdmRequest->Header.Param1;
 

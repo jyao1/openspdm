@@ -60,7 +60,10 @@ TrySpdmGetVersion (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
@@ -101,7 +104,10 @@ TrySpdmGetVersion (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
   CompatibleVersionCount = 0;
 
   ZeroMem (&CompatibleVersionNumberEntry, sizeof(CompatibleVersionNumberEntry) * sizeof(SPDM_VERSION_NUMBER));

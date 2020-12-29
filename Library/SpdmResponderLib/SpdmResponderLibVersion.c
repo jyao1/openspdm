@@ -49,6 +49,7 @@ SpdmGetResponseVersion (
   UINTN                       SpdmRequestSize;
   MY_SPDM_VERSION_RESPONSE    *SpdmResponse;
   SPDM_DEVICE_CONTEXT         *SpdmContext;
+  RETURN_STATUS               Status;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -75,8 +76,11 @@ SpdmGetResponseVersion (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmRequest, SpdmRequestSize);
-
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmRequest, SpdmRequestSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   ASSERT (*ResponseSize >= sizeof(MY_SPDM_VERSION_RESPONSE));
   *ResponseSize = sizeof(SPDM_VERSION_RESPONSE) + MY_SPDM_VERSION_ENTRY_COUNT * sizeof(SPDM_VERSION_NUMBER);
@@ -95,7 +99,11 @@ SpdmGetResponseVersion (
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmResponse, *ResponseSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmResponse, *ResponseSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_10;
   SpdmContext->ConnectionInfo.Version[1] = SPDM_MESSAGE_VERSION_11;

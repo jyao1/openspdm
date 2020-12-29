@@ -104,7 +104,10 @@ TrySpdmNegotiateAlgorithms (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, SpdmRequest.Length);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, SpdmRequest.Length);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
@@ -142,8 +145,11 @@ TrySpdmNegotiateAlgorithms (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
-  
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
+
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SpdmResponse.MeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse.BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse.BaseHashSel;

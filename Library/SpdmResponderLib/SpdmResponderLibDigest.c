@@ -65,7 +65,8 @@ SpdmGetResponseDigest (
   //
   Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
 
   if (SpdmContext->LocalContext.CertificateChain == NULL) {
@@ -99,7 +100,8 @@ SpdmGetResponseDigest (
   //
   Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmResponse, *ResponseSize);
   if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
 
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;

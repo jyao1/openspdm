@@ -597,7 +597,7 @@ SpdmFreeSessionId (
   This function calculates TH1 hash.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionId                    The SPDM session ID.
+  @param  SessionInfo                  The SPDM session ID.
   @param  IsRequester                  Indicate of the key generation for a requester or a responder.
   @param  TH1HashData                  TH1 hash
 
@@ -606,7 +606,7 @@ SpdmFreeSessionId (
 RETURN_STATUS
 SpdmCalculateTh1 (
   IN VOID                         *SpdmContext,
-  IN UINT32                       SessionId,
+  IN VOID                         *SpdmSessionInfo,
   IN BOOLEAN                      IsRequester,
   OUT UINT8                       *TH1HashData
   );
@@ -615,7 +615,7 @@ SpdmCalculateTh1 (
   This function calculates TH2 hash.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SessionId                    The SPDM session ID.
+  @param  SessionInfo                  The SPDM session ID.
   @param  IsRequester                  Indicate of the key generation for a requester or a responder.
   @param  TH1HashData                  TH2 hash
 
@@ -623,8 +623,8 @@ SpdmCalculateTh1 (
 */
 RETURN_STATUS
 SpdmCalculateTh2 (
-  IN VOID                        *SpdmContext,
-  IN UINT32                       SessionId,
+  IN VOID                         *SpdmContext,
+  IN VOID                         *SpdmSessionInfo,
   IN BOOLEAN                      IsRequester,
   OUT UINT8                       *TH2HashData
   );

@@ -105,7 +105,10 @@ TrySpdmChallenge (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, &SpdmRequest, sizeof(SpdmRequest));
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageC, &SpdmRequest, sizeof(SpdmRequest));
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
@@ -206,7 +209,10 @@ TrySpdmChallenge (
                      sizeof(UINT16) +
                      OpaqueLength +
                      SignatureSize;
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, &SpdmResponse, SpdmResponseSize - SignatureSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageC, &SpdmResponse, SpdmResponseSize - SignatureSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
   Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;

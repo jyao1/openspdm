@@ -47,6 +47,7 @@ SpdmGetResponseChallengeAuth (
   UINTN                                     TotalSize;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
   SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE    AuthAttribute;
+  RETURN_STATUS                             Status;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -67,7 +68,11 @@ SpdmGetResponseChallengeAuth (
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, SpdmRequest, SpdmRequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageC, SpdmRequest, SpdmRequestSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   SlotNum = SpdmRequest->Header.Param1;
 

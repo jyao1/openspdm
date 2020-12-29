@@ -677,21 +677,23 @@ void TestSpdmResponderCertificateCase12(void **state) {
 
     ResponseSize = sizeof(Response);
     Status = SpdmGetResponseCertificate (SpdmContext, mSpdmGetCertificateRequest3Size, &mSpdmGetCertificateRequest3, &ResponseSize, Response);
+    assert_int_equal (Status, RETURN_SUCCESS);
+    SpdmResponse = (VOID *)Response;
     // It may fail because the spdm does not support too many messages.
-    //assert_int_equal (Status, RETURN_SUCCESS);
-    if (Status == RETURN_SUCCESS) {
-      assert_int_equal (ResponseSize, sizeof(SPDM_CERTIFICATE_RESPONSE) + ExpectedChunkSize);
-      SpdmResponse = (VOID *)Response;
+    // assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_CERTIFICATE);
+    if (SpdmResponse->Header.RequestResponseCode == SPDM_CERTIFICATE) {
       assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_CERTIFICATE);
+      assert_int_equal (ResponseSize, sizeof(SPDM_CERTIFICATE_RESPONSE) + ExpectedChunkSize);
       assert_int_equal (SpdmResponse->Header.Param1, 0);
       assert_int_equal (SpdmResponse->PortionLength, ExpectedChunkSize);
       assert_int_equal (SpdmResponse->RemainderLength, DataSize - offset - ExpectedChunkSize);
       assert_int_equal ( ((UINT8*) Data)[offset], (Response + sizeof(SPDM_CERTIFICATE_RESPONSE))[0]);
     } else {
+      assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
       break;
     }
   }
-  if (Status == RETURN_SUCCESS) {
+  if (SpdmResponse->Header.RequestResponseCode == SPDM_CERTIFICATE) {
     assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
   }
   free(Data);

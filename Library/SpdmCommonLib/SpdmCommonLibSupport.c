@@ -147,6 +147,7 @@ AppendManagedBuffer (
   ASSERT (ManagedBuffer->MaxBufferSize >= ManagedBuffer->BufferSize);
   if (BufferSize > ManagedBuffer->MaxBufferSize - ManagedBuffer->BufferSize) {
     // Do not ASSERT here, because command processor will append message from external.
+    DEBUG ((DEBUG_ERROR, "AppendManagedBuffer 0x%x fail, rest 0x%x only\n", (UINT32)BufferSize, (UINT32)(ManagedBuffer->MaxBufferSize - ManagedBuffer->BufferSize)));
     return RETURN_BUFFER_TOO_SMALL;
   }
   ASSERT (BufferSize <= ManagedBuffer->MaxBufferSize - ManagedBuffer->BufferSize);

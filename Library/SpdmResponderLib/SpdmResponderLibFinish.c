@@ -46,6 +46,7 @@ SpdmGetResponseFinish (
   SPDM_DEVICE_CONTEXT      *SpdmContext;
   SPDM_SESSION_INFO        *SessionInfo;
   UINT8                    TH2HashData[64];
+  RETURN_STATUS            Status;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -102,14 +103,22 @@ SpdmGetResponseFinish (
     return RETURN_SUCCESS;
   }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Request, sizeof(SPDM_FINISH_REQUEST));
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Request, sizeof(SPDM_FINISH_REQUEST));
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   if (SessionInfo->MutAuthRequested) {
     Result = SpdmVerifyFinishReqSignature (SpdmContext, SessionInfo, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST), SignatureSize);
     if (!Result) {
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
       return RETURN_SUCCESS;
     }
-    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST), SignatureSize);
+    Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST), SignatureSize);
+    if (RETURN_ERROR(Status)) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
   }
 
   Result = SpdmVerifyFinishReqHmac (SpdmContext, SessionInfo, (UINT8 *)Request + SignatureSize + sizeof(SPDM_FINISH_REQUEST), HmacSize);
@@ -118,7 +127,11 @@ SpdmGetResponseFinish (
     return RETURN_SUCCESS;
   }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)Request + SignatureSize + sizeof(SPDM_FINISH_REQUEST), HmacSize);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)Request + SignatureSize + sizeof(SPDM_FINISH_REQUEST), HmacSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
     HmacSize = 0;
@@ -134,7 +147,11 @@ SpdmGetResponseFinish (
   SpdmResponse->Header.Param1 = 0;
   SpdmResponse->Header.Param2 = 0;
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, sizeof(SPDM_FINISH_RESPONSE));
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, sizeof(SPDM_FINISH_RESPONSE));
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
     Result = SpdmGenerateFinishRspHmac (SpdmContext, SessionInfo, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST));
@@ -143,12 +160,24 @@ SpdmGetResponseFinish (
       return RETURN_SUCCESS;
     }
 
-    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST), HmacSize);
+    Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)SpdmResponse + sizeof(SPDM_FINISH_REQUEST), HmacSize);
+    if (RETURN_ERROR(Status)) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
-  SpdmCalculateTh2 (SpdmContext, SessionId, FALSE, TH2HashData);
-  SpdmGenerateSessionDataKey (SessionInfo->SecuredMessageContext, TH2HashData);
+  Status = SpdmCalculateTh2 (SpdmContext, SessionInfo, FALSE, TH2HashData);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  Status = SpdmGenerateSessionDataKey (SessionInfo->SecuredMessageContext, TH2HashData);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   SpdmContext->SpdmCmdReceiveState |= SPDM_FINISH_RECEIVE_FLAG;
 

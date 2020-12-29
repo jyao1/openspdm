@@ -149,7 +149,12 @@ SpdmGetResponseKeyExchange (
     return RETURN_SUCCESS;
   }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Request, RequestSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   SpdmResponse->RspSessionID = RspSessionId;
 
@@ -171,8 +176,13 @@ SpdmGetResponseKeyExchange (
   DEBUG((DEBUG_INFO, "Calc PeerKey (0x%x):\n", DheKeySize));
   InternalDumpHex ((UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize);
 
-  SpdmSecuredMessageDheComputeKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, SessionInfo->SecuredMessageContext);
+  Result = SpdmSecuredMessageDheComputeKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, SessionInfo->SecuredMessageContext);
   SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
+  if (!Result) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   Ptr += DheKeySize;
 
@@ -193,7 +203,12 @@ SpdmGetResponseKeyExchange (
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = SpdmContext->LocalContext.CertificateChain[SlotNum];
   SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotNum];
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   Result = SpdmGenerateKeyExchangeRspSignature (SpdmContext, SessionInfo, Ptr);
   if (!Result) {
     SpdmFreeSessionId (SpdmContext, SessionId);
@@ -201,11 +216,27 @@ SpdmGetResponseKeyExchange (
     return RETURN_SUCCESS;
   }
 
-  AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, SignatureSize);
+  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, SignatureSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", SessionId));
-  SpdmCalculateTh1 (SpdmContext, SessionId, FALSE, TH1HashData);
-  SpdmGenerateSessionHandshakeKey (SessionInfo->SecuredMessageContext, TH1HashData);
+  Status = SpdmCalculateTh1 (SpdmContext, SessionInfo, FALSE, TH1HashData);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  Status = SpdmGenerateSessionHandshakeKey (SessionInfo->SecuredMessageContext, TH1HashData);
+  if (RETURN_ERROR(Status)) {
+    SpdmFreeSessionId (SpdmContext, SessionId);
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   Ptr += SignatureSize;
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
@@ -215,7 +246,13 @@ SpdmGetResponseKeyExchange (
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE_RSP, ResponseSize, Response);
       return RETURN_SUCCESS;
     }
-    AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, HmacSize);
+    Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, Ptr, HmacSize);
+    if (RETURN_ERROR(Status)) {
+      SpdmFreeSessionId (SpdmContext, SessionId);
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+
     Ptr += HmacSize;
   }
 

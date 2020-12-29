@@ -106,7 +106,8 @@ SpdmGetResponseMeasurement (
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
   Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmRequest, RequestSize);
   if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
 
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
@@ -286,7 +287,8 @@ SpdmGetResponseMeasurement (
   } else {
     Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmResponse, *ResponseSize);
     if (RETURN_ERROR(Status)) {
-      return RETURN_SECURITY_VIOLATION;
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
     }
   }
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_MEASUREMENTS_RECEIVE_FLAG;

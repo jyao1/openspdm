@@ -58,7 +58,8 @@ SpdmGetEncapResponseCertificate (
   //
   Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
 
   if (SpdmContext->LocalContext.CertificateChain == NULL) {
@@ -110,7 +111,8 @@ SpdmGetEncapResponseCertificate (
   //
   Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, *ResponseSize);
   if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
 
   return RETURN_SUCCESS;

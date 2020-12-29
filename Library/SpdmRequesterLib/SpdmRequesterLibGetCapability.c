@@ -60,7 +60,10 @@ TrySpdmGetCapabilities (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
@@ -89,7 +92,10 @@ TrySpdmGetCapabilities (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   SpdmContext->ConnectionInfo.Capability.CTExponent = SpdmResponse.CTExponent;
   SpdmContext->ConnectionInfo.Capability.Flags = SpdmResponse.Flags;
