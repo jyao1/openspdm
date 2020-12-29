@@ -653,7 +653,7 @@ void TestSpdmResponderCertificateCase12(void **state) {
   // Setting up the SpdmContext and loading a sample certificate chain
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
-  SpdmTestContext->CaseId = 0x7;
+  SpdmTestContext->CaseId = 0xC;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
