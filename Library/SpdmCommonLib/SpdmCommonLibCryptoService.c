@@ -157,14 +157,21 @@ SpdmGenerateChallengeAuthSignature (
   BOOLEAN                       Result;
   UINTN                         SignatureSize;
   UINT32                        HashSize;
+  RETURN_STATUS                 Status;
 
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (IsRequester) {
     AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, ResponseMessage, ResponseMessageSize);
-    AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutB), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutB));
-    AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutB), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutB));
+    if (RETURN_ERROR(Status)) {
+      return FALSE;
+    }
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
+    if (RETURN_ERROR(Status)) {
+      return FALSE;
+    }
 
     DEBUG((DEBUG_INFO, "Calc MessageMutB Data :\n"));
     InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageMutB), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutB));
@@ -186,9 +193,18 @@ SpdmGenerateChallengeAuthSignature (
               );
   } else {
     AppendManagedBuffer (&SpdmContext->Transcript.MessageC, ResponseMessage, ResponseMessageSize);
-    AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-    AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageB), GetManagedBufferSize(&SpdmContext->Transcript.MessageB));
-    AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
+    if (RETURN_ERROR(Status)) {
+      return FALSE;
+    }
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageB), GetManagedBufferSize(&SpdmContext->Transcript.MessageB));
+    if (RETURN_ERROR(Status)) {
+      return FALSE;
+    }
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
+    if (RETURN_ERROR(Status)) {
+      return FALSE;
+    }
 
     DEBUG((DEBUG_INFO, "Calc MessageA Data :\n"));
     InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
@@ -479,7 +495,8 @@ SpdmGenerateMeasurementSignature (
   BOOLEAN                       Result;
   UINT8                         HashData[MAX_HASH_SIZE];
   UINT32                        HashSize;
-  
+  RETURN_STATUS                 Status;
+
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   MeasurmentSigSize = SPDM_NONCE_SIZE +
                       sizeof(UINT16) +
@@ -498,8 +515,11 @@ SpdmGenerateMeasurementSignature (
 
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
-  AppendManagedBuffer (&SpdmContext->Transcript.L1L2, ResponseMessage, ResponseMessageSize - SignatureSize);
-  
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, ResponseMessage, ResponseMessageSize - SignatureSize);
+  if (RETURN_ERROR(Status)) {
+    return FALSE;
+  }
+
   DEBUG((DEBUG_INFO, "Calc L1L2 Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.L1L2), GetManagedBufferSize(&SpdmContext->Transcript.L1L2));
 

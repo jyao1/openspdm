@@ -740,7 +740,7 @@ SpdmResetMessageC (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
 }
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageA (
   IN     VOID                                *Context,
   IN     VOID                                *Message,
@@ -750,10 +750,10 @@ SpdmAppendMessageA (
   SPDM_DEVICE_CONTEXT        *SpdmContext;
 
   SpdmContext = Context;
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageA, Message, MessageSize);
+  return AppendManagedBuffer (&SpdmContext->Transcript.MessageA, Message, MessageSize);
 }
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageB (
   IN     VOID                                *Context,
   IN     VOID                                *Message,
@@ -763,10 +763,10 @@ SpdmAppendMessageB (
   SPDM_DEVICE_CONTEXT        *SpdmContext;
 
   SpdmContext = Context;
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, Message, MessageSize);
+  return AppendManagedBuffer (&SpdmContext->Transcript.MessageB, Message, MessageSize);
 }
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageC (
   IN     VOID                                *Context,
   IN     VOID                                *Message,
@@ -776,10 +776,10 @@ SpdmAppendMessageC (
   SPDM_DEVICE_CONTEXT        *SpdmContext;
 
   SpdmContext = Context;
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageC, Message, MessageSize);
+  return AppendManagedBuffer (&SpdmContext->Transcript.MessageC, Message, MessageSize);
 }
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageK (
   IN     VOID                                *SessionInfo,
   IN     VOID                                *Message,
@@ -789,10 +789,10 @@ SpdmAppendMessageK (
   SPDM_SESSION_INFO       *SpdmSessionInfo;
 
   SpdmSessionInfo = SessionInfo;
-  AppendManagedBuffer (&SpdmSessionInfo->SessionTranscript.MessageK, Message, MessageSize);
+  return AppendManagedBuffer (&SpdmSessionInfo->SessionTranscript.MessageK, Message, MessageSize);
 }
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageF (
   IN     VOID                                *SessionInfo,
   IN     VOID                                *Message,
@@ -802,7 +802,7 @@ SpdmAppendMessageF (
   SPDM_SESSION_INFO       *SpdmSessionInfo;
 
   SpdmSessionInfo = SessionInfo;
-  AppendManagedBuffer (&SpdmSessionInfo->SessionTranscript.MessageF, Message, MessageSize);
+  return AppendManagedBuffer (&SpdmSessionInfo->SessionTranscript.MessageF, Message, MessageSize);
 }
 
 /**

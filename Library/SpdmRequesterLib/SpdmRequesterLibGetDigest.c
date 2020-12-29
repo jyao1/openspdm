@@ -80,7 +80,10 @@ TrySpdmGetDigest (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmRequest, sizeof(SpdmRequest));
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmRequest, sizeof(SpdmRequest));
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
@@ -118,7 +121,10 @@ TrySpdmGetDigest (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmResponse, SpdmResponseSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmResponse, SpdmResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   for (Index = 0; Index < DigestCount; Index++) {
     DEBUG((DEBUG_INFO, "Digest (0x%x) - ", Index));

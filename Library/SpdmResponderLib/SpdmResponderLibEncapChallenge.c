@@ -92,6 +92,7 @@ SpdmProcessEncapResponseChallengeAuth (
   VOID                                      *Signature;
   UINTN                                     SignatureSize;
   SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE    AuthAttribute;
+  RETURN_STATUS                             Status;
 
   SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
@@ -176,8 +177,14 @@ SpdmProcessEncapResponseChallengeAuth (
                      OpaqueLength +
                      SignatureSize;
   AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, SpdmResponse, SpdmResponseSize - SignatureSize);
-  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutB), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutB));
-  AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutB), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutB));
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   Opaque = Ptr;
   Ptr += OpaqueLength;

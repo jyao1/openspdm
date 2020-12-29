@@ -44,6 +44,7 @@ SpdmGetResponseCertificate (
   UINTN                         RemainderLength;
   UINT8                         SlotNum;
   SPDM_DEVICE_CONTEXT           *SpdmContext;
+  RETURN_STATUS                 Status;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -63,7 +64,10 @@ SpdmGetResponseCertificate (
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, SpdmRequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, SpdmRequestSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   if (SpdmContext->LocalContext.CertificateChain == NULL) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_CERTIFICATE, ResponseSize, Response);
@@ -112,7 +116,11 @@ SpdmGetResponseCertificate (
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmResponse, *ResponseSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmResponse, *ResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
+
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CERTIFICATE_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;

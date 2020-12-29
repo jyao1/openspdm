@@ -43,6 +43,7 @@ SpdmGetEncapResponseDigest (
   UINT32                        HashSize;
   UINT8                         *Digest;
   SPDM_DEVICE_CONTEXT           *SpdmContext;
+  RETURN_STATUS                 Status;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -54,7 +55,10 @@ SpdmGetEncapResponseDigest (
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, SpdmRequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, SpdmRequestSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   if (SpdmContext->LocalContext.CertificateChain == NULL) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);
@@ -85,7 +89,10 @@ SpdmGetEncapResponseDigest (
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, *ResponseSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, *ResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   return RETURN_SUCCESS;
 }

@@ -104,7 +104,10 @@ SpdmGetResponseMeasurement (
   // Cache
   //
   ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-  AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmRequest, RequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmRequest, RequestSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   MeasurmentSigSize = SPDM_NONCE_SIZE +
@@ -281,7 +284,10 @@ SpdmGetResponseMeasurement (
     //
     ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
   } else {
-    AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmResponse, *ResponseSize);
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmResponse, *ResponseSize);
+    if (RETURN_ERROR(Status)) {
+      return RETURN_SECURITY_VIOLATION;
+    }
   }
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_MEASUREMENTS_RECEIVE_FLAG;
   return RETURN_SUCCESS;

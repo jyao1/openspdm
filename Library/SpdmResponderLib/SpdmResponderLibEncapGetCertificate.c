@@ -31,6 +31,7 @@ SpdmGetEncapReqestGetCertificate (
   )
 {
   SPDM_GET_CERTIFICATE_REQUEST                  *SpdmRequest;
+  RETURN_STATUS                                 Status;
 
   ASSERT (*EncapRequestSize >= sizeof(SPDM_GET_CERTIFICATE_REQUEST));
   *EncapRequestSize = sizeof(SPDM_GET_CERTIFICATE_REQUEST);
@@ -52,7 +53,10 @@ SpdmGetEncapReqestGetCertificate (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, *EncapRequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, *EncapRequestSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   return RETURN_SUCCESS;
 }
@@ -81,6 +85,7 @@ SpdmProcessEncapResponseCertificate (
   SPDM_CERTIFICATE_RESPONSE             *SpdmResponse;
   UINTN                                 SpdmResponseSize;
   BOOLEAN                               Result;
+  RETURN_STATUS                         Status;
 
   SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
@@ -106,12 +111,18 @@ SpdmProcessEncapResponseCertificate (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, SpdmResponseSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, SpdmResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   DEBUG((DEBUG_INFO, "Certificate (Offset 0x%x, Size 0x%x):\n", GetManagedBufferSize (&SpdmContext->EncapContext.CertificateChainBuffer), SpdmResponse->PortionLength));
   InternalDumpHex ((VOID *)(SpdmResponse + 1), SpdmResponse->PortionLength);
 
-  AppendManagedBuffer (&SpdmContext->EncapContext.CertificateChainBuffer, (VOID *)(SpdmResponse + 1), SpdmResponse->PortionLength);
+  Status = AppendManagedBuffer (&SpdmContext->EncapContext.CertificateChainBuffer, (VOID *)(SpdmResponse + 1), SpdmResponse->PortionLength);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   if (SpdmResponse->RemainderLength != 0) {
     *Continue = TRUE;

@@ -98,7 +98,11 @@ TrySpdmGetCertificate (
     //
     // Cache data
     //
-    AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmRequest, sizeof(SpdmRequest));
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmRequest, sizeof(SpdmRequest));
+    if (RETURN_ERROR(Status)) {
+      Status = RETURN_SECURITY_VIOLATION;
+      goto Done;
+    }
 
     SpdmResponseSize = sizeof(SpdmResponse);
     ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
@@ -144,12 +148,20 @@ TrySpdmGetCertificate (
     //
     // Cache data
     //
-    AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmResponse, SpdmResponseSize);
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmResponse, SpdmResponseSize);
+    if (RETURN_ERROR(Status)) {
+      Status = RETURN_SECURITY_VIOLATION;
+      goto Done;
+    }
 
     DEBUG((DEBUG_INFO, "Certificate (Offset 0x%x, Size 0x%x):\n", SpdmRequest.Offset, SpdmResponse.PortionLength));
     InternalDumpHex (SpdmResponse.CertChain, SpdmResponse.PortionLength);
 
-    AppendManagedBuffer (&CertificateChainBuffer, SpdmResponse.CertChain, SpdmResponse.PortionLength);
+    Status = AppendManagedBuffer (&CertificateChainBuffer, SpdmResponse.CertChain, SpdmResponse.PortionLength);
+    if (RETURN_ERROR(Status)) {
+      Status = RETURN_SECURITY_VIOLATION;
+      goto Done;
+    }
 
   } while (SpdmResponse.RemainderLength != 0);
 

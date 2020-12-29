@@ -31,6 +31,7 @@ SpdmGetEncapReqestGetDigest (
   )
 {
   SPDM_GET_DIGESTS_REQUEST                  *SpdmRequest;
+  RETURN_STATUS                             Status;
 
   ASSERT (*EncapRequestSize >= sizeof(SPDM_GET_DIGESTS_REQUEST));
   *EncapRequestSize = sizeof(SPDM_GET_DIGESTS_REQUEST);
@@ -49,7 +50,10 @@ SpdmGetEncapReqestGetDigest (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, *EncapRequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, *EncapRequestSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   return RETURN_SUCCESS;
 }
@@ -82,6 +86,7 @@ SpdmProcessEncapResponseDigest (
   UINTN                                     DigestSize;
   UINTN                                     DigestCount;
   UINTN                                     Index;
+  RETURN_STATUS                             Status;
 
   SpdmResponse = EncapResponse;
   SpdmResponseSize = EncapResponseSize;
@@ -105,7 +110,10 @@ SpdmProcessEncapResponseDigest (
   //
   // Cache data
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, SpdmResponseSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, SpdmResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   Digest = (VOID *)(SpdmResponse + 1);
   for (Index = 0; Index < DigestCount; Index++) {

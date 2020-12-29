@@ -43,6 +43,7 @@ SpdmGetResponseDigest (
   UINT32                        HashSize;
   UINT8                         *Digest;
   SPDM_DEVICE_CONTEXT           *SpdmContext;
+  RETURN_STATUS                 Status;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -62,7 +63,10 @@ SpdmGetResponseDigest (
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, SpdmRequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, SpdmRequestSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   if (SpdmContext->LocalContext.CertificateChain == NULL) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);
@@ -93,7 +97,11 @@ SpdmGetResponseDigest (
   //
   // Cache
   //
-  AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmResponse, *ResponseSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmResponse, *ResponseSize);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_SECURITY_VIOLATION;
+  }
+
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_DIGESTS_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;

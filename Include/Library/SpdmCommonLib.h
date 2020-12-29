@@ -476,35 +476,35 @@ SpdmResetMessageC (
   IN     VOID                                *SpdmContext
   );
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageA (
   IN     VOID                                *SpdmContext,
   IN     VOID                                *Message,
   IN     UINTN                               MessageSize
   );
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageB (
   IN     VOID                                *SpdmContext,
   IN     VOID                                *Message,
   IN     UINTN                               MessageSize
   );
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageC (
   IN     VOID                                *SpdmContext,
   IN     VOID                                *Message,
   IN     UINTN                               MessageSize
   );
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageK (
   IN     VOID                                *SpdmSessionInfo,
   IN     VOID                                *Message,
   IN     UINTN                               MessageSize
   );
 
-VOID
+RETURN_STATUS
 SpdmAppendMessageF (
   IN     VOID                                *SpdmSessionInfo,
   IN     VOID                                *Message,
