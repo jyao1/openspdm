@@ -104,6 +104,11 @@ SpdmEncodeSecuredMessage (
     return RETURN_UNSUPPORTED;
     break;
   }
+
+  if (SequenceNumber == (UINT64)-1) {
+    return RETURN_SECURITY_VIOLATION;
+  }
+
   *(UINT64 *)Salt = *(UINT64 *)Salt ^ SequenceNumber;
 
   SequenceNumInHeader = 0;
@@ -319,6 +324,11 @@ SpdmDecodeSecuredMessage (
     ASSERT(FALSE);
     return RETURN_UNSUPPORTED;
   }
+
+  if (SequenceNumber == (UINT64)-1) {
+    return RETURN_SECURITY_VIOLATION;
+  }
+
   *(UINT64 *)Salt = *(UINT64 *)Salt ^ SequenceNumber;
 
   SequenceNumInHeader = 0;
