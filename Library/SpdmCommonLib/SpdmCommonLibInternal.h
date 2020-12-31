@@ -506,24 +506,24 @@ SpdmGenerateCertChainHash (
   @retval FALSE digest verification fail.
 **/
 BOOLEAN
-SpdmVerifyDigest (
+SpdmVerifyPeerDigests (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *Digest,
   IN UINTN                        DigestSize
   );
 
 /**
-  This function verifies and save peer certificate chain buffer including SPDM_CERT_CHAIN header.
+  This function verifies peer certificate chain buffer including SPDM_CERT_CHAIN header.
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  CertChainBuffer              Certitiface chain buffer including SPDM_CERT_CHAIN header.
   @param  CertChainBufferSize          Size in bytes of the certitiface chain buffer.
 
-  @retval TRUE  Peer certificate chain buffer verification passed and saved.
-  @retval FALSE Peer certificate chain buffer verification fail.
+  @retval TRUE  Peer certificate chain buffer verification passed.
+  @retval FALSE Peer certificate chain buffer verification failed.
 **/
 BOOLEAN
-SpdmVerifySavePeerCertChainBuffer (
+SpdmVerifyPeerCertChainBuffer (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *CertChainBuffer,
   IN UINTN                        CertChainBufferSize

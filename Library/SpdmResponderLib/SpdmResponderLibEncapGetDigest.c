@@ -122,7 +122,7 @@ SpdmProcessEncapResponseDigest (
     DEBUG((DEBUG_INFO, "\n"));
   }
 
-  Result = SpdmVerifyDigest (SpdmContext, Digest, DigestCount * DigestSize);
+  Result = SpdmVerifyPeerDigests (SpdmContext, Digest, DigestCount * DigestSize);
   if (!Result) {
     return RETURN_SECURITY_VIOLATION;
   }

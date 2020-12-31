@@ -291,7 +291,7 @@ SpdmGenerateCertChainHash (
   @retval FALSE digest verification fail.
 **/
 BOOLEAN
-SpdmVerifyDigest (
+SpdmVerifyPeerDigests (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *Digest,
   IN UINTN                        DigestSize
@@ -309,28 +309,28 @@ SpdmVerifyDigest (
     SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertChainBuffer, CertChainBufferSize, CertChainBufferHash);
 
     if (CompareMem (Digest, CertChainBufferHash, HashSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! VerifyDigest - FAIL !!!\n"));
+      DEBUG((DEBUG_INFO, "!!! VerifyPeerDigests - FAIL !!!\n"));
       return FALSE;
     }
   }
 
-  DEBUG((DEBUG_INFO, "!!! VerifyDigest - PASS !!!\n"));
+  DEBUG((DEBUG_INFO, "!!! VerifyPeerDigests - PASS !!!\n"));
 
   return TRUE;
 }
 
 /**
-  This function verifies and save peer certificate chain buffer including SPDM_CERT_CHAIN header.
+  This function verifies peer certificate chain buffer including SPDM_CERT_CHAIN header.
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  CertChainBuffer              Certitiface chain buffer including SPDM_CERT_CHAIN header.
   @param  CertChainBufferSize          Size in bytes of the certitiface chain buffer.
 
-  @retval TRUE  Peer certificate chain buffer verification passed and saved.
-  @retval FALSE Peer certificate chain buffer verification fail.
+  @retval TRUE  Peer certificate chain buffer verification passed.
+  @retval FALSE Peer certificate chain buffer verification failed.
 **/
 BOOLEAN
-SpdmVerifySavePeerCertChainBuffer (
+SpdmVerifyPeerCertChainBuffer (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
   IN VOID                         *CertChainBuffer,
   IN UINTN                        CertChainBufferSize
@@ -356,27 +356,25 @@ SpdmVerifySavePeerCertChainBuffer (
   if ((RootCertHash != NULL) && (RootCertHashSize != 0)) {
     HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
     if (RootCertHashSize != HashSize) {
-      DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - FAIL (hash size mismatch) !!!\n"));
+      DEBUG((DEBUG_INFO, "!!! VerifyPeerCertChainBuffer - FAIL (hash size mismatch) !!!\n"));
       return FALSE;
     }
     if (CompareMem ((UINT8 *)CertChainBuffer + sizeof(SPDM_CERT_CHAIN), RootCertHash, HashSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - FAIL (root hash mismatch) !!!\n"));
+      DEBUG((DEBUG_INFO, "!!! VerifyPeerCertChainBuffer - FAIL (root hash mismatch) !!!\n"));
       return FALSE;
     }
   } else if ((CertChainData != NULL) && (CertChainDataSize != 0)) {
     if (CertChainDataSize != CertChainBufferSize) {
-      DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - FAIL !!!\n"));
+      DEBUG((DEBUG_INFO, "!!! VerifyPeerCertChainBuffer - FAIL !!!\n"));
       return FALSE;
     }
     if (CompareMem (CertChainBuffer, CertChainData, CertChainBufferSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - FAIL !!!\n"));
+      DEBUG((DEBUG_INFO, "!!! VerifyPeerCertChainBuffer - FAIL !!!\n"));
       return FALSE;
     }
   }
 
-  DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - PASS !!!\n"));
-  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = CertChainBufferSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, CertChainBuffer, CertChainBufferSize);
+  DEBUG((DEBUG_INFO, "!!! VerifyPeerCertChainBuffer - PASS !!!\n"));
 
   return TRUE;
 }

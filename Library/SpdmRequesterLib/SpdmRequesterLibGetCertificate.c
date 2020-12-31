@@ -165,12 +165,14 @@ TrySpdmGetCertificate (
 
   } while (SpdmResponse.RemainderLength != 0);
 
-  Result = SpdmVerifySavePeerCertChainBuffer (SpdmContext, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
+  Result = SpdmVerifyPeerCertChainBuffer (SpdmContext, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
   if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     Status = RETURN_SECURITY_VIOLATION;
     goto Done;
   }
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = GetManagedBufferSize(&CertificateChainBuffer);
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
 
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
 

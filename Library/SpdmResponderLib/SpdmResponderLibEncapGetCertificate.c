@@ -130,11 +130,13 @@ SpdmProcessEncapResponseCertificate (
   }
 
   *Continue = FALSE;
-  Result = SpdmVerifySavePeerCertChainBuffer (SpdmContext, GetManagedBuffer(&SpdmContext->EncapContext.CertificateChainBuffer), GetManagedBufferSize(&SpdmContext->EncapContext.CertificateChainBuffer));
+  Result = SpdmVerifyPeerCertChainBuffer (SpdmContext, GetManagedBuffer(&SpdmContext->EncapContext.CertificateChainBuffer), GetManagedBufferSize(&SpdmContext->EncapContext.CertificateChainBuffer));
   if (!Result) {
     SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
   }
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = GetManagedBufferSize(&SpdmContext->EncapContext.CertificateChainBuffer);
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, GetManagedBuffer(&SpdmContext->EncapContext.CertificateChainBuffer), GetManagedBufferSize(&SpdmContext->EncapContext.CertificateChainBuffer));
 
   SpdmContext->EncapContext.ErrorState = SPDM_STATUS_SUCCESS;
 

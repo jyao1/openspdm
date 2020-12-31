@@ -132,7 +132,7 @@ TrySpdmGetDigest (
     DEBUG((DEBUG_INFO, "\n"));
   }
 
-  Result = SpdmVerifyDigest (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
+  Result = SpdmVerifyPeerDigests (SpdmContext, SpdmResponse.Digest, SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE));
   if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;
