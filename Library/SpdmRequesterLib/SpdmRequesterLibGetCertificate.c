@@ -98,7 +98,7 @@ TrySpdmGetCertificate (
     //
     // Cache data
     //
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmRequest, sizeof(SpdmRequest));
+    Status = SpdmAppendMessageB (SpdmContext, &SpdmRequest, sizeof(SpdmRequest));
     if (RETURN_ERROR(Status)) {
       Status = RETURN_SECURITY_VIOLATION;
       goto Done;
@@ -148,7 +148,7 @@ TrySpdmGetCertificate (
     //
     // Cache data
     //
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmResponse, SpdmResponseSize);
+    Status = SpdmAppendMessageB (SpdmContext, &SpdmResponse, SpdmResponseSize);
     if (RETURN_ERROR(Status)) {
       Status = RETURN_SECURITY_VIOLATION;
       goto Done;
@@ -165,7 +165,7 @@ TrySpdmGetCertificate (
 
   } while (SpdmResponse.RemainderLength != 0);
 
-  Result = SpdmVerifyCertificateChain (SpdmContext, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
+  Result = SpdmVerifySavePeerCertChainBuffer (SpdmContext, GetManagedBuffer(&CertificateChainBuffer), GetManagedBufferSize(&CertificateChainBuffer));
   if (!Result) {
     SpdmContext->ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     Status = RETURN_SECURITY_VIOLATION;

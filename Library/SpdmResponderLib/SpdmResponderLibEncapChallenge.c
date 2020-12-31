@@ -54,7 +54,7 @@ SpdmGetEncapReqestChallenge (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, SpdmRequest, *EncapRequestSize);
+  Status = SpdmAppendMessageMutC (SpdmContext, SpdmRequest, *EncapRequestSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -180,7 +180,7 @@ SpdmProcessEncapResponseChallengeAuth (
                      sizeof(UINT16) +
                      OpaqueLength +
                      SignatureSize;
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, SpdmResponse, SpdmResponseSize - SignatureSize);
+  Status = SpdmAppendMessageMutC (SpdmContext, SpdmResponse, SpdmResponseSize - SignatureSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }

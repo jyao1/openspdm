@@ -222,7 +222,7 @@ ReadResponderPublicCertificateChain (
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
 
-  Res = SpdmVerifyCertificateBuffer(FileData, FileSize);
+  Res = SpdmVerifyCertChainData(FileData, FileSize);
   if (!Res) {
     free (FileData);
     free (CertChain);
@@ -314,7 +314,7 @@ ReadRequesterPublicCertificateChain (
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
 
-  Res = SpdmVerifyCertificateBuffer(FileData, FileSize);
+  Res = SpdmVerifyCertChainData(FileData, FileSize);
   if (!Res) {
     free (FileData);
     free (CertChain);
@@ -477,7 +477,7 @@ ReadResponderPublicCertificateChainBySize (
   CertChain->Length = (UINT16)CertChainSize;
   CertChain->Reserved = 0;
 
-  Res = SpdmVerifyCertificateBuffer(FileData, FileSize);
+  Res = SpdmVerifyCertChainData(FileData, FileSize);
   if (!Res) {
     free (FileData);
     free (CertChain);

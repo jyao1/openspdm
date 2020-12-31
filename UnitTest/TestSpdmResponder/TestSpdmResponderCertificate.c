@@ -74,8 +74,8 @@ void TestSpdmResponderCertificateCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -111,8 +111,8 @@ void TestSpdmResponderCertificateCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -148,8 +148,8 @@ void TestSpdmResponderCertificateCase3(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -186,8 +186,8 @@ void TestSpdmResponderCertificateCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -225,8 +225,8 @@ void TestSpdmResponderCertificateCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -263,8 +263,8 @@ void TestSpdmResponderCertificateCase6(void **state) {
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -304,8 +304,8 @@ void TestSpdmResponderCertificateCase7(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   // This tests considers only offset = 0, other tests vary offset value
@@ -358,8 +358,8 @@ void TestSpdmResponderCertificateCase8(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   // This tests considers only length = 0, other tests vary length value
@@ -432,8 +432,8 @@ void TestSpdmResponderCertificateCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   // Setting up offset values at the boundary of certificate length
@@ -513,8 +513,8 @@ void TestSpdmResponderCertificateCase10(void **state) {
   for(int i=0; i<sizeof(TestCases)/sizeof(TestCases[0]); i++) {
     ReadResponderPublicCertificateChainBySize (mUseHashAlgo, mUseAsymAlgo, TestCases[i], &Data, &DataSize, NULL, NULL);
 
-    SpdmContext->LocalContext.CertificateChain[0] = Data;
-    SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+    SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+    SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
     SpdmContext->LocalContext.SlotCount = 1;
 
     mSpdmGetCertificateRequest3.Offset = (UINT16)(MIN(DataSize - 1, MAX_UINT16));
@@ -590,8 +590,8 @@ void TestSpdmResponderCertificateCase11(void **state) {
 
   for(int i=0; i<sizeof(TestCases)/sizeof(TestCases[0]); i++) {
     ReadResponderPublicCertificateChainBySize (mUseHashAlgo, mUseAsymAlgo, TestCases[i], &Data, &DataSize, NULL, NULL);
-    SpdmContext->LocalContext.CertificateChain[0] = Data;
-    SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+    SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+    SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
     SpdmContext->LocalContext.SlotCount = 1;
 
     TEST_DEBUG_PRINT("DataSize: %u\n",DataSize);
@@ -658,8 +658,8 @@ void TestSpdmResponderCertificateCase12(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
   SpdmContext->LocalContext.SlotCount = 1;
 
   // This tests considers only Length = 1

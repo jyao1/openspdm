@@ -62,14 +62,14 @@ SpdmSendReceivePskFinish (
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + HmacSize;
   
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
+  Status = SpdmAppendMessageF (SessionInfo, (UINT8 *)&SpdmRequest, SpdmRequestSize - HmacSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
 
   SpdmGeneratePskFinishReqHmac (SpdmContext, SessionInfo, SpdmRequest.VerifyData);
 
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest + SpdmRequestSize - HmacSize, HmacSize);
+  Status = SpdmAppendMessageF (SessionInfo, (UINT8 *)&SpdmRequest + SpdmRequestSize - HmacSize, HmacSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -92,13 +92,13 @@ SpdmSendReceivePskFinish (
     return RETURN_DEVICE_ERROR;
   }
   
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, &SpdmResponse, SpdmResponseSize);
+  Status = SpdmAppendMessageF (SessionInfo, &SpdmResponse, SpdmResponseSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
-  Status = SpdmCalculateTH2 (SpdmContext, SessionInfo, TRUE, TH2HashData);
+  Status = SpdmCalculateTH2Hash (SpdmContext, SessionInfo, TRUE, TH2HashData);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }

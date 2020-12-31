@@ -52,8 +52,8 @@ void TestSpdmResponderChallengeAuthCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -90,8 +90,8 @@ void TestSpdmResponderChallengeAuthCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -129,8 +129,8 @@ void TestSpdmResponderChallengeAuthCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -169,8 +169,8 @@ void TestSpdmResponderChallengeAuthCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -210,8 +210,8 @@ void TestSpdmResponderChallengeAuthCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);
@@ -249,8 +249,8 @@ void TestSpdmResponderChallengeAuthCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
 
   ResponseSize = sizeof(Response);

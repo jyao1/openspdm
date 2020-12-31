@@ -109,8 +109,8 @@ SpdmRequesterChallengeTestReceiveMessage (
     UINTN                         TempBufSize;
 
     ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvision[0] = Data;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
@@ -126,7 +126,7 @@ SpdmRequesterChallengeTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = (1 << 0);
     Ptr = (VOID *)(SpdmResponse + 1);
-    SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
+    SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvision[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvisionSize[0], Ptr);
     free(Data);
     Ptr += GetSpdmHashSize (mUseHashAlgo);
     SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
@@ -162,8 +162,8 @@ SpdmRequesterChallengeTestReceiveMessage (
     UINTN                         TempBufSize;
 
     ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
-    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvision[0] = Data;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
@@ -179,7 +179,7 @@ SpdmRequesterChallengeTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = (1 << 0);
     Ptr = (VOID *)(SpdmResponse + 1);
-    SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
+    SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvision[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvisionSize[0], Ptr);
     free(Data);
     Ptr += GetSpdmHashSize (mUseHashAlgo);
     SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
@@ -249,8 +249,8 @@ SpdmRequesterChallengeTestReceiveMessage (
       UINTN                         TempBufSize;
 
       ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvision[0] = Data;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
@@ -266,7 +266,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = (1 << 0);
       Ptr = (VOID *)(SpdmResponse + 1);
-      SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
+      SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvision[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvisionSize[0], Ptr);
       free(Data);
       Ptr += GetSpdmHashSize (mUseHashAlgo);
       SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
@@ -345,8 +345,8 @@ SpdmRequesterChallengeTestReceiveMessage (
       UINTN                         TempBufSize;
 
       ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0] = DataSize;
-      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0] = Data;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvisionSize[0] = DataSize;
+      ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvision[0] = Data;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
       TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
@@ -362,7 +362,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = (1 << 0);
       Ptr = (VOID *)(SpdmResponse + 1);
-      SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChain[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.CertificateChainSize[0], Ptr);
+      SpdmHashAll (mUseHashAlgo, ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvision[0], ((SPDM_DEVICE_CONTEXT*)SpdmContext)->LocalContext.LocalCertChainProvisionSize[0], Ptr);
       free(Data);
       Ptr += GetSpdmHashSize (mUseHashAlgo);
       SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
@@ -411,8 +411,8 @@ void TestSpdmRequesterChallengeCase1(void **state) {
   SpdmContext->Transcript.MessageC.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
@@ -444,8 +444,8 @@ void TestSpdmRequesterChallengeCase2(void **state) {
   SpdmContext->Transcript.MessageC.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
@@ -474,8 +474,8 @@ void TestSpdmRequesterChallengeCase3(void **state) {
   SpdmContext->Transcript.MessageC.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
@@ -507,8 +507,8 @@ void TestSpdmRequesterChallengeCase4(void **state) {
   SpdmContext->Transcript.MessageC.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
@@ -540,8 +540,8 @@ void TestSpdmRequesterChallengeCase5(void **state) {
   SpdmContext->Transcript.MessageC.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
@@ -573,8 +573,8 @@ void TestSpdmRequesterChallengeCase6(void **state) {
   SpdmContext->Transcript.MessageC.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
@@ -605,8 +605,8 @@ void TestSpdmRequesterChallengeCase7(void **state) {
   SpdmContext->Transcript.MessageC.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
@@ -639,8 +639,8 @@ void TestSpdmRequesterChallengeCase8(void **state) {
   SpdmContext->Transcript.MessageC.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
@@ -671,8 +671,8 @@ void TestSpdmRequesterChallengeCase9(void **state) {
   SpdmContext->Transcript.MessageC.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);

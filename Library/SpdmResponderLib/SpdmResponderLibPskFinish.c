@@ -68,7 +68,7 @@ SpdmGetResponsePskFinish (
     return RETURN_SUCCESS;
   }
 
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Request, RequestSize - HmacSize);
+  Status = SpdmAppendMessageF (SessionInfo, Request, RequestSize - HmacSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -89,20 +89,20 @@ SpdmGetResponsePskFinish (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)Request + RequestSize - HmacSize, HmacSize);
+  Status = SpdmAppendMessageF (SessionInfo, (UINT8 *)Request + RequestSize - HmacSize, HmacSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, SpdmResponse, *ResponseSize);
+  Status = SpdmAppendMessageF (SessionInfo, SpdmResponse, *ResponseSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
-  Status = SpdmCalculateTH2 (SpdmContext, SessionInfo, FALSE, TH2HashData);
+  Status = SpdmCalculateTH2Hash (SpdmContext, SessionInfo, FALSE, TH2HashData);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

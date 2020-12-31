@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /**
   Encode an application message to a secured message.
 
-  @param  SecuredMessageContext        A pointer to the SPDM context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  SessionId                    The session ID of the SPDM session.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  AppMessageSize               Size in bytes of the application message data buffer.
@@ -235,7 +235,7 @@ SpdmEncodeSecuredMessage (
 /**
   Decode an application message from a secured message.
 
-  @param  SecuredMessageContext        A pointer to the SPDM context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  SessionId                    The session ID of the SPDM session.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  SecuredMessageSize           Size in bytes of the secured message data buffer.

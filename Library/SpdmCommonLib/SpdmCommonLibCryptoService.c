@@ -9,16 +9,164 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmCommonLibInternal.h"
 
+/**
+  This function returns peer certificate chain buffer including SPDM_CERT_CHAIN header.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertChainBuffer              Certitiface chain buffer including SPDM_CERT_CHAIN header.
+  @param  CertChainBufferSize          Size in bytes of the certitiface chain buffer.
+
+  @retval TRUE  Peer certificate chain buffer including SPDM_CERT_CHAIN header is returned.
+  @retval FALSE Peer certificate chain buffer including SPDM_CERT_CHAIN header is not found.
+**/
 BOOLEAN
+EFIAPI
+SpdmGetPeerCertChainBuffer (
+  IN     VOID                     *Context,
+     OUT VOID                     **CertChainBuffer,
+     OUT UINTN                    *CertChainBufferSize
+  )
+{
+  SPDM_DEVICE_CONTEXT          *SpdmContext;
+
+  SpdmContext = Context;
+  if (SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize != 0) {
+    *CertChainBuffer = SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer;
+    *CertChainBufferSize = SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize;
+    return TRUE;
+  }
+  if (SpdmContext->LocalContext.PeerCertChainProvisionSize != 0) {
+    *CertChainBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
+    *CertChainBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+  This function returns peer certificate chain data without SPDM_CERT_CHAIN header.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertChainData                Certitiface chain data without SPDM_CERT_CHAIN header.
+  @param  CertChainDataSize            Size in bytes of the certitiface chain data.
+
+  @retval TRUE  Peer certificate chain data without SPDM_CERT_CHAIN header is returned.
+  @retval FALSE Peer certificate chain data without SPDM_CERT_CHAIN header is not found.
+**/
+BOOLEAN
+EFIAPI
+SpdmGetPeerCertChainData (
+  IN     VOID                     *Context,
+     OUT VOID                     **CertChainData,
+     OUT UINTN                    *CertChainDataSize
+  )
+{
+  SPDM_DEVICE_CONTEXT          *SpdmContext;
+  BOOLEAN                      Result;
+  UINTN                        HashSize;
+
+  SpdmContext = Context;
+
+  Result = SpdmGetPeerCertChainBuffer (SpdmContext, CertChainData, CertChainDataSize);
+  if (!Result) {
+    return FALSE;
+  }
+
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+
+  *CertChainData = (UINT8 *)*CertChainData + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  *CertChainDataSize = *CertChainDataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  return TRUE;
+}
+
+/**
+  This function returns local used certificate chain buffer including SPDM_CERT_CHAIN header.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertChainBuffer              Certitiface chain buffer including SPDM_CERT_CHAIN header.
+  @param  CertChainBufferSize          Size in bytes of the certitiface chain buffer.
+
+  @retval TRUE  Local used certificate chain buffer including SPDM_CERT_CHAIN header is returned.
+  @retval FALSE Local used certificate chain buffer including SPDM_CERT_CHAIN header is not found.
+**/
+BOOLEAN
+EFIAPI
+SpdmGetLocalCertChainBuffer (
+  IN     VOID                     *Context,
+     OUT VOID                     **CertChainBuffer,
+     OUT UINTN                    *CertChainBufferSize
+  )
+{
+  SPDM_DEVICE_CONTEXT          *SpdmContext;
+
+  SpdmContext = Context;
+  if (SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize != 0) {
+    *CertChainBuffer = SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer;
+    *CertChainBufferSize = SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize;
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+  This function returns local used certificate chain data without SPDM_CERT_CHAIN header.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertChainData                Certitiface chain data without SPDM_CERT_CHAIN header.
+  @param  CertChainDataSize            Size in bytes of the certitiface chain data.
+
+  @retval TRUE  Local used certificate chain data without SPDM_CERT_CHAIN header is returned.
+  @retval FALSE Local used certificate chain data without SPDM_CERT_CHAIN header is not found.
+**/
+BOOLEAN
+EFIAPI
+SpdmGetLocalCertChainData (
+  IN     VOID                     *Context,
+     OUT VOID                     **CertChainData,
+     OUT UINTN                    *CertChainDataSize
+  )
+{
+  SPDM_DEVICE_CONTEXT          *SpdmContext;
+  BOOLEAN                      Result;
+  UINTN                        HashSize;
+  
+  SpdmContext = Context;
+
+  Result = SpdmGetLocalCertChainBuffer (SpdmContext, CertChainData, CertChainDataSize);
+  if (!Result) {
+    return FALSE;
+  }
+
+  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+
+  *CertChainData = (UINT8 *)*CertChainData + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  *CertChainDataSize = *CertChainDataSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
+  return TRUE;
+}
+
+/*
+  This function calculates M1M2 hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsMut                        Indicate if this is from mutual authentication.
+  @param  HashData                     M1M2 hash
+
+  @retval RETURN_SUCCESS  M1M2 hash is calculated.
+*/
+BOOLEAN
+EFIAPI
 SpdmCalculateM1M2Hash (
-  IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
+  IN     VOID                   *Context,
   IN     BOOLEAN                IsMut,
      OUT VOID                   *HashData
   )
 {
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
   RETURN_STATUS                 Status;
   UINT32                        HashSize;
   LARGE_MANAGED_BUFFER          M1M2;
+
+  SpdmContext = Context;
 
   InitManagedBuffer (&M1M2, MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
@@ -77,13 +225,25 @@ SpdmCalculateM1M2Hash (
   return TRUE;
 }
 
+/*
+  This function calculates L1L2 hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  HashData                     L1L2 hash
+
+  @retval RETURN_SUCCESS  L1L2 hash is calculated.
+*/
 BOOLEAN
+EFIAPI
 SpdmCalculateL1L2Hash (
-  IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
+  IN     VOID                   *Context,
      OUT VOID                   *HashData
   )
 {
+  SPDM_DEVICE_CONTEXT           *SpdmContext;
   UINT32                        HashSize;
+
+  SpdmContext = Context;
 
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
@@ -116,7 +276,7 @@ SpdmGenerateCertChainHash (
   )
 {
   ASSERT (SlotIndex < SpdmContext->LocalContext.SlotCount);
-  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, SpdmContext->LocalContext.CertificateChain[SlotIndex], SpdmContext->LocalContext.CertificateChainSize[SlotIndex], Hash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, SpdmContext->LocalContext.LocalCertChainProvision[SlotIndex], SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotIndex], Hash);
   return TRUE;
 }
 
@@ -138,17 +298,17 @@ SpdmVerifyDigest (
   )
 {
   UINTN                                     HashSize;
-  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
+  UINT8                                     CertChainBufferHash[MAX_HASH_SIZE];
+  UINT8                                     *CertChainBuffer;
+  UINTN                                     CertChainBufferSize;
 
-  CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
-  CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
-  if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
+  CertChainBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
+  CertChainBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
+  if ((CertChainBuffer != NULL) && (CertChainBufferSize != 0)) {
     HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
-    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
+    SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertChainBuffer, CertChainBufferSize, CertChainBufferHash);
 
-    if (CompareMem (Digest, CertBufferHash, HashSize) != 0) {
+    if (CompareMem (Digest, CertChainBufferHash, HashSize) != 0) {
       DEBUG((DEBUG_INFO, "!!! VerifyDigest - FAIL !!!\n"));
       return FALSE;
     }
@@ -160,63 +320,63 @@ SpdmVerifyDigest (
 }
 
 /**
-  This function verifies the certificate chain.
+  This function verifies and save peer certificate chain buffer including SPDM_CERT_CHAIN header.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  CertificateChain             The certificate chain data buffer.
-  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+  @param  CertChainBuffer              Certitiface chain buffer including SPDM_CERT_CHAIN header.
+  @param  CertChainBufferSize          Size in bytes of the certitiface chain buffer.
 
-  @retval TRUE  certificate chain verification pass.
-  @retval FALSE certificate chain verification fail.
+  @retval TRUE  Peer certificate chain buffer verification passed and saved.
+  @retval FALSE Peer certificate chain buffer verification fail.
 **/
 BOOLEAN
-SpdmVerifyCertificateChain (
+SpdmVerifySavePeerCertChainBuffer (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *CertificateChain,
-  IN UINTN                        CertificateChainSize
+  IN VOID                         *CertChainBuffer,
+  IN UINTN                        CertChainBufferSize
   )
 {
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
+  UINT8                                     *CertChainData;
+  UINTN                                     CertChainDataSize;
   UINTN                                     HashSize;
   UINT8                                     *RootCertHash;
   UINTN                                     RootCertHashSize;
   BOOLEAN                                   Result;
 
-  Result = SpdmVerifyCertificateChainData (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertificateChain, CertificateChainSize);
+  Result = SpdmVerifyCertificateChainBuffer (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertChainBuffer, CertChainBufferSize);
   if (!Result) {
     return FALSE;
   }
 
   RootCertHash = SpdmContext->LocalContext.PeerRootCertHashProvision;
   RootCertHashSize = SpdmContext->LocalContext.PeerRootCertHashProvisionSize;
-  CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
-  CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
+  CertChainData = SpdmContext->LocalContext.PeerCertChainProvision;
+  CertChainDataSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
 
   if ((RootCertHash != NULL) && (RootCertHashSize != 0)) {
     HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
     if (RootCertHashSize != HashSize) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (hash size mismatch) !!!\n"));
+      DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - FAIL (hash size mismatch) !!!\n"));
       return FALSE;
     }
-    if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), RootCertHash, HashSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (root hash mismatch) !!!\n"));
+    if (CompareMem ((UINT8 *)CertChainBuffer + sizeof(SPDM_CERT_CHAIN), RootCertHash, HashSize) != 0) {
+      DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - FAIL (root hash mismatch) !!!\n"));
       return FALSE;
     }
-  } else if ((CertBuffer != NULL) && (CertBufferSize != 0)) {
-    if (CertBufferSize != CertificateChainSize) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL !!!\n"));
+  } else if ((CertChainData != NULL) && (CertChainDataSize != 0)) {
+    if (CertChainDataSize != CertChainBufferSize) {
+      DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - FAIL !!!\n"));
       return FALSE;
     }
-    if (CompareMem (CertificateChain, CertBuffer, CertificateChainSize) != 0) {
-      DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL !!!\n"));
+    if (CompareMem (CertChainBuffer, CertChainData, CertChainBufferSize) != 0) {
+      DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - FAIL !!!\n"));
       return FALSE;
     }
   }
 
-  DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - PASS !!!\n"));
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = CertificateChainSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, CertificateChain, CertificateChainSize);
+  DEBUG((DEBUG_INFO, "!!! VerifySavePeerCertChainBuffer - PASS !!!\n"));
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = CertChainBufferSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, CertChainBuffer, CertChainBufferSize);
 
   return TRUE;
 }
@@ -226,8 +386,6 @@ SpdmVerifyCertificateChain (
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  IsRequester                  Indicate of the signature generation for a requester or a responder.
-  @param  ResponseMessage              The response message buffer.
-  @param  ResponseMessageSize          Size in bytes of the response message buffer.
   @param  Signature                    The buffer to store the challenge signature.
 
   @retval TRUE  challenge signature is generated.
@@ -237,8 +395,6 @@ BOOLEAN
 SpdmGenerateChallengeAuthSignature (
   IN     SPDM_DEVICE_CONTEXT        *SpdmContext,
   IN     BOOLEAN                    IsRequester,
-  IN     VOID                       *ResponseMessage,
-  IN     UINTN                      ResponseMessageSize,
      OUT UINT8                      *Signature
   )
 {
@@ -246,22 +402,16 @@ SpdmGenerateChallengeAuthSignature (
   BOOLEAN                       Result;
   UINTN                         SignatureSize;
   UINT32                        HashSize;
-  RETURN_STATUS                 Status;
 
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
+  Result = SpdmCalculateM1M2Hash (SpdmContext, IsRequester, HashData);
+  if (!Result) {
+    return FALSE;
+  }
+
   if (IsRequester) {
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, ResponseMessage, ResponseMessageSize);
-    if (RETURN_ERROR(Status)) {
-      return FALSE;
-    }
-
-    Result = SpdmCalculateM1M2Hash (SpdmContext, IsRequester, HashData);
-    if (!Result) {
-      return FALSE;
-    }
-
     Result = SpdmRequesterDataSignFunc (
               SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
               HashData,
@@ -270,16 +420,6 @@ SpdmGenerateChallengeAuthSignature (
               &SignatureSize
               );
   } else {
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageC, ResponseMessage, ResponseMessageSize);
-    if (RETURN_ERROR(Status)) {
-      return FALSE;
-    }
-
-    Result = SpdmCalculateM1M2Hash (SpdmContext, IsRequester, HashData);
-    if (!Result) {
-      return FALSE;
-    }
-
     Result = SpdmResponderDataSignFunc (
               SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
               HashData,
@@ -310,29 +450,25 @@ SpdmVerifyCertificateChainHash (
   )
 {
   UINTN                                     HashSize;
-  UINT8                                     CertBufferHash[MAX_HASH_SIZE];
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
+  UINT8                                     CertChainBufferHash[MAX_HASH_SIZE];
+  UINT8                                     *CertChainBuffer;
+  UINTN                                     CertChainBufferSize;
+  BOOLEAN                                   Result;
 
-  if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
-    CertBuffer = SpdmContext->ConnectionInfo.PeerCertChainBuffer;
-    CertBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize;
-  } else if (SpdmContext->LocalContext.PeerCertChainProvisionSize != 0) {
-    CertBuffer = SpdmContext->LocalContext.PeerCertChainProvision;
-    CertBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize;
-  } else {
+  Result = SpdmGetPeerCertChainBuffer (SpdmContext, (VOID **)&CertChainBuffer, &CertChainBufferSize);
+  if (!Result) {
     return FALSE;
   }
 
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
-  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertBuffer, CertBufferSize, CertBufferHash);
+  SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, CertChainBuffer, CertChainBufferSize, CertChainBufferHash);
 
   if (HashSize != CertificateChainHashSize) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - FAIL !!!\n"));
     return FALSE;
   }
-  if (CompareMem (CertificateChainHash, CertBufferHash, CertificateChainHashSize) != 0) {
+  if (CompareMem (CertificateChainHash, CertChainBufferHash, CertificateChainHashSize) != 0) {
     DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainHash - FAIL !!!\n"));
     return FALSE;
   }
@@ -365,8 +501,8 @@ SpdmVerifyChallengeAuthSignature (
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   VOID                                      *Context;
-  UINT8                                     *CertChainBuffer;
-  UINTN                                     CertChainBufferSize;
+  UINT8                                     *CertChainData;
+  UINTN                                     CertChainDataSize;
 
   Result = SpdmCalculateM1M2Hash (SpdmContext, !IsRequester, HashData);
   if (!Result) {
@@ -375,20 +511,15 @@ SpdmVerifyChallengeAuthSignature (
 
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
-  if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
-    CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-    CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  } else if (SpdmContext->LocalContext.PeerCertChainProvisionSize != 0) {
-    CertChainBuffer = (UINT8 *)SpdmContext->LocalContext.PeerCertChainProvision + sizeof(SPDM_CERT_CHAIN) + HashSize;
-    CertChainBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  } else {
+  Result = SpdmGetPeerCertChainData (SpdmContext, (VOID **)&CertChainData, &CertChainDataSize);
+  if (!Result) {
     return FALSE;
   }
 
   //
   // Get leaf cert from cert chain
   //
-  Result = X509GetCertFromCertChain (CertChainBuffer, CertChainBufferSize, -1,  &CertBuffer, &CertBufferSize);
+  Result = X509GetCertFromCertChain (CertChainData, CertChainDataSize, -1,  &CertBuffer, &CertBufferSize);
   if (!Result) {
     return FALSE;
   }
@@ -515,62 +646,37 @@ SpdmGenerateMeasurementSummaryHash (
 }
 
 /**
-  This function creates the measurement signature to response message based upon L1L2.
+  This function generates the measurement signature to response message based upon L1L2.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  ResponseMessage              The measurement response message with empty signature to be filled.
-  @param  ResponseMessageSize          Total size in bytes of the response message including signature.
+  @param  Signature                    The buffer to store the Signature.
 
-  @retval TRUE  measurement signature is created.
-  @retval FALSE measurement signature is not created.
+  @retval TRUE  measurement signature is generated.
+  @retval FALSE measurement signature is not generated.
 **/
 BOOLEAN
 SpdmGenerateMeasurementSignature (
   IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
-  IN OUT VOID                   *ResponseMessage,
-  IN     UINTN                  ResponseMessageSize
+     OUT UINT8                  *Signature
   )
 {
-  UINT8                         *Ptr;
-  UINTN                         MeasurmentSigSize;
   UINTN                         SignatureSize;
   BOOLEAN                       Result;
   UINT8                         HashData[MAX_HASH_SIZE];
   UINT32                        HashSize;
-  RETURN_STATUS                 Status;
-
-  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
-  MeasurmentSigSize = SPDM_NONCE_SIZE +
-                      sizeof(UINT16) +
-                      SpdmContext->LocalContext.OpaqueMeasurementRspSize +
-                      SignatureSize;
-  ASSERT (ResponseMessageSize > MeasurmentSigSize);
-  Ptr = (VOID *)((UINT8 *)ResponseMessage + ResponseMessageSize - MeasurmentSigSize);
-  
-  SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
-  Ptr += SPDM_NONCE_SIZE;
-
-  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueMeasurementRspSize;
-  Ptr += sizeof(UINT16);
-  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueMeasurementRsp, SpdmContext->LocalContext.OpaqueMeasurementRspSize);
-  Ptr += SpdmContext->LocalContext.OpaqueMeasurementRspSize;
-
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, ResponseMessage, ResponseMessageSize - SignatureSize);
-  if (RETURN_ERROR(Status)) {
-    return FALSE;
-  }
 
   Result = SpdmCalculateL1L2Hash (SpdmContext, HashData);
   if (!Result) {
     return FALSE;
   }
 
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   Result = SpdmResponderDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
              HashData,
              HashSize,
-             Ptr,
+             Signature,
              &SignatureSize
              );
   return Result;
@@ -599,8 +705,8 @@ SpdmVerifyMeasurementSignature (
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   VOID                                      *Context;
-  UINT8                                     *CertChainBuffer;
-  UINTN                                     CertChainBufferSize;
+  UINT8                                     *CertChainData;
+  UINTN                                     CertChainDataSize;
 
   Result = SpdmCalculateL1L2Hash (SpdmContext, HashData);
   if (!Result) {
@@ -609,20 +715,15 @@ SpdmVerifyMeasurementSignature (
 
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
-  if (SpdmContext->ConnectionInfo.PeerCertChainBufferSize != 0) {
-    CertChainBuffer = (UINT8 *)SpdmContext->ConnectionInfo.PeerCertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
-    CertChainBufferSize = SpdmContext->ConnectionInfo.PeerCertChainBufferSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  } else if (SpdmContext->LocalContext.PeerCertChainProvisionSize != 0) {
-    CertChainBuffer = (UINT8 *)SpdmContext->LocalContext.PeerCertChainProvision + sizeof(SPDM_CERT_CHAIN) + HashSize;
-    CertChainBufferSize = SpdmContext->LocalContext.PeerCertChainProvisionSize - (sizeof(SPDM_CERT_CHAIN) + HashSize);
-  } else {
+  Result = SpdmGetPeerCertChainData (SpdmContext, (VOID **)&CertChainData, &CertChainDataSize);
+  if (!Result) {
     return FALSE;
   }
 
   //
   // Get leaf cert from cert chain
   //
-  Result = X509GetCertFromCertChain (CertChainBuffer, CertChainBufferSize, -1,  &CertBuffer, &CertBufferSize);
+  Result = X509GetCertFromCertChain (CertChainData, CertChainDataSize, -1,  &CertBuffer, &CertBufferSize);
   if (!Result) {
     return FALSE;
   }

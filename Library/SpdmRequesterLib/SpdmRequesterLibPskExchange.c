@@ -153,7 +153,7 @@ TrySpdmSendReceivePskExchange (
   //
   // Cache session data
   //
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmRequest, SpdmRequestSize);
+  Status = SpdmAppendMessageK (SessionInfo, &SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -199,14 +199,14 @@ TrySpdmSendReceivePskExchange (
 
   Ptr += SpdmResponse.OpaqueLength;
 
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, &SpdmResponse, SpdmResponseSize - HmacSize);
+  Status = SpdmAppendMessageK (SessionInfo, &SpdmResponse, SpdmResponseSize - HmacSize);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_SECURITY_VIOLATION;
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", *SessionId));
-  Status = SpdmCalculateTH1 (SpdmContext, SessionInfo, TRUE, TH1HashData);
+  Status = SpdmCalculateTH1Hash (SpdmContext, SessionInfo, TRUE, TH1HashData);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_SECURITY_VIOLATION;
@@ -227,7 +227,7 @@ TrySpdmSendReceivePskExchange (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageK, VerifyData, HmacSize);
+  Status = SpdmAppendMessageK (SessionInfo, VerifyData, HmacSize);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_SECURITY_VIOLATION;

@@ -1976,19 +1976,19 @@ SpdmGetDMTFSubjectAltName (
 }
 
 /**
-  This function verifies the integrity of certificate buffer.
+  This function verifies the integrity of certificate chain data without SPDM_CERT_CHAIN header.
 
-  @param  CertBuffer             The certificate data buffer.
-  @param  CertBufferSize         Size in bytes of the certificate data buffer.
+  @param  CertChainData          The certificate chain data without SPDM_CERT_CHAIN header.
+  @param  CertChainDataSize      Size in bytes of the certificate chain data.
 
-  @retval TRUE  certificate buffer integrity verification pass.
-  @retval FALSE certificate buffer integrity verification fail.
+  @retval TRUE  certificate chain data integrity verification pass.
+  @retval FALSE certificate chain data integrity verification fail.
 **/
 BOOLEAN
 EFIAPI
-SpdmVerifyCertificateBuffer (
-  IN UINT8                        *CertBuffer,
-  IN UINTN                        CertBufferSize
+SpdmVerifyCertChainData (
+  IN UINT8                        *CertChainData,
+  IN UINTN                        CertChainDataSize
   )
 {
   UINT8                                     *RootCertBuffer;
@@ -1996,28 +1996,28 @@ SpdmVerifyCertificateBuffer (
   UINT8                                     *LeafCertBuffer;
   UINTN                                     LeafCertBufferSize;
 
-  if (CertBufferSize > MAX_UINT16 - (sizeof(SPDM_CERT_CHAIN) + MAX_HASH_SIZE)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (chain size too large) !!!\n"));
+  if (CertChainDataSize > MAX_UINT16 - (sizeof(SPDM_CERT_CHAIN) + MAX_HASH_SIZE)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainData - FAIL (chain size too large) !!!\n"));
     return FALSE;
   }
 
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get root certificate failed)!!!\n"));
+  if (!X509GetCertFromCertChain (CertChainData, CertChainDataSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainData - FAIL (get root certificate failed)!!!\n"));
     return FALSE;
   }
 
-  if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertBuffer, CertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert chain verify failed)!!!\n"));
+  if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertChainData, CertChainDataSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainData - FAIL (cert chain verify failed)!!!\n"));
     return FALSE;
   }
 
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, -1, &LeafCertBuffer, &LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get leaf certificate failed)!!!\n"));
+  if (!X509GetCertFromCertChain (CertChainData, CertChainDataSize, -1, &LeafCertBuffer, &LeafCertBufferSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainData - FAIL (get leaf certificate failed)!!!\n"));
     return FALSE;
   }
 
   if(!SpdmX509CertificateCheck (LeafCertBuffer, LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (leaf certificate check failed)!!!\n"));
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainData - FAIL (leaf certificate check failed)!!!\n"));
     return FALSE;
   }
 
@@ -2025,25 +2025,25 @@ SpdmVerifyCertificateBuffer (
 }
 
 /**
-  This function verifies the integrity of certificate chain.
+  This function verifies the integrity of certificate chain buffer including SPDM_CERT_CHAIN header.
 
   @param  BaseHashAlgo                 SPDM BaseHashAlgo
-  @param  CertificateChain             The certificate chain data buffer.
-  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+  @param  CertChainBuffer              The certificate chain buffer including SPDM_CERT_CHAIN header.
+  @param  CertChainBufferSize          Size in bytes of the certificate chain buffer.
 
-  @retval TRUE  certificate chain integrity verification pass.
-  @retval FALSE certificate chain integrity verification fail.
+  @retval TRUE  certificate chain buffer integrity verification pass.
+  @retval FALSE certificate chain buffer integrity verification fail.
 **/
 BOOLEAN
 EFIAPI
-SpdmVerifyCertificateChainData (
+SpdmVerifyCertificateChainBuffer (
   IN UINT32                       BaseHashAlgo,
-  IN VOID                         *CertificateChain,
-  IN UINTN                        CertificateChainSize
+  IN VOID                         *CertChainBuffer,
+  IN UINTN                        CertChainBufferSize
   )
 {
-  UINT8                                     *CertBuffer;
-  UINTN                                     CertBufferSize;
+  UINT8                                     *CertChainData;
+  UINTN                                     CertChainDataSize;
   UINT8                                     *RootCertBuffer;
   UINTN                                     RootCertBufferSize;
   UINTN                                     HashSize;
@@ -2053,41 +2053,41 @@ SpdmVerifyCertificateChainData (
 
   HashSize = GetSpdmHashSize (BaseHashAlgo);
 
-  if (CertificateChainSize > MAX_SPDM_MESSAGE_BUFFER_SIZE) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (buffer too large) !!!\n"));
+  if (CertChainBufferSize > MAX_SPDM_MESSAGE_BUFFER_SIZE) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainBuffer - FAIL (buffer too large) !!!\n"));
     return FALSE;
   }
 
-  if (CertificateChainSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (buffer too small) !!!\n"));
+  if (CertChainBufferSize <= sizeof(SPDM_CERT_CHAIN) + HashSize) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainBuffer - FAIL (buffer too small) !!!\n"));
     return FALSE;
   }
 
-  CertBuffer = (UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN) + HashSize;
-  CertBufferSize = CertificateChainSize - sizeof(SPDM_CERT_CHAIN) - HashSize;
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get root certificate failed)!!!\n"));
+  CertChainData = (UINT8 *)CertChainBuffer + sizeof(SPDM_CERT_CHAIN) + HashSize;
+  CertChainDataSize = CertChainBufferSize - sizeof(SPDM_CERT_CHAIN) - HashSize;
+  if (!X509GetCertFromCertChain (CertChainData, CertChainDataSize, 0, &RootCertBuffer, &RootCertBufferSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainBuffer - FAIL (get root certificate failed)!!!\n"));
     return FALSE;
   }
 
   SpdmHashAll (BaseHashAlgo, RootCertBuffer, RootCertBufferSize, CalcRootCertHash);
-  if (CompareMem ((UINT8 *)CertificateChain + sizeof(SPDM_CERT_CHAIN), CalcRootCertHash, HashSize) != 0) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert root hash mismatch) !!!\n"));
+  if (CompareMem ((UINT8 *)CertChainBuffer + sizeof(SPDM_CERT_CHAIN), CalcRootCertHash, HashSize) != 0) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainBuffer - FAIL (cert root hash mismatch) !!!\n"));
     return FALSE;
   }
 
-  if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertBuffer, CertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (cert chain verify failed)!!!\n"));
+  if (!X509VerifyCertChain (RootCertBuffer, RootCertBufferSize, CertChainData, CertChainDataSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainBuffer - FAIL (cert chain verify failed)!!!\n"));
     return FALSE;
   }
 
-  if (!X509GetCertFromCertChain (CertBuffer, CertBufferSize, -1, &LeafCertBuffer, &LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (get leaf certificate failed)!!!\n"));
+  if (!X509GetCertFromCertChain (CertChainData, CertChainDataSize, -1, &LeafCertBuffer, &LeafCertBufferSize)) {
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainBuffer - FAIL (get leaf certificate failed)!!!\n"));
     return FALSE;
   }
 
   if(!SpdmX509CertificateCheck (LeafCertBuffer, LeafCertBufferSize)) {
-    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChain - FAIL (leaf certificate check failed)!!!\n"));
+    DEBUG((DEBUG_INFO, "!!! VerifyCertificateChainBuffer - FAIL (leaf certificate check failed)!!!\n"));
     return FALSE;
   }
 

@@ -74,10 +74,10 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    1.5, if mutual authentication is supported, deploy slot number, public certificate chain.
    ```
    Parameter.Location = SpdmDataLocationLocal;
-   SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
+   SpdmSetData (SpdmContext, SpdmDataLocalSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
 
    Parameter.AdditionalData[0] = SlotIndex;
-   SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
+   SpdmSetData (SpdmContext, SpdmDataLocalPublicCertChain, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
    ```
 
    1.6, if PSK is required, optionally deploy PSK Hint.
@@ -255,10 +255,10 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    1.4, deploy slot number, public certificate chain.
    ```
    Parameter.Location = SpdmDataLocationLocal;
-   SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
+   SpdmSetData (SpdmContext, SpdmDataLocalSlotCount, &Parameter, &SlotNumber, sizeof(SlotNumber));
 
    Parameter.AdditionalData[0] = SlotIndex;
-   SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
+   SpdmSetData (SpdmContext, SpdmDataLocalPublicCertChain, &Parameter, MyPublicCertChains, MyPublicCertChainsSize);
    ```
 
    1.5, if mutual authentication (requester verification) is required, deploy the peer public root hash or peer public certificate chain.

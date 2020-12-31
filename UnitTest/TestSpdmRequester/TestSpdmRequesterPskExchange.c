@@ -580,8 +580,8 @@ void TestSpdmRequesterPskExchangeCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   ZeroMem (LocalPskHint, 32);
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
@@ -620,8 +620,8 @@ void TestSpdmRequesterPskExchangeCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   ZeroMem (LocalPskHint, 32);
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
@@ -660,8 +660,8 @@ void TestSpdmRequesterPskExchangeCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   ZeroMem (LocalPskHint, 32);
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
@@ -700,8 +700,8 @@ void TestSpdmRequesterPskExchangeCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   ZeroMem (LocalPskHint, 32);
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
@@ -740,8 +740,8 @@ void TestSpdmRequesterPskExchangeCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   ZeroMem (LocalPskHint, 32);
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
@@ -780,8 +780,8 @@ void TestSpdmRequesterPskExchangeCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   ZeroMem (LocalPskHint, 32);
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
@@ -822,8 +822,8 @@ void TestSpdmRequesterPskExchangeCase7(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   ZeroMem (LocalPskHint, 32);
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
@@ -863,8 +863,8 @@ void TestSpdmRequesterPskExchangeCase8(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   ZeroMem (LocalPskHint, 32);
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
@@ -903,8 +903,8 @@ void TestSpdmRequesterPskExchangeCase9(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   ZeroMem (LocalPskHint, 32);
   CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
   SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);

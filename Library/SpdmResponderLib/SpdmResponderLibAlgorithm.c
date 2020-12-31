@@ -212,7 +212,7 @@ SpdmGetResponseAlgorithm (
   //
   // Cache
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmRequest, SpdmRequestSize);
+  Status = SpdmAppendMessageA (SpdmContext, SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -320,7 +320,7 @@ SpdmGetResponseAlgorithm (
   //
   // Cache
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmResponse, *ResponseSize);
+  Status = SpdmAppendMessageA (SpdmContext, SpdmResponse, *ResponseSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

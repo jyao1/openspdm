@@ -128,7 +128,7 @@ TrySpdmGetMeasurement (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, &SpdmRequest, SpdmRequestSize);
+  Status = SpdmAppendMessageM (SpdmContext, &SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -219,7 +219,7 @@ TrySpdmGetMeasurement (
                        sizeof(UINT16) +
                        OpaqueLength +
                        SignatureSize;
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, &SpdmResponse, SpdmResponseSize - SignatureSize);
+    Status = SpdmAppendMessageM (SpdmContext, &SpdmResponse, SpdmResponseSize - SignatureSize);
     if (RETURN_ERROR(Status)) {
       return RETURN_SECURITY_VIOLATION;
     }
@@ -246,7 +246,7 @@ TrySpdmGetMeasurement (
     } else {
       SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurementRecordDataLength;
     }
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, &SpdmResponse, SpdmResponseSize);
+    Status = SpdmAppendMessageM (SpdmContext, &SpdmResponse, SpdmResponseSize);
     if (RETURN_ERROR(Status)) {
       return RETURN_SECURITY_VIOLATION;
     }

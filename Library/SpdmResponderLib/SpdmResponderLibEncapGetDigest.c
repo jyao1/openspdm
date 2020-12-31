@@ -50,7 +50,7 @@ SpdmGetEncapReqestGetDigest (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, *EncapRequestSize);
+  Status = SpdmAppendMessageMutB (SpdmContext, SpdmRequest, *EncapRequestSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -110,7 +110,7 @@ SpdmProcessEncapResponseDigest (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, SpdmResponseSize);
+  Status = SpdmAppendMessageMutB (SpdmContext, SpdmResponse, SpdmResponseSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }

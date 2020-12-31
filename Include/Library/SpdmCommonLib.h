@@ -86,17 +86,17 @@ typedef enum {
   //
   // Certificate info
   //
+  SpdmDataLocalPublicCertChain,
+  SpdmDataLocalSlotCount,
   SpdmDataPeerPublicRootCertHash,
   SpdmDataPeerPublicCertChains,
-  SpdmDataSlotCount,
-  SpdmDataPublicCertChains,
   SpdmDataBasicMutAuthRequested,
   SpdmDataMutAuthRequested,
   //
   // Negotiated result
   //
   SpdmDataLocalUsedCertChainBuffer,
-  SpdmDataPeerCertChainBuffer,
+  SpdmDataPeerUsedCertChainBuffer,
   //
   // Pre-shared Key Hint
   // If PSK is present, then PSK_EXCHANGE is used.
@@ -463,36 +463,82 @@ SpdmRegisterTransportLayerFunc (
   IN     SPDM_TRANSPORT_DECODE_MESSAGE_FUNC  TransportDecodeMessage
   );
 
+/**
+  Reset Message A cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageA (
   IN     VOID                                *SpdmContext
   );
 
+/**
+  Reset Message B cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageB (
   IN     VOID                                *SpdmContext
   );
 
+/**
+  Reset Message C cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageC (
   IN     VOID                                *SpdmContext
   );
 
+/**
+  Reset Message MutB cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageMutB (
   IN     VOID                                *SpdmContext
   );
 
+/**
+  Reset Message MutC cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageMutC (
   IN     VOID                                *SpdmContext
   );
 
+/**
+  Reset Message M cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
+VOID
+EFIAPI
+SpdmResetMessageM (
+  IN     VOID                                *SpdmContext
+  );
+
+/**
+  Append Message A cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageA (
@@ -501,6 +547,16 @@ SpdmAppendMessageA (
   IN     UINTN                               MessageSize
   );
 
+/**
+  Append Message B cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageB (
@@ -509,6 +565,16 @@ SpdmAppendMessageB (
   IN     UINTN                               MessageSize
   );
 
+/**
+  Append Message C cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageC (
@@ -517,6 +583,16 @@ SpdmAppendMessageC (
   IN     UINTN                               MessageSize
   );
 
+/**
+  Append Message MutB cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageMutB (
@@ -525,6 +601,16 @@ SpdmAppendMessageMutB (
   IN     UINTN                               MessageSize
   );
 
+/**
+  Append Message MutC cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageMutC (
@@ -533,6 +619,34 @@ SpdmAppendMessageMutC (
   IN     UINTN                               MessageSize
   );
 
+/**
+  Append Message M cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmAppendMessageM (
+  IN     VOID                                *SpdmContext,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  );
+
+/**
+  Append Message K cache in SPDM context.
+
+  @param  SpdmSessionInfo              A pointer to the SPDM session context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageK (
@@ -541,6 +655,16 @@ SpdmAppendMessageK (
   IN     UINTN                               MessageSize
   );
 
+/**
+  Append Message F cache in SPDM context.
+
+  @param  SpdmSessionInfo              A pointer to the SPDM session context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageF (
@@ -624,6 +748,88 @@ SpdmFreeSessionId (
   );
 
 /*
+  This function calculates M1M2 hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsMut                        Indicate if this is from mutual authentication.
+  @param  HashData                     M1M2 hash
+
+  @retval RETURN_SUCCESS  M1M2 hash is calculated.
+*/
+BOOLEAN
+EFIAPI
+SpdmCalculateM1M2Hash (
+  IN     VOID                   *SpdmContext,
+  IN     BOOLEAN                IsMut,
+     OUT VOID                   *HashData
+  );
+
+/*
+  This function calculates L1L2 hash.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  HashData                     L1L2 hash
+
+  @retval RETURN_SUCCESS  L1L2 hash is calculated.
+*/
+BOOLEAN
+EFIAPI
+SpdmCalculateL1L2Hash (
+  IN     VOID                   *SpdmContext,
+     OUT VOID                   *HashData
+  );
+
+/*
+  This function calculates current TH data with Message A and Message K.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The SPDM session ID.
+  @param  CertChainData                Certitiface chain data without SPDM_CERT_CHAIN header.
+  @param  CertChainDataSize            Size in bytes of the certitiface chain data.
+  @param  THDataBufferSize             Size in bytes of the THDataBuffer
+  @param  THDataBuffer                 The buffer to store the THDataBuffer
+
+  @retval RETURN_SUCCESS  current TH data is calculated.
+*/
+BOOLEAN
+EFIAPI
+SpdmCalculateTHForExchange (
+  IN     VOID                      *SpdmContext,
+  IN     VOID                      *SpdmSessionInfo,
+  IN     UINT8                     *CertChainData, OPTIONAL
+  IN     UINTN                     CertChainDataSize, OPTIONAL
+  IN OUT UINTN                     *THDataBufferSize,
+     OUT VOID                      *THDataBuffer
+  );
+
+/*
+  This function calculates current TH data with Message A, Message K and Message F.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionInfo                  The SPDM session ID.
+  @param  CertChainData                Certitiface chain data without SPDM_CERT_CHAIN header.
+  @param  CertChainDataSize            Size in bytes of the certitiface chain data.
+  @param  MutCertChainData             Certitiface chain data without SPDM_CERT_CHAIN header in mutual authentication.
+  @param  MutCertChainDataSize         Size in bytes of the certitiface chain data in mutual authentication.
+  @param  THDataBufferSize             Size in bytes of the THDataBuffer
+  @param  THDataBuffer                 The buffer to store the THDataBuffer
+
+  @retval RETURN_SUCCESS  current TH data is calculated.
+*/
+BOOLEAN
+EFIAPI
+SpdmCalculateTHForFinish (
+  IN     VOID                      *SpdmContext,
+  IN     VOID                      *SpdmSessionInfo,
+  IN     UINT8                     *CertChainData, OPTIONAL
+  IN     UINTN                     CertChainDataSize, OPTIONAL
+  IN     UINT8                     *MutCertChainData, OPTIONAL
+  IN     UINTN                     MutCertChainDataSize, OPTIONAL
+  IN OUT UINTN                     *THDataBufferSize,
+     OUT VOID                      *THDataBuffer
+  );
+
+/*
   This function calculates TH1 hash.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -635,7 +841,7 @@ SpdmFreeSessionId (
 */
 RETURN_STATUS
 EFIAPI
-SpdmCalculateTH1 (
+SpdmCalculateTH1Hash (
   IN VOID                         *SpdmContext,
   IN VOID                         *SpdmSessionInfo,
   IN BOOLEAN                      IsRequester,
@@ -654,11 +860,83 @@ SpdmCalculateTH1 (
 */
 RETURN_STATUS
 EFIAPI
-SpdmCalculateTH2 (
+SpdmCalculateTH2Hash (
   IN VOID                         *SpdmContext,
   IN VOID                         *SpdmSessionInfo,
   IN BOOLEAN                      IsRequester,
   OUT UINT8                       *TH2HashData
+  );
+
+/**
+  This function returns peer certificate chain buffer including SPDM_CERT_CHAIN header.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertChainBuffer              Certitiface chain buffer including SPDM_CERT_CHAIN header.
+  @param  CertChainBufferSize          Size in bytes of the certitiface chain buffer.
+
+  @retval TRUE  Peer certificate chain buffer including SPDM_CERT_CHAIN header is returned.
+  @retval FALSE Peer certificate chain buffer including SPDM_CERT_CHAIN header is not found.
+**/
+BOOLEAN
+EFIAPI
+SpdmGetPeerCertChainBuffer (
+  IN     VOID                     *SpdmContext,
+     OUT VOID                     **CertChainBuffer,
+     OUT UINTN                    *CertChainBufferSize
+  );
+
+/**
+  This function returns peer certificate chain data without SPDM_CERT_CHAIN header.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertChainData                Certitiface chain data without SPDM_CERT_CHAIN header.
+  @param  CertChainDataSize            Size in bytes of the certitiface chain data.
+
+  @retval TRUE  Peer certificate chain data without SPDM_CERT_CHAIN header is returned.
+  @retval FALSE Peer certificate chain data without SPDM_CERT_CHAIN header is not found.
+**/
+BOOLEAN
+EFIAPI
+SpdmGetPeerCertChainData (
+  IN     VOID                     *SpdmContext,
+     OUT VOID                     **CertChainData,
+     OUT UINTN                    *CertChainDataSize
+  );
+
+/**
+  This function returns local used certificate chain buffer including SPDM_CERT_CHAIN header.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertChainBuffer              Certitiface chain buffer including SPDM_CERT_CHAIN header.
+  @param  CertChainBufferSize          Size in bytes of the certitiface chain buffer.
+
+  @retval TRUE  Local used certificate chain buffer including SPDM_CERT_CHAIN header is returned.
+  @retval FALSE Local used certificate chain buffer including SPDM_CERT_CHAIN header is not found.
+**/
+BOOLEAN
+EFIAPI
+SpdmGetLocalCertChainBuffer (
+  IN     VOID                     *SpdmContext,
+     OUT VOID                     **CertChainBuffer,
+     OUT UINTN                    *CertChainBufferSize
+  );
+
+/**
+  This function returns local used certificate chain data without SPDM_CERT_CHAIN header.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  CertChainData                Certitiface chain data without SPDM_CERT_CHAIN header.
+  @param  CertChainDataSize            Size in bytes of the certitiface chain data.
+
+  @retval TRUE  Local used certificate chain data without SPDM_CERT_CHAIN header is returned.
+  @retval FALSE Local used certificate chain data without SPDM_CERT_CHAIN header is not found.
+**/
+BOOLEAN
+EFIAPI
+SpdmGetLocalCertChainData (
+  IN     VOID                     *SpdmContext,
+     OUT VOID                     **CertChainData,
+     OUT UINTN                    *CertChainDataSize
   );
 
 /**

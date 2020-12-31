@@ -208,7 +208,7 @@ SpdmSetData (
     SpdmContext->LocalContext.PeerCertChainProvisionSize = DataSize;
     SpdmContext->LocalContext.PeerCertChainProvision = Data;
     break;
-  case SpdmDataSlotCount:
+  case SpdmDataLocalSlotCount:
     if (DataSize != sizeof(UINT8)) {
       return RETURN_INVALID_PARAMETER;
     }
@@ -218,13 +218,13 @@ SpdmSetData (
     }
     SpdmContext->LocalContext.SlotCount = SlotNum;
     break;
-  case SpdmDataPublicCertChains:
+  case SpdmDataLocalPublicCertChain:
     SlotNum = Parameter->AdditionalData[0];
     if (SlotNum >= SpdmContext->LocalContext.SlotCount) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.CertificateChainSize[SlotNum] = DataSize;
-    SpdmContext->LocalContext.CertificateChain[SlotNum] = Data;
+    SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotNum] = DataSize;
+    SpdmContext->LocalContext.LocalCertChainProvision[SlotNum] = Data;
     break;
   case SpdmDataLocalUsedCertChainBuffer:
     if (DataSize > MAX_SPDM_CERT_CHAIN_SIZE) {
@@ -233,12 +233,12 @@ SpdmSetData (
     SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = DataSize;
     SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data;
     break;
-  case SpdmDataPeerCertChainBuffer:
+  case SpdmDataPeerUsedCertChainBuffer:
     if (DataSize > MAX_SPDM_CERT_CHAIN_SIZE) {
       return RETURN_OUT_OF_RESOURCES;
     }
-    SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-    CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+    SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+    CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
     break;
   case SpdmDataBasicMutAuthRequested:
     if (DataSize != sizeof(BOOLEAN)) {
@@ -439,6 +439,11 @@ SpdmGetData (
   return RETURN_SUCCESS;
 }
 
+/**
+  Reset Message A cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageA (
@@ -451,6 +456,11 @@ SpdmResetMessageA (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageA);
 }
 
+/**
+  Reset Message B cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageB (
@@ -463,6 +473,11 @@ SpdmResetMessageB (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
 }
 
+/**
+  Reset Message C cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageC (
@@ -475,6 +490,11 @@ SpdmResetMessageC (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
 }
 
+/**
+  Reset Message MutB cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageMutB (
@@ -487,6 +507,11 @@ SpdmResetMessageMutB (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
 }
 
+/**
+  Reset Message MutC cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
 VOID
 EFIAPI
 SpdmResetMessageMutC (
@@ -499,6 +524,33 @@ SpdmResetMessageMutC (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
 }
 
+/**
+  Reset Message M cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
+VOID
+EFIAPI
+SpdmResetMessageM (
+  IN     VOID                                *Context
+  )
+{
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
+
+  SpdmContext = Context;
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
+}
+
+/**
+  Append Message A cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageA (
@@ -513,6 +565,16 @@ SpdmAppendMessageA (
   return AppendManagedBuffer (&SpdmContext->Transcript.MessageA, Message, MessageSize);
 }
 
+/**
+  Append Message B cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageB (
@@ -527,6 +589,16 @@ SpdmAppendMessageB (
   return AppendManagedBuffer (&SpdmContext->Transcript.MessageB, Message, MessageSize);
 }
 
+/**
+  Append Message C cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageC (
@@ -541,6 +613,16 @@ SpdmAppendMessageC (
   return AppendManagedBuffer (&SpdmContext->Transcript.MessageC, Message, MessageSize);
 }
 
+/**
+  Append Message MutB cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageMutB (
@@ -555,6 +637,16 @@ SpdmAppendMessageMutB (
   return AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, Message, MessageSize);
 }
 
+/**
+  Append Message MutC cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageMutC (
@@ -569,6 +661,40 @@ SpdmAppendMessageMutC (
   return AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, Message, MessageSize);
 }
 
+/**
+  Append Message M cache in SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmAppendMessageM (
+  IN     VOID                                *Context,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  )
+{
+  SPDM_DEVICE_CONTEXT        *SpdmContext;
+
+  SpdmContext = Context;
+  return AppendManagedBuffer (&SpdmContext->Transcript.MessageM, Message, MessageSize);
+}
+
+/**
+  Append Message K cache in SPDM context.
+
+  @param  SpdmSessionInfo              A pointer to the SPDM session context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageK (
@@ -583,6 +709,16 @@ SpdmAppendMessageK (
   return AppendManagedBuffer (&SpdmSessionInfo->SessionTranscript.MessageK, Message, MessageSize);
 }
 
+/**
+  Append Message F cache in SPDM context.
+
+  @param  SpdmSessionInfo              A pointer to the SPDM session context.
+  @param  Message                      Message buffer.
+  @param  MessageSize                  Size in bytes of message buffer.
+
+  @return RETURN_SUCCESS          Message is appended.
+  @return RETURN_OUT_OF_RESOURCES Message is not appended because the internal cache is full.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmAppendMessageF (

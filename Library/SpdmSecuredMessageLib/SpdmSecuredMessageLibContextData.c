@@ -9,6 +9,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmSecuredMessageLibInternal.h"
 
+/**
+  Return the size in bytes of the SPDM secured message context.
+
+  @return the size in bytes of the SPDM secured message context.
+**/
 UINTN
 EFIAPI
 SpdmSecuredMessageGetContextSize (
@@ -18,6 +23,13 @@ SpdmSecuredMessageGetContextSize (
   return sizeof(SPDM_SECURED_MESSAGE_CONTEXT);
 }
 
+/**
+  Initialize an SPDM secured message context.
+
+  The size in bytes of the SpdmSecuredMessageContext can be returned by SpdmSecuredMessageGetContextSize.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageInitContext (
@@ -32,6 +44,12 @@ SpdmSecuredMessageInitContext (
   RandomSeed (NULL, 0);
 }
 
+/**
+  Set UsePsk to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  UsePsk                       Indicate if the SPDM session use PSK.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetUsePsk (
@@ -45,6 +63,12 @@ SpdmSecuredMessageSetUsePsk (
   SecuredMessageContext->UsePsk = UsePsk;
 }
 
+/**
+  Set SessionState to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  SessionState                 Indicate the SPDM session state.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetSessionState (
@@ -58,6 +82,13 @@ SpdmSecuredMessageSetSessionState (
   SecuredMessageContext->SessionState = SessionState;
 }
 
+/**
+  Return SessionState of an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+
+  @return the SPDM session state.
+*/
 SPDM_SESSION_STATE
 EFIAPI
 SpdmSecuredMessageGetSessionState (
@@ -70,6 +101,12 @@ SpdmSecuredMessageGetSessionState (
   return SecuredMessageContext->SessionState;
 }
 
+/**
+  Set SessionType to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  SessionType                  Indicate the SPDM session type.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetSessionType (
@@ -83,6 +120,15 @@ SpdmSecuredMessageSetSessionType (
   SecuredMessageContext->SessionType = SessionType;
 }
 
+/**
+  Set Algorithm to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  BaseHashAlgo                 Indicate the negotiated BaseHashAlgo for the SPDM session.
+  @param  DHENamedGroup                Indicate the negotiated DHENamedGroup for the SPDM session.
+  @param  AEADCipherSuite              Indicate the negotiated AEADCipherSuite for the SPDM session.
+  @param  KeySchedule                  Indicate the negotiated KeySchedule for the SPDM session.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetAlgorithms (
@@ -109,6 +155,13 @@ SpdmSecuredMessageSetAlgorithms (
   SecuredMessageContext->AeadTagSize   = GetSpdmAeadTagSize (SecuredMessageContext->AEADCipherSuite);
 }
 
+/**
+  Set the PskHint to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  PskHint                      Indicate the PSK hint.
+  @param  PskHintSize                  The size in bytes of the PSK hint.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetPskHint (
@@ -124,6 +177,15 @@ SpdmSecuredMessageSetPskHint (
   SecuredMessageContext->PskHintSize = PskHintSize;
 }
 
+/**
+  Import the DHE Secret to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  DheSecret                    Indicate the DHE secret.
+  @param  DheSecretSize                The size in bytes of the DHE secret.
+
+  @retval RETURN_SUCCESS  DHE Secret is imported.
+*/
 RETURN_STATUS
 EFIAPI
 SpdmSecuredMessageImportDheSecret (
@@ -143,6 +205,15 @@ SpdmSecuredMessageImportDheSecret (
   return RETURN_SUCCESS;
 }
 
+/**
+  Export the ExportMasterSecret from an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  ExportMasterSecret           Indicate the buffer to store the ExportMasterSecret.
+  @param  ExportMasterSecretSize       The size in bytes of the ExportMasterSecret.
+
+  @retval RETURN_SUCCESS  ExportMasterSecret is exported.
+*/
 RETURN_STATUS
 EFIAPI
 SpdmSecuredMessageExportMasterSecret (
@@ -163,6 +234,15 @@ SpdmSecuredMessageExportMasterSecret (
   return RETURN_SUCCESS;
 }
 
+/**
+  Export the SessionKeys from an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  SessionKeys                  Indicate the buffer to store the SessionKeys in SPDM_SECURE_SESSION_KEYS_STRUCT.
+  @param  SessionKeysSize              The size in bytes of the SessionKeys in SPDM_SECURE_SESSION_KEYS_STRUCT.
+
+  @retval RETURN_SUCCESS  SessionKeys are exported.
+*/
 RETURN_STATUS
 EFIAPI
 SpdmSecuredMessageExportSessionKeys (
@@ -205,6 +285,15 @@ SpdmSecuredMessageExportSessionKeys (
   return RETURN_SUCCESS;
 }
 
+/**
+  Import the SessionKeys from an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  SessionKeys                  Indicate the buffer to store the SessionKeys in SPDM_SECURE_SESSION_KEYS_STRUCT.
+  @param  SessionKeysSize              The size in bytes of the SessionKeys in SPDM_SECURE_SESSION_KEYS_STRUCT.
+
+  @retval RETURN_SUCCESS  SessionKeys are imported.
+*/
 RETURN_STATUS
 EFIAPI
 SpdmSecuredMessageImportSessionKeys (

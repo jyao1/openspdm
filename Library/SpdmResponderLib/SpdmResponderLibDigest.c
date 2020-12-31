@@ -63,13 +63,13 @@ SpdmGetResponseDigest (
   //
   // Cache
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, SpdmRequestSize);
+  Status = SpdmAppendMessageB (SpdmContext, SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  if (SpdmContext->LocalContext.CertificateChain == NULL) {
+  if (SpdmContext->LocalContext.LocalCertChainProvision == NULL) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
@@ -98,7 +98,7 @@ SpdmGetResponseDigest (
   //
   // Cache
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmResponse, *ResponseSize);
+  Status = SpdmAppendMessageB (SpdmContext, SpdmResponse, *ResponseSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

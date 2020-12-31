@@ -47,50 +47,6 @@ InternalDumpHex (
   IN UINTN  Size
   );
 
-BOOLEAN
-EFIAPI
-SpdmHmacAllWithRequestFinishedKey (
-  IN   VOID                         *SpdmSecuredMessageContext,
-  IN   CONST VOID                   *Data,
-  IN   UINTN                        DataSize,
-  OUT  UINT8                        *HmacValue
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  return SpdmHmacAll (
-          SecuredMessageContext->BaseHashAlgo,
-          Data,
-          DataSize,
-          SecuredMessageContext->HandshakeSecret.RequestFinishedKey,
-          SecuredMessageContext->HashSize,
-          HmacValue
-          );
-}
-
-BOOLEAN
-EFIAPI
-SpdmHmacAllWithResponseFinishedKey (
-  IN   VOID                         *SpdmSecuredMessageContext,
-  IN   CONST VOID                   *Data,
-  IN   UINTN                        DataSize,
-  OUT  UINT8                        *HmacValue
-  )
-{
-  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
-
-  SecuredMessageContext = SpdmSecuredMessageContext;
-  return SpdmHmacAll (
-          SecuredMessageContext->BaseHashAlgo,
-          Data,
-          DataSize,
-          SecuredMessageContext->HandshakeSecret.ResponseFinishedKey,
-          SecuredMessageContext->HashSize,
-          HmacValue
-          );
-}
-
 /**
   This function concatenates binary data, which is used as Info in HKDF expand later.
 
@@ -143,7 +99,7 @@ SpdmBinConcat (
 /**
   This function generates SPDM AEAD Key and IV for a session.
 
-  @param  SecuredMessageContext        A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  MajorSecret                  The major secret.
   @param  Key                          The buffer to store the AEAD key.
   @param  Iv                           The buffer to store the AEAD IV.
@@ -200,7 +156,7 @@ SpdmGenerateAeadKeyAndIv (
 /**
   This function generates SPDM FinishedKey for a session.
 
-  @param  SecuredMessageContext        A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  HandshakeSecret              The handshake secret.
   @param  FinishedKey                  The buffer to store the finished key.
 
@@ -238,7 +194,7 @@ SpdmGenerateFinishedKey (
 /**
   This function generates SPDM HandshakeKey for a session.
 
-  @param  SecuredMessageContext        A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  TH1HashData                  TH1 hash
 
   @retval RETURN_SUCCESS  SPDM HandshakeKey for a session is generated.
@@ -353,7 +309,7 @@ SpdmGenerateSessionHandshakeKey (
 /**
   This function generates SPDM DataKey for a session.
 
-  @param  SecuredMessageContext        A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  TH2HashData                  TH2 hash
 
   @retval RETURN_SUCCESS  SPDM DataKey for a session is generated.
@@ -477,7 +433,7 @@ SpdmGenerateSessionDataKey (
 /**
   This function creates the updates of SPDM DataKey for a session.
 
-  @param  SecuredMessageContext        A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  Action                       Indicate of the key update action.
 
   @retval RETURN_SUCCESS  SPDM DataKey update is created.
@@ -553,7 +509,7 @@ SpdmCreateUpdateSessionDataKey (
 /**
   This function activates the update of SPDM DataKey for a session.
 
-  @param  SecuredMessageContext        A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  Action                       Indicate of the key update action.
   @param  UseNewKey                    Indicate if the new key should be used.
 
@@ -601,3 +557,68 @@ SpdmActivateUpdateSessionDataKey (
   return RETURN_SUCCESS;
 }
 
+/**
+  Computes the HMAC of a input data buffer, with RequestFinishedKey.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
+BOOLEAN
+EFIAPI
+SpdmHmacAllWithRequestFinishedKey (
+  IN   VOID                         *SpdmSecuredMessageContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HmacValue
+  )
+{
+  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
+
+  SecuredMessageContext = SpdmSecuredMessageContext;
+  return SpdmHmacAll (
+          SecuredMessageContext->BaseHashAlgo,
+          Data,
+          DataSize,
+          SecuredMessageContext->HandshakeSecret.RequestFinishedKey,
+          SecuredMessageContext->HashSize,
+          HmacValue
+          );
+}
+
+/**
+  Computes the HMAC of a input data buffer, with ResponseFinishedKey.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
+BOOLEAN
+EFIAPI
+SpdmHmacAllWithResponseFinishedKey (
+  IN   VOID                         *SpdmSecuredMessageContext,
+  IN   CONST VOID                   *Data,
+  IN   UINTN                        DataSize,
+  OUT  UINT8                        *HmacValue
+  )
+{
+  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
+
+  SecuredMessageContext = SpdmSecuredMessageContext;
+  return SpdmHmacAll (
+          SecuredMessageContext->BaseHashAlgo,
+          Data,
+          DataSize,
+          SecuredMessageContext->HandshakeSecret.ResponseFinishedKey,
+          SecuredMessageContext->HashSize,
+          HmacValue
+          );
+}

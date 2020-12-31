@@ -1050,37 +1050,37 @@ SpdmGetDMTFSubjectAltName (
   );
 
 /**
-  This function verifies the integrity of certificate buffer.
+  This function verifies the integrity of certificate chain data without SPDM_CERT_CHAIN header.
 
-  @param  CertBuffer             The certificate data buffer.
-  @param  CertBufferSize         Size in bytes of the certificate data buffer.
+  @param  CertChainData          The certificate chain data without SPDM_CERT_CHAIN header.
+  @param  CertChainDataSize      Size in bytes of the certificate chain data.
 
-  @retval TRUE  certificate buffer integrity verification pass.
-  @retval FALSE certificate buffer integrity verification fail.
+  @retval TRUE  certificate chain data integrity verification pass.
+  @retval FALSE certificate chain data integrity verification fail.
 **/
 BOOLEAN
 EFIAPI
-SpdmVerifyCertificateBuffer (
-  IN UINT8                        *CertBuffer,
-  IN UINTN                        CertBufferSize
+SpdmVerifyCertChainData (
+  IN UINT8                        *CertChainData,
+  IN UINTN                        CertChainDataSize
   );
 
 /**
-  This function verifies the integrity of certificate chain.
+  This function verifies the integrity of certificate chain buffer including SPDM_CERT_CHAIN header.
 
   @param  BaseHashAlgo                 SPDM BaseHashAlgo
-  @param  CertificateChain             The certificate chain data buffer.
-  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+  @param  CertChainBuffer              The certificate chain buffer including SPDM_CERT_CHAIN header.
+  @param  CertChainBufferSize          Size in bytes of the certificate chain buffer.
 
-  @retval TRUE  certificate chain integrity verification pass.
-  @retval FALSE certificate chain integrity verification fail.
+  @retval TRUE  certificate chain buffer integrity verification pass.
+  @retval FALSE certificate chain buffer integrity verification fail.
 **/
 BOOLEAN
 EFIAPI
-SpdmVerifyCertificateChainData (
+SpdmVerifyCertificateChainBuffer (
   IN UINT32                       BaseHashAlgo,
-  IN VOID                         *CertificateChain,
-  IN UINTN                        CertificateChainSize
+  IN VOID                         *CertChainBuffer,
+  IN UINTN                        CertChainBufferSize
   );
 
 #endif

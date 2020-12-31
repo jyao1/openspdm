@@ -451,8 +451,8 @@ void TestSpdmRequesterGetMeasurementCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
@@ -488,8 +488,8 @@ void TestSpdmRequesterGetMeasurementCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
@@ -523,8 +523,8 @@ void TestSpdmRequesterGetMeasurementCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
@@ -560,8 +560,8 @@ void TestSpdmRequesterGetMeasurementCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
@@ -597,8 +597,8 @@ void TestSpdmRequesterGetMeasurementCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);  
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);  
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
@@ -634,8 +634,8 @@ void TestSpdmRequesterGetMeasurementCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
@@ -671,8 +671,8 @@ void TestSpdmRequesterGetMeasurementCase7(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
@@ -709,8 +709,8 @@ void TestSpdmRequesterGetMeasurementCase8(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
@@ -745,8 +745,8 @@ void TestSpdmRequesterGetMeasurementCase9(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
@@ -780,8 +780,8 @@ void TestSpdmRequesterGetMeasurementCase10(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = 0;
 
   Status = SpdmGetMeasurement (
@@ -820,8 +820,8 @@ void TestSpdmRequesterGetMeasurementCase11(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
   RequestAttribute = 0;
 
   MeasurementRecordLength = sizeof(MeasurementRecord);

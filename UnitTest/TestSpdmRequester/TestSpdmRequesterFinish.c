@@ -431,8 +431,8 @@ void TestSpdmRequesterFinishCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
@@ -474,8 +474,8 @@ void TestSpdmRequesterFinishCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
@@ -515,8 +515,8 @@ void TestSpdmRequesterFinishCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
@@ -558,8 +558,8 @@ void TestSpdmRequesterFinishCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
@@ -601,8 +601,8 @@ void TestSpdmRequesterFinishCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
@@ -644,8 +644,8 @@ void TestSpdmRequesterFinishCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
@@ -688,8 +688,8 @@ void TestSpdmRequesterFinishCase7(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
@@ -732,8 +732,8 @@ void TestSpdmRequesterFinishCase8(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];
@@ -775,8 +775,8 @@ void TestSpdmRequesterFinishCase9(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   SessionId = 0xFFFFFFFF;
   SessionInfo = &SpdmContext->SessionInfo[0];

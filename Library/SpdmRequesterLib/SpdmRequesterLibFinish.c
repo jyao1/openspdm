@@ -98,15 +98,15 @@ TrySpdmSendReceiveFinish (
   }
 
   if (SessionInfo->MutAuthRequested) {
-    SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = SpdmContext->LocalContext.CertificateChain[SlotIdParam];
-    SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.CertificateChainSize[SlotIdParam];
+    SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = SpdmContext->LocalContext.LocalCertChainProvision[SlotIdParam];
+    SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotIdParam];
   }
 
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   SpdmRequestSize = sizeof(SPDM_FINISH_REQUEST) + SignatureSize + HmacSize;
   Ptr = SpdmRequest.Signature;
   
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmRequest, sizeof(SPDM_FINISH_REQUEST));
+  Status = SpdmAppendMessageF (SessionInfo, (UINT8 *)&SpdmRequest, sizeof(SPDM_FINISH_REQUEST));
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -115,7 +115,7 @@ TrySpdmSendReceiveFinish (
     if (!Result) {
       return RETURN_SECURITY_VIOLATION;
     }
-    Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Ptr, SignatureSize);
+    Status = SpdmAppendMessageF (SessionInfo, Ptr, SignatureSize);
     if (RETURN_ERROR(Status)) {
       return RETURN_SECURITY_VIOLATION;
     }
@@ -127,7 +127,7 @@ TrySpdmSendReceiveFinish (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, Ptr, HmacSize);
+  Status = SpdmAppendMessageF (SessionInfo, Ptr, HmacSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -168,7 +168,7 @@ TrySpdmSendReceiveFinish (
     return RETURN_DEVICE_ERROR;
   }
 
-  Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, &SpdmResponse, sizeof(SPDM_FINISH_RESPONSE));
+  Status = SpdmAppendMessageF (SessionInfo, &SpdmResponse, sizeof(SPDM_FINISH_RESPONSE));
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -181,14 +181,14 @@ TrySpdmSendReceiveFinish (
       return RETURN_SECURITY_VIOLATION;
     }
 
-    Status = AppendManagedBuffer (&SessionInfo->SessionTranscript.MessageF, (UINT8 *)&SpdmResponse + sizeof(SPDM_FINISH_RESPONSE), HmacSize);
+    Status = SpdmAppendMessageF (SessionInfo, (UINT8 *)&SpdmResponse + sizeof(SPDM_FINISH_RESPONSE), HmacSize);
     if (RETURN_ERROR(Status)) {
       return RETURN_SECURITY_VIOLATION;
     }
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
-  Status = SpdmCalculateTH2 (SpdmContext, SessionInfo, TRUE, TH2HashData);
+  Status = SpdmCalculateTH2Hash (SpdmContext, SessionInfo, TRUE, TH2HashData);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }

@@ -80,7 +80,7 @@ SpdmDumpSessionDataProvision (
       mPeerCertChainBufferSize = sizeof(SPDM_CERT_CHAIN) + HashSize + mResponderCertChainBufferSize;
       ZeroMem (&Parameter, sizeof(Parameter));
       Parameter.Location = SpdmDataLocationConnection;
-      SpdmSetData (SpdmContext, SpdmDataPeerCertChainBuffer, &Parameter, mPeerCertChainBuffer, mPeerCertChainBufferSize);
+      SpdmSetData (SpdmContext, SpdmDataPeerUsedCertChainBuffer, &Parameter, mPeerCertChainBuffer, mPeerCertChainBufferSize);
     } else {
       if (mResponderCertChainBuffer == NULL || mResponderCertChainBufferSize == 0) {
         return RETURN_UNSUPPORTED;
@@ -98,7 +98,7 @@ SpdmDumpSessionDataProvision (
         mPeerCertChainBufferSize = sizeof(SPDM_CERT_CHAIN) + HashSize + mRequesterCertChainBufferSize;
         ZeroMem (&Parameter, sizeof(Parameter));
         Parameter.Location = SpdmDataLocationConnection;
-        SpdmSetData (SpdmContext, SpdmDataPeerCertChainBuffer, &Parameter, mPeerCertChainBuffer, mPeerCertChainBufferSize);
+        SpdmSetData (SpdmContext, SpdmDataPeerUsedCertChainBuffer, &Parameter, mPeerCertChainBuffer, mPeerCertChainBufferSize);
       }
     }
   } else {

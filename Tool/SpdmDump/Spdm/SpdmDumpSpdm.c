@@ -1399,7 +1399,7 @@ DumpSpdmKeyExchangeRsp (
   if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionId, TRUE) != RETURN_SUCCESS) {
     return ;
   }
-  SpdmCalculateTH1 (mSpdmContext, mCurrentSessionInfo, TRUE, TH1HashData);
+  SpdmCalculateTH1Hash (mSpdmContext, mCurrentSessionInfo, TRUE, TH1HashData);
   SpdmGenerateSessionHandshakeKey (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), TH1HashData);
   if ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
     SpdmAppendMessageK (mCurrentSessionInfo, (UINT8 *)Buffer + MessageSize - HmacSize, HmacSize);
@@ -1528,7 +1528,7 @@ DumpSpdmFinishRsp (
   if (SpdmDumpSessionDataCheck (mSpdmContext, mCurrentSessionId, TRUE) != RETURN_SUCCESS) {
     return ;
   }
-  SpdmCalculateTH2 (mSpdmContext, mCurrentSessionInfo, TRUE, TH2HashData);
+  SpdmCalculateTH2Hash (mSpdmContext, mCurrentSessionInfo, TRUE, TH2HashData);
   SpdmGenerateSessionDataKey (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), TH2HashData);
   SpdmSecuredMessageSetSessionState (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), SpdmSessionStateEstablished);
 }
@@ -1661,7 +1661,7 @@ DumpSpdmPskExchangeRsp (
   if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionId, TRUE) != RETURN_SUCCESS) {
     return ;
   }
-  SpdmCalculateTH1 (mSpdmContext, mCurrentSessionInfo, TRUE, TH1HashData);
+  SpdmCalculateTH1Hash (mSpdmContext, mCurrentSessionInfo, TRUE, TH1HashData);
   SpdmSecuredMessageSetUsePsk (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), FALSE);
 
   UsePsk = FALSE;
@@ -1760,7 +1760,7 @@ DumpSpdmPskFinishRsp (
   if (SpdmDumpSessionDataCheck (mSpdmContext, mCurrentSessionId, TRUE) != RETURN_SUCCESS) {
     return ;
   }
-  SpdmCalculateTH2 (mSpdmContext, mCurrentSessionInfo, TRUE, TH2HashData);
+  SpdmCalculateTH2Hash (mSpdmContext, mCurrentSessionInfo, TRUE, TH2HashData);
   SpdmSecuredMessageSetUsePsk (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), FALSE);
 
   UsePsk = FALSE;

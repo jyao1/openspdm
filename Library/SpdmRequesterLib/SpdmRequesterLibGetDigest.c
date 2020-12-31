@@ -80,7 +80,7 @@ TrySpdmGetDigest (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmRequest, sizeof(SpdmRequest));
+  Status = SpdmAppendMessageB (SpdmContext, &SpdmRequest, sizeof(SpdmRequest));
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -121,7 +121,7 @@ TrySpdmGetDigest (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, &SpdmResponse, SpdmResponseSize);
+  Status = SpdmAppendMessageB (SpdmContext, &SpdmResponse, SpdmResponseSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }

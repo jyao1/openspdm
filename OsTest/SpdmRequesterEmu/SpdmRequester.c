@@ -211,11 +211,11 @@ SpdmClientInit (
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
     Data8 = mUseSlotCount;
-    SpdmSetData (SpdmContext, SpdmDataSlotCount, &Parameter, &Data8, sizeof(Data8));
+    SpdmSetData (SpdmContext, SpdmDataLocalSlotCount, &Parameter, &Data8, sizeof(Data8));
 
     for (Index = 0; Index < mUseSlotCount; Index++) {
       Parameter.AdditionalData[0] = Index;
-      SpdmSetData (SpdmContext, SpdmDataPublicCertChains, &Parameter, Data, DataSize);
+      SpdmSetData (SpdmContext, SpdmDataLocalPublicCertChain, &Parameter, Data, DataSize);
     }
     // do not free it
   }

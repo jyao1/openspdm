@@ -60,18 +60,36 @@ typedef enum {
   SpdmSessionStateMax,
 } SPDM_SESSION_STATE;
 
+/**
+  Return the size in bytes of the SPDM secured message context.
+
+  @return the size in bytes of the SPDM secured message context.
+**/
 UINTN
 EFIAPI
 SpdmSecuredMessageGetContextSize (
   VOID
   );
 
+/**
+  Initialize an SPDM secured message context.
+
+  The size in bytes of the SpdmSecuredMessageContext can be returned by SpdmSecuredMessageGetContextSize.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageInitContext (
   IN     VOID                     *SpdmSecuredMessageContext
   );
 
+/**
+  Set UsePsk to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  UsePsk                       Indicate if the SPDM session use PSK.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetUsePsk (
@@ -79,6 +97,12 @@ SpdmSecuredMessageSetUsePsk (
   IN BOOLEAN                      UsePsk
   );
 
+/**
+  Set SessionState to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  SessionState                 Indicate the SPDM session state.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetSessionState (
@@ -86,12 +110,25 @@ SpdmSecuredMessageSetSessionState (
   IN SPDM_SESSION_STATE           SessionState
   );
 
+/**
+  Return SessionState of an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+
+  @return the SPDM session state.
+*/
 SPDM_SESSION_STATE
 EFIAPI
 SpdmSecuredMessageGetSessionState (
   IN VOID                         *SpdmSecuredMessageContext
   );
 
+/**
+  Set SessionType to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  SessionType                  Indicate the SPDM session type.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetSessionType (
@@ -99,6 +136,15 @@ SpdmSecuredMessageSetSessionType (
   IN SPDM_SESSION_TYPE            SessionType
   );
 
+/**
+  Set Algorithm to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  BaseHashAlgo                 Indicate the negotiated BaseHashAlgo for the SPDM session.
+  @param  DHENamedGroup                Indicate the negotiated DHENamedGroup for the SPDM session.
+  @param  AEADCipherSuite              Indicate the negotiated AEADCipherSuite for the SPDM session.
+  @param  KeySchedule                  Indicate the negotiated KeySchedule for the SPDM session.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetAlgorithms (
@@ -109,6 +155,13 @@ SpdmSecuredMessageSetAlgorithms (
   IN UINT16                       KeySchedule
   );
 
+/**
+  Set the PskHint to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  PskHint                      Indicate the PSK hint.
+  @param  PskHintSize                  The size in bytes of the PSK hint.
+*/
 VOID
 EFIAPI
 SpdmSecuredMessageSetPskHint (
@@ -117,6 +170,15 @@ SpdmSecuredMessageSetPskHint (
   IN UINTN                        PskHintSize
   );
 
+/**
+  Import the DHE Secret to an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  DheSecret                    Indicate the DHE secret.
+  @param  DheSecretSize                The size in bytes of the DHE secret.
+
+  @retval RETURN_SUCCESS  DHE Secret is imported.
+*/
 RETURN_STATUS
 EFIAPI
 SpdmSecuredMessageImportDheSecret (
@@ -125,6 +187,15 @@ SpdmSecuredMessageImportDheSecret (
   IN UINTN                        DheSecretSize
   );
 
+/**
+  Export the ExportMasterSecret from an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  ExportMasterSecret           Indicate the buffer to store the ExportMasterSecret.
+  @param  ExportMasterSecretSize       The size in bytes of the ExportMasterSecret.
+
+  @retval RETURN_SUCCESS  ExportMasterSecret is exported.
+*/
 RETURN_STATUS
 EFIAPI
 SpdmSecuredMessageExportMasterSecret (
@@ -149,6 +220,15 @@ typedef struct {
 } SPDM_SECURE_SESSION_KEYS_STRUCT;
 #pragma pack()
 
+/**
+  Export the SessionKeys from an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  SessionKeys                  Indicate the buffer to store the SessionKeys in SPDM_SECURE_SESSION_KEYS_STRUCT.
+  @param  SessionKeysSize              The size in bytes of the SessionKeys in SPDM_SECURE_SESSION_KEYS_STRUCT.
+
+  @retval RETURN_SUCCESS  SessionKeys are exported.
+*/
 RETURN_STATUS
 EFIAPI
 SpdmSecuredMessageExportSessionKeys (
@@ -157,6 +237,15 @@ SpdmSecuredMessageExportSessionKeys (
   IN OUT UINTN                        *SessionKeysSize
   );
 
+/**
+  Import the SessionKeys from an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  SessionKeys                  Indicate the buffer to store the SessionKeys in SPDM_SECURE_SESSION_KEYS_STRUCT.
+  @param  SessionKeysSize              The size in bytes of the SessionKeys in SPDM_SECURE_SESSION_KEYS_STRUCT.
+
+  @retval RETURN_SUCCESS  SessionKeys are imported.
+*/
 RETURN_STATUS
 EFIAPI
 SpdmSecuredMessageImportSessionKeys (
@@ -232,9 +321,7 @@ SpdmSecuredMessageDheGenerateKey (
   @param  DheContext                   Pointer to the DHE context.
   @param  PeerPublicKey                Pointer to the peer's public key.
   @param  PeerPublicKeySize            Size of peer's public key in bytes.
-  @param  Key                          Pointer to the buffer to receive generated key.
-  @param  KeySize                      On input, the size of Key buffer in bytes.
-                                       On output, the size of data returned in Key buffer in bytes.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
 
   @retval TRUE   DHE exchanged key generation succeeded.
   @retval FALSE  DHE exchanged key generation failed.
@@ -250,6 +337,17 @@ SpdmSecuredMessageDheComputeKey (
   IN OUT  VOID                         *SpdmSecuredMessageContext
   );
 
+/**
+  Computes the HMAC of a input data buffer, with RequestFinishedKey.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
 BOOLEAN
 EFIAPI
 SpdmHmacAllWithRequestFinishedKey (
@@ -259,6 +357,17 @@ SpdmHmacAllWithRequestFinishedKey (
   OUT  UINT8                        *HmacValue
   );
 
+/**
+  Computes the HMAC of a input data buffer, with ResponseFinishedKey.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  Data                         Pointer to the buffer containing the data to be HMACed.
+  @param  DataSize                     Size of Data buffer in bytes.
+  @param  HashValue                    Pointer to a buffer that receives the HMAC value.
+
+  @retval TRUE   HMAC computation succeeded.
+  @retval FALSE  HMAC computation failed.
+**/
 BOOLEAN
 EFIAPI
 SpdmHmacAllWithResponseFinishedKey (
@@ -268,6 +377,20 @@ SpdmHmacAllWithResponseFinishedKey (
   OUT  UINT8                        *HmacValue
   );
 
+/**
+  This function concatenates binary data, which is used as Info in HKDF expand later.
+
+  @param  Label                        An ascii string label for the SpdmBinConcat.
+  @param  LabelSize                    The size in bytes of the ASCII string label, including the NULL terminator.
+  @param  Context                      A pre-defined hash value as the context for the SpdmBinConcat.
+  @param  Length                       16 bits length for the SpdmBinConcat.
+  @param  HashSize                     The size in bytes of the context hash.
+  @param  OutBin                       The buffer to store the output binary.
+  @param  OutBinSize                   The size in bytes for the OutBin.
+
+  @retval RETURN_SUCCESS               The binary SpdmBinConcat data is generated.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
 RETURN_STATUS
 EFIAPI
 SpdmBinConcat (
@@ -283,7 +406,7 @@ SpdmBinConcat (
 /**
   This function generates SPDM HandshakeKey for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  TH1HashData                  TH1 hash
 
   @retval RETURN_SUCCESS  SPDM HandshakeKey for a session is generated.
@@ -298,7 +421,7 @@ SpdmGenerateSessionHandshakeKey (
 /**
   This function generates SPDM DataKey for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  TH2HashData                  TH2 hash
 
   @retval RETURN_SUCCESS  SPDM DataKey for a session is generated.
@@ -319,7 +442,7 @@ typedef enum {
 /**
   This function creates the updates of SPDM DataKey for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  Action                       Indicate of the key update action.
 
   @retval RETURN_SUCCESS  SPDM DataKey update is created.
@@ -334,7 +457,7 @@ SpdmCreateUpdateSessionDataKey (
 /**
   This function activates the update of SPDM DataKey for a session.
 
-  @param  SecuredMessageContext               A pointer to the SPDM session context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  Action                       Indicate of the key update action.
   @param  UseNewKey                    Indicate if the new key should be used.
 
@@ -393,7 +516,7 @@ typedef struct {
 /**
   Encode an application message to a secured message.
 
-  @param  SecuredMessageContext               A pointer to the SPDM context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  SessionId                    The session ID of the SPDM session.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  AppMessageSize               Size in bytes of the application message data buffer.
@@ -421,7 +544,7 @@ SpdmEncodeSecuredMessage (
 /**
   Decode an application message from a secured message.
 
-  @param  SecuredMessageContext               A pointer to the SPDM context.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
   @param  SessionId                    The session ID of the SPDM session.
   @param  IsRequester                  Indicates if it is a requester message.
   @param  SecuredMessageSize           Size in bytes of the secured message data buffer.

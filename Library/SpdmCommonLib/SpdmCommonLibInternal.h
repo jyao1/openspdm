@@ -42,8 +42,8 @@ typedef struct {
   //
   // My Certificate
   //
-  VOID                            *CertificateChain[MAX_SPDM_SLOT_COUNT];
-  UINTN                           CertificateChainSize[MAX_SPDM_SLOT_COUNT];
+  VOID                            *LocalCertChainProvision[MAX_SPDM_SLOT_COUNT];
+  UINTN                           LocalCertChainProvisionSize[MAX_SPDM_SLOT_COUNT];
   UINT8                           SlotCount;
   // My provisioned certificate (for SlotNum - 0xFF, default 0)
   UINT8                           ProvisionedSlotNum;
@@ -91,8 +91,8 @@ typedef struct {
   //
   // Peer CertificateChain
   //
-  UINT8                           PeerCertChainBuffer[MAX_SPDM_CERT_CHAIN_SIZE];
-  UINTN                           PeerCertChainBufferSize;
+  UINT8                           PeerUsedCertChainBuffer[MAX_SPDM_CERT_CHAIN_SIZE];
+  UINTN                           PeerUsedCertChainBufferSize;
   //
   // Local Used CertificateChain (for responder, or requester in mut auth)
   //
@@ -513,20 +513,20 @@ SpdmVerifyDigest (
   );
 
 /**
-  This function verifies the certificate chain.
+  This function verifies and save peer certificate chain buffer including SPDM_CERT_CHAIN header.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  CertificateChain             The certificate chain data buffer.
-  @param  CertificateChainSize         Size in bytes of the certificate chain data buffer.
+  @param  CertChainBuffer              Certitiface chain buffer including SPDM_CERT_CHAIN header.
+  @param  CertChainBufferSize          Size in bytes of the certitiface chain buffer.
 
-  @retval TRUE  certificate chain verification pass.
-  @retval FALSE certificate chain verification fail.
+  @retval TRUE  Peer certificate chain buffer verification passed and saved.
+  @retval FALSE Peer certificate chain buffer verification fail.
 **/
 BOOLEAN
-SpdmVerifyCertificateChain (
+SpdmVerifySavePeerCertChainBuffer (
   IN SPDM_DEVICE_CONTEXT          *SpdmContext,
-  IN VOID                         *CertificateChain,
-  IN UINTN                        CertificateChainSize
+  IN VOID                         *CertChainBuffer,
+  IN UINTN                        CertChainBufferSize
   );
 
 /**
@@ -534,8 +534,6 @@ SpdmVerifyCertificateChain (
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  IsRequester                  Indicate of the signature generation for a requester or a responder.
-  @param  ResponseMessage              The response message buffer.
-  @param  ResponseMessageSize          Size in bytes of the response message buffer.
   @param  Signature                    The buffer to store the challenge signature.
 
   @retval TRUE  challenge signature is generated.
@@ -545,8 +543,6 @@ BOOLEAN
 SpdmGenerateChallengeAuthSignature (
   IN     SPDM_DEVICE_CONTEXT        *SpdmContext,
   IN     BOOLEAN                    IsRequester,
-  IN     VOID                       *ResponseMessage,
-  IN     UINTN                      ResponseMessageSize,
      OUT UINT8                      *Signature
   );
 
@@ -604,11 +600,10 @@ SpdmGenerateMeasurementSummaryHash (
   );
 
 /**
-  This function creates the measurement signature to response message based upon L1L2.
+  This function generates the measurement signature to response message based upon L1L2.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  ResponseMessage              The measurement response message with empty signature to be filled.
-  @param  ResponseMessageSize          Total size in bytes of the response message including signature.
+  @param  Signature                    The buffer to store the Signature.
 
   @retval TRUE  measurement signature is created.
   @retval FALSE measurement signature is not created.
@@ -616,8 +611,7 @@ SpdmGenerateMeasurementSummaryHash (
 BOOLEAN
 SpdmGenerateMeasurementSignature (
   IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
-  IN OUT VOID                   *ResponseMessage,
-  IN     UINTN                  ResponseMessageSize
+     OUT UINT8                  *Signature
   );
 
 /**
@@ -887,39 +881,6 @@ SpdmVerifyPskFinishReqHmac (
   IN  SPDM_SESSION_INFO         *SessionInfo,
   IN  UINT8                     *Hmac,
   IN  UINTN                     HmacSize
-  );
-
-BOOLEAN
-SpdmCalculateM1M2Hash (
-  IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
-  IN     BOOLEAN                IsMut,
-     OUT VOID                   *HashData
-  );
-
-BOOLEAN
-SpdmCalculateL1L2Hash (
-  IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
-     OUT VOID                   *HashData
-  );
-
-BOOLEAN
-SpdmCalculateTHCurrAK (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     SPDM_SESSION_INFO         *SessionInfo,
-  IN     UINT8                     *CertBuffer, OPTIONAL
-  IN     UINTN                     CertBufferSize, OPTIONAL
-     OUT LARGE_MANAGED_BUFFER      *THCurr
-  );
-
-BOOLEAN
-SpdmCalculateTHCurrAKF (
-  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
-  IN     SPDM_SESSION_INFO         *SessionInfo,
-  IN     UINT8                     *CertBuffer, OPTIONAL
-  IN     UINTN                     CertBufferSize, OPTIONAL
-  IN     UINT8                     *MutCertBuffer, OPTIONAL
-  IN     UINTN                     MutCertBufferSize, OPTIONAL
-     OUT LARGE_MANAGED_BUFFER      *THCurr
   );
 
 /**

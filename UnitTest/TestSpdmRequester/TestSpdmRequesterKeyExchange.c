@@ -696,8 +696,8 @@ void TestSpdmRequesterKeyExchangeCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -733,8 +733,8 @@ void TestSpdmRequesterKeyExchangeCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -770,8 +770,8 @@ void TestSpdmRequesterKeyExchangeCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -807,8 +807,8 @@ void TestSpdmRequesterKeyExchangeCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -844,8 +844,8 @@ void TestSpdmRequesterKeyExchangeCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -881,8 +881,8 @@ void TestSpdmRequesterKeyExchangeCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -920,8 +920,8 @@ void TestSpdmRequesterKeyExchangeCase7(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -958,8 +958,8 @@ void TestSpdmRequesterKeyExchangeCase8(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
@@ -995,8 +995,8 @@ void TestSpdmRequesterKeyExchangeCase9(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
-  SpdmContext->ConnectionInfo.PeerCertChainBufferSize = DataSize;
-  CopyMem (SpdmContext->ConnectionInfo.PeerCertChainBuffer, Data, DataSize);
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
 
   HeartbeatPeriod = 0;
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));

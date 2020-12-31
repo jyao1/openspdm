@@ -73,8 +73,8 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -132,8 +132,8 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -193,8 +193,8 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -255,8 +255,8 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -318,8 +318,8 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;
@@ -379,8 +379,8 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
-  SpdmContext->LocalContext.CertificateChain[0] = Data1;
-  SpdmContext->LocalContext.CertificateChainSize[0] = DataSize1;  
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;  
   SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = Data1;
   SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = DataSize1;
   SpdmContext->LocalContext.SlotCount = 1;

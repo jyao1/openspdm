@@ -104,7 +104,7 @@ TrySpdmNegotiateAlgorithms (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, SpdmRequest.Length);
+  Status = SpdmAppendMessageA (SpdmContext, &SpdmRequest, SpdmRequest.Length);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -145,7 +145,7 @@ TrySpdmNegotiateAlgorithms (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmResponse, SpdmResponseSize);
+  Status = SpdmAppendMessageA (SpdmContext, &SpdmResponse, SpdmResponseSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }

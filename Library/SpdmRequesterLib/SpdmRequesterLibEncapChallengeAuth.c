@@ -57,7 +57,7 @@ SpdmGetEncapResponseChallengeAuth (
   //
   // Cache
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutC, SpdmRequest, RequestSize);
+  Status = SpdmAppendMessageMutC (SpdmContext, SpdmRequest, RequestSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -125,7 +125,12 @@ SpdmGetEncapResponseChallengeAuth (
   //
   // Calc Sign
   //
-  Result = SpdmGenerateChallengeAuthSignature (SpdmContext, TRUE, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse, Ptr);
+  Status = SpdmAppendMessageMutC (SpdmContext, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  Result = SpdmGenerateChallengeAuthSignature (SpdmContext, TRUE, Ptr);
   if (!Result) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE_AUTH, ResponseSize, Response);
     return RETURN_SUCCESS;

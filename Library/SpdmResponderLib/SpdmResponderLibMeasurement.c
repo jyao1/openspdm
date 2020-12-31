@@ -10,6 +10,55 @@
 #include "SpdmResponderLibInternal.h"
 
 /**
+  This function creates the measurement signature to response message based upon L1L2.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ResponseMessage              The measurement response message with empty signature to be filled.
+  @param  ResponseMessageSize          Total size in bytes of the response message including signature.
+
+  @retval TRUE  measurement signature is created.
+  @retval FALSE measurement signature is not created.
+**/
+BOOLEAN
+SpdmCreateMeasurementSignature (
+  IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
+  IN OUT VOID                   *ResponseMessage,
+  IN     UINTN                  ResponseMessageSize
+  )
+{
+  UINT8                         *Ptr;
+  UINTN                         MeasurmentSigSize;
+  UINTN                         SignatureSize;
+  BOOLEAN                       Result;
+  RETURN_STATUS                 Status;
+
+  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  MeasurmentSigSize = SPDM_NONCE_SIZE +
+                      sizeof(UINT16) +
+                      SpdmContext->LocalContext.OpaqueMeasurementRspSize +
+                      SignatureSize;
+  ASSERT (ResponseMessageSize > MeasurmentSigSize);
+  Ptr = (VOID *)((UINT8 *)ResponseMessage + ResponseMessageSize - MeasurmentSigSize);
+  
+  SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
+  Ptr += SPDM_NONCE_SIZE;
+
+  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueMeasurementRspSize;
+  Ptr += sizeof(UINT16);
+  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueMeasurementRsp, SpdmContext->LocalContext.OpaqueMeasurementRspSize);
+  Ptr += SpdmContext->LocalContext.OpaqueMeasurementRspSize;
+
+  Status = SpdmAppendMessageM (SpdmContext, ResponseMessage, ResponseMessageSize - SignatureSize);
+  if (RETURN_ERROR(Status)) {
+    return FALSE;
+  }
+
+  Result = SpdmGenerateMeasurementSignature (SpdmContext, Ptr);
+
+  return Result;
+}
+
+/**
   Process the SPDM GET_MEASUREMENT request and return the response.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -103,7 +152,7 @@ SpdmGetResponseMeasurement (
   //
   // Cache
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, SpdmRequest, RequestSize);
+  Status = SpdmAppendMessageM (SpdmContext, SpdmRequest, RequestSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -148,7 +197,7 @@ SpdmGetResponseMeasurement (
         }
         SpdmResponse->Header.Param2 = SlotIdParam;
       }
-      Status = SpdmGenerateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
+      Status = SpdmCreateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
         return RETURN_SUCCESS;
@@ -204,7 +253,7 @@ SpdmGetResponseMeasurement (
         }
         SpdmResponse->Header.Param2 = SlotIdParam;
       }
-      Status = SpdmGenerateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
+      Status = SpdmCreateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
       if (RETURN_ERROR(Status)) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
         return RETURN_SUCCESS;
@@ -266,7 +315,7 @@ SpdmGetResponseMeasurement (
           }
           SpdmResponse->Header.Param2 = SlotIdParam;
         }
-        Status = SpdmGenerateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
+        Status = SpdmCreateMeasurementSignature (SpdmContext, SpdmResponse, SpdmResponseSize);
         if (RETURN_ERROR(Status)) {
           SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
           return RETURN_SUCCESS;
@@ -284,7 +333,7 @@ SpdmGetResponseMeasurement (
     //
     ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
   } else {
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, SpdmResponse, *ResponseSize);
+    Status = SpdmAppendMessageM (SpdmContext, SpdmResponse, *ResponseSize);
     if (RETURN_ERROR(Status)) {
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
       return RETURN_SUCCESS;

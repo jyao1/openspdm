@@ -86,8 +86,7 @@ SpdmSecuredMessageDheGenerateKey (
   @param  PeerPublicKey                Pointer to the peer's public key.
   @param  PeerPublicKeySize            Size of peer's public key in bytes.
   @param  Key                          Pointer to the buffer to receive generated key.
-  @param  KeySize                      On input, the size of Key buffer in bytes.
-                                       On output, the size of data returned in Key buffer in bytes.
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
 
   @retval TRUE   DHE exchanged key generation succeeded.
   @retval FALSE  DHE exchanged key generation failed.

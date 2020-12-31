@@ -53,7 +53,7 @@ SpdmGetEncapReqestGetCertificate (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmRequest, *EncapRequestSize);
+  Status = SpdmAppendMessageMutB (SpdmContext, SpdmRequest, *EncapRequestSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -111,7 +111,7 @@ SpdmProcessEncapResponseCertificate (
   //
   // Cache data
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageMutB, SpdmResponse, SpdmResponseSize);
+  Status = SpdmAppendMessageMutB (SpdmContext, SpdmResponse, SpdmResponseSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -130,7 +130,7 @@ SpdmProcessEncapResponseCertificate (
   }
 
   *Continue = FALSE;
-  Result = SpdmVerifyCertificateChain (SpdmContext, GetManagedBuffer(&SpdmContext->EncapContext.CertificateChainBuffer), GetManagedBufferSize(&SpdmContext->EncapContext.CertificateChainBuffer));
+  Result = SpdmVerifySavePeerCertChainBuffer (SpdmContext, GetManagedBuffer(&SpdmContext->EncapContext.CertificateChainBuffer), GetManagedBufferSize(&SpdmContext->EncapContext.CertificateChainBuffer));
   if (!Result) {
     SpdmContext->EncapContext.ErrorState = SPDM_STATUS_ERROR_CERTIFICATE_FAILURE;
     return RETURN_SECURITY_VIOLATION;

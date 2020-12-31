@@ -64,13 +64,13 @@ SpdmGetResponseCertificate (
   //
   // Cache
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmRequest, SpdmRequestSize);
+  Status = SpdmAppendMessageB (SpdmContext, SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  if (SpdmContext->LocalContext.CertificateChain == NULL) {
+  if (SpdmContext->LocalContext.LocalCertChainProvision == NULL) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_CERTIFICATE, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
@@ -88,15 +88,15 @@ SpdmGetResponseCertificate (
     Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
   }
   
-  if (Offset >= SpdmContext->LocalContext.CertificateChainSize[SlotNum]) {
+  if (Offset >= SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotNum]) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  if ((UINTN)(Offset + Length) > SpdmContext->LocalContext.CertificateChainSize[SlotNum]) {
-    Length = (UINT16)(SpdmContext->LocalContext.CertificateChainSize[SlotNum] - Offset);
+  if ((UINTN)(Offset + Length) > SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotNum]) {
+    Length = (UINT16)(SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotNum] - Offset);
   }
-  RemainderLength = SpdmContext->LocalContext.CertificateChainSize[SlotNum] - (Length + Offset);
+  RemainderLength = SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotNum] - (Length + Offset);
 
   ASSERT (*ResponseSize >= sizeof(SPDM_CERTIFICATE_RESPONSE) + Length);
   *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + Length;
@@ -113,11 +113,11 @@ SpdmGetResponseCertificate (
   SpdmResponse->Header.Param2 = 0;
   SpdmResponse->PortionLength = Length;
   SpdmResponse->RemainderLength = (UINT16)RemainderLength;
-  CopyMem (SpdmResponse + 1, (UINT8 *)SpdmContext->LocalContext.CertificateChain[SlotNum] + Offset, Length);
+  CopyMem (SpdmResponse + 1, (UINT8 *)SpdmContext->LocalContext.LocalCertChainProvision[SlotNum] + Offset, Length);
   //
   // Cache
   //
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageB, SpdmResponse, *ResponseSize);
+  Status = SpdmAppendMessageB (SpdmContext, SpdmResponse, *ResponseSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
