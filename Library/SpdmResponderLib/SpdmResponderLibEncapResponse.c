@@ -234,7 +234,6 @@ SpdmInitEncapState (
   //
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
 }
 
 /**

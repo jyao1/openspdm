@@ -132,11 +132,6 @@ SpdmGetEncapResponseChallengeAuth (
   }
   Ptr += SignatureSize;
 
-  //
-  // Reset
-  //
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-
   return RETURN_SUCCESS;
 }
 

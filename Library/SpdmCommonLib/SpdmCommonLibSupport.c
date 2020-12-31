@@ -86,6 +86,7 @@ InternalDumpHex (
   @return The 24-bit value read from Buffer.
 **/
 UINT32
+EFIAPI
 SpdmReadUint24 (
   IN UINT8  *Buffer
   )
@@ -102,6 +103,7 @@ SpdmReadUint24 (
   @return The 24-bit value to write to Buffer.
 **/
 UINT32
+EFIAPI
 SpdmWriteUint24 (
   IN UINT8  *Buffer,
   IN UINT32 Value

@@ -213,18 +213,6 @@ TrySpdmChallenge (
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageA), GetManagedBufferSize(&SpdmContext->Transcript.MessageA));
-  if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
-  }
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageB), GetManagedBufferSize(&SpdmContext->Transcript.MessageB));
-  if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
-  }
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageC), GetManagedBufferSize(&SpdmContext->Transcript.MessageC));
-  if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
-  }
 
   Opaque = Ptr;
   Ptr += OpaqueLength;
@@ -241,8 +229,6 @@ TrySpdmChallenge (
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
 
   if (MeasurementHash != NULL) {
     CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);

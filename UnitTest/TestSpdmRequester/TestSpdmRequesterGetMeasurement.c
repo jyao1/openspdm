@@ -446,7 +446,7 @@ void TestSpdmRequesterGetMeasurementCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -458,7 +458,7 @@ void TestSpdmRequesterGetMeasurementCase1(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -483,7 +483,7 @@ void TestSpdmRequesterGetMeasurementCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -495,7 +495,7 @@ void TestSpdmRequesterGetMeasurementCase2(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -518,7 +518,7 @@ void TestSpdmRequesterGetMeasurementCase3(void **state) {
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -530,7 +530,7 @@ void TestSpdmRequesterGetMeasurementCase3(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -555,7 +555,7 @@ void TestSpdmRequesterGetMeasurementCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -567,7 +567,7 @@ void TestSpdmRequesterGetMeasurementCase4(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -592,7 +592,7 @@ void TestSpdmRequesterGetMeasurementCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -604,7 +604,7 @@ void TestSpdmRequesterGetMeasurementCase5(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_NO_RESPONSE);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -629,7 +629,7 @@ void TestSpdmRequesterGetMeasurementCase6(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -641,7 +641,7 @@ void TestSpdmRequesterGetMeasurementCase6(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -666,7 +666,7 @@ void TestSpdmRequesterGetMeasurementCase7(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -679,7 +679,7 @@ void TestSpdmRequesterGetMeasurementCase7(void **state) {
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
   assert_int_equal (SpdmContext->SpdmCmdReceiveState, 0);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -704,7 +704,7 @@ void TestSpdmRequesterGetMeasurementCase8(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -740,7 +740,7 @@ void TestSpdmRequesterGetMeasurementCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -752,7 +752,7 @@ void TestSpdmRequesterGetMeasurementCase9(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -775,7 +775,7 @@ void TestSpdmRequesterGetMeasurementCase10(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -790,7 +790,7 @@ void TestSpdmRequesterGetMeasurementCase10(void **state) {
              0, &NumberOfBlocks, NULL, NULL);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (NumberOfBlocks, 4);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE));
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE));
   free(Data);
 }
 
@@ -815,7 +815,7 @@ void TestSpdmRequesterGetMeasurementCase11(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -827,7 +827,7 @@ void TestSpdmRequesterGetMeasurementCase11(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_SUCCESS);  
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
   free(Data);
 }
 

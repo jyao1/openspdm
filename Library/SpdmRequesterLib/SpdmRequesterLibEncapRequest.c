@@ -174,7 +174,6 @@ SpdmEncapsulatedRequest (
   //
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
 
   if (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)) {
     GetDigests.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;

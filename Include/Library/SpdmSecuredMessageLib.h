@@ -73,29 +73,34 @@ SpdmSecuredMessageInitContext (
   );
 
 VOID
+EFIAPI
 SpdmSecuredMessageSetUsePsk (
   IN VOID                         *SpdmSecuredMessageContext,
   IN BOOLEAN                      UsePsk
   );
 
 VOID
+EFIAPI
 SpdmSecuredMessageSetSessionState (
   IN VOID                         *SpdmSecuredMessageContext,
   IN SPDM_SESSION_STATE           SessionState
   );
 
 SPDM_SESSION_STATE
+EFIAPI
 SpdmSecuredMessageGetSessionState (
   IN VOID                         *SpdmSecuredMessageContext
   );
 
 VOID
+EFIAPI
 SpdmSecuredMessageSetSessionType (
   IN VOID                         *SpdmSecuredMessageContext,
   IN SPDM_SESSION_TYPE            SessionType
   );
 
 VOID
+EFIAPI
 SpdmSecuredMessageSetAlgorithms (
   IN VOID                         *SpdmSecuredMessageContext,
   IN UINT32                       BaseHashAlgo,
@@ -105,6 +110,7 @@ SpdmSecuredMessageSetAlgorithms (
   );
 
 VOID
+EFIAPI
 SpdmSecuredMessageSetPskHint (
   IN VOID                         *SpdmSecuredMessageContext,
   IN VOID                         *PskHint,
@@ -112,6 +118,7 @@ SpdmSecuredMessageSetPskHint (
   );
 
 RETURN_STATUS
+EFIAPI
 SpdmSecuredMessageImportDheSecret (
   IN VOID                         *SpdmSecuredMessageContext,
   IN VOID                         *DheSecret,
@@ -119,6 +126,7 @@ SpdmSecuredMessageImportDheSecret (
   );
 
 RETURN_STATUS
+EFIAPI
 SpdmSecuredMessageExportMasterSecret (
   IN     VOID                         *SpdmSecuredMessageContext,
      OUT VOID                         *ExportMasterSecret,
@@ -142,6 +150,7 @@ typedef struct {
 #pragma pack()
 
 RETURN_STATUS
+EFIAPI
 SpdmSecuredMessageExportSessionKeys (
   IN     VOID                         *SpdmSecuredMessageContext,
      OUT VOID                         *SessionKeys,
@@ -149,6 +158,7 @@ SpdmSecuredMessageExportSessionKeys (
   );
 
 RETURN_STATUS
+EFIAPI
 SpdmSecuredMessageImportSessionKeys (
   IN     VOID                         *SpdmSecuredMessageContext,
   IN     VOID                         *SessionKeys,
@@ -164,6 +174,7 @@ SpdmSecuredMessageImportSessionKeys (
   @return  Pointer to the Diffie-Hellman Context that has been initialized.
 **/
 VOID *
+EFIAPI
 SpdmSecuredMessageDheNew (
   IN   UINT16                       DHENamedGroup
   );
@@ -176,6 +187,7 @@ SpdmSecuredMessageDheNew (
   @param  DheContext                   Pointer to the DHE context to be released.
 **/
 VOID
+EFIAPI
 SpdmSecuredMessageDheFree (
   IN   UINT16                       DHENamedGroup,
   IN   VOID                         *DheContext
@@ -201,6 +213,7 @@ SpdmSecuredMessageDheFree (
   @retval FALSE  PublicKeySize is not large enough.
 **/
 BOOLEAN
+EFIAPI
 SpdmSecuredMessageDheGenerateKey (
   IN      UINT16                       DHENamedGroup,
   IN OUT  VOID                         *DheContext,
@@ -228,6 +241,7 @@ SpdmSecuredMessageDheGenerateKey (
   @retval FALSE  KeySize is not large enough.
 **/
 BOOLEAN
+EFIAPI
 SpdmSecuredMessageDheComputeKey (
   IN      UINT16                       DHENamedGroup,
   IN OUT  VOID                         *DheContext,
@@ -237,6 +251,7 @@ SpdmSecuredMessageDheComputeKey (
   );
 
 BOOLEAN
+EFIAPI
 SpdmHmacAllWithRequestFinishedKey (
   IN   VOID                         *SpdmSecuredMessageContext,
   IN   CONST VOID                   *Data,
@@ -245,6 +260,7 @@ SpdmHmacAllWithRequestFinishedKey (
   );
 
 BOOLEAN
+EFIAPI
 SpdmHmacAllWithResponseFinishedKey (
   IN   VOID                         *SpdmSecuredMessageContext,
   IN   CONST VOID                   *Data,
@@ -253,6 +269,7 @@ SpdmHmacAllWithResponseFinishedKey (
   );
 
 RETURN_STATUS
+EFIAPI
 SpdmBinConcat (
   IN CHAR8     *Label,
   IN UINTN     LabelSize,
@@ -272,6 +289,7 @@ SpdmBinConcat (
   @retval RETURN_SUCCESS  SPDM HandshakeKey for a session is generated.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmGenerateSessionHandshakeKey (
   IN VOID                         *SpdmSecuredMessageContext,
   IN UINT8                        *TH1HashData
@@ -286,6 +304,7 @@ SpdmGenerateSessionHandshakeKey (
   @retval RETURN_SUCCESS  SPDM DataKey for a session is generated.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmGenerateSessionDataKey (
   IN VOID                         *SpdmSecuredMessageContext,
   IN UINT8                        *TH2HashData
@@ -306,6 +325,7 @@ typedef enum {
   @retval RETURN_SUCCESS  SPDM DataKey update is created.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmCreateUpdateSessionDataKey (
   IN VOID                         *SpdmSecuredMessageContext,
   IN SPDM_KEY_UPDATE_ACTION       Action
@@ -321,6 +341,7 @@ SpdmCreateUpdateSessionDataKey (
   @retval RETURN_SUCCESS  SPDM DataKey update is activated.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmActivateUpdateSessionDataKey (
   IN VOID                         *SpdmSecuredMessageContext,
   IN SPDM_KEY_UPDATE_ACTION       Action,

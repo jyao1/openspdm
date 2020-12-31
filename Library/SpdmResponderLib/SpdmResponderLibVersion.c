@@ -75,7 +75,6 @@ SpdmGetResponseVersion (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageA);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
   Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);

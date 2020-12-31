@@ -206,7 +206,7 @@ TrySpdmSendReceivePskExchange (
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", *SessionId));
-  Status = SpdmCalculateTh1 (SpdmContext, SessionInfo, TRUE, TH1HashData);
+  Status = SpdmCalculateTH1 (SpdmContext, SessionInfo, TRUE, TH1HashData);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_SECURITY_VIOLATION;

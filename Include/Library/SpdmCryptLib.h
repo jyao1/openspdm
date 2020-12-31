@@ -348,6 +348,7 @@ BOOLEAN
   @return SPDM hash algorithm size.
 **/
 UINT32
+EFIAPI
 GetSpdmHashSize (
   IN      UINT32       BaseHashAlgo
   );
@@ -366,6 +367,7 @@ GetSpdmHashSize (
   @retval FALSE  Hash computation failed.
 **/
 BOOLEAN
+EFIAPI
 SpdmHashAll (
   IN   UINT32                       BaseHashAlgo,
   IN   CONST VOID                   *Data,
@@ -381,6 +383,7 @@ SpdmHashAll (
   @return SPDM measurement hash algorithm size.
 **/
 UINT32
+EFIAPI
 GetSpdmMeasurementHashSize (
   IN   UINT32                       MeasurementHashAlgo
   );
@@ -399,6 +402,7 @@ GetSpdmMeasurementHashSize (
   @retval FALSE  Hash computation failed.
 **/
 BOOLEAN
+EFIAPI
 SpdmMeasurementHashAll (
   IN   UINT32                       MeasurementHashAlgo,
   IN   CONST VOID                   *Data,
@@ -422,6 +426,7 @@ SpdmMeasurementHashAll (
   @retval FALSE  HMAC computation failed.
 **/
 BOOLEAN
+EFIAPI
 SpdmHmacAll (
   IN   UINT32                       BaseHashAlgo,
   IN   CONST VOID                   *Data,
@@ -446,6 +451,7 @@ SpdmHmacAll (
   @retval FALSE  Hkdf generation failed.
 **/
 BOOLEAN
+EFIAPI
 SpdmHkdfExpand (
   IN   UINT32                       BaseHashAlgo,
   IN   CONST UINT8                  *Prk,
@@ -464,6 +470,7 @@ SpdmHkdfExpand (
   @return SPDM asymmetric algorithm size.
 **/
 UINT32
+EFIAPI
 GetSpdmAsymSize (
   IN   UINT32                       BaseAsymAlgo
   );
@@ -482,6 +489,7 @@ GetSpdmAsymSize (
   @retval  FALSE  Fail to retrieve public key from X509 certificate.
 **/
 BOOLEAN
+EFIAPI
 SpdmAsymGetPublicKeyFromX509 (
   IN   UINT32                       BaseAsymAlgo,
   IN   CONST UINT8                  *Cert,
@@ -497,6 +505,7 @@ SpdmAsymGetPublicKeyFromX509 (
   @param  Context                      Pointer to the asymmetric context to be released.
 **/
 VOID
+EFIAPI
 SpdmAsymFree (
   IN   UINT32                       BaseAsymAlgo,
   IN   VOID                         *Context
@@ -517,6 +526,7 @@ SpdmAsymFree (
   @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
 **/
 BOOLEAN
+EFIAPI
 SpdmAsymVerify (
   IN   UINT32                       BaseAsymAlgo,
   IN   VOID                         *Context,
@@ -540,6 +550,7 @@ SpdmAsymVerify (
   @retval  FALSE  Invalid PEM key data or incorrect password.
 **/
 BOOLEAN
+EFIAPI
 SpdmAsymGetPrivateKeyFromPem (
   IN   UINT32                       BaseAsymAlgo,
   IN   CONST UINT8                  *PemData,
@@ -567,6 +578,7 @@ SpdmAsymGetPrivateKeyFromPem (
   @retval  FALSE  SigSize is too small.
 **/
 BOOLEAN
+EFIAPI
 SpdmAsymSign (
   IN      UINT32                       BaseAsymAlgo,
   IN      VOID                         *Context,
@@ -584,6 +596,7 @@ SpdmAsymSign (
   @return SPDM requester asymmetric algorithm size.
 **/
 UINT32
+EFIAPI
 GetSpdmReqAsymSize (
   IN   UINT16                       ReqBaseAsymAlg
   );
@@ -602,6 +615,7 @@ GetSpdmReqAsymSize (
   @retval  FALSE  Fail to retrieve public key from X509 certificate.
 **/
 BOOLEAN
+EFIAPI
 SpdmReqAsymGetPublicKeyFromX509 (
   IN   UINT16                       ReqBaseAsymAlg,
   IN   CONST UINT8                  *Cert,
@@ -617,6 +631,7 @@ SpdmReqAsymGetPublicKeyFromX509 (
   @param  Context                      Pointer to the asymmetric context to be released.
 **/
 VOID
+EFIAPI
 SpdmReqAsymFree (
   IN   UINT16                       ReqBaseAsymAlg,
   IN   VOID                         *Context
@@ -637,6 +652,7 @@ SpdmReqAsymFree (
   @retval  FALSE  Invalid asymmetric signature or invalid asymmetric context.
 **/
 BOOLEAN
+EFIAPI
 SpdmReqAsymVerify (
   IN   UINT16                       ReqBaseAsymAlg,
   IN   VOID                         *Context,
@@ -660,6 +676,7 @@ SpdmReqAsymVerify (
   @retval  FALSE  Invalid PEM key data or incorrect password.
 **/
 BOOLEAN
+EFIAPI
 SpdmReqAsymGetPrivateKeyFromPem (
   IN   UINT16                       ReqBaseAsymAlg,
   IN   CONST UINT8                  *PemData,
@@ -687,6 +704,7 @@ SpdmReqAsymGetPrivateKeyFromPem (
   @retval  FALSE  SigSize is too small.
 **/
 BOOLEAN
+EFIAPI
 SpdmReqAsymSign (
   IN      UINT16                       ReqBaseAsymAlg,
   IN      VOID                         *Context,
@@ -704,6 +722,7 @@ SpdmReqAsymSign (
   @return SPDM DHE algorithm key size.
 **/
 UINT32
+EFIAPI
 GetSpdmDheKeySize (
   IN   UINT16                       DHENamedGroup
   );
@@ -717,6 +736,7 @@ GetSpdmDheKeySize (
   @return  Pointer to the Diffie-Hellman Context that has been initialized.
 **/
 VOID *
+EFIAPI
 SpdmDheNew (
   IN   UINT16                       DHENamedGroup
   );
@@ -729,6 +749,7 @@ SpdmDheNew (
   @param  Context                      Pointer to the DHE context to be released.
 **/
 VOID
+EFIAPI
 SpdmDheFree (
   IN   UINT16                       DHENamedGroup,
   IN   VOID                         *Context
@@ -754,6 +775,7 @@ SpdmDheFree (
   @retval FALSE  PublicKeySize is not large enough.
 **/
 BOOLEAN
+EFIAPI
 SpdmDheGenerateKey (
   IN      UINT16                       DHENamedGroup,
   IN OUT  VOID                         *Context,
@@ -781,6 +803,7 @@ SpdmDheGenerateKey (
   @retval FALSE  KeySize is not large enough.
 **/
 BOOLEAN
+EFIAPI
 SpdmDheComputeKey (
   IN      UINT16                       DHENamedGroup,
   IN OUT  VOID                         *Context,
@@ -798,6 +821,7 @@ SpdmDheComputeKey (
   @return SPDM AEAD algorithm key size.
 **/
 UINT32
+EFIAPI
 GetSpdmAeadKeySize (
   IN   UINT16                       AEADCipherSuite
   );
@@ -810,6 +834,7 @@ GetSpdmAeadKeySize (
   @return SPDM AEAD algorithm iv size.
 **/
 UINT32
+EFIAPI
 GetSpdmAeadIvSize (
   IN   UINT16                       AEADCipherSuite
   );
@@ -822,6 +847,7 @@ GetSpdmAeadIvSize (
   @return SPDM AEAD algorithm tag size.
 **/
 UINT32
+EFIAPI
 GetSpdmAeadTagSize (
   IN   UINT16                       AEADCipherSuite
   );
@@ -834,6 +860,7 @@ GetSpdmAeadTagSize (
   @return SPDM AEAD algorithm block size.
 **/
 UINT32
+EFIAPI
 GetSpdmAeadBlockSize (
   IN   UINT16                       AEADCipherSuite
   );
@@ -860,6 +887,7 @@ GetSpdmAeadBlockSize (
   @retval FALSE  AEAD authenticated encryption failed.
 **/
 BOOLEAN
+EFIAPI
 SpdmAeadEncryption (
   IN   UINT16                       AEADCipherSuite,
   IN   CONST UINT8*                 Key,
@@ -898,6 +926,7 @@ SpdmAeadEncryption (
   @retval FALSE  AEAD authenticated decryption failed.
 **/
 BOOLEAN
+EFIAPI
 SpdmAeadDecryption (
   IN   UINT16                       AEADCipherSuite,
   IN   CONST UINT8*                 Key,
@@ -922,6 +951,7 @@ SpdmAeadDecryption (
   @param  Rand                         Pointer to buffer to receive random value.
 **/
 VOID
+EFIAPI
 SpdmGetRandomNumber (
   IN  UINTN                     Size,
   OUT UINT8                     *Rand
@@ -937,6 +967,7 @@ SpdmGetRandomNumber (
   @retval  FALSE  Certificate is not valid
 **/
 BOOLEAN
+EFIAPI
 SpdmX509CertificateCheck (
   IN   CONST UINT8  *Cert,
   IN   UINTN        CertSize
@@ -970,6 +1001,7 @@ SpdmX509CertificateCheck (
   @retval RETURN_UNSUPPORTED       The operation is not supported.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmGetDMTFSubjectAltNameFromBytes (
   IN      CONST UINT8   *Buffer,
   IN      INTN          Len,
@@ -1007,6 +1039,7 @@ SpdmGetDMTFSubjectAltNameFromBytes (
   @retval RETURN_UNSUPPORTED       The operation is not supported.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmGetDMTFSubjectAltName (
   IN      CONST UINT8   *Cert,
   IN      INTN          CertSize,
@@ -1026,6 +1059,7 @@ SpdmGetDMTFSubjectAltName (
   @retval FALSE certificate buffer integrity verification fail.
 **/
 BOOLEAN
+EFIAPI
 SpdmVerifyCertificateBuffer (
   IN UINT8                        *CertBuffer,
   IN UINTN                        CertBufferSize
@@ -1042,6 +1076,7 @@ SpdmVerifyCertificateBuffer (
   @retval FALSE certificate chain integrity verification fail.
 **/
 BOOLEAN
+EFIAPI
 SpdmVerifyCertificateChainData (
   IN UINT32                       BaseHashAlgo,
   IN VOID                         *CertificateChain,

@@ -59,7 +59,6 @@ TrySpdmGetVersion (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageA);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageC);
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
   Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageA, &SpdmRequest, sizeof(SpdmRequest));
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;

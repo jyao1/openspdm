@@ -464,21 +464,37 @@ SpdmRegisterTransportLayerFunc (
   );
 
 VOID
+EFIAPI
 SpdmResetMessageA (
   IN     VOID                                *SpdmContext
   );
 
 VOID
+EFIAPI
 SpdmResetMessageB (
   IN     VOID                                *SpdmContext
   );
 
 VOID
+EFIAPI
 SpdmResetMessageC (
   IN     VOID                                *SpdmContext
   );
 
+VOID
+EFIAPI
+SpdmResetMessageMutB (
+  IN     VOID                                *SpdmContext
+  );
+
+VOID
+EFIAPI
+SpdmResetMessageMutC (
+  IN     VOID                                *SpdmContext
+  );
+
 RETURN_STATUS
+EFIAPI
 SpdmAppendMessageA (
   IN     VOID                                *SpdmContext,
   IN     VOID                                *Message,
@@ -486,6 +502,7 @@ SpdmAppendMessageA (
   );
 
 RETURN_STATUS
+EFIAPI
 SpdmAppendMessageB (
   IN     VOID                                *SpdmContext,
   IN     VOID                                *Message,
@@ -493,6 +510,7 @@ SpdmAppendMessageB (
   );
 
 RETURN_STATUS
+EFIAPI
 SpdmAppendMessageC (
   IN     VOID                                *SpdmContext,
   IN     VOID                                *Message,
@@ -500,6 +518,23 @@ SpdmAppendMessageC (
   );
 
 RETURN_STATUS
+EFIAPI
+SpdmAppendMessageMutB (
+  IN     VOID                                *SpdmContext,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  );
+
+RETURN_STATUS
+EFIAPI
+SpdmAppendMessageMutC (
+  IN     VOID                                *SpdmContext,
+  IN     VOID                                *Message,
+  IN     UINTN                               MessageSize
+  );
+
+RETURN_STATUS
+EFIAPI
 SpdmAppendMessageK (
   IN     VOID                                *SpdmSessionInfo,
   IN     VOID                                *Message,
@@ -507,6 +542,7 @@ SpdmAppendMessageK (
   );
 
 RETURN_STATUS
+EFIAPI
 SpdmAppendMessageF (
   IN     VOID                                *SpdmSessionInfo,
   IN     VOID                                *Message,
@@ -522,6 +558,7 @@ SpdmAppendMessageF (
   @return session info.
 **/
 VOID *
+EFIAPI
 SpdmGetSessionInfoViaSessionId (
   IN     VOID                      *SpdmContext,
   IN     UINT32                    SessionId
@@ -536,6 +573,7 @@ SpdmGetSessionInfoViaSessionId (
   @return secured message context.
 **/
 VOID *
+EFIAPI
 SpdmGetSecuredMessageContextViaSessionId (
   IN     VOID                      *SpdmContext,
   IN     UINT32                    SessionId
@@ -549,6 +587,7 @@ SpdmGetSecuredMessageContextViaSessionId (
   @return secured message context.
 **/
 VOID *
+EFIAPI
 SpdmGetSecuredMessageContextViaSessionInfo (
   IN     VOID                      *SpdmSessionInfo
   );
@@ -562,6 +601,7 @@ SpdmGetSecuredMessageContextViaSessionInfo (
   @return session info associated with this new session ID.
 **/
 VOID *
+EFIAPI
 SpdmAssignSessionId (
   IN     VOID                      *SpdmContext,
   IN     UINT32                    SessionId,
@@ -577,6 +617,7 @@ SpdmAssignSessionId (
   @return freed session info assicated with this session ID.
 **/
 VOID *
+EFIAPI
 SpdmFreeSessionId (
   IN     VOID                      *SpdmContext,
   IN     UINT32                    SessionId
@@ -593,7 +634,8 @@ SpdmFreeSessionId (
   @retval RETURN_SUCCESS  TH1 hash is calculated.
 */
 RETURN_STATUS
-SpdmCalculateTh1 (
+EFIAPI
+SpdmCalculateTH1 (
   IN VOID                         *SpdmContext,
   IN VOID                         *SpdmSessionInfo,
   IN BOOLEAN                      IsRequester,
@@ -611,7 +653,8 @@ SpdmCalculateTh1 (
   @retval RETURN_SUCCESS  TH2 hash is calculated.
 */
 RETURN_STATUS
-SpdmCalculateTh2 (
+EFIAPI
+SpdmCalculateTH2 (
   IN VOID                         *SpdmContext,
   IN VOID                         *SpdmSessionInfo,
   IN BOOLEAN                      IsRequester,
@@ -626,6 +669,7 @@ SpdmCalculateTh2 (
   @return The 24-bit value read from Buffer.
 **/
 UINT32
+EFIAPI
 SpdmReadUint24 (
   IN UINT8  *Buffer
   );
@@ -639,6 +683,7 @@ SpdmReadUint24 (
   @return The 24-bit value to write to Buffer.
 **/
 UINT32
+EFIAPI
 SpdmWriteUint24 (
   IN UINT8  *Buffer,
   IN UINT32 Value

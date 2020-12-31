@@ -103,8 +103,7 @@ SpdmGetResponseMeasurement (
   //
   // Cache
   //
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmRequest, RequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, SpdmRequest, RequestSize);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -283,9 +282,9 @@ SpdmGetResponseMeasurement (
     //
     // Reset
     //
-    ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
+    ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
   } else {
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, SpdmResponse, *ResponseSize);
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, SpdmResponse, *ResponseSize);
     if (RETURN_ERROR(Status)) {
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
       return RETURN_SUCCESS;

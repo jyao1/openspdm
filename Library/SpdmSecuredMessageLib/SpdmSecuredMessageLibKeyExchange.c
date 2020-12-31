@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @return  Pointer to the Diffie-Hellman Context that has been initialized.
 **/
 VOID *
+EFIAPI
 SpdmSecuredMessageDheNew (
   IN   UINT16                       DHENamedGroup
   )
@@ -33,6 +34,7 @@ SpdmSecuredMessageDheNew (
   @param  DheContext                   Pointer to the DHE context to be released.
 **/
 VOID
+EFIAPI
 SpdmSecuredMessageDheFree (
   IN   UINT16                       DHENamedGroup,
   IN   VOID                         *DheContext
@@ -61,6 +63,7 @@ SpdmSecuredMessageDheFree (
   @retval FALSE  PublicKeySize is not large enough.
 **/
 BOOLEAN
+EFIAPI
 SpdmSecuredMessageDheGenerateKey (
   IN      UINT16                       DHENamedGroup,
   IN OUT  VOID                         *DheContext,
@@ -91,6 +94,7 @@ SpdmSecuredMessageDheGenerateKey (
   @retval FALSE  KeySize is not large enough.
 **/
 BOOLEAN
+EFIAPI
 SpdmSecuredMessageDheComputeKey (
   IN      UINT16                       DHENamedGroup,
   IN OUT  VOID                         *DheContext,

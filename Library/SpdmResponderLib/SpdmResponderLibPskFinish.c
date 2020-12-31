@@ -102,7 +102,7 @@ SpdmGetResponsePskFinish (
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
-  Status = SpdmCalculateTh2 (SpdmContext, SessionInfo, FALSE, TH2HashData);
+  Status = SpdmCalculateTH2 (SpdmContext, SessionInfo, FALSE, TH2HashData);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

@@ -184,14 +184,6 @@ SpdmProcessEncapResponseChallengeAuth (
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutB), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutB));
-  if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
-  }
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.M1M2, GetManagedBuffer(&SpdmContext->Transcript.MessageMutC), GetManagedBufferSize(&SpdmContext->Transcript.MessageMutC));
-  if (RETURN_ERROR(Status)) {
-    return RETURN_SECURITY_VIOLATION;
-  }
 
   Opaque = Ptr;
   Ptr += OpaqueLength;

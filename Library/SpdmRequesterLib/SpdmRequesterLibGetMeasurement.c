@@ -128,8 +128,7 @@ TrySpdmGetMeasurement (
   //
   // Cache data
   //
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
-  Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, &SpdmRequest, SpdmRequestSize);
+  Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, &SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -141,7 +140,7 @@ TrySpdmGetMeasurement (
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
-    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.L1L2, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_GET_MEASUREMENTS, SPDM_MEASUREMENTS, sizeof(SPDM_MEASUREMENTS_RESPONSE_MAX));
+    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.MessageM, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_GET_MEASUREMENTS, SPDM_MEASUREMENTS, sizeof(SPDM_MEASUREMENTS_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {
       return Status;
     }
@@ -220,7 +219,7 @@ TrySpdmGetMeasurement (
                        sizeof(UINT16) +
                        OpaqueLength +
                        SignatureSize;
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, &SpdmResponse, SpdmResponseSize - SignatureSize);
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, &SpdmResponse, SpdmResponseSize - SignatureSize);
     if (RETURN_ERROR(Status)) {
       return RETURN_SECURITY_VIOLATION;
     }
@@ -240,14 +239,14 @@ TrySpdmGetMeasurement (
       return RETURN_SECURITY_VIOLATION;
     }
 
-    ResetManagedBuffer (&SpdmContext->Transcript.L1L2);
+    ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
   } else {
     if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
       SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE);
     } else {
       SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurementRecordDataLength;
     }
-    Status = AppendManagedBuffer (&SpdmContext->Transcript.L1L2, &SpdmResponse, SpdmResponseSize);
+    Status = AppendManagedBuffer (&SpdmContext->Transcript.MessageM, &SpdmResponse, SpdmResponseSize);
     if (RETURN_ERROR(Status)) {
       return RETURN_SECURITY_VIOLATION;
     }

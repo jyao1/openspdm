@@ -146,10 +146,6 @@ SpdmGetResponseChallengeAuth (
   }
   Ptr += SignatureSize;
 
-  //
-  // Reset
-  //
-  ResetManagedBuffer (&SpdmContext->Transcript.M1M2);
   SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
 
   if (AuthAttribute.BasicMutAuthReq == 0) {

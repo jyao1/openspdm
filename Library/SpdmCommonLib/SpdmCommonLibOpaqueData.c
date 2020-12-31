@@ -17,7 +17,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @return the size in bytes of opaque data version selection.
 **/
 UINTN
-EFIAPI
 SpdmGetOpaqueDataVersionSelectionDataSize (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
@@ -39,7 +38,6 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
   @return the size in bytes of opaque data supproted version.
 **/
 UINTN
-EFIAPI
 SpdmGetOpaqueDataSupportedVersionDataSize (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
@@ -69,7 +67,6 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
   @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
 **/
 RETURN_STATUS
-EFIAPI
 SpdmBuildOpaqueDataSupportedVersionData (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINTN                *DataOutSize,
@@ -130,7 +127,6 @@ SpdmBuildOpaqueDataSupportedVersionData (
   @retval RETURN_UNSUPPORTED           The DataIn is NOT opaque data supported version.
 **/
 RETURN_STATUS
-EFIAPI
 SpdmProcessOpaqueDataSupportedVersionData (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINTN                DataInSize,
@@ -188,7 +184,6 @@ SpdmProcessOpaqueDataSupportedVersionData (
   @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
 **/
 RETURN_STATUS
-EFIAPI
 SpdmBuildOpaqueDataVersionSelectionData (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINTN                *DataOutSize,
@@ -245,7 +240,6 @@ SpdmBuildOpaqueDataVersionSelectionData (
   @retval RETURN_UNSUPPORTED           The DataIn is NOT opaque data version selection.
 **/
 RETURN_STATUS
-EFIAPI
 SpdmProcessOpaqueDataVersionSelectionData (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINTN                DataInSize,

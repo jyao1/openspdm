@@ -98,7 +98,7 @@ SpdmSendReceivePskFinish (
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
-  Status = SpdmCalculateTh2 (SpdmContext, SessionInfo, TRUE, TH2HashData);
+  Status = SpdmCalculateTH2 (SpdmContext, SessionInfo, TRUE, TH2HashData);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }

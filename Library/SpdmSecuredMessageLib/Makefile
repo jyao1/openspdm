@@ -32,9 +32,10 @@ SOURCE_DIR = $(WORKSPACE)\Library\$(MODULE_NAME)
 #
 
 OBJECT_FILES =  \
+    $(OUTPUT_DIR)\SpdmSecuredMessageLibContextData.obj \
     $(OUTPUT_DIR)\SpdmSecuredMessageLibEncodeDecode.obj \
     $(OUTPUT_DIR)\SpdmSecuredMessageLibKeyExchange.obj \
-    $(OUTPUT_DIR)\SpdmSecuredMessageLibSessionKeys.obj \
+    $(OUTPUT_DIR)\SpdmSecuredMessageLibSession.obj \
 
 
 INC =  \
@@ -70,14 +71,17 @@ init:
 #
 # Individual Object Build Targets
 #
+$(OUTPUT_DIR)\SpdmSecuredMessageLibContextData.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibContextData.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibContextData.c
+
 $(OUTPUT_DIR)\SpdmSecuredMessageLibEncodeDecode.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibEncodeDecode.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibEncodeDecode.c
 
 $(OUTPUT_DIR)\SpdmSecuredMessageLibKeyExchange.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibKeyExchange.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibKeyExchange.c
 
-$(OUTPUT_DIR)\SpdmSecuredMessageLibSessionKeys.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibSessionKeys.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibSessionKeys.c
+$(OUTPUT_DIR)\SpdmSecuredMessageLibSession.obj : $(SOURCE_DIR)\SpdmSecuredMessageLibSession.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmSecuredMessageLibSession.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

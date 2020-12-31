@@ -138,14 +138,14 @@ typedef struct {
   SMALL_MANAGED_BUFFER            MessageC;
   LARGE_MANAGED_BUFFER            MessageMutB;
   SMALL_MANAGED_BUFFER            MessageMutC;
-  LARGE_MANAGED_BUFFER            M1M2;
   //
   // Signature = Sign(SK, Hash(L1))
   // Verify(PK, Hash(L2), Signature)
   //
-  // L1/L2 = Concatenate (GET_MEASUREMENT, MEASUREMENT\Signature)
+  // L1/L2 = Concatenate (M)
+  // M = Concatenate (GET_MEASUREMENT, MEASUREMENT\Signature)
   //
-  LARGE_MANAGED_BUFFER            L1L2;
+  LARGE_MANAGED_BUFFER            MessageM;
 } SPDM_TRANSCRIPT;
 
 typedef struct {
@@ -890,6 +890,19 @@ SpdmVerifyPskFinishReqHmac (
   );
 
 BOOLEAN
+SpdmCalculateM1M2Hash (
+  IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
+  IN     BOOLEAN                IsMut,
+     OUT VOID                   *HashData
+  );
+
+BOOLEAN
+SpdmCalculateL1L2Hash (
+  IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
+     OUT VOID                   *HashData
+  );
+
+BOOLEAN
 SpdmCalculateTHCurrAK (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN     SPDM_SESSION_INFO         *SessionInfo,
@@ -917,7 +930,6 @@ SpdmCalculateTHCurrAKF (
   @return the size in bytes of opaque data supproted version.
 **/
 UINTN
-EFIAPI
 SpdmGetOpaqueDataSupportedVersionDataSize (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   );
@@ -937,7 +949,6 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
   @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
 **/
 RETURN_STATUS
-EFIAPI
 SpdmBuildOpaqueDataSupportedVersionData (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINTN                *DataOutSize,
@@ -956,7 +967,6 @@ SpdmBuildOpaqueDataSupportedVersionData (
   @retval RETURN_UNSUPPORTED           The DataIn is NOT opaque data version selection.
 **/
 RETURN_STATUS
-EFIAPI
 SpdmProcessOpaqueDataVersionSelectionData (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINTN                DataInSize,
@@ -971,7 +981,6 @@ SpdmProcessOpaqueDataVersionSelectionData (
   @return the size in bytes of opaque data version selection.
 **/
 UINTN
-EFIAPI
 SpdmGetOpaqueDataVersionSelectionDataSize (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   );
@@ -991,7 +1000,6 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
   @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
 **/
 RETURN_STATUS
-EFIAPI
 SpdmBuildOpaqueDataVersionSelectionData (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINTN                *DataOutSize,
@@ -1010,7 +1018,6 @@ SpdmBuildOpaqueDataVersionSelectionData (
   @retval RETURN_UNSUPPORTED           The DataIn is NOT opaque data supported version.
 **/
 RETURN_STATUS
-EFIAPI
 SpdmProcessOpaqueDataSupportedVersionData (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINTN                DataInSize,

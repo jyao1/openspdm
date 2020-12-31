@@ -224,7 +224,7 @@ SpdmGetResponseKeyExchange (
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", SessionId));
-  Status = SpdmCalculateTh1 (SpdmContext, SessionInfo, FALSE, TH1HashData);
+  Status = SpdmCalculateTH1 (SpdmContext, SessionInfo, FALSE, TH1HashData);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, SessionId);
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);

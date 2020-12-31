@@ -450,7 +450,6 @@ void TestSpdmRequesterChallengeCase2(void **state) {
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.M1M2.BufferSize, 0);
   free(Data);
 }
 
@@ -580,7 +579,6 @@ void TestSpdmRequesterChallengeCase6(void **state) {
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.M1M2.BufferSize, 0);
   free(Data);
 }
 
@@ -679,7 +677,6 @@ void TestSpdmRequesterChallengeCase9(void **state) {
   ZeroMem (MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmChallenge (SpdmContext, 0, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH, MeasurementHash);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.M1M2.BufferSize, 0);
   free(Data);
 }
 
