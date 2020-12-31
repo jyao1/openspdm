@@ -195,7 +195,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     HashSize = GetSpdmHashSize (mUseHashAlgo);
     HmacSize = GetSpdmHashSize (mUseHashAlgo);
     DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
-    OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+    OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
     TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
               HashSize +
@@ -223,7 +223,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     Ptr += HashSize;
     *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
     Ptr += sizeof(UINT16);
-    SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
+    SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
     Ptr += OpaqueKeyExchangeRspSize;
     ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -301,7 +301,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     HashSize = GetSpdmHashSize (mUseHashAlgo);
     HmacSize = GetSpdmHashSize (mUseHashAlgo);
     DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
-    OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+    OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
     TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
               HashSize +
@@ -329,7 +329,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     Ptr += HashSize;
     *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
     Ptr += sizeof(UINT16);
-    SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
+    SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
     Ptr += OpaqueKeyExchangeRspSize;
     ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -445,7 +445,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       HashSize = GetSpdmHashSize (mUseHashAlgo);
       HmacSize = GetSpdmHashSize (mUseHashAlgo);
       DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
-      OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+      OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
       TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
               HashSize +
@@ -473,7 +473,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       Ptr += HashSize;
       *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
       Ptr += sizeof(UINT16);
-      SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
+      SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
       Ptr += OpaqueKeyExchangeRspSize;
       ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -598,7 +598,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       HashSize = GetSpdmHashSize (mUseHashAlgo);
       HmacSize = GetSpdmHashSize (mUseHashAlgo);
       DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
-      OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+      OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
       TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
               HashSize +
@@ -626,7 +626,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       Ptr += HashSize;
       *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
       Ptr += sizeof(UINT16);
-      SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
+      SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
       Ptr += OpaqueKeyExchangeRspSize;
       ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);

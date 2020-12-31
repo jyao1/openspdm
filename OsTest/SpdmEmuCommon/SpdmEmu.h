@@ -44,8 +44,9 @@ extern UINT32  mUseMeasurementHashAlgo;
 extern UINT32  mUseAsymAlgo;
 extern UINT16  mUseReqAsymAlgo;
 
-extern UINT32  mSupportHashAlgo;
+extern UINT8   mSupportMeasurementSpec;
 extern UINT32  mSupportMeasurementHashAlgo;
+extern UINT32  mSupportHashAlgo;
 extern UINT32  mSupportAsymAlgo;
 extern UINT16  mSupportReqAsymAlgo;
 extern UINT16  mSupportDheAlgo;

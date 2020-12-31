@@ -52,6 +52,7 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &CTExponent, sizeof(CTExponent));
    SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &CapFlags, sizeof(CapFlags));
 
+   SpdmSetData (SpdmContext, SpdmDataMeasurementSpec, &Parameter, &MeasurementSpec, sizeof(MeasurementSpec));
    SpdmSetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &BaseAsymAlgo, sizeof(BaseAsymAlgo));
    SpdmSetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &BaseHashAlgo, sizeof(BaseHashAlgo));
    SpdmSetData (SpdmContext, SpdmDataDHENamedGroup, &Parameter, &DHENamedGroup, sizeof(DHENamedGroup));
@@ -241,6 +242,8 @@ Please refer to SpdmServerInit() in [SpdmResponder.c](https://github.com/jyao1/o
    SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &CTExponent, sizeof(CTExponent));
    SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &CapFlags, sizeof(CapFlags));
 
+   SpdmSetData (SpdmContext, SpdmDataMeasurementSpec, &Parameter, &MeasurementSpec, sizeof(MeasurementSpec));
+   SpdmSetData (SpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &MeasurementHashAlgo, sizeof(MeasurementHashAlgo));
    SpdmSetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &BaseAsymAlgo, sizeof(BaseAsymAlgo));
    SpdmSetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &BaseHashAlgo, sizeof(BaseHashAlgo));
    SpdmSetData (SpdmContext, SpdmDataDHENamedGroup, &Parameter, &DHENamedGroup, sizeof(DHENamedGroup));

@@ -435,7 +435,7 @@ SpdmGenerateMeasurementSummaryHash (
 
     DeviceMeasurementSize = sizeof(DeviceMeasurement);
     Ret = SpdmMeasurementCollectionFunc (
-            SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
+            SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec,
             SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo,
             &DeviceMeasurementCount,
             DeviceMeasurement,

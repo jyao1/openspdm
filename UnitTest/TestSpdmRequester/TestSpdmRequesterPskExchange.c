@@ -173,7 +173,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
     HashSize = GetSpdmHashSize (mUseHashAlgo);
     HmacSize = GetSpdmHashSize (mUseHashAlgo);
-    OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+    OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
     TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
@@ -194,7 +194,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     Ptr += HashSize;
     SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
     Ptr += DEFAULT_CONTEXT_LENGTH;
-    SpdmBuildOpaqueDataVersionSelectionData (&OpaquePskExchangeRspSize, Ptr);
+    SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
     Ptr += OpaquePskExchangeRspSize;
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
     LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
@@ -253,7 +253,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
     HashSize = GetSpdmHashSize (mUseHashAlgo);
     HmacSize = GetSpdmHashSize (mUseHashAlgo);
-    OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+    OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
     TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
@@ -274,7 +274,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     Ptr += HashSize;
     SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
     Ptr += DEFAULT_CONTEXT_LENGTH;
-    SpdmBuildOpaqueDataVersionSelectionData (&OpaquePskExchangeRspSize, Ptr);
+    SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
     Ptr += OpaquePskExchangeRspSize;
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
     LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
@@ -371,7 +371,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
       HashSize = GetSpdmHashSize (mUseHashAlgo);
       HmacSize = GetSpdmHashSize (mUseHashAlgo);
-      OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+      OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
       TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
@@ -392,7 +392,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       Ptr += HashSize;
       SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
       Ptr += DEFAULT_CONTEXT_LENGTH;
-      SpdmBuildOpaqueDataVersionSelectionData (&OpaquePskExchangeRspSize, Ptr);
+      SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
       Ptr += OpaquePskExchangeRspSize;
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);
@@ -498,7 +498,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
       HashSize = GetSpdmHashSize (mUseHashAlgo);
       HmacSize = GetSpdmHashSize (mUseHashAlgo);
-      OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+      OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
       TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
@@ -519,7 +519,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       Ptr += HashSize;
       SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
       Ptr += DEFAULT_CONTEXT_LENGTH;
-      SpdmBuildOpaqueDataVersionSelectionData (&OpaquePskExchangeRspSize, Ptr);
+      SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
       Ptr += OpaquePskExchangeRspSize;
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
       LocalBufferSize += ((UINTN)Ptr - (UINTN)SpdmResponse);

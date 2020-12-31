@@ -33,6 +33,7 @@ UINTN              mPeerCertChainBufferSize;
 
 UINT32             mSpdmRequesterCapabilitiesFlags;
 UINT32             mSpdmResponderCapabilitiesFlags;
+UINT8              mSpdmMeasurementSpec;
 UINT32             mSpdmMeasurementHashAlgo;
 UINT32             mSpdmBaseAsymAlgo;
 UINT32             mSpdmBaseHashAlgo;
@@ -500,6 +501,7 @@ DumpSpdmAlgorithms (
 
   printf ("\n");
 
+  mSpdmMeasurementSpec = SpdmResponse->MeasurementSpecificationSel;
   mSpdmMeasurementHashAlgo = SpdmResponse->MeasurementHashAlgo;
   mSpdmBaseAsymAlgo = SpdmResponse->BaseAsymSel;
   mSpdmBaseHashAlgo = SpdmResponse->BaseHashSel;
@@ -530,6 +532,7 @@ DumpSpdmAlgorithms (
 
   ZeroMem (&Parameter, sizeof(Parameter));
   Parameter.Location = SpdmDataLocationConnection;
+  SpdmSetData (mSpdmContext, SpdmDataMeasurementSpec, &Parameter, &mSpdmMeasurementSpec, sizeof(UINT8));
   SpdmSetData (mSpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &mSpdmMeasurementHashAlgo, sizeof(UINT32));
   SpdmSetData (mSpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &mSpdmBaseAsymAlgo, sizeof(UINT32));
   SpdmSetData (mSpdmContext, SpdmDataBaseHashAlgo, &Parameter, &mSpdmBaseHashAlgo, sizeof(UINT32));

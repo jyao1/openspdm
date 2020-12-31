@@ -98,13 +98,13 @@ SpdmGetResponsePskExchange (
                 SpdmRequest->OpaqueLength;
 
   Ptr = (UINT8 *)Request + sizeof(SPDM_PSK_EXCHANGE_REQUEST) + SpdmRequest->PSKHintLength + SpdmRequest->RequesterContextLength;
-  Status = SpdmProcessOpaqueDataSupportedVersionData (SpdmRequest->OpaqueLength, Ptr);
+  Status = SpdmProcessOpaqueDataSupportedVersionData (SpdmContext, SpdmRequest->OpaqueLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+  OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
   TotalSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               HashSize +
               DEFAULT_CONTEXT_LENGTH +
@@ -155,7 +155,7 @@ SpdmGetResponsePskExchange (
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += DEFAULT_CONTEXT_LENGTH;
 
-  Status = SpdmBuildOpaqueDataVersionSelectionData (&OpaquePskExchangeRspSize, Ptr);
+  Status = SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
   ASSERT_RETURN_ERROR(Status);
   Ptr += OpaquePskExchangeRspSize;
 

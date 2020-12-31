@@ -146,6 +146,8 @@ SpdmClientInit (
   }
   SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &Data32, sizeof(Data32));
 
+  Data8 = mSupportMeasurementSpec;
+  SpdmSetData (SpdmContext, SpdmDataMeasurementSpec, &Parameter, &Data8, sizeof(Data8));
   Data32 = mSupportAsymAlgo;
   SpdmSetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, sizeof(Data32));
   Data32 = mSupportHashAlgo;
@@ -174,14 +176,14 @@ SpdmClientInit (
   ASSERT (Data32 == SpdmConnectionStateNegotiated);
 
   DataSize = sizeof(Data32);
+  SpdmGetData (SpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &Data32, &DataSize);
+  mUseMeasurementHashAlgo = Data32;
+  DataSize = sizeof(Data32);
   SpdmGetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, &DataSize);
   mUseAsymAlgo = Data32;
   DataSize = sizeof(Data32);
   SpdmGetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &Data32, &DataSize);
   mUseHashAlgo = Data32;
-  DataSize = sizeof(Data32);
-  SpdmGetData (SpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &Data32, &DataSize);
-  mUseMeasurementHashAlgo = Data32;
   DataSize = sizeof(Data16);
   SpdmGetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, &DataSize);
   mUseReqAsymAlgo = Data16;

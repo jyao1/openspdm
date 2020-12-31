@@ -123,10 +123,10 @@ TrySpdmSendReceiveKeyExchange (
   InternalDumpHex (Ptr, DheKeySize);
   Ptr += DheKeySize;
 
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  Status = SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr);
+  Status = SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr);
   ASSERT_RETURN_ERROR(Status);
   Ptr += OpaqueKeyExchangeReqSize;
 
@@ -245,7 +245,7 @@ TrySpdmSendReceiveKeyExchange (
     SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
     return RETURN_DEVICE_ERROR;
   }
-  Status = SpdmProcessOpaqueDataVersionSelectionData (OpaqueLength, Ptr);
+  Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmContext, OpaqueLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);

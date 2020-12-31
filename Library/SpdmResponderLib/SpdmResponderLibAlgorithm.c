@@ -114,6 +114,10 @@ UINT32 mMeasurementHashPriorityTable[] = {
   SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_RAW_BIT_STREAM_ONLY,
 };
 
+UINT32 mMeasurementSpecPriorityTable[] = {
+  SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,
+};
+
 /**
   Select the preferred supproted algorithm according to the PriorityTable.
 
@@ -230,13 +234,13 @@ SpdmGetResponseAlgorithm (
   SpdmResponse->Header.RequestResponseCode = SPDM_ALGORITHMS;
   SpdmResponse->Header.Param2 = 0;
   SpdmResponse->Length = (UINT16)*ResponseSize;
-  SpdmResponse->MeasurementSpecificationSel = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
 
   StructTable = (VOID *)((UINTN)SpdmRequest +
                           sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) +
                           sizeof(UINT32) * SpdmRequest->ExtAsymCount +
                           sizeof(UINT32) * SpdmRequest->ExtHashCount
                           );
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = SpdmRequest->MeasurementSpecification;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmRequest->BaseAsymAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmRequest->BaseHashAlgo;
@@ -257,6 +261,12 @@ SpdmGetResponseAlgorithm (
     }
   }
 
+  SpdmResponse->MeasurementSpecificationSel = (UINT8)SpdmPrioritizeAlgorithm (
+                                                mMeasurementSpecPriorityTable,
+                                                ARRAY_SIZE(mMeasurementSpecPriorityTable),
+                                                SpdmContext->LocalContext.Algorithm.MeasurementSpec,
+                                                SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec
+                                                );
   SpdmResponse->MeasurementHashAlgo = SpdmPrioritizeAlgorithm (
                                         mMeasurementHashPriorityTable,
                                         ARRAY_SIZE(mMeasurementHashPriorityTable),
@@ -316,6 +326,7 @@ SpdmGetResponseAlgorithm (
     return RETURN_SUCCESS;
   }
 
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = SpdmResponse->MeasurementSpecificationSel;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SpdmResponse->MeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse->BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse->BaseHashSel;

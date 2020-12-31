@@ -91,7 +91,7 @@ TrySpdmSendReceivePskExchange (
   SpdmRequest.Header.Param2 = 0;
   SpdmRequest.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   SpdmRequest.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   SpdmRequest.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
 
   ReqSessionId = SpdmAllocateReqSessionId (SpdmContext);
@@ -110,7 +110,7 @@ TrySpdmSendReceivePskExchange (
   DEBUG((DEBUG_INFO, "\n"));
   Ptr += SpdmRequest.RequesterContextLength;
 
-  Status = SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
+  Status = SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
   ASSERT_RETURN_ERROR(Status);
   Ptr += OpaquePskExchangeReqSize;
 
@@ -171,7 +171,7 @@ TrySpdmSendReceivePskExchange (
   }
 
   Ptr = (UINT8 *)&SpdmResponse + sizeof(SPDM_PSK_EXCHANGE_RESPONSE) + HashSize + SpdmResponse.ResponderContextLength;
-  Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmResponse.OpaqueLength, Ptr);
+  Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmContext, SpdmResponse.OpaqueLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_UNSUPPORTED;

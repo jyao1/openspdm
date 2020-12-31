@@ -399,6 +399,16 @@ SpdmSetData (
     }
     SpdmContext->LocalContext.Capability.CTExponent = *(UINT8 *)Data;
     break;
+  case SpdmDataMeasurementSpec:
+    if (DataSize != sizeof(UINT8)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = *(UINT8 *)Data;
+    } else {
+      SpdmContext->LocalContext.Algorithm.MeasurementSpec = *(UINT8 *)Data;
+    }
+    break;
   case SpdmDataMeasurementHashAlgo:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
@@ -624,6 +634,13 @@ SpdmGetData (
     TargetDataSize = sizeof(UINT8);
     TargetData = &SpdmContext->ConnectionInfo.Capability.CTExponent;
     break;
+  case SpdmDataMeasurementSpec:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    TargetDataSize = sizeof(UINT8);
+    TargetData = &SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec;
+    break;
   case SpdmDataMeasurementHashAlgo:
     if (Parameter->Location != SpdmDataLocationConnection) {
       return RETURN_INVALID_PARAMETER;
@@ -823,7 +840,7 @@ SpdmIsVersionSupported (
   UINTN  Index;
 
   for (Index = 0; Index < MAX_SPDM_VERSION_COUNT; Index++) {
-    if (Version == SpdmContext->ConnectionInfo.Version[Index]) {
+    if (Version == SpdmContext->ConnectionInfo.SpdmVersion[Index]) {
       return TRUE;
     }
   }

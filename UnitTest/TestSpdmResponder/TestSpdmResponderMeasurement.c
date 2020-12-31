@@ -107,6 +107,7 @@ void TestSpdmResponderMeasurementCase1(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -140,6 +141,7 @@ void TestSpdmResponderMeasurementCase2(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -175,6 +177,7 @@ void TestSpdmResponderMeasurementCase3(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -211,6 +214,7 @@ void TestSpdmResponderMeasurementCase4(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -248,6 +252,7 @@ void TestSpdmResponderMeasurementCase5(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -283,6 +288,7 @@ void TestSpdmResponderMeasurementCase6(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -318,6 +324,7 @@ void TestSpdmResponderMeasurementCase7(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -353,6 +360,7 @@ void TestSpdmResponderMeasurementCase8(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -385,6 +393,7 @@ void TestSpdmResponderMeasurementCase9(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -419,6 +428,7 @@ void TestSpdmResponderMeasurementCase10(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -452,6 +462,7 @@ void TestSpdmResponderMeasurementCase11(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
@@ -486,6 +497,7 @@ void TestSpdmResponderMeasurementCase12(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->Transcript.L1L2.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;

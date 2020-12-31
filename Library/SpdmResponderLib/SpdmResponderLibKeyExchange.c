@@ -111,13 +111,13 @@ SpdmGetResponseKeyExchange (
                 OpaqueDataLength;
 
   Ptr = (UINT8 *)Request + sizeof(SPDM_KEY_EXCHANGE_REQUEST) + DheKeySize + sizeof(UINT16);
-  Status = SpdmProcessOpaqueDataSupportedVersionData (OpaqueDataLength, Ptr);
+  Status = SpdmProcessOpaqueDataSupportedVersionData (SpdmContext, OpaqueDataLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
-  OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize ();
+  OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
     HmacSize = 0;
@@ -196,7 +196,7 @@ SpdmGetResponseKeyExchange (
 
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
   Ptr += sizeof(UINT16);
-  Status = SpdmBuildOpaqueDataVersionSelectionData (&OpaqueKeyExchangeRspSize, Ptr);
+  Status = SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
   ASSERT_RETURN_ERROR(Status);
   Ptr += OpaqueKeyExchangeRspSize;
 

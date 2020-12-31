@@ -79,7 +79,7 @@ TrySpdmNegotiateAlgorithms (
   }
   SpdmRequest.Header.RequestResponseCode = SPDM_NEGOTIATE_ALGORITHMS;
   SpdmRequest.Header.Param2 = 0;
-  SpdmRequest.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
+  SpdmRequest.MeasurementSpecification = SpdmContext->LocalContext.Algorithm.MeasurementSpec;
   SpdmRequest.BaseAsymAlgo = SpdmContext->LocalContext.Algorithm.BaseAsymAlgo;
   SpdmRequest.BaseHashAlgo = SpdmContext->LocalContext.Algorithm.BaseHashAlgo;
   SpdmRequest.ExtAsymCount = 0;
@@ -150,9 +150,14 @@ TrySpdmNegotiateAlgorithms (
     return RETURN_SECURITY_VIOLATION;
   }
 
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = SpdmResponse.MeasurementSpecificationSel;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = SpdmResponse.MeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse.BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse.BaseHashSel;
+
+  if (SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec != SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF) {
+    return RETURN_SECURITY_VIOLATION;
+  }
 
   AlgoSize = GetSpdmMeasurementHashSize (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo);
   if (AlgoSize == 0) {

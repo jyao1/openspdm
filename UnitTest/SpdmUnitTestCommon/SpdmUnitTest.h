@@ -29,8 +29,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <SpdmCommonLibInternal.h>
 #include <SpdmDeviceSecretLibInternal.h>
 
-extern UINT32  mUseHashAlgo;
+extern UINT8   mUseMeasurementSpec;
 extern UINT32  mUseMeasurementHashAlgo;
+extern UINT32  mUseHashAlgo;
 extern UINT32  mUseAsymAlgo;
 extern UINT16  mUseReqAsymAlgo;
 extern UINT16  mUseDheAlgo;

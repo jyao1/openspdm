@@ -67,6 +67,7 @@ void TestSpdmResponderKeyExchangeCase1(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -86,10 +87,10 @@ void TestSpdmResponderKeyExchangeCase1(void **state) {
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (mUseDheAlgo, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);
@@ -124,6 +125,7 @@ void TestSpdmResponderKeyExchangeCase2(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -143,10 +145,10 @@ void TestSpdmResponderKeyExchangeCase2(void **state) {
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (mUseDheAlgo, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest2Size, &mSpdmKeyExchangeRequest2, &ResponseSize, Response);
@@ -183,6 +185,7 @@ void TestSpdmResponderKeyExchangeCase3(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -202,10 +205,10 @@ void TestSpdmResponderKeyExchangeCase3(void **state) {
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (mUseDheAlgo, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);
@@ -243,6 +246,7 @@ void TestSpdmResponderKeyExchangeCase4(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -262,10 +266,10 @@ void TestSpdmResponderKeyExchangeCase4(void **state) {
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (mUseDheAlgo, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);
@@ -304,6 +308,7 @@ void TestSpdmResponderKeyExchangeCase5(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -323,10 +328,10 @@ void TestSpdmResponderKeyExchangeCase5(void **state) {
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (mUseDheAlgo, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);
@@ -363,6 +368,7 @@ void TestSpdmResponderKeyExchangeCase6(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -382,10 +388,10 @@ void TestSpdmResponderKeyExchangeCase6(void **state) {
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
   SpdmDheFree (mUseDheAlgo, DHEContext);
-  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaqueKeyExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeReqSize;
   Ptr += sizeof(UINT16);
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaqueKeyExchangeReqSize, Ptr); 
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaqueKeyExchangeReqSize, Ptr); 
   Ptr += OpaqueKeyExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseKeyExchange (SpdmContext, mSpdmKeyExchangeRequest1Size, &mSpdmKeyExchangeRequest1, &ResponseSize, Response);

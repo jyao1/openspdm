@@ -87,6 +87,7 @@ void TestSpdmResponderFinishCase1(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -160,6 +161,7 @@ void TestSpdmResponderFinishCase2(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -235,6 +237,7 @@ void TestSpdmResponderFinishCase3(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -313,6 +316,7 @@ void TestSpdmResponderFinishCase4(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -392,6 +396,7 @@ void TestSpdmResponderFinishCase5(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -468,6 +473,7 @@ void TestSpdmResponderFinishCase6(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;

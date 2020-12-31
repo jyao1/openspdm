@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 UINTN
 EFIAPI
 SpdmGetOpaqueDataVersionSelectionDataSize (
-  VOID
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
 {
   UINTN  Size;
@@ -41,7 +41,7 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
 UINTN
 EFIAPI
 SpdmGetOpaqueDataSupportedVersionDataSize (
-  VOID
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
 {
   UINTN  Size;
@@ -71,6 +71,7 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
 RETURN_STATUS
 EFIAPI
 SpdmBuildOpaqueDataSupportedVersionData (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINTN                *DataOutSize,
      OUT VOID                 *DataOut
   )
@@ -82,7 +83,7 @@ SpdmBuildOpaqueDataSupportedVersionData (
   SPDM_VERSION_NUMBER                                *VersionsList;
   VOID                                               *End;
 
-  FinalDataSize = SpdmGetOpaqueDataSupportedVersionDataSize();
+  FinalDataSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   if (*DataOutSize < FinalDataSize) {
     *DataOutSize = FinalDataSize;
     return RETURN_BUFFER_TOO_SMALL;
@@ -131,6 +132,7 @@ SpdmBuildOpaqueDataSupportedVersionData (
 RETURN_STATUS
 EFIAPI
 SpdmProcessOpaqueDataSupportedVersionData (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINTN                DataInSize,
   IN     VOID                 *DataIn
   )
@@ -140,7 +142,7 @@ SpdmProcessOpaqueDataSupportedVersionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION   *OpaqueElementSupportVersion;
   SPDM_VERSION_NUMBER                                *VersionsList;
 
-  if (DataInSize != SpdmGetOpaqueDataSupportedVersionDataSize()) {
+  if (DataInSize != SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext)) {
     return RETURN_UNSUPPORTED;
   }
   GeneralOpaqueDataTableHeader = DataIn;
@@ -188,6 +190,7 @@ SpdmProcessOpaqueDataSupportedVersionData (
 RETURN_STATUS
 EFIAPI
 SpdmBuildOpaqueDataVersionSelectionData (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN OUT UINTN                *DataOutSize,
      OUT VOID                 *DataOut
   )
@@ -198,7 +201,7 @@ SpdmBuildOpaqueDataVersionSelectionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
   VOID                                               *End;
 
-  FinalDataSize = SpdmGetOpaqueDataVersionSelectionDataSize();
+  FinalDataSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
   if (*DataOutSize < FinalDataSize) {
     *DataOutSize = FinalDataSize;
     return RETURN_BUFFER_TOO_SMALL;
@@ -244,6 +247,7 @@ SpdmBuildOpaqueDataVersionSelectionData (
 RETURN_STATUS
 EFIAPI
 SpdmProcessOpaqueDataVersionSelectionData (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINTN                DataInSize,
   IN     VOID                 *DataIn
   )
@@ -252,7 +256,7 @@ SpdmProcessOpaqueDataVersionSelectionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
   SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
 
-  if (DataInSize != SpdmGetOpaqueDataVersionSelectionDataSize()) {
+  if (DataInSize != SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext)) {
     return RETURN_UNSUPPORTED;
   }
   GeneralOpaqueDataTableHeader = DataIn;

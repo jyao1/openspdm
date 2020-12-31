@@ -119,6 +119,9 @@ SpdmMeasurementCollectionFunc (
   UINTN                        TotalSize;
 
   ASSERT (MeasurementSpecification == SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF);
+  if (MeasurementSpecification != SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF) {
+    return FALSE;
+  }
 
   HashSize = GetSpdmMeasurementHashSize (MeasurementHashAlgo);
 

@@ -68,6 +68,7 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -85,7 +86,7 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -93,7 +94,7 @@ void TestSpdmResponderPskExchangeCase1(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);
@@ -126,6 +127,7 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -143,7 +145,7 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
 
   mSpdmPskExchangeRequest2.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest2.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   mSpdmPskExchangeRequest2.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest2.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest2.PSKHint;
@@ -151,7 +153,7 @@ void TestSpdmResponderPskExchangeCase2(void **state) {
   Ptr += mSpdmPskExchangeRequest2.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest2.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest2Size, &mSpdmPskExchangeRequest2, &ResponseSize, Response);
@@ -186,6 +188,7 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -203,7 +206,7 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -211,7 +214,7 @@ void TestSpdmResponderPskExchangeCase3(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);
@@ -247,6 +250,7 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -264,7 +268,7 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -272,7 +276,7 @@ void TestSpdmResponderPskExchangeCase4(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);
@@ -309,6 +313,7 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -326,7 +331,7 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -334,7 +339,7 @@ void TestSpdmResponderPskExchangeCase5(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);
@@ -369,6 +374,7 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
   SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
@@ -386,7 +392,7 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
 
   mSpdmPskExchangeRequest1.PSKHintLength = (UINT16)SpdmContext->LocalContext.PskHintSize;
   mSpdmPskExchangeRequest1.RequesterContextLength = DEFAULT_CONTEXT_LENGTH;
-  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize ();
+  OpaquePskExchangeReqSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   mSpdmPskExchangeRequest1.OpaqueLength = (UINT16)OpaquePskExchangeReqSize;
   mSpdmPskExchangeRequest1.ReqSessionID = 0xFFFF;
   Ptr = mSpdmPskExchangeRequest1.PSKHint;
@@ -394,7 +400,7 @@ void TestSpdmResponderPskExchangeCase6(void **state) {
   Ptr += mSpdmPskExchangeRequest1.PSKHintLength;
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += mSpdmPskExchangeRequest1.RequesterContextLength;
-  SpdmBuildOpaqueDataSupportedVersionData (&OpaquePskExchangeReqSize, Ptr);
+  SpdmBuildOpaqueDataSupportedVersionData (SpdmContext, &OpaquePskExchangeReqSize, Ptr);
   Ptr += OpaquePskExchangeReqSize;
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponsePskExchange (SpdmContext, mSpdmPskExchangeRequest1Size, &mSpdmPskExchangeRequest1, &ResponseSize, Response);

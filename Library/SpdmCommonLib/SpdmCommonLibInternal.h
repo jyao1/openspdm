@@ -21,6 +21,7 @@ typedef struct {
 } SPDM_DEVICE_CAPABILITY;
 
 typedef struct {
+  UINT8                MeasurementSpec;
   UINT32               MeasurementHashAlgo;
   UINT32               BaseAsymAlgo;
   UINT32               BaseHashAlgo;
@@ -35,6 +36,7 @@ typedef struct {
   // Local device info
   //
   UINT16                          SpdmVersion;
+  UINT16                          SecuredMessageVersion;
   SPDM_DEVICE_CAPABILITY          Capability;
   SPDM_DEVICE_ALGORITHM           Algorithm;
   //
@@ -82,7 +84,8 @@ typedef struct {
   //
   // Peer device info (negotiated)
   //
-  UINT8                           Version[MAX_SPDM_VERSION_COUNT];
+  UINT8                           SpdmVersion[MAX_SPDM_VERSION_COUNT];
+  UINT8                           SecuredMessageVersion[MAX_SPDM_VERSION_COUNT];
   SPDM_DEVICE_CAPABILITY          Capability;
   SPDM_DEVICE_ALGORITHM           Algorithm;
   //
@@ -904,6 +907,114 @@ SpdmCalculateTHCurrAKF (
   IN     UINT8                     *MutCertBuffer, OPTIONAL
   IN     UINTN                     MutCertBufferSize, OPTIONAL
      OUT LARGE_MANAGED_BUFFER      *THCurr
+  );
+
+/**
+  Return the size in bytes of opaque data supproted version.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request generation.
+
+  @return the size in bytes of opaque data supproted version.
+**/
+UINTN
+EFIAPI
+SpdmGetOpaqueDataSupportedVersionDataSize (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
+  );
+
+/**
+  Build opaque data supported version.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request generation.
+
+  @param  DataOutSize                  Size in bytes of the DataOut.
+                                       On input, it means the size in bytes of DataOut buffer.
+                                       On output, it means the size in bytes of copied DataOut buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired DataOut buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  DataOut                      A pointer to the desination buffer to store the opaque data supported version.
+
+  @retval RETURN_SUCCESS               The opaque data supported version is built successfully.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmBuildOpaqueDataSupportedVersionData (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT UINTN                *DataOutSize,
+     OUT VOID                 *DataOut
+  );
+
+/**
+  Process opaque data version selection.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response parsing in requester.
+
+  @param  DataInSize                   Size in bytes of the DataIn.
+  @param  DataIn                       A pointer to the buffer to store the opaque data version selection.
+
+  @retval RETURN_SUCCESS               The opaque data version selection is processed successfully.
+  @retval RETURN_UNSUPPORTED           The DataIn is NOT opaque data version selection.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmProcessOpaqueDataVersionSelectionData (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINTN                DataInSize,
+  IN     VOID                 *DataIn
+  );
+
+/**
+  Return the size in bytes of opaque data version selection.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response generation.
+
+  @return the size in bytes of opaque data version selection.
+**/
+UINTN
+EFIAPI
+SpdmGetOpaqueDataVersionSelectionDataSize (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
+  );
+
+/**
+  Build opaque data version selection.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE response generation.
+
+  @param  DataOutSize                  Size in bytes of the DataOut.
+                                       On input, it means the size in bytes of DataOut buffer.
+                                       On output, it means the size in bytes of copied DataOut buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired DataOut buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  DataOut                      A pointer to the desination buffer to store the opaque data version selection.
+
+  @retval RETURN_SUCCESS               The opaque data version selection is built successfully.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmBuildOpaqueDataVersionSelectionData (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT UINTN                *DataOutSize,
+     OUT VOID                 *DataOut
+  );
+
+/**
+  Process opaque data supported version.
+
+  This function should be called in KEY_EXCHANGE/PSK_EXCHANGE request parsing in responder.
+
+  @param  DataInSize                   Size in bytes of the DataIn.
+  @param  DataIn                       A pointer to the buffer to store the opaque data supported version.
+
+  @retval RETURN_SUCCESS               The opaque data supported version is processed successfully.
+  @retval RETURN_UNSUPPORTED           The DataIn is NOT opaque data supported version.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmProcessOpaqueDataSupportedVersionData (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINTN                DataInSize,
+  IN     VOID                 *DataIn
   );
 
 #endif

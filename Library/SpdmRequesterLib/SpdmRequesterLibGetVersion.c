@@ -115,10 +115,10 @@ TrySpdmGetVersion (
     Version = (UINT8)((SpdmResponse.VersionNumberEntry[Index].MajorVersion << 4) |
                                                          SpdmResponse.VersionNumberEntry[Index].MinorVersion);
 
-    if(Version == SPDM_MESSAGE_VERSION_11 || Version == SPDM_MESSAGE_VERSION_10) {
-         SpdmContext->ConnectionInfo.Version[Index] = Version;
-         CompatibleVersionNumberEntry[CompatibleVersionCount] = SpdmResponse.VersionNumberEntry[Index];
-         CompatibleVersionCount++;
+    if (Version == SPDM_MESSAGE_VERSION_11 || Version == SPDM_MESSAGE_VERSION_10) {
+      SpdmContext->ConnectionInfo.SpdmVersion[Index] = Version;
+      CompatibleVersionNumberEntry[CompatibleVersionCount] = SpdmResponse.VersionNumberEntry[Index];
+      CompatibleVersionCount++;
     }
   }
   if(CompatibleVersionCount == 0) {
