@@ -66,6 +66,58 @@ SpdmRegisterGetResponseFunc (
   );
 
 /**
+  Process a SPDM request from a device.
+
+  @param  SpdmContext                  The SPDM context for the device.
+  @param  SessionId                    Indicate if the request is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  IsAppMessage                 Indicates if it is an APP message or SPDM message.
+  @param  RequestSize                  Size in bytes of the request data buffer.
+  @param  Request                      A pointer to a destination buffer to store the request.
+                                       The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
+
+  @retval RETURN_SUCCESS               The SPDM request is received successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM request is received from the device.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmProcessRequest (
+  IN     VOID                    *SpdmContext,
+     OUT UINT32                  **SessionId,
+     OUT BOOLEAN                 *IsAppMessage,
+  IN     UINTN                   RequestSize,
+  IN     VOID                    *Request
+  );
+
+/**
+  Build a SPDM response to a device.
+
+  @param  SpdmContext                  The SPDM context for the device.
+  @param  SessionId                    Indicate if the response is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+  @param  IsAppMessage                 Indicates if it is an APP message or SPDM message.
+  @param  ResponseSize                 Size in bytes of the response data buffer.
+  @param  Response                     A pointer to a destination buffer to store the response.
+                                       The caller is responsible for having
+                                       either implicit or explicit ownership of the buffer.
+
+  @retval RETURN_SUCCESS               The SPDM response is sent successfully.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM response is sent to the device.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmBuildResponse (
+  IN     VOID                    *SpdmContext,
+  IN     UINT32                  *SessionId,
+  IN     BOOLEAN                 IsAppMessage,
+  IN OUT UINTN                   *ResponseSize,
+     OUT VOID                    *Response
+  );
+
+/**
   Process a transport layer message.
 
   The message can be a normal message or a secured message in SPDM session.

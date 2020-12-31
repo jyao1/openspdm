@@ -93,17 +93,21 @@ SpdmGetResponseFuncViaLastRequest (
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM request is received from the device.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmProcessRequest (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
+  IN     VOID                    *Context,
      OUT UINT32                  **SessionId,
      OUT BOOLEAN                 *IsAppMessage,
   IN     UINTN                   RequestSize,
   IN     VOID                    *Request
   )
 {
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
   RETURN_STATUS             Status;
   SPDM_SESSION_INFO         *SessionInfo;
   UINT32                    *MessageSessionId;
+
+  SpdmContext = Context;
 
   if (Request == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -157,14 +161,16 @@ SpdmProcessRequest (
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM response is sent to the device.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmBuildResponse (
-  IN     SPDM_DEVICE_CONTEXT     *SpdmContext,
+  IN     VOID                    *Context,
   IN     UINT32                  *SessionId,
   IN     BOOLEAN                 IsAppMessage,
   IN OUT UINTN                   *ResponseSize,
      OUT VOID                    *Response
   )
 {
+  SPDM_DEVICE_CONTEXT               *SpdmContext;
   UINT8                             MyResponse[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                             MyResponseSize;
   RETURN_STATUS                     Status;
@@ -172,6 +178,8 @@ SpdmBuildResponse (
   SPDM_SESSION_INFO                 *SessionInfo;
   SPDM_MESSAGE_HEADER               *SpdmRequest;
   SPDM_MESSAGE_HEADER               *SpdmResponse;
+
+  SpdmContext = Context;
 
   if (SessionId != NULL) {
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);

@@ -26,17 +26,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM request is sent to the device.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmSendRequest (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT32               *SessionId,
   IN     BOOLEAN              IsAppMessage,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request
   )
 {
+  SPDM_DEVICE_CONTEXT                *SpdmContext;
   RETURN_STATUS                      Status;
   UINT8                              Message[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                              MessageSize;
+
+  SpdmContext = Context;
 
   DEBUG((DEBUG_INFO, "SpdmSendSpdmRequest[%x] (0x%x): \n", (SessionId != NULL) ? *SessionId : 0x0, RequestSize));
   InternalDumpHex (Request, RequestSize);
@@ -73,19 +77,23 @@ SpdmSendRequest (
   @retval RETURN_DEVICE_ERROR          A device error occurs when the SPDM response is received from the device.
 **/
 RETURN_STATUS
+EFIAPI
 SpdmReceiveResponse (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     VOID                 *Context,
   IN     UINT32               *SessionId,
   IN     BOOLEAN              IsAppMessage,
   IN OUT UINTN                *ResponseSize,
      OUT VOID                 *Response
   )
 {
+  SPDM_DEVICE_CONTEXT       *SpdmContext;
   RETURN_STATUS             Status;
   UINT8                     Message[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                     MessageSize;
   UINT32                    *MessageSessionId;
   BOOLEAN                   IsMessageAppMessage;
+
+  SpdmContext = Context;
 
   ASSERT (*ResponseSize <= MAX_SPDM_MESSAGE_BUFFER_SIZE);
 
