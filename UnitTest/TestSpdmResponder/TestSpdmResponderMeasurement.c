@@ -599,7 +599,7 @@ void TestSpdmResponderMeasurementCase13(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -618,7 +618,7 @@ void TestSpdmResponderMeasurementCase13(void **state) {
     assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
     assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
     assert_int_equal (SpdmResponse->Header.Param2, 0);
-    assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+    assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   }
   free(Data);
   free(SpdmContext->LocalContext.DeviceMeasurement);
@@ -650,7 +650,7 @@ void TestSpdmResponderMeasurementCase14(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -669,7 +669,7 @@ void TestSpdmResponderMeasurementCase14(void **state) {
     assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
     assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
     assert_int_equal (SpdmResponse->Header.Param2, 0);
-    assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+    assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   }
   free(Data);
   free(SpdmContext->LocalContext.DeviceMeasurement);
@@ -699,7 +699,7 @@ void TestSpdmResponderMeasurementCase15(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -718,7 +718,7 @@ void TestSpdmResponderMeasurementCase15(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, mSpdmGetMeasurementRequest10.Header.RequestResponseCode);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
   free(SpdmContext->LocalContext.DeviceMeasurement);
 }
@@ -747,7 +747,7 @@ void TestSpdmResponderMeasurementCase16(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -765,7 +765,7 @@ void TestSpdmResponderMeasurementCase16(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
   free(SpdmContext->LocalContext.DeviceMeasurement);
 }
@@ -793,7 +793,7 @@ void TestSpdmResponderMeasurementCase17(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -811,7 +811,7 @@ void TestSpdmResponderMeasurementCase17(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, mSpdmGetMeasurementRequest10.Header.RequestResponseCode);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -837,7 +837,7 @@ void TestSpdmResponderMeasurementCase18(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -859,7 +859,7 @@ void TestSpdmResponderMeasurementCase18(void **state) {
   assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext) + MeasurmentSigSize);
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   assert_int_equal (mSpdmGetMeasurementRequest11.SlotIDParam, SpdmResponse->Header.Param2);
   free(Data);
   free(SpdmContext->LocalContext.DeviceMeasurement);
@@ -887,7 +887,7 @@ void TestSpdmResponderMeasurementCase19(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -906,7 +906,7 @@ void TestSpdmResponderMeasurementCase19(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
   free(SpdmContext->LocalContext.DeviceMeasurement);
 }
@@ -933,7 +933,7 @@ void TestSpdmResponderMeasurementCase20(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -952,7 +952,7 @@ void TestSpdmResponderMeasurementCase20(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
   free(SpdmContext->LocalContext.DeviceMeasurement);
 }
@@ -979,7 +979,7 @@ void TestSpdmResponderMeasurementCase21(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -998,7 +998,7 @@ void TestSpdmResponderMeasurementCase21(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
-  assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
   free(SpdmContext->LocalContext.DeviceMeasurement);
 }
@@ -1026,7 +1026,7 @@ void TestSpdmResponderMeasurementCase22(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
   SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
-  SpdmContext->Transcript.L1L2.BufferSize = 0;
+  SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   SpdmContext->LocalContext.DeviceMeasurementCount = 4;
@@ -1043,7 +1043,7 @@ void TestSpdmResponderMeasurementCase22(void **state) {
     assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext));
     SpdmResponse = (VOID *)Response;
     assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
-    assert_int_equal (SpdmContext->Transcript.L1L2.BufferSize, NumberOfMessages*(mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
+    assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, NumberOfMessages*(mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
   }
   free(Data);
   free(SpdmContext->LocalContext.DeviceMeasurement);

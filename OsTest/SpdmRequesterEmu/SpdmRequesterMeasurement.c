@@ -56,7 +56,7 @@ SpdmSendReceiveGetMeasurement (
     Status = SpdmGetMeasurement (
               SpdmContext,
               RequestAttribute,
-              SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS,
+              SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS,
               mUseSlotId & 0xF,
               &NumberOfBlocks,
               NULL,
