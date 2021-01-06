@@ -915,7 +915,7 @@ DumpSpdmGetMeasurements (
     DumpEntryFlags (mSpdmMeasurementAttributeStringTable, ARRAY_SIZE(mSpdmMeasurementAttributeStringTable), SpdmRequest->Header.Param1);
     printf ("), MeasOp=0x%02x", SpdmRequest->Header.Param2);
     switch (SpdmRequest->Header.Param2) {
-    case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS:
+    case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS:
       printf ("(TotalNum)");
       break;
     case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS:
@@ -1053,7 +1053,7 @@ DumpSpdmMeasurements (
   }
 
   if (!mParamQuiteMode) {
-    if (mCachedGetMeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+    if (mCachedGetMeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
       printf ("(TotalMeasIndex=0x%02x", SpdmResponse->Header.Param1);
       if (IncludeSignature) {
         printf (", SlotID=0x%02x", SpdmResponse->Header.Param2);
@@ -1069,7 +1069,7 @@ DumpSpdmMeasurements (
 
     if (mParamAllMode) {
       MeasurementRecord = (VOID *)(SpdmResponse + 1);
-      if (mCachedGetMeasurementOperation != SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTOAL_NUMBER_OF_MEASUREMENTS) {
+      if (mCachedGetMeasurementOperation != SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
         printf ("\n    MeasurementRecord(");
         DumpData (MeasurementRecord, MeasurementRecordLength);
         printf (")");

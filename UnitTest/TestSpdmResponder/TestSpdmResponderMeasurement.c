@@ -580,8 +580,6 @@ void TestSpdmResponderMeasurementCase13(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   UINT16               TestMsgSizes[] = {mSpdmGetMeasurementRequest9Size + sizeof(mSpdmGetMeasurementRequest9.SlotIDParam) + sizeof(mSpdmGetMeasurementRequest9.Nonce),
                                          mSpdmGetMeasurementRequest9Size + sizeof(mSpdmGetMeasurementRequest9.SlotIDParam),
                                          mSpdmGetMeasurementRequest9Size + sizeof(mSpdmGetMeasurementRequest9.Nonce)};
@@ -595,18 +593,13 @@ void TestSpdmResponderMeasurementCase13(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest9.Nonce);
   for(int i=0; i<sizeof(TestMsgSizes)/sizeof(TestMsgSizes[0]); i++) {
@@ -620,8 +613,6 @@ void TestSpdmResponderMeasurementCase13(void **state) {
     assert_int_equal (SpdmResponse->Header.Param2, 0);
     assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   }
-  free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase14(void **state) {
@@ -631,8 +622,6 @@ void TestSpdmResponderMeasurementCase14(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   UINT16               TestMsgSizes[] = {mSpdmGetMeasurementRequest10Size - sizeof(mSpdmGetMeasurementRequest10.SlotIDParam) - sizeof(mSpdmGetMeasurementRequest10.Nonce),
                                          mSpdmGetMeasurementRequest10Size - sizeof(mSpdmGetMeasurementRequest10.SlotIDParam),
                                          mSpdmGetMeasurementRequest10Size - sizeof(mSpdmGetMeasurementRequest10.Nonce)};
@@ -646,18 +635,13 @@ void TestSpdmResponderMeasurementCase14(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest10.Nonce);
   for(int i=0; i<sizeof(TestMsgSizes)/sizeof(TestMsgSizes[0]); i++) {
@@ -671,8 +655,6 @@ void TestSpdmResponderMeasurementCase14(void **state) {
     assert_int_equal (SpdmResponse->Header.Param2, 0);
     assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   }
-  free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase15(void **state) {
@@ -682,8 +664,6 @@ void TestSpdmResponderMeasurementCase15(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   // UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
@@ -695,19 +675,14 @@ void TestSpdmResponderMeasurementCase15(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  SpdmContext->LocalContext.SpdmDataSignFunc = NULL;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest10.Nonce);
@@ -716,11 +691,9 @@ void TestSpdmResponderMeasurementCase15(void **state) {
   assert_int_equal (ResponseSize, sizeof(SPDM_ERROR_RESPONSE));
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
-  assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST);
-  assert_int_equal (SpdmResponse->Header.Param2, mSpdmGetMeasurementRequest10.Header.RequestResponseCode);
+  assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
+  assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
-  free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase16(void **state) {
@@ -730,8 +703,6 @@ void TestSpdmResponderMeasurementCase16(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   // UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
@@ -743,19 +714,14 @@ void TestSpdmResponderMeasurementCase16(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest9Size, &mSpdmGetMeasurementRequest10, &ResponseSize, Response);
@@ -766,8 +732,6 @@ void TestSpdmResponderMeasurementCase16(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
-  free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase17(void **state) {
@@ -777,8 +741,6 @@ void TestSpdmResponderMeasurementCase17(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   // UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
@@ -789,18 +751,14 @@ void TestSpdmResponderMeasurementCase17(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags = 0;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
-  SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = NULL;
-  SpdmContext->LocalContext.SpdmDataSignFunc = NULL;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
+  SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;;
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest9.Nonce);
@@ -812,7 +770,6 @@ void TestSpdmResponderMeasurementCase17(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, mSpdmGetMeasurementRequest10.Header.RequestResponseCode);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
-  free(Data);
 }
 
 void TestSpdmResponderMeasurementCase18(void **state) {
@@ -833,36 +790,33 @@ void TestSpdmResponderMeasurementCase18(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.SlotCount = MAX_SPDM_SLOT_COUNT-1;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
-  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
-  for (int i=0; i<SpdmContext->LocalContext.SlotCount; i++) {
-    SpdmContext->LocalContext.CertificateChainSize[i] = DataSize;
-    SpdmContext->LocalContext.CertificateChain[i] = Data;
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
+  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  SpdmContext->LocalContext.SlotCount = MAX_SPDM_SLOT_COUNT;
+  for (int i=1  ; i<SpdmContext->LocalContext.SlotCount; i++) {
+    SpdmContext->LocalContext.LocalCertChainProvisionSize[i] = DataSize;
+    SpdmContext->LocalContext.LocalCertChainProvision[i] = Data;
   }
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest11.Nonce);
   Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest11Size, &mSpdmGetMeasurementRequest11, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext) + MeasurmentSigSize);
+  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + MeasurmentSigSize);
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   assert_int_equal (mSpdmGetMeasurementRequest11.SlotIDParam, SpdmResponse->Header.Param2);
+
+  SpdmContext->LocalContext.SlotCount = 1;
   free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase19(void **state) {
@@ -872,8 +826,6 @@ void TestSpdmResponderMeasurementCase19(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   // UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
@@ -883,19 +835,14 @@ void TestSpdmResponderMeasurementCase19(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest12.Nonce);
@@ -907,8 +854,6 @@ void TestSpdmResponderMeasurementCase19(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
-  free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase20(void **state) {
@@ -918,8 +863,6 @@ void TestSpdmResponderMeasurementCase20(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   // UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
@@ -929,19 +872,14 @@ void TestSpdmResponderMeasurementCase20(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest11.Nonce);
@@ -953,8 +891,6 @@ void TestSpdmResponderMeasurementCase20(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
-  free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase21(void **state) {
@@ -964,8 +900,6 @@ void TestSpdmResponderMeasurementCase21(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   // UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
@@ -975,19 +909,14 @@ void TestSpdmResponderMeasurementCase21(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (SpdmContext);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest13.Nonce);
@@ -999,8 +928,6 @@ void TestSpdmResponderMeasurementCase21(void **state) {
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
-  free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 void TestSpdmResponderMeasurementCase22(void **state) {
@@ -1010,10 +937,8 @@ void TestSpdmResponderMeasurementCase22(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  VOID                 *Data;
-  UINTN                DataSize;
   UINTN                NumberOfMessages;
-  #define TOTAL_MESSAGES 1000
+  #define TOTAL_MESSAGES 100
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -1022,31 +947,28 @@ void TestSpdmResponderMeasurementCase22(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP;
-  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = USE_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = USE_ASYM_ALGO;
-  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = USE_MEASUREMENT_HASH_ALGO;
-  SpdmContext->ConnectionInfo.Version[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  SpdmContext->LocalContext.DeviceMeasurementCount = 4;
-  SpdmContext->LocalContext.DeviceMeasurement = (VOID *)malloc (4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
-  SetMem (SpdmContext->LocalContext.DeviceMeasurement, 4 * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize(SpdmContext)), 1);
-  SpdmContext->LocalContext.SpdmDataSignFunc = SpdmDataSignFunc;
-  ReadResponderPrivateCertificate (&Data, &DataSize);
 
-  ResponseSize = sizeof(Response);
-  SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest6.Nonce);
   for (NumberOfMessages = 1; NumberOfMessages <= TOTAL_MESSAGES; NumberOfMessages++) {
+    SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest6.Nonce);
+    ResponseSize = sizeof(Response);
     Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest6Size, &mSpdmGetMeasurementRequest6, &ResponseSize, Response);
     assert_int_equal (Status, RETURN_SUCCESS);
-    assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext));
     SpdmResponse = (VOID *)Response;
-    assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
-    assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, NumberOfMessages*(mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (SpdmContext)));
+    if (SpdmResponse->Header.RequestResponseCode == SPDM_MEASUREMENTS) {
+      assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
+      assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+      assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, NumberOfMessages*(mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
+    } else {
+      assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
+    }
   }
-  free(Data);
-  free(SpdmContext->LocalContext.DeviceMeasurement);
 }
 
 int SpdmResponderMeasurementTestMain(void) {
@@ -1097,7 +1019,7 @@ int SpdmResponderMeasurementTestMain(void) {
     // Error Case: request a measurement out of bounds
     cmocka_unit_test(TestSpdmResponderMeasurementCase21),
     // Large number of requests before requiring a signature
-    // cmocka_unit_test(TestSpdmResponderMeasurementCase22),
+    cmocka_unit_test(TestSpdmResponderMeasurementCase22),
   };
 
   SetupSpdmTestContext (&mSpdmResponderMeasurementTestContext);
