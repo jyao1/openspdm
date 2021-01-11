@@ -728,7 +728,7 @@ int SpdmResponderCertificateTestMain(void) {
     // Tests large certificate chains
     cmocka_unit_test(TestSpdmResponderCertificateCase10),
     // Certificate fits in one single message
-    // cmocka_unit_test(TestSpdmResponderCertificateCase11),
+    cmocka_unit_test(TestSpdmResponderCertificateCase11),
     // Requests byte by byte
     cmocka_unit_test(TestSpdmResponderCertificateCase12),
 
