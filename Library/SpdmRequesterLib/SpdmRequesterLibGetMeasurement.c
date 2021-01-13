@@ -195,6 +195,9 @@ TrySpdmGetMeasurement (
                            sizeof(UINT16)) {
       return RETURN_DEVICE_ERROR;
     }
+    if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) && SpdmResponse.Header.Param2 != SlotIdParam) {
+      return RETURN_SECURITY_VIOLATION;
+    }
     Ptr = MeasurementRecordData + MeasurementRecordDataLength;
     ServerNonce = Ptr;
     DEBUG((DEBUG_INFO, "ServerNonce (0x%x) - ", SPDM_NONCE_SIZE));
