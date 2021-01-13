@@ -144,6 +144,10 @@ SPDM_GET_MEASUREMENTS_REQUEST    mSpdmGetMeasurementRequest13 = {
 };
 UINTN mSpdmGetMeasurementRequest13Size = sizeof(SPDM_MESSAGE_HEADER);
 
+/**
+  Test 1: Successful response to get a number of measurements without signature
+  Expected Behavior: get a RETURN_SUCCESS return code, correct Transcript.MessageM size, and correct response message size and fields
+**/
 void TestSpdmResponderMeasurementCase1(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -178,6 +182,10 @@ void TestSpdmResponderMeasurementCase1(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, mSpdmGetMeasurementRequest1Size + sizeof(SPDM_MEASUREMENTS_RESPONSE));
 }
 
+/**
+  Test 2: Error case, Bad Request Size (MAX_SPDM_MESSAGE_BUFFER_SIZE) to get measurement number without signature
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase2(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -213,6 +221,10 @@ void TestSpdmResponderMeasurementCase2(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 3: Force ResponseState = SpdmResponseStateBusy when asked GET_MEASUREMENTS
+  Expected Behavior: generate an ERROR_RESPONSE with code SPDM_ERROR_CODE_BUSY
+**/
 void TestSpdmResponderMeasurementCase3(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -250,6 +262,10 @@ void TestSpdmResponderMeasurementCase3(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 4: Force ResponseState = SpdmResponseStateNeedResync when asked GET_MEASUREMENTS
+  Expected Behavior: generate an ERROR_RESPONSE with code SPDM_ERROR_CODE_REQUEST_RESYNCH
+**/
 void TestSpdmResponderMeasurementCase4(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -287,6 +303,10 @@ void TestSpdmResponderMeasurementCase4(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 5: Force ResponseState = SpdmResponseStateNotReady when asked GET_MEASUREMENTS
+  Expected Behavior: generate an ERROR_RESPONSE with code SPDM_ERROR_CODE_RESPONSE_NOT_READY
+**/
 void TestSpdmResponderMeasurementCase5(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -327,6 +347,11 @@ void TestSpdmResponderMeasurementCase5(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 6: simulate wrong SpdmCmdReceiveState when asked GET_MEASUREMENTS
+          (missing SPDM_GET_DIGESTS_RECEIVE_FLAG, SPDM_GET_CAPABILITIES_RECEIVE_FLAG and SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG)
+  Expected Behavior: generate an ERROR_RESPONSE with code SPDM_ERROR_CODE_UNEXPECTED_REQUEST
+**/
 void TestSpdmResponderMeasurementCase6(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -360,6 +385,10 @@ void TestSpdmResponderMeasurementCase6(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 7: Successful response to get a number of measurements with signature
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM, and correct response message size and fields
+**/
 void TestSpdmResponderMeasurementCase7(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -396,6 +425,10 @@ void TestSpdmResponderMeasurementCase7(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 8: Successful response to get one measurement with signature
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM, and correct response message size and fields
+**/
 void TestSpdmResponderMeasurementCase8(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -430,6 +463,10 @@ void TestSpdmResponderMeasurementCase8(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 9: Error case, Bad Request Size (sizeof(SPDM_MESSAGE_HEADER)x) to get measurement number with signature
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase9(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -465,6 +502,10 @@ void TestSpdmResponderMeasurementCase9(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 10: Successful response to get one measurement without signature
+  Expected Behavior: get a RETURN_SUCCESS return code, correct Transcript.MessageM size, and correct response message size and fields
+**/
 void TestSpdmResponderMeasurementCase10(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -498,6 +539,10 @@ void TestSpdmResponderMeasurementCase10(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
 }
 
+/**
+  Test 11: Successful response to get all measurements with signature
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM, and correct response message size and fields
+**/
 void TestSpdmResponderMeasurementCase11(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -534,6 +579,10 @@ void TestSpdmResponderMeasurementCase11(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 12: Successful response to get all measurements without signature
+  Expected Behavior: get a RETURN_SUCCESS return code, correct Transcript.MessageM size, and correct response message size and fields
+**/
 void TestSpdmResponderMeasurementCase12(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -568,11 +617,10 @@ void TestSpdmResponderMeasurementCase12(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, mSpdmGetMeasurementRequest7Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)) + (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MEASUREMENT_MANIFEST_SIZE));
 }
 
-SPDM_TEST_CONTEXT       mSpdmResponderMeasurementTestContext = {
-  SPDM_TEST_CONTEXT_SIGNATURE,
-  FALSE,
-};
-
+/**
+  Test 13: Error case, even though signature was not required, there is nonce and/or slotID
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase13(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -615,6 +663,10 @@ void TestSpdmResponderMeasurementCase13(void **state) {
   }
 }
 
+/**
+  Test 14: Error case, signature was required, but there is no nonce and/or slotID
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase14(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -657,6 +709,10 @@ void TestSpdmResponderMeasurementCase14(void **state) {
   }
 }
 
+/**
+  Test 15: Error case, MEAS_CAP = 01b, but signature was requested (request message includes nonce and slotID)
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase15(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -696,6 +752,10 @@ void TestSpdmResponderMeasurementCase15(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 16: Error case, MEAS_CAP = 01b, but signature was requested (request message does not include nonce and slotID)
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase16(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -734,6 +794,10 @@ void TestSpdmResponderMeasurementCase16(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 17: Error case, MEAS_CAP = 00
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase17(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -772,6 +836,10 @@ void TestSpdmResponderMeasurementCase17(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 18: Successful response to get one measurement with signature, SlotId different from default
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM, and correct response message size and fields
+**/
 void TestSpdmResponderMeasurementCase18(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -819,6 +887,10 @@ void TestSpdmResponderMeasurementCase18(void **state) {
   free(Data);
 }
 
+/**
+  Test 19: Error case, invalid SlotId parameter (SlotId >= MAX_SPDM_SLOT_COUNT)
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase19(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -856,6 +928,10 @@ void TestSpdmResponderMeasurementCase19(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 19: Error case, invalid SlotId parameter (SlotCount < SlotId < MAX_SPDM_SLOT_COUNT)
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase20(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -893,6 +969,10 @@ void TestSpdmResponderMeasurementCase20(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 21: Error case, request a measurement index larger than the total number of measurements
+  Expected Behavior: get a RETURN_SUCCESS return code, empty Transcript.MessageM size, and Error message as response
+**/
 void TestSpdmResponderMeasurementCase21(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -900,7 +980,6 @@ void TestSpdmResponderMeasurementCase21(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  // UINTN                MeasurmentSigSize;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -916,7 +995,6 @@ void TestSpdmResponderMeasurementCase21(void **state) {
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest13.Nonce);
@@ -930,6 +1008,11 @@ void TestSpdmResponderMeasurementCase21(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
+/**
+  Test 22: request a large number of measurements before requesting a singed response
+  Expected Behavior: while Transcript.MessageM is not full, get a RETURN_SUCCESS return code, empty Transcript.MessageM, and correct response message size and fields
+                      if Transcript.MessageM has no more room, an error response is expected
+**/
 void TestSpdmResponderMeasurementCase22(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -967,9 +1050,16 @@ void TestSpdmResponderMeasurementCase22(void **state) {
       assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, NumberOfMessages*(mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     } else {
       assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
+      assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+      break;
     }
   }
 }
+
+SPDM_TEST_CONTEXT       mSpdmResponderMeasurementTestContext = {
+  SPDM_TEST_CONTEXT_SIGNATURE,
+  FALSE,
+};
 
 int SpdmResponderMeasurementTestMain(void) {
   mSpdmGetMeasurementRequest11.SlotIDParam = MAX_SPDM_SLOT_COUNT-1;
