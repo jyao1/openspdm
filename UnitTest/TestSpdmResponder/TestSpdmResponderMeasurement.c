@@ -628,9 +628,9 @@ void TestSpdmResponderMeasurementCase13(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  UINT16               TestMsgSizes[] = {mSpdmGetMeasurementRequest9Size + sizeof(mSpdmGetMeasurementRequest9.SlotIDParam) + sizeof(mSpdmGetMeasurementRequest9.Nonce),
-                                         mSpdmGetMeasurementRequest9Size + sizeof(mSpdmGetMeasurementRequest9.SlotIDParam),
-                                         mSpdmGetMeasurementRequest9Size + sizeof(mSpdmGetMeasurementRequest9.Nonce)};
+  UINT16               TestMsgSizes[] = {(UINT16)(mSpdmGetMeasurementRequest9Size + sizeof(mSpdmGetMeasurementRequest9.SlotIDParam) + sizeof(mSpdmGetMeasurementRequest9.Nonce)),
+                                         (UINT16)(mSpdmGetMeasurementRequest9Size + sizeof(mSpdmGetMeasurementRequest9.SlotIDParam)),
+                                         (UINT16)(mSpdmGetMeasurementRequest9Size + sizeof(mSpdmGetMeasurementRequest9.Nonce))};
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
@@ -674,9 +674,9 @@ void TestSpdmResponderMeasurementCase14(void **state) {
   UINTN                ResponseSize;
   UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   SPDM_MEASUREMENTS_RESPONSE *SpdmResponse;
-  UINT16               TestMsgSizes[] = {mSpdmGetMeasurementRequest10Size - sizeof(mSpdmGetMeasurementRequest10.SlotIDParam) - sizeof(mSpdmGetMeasurementRequest10.Nonce),
-                                         mSpdmGetMeasurementRequest10Size - sizeof(mSpdmGetMeasurementRequest10.SlotIDParam),
-                                         mSpdmGetMeasurementRequest10Size - sizeof(mSpdmGetMeasurementRequest10.Nonce)};
+  UINT16               TestMsgSizes[] = {(UINT16)(mSpdmGetMeasurementRequest10Size - sizeof(mSpdmGetMeasurementRequest10.SlotIDParam) - sizeof(mSpdmGetMeasurementRequest10.Nonce)),
+                                         (UINT16)(mSpdmGetMeasurementRequest10Size - sizeof(mSpdmGetMeasurementRequest10.SlotIDParam)),
+                                         (UINT16)(mSpdmGetMeasurementRequest10Size - sizeof(mSpdmGetMeasurementRequest10.Nonce))};
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
