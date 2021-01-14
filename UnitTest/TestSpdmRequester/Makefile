@@ -44,6 +44,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmRequesterKeyExchange.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterFinish.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterPskExchange.obj \
+    $(OUTPUT_DIR)\TestSpdmRequesterPskFinish.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
     $(OUTPUT_DIR)\SpdmTestKey.obj \
     $(OUTPUT_DIR)\SpdmTestSupport.obj \
@@ -174,6 +175,9 @@ $(OUTPUT_DIR)\TestSpdmRequesterFinish.obj : $(SOURCE_DIR)\TestSpdmRequesterFinis
 
 $(OUTPUT_DIR)\TestSpdmRequesterPskExchange.obj : $(SOURCE_DIR)\TestSpdmRequesterPskExchange.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterPskExchange.c
+
+$(OUTPUT_DIR)\TestSpdmRequesterPskFinish.obj : $(SOURCE_DIR)\TestSpdmRequesterPskFinish.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterPskFinish.c
 
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c

@@ -16,6 +16,11 @@ typedef struct {
   UINT8                VerifyData[MAX_HASH_SIZE];
 } SPDM_PSK_FINISH_REQUEST_MINE;
 
+typedef struct {
+  SPDM_MESSAGE_HEADER  Header;
+  UINT8                DummyData[sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY)];
+} SPDM_PSK_FINISH_RESPONSE_MINE;
+
 #pragma pack()
 
 /**
@@ -28,7 +33,7 @@ typedef struct {
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
-SpdmSendReceivePskFinish (
+TrySpdmSendReceivePskFinish (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               SessionId
   )
@@ -37,11 +42,17 @@ SpdmSendReceivePskFinish (
   SPDM_PSK_FINISH_REQUEST_MINE              SpdmRequest;
   UINTN                                     SpdmRequestSize;
   UINTN                                     HmacSize;
-  SPDM_PSK_FINISH_RESPONSE                  SpdmResponse;
+  SPDM_PSK_FINISH_RESPONSE_MINE             SpdmResponse;
   UINTN                                     SpdmResponseSize;
   SPDM_SESSION_INFO                         *SessionInfo;
   UINT8                                     TH2HashData[64];
-  
+
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_EXCHANGE_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
   }
@@ -85,10 +96,15 @@ SpdmSendReceivePskFinish (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponseSize != sizeof(SPDM_PSK_FINISH_RESPONSE)) {
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SessionId, &SessionInfo->SessionTranscript.MessageF, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_PSK_FINISH, SPDM_PSK_FINISH_RSP, sizeof(SPDM_PSK_FINISH_RESPONSE_MINE));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_PSK_FINISH_RSP) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_PSK_FINISH_RSP) {
+  if (SpdmResponseSize != sizeof(SPDM_PSK_FINISH_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   
@@ -109,7 +125,28 @@ SpdmSendReceivePskFinish (
 
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   
   return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+SpdmSendReceivePskFinish (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               SessionId
+  )
+{
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+
+  Retry = SpdmContext->RetryTimes;
+  do {
+    Status = TrySpdmSendReceivePskFinish(SpdmContext, SessionId);
+    if (RETURN_NO_RESPONSE != Status) {
+      return Status;
+    }
+  } while (Retry-- != 0);
+
+  return Status;
 }
 

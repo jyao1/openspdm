@@ -43,10 +43,22 @@ SpdmGetResponsePskFinish (
   SPDM_DEVICE_CONTEXT          *SpdmContext;
   SPDM_SESSION_INFO            *SessionInfo;
   UINT8                        TH2HashData[64];
+  SPDM_PSK_FINISH_REQUEST      *SpdmRequest;
   RETURN_STATUS                Status;
 
   SpdmContext = Context;
-
+  SpdmRequest = Request;
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_EXCHANGE_RECEIVE_FLAG) == 0) ||
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
+  }
+  
   ASSERT (SpdmContext->LastSpdmRequestSessionIdValid);
   if (!SpdmContext->LastSpdmRequestSessionIdValid) {
     SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
@@ -113,5 +125,7 @@ SpdmGetResponsePskFinish (
     return RETURN_SUCCESS;
   }
 
+  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  
   return RETURN_SUCCESS;
 }
