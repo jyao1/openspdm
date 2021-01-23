@@ -29,7 +29,7 @@ typedef struct {
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    SessionId to the FINISH request.
-  @param  SlotIdParam                  SlotIdParam to the FINISH request.
+  @param  ReqSlotIdParam               ReqSlotIdParam to the FINISH request.
 
   @retval RETURN_SUCCESS               The FINISH is sent and the FINISH_RSP is received.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
@@ -38,7 +38,7 @@ RETURN_STATUS
 TrySpdmSendReceiveFinish (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               SessionId,
-  IN     UINT8                SlotIdParam
+  IN     UINT8                ReqSlotIdParam
   )
 {
   RETURN_STATUS                             Status;
@@ -70,11 +70,11 @@ TrySpdmSendReceiveFinish (
   }
 
   if (SessionInfo->MutAuthRequested != 0) {
-    if ((SlotIdParam >= SpdmContext->LocalContext.SlotCount) && (SlotIdParam != 0xFF)) {
+    if ((ReqSlotIdParam >= SpdmContext->LocalContext.SlotCount) && (ReqSlotIdParam != 0xFF)) {
       return RETURN_INVALID_PARAMETER;
     }
   } else {
-    if (SlotIdParam != 0) {
+    if (ReqSlotIdParam != 0) {
       return RETURN_INVALID_PARAMETER;
     }
   }
@@ -85,7 +85,7 @@ TrySpdmSendReceiveFinish (
   SpdmRequest.Header.RequestResponseCode = SPDM_FINISH;
   if (SessionInfo->MutAuthRequested) {
     SpdmRequest.Header.Param1 = SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED;
-    SpdmRequest.Header.Param2 = SlotIdParam;
+    SpdmRequest.Header.Param2 = ReqSlotIdParam;
     SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
   } else {
     SpdmRequest.Header.Param1 = 0;
@@ -93,13 +93,13 @@ TrySpdmSendReceiveFinish (
     SignatureSize = 0;
   }
   
-  if (SlotIdParam == 0xFF) {
-    SlotIdParam = SpdmContext->LocalContext.ProvisionedSlotNum;
+  if (ReqSlotIdParam == 0xFF) {
+    ReqSlotIdParam = SpdmContext->LocalContext.ProvisionedSlotNum;
   }
 
   if (SessionInfo->MutAuthRequested) {
-    SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = SpdmContext->LocalContext.LocalCertChainProvision[SlotIdParam];
-    SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotIdParam];
+    SpdmContext->ConnectionInfo.LocalUsedCertChainBuffer = SpdmContext->LocalContext.LocalCertChainProvision[ReqSlotIdParam];
+    SpdmContext->ConnectionInfo.LocalUsedCertChainBufferSize = SpdmContext->LocalContext.LocalCertChainProvisionSize[ReqSlotIdParam];
   }
 
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
@@ -208,7 +208,7 @@ RETURN_STATUS
 SpdmSendReceiveFinish (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               SessionId,
-  IN     UINT8                SlotIdParam
+  IN     UINT8                ReqSlotIdParam
   )
 {
   UINTN                   Retry;
@@ -216,7 +216,7 @@ SpdmSendReceiveFinish (
 
   Retry = SpdmContext->RetryTimes;
   do {
-    Status = TrySpdmSendReceiveFinish(SpdmContext, SessionId, SlotIdParam);
+    Status = TrySpdmSendReceiveFinish(SpdmContext, SessionId, ReqSlotIdParam);
     if (RETURN_NO_RESPONSE != Status) {
       return Status;
     }

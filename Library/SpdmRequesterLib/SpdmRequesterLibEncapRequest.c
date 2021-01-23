@@ -123,7 +123,7 @@ SpdmProcessEncapsulatedRequest (
                                        If SessionId is NULL, it is a normal message.
                                        If SessionId is NOT NULL, it is a secured message.
   @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
-  @param  SlotIdParam                  SlotIdParam from the RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER.
+  @param  ReqSlotIdParam               ReqSlotIdParam from the RESPONSE_PAYLOAD_TYPE_REQ_SLOT_NUMBER.
 
   @retval RETURN_SUCCESS               The SPDM Encapsulated requests are sent and the responses are received.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
@@ -133,7 +133,7 @@ SpdmEncapsulatedRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
   IN     UINT8                MutAuthRequested,
-     OUT UINT8                *SlotIdParam
+     OUT UINT8                *ReqSlotIdParam
   )
 {
   RETURN_STATUS                               Status;
@@ -267,11 +267,11 @@ SpdmEncapsulatedRequest (
       break;
     case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_PRESENT:
       break;
-    case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER:
+    case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_REQ_SLOT_NUMBER:
       if (SpdmResponseSize >= sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE) + sizeof(UINT8)) {
-        if ((SlotIdParam != NULL) && (*SlotIdParam == 0)) {
-          *SlotIdParam = *(UINT8 *)(SpdmEncapsulatedResponseAckResponse + 1);
-          if (*SlotIdParam >= SpdmContext->LocalContext.SlotCount) {
+        if ((ReqSlotIdParam != NULL) && (*ReqSlotIdParam == 0)) {
+          *ReqSlotIdParam = *(UINT8 *)(SpdmEncapsulatedResponseAckResponse + 1);
+          if (*ReqSlotIdParam >= SpdmContext->LocalContext.SlotCount) {
             return RETURN_DEVICE_ERROR;
           }
         }

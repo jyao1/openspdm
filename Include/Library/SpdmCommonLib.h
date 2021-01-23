@@ -136,7 +136,7 @@ typedef struct {
   // DataType specific:
   //   SessionId for the negoatiated key.
   //   SlotId for the certificate.
-  //   SlotNum + MeasurementHashType for SpdmDataMutAuthRequested
+  //   ReqSlotNum + MeasurementHashType for SpdmDataMutAuthRequested
   UINT8                AdditionalData[4];
 } SPDM_DATA_PARAMETER;
 

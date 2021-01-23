@@ -634,7 +634,7 @@ typedef struct {
   // Param2 == RSVD
   UINT16               RspSessionID;
   UINT8                MutAuthRequested;
-  UINT8                SlotIDParam;
+  UINT8                ReqSlotIDParam;
   UINT8                RandomData[32];
 //UINT8                ExchangeData[D];
 //UINT8                MeasurementSummaryHash[DigestSize];
@@ -657,7 +657,7 @@ typedef struct {
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   // Param1 == SignatureIncluded
-  // Param2 == SlotNum
+  // Param2 == ReqSlotNum
 //UINT8                Signature[S];
 //UINT8                RequesterVerifyData[H];
 } SPDM_FINISH_REQUEST;
@@ -816,7 +816,7 @@ typedef struct {
 ///
 #define SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_ABSENT       0
 #define SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_PRESENT      1
-#define SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER  2
+#define SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_REQ_SLOT_NUMBER  2
 
 ///
 /// SPDM END_SESSION request

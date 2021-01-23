@@ -210,7 +210,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->RspSessionID = SpdmAllocateRspSessionId (SpdmContext);
     SpdmResponse->MutAuthRequested = 0;
-    SpdmResponse->SlotIDParam = 0;
+    SpdmResponse->ReqSlotIDParam = 0;
     SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
     Ptr = (VOID *)(SpdmResponse + 1);
     DHEContext = SpdmDheNew (mUseDheAlgo);
@@ -316,7 +316,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->RspSessionID = SpdmAllocateRspSessionId (SpdmContext);
     SpdmResponse->MutAuthRequested = 0;
-    SpdmResponse->SlotIDParam = 0;
+    SpdmResponse->ReqSlotIDParam = 0;
     SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
     Ptr = (VOID *)(SpdmResponse + 1);
     DHEContext = SpdmDheNew (mUseDheAlgo);
@@ -460,7 +460,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->RspSessionID = SpdmAllocateRspSessionId (SpdmContext);
       SpdmResponse->MutAuthRequested = 0;
-      SpdmResponse->SlotIDParam = 0;
+      SpdmResponse->ReqSlotIDParam = 0;
       SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
       Ptr = (VOID *)(SpdmResponse + 1);
       DHEContext = SpdmDheNew (mUseDheAlgo);
@@ -613,7 +613,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->RspSessionID = SpdmAllocateRspSessionId (SpdmContext);
       SpdmResponse->MutAuthRequested = 0;
-      SpdmResponse->SlotIDParam = 0;
+      SpdmResponse->ReqSlotIDParam = 0;
       SpdmGetRandomNumber (SPDM_RANDOM_DATA_SIZE, SpdmResponse->RandomData);
       Ptr = (VOID *)(SpdmResponse + 1);
       DHEContext = SpdmDheNew (mUseDheAlgo);

@@ -40,7 +40,7 @@ SpdmGetResponseFinish (
   BOOLEAN                  Result;
   UINT32                   HmacSize;
   UINT32                   SignatureSize;
-  UINT8                    SlotNum;
+  UINT8                    ReqSlotNum;
   SPDM_FINISH_REQUEST      *SpdmRequest;
   SPDM_FINISH_RESPONSE     *SpdmResponse;
   SPDM_DEVICE_CONTEXT      *SpdmContext;
@@ -90,15 +90,15 @@ SpdmGetResponseFinish (
     return RETURN_SUCCESS;
   }
 
-  SlotNum = SpdmRequest->Header.Param2;
-  if ((SlotNum != 0xFF) && (SlotNum >= SpdmContext->LocalContext.SlotCount)) {
+  ReqSlotNum = SpdmRequest->Header.Param2;
+  if ((ReqSlotNum != 0xFF) && (ReqSlotNum >= SpdmContext->LocalContext.SlotCount)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  if (SlotNum == 0xFF) {
-    SlotNum = SpdmContext->EncapContext.SlotNum;
+  if (ReqSlotNum == 0xFF) {
+    ReqSlotNum = SpdmContext->EncapContext.ReqSlotNum;
   }
-  if (SlotNum != SpdmContext->EncapContext.SlotNum) {
+  if (ReqSlotNum != SpdmContext->EncapContext.ReqSlotNum) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }

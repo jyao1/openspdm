@@ -14,21 +14,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
-  @param  SlotNum                      SlotNum to the peer in in CHALLENGE_AUTH request or RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER.
+  @param  ReqSlotNum                   SlotNum to the peer in in CHALLENGE_AUTH request or RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER.
   @param  MeasurementHashType          MeasurementHashType to the peer in CHALLENGE_AUTH request.
 **/
 VOID
 SpdmInitEncapEnv (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MutAuthRequested,
-  IN     UINT8                SlotNum,
+  IN     UINT8                ReqSlotNum,
   IN     UINT8                MeasurementHashType
   )
 {
   SpdmContext->EncapContext.ErrorState = 0;
   SpdmContext->EncapContext.EncapState = 0;
   SpdmContext->EncapContext.RequestId = 0;
-  SpdmContext->EncapContext.SlotNum = SlotNum;
+  SpdmContext->EncapContext.ReqSlotNum = ReqSlotNum;
   SpdmContext->EncapContext.MeasurementHashType = MeasurementHashType;
 }
 

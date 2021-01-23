@@ -114,7 +114,7 @@ SpdmGetEncapStructViaState (
   UINTN                       Count;
 
   if (SpdmContext->LastSpdmRequestSessionIdValid) {
-    if (SpdmContext->EncapContext.SlotNum != 0xFF) {
+    if (SpdmContext->EncapContext.ReqSlotNum != 0xFF) {
       EncapResponseStruct = mSpdmEncapSessionStruct;
       Count = ARRAY_SIZE(mSpdmEncapSessionStruct);
     } else {
@@ -122,7 +122,7 @@ SpdmGetEncapStructViaState (
       Count = ARRAY_SIZE(mSpdmEncapSessionNoCertStruct);
     }
   } else {
-    if (SpdmContext->EncapContext.SlotNum != 0xFF) {
+    if (SpdmContext->EncapContext.ReqSlotNum != 0xFF) {
       EncapResponseStruct = mSpdmEncapStruct;
       Count = ARRAY_SIZE(mSpdmEncapStruct);
     } else {
@@ -375,10 +375,10 @@ SpdmGetResponseEncapsulatedResponseAck (
   SpdmResponse->Header.Param1 = SpdmContext->EncapContext.RequestId;
   if (EncapRequestSize == 0) {
     SpdmResponse->Header.Param2 = SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_ABSENT;
-    if (SpdmContext->EncapContext.SlotNum != 0) {
-      SpdmResponse->Header.Param2 = SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER;
+    if (SpdmContext->EncapContext.ReqSlotNum != 0) {
+      SpdmResponse->Header.Param2 = SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_REQ_SLOT_NUMBER;
       *ResponseSize = sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE) + 1;
-      *(UINT8 *)(SpdmResponse + 1) = SpdmContext->EncapContext.SlotNum;
+      *(UINT8 *)(SpdmResponse + 1) = SpdmContext->EncapContext.ReqSlotNum;
     }
   }
 

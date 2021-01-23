@@ -410,7 +410,7 @@ void TestSpdmRequesterFinishCase1(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINT32               SessionId;
-  UINT8                SlotIdParam; 
+  UINT8                ReqSlotIdParam; 
   VOID                 *Data;
   UINTN                DataSize;
   VOID                 *Hash;
@@ -442,8 +442,8 @@ void TestSpdmRequesterFinishCase1(void **state) {
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  SlotIdParam = 0;
-  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
+  ReqSlotIdParam = 0;
+  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, ReqSlotIdParam); 
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
   free(Data);
 }
@@ -453,7 +453,7 @@ void TestSpdmRequesterFinishCase2(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINT32               SessionId;
-  UINT8                SlotIdParam;
+  UINT8                ReqSlotIdParam;
   VOID                 *Data;
   UINTN                DataSize;
   VOID                 *Hash;
@@ -485,8 +485,8 @@ void TestSpdmRequesterFinishCase2(void **state) {
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  SlotIdParam = 0;
-  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
+  ReqSlotIdParam = 0;
+  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, ReqSlotIdParam); 
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateEstablished);
   free(Data);
@@ -497,7 +497,7 @@ void TestSpdmRequesterFinishCase3(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINT32               SessionId;
-  UINT8                SlotIdParam;
+  UINT8                ReqSlotIdParam;
   VOID                 *Data;
   UINTN                DataSize;
   VOID                 *Hash;
@@ -526,8 +526,8 @@ void TestSpdmRequesterFinishCase3(void **state) {
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  SlotIdParam = 0;
-  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
+  ReqSlotIdParam = 0;
+  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, ReqSlotIdParam); 
   assert_int_equal (Status, RETURN_DEVICE_ERROR);  
   free(Data);
 }
@@ -537,7 +537,7 @@ void TestSpdmRequesterFinishCase4(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINT32               SessionId;
-  UINT8                SlotIdParam;
+  UINT8                ReqSlotIdParam;
   VOID                 *Data;
   UINTN                DataSize;
   VOID                 *Hash;
@@ -569,8 +569,8 @@ void TestSpdmRequesterFinishCase4(void **state) {
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  SlotIdParam = 0;
-  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
+  ReqSlotIdParam = 0;
+  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, ReqSlotIdParam); 
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
   free(Data);
 }
@@ -580,7 +580,7 @@ void TestSpdmRequesterFinishCase5(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINT32               SessionId;
-  UINT8                SlotIdParam;
+  UINT8                ReqSlotIdParam;
   VOID                 *Data;
   UINTN                DataSize;
   VOID                 *Hash;
@@ -612,8 +612,8 @@ void TestSpdmRequesterFinishCase5(void **state) {
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  SlotIdParam = 0;
-  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
+  ReqSlotIdParam = 0;
+  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, ReqSlotIdParam); 
   assert_int_equal (Status, RETURN_NO_RESPONSE);
   free(Data);
 }
@@ -623,7 +623,7 @@ void TestSpdmRequesterFinishCase6(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINT32               SessionId;
-  UINT8                SlotIdParam;
+  UINT8                ReqSlotIdParam;
   VOID                 *Data;
   UINTN                DataSize;
   VOID                 *Hash;
@@ -655,8 +655,8 @@ void TestSpdmRequesterFinishCase6(void **state) {
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  SlotIdParam = 0;
-  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
+  ReqSlotIdParam = 0;
+  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, ReqSlotIdParam); 
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateEstablished);
   free(Data);
@@ -667,7 +667,7 @@ void TestSpdmRequesterFinishCase7(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINT32               SessionId;
-  UINT8                SlotIdParam;
+  UINT8                ReqSlotIdParam;
   VOID                 *Data;
   UINTN                DataSize;
   VOID                 *Hash;
@@ -699,8 +699,8 @@ void TestSpdmRequesterFinishCase7(void **state) {
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  SlotIdParam = 0;
-  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
+  ReqSlotIdParam = 0;
+  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, ReqSlotIdParam); 
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
   assert_int_equal (SpdmContext->SpdmCmdReceiveState, 0);
   free(Data);
@@ -711,7 +711,7 @@ void TestSpdmRequesterFinishCase8(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINT32               SessionId;
-  UINT8                SlotIdParam;
+  UINT8                ReqSlotIdParam;
   VOID                 *Data;
   UINTN                DataSize;
   VOID                 *Hash;
@@ -743,8 +743,8 @@ void TestSpdmRequesterFinishCase8(void **state) {
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  SlotIdParam = 0;
-  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
+  ReqSlotIdParam = 0;
+  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, ReqSlotIdParam); 
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
   free(Data);
 }
@@ -754,7 +754,7 @@ void TestSpdmRequesterFinishCase9(void **state) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
   UINT32               SessionId;
-  UINT8                SlotIdParam;
+  UINT8                ReqSlotIdParam;
   VOID                 *Data;
   UINTN                DataSize;
   VOID                 *Hash;
@@ -786,8 +786,8 @@ void TestSpdmRequesterFinishCase9(void **state) {
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
-  SlotIdParam = 0;
-  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, SlotIdParam); 
+  ReqSlotIdParam = 0;
+  Status = SpdmSendReceiveFinish (SpdmContext, SessionId, ReqSlotIdParam); 
   assert_int_equal (Status, RETURN_SUCCESS); 
   assert_int_equal (SpdmSecuredMessageGetSessionState (SpdmContext->SessionInfo[0].SecuredMessageContext), SpdmSessionStateEstablished);
   free(Data);

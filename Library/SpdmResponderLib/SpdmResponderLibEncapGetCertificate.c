@@ -44,7 +44,7 @@ SpdmGetEncapReqestGetCertificate (
     SpdmRequest->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   }
   SpdmRequest->Header.RequestResponseCode = SPDM_GET_CERTIFICATE;
-  SpdmRequest->Header.Param1 = SpdmContext->EncapContext.SlotNum;
+  SpdmRequest->Header.Param1 = SpdmContext->EncapContext.ReqSlotNum;
   SpdmRequest->Header.Param2 = 0;
   SpdmRequest->Offset = (UINT16)GetManagedBufferSize (&SpdmContext->EncapContext.CertificateChainBuffer);
   SpdmRequest->Length = MAX_SPDM_CERT_CHAIN_BLOCK_LEN;
@@ -101,7 +101,7 @@ SpdmProcessEncapResponseCertificate (
   if (SpdmResponse->PortionLength > MAX_SPDM_CERT_CHAIN_BLOCK_LEN) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse->Header.Param1 != SpdmContext->EncapContext.SlotNum) {
+  if (SpdmResponse->Header.Param1 != SpdmContext->EncapContext.ReqSlotNum) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE) + SpdmResponse->PortionLength) {

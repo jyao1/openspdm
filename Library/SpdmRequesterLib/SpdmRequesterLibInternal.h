@@ -115,7 +115,7 @@ SpdmNegotiateAlgorithms (
   @param  SlotNum                      SlotNum to the KEY_EXCHANGE request.
   @param  HeartbeatPeriod              HeartbeatPeriod from the KEY_EXCHANGE_RSP response.
   @param  SessionId                    SessionId from the KEY_EXCHANGE_RSP response.
-  @param  SlotIdParam                  SlotIdParam from the KEY_EXCHANGE_RSP response.
+  @param  ReqSlotIdParam               ReqSlotIdParam from the KEY_EXCHANGE_RSP response.
   @param  MeasurementHash              MeasurementHash from the KEY_EXCHANGE_RSP response.
 
   @retval RETURN_SUCCESS               The KEY_EXCHANGE is sent and the KEY_EXCHANGE_RSP is received.
@@ -128,7 +128,7 @@ SpdmSendReceiveKeyExchange (
   IN     UINT8                SlotNum,
      OUT UINT32               *SessionId,
      OUT UINT8                *HeartbeatPeriod,
-     OUT UINT8                *SlotIdParam,
+     OUT UINT8                *ReqSlotIdParam,
      OUT VOID                 *MeasurementHash
   );
 
@@ -137,7 +137,7 @@ SpdmSendReceiveKeyExchange (
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  SessionId                    SessionId to the FINISH request.
-  @param  SlotIdParam                  SlotIdParam to the FINISH request.
+  @param  ReqSlotIdParam               ReqSlotIdParam to the FINISH request.
 
   @retval RETURN_SUCCESS               The FINISH is sent and the FINISH_RSP is received.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
@@ -146,7 +146,7 @@ RETURN_STATUS
 SpdmSendReceiveFinish (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               SessionId,
-  IN     UINT8                SlotIdParam
+  IN     UINT8                ReqSlotIdParam
   );
 
 /**
@@ -213,7 +213,7 @@ SpdmSendReceiveEndSession (
                                        If SessionId is NULL, it is a normal message.
                                        If SessionId is NOT NULL, it is a secured message.
   @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
-  @param  SlotIdParam                  SlotIdParam from the RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER.
+  @param  ReqSlotIdParam               ReqSlotIdParam from the RESPONSE_PAYLOAD_TYPE_REQ_SLOT_NUMBER.
 
   @retval RETURN_SUCCESS               The SPDM Encapsulated requests are sent and the responses are received.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
@@ -223,7 +223,7 @@ SpdmEncapsulatedRequest (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               *SessionId,
   IN     UINT8                MutAuthRequested,
-     OUT UINT8                *SlotIdParam
+     OUT UINT8                *ReqSlotIdParam
   );
 
 /**

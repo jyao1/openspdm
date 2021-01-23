@@ -215,7 +215,7 @@ typedef struct {
   UINT32                               ErrorState;
   UINT32                               EncapState;
   UINT8                                RequestId;
-  UINT8                                SlotNum;
+  UINT8                                ReqSlotNum;
   UINT8                                MeasurementHashType;
   LARGE_MANAGED_BUFFER                 CertificateChainBuffer;
 } SPDM_ENCAP_CONTEXT;

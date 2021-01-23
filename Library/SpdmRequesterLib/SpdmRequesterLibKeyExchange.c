@@ -25,7 +25,7 @@ typedef struct {
   SPDM_MESSAGE_HEADER  Header;
   UINT16               RspSessionID;
   UINT8                MutAuthRequested;
-  UINT8                SlotIDParam;
+  UINT8                ReqSlotIDParam;
   UINT8                RandomData[SPDM_RANDOM_DATA_SIZE];
   UINT8                ExchangeData[MAX_DHE_KEY_SIZE];
   UINT8                MeasurementSummaryHash[MAX_HASH_SIZE];
@@ -45,7 +45,7 @@ typedef struct {
   @param  SlotNum                      SlotNum to the KEY_EXCHANGE request.
   @param  HeartbeatPeriod              HeartbeatPeriod from the KEY_EXCHANGE_RSP response.
   @param  SessionId                    SessionId from the KEY_EXCHANGE_RSP response.
-  @param  SlotIdParam                  SlotIdParam from the KEY_EXCHANGE_RSP response.
+  @param  ReqSlotIdParam               ReqSlotIdParam from the KEY_EXCHANGE_RSP response.
   @param  MeasurementHash              MeasurementHash from the KEY_EXCHANGE_RSP response.
 
   @retval RETURN_SUCCESS               The KEY_EXCHANGE is sent and the KEY_EXCHANGE_RSP is received.
@@ -58,7 +58,7 @@ TrySpdmSendReceiveKeyExchange (
   IN     UINT8                SlotNum,
      OUT UINT32               *SessionId,
      OUT UINT8                *HeartbeatPeriod,
-     OUT UINT8                *SlotIdParam,
+     OUT UINT8                *ReqSlotIdParam,
      OUT VOID                 *MeasurementHash
   )
 {
@@ -166,14 +166,14 @@ TrySpdmSendReceiveKeyExchange (
   if (HeartbeatPeriod != NULL) {
     *HeartbeatPeriod = SpdmResponse.Header.Param1;
   }
-  *SlotIdParam = SpdmResponse.SlotIDParam;
+  *ReqSlotIdParam = SpdmResponse.ReqSlotIDParam;
   if (SpdmResponse.MutAuthRequested != 0) {
-    if ((*SlotIdParam != 0xF) && (*SlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
+    if ((*ReqSlotIdParam != 0xF) && (*ReqSlotIdParam >= SpdmContext->LocalContext.SlotCount)) {
       SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
       return RETURN_DEVICE_ERROR;
     }
   } else {
-    if (*SlotIdParam != 0) {
+    if (*ReqSlotIdParam != 0) {
       SpdmSecuredMessageDheFree (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext);
       return RETURN_DEVICE_ERROR;
     }
@@ -348,7 +348,7 @@ SpdmSendReceiveKeyExchange (
   IN     UINT8                SlotNum,
      OUT UINT32               *SessionId,
      OUT UINT8                *HeartbeatPeriod,
-     OUT UINT8                *SlotIdParam,
+     OUT UINT8                *ReqSlotIdParam,
      OUT VOID                 *MeasurementHash
   )
 {
@@ -357,7 +357,7 @@ SpdmSendReceiveKeyExchange (
 
   Retry = SpdmContext->RetryTimes;
   do {
-    Status = TrySpdmSendReceiveKeyExchange(SpdmContext, MeasurementHashType, SlotNum, SessionId, HeartbeatPeriod, SlotIdParam, MeasurementHash);
+    Status = TrySpdmSendReceiveKeyExchange(SpdmContext, MeasurementHashType, SlotNum, SessionId, HeartbeatPeriod, ReqSlotIdParam, MeasurementHash);
     if (RETURN_NO_RESPONSE != Status) {
       return Status;
     }

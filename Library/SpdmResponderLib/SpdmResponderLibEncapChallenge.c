@@ -44,7 +44,7 @@ SpdmGetEncapReqestChallenge (
     SpdmRequest->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   }
   SpdmRequest->Header.RequestResponseCode = SPDM_CHALLENGE;
-  SpdmRequest->Header.Param1 = SpdmContext->EncapContext.SlotNum;
+  SpdmRequest->Header.Param1 = SpdmContext->EncapContext.ReqSlotNum;
   SpdmRequest->Header.Param2 = SpdmContext->EncapContext.MeasurementHashType;
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, SpdmRequest->Nonce);
   DEBUG((DEBUG_INFO, "Encap ClientNonce - "));
@@ -110,7 +110,7 @@ SpdmProcessEncapResponseChallengeAuth (
     return RETURN_DEVICE_ERROR;
   }
   *(UINT8 *)&AuthAttribute = SpdmResponse->Header.Param1;
-  if (SpdmContext->EncapContext.SlotNum == 0xFF) {
+  if (SpdmContext->EncapContext.ReqSlotNum == 0xFF) {
     if (AuthAttribute.SlotNum != 0xF) {
       return RETURN_DEVICE_ERROR;
     }
@@ -118,10 +118,10 @@ SpdmProcessEncapResponseChallengeAuth (
       return RETURN_DEVICE_ERROR;
     }
   } else {
-    if (AuthAttribute.SlotNum != SpdmContext->EncapContext.SlotNum) {
+    if (AuthAttribute.SlotNum != SpdmContext->EncapContext.ReqSlotNum) {
       return RETURN_DEVICE_ERROR;
     }
-    if (SpdmResponse->Header.Param2 != (1 << SpdmContext->EncapContext.SlotNum)) {
+    if (SpdmResponse->Header.Param2 != (1 << SpdmContext->EncapContext.ReqSlotNum)) {
       return RETURN_DEVICE_ERROR;
     }
   }

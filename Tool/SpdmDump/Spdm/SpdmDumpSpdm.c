@@ -1341,7 +1341,7 @@ DumpSpdmKeyExchangeRsp (
   if (!mParamQuiteMode) {
     printf ("(Heart=0x%02x, RspSessionID=0x%04x, MutAuth=0x%02x(", SpdmResponse->Header.Param1, SpdmResponse->RspSessionID, SpdmResponse->MutAuthRequested);
     DumpEntryFlags (mSpdmKeyExchangeMutAuthStringTable, ARRAY_SIZE(mSpdmKeyExchangeMutAuthStringTable), SpdmResponse->MutAuthRequested);
-    printf ("), SlotID=0x%02x) ", SpdmResponse->SlotIDParam);
+    printf ("), ReqSlotID=0x%02x) ", SpdmResponse->ReqSlotIDParam);
 
     if (mParamAllMode) {
       printf ("\n    RandomData(");
@@ -1445,7 +1445,7 @@ DumpSpdmFinish (
   }
 
   if (!mParamQuiteMode) {
-    printf ("(Attr=0x%02x (SigIncl=%x), SlotID=0x%02x) ",
+    printf ("(Attr=0x%02x (SigIncl=%x), ReqSlotID=0x%02x) ",
       SpdmRequest->Header.Param1,
       ((SpdmRequest->Header.Param1 & SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED) != 0) ? 1 : 0,
       SpdmRequest->Header.Param2
@@ -1992,14 +1992,14 @@ DumpSpdmEncapsulatedResponseAck (
     mEncapsulated = FALSE;
     return ;
 
-  case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER:
+  case SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE_PAYLOAD_TYPE_REQ_SLOT_NUMBER:
     if (BufferSize < HeaderSize + 1) {
       printf ("\n");
       return ;
     }
 
     if (!mParamQuiteMode) {
-      printf ("(SlotID=0x%02x) ", *((UINT8 *)Buffer + HeaderSize));
+      printf ("(ReqSlotID=0x%02x) ", *((UINT8 *)Buffer + HeaderSize));
     }
     break;
   }

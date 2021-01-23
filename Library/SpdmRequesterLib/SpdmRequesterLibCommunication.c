@@ -153,12 +153,12 @@ SpdmStartSession (
   RETURN_STATUS                 Status;
   SPDM_DEVICE_CONTEXT           *SpdmContext;
   SPDM_SESSION_INFO             *SessionInfo;
-  UINT8                         SlotIdParam;
+  UINT8                         ReqSlotIdParam;
 
   SpdmContext = Context;
 
   if (!UsePsk) {
-    Status = SpdmSendReceiveKeyExchange (SpdmContext, MeasurementHashType, SlotNum, SessionId, HeartbeatPeriod, &SlotIdParam, MeasurementHash);
+    Status = SpdmSendReceiveKeyExchange (SpdmContext, MeasurementHashType, SlotNum, SessionId, HeartbeatPeriod, &ReqSlotIdParam, MeasurementHash);
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceiveKeyExchange - %p\n", Status));
       return Status;
@@ -177,7 +177,7 @@ SpdmStartSession (
       break;
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST:
     case SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS:
-      Status = SpdmEncapsulatedRequest (SpdmContext, SessionId, SessionInfo->MutAuthRequested, &SlotIdParam);
+      Status = SpdmEncapsulatedRequest (SpdmContext, SessionId, SessionInfo->MutAuthRequested, &ReqSlotIdParam);
       DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmEncapsulatedRequest - %p\n", Status));
       if (RETURN_ERROR(Status)) {
         return Status;
@@ -188,10 +188,10 @@ SpdmStartSession (
       return RETURN_UNSUPPORTED;
     }
 
-    if (SlotIdParam == 0xF) {
-      SlotIdParam = 0xFF;
+    if (ReqSlotIdParam == 0xF) {
+      ReqSlotIdParam = 0xFF;
     }
-    Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, SlotIdParam);
+    Status = SpdmSendReceiveFinish (SpdmContext, *SessionId, ReqSlotIdParam);
     DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceiveFinish - %p\n", Status));
   } else {
     Status = SpdmSendReceivePskExchange (SpdmContext, MeasurementHashType, SessionId, HeartbeatPeriod, MeasurementHash);
