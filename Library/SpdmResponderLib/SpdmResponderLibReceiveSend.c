@@ -145,6 +145,29 @@ SpdmProcessRequest (
 }
 
 /**
+  Notify the session state to a session APP.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SessionId of a session.
+  @param  SessionState                 The state of a session.
+**/
+VOID
+SpdmTriggerSessionStateCallback (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               SessionId,
+  IN     SPDM_SESSION_STATE   SessionState
+  )
+{
+  UINTN                    Index;
+
+  for (Index = 0; Index < MAX_SPDM_SESSION_STATE_CALLBACK_NUM; Index++) {
+    if (SpdmContext->SpdmSessionStateCallback[Index] != 0) {
+      ((SPDM_SESSION_STATE_CALLBACK)SpdmContext->SpdmSessionStateCallback[Index]) (SpdmContext, SessionId, SessionState);
+    }
+  }
+}
+
+/**
   Build a SPDM response to a device.
   
   @param  SpdmContext                  The SPDM context for the device.
@@ -241,13 +264,16 @@ SpdmBuildResponse (
     case SPDM_FINISH_RSP:
       if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
         SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+        SpdmTriggerSessionStateCallback (Context, SessionInfo->SessionId, SpdmSessionStateEstablished);
       }
       break;
     case SPDM_PSK_FINISH_RSP:
       SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+      SpdmTriggerSessionStateCallback (Context, SessionInfo->SessionId, SpdmSessionStateEstablished);
       break;
     case SPDM_END_SESSION_ACK:
       SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateNotStarted);
+      SpdmTriggerSessionStateCallback (Context, SessionInfo->SessionId, SpdmSessionStateNotStarted);
       SpdmFreeSessionId(SpdmContext, *SessionId);
       break;
     }
@@ -261,6 +287,7 @@ SpdmBuildResponse (
           return RETURN_SUCCESS;
         }
         SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+        SpdmTriggerSessionStateCallback (Context, SessionInfo->SessionId, SpdmSessionStateEstablished);
       }
       break;
     }
@@ -291,4 +318,37 @@ SpdmRegisterGetResponseFunc (
   SpdmContext->GetResponseFunc = (UINTN)GetResponseFunc;
 
   return ;
+}
+
+/**
+  Register an SPDM state callback function.
+
+  This function can be called multiple times to let different session APPs register its own callback.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SpdmSessionStateCallback     The function to be called in SPDM session state change.
+
+  @retval RETURN_SUCCESS          The callback is registered.
+  @retval RETURN_ALREADY_STARTED  No enough memory to register the callback.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmRegisterSessionStateCallback (
+  IN  VOID                         *Context,
+  IN  SPDM_SESSION_STATE_CALLBACK  SpdmSessionStateCallback
+  )
+{
+  SPDM_DEVICE_CONTEXT      *SpdmContext;
+  UINTN                    Index;
+
+  SpdmContext = Context;
+  for (Index = 0; Index < MAX_SPDM_SESSION_STATE_CALLBACK_NUM; Index++) {
+    if (SpdmContext->SpdmSessionStateCallback[Index] == 0) {
+      SpdmContext->SpdmSessionStateCallback[Index] = (UINTN)SpdmSessionStateCallback;
+      return RETURN_SUCCESS;
+    }
+  }
+  ASSERT(FALSE);
+
+  return RETURN_ALREADY_STARTED;
 }

@@ -232,4 +232,37 @@ SpdmGenerateExtendedErrorResponse (
      OUT VOID                 *SpdmResponse
   );
 
+/**
+  Notify the session state to a session APP.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SessionId of a session.
+  @param  SessionState                 The state of a session.
+**/
+typedef
+VOID
+(EFIAPI *SPDM_SESSION_STATE_CALLBACK) (
+  IN     VOID                 *SpdmContext,
+  IN     UINT32               SessionId,
+  IN     SPDM_SESSION_STATE   SessionState
+  );
+
+/**
+  Register an SPDM state callback function.
+
+  This function can be called multiple times to let different session APPs register its own callback.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SpdmSessionStateCallback     The function to be called in SPDM session state change.
+
+  @retval RETURN_SUCCESS          The callback is registered.
+  @retval RETURN_ALREADY_STARTED  No enough memory to register the callback.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmRegisterSessionStateCallback (
+  IN  VOID                         *SpdmContext,
+  IN  SPDM_SESSION_STATE_CALLBACK  SpdmSessionStateCallback
+  );
+
 #endif

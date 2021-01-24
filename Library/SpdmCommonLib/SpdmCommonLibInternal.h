@@ -277,6 +277,11 @@ typedef struct {
   //
   UINTN                           GetEncapResponseFunc;
   SPDM_ENCAP_CONTEXT              EncapContext;
+  //
+  // Register SpdmSessionStateCallback function (responder only)
+  // Requester can know the state after StartSession / EndSession.
+  //
+  UINTN                           SpdmSessionStateCallback[MAX_SPDM_SESSION_STATE_CALLBACK_NUM];
 
   SPDM_LOCAL_CONTEXT              LocalContext;
 
