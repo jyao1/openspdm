@@ -37,7 +37,19 @@ SpdmGetResponseHeartbeat (
   )
 {
   SPDM_HEARTBEAT_RESPONSE     *SpdmResponse;
+  SPDM_HEARTBEAT_REQUEST      *SpdmRequest;
+  SPDM_DEVICE_CONTEXT         *SpdmContext;
 
+  SpdmContext = Context;
+  SpdmRequest = Request;
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_FINISH_RECEIVE_FLAG) == 0) &&
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_FINISH_RECEIVE_FLAG) == 0)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
+  }
   if (RequestSize != sizeof(SPDM_HEARTBEAT_REQUEST)) {
     SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -53,6 +65,7 @@ SpdmGetResponseHeartbeat (
   SpdmResponse->Header.Param1 = 0;
   SpdmResponse->Header.Param2 = 0;
 
+  SpdmContext->SpdmCmdReceiveState |= SPDM_HEART_BEAT_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }
 
