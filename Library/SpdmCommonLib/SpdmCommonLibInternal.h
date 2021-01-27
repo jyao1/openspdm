@@ -236,6 +236,7 @@ typedef struct {
 #define SPDM_FINISH_RECEIVE_FLAG                        BIT8
 #define SPDM_PSK_EXCHANGE_RECEIVE_FLAG                  BIT9
 #define SPDM_PSK_FINISH_RECEIVE_FLAG                    BIT10
+#define SPDM_HEART_BEAT_RECEIVE_FLAG                    BIT11
 
 
 

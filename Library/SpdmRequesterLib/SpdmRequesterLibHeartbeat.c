@@ -9,6 +9,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmRequesterLibInternal.h"
 
+#pragma pack(1)
+
+typedef struct {
+  SPDM_MESSAGE_HEADER  Header;
+  UINT8                DummyData[sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY)];
+} SPDM_HEARTBEAT_RESPONSE_MINE;
+
+#pragma pack()
+
 /**
   This function sends HEARTBEAT
   to an SPDM Session.
@@ -21,20 +30,23 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @retval RETURN_SECURITY_VIOLATION    Any verification fails.
 **/
 RETURN_STATUS
-EFIAPI
-SpdmHeartbeat (
+TrySpdmHeartbeat (
   IN     VOID                 *Context,
   IN     UINT32               SessionId
   )
 {
   RETURN_STATUS                             Status;
   SPDM_HEARTBEAT_REQUEST                    SpdmRequest;
-  SPDM_HEARTBEAT_RESPONSE                   SpdmResponse;
+  SPDM_HEARTBEAT_RESPONSE_MINE              SpdmResponse;
   UINTN                                     SpdmResponseSize;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
 
   SpdmContext = Context;
 
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_FINISH_RECEIVE_FLAG) == 0) &&
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_FINISH_RECEIVE_FLAG) == 0)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP) == 0) {
     return RETURN_DEVICE_ERROR;
   }
@@ -54,12 +66,42 @@ SpdmHeartbeat (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SessionId, NULL, 0, &SpdmResponseSize, &SpdmResponse, SPDM_HEARTBEAT, SPDM_HEARTBEAT_ACK, sizeof(SPDM_HEARTBEAT_RESPONSE_MINE));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_HEARTBEAT_ACK) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize != sizeof(SPDM_HEARTBEAT_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_HEARTBEAT_ACK) {
-    return RETURN_DEVICE_ERROR;
-  }
 
+  SpdmContext->SpdmCmdReceiveState |= SPDM_HEART_BEAT_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }
+
+RETURN_STATUS
+EFIAPI
+SpdmHeartbeat (
+  IN     VOID                 *Context,
+  IN     UINT32               SessionId
+  )
+{
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+  SPDM_DEVICE_CONTEXT     *SpdmContext;
+
+  SpdmContext = Context;
+  Retry = SpdmContext->RetryTimes;
+  do {
+    Status = TrySpdmHeartbeat(SpdmContext, SessionId);
+    if (RETURN_NO_RESPONSE != Status) {
+      return Status;
+    }
+  } while (Retry-- != 0);
+
+  return Status;
+}
+

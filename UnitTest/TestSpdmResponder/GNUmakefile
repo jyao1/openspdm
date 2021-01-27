@@ -45,6 +45,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/TestSpdmResponderFinish.o \
     $(OUTPUT_DIR)/TestSpdmResponderPskExchange.o \
     $(OUTPUT_DIR)/TestSpdmResponderPskFinish.o \
+    $(OUTPUT_DIR)/TestSpdmResponderHeartbeat.o \
     $(OUTPUT_DIR)/SpdmUnitTestCommon.o \
     $(OUTPUT_DIR)/SpdmTestKey.o \
     $(OUTPUT_DIR)/SpdmTestSupport.o \
@@ -177,6 +178,9 @@ $(OUTPUT_DIR)/TestSpdmResponderPskExchange.o : $(SOURCE_DIR)/TestSpdmResponderPs
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/TestSpdmResponderPskFinish.o : $(SOURCE_DIR)/TestSpdmResponderPskFinish.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/TestSpdmResponderHeartbeat.o : $(SOURCE_DIR)/TestSpdmResponderHeartbeat.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmUnitTestCommon.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmUnitTestCommon.c
