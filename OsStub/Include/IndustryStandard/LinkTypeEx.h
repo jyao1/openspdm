@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // It starts with MCTP transport header in Figure 4 – Generic message fields.
 //
-#define LINKTYPE_MCTP      290  // 0x0122
+#define LINKTYPE_MCTP      291  // 0x0123
 
 //
 // PCI Data Object Exchange (DOE) is defined in PCI-SIG Data Object Exchange (DOE) ECN
@@ -32,7 +32,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // It starts with DOE Data Object Header 1 in Figure 6-x1: DOE Data Object Format.
 //
-#define LINKTYPE_PCI_DOE   291  // 0x0123
+#define LINKTYPE_PCI_DOE   292  // 0x0124
 
 #pragma pack()
 

@@ -9,8 +9,8 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
    The packet must include the transport layer. We add below extension for [LinkType](https://www.tcpdump.org/linktypes.html).
    
    ```
-   #define LINKTYPE_MCTP      290  // 0x0122
-   #define LINKTYPE_PCI_DOE   291  // 0x0123
+   #define LINKTYPE_MCTP      291  // 0x0123
+   #define LINKTYPE_PCI_DOE   292  // 0x0124
    ```
 
 ## SpdmDump user guide
