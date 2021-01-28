@@ -16,6 +16,47 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 STATIC UINTN                  LocalBufferSize;
 STATIC UINT8                  LocalBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
+UINTN
+SpdmTestGetMeasurementRequestSize (
+  IN VOID    *SpdmContext,
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  )
+{
+  SPDM_GET_MEASUREMENTS_REQUEST   *SpdmRequest;
+  UINTN                           MessageSize;
+
+  SpdmRequest = Buffer;
+  MessageSize = sizeof(SPDM_MESSAGE_HEADER);
+  if (BufferSize < MessageSize) {
+    return BufferSize;
+  }
+
+  if (SpdmRequest->Header.RequestResponseCode != SPDM_GET_MEASUREMENTS) {
+    return BufferSize;
+  }
+
+  if (SpdmRequest->Header.Param1 == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {
+    if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+      if (BufferSize < sizeof(SPDM_GET_MEASUREMENTS_REQUEST)) {
+        return BufferSize;
+      }
+      MessageSize = sizeof(SPDM_GET_MEASUREMENTS_REQUEST);
+    } else {
+      if (BufferSize < sizeof(SPDM_GET_MEASUREMENTS_REQUEST) - sizeof(SpdmRequest->SlotIDParam)) {
+        return BufferSize;
+      }
+      MessageSize = sizeof(SPDM_GET_MEASUREMENTS_REQUEST) - sizeof(SpdmRequest->SlotIDParam);
+    }
+  } else {
+    // already checked before if BufferSize < sizeof(SPDM_MESSAGE_HEADER)
+    MessageSize = sizeof(SPDM_MESSAGE_HEADER);
+  }
+
+  // Good message, return actual size
+  return MessageSize;
+}
+
 RETURN_STATUS
 EFIAPI
 SpdmRequesterGetMeasurementTestSendMessage (
@@ -26,168 +67,199 @@ SpdmRequesterGetMeasurementTestSendMessage (
   )
 {
   SPDM_TEST_CONTEXT       *SpdmTestContext;
-  UINT8                   *Ptr;
+  UINTN                   HeaderSize;
+  UINTN                   MessageSize;
 
   SpdmTestContext = GetSpdmTestContext ();
-  Ptr = (UINT8 *)Request;
+  HeaderSize = sizeof(TEST_MESSAGE_HEADER);
   switch (SpdmTestContext->CaseId) {
   case 0x1:
     return RETURN_DEVICE_ERROR;
   case 0x2:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x3:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x4:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x5:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x6:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x7:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x8:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x9:
   {
     STATIC UINTN SubIndex = 0;
     if (SubIndex == 0) {
       LocalBufferSize = 0;
-      CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-      LocalBufferSize += (RequestSize - 1);
+      MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+      CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+      LocalBufferSize += MessageSize;
       SubIndex ++;
     }
   }
     return RETURN_SUCCESS;
   case 0xA:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0xB:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0xC:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0xD:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0xE:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0xF:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x10:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x11:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x12:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x13:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x14:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x15:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x16:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x17:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x18:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x19:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x1A:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x1B:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x1C:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x1D:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x1E:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   case 0x1F:
     LocalBufferSize = 0;
-    CopyMem (LocalBuffer, &Ptr[1], RequestSize - 1);
-    LocalBufferSize += (RequestSize - 1);
+    MessageSize = SpdmTestGetMeasurementRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
     return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
@@ -2660,7 +2732,7 @@ int SpdmRequesterGetMeasurementTestMain(void) {
       // Error: wrong response code
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase15),
       // Error: SlotID mismatch
-      // cmocka_unit_test(TestSpdmRequesterGetMeasurementCase16), // fails if TEST_ALIGNMENT = 4 (causes hash missmatch)
+      cmocka_unit_test(TestSpdmRequesterGetMeasurementCase16),
       // Error: get total measurement number (no signature), but there is a measurement block
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase17),
       // Large measurement block
@@ -2678,7 +2750,7 @@ int SpdmRequesterGetMeasurementTestMain(void) {
       // Error: get one measurement with opaque data larger than 1024, without signature
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase24),
       // Successful response to get one measurement with opaque data with signature
-      // cmocka_unit_test(TestSpdmRequesterGetMeasurementCase25),  // fails if TEST_ALIGNMENT = 4 (causes hash missmatch)
+      cmocka_unit_test(TestSpdmRequesterGetMeasurementCase25),
       // Error: response to get one measurement with opaque data with signature, opaque data is S bytes shorter than announced
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase26),
       // Error: response to get one measurement with opaque data with signature, opaque data is S+1 bytes shorter than announced
