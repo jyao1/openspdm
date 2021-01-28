@@ -145,6 +145,7 @@ TrySpdmGetMeasurement (
       return Status;
     }
   } else if (SpdmResponse.Header.RequestResponseCode != SPDM_MEASUREMENTS) {
+    ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
@@ -159,6 +160,7 @@ TrySpdmGetMeasurement (
 
   if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
     if (SpdmResponse.NumberOfBlocks != 0) {
+      ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
       return RETURN_DEVICE_ERROR;
     }
   } else if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS) {
@@ -174,6 +176,7 @@ TrySpdmGetMeasurement (
   MeasurementRecordDataLength = SpdmReadUint24 (SpdmResponse.MeasurementRecordLength);
   if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
     if (MeasurementRecordDataLength != 0) {
+      ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
       return RETURN_DEVICE_ERROR;
     }
   } else {
@@ -193,9 +196,11 @@ TrySpdmGetMeasurement (
                            MeasurementRecordDataLength +
                            SPDM_NONCE_SIZE +
                            sizeof(UINT16)) {
+      ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
       return RETURN_DEVICE_ERROR;
     }
     if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) && SpdmResponse.Header.Param2 != SlotIdParam) {
+      ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
       return RETURN_SECURITY_VIOLATION;
     }
     Ptr = MeasurementRecordData + MeasurementRecordDataLength;
@@ -227,6 +232,7 @@ TrySpdmGetMeasurement (
                        SignatureSize;
     Status = SpdmAppendMessageM (SpdmContext, &SpdmResponse, SpdmResponseSize - SignatureSize);
     if (RETURN_ERROR(Status)) {
+      ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
       return RETURN_SECURITY_VIOLATION;
     }
 
@@ -242,6 +248,7 @@ TrySpdmGetMeasurement (
     Result = SpdmVerifyMeasurementSignature (SpdmContext, Signature, SignatureSize);
     if (!Result) {
       SpdmContext->ErrorState = SPDM_STATUS_ERROR_MEASUREMENT_AUTH_FAILURE;
+      ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
       return RETURN_SECURITY_VIOLATION;
     }
 
@@ -275,6 +282,7 @@ TrySpdmGetMeasurement (
                        OpaqueLength;
     Status = SpdmAppendMessageM (SpdmContext, &SpdmResponse, SpdmResponseSize);
     if (RETURN_ERROR(Status)) {
+      ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
       return RETURN_SECURITY_VIOLATION;
     }
   }

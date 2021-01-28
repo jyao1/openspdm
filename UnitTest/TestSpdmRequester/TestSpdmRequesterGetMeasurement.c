@@ -1857,7 +1857,7 @@ void TestSpdmRequesterGetMeasurementCase12(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
-  // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -1899,7 +1899,7 @@ void TestSpdmRequesterGetMeasurementCase13(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
-  // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -1941,7 +1941,7 @@ void TestSpdmRequesterGetMeasurementCase14(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -1983,7 +1983,7 @@ void TestSpdmRequesterGetMeasurementCase15(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -2033,7 +2033,7 @@ void TestSpdmRequesterGetMeasurementCase16(void **state) {
       assert_int_equal (Status, RETURN_INVALID_PARAMETER);
     } else {
       assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
-      // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+      assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
     }
   }
   free(Data);
@@ -2081,7 +2081,7 @@ void TestSpdmRequesterGetMeasurementCase17(void **state) {
                SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS,
                0, &NumberOfBlocks, NULL, NULL);
     assert_int_equal (Status, RETURN_DEVICE_ERROR);
-    // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+    assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   }
   free(Data);
 }
@@ -2166,7 +2166,7 @@ void TestSpdmRequesterGetMeasurementCase19(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -2208,7 +2208,7 @@ void TestSpdmRequesterGetMeasurementCase20(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -2250,7 +2250,7 @@ void TestSpdmRequesterGetMeasurementCase21(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
 
@@ -2298,7 +2298,7 @@ void TestSpdmRequesterGetMeasurementCase22(void **state) {
     if (Status == RETURN_SUCCESS) {
       assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, NumberOfMessages * (sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     } else {
-      // assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
+      assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
       break;
     }
   }
@@ -2553,9 +2553,7 @@ void TestSpdmRequesterGetMeasurementCase28(void **state) {
   RequestAttribute = SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE;
 
   OpaqueInformedSize = MAX_SPDM_OPAQUE_DATA_SIZE/2 - 1;
-  ExpectedBufferSize = sizeof(SPDM_GET_MEASUREMENTS_REQUEST) + sizeof(SPDM_MEASUREMENTS_RESPONSE) +
-                        sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) +
-                        SPDM_NONCE_SIZE + sizeof(UINT16) + OpaqueInformedSize;
+  ExpectedBufferSize = 0;
 
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
