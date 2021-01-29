@@ -487,7 +487,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
 
-    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE);
+    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(UINT16);
     SpdmResponse = (VOID *)TempBuf;
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
     SpdmResponse->Header.RequestResponseCode = SPDM_MEASUREMENTS;
@@ -495,6 +495,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 0;
     *(UINT32 *)SpdmResponse->MeasurementRecordLength = 0;
+    *(UINT16 *)((UINT8 *)SpdmResponse + sizeof(SPDM_MEASUREMENTS_RESPONSE)) = 0;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
@@ -508,7 +509,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     UINTN                         TempBufSize;
 
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
+    TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + sizeof(UINT16);
     SpdmResponse = (VOID *)TempBuf;
 
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
@@ -519,6 +520,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
+    *(UINT16 *)((UINT8 *)SpdmResponse + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)) = 0;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
@@ -1700,7 +1702,7 @@ void TestSpdmRequesterGetMeasurementCase10(void **state) {
              0, &NumberOfBlocks, NULL, NULL);
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (NumberOfBlocks, 4);
-  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE));
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(UINT16));
   free(Data);
 }
 
@@ -1741,7 +1743,7 @@ void TestSpdmRequesterGetMeasurementCase11(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + sizeof(UINT16));
   free(Data);
 }
 

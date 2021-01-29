@@ -175,11 +175,11 @@ void TestSpdmResponderMeasurementCase1(void **state) {
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest1.Nonce);
   Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest1Size, &mSpdmGetMeasurementRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE));
+  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(UINT16));
   SpdmResponse = (VOID *)Response;
-  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
+  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
   assert_int_equal (SpdmResponse->Header.Param1, MEASUREMENT_BLOCK_NUMBER);
-  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, mSpdmGetMeasurementRequest1Size + sizeof(SPDM_MEASUREMENTS_RESPONSE));
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, mSpdmGetMeasurementRequest1Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(UINT16));
 }
 
 /**
@@ -533,10 +533,10 @@ void TestSpdmResponderMeasurementCase10(void **state) {
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest6.Nonce);
   Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest6Size, &mSpdmGetMeasurementRequest6, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + sizeof(UINT16));
   SpdmResponse = (VOID *)Response;
-  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
-  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + sizeof(UINT16));
 }
 
 /**
@@ -610,11 +610,11 @@ void TestSpdmResponderMeasurementCase12(void **state) {
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest7.Nonce);
   Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest7Size, &mSpdmGetMeasurementRequest7, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)) + (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MEASUREMENT_MANIFEST_SIZE));
+  assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)) + (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MEASUREMENT_MANIFEST_SIZE) + sizeof(UINT16));
   SpdmResponse = (VOID *)Response;
-  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);  
+  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
   assert_int_equal (SpdmResponse->NumberOfBlocks, MEASUREMENT_BLOCK_NUMBER);
-  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, mSpdmGetMeasurementRequest7Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)) + (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MEASUREMENT_MANIFEST_SIZE));
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, mSpdmGetMeasurementRequest7Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)) + (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + MEASUREMENT_MANIFEST_SIZE) + sizeof(UINT16));
 }
 
 /**
@@ -1050,8 +1050,8 @@ void TestSpdmResponderMeasurementCase22(void **state) {
     SpdmResponse = (VOID *)Response;
     if (SpdmResponse->Header.RequestResponseCode == SPDM_MEASUREMENTS) {
       assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_MEASUREMENTS);
-      assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
-      assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, NumberOfMessages*(mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
+      assert_int_equal (ResponseSize, sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + sizeof(UINT16));
+      assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, NumberOfMessages*(mSpdmGetMeasurementRequest6Size + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + sizeof(UINT16)));
     } else {
       assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
       assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
