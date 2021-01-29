@@ -60,6 +60,9 @@ TrySpdmGetMeasurement (
   UINTN                                     SpdmResponseSize;
   UINT32                                    MeasurementRecordDataLength;
   UINT8                                     *MeasurementRecordData;
+  SPDM_MEASUREMENT_BLOCK_COMMON_HEADER      *MeasurementBlockHeader;
+  UINT32                                    MeasurementBlockSize;
+  UINT8                                     MeasurementBlockCount;
   UINT8                                     *Ptr;
   VOID                                      *ServerNonce;
   UINT16                                    OpaqueLength;
@@ -294,6 +297,33 @@ TrySpdmGetMeasurement (
     if (*MeasurementRecordLength < MeasurementRecordDataLength) {
       return RETURN_BUFFER_TOO_SMALL;
     }
+    if (MeasurementRecordDataLength < sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER)) {
+      return RETURN_DEVICE_ERROR;
+    }
+
+    MeasurementBlockSize = 0;
+    MeasurementBlockCount = 1;
+    while (MeasurementBlockSize < MeasurementRecordDataLength) {
+      MeasurementBlockHeader = (SPDM_MEASUREMENT_BLOCK_COMMON_HEADER*) &MeasurementRecordData[MeasurementBlockSize];
+      if (MeasurementBlockHeader->MeasurementSize > MeasurementRecordDataLength - ((UINT8 *)MeasurementBlockHeader - (UINT8 *)MeasurementRecordData)) {
+        return RETURN_DEVICE_ERROR;
+      }
+      if (MeasurementBlockHeader->MeasurementSpecification == 0 || (MeasurementBlockHeader->MeasurementSpecification & (MeasurementBlockHeader->MeasurementSpecification-1))) {
+        return RETURN_DEVICE_ERROR;
+      }
+      if (MeasurementBlockHeader->MeasurementSpecification != SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec) {
+        return RETURN_DEVICE_ERROR;
+      }
+      if (MeasurementBlockHeader->Index == 0 || MeasurementBlockHeader->Index > *NumberOfBlocks) {
+        return RETURN_DEVICE_ERROR;
+      }
+      if (MeasurementBlockCount > *NumberOfBlocks) {
+        return RETURN_DEVICE_ERROR;
+      }
+      MeasurementBlockCount++;
+      MeasurementBlockSize = (UINT32) (MeasurementBlockSize + sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER) + MeasurementBlockHeader->MeasurementSize);
+    }
+
     *MeasurementRecordLength = MeasurementRecordDataLength;
     CopyMem (MeasurementRecord, MeasurementRecordData, MeasurementRecordDataLength);
   }
