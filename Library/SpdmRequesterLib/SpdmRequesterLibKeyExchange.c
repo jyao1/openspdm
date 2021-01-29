@@ -233,6 +233,9 @@ TrySpdmSendReceiveKeyExchange (
   Ptr += HashSize;
 
   OpaqueLength = *(UINT16 *)Ptr;
+  if (OpaqueLength > MAX_SPDM_OPAQUE_DATA_SIZE) {
+    return RETURN_SECURITY_VIOLATION;
+  }
   Ptr += sizeof(UINT16);
   if (SpdmResponseSize < sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
                          DheKeySize +

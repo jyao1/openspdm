@@ -206,6 +206,9 @@ TrySpdmGetMeasurement (
     Ptr += SPDM_NONCE_SIZE;
 
     OpaqueLength = *(UINT16 *)Ptr;
+    if (OpaqueLength > MAX_SPDM_OPAQUE_DATA_SIZE) {
+      return RETURN_SECURITY_VIOLATION;
+    }
     Ptr += sizeof(UINT16);
 
     if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE) +
@@ -255,6 +258,9 @@ TrySpdmGetMeasurement (
     Ptr = MeasurementRecordData + MeasurementRecordDataLength;
 
     OpaqueLength = *(UINT16 *)Ptr;
+    if (OpaqueLength > MAX_SPDM_OPAQUE_DATA_SIZE) {
+      return RETURN_SECURITY_VIOLATION;
+    }
     Ptr += sizeof(UINT16);
 
     if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE) +
