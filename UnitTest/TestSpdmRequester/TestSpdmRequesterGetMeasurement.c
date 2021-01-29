@@ -930,7 +930,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
-    // adding extra fields: NONCE, OpaqueLength, OpaqueData
+    // adding extra fields: OpaqueLength, OpaqueData
     Ptr = (VOID *)((UINT8 *)SpdmResponse + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
     // SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
     // Ptr += SPDM_NONCE_SIZE;
@@ -963,7 +963,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
-    // adding extra fields: NONCE, OpaqueLength, OpaqueData
+    // adding extra fields: OpaqueLength, OpaqueData
     Ptr = (VOID *)((UINT8 *)SpdmResponse + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
     // SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
     // Ptr += SPDM_NONCE_SIZE;
@@ -1210,7 +1210,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
-    // adding extra fields: NONCE, OpaqueLength, OpaqueData
+    // adding extra fields: OpaqueLength, OpaqueData
     Ptr = (VOID *)((UINT8 *)SpdmResponse + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
     // SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
     // Ptr += SPDM_NONCE_SIZE;
@@ -2312,8 +2312,8 @@ void TestSpdmRequesterGetMeasurementCase24(void **state) {
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
-  assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) + sizeof(UINT16) + MAX_SPDM_OPAQUE_DATA_SIZE + 1);
+  assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
+  assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, sizeof(SPDM_MESSAGE_HEADER));
   free(Data);
 }
 
@@ -2533,7 +2533,7 @@ void TestSpdmRequesterGetMeasurementCase29(void **state) {
   assert_int_equal (Status, RETURN_SUCCESS);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, sizeof(SPDM_MESSAGE_HEADER) + sizeof(SPDM_MEASUREMENTS_RESPONSE) +
                                                                   sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo) +
-                                                                  sizeof(UINT16) + MAX_SPDM_OPAQUE_DATA_SIZE/2);
+                                                                  sizeof(UINT16) + MAX_SPDM_OPAQUE_DATA_SIZE/2 - 1);
   free(Data);
 }
 
@@ -2674,9 +2674,9 @@ int SpdmRequesterGetMeasurementTestMain(void) {
       // Request a large number of measurement blocks before requesting a signature
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase22),
       // Successful response to get one measurement with opaque data without signature
-      // cmocka_unit_test(TestSpdmRequesterGetMeasurementCase23), // fails because opaque data is not appended to message transcript if message is not signed
+      cmocka_unit_test(TestSpdmRequesterGetMeasurementCase23),
       // Error: get one measurement with opaque data larger than 1024, without signature
-      // cmocka_unit_test(TestSpdmRequesterGetMeasurementCase24), // fails because opaque data size is not checked
+      cmocka_unit_test(TestSpdmRequesterGetMeasurementCase24),
       // Successful response to get one measurement with opaque data with signature
       // cmocka_unit_test(TestSpdmRequesterGetMeasurementCase25),  // fails if TEST_ALIGNMENT = 4 (causes hash missmatch)
       // Error: response to get one measurement with opaque data with signature, opaque data is S bytes shorter than announced
@@ -2686,7 +2686,7 @@ int SpdmRequesterGetMeasurementTestMain(void) {
       // Error: response to get one measurement with opaque data with signature, opaque data is 1 byte longer than announced
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase28),
       // response to get one measurement with opaque data without signature, opaque data is 1 byte longer than announced
-      // cmocka_unit_test(TestSpdmRequesterGetMeasurementCase29), // fails because opaque data is not appended to message transcript if message is not signed
+      cmocka_unit_test(TestSpdmRequesterGetMeasurementCase29),
       // response to get one measurement with opaque data without signature, opaque data has MAX_UINT16, but opaque data size is valid
       // cmocka_unit_test(TestSpdmRequesterGetMeasurementCase30), // test triggers runtime assert because the transmitted packet is larger than the 4096-byte buffer
       // Error: get one measurement with opaque data too large, without signature
