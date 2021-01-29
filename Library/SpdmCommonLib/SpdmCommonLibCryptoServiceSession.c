@@ -1086,7 +1086,7 @@ SpdmCalculateTH2Hash (
 
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
-  if (SessionInfo->UsePsk) {
+  if (!SessionInfo->UsePsk) {
     if (IsRequester) {
       Result = SpdmGetPeerCertChainData (SpdmContext, (VOID **)&CertChainData, &CertChainDataSize);
     } else {
