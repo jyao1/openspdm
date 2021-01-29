@@ -244,11 +244,29 @@ TrySpdmGetMeasurement (
 
     ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
   } else {
-    if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
-      SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE);
-    } else {
-      SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurementRecordDataLength;
+    //
+    // Nonce is absent if there is not signature
+    //
+    if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE) +
+                           MeasurementRecordDataLength +
+                           sizeof(UINT16)) {
+      return RETURN_DEVICE_ERROR;
     }
+    Ptr = MeasurementRecordData + MeasurementRecordDataLength;
+
+    OpaqueLength = *(UINT16 *)Ptr;
+    Ptr += sizeof(UINT16);
+
+    if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE) +
+                           MeasurementRecordDataLength +
+                           sizeof(UINT16) +
+                           OpaqueLength) {
+      return RETURN_DEVICE_ERROR;
+    }
+    SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) +
+                       MeasurementRecordDataLength +
+                       sizeof(UINT16) +
+                       OpaqueLength;
     Status = SpdmAppendMessageM (SpdmContext, &SpdmResponse, SpdmResponseSize);
     if (RETURN_ERROR(Status)) {
       return RETURN_SECURITY_VIOLATION;

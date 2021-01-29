@@ -58,6 +58,35 @@ SpdmCreateMeasurementSignature (
 }
 
 /**
+  This function creates the opaque data to response message.
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ResponseMessage              The measurement response message with empty signature to be filled.
+  @param  ResponseMessageSize          Total size in bytes of the response message including signature.
+**/
+VOID
+SpdmCreateMeasurementOpaque (
+  IN     SPDM_DEVICE_CONTEXT    *SpdmContext,
+  IN OUT VOID                   *ResponseMessage,
+  IN     UINTN                  ResponseMessageSize
+  )
+{
+  UINT8                         *Ptr;
+  UINTN                         MeasurmentNoSigSize;
+
+  MeasurmentNoSigSize = sizeof(UINT16) +
+                        SpdmContext->LocalContext.OpaqueMeasurementRspSize;
+  ASSERT (ResponseMessageSize > MeasurmentNoSigSize);
+  Ptr = (VOID *)((UINT8 *)ResponseMessage + ResponseMessageSize - MeasurmentNoSigSize);
+
+  *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueMeasurementRspSize;
+  Ptr += sizeof(UINT16);
+  CopyMem (Ptr, SpdmContext->LocalContext.OpaqueMeasurementRsp, SpdmContext->LocalContext.OpaqueMeasurementRspSize);
+  Ptr += SpdmContext->LocalContext.OpaqueMeasurementRspSize;
+
+  return ;
+}
+
+/**
   Process the SPDM GET_MEASUREMENT request and return the response.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -91,6 +120,7 @@ SpdmGetResponseMeasurement (
   RETURN_STATUS                  Status;
   UINTN                          SignatureSize;
   UINTN                          MeasurmentSigSize;
+  UINTN                          MeasurmentNoSigSize;
   UINTN                          MeasurmentRecordSize;
   UINTN                          MeasurmentBlockSize;
   SPDM_MEASUREMENT_BLOCK_DMTF    *MeasurmentBlock;
@@ -167,12 +197,16 @@ SpdmGetResponseMeasurement (
                       sizeof(UINT16) +
                       SpdmContext->LocalContext.OpaqueMeasurementRspSize +
                       SignatureSize;
+  MeasurmentNoSigSize = sizeof(UINT16) +
+                        SpdmContext->LocalContext.OpaqueMeasurementRspSize;
 
   switch (SpdmRequest->Header.Param2) {
   case SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS:
     SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE);
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
       SpdmResponseSize += MeasurmentSigSize;
+    } else {
+      SpdmResponseSize += MeasurmentNoSigSize;
     }
 
     ASSERT (*ResponseSize >= SpdmResponseSize);
@@ -208,6 +242,8 @@ SpdmGetResponseMeasurement (
         ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
         return RETURN_SUCCESS;
       }
+    } else {
+      SpdmCreateMeasurementOpaque (SpdmContext, SpdmResponse, SpdmResponseSize);
     }
     break;
 
@@ -223,6 +259,8 @@ SpdmGetResponseMeasurement (
     SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurmentRecordSize;
     if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
       SpdmResponseSize += MeasurmentSigSize;
+    } else {
+      SpdmResponseSize += MeasurmentNoSigSize;
     }
 
     ASSERT (*ResponseSize >= SpdmResponseSize);
@@ -266,6 +304,8 @@ SpdmGetResponseMeasurement (
         ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
         return RETURN_SUCCESS;
       }
+    } else {
+      SpdmCreateMeasurementOpaque (SpdmContext, SpdmResponse, SpdmResponseSize);
     }
     break;
 
@@ -285,6 +325,8 @@ SpdmGetResponseMeasurement (
       SpdmResponseSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + MeasurmentRecordSize;
       if ((SpdmRequest->Header.Param1 & SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) != 0) {
         SpdmResponseSize += MeasurmentSigSize;
+      } else {
+        SpdmResponseSize += MeasurmentNoSigSize;
       }
 
       ASSERT (*ResponseSize >= SpdmResponseSize);
@@ -330,6 +372,8 @@ SpdmGetResponseMeasurement (
           ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
           return RETURN_SUCCESS;
         }
+      } else {
+        SpdmCreateMeasurementOpaque (SpdmContext, SpdmResponse, SpdmResponseSize);
       }
     } else {
       SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
