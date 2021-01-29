@@ -116,7 +116,7 @@ SpdmRequesterChallengeTestReceiveMessage (
     TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
               GetSpdmHashSize (mUseHashAlgo) +
               SPDM_NONCE_SIZE +
-              GetSpdmHashSize (mUseHashAlgo) +
+              0 +
               sizeof(UINT16) + 0 +
               GetSpdmAsymSize (mUseAsymAlgo);
     SpdmResponse = (VOID *)TempBuf;
@@ -131,8 +131,8 @@ SpdmRequesterChallengeTestReceiveMessage (
     Ptr += GetSpdmHashSize (mUseHashAlgo);
     SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
     Ptr += SPDM_NONCE_SIZE;
-    ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
-    Ptr += GetSpdmHashSize (mUseHashAlgo);
+    // ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
+    // Ptr += GetSpdmHashSize (mUseHashAlgo);
     *(UINT16 *)Ptr = 0;
     Ptr += sizeof(UINT16);
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -169,7 +169,7 @@ SpdmRequesterChallengeTestReceiveMessage (
     TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
               GetSpdmHashSize (mUseHashAlgo) +
               SPDM_NONCE_SIZE +
-              GetSpdmHashSize (mUseHashAlgo) +
+              0 +
               sizeof(UINT16) + 0 +
               GetSpdmAsymSize (mUseAsymAlgo);
     SpdmResponse = (VOID *)TempBuf;
@@ -184,8 +184,8 @@ SpdmRequesterChallengeTestReceiveMessage (
     Ptr += GetSpdmHashSize (mUseHashAlgo);
     SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
     Ptr += SPDM_NONCE_SIZE;
-    ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
-    Ptr += GetSpdmHashSize (mUseHashAlgo);
+    // ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
+    // Ptr += GetSpdmHashSize (mUseHashAlgo);
     *(UINT16 *)Ptr = 0;
     Ptr += sizeof(UINT16);
     CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -256,7 +256,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
               GetSpdmHashSize (mUseHashAlgo) +
               SPDM_NONCE_SIZE +
-              GetSpdmHashSize (mUseHashAlgo) +
+              0 +
               sizeof(UINT16) + 0 +
               GetSpdmAsymSize (mUseAsymAlgo);
       SpdmResponse = (VOID *)TempBuf;
@@ -271,8 +271,8 @@ SpdmRequesterChallengeTestReceiveMessage (
       Ptr += GetSpdmHashSize (mUseHashAlgo);
       SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
       Ptr += SPDM_NONCE_SIZE;
-      ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
-      Ptr += GetSpdmHashSize (mUseHashAlgo);
+      // ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
+      // Ptr += GetSpdmHashSize (mUseHashAlgo);
       *(UINT16 *)Ptr = 0;
       Ptr += sizeof(UINT16);
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
@@ -352,7 +352,7 @@ SpdmRequesterChallengeTestReceiveMessage (
       TempBufSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
               GetSpdmHashSize (mUseHashAlgo) +
               SPDM_NONCE_SIZE +
-              GetSpdmHashSize (mUseHashAlgo) +
+              0 +
               sizeof(UINT16) + 0 +
               GetSpdmAsymSize (mUseAsymAlgo);
       SpdmResponse = (VOID *)TempBuf;
@@ -367,8 +367,8 @@ SpdmRequesterChallengeTestReceiveMessage (
       Ptr += GetSpdmHashSize (mUseHashAlgo);
       SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
       Ptr += SPDM_NONCE_SIZE;
-      ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
-      Ptr += GetSpdmHashSize (mUseHashAlgo);
+      // ZeroMem (Ptr, GetSpdmHashSize (mUseHashAlgo));
+      // Ptr += GetSpdmHashSize (mUseHashAlgo);
       *(UINT16 *)Ptr = 0;
       Ptr += sizeof(UINT16);
       CopyMem (&LocalBuffer[LocalBufferSize], SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);

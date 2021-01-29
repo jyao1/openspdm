@@ -175,7 +175,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     HmacSize = GetSpdmHashSize (mUseHashAlgo);
     OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
     TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
-              HashSize +
+              0 +
               DEFAULT_CONTEXT_LENGTH +
               OpaquePskExchangeRspSize +
               HmacSize;
@@ -190,8 +190,8 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
     SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
     Ptr = (VOID *)(SpdmResponse + 1);
-    ZeroMem (Ptr, HashSize);
-    Ptr += HashSize;
+    // ZeroMem (Ptr, HashSize);
+    // Ptr += HashSize;
     SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
     Ptr += DEFAULT_CONTEXT_LENGTH;
     SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
@@ -255,7 +255,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     HmacSize = GetSpdmHashSize (mUseHashAlgo);
     OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
     TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
-              HashSize +
+              0 +
               DEFAULT_CONTEXT_LENGTH +
               OpaquePskExchangeRspSize +
               HmacSize;
@@ -270,8 +270,8 @@ SpdmRequesterPskExchangeTestReceiveMessage (
     SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
     SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
     Ptr = (VOID *)(SpdmResponse + 1);
-    ZeroMem (Ptr, HashSize);
-    Ptr += HashSize;
+    // ZeroMem (Ptr, HashSize);
+    // Ptr += HashSize;
     SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
     Ptr += DEFAULT_CONTEXT_LENGTH;
     SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
@@ -373,7 +373,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       HmacSize = GetSpdmHashSize (mUseHashAlgo);
       OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
       TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
-              HashSize +
+              0 +
               DEFAULT_CONTEXT_LENGTH +
               OpaquePskExchangeRspSize +
               HmacSize;
@@ -388,8 +388,8 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
       SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
       Ptr = (VOID *)(SpdmResponse + 1);
-      ZeroMem (Ptr, HashSize);
-      Ptr += HashSize;
+      // ZeroMem (Ptr, HashSize);
+      // Ptr += HashSize;
       SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
       Ptr += DEFAULT_CONTEXT_LENGTH;
       SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
@@ -500,7 +500,7 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       HmacSize = GetSpdmHashSize (mUseHashAlgo);
       OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
       TempBufSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
-              HashSize +
+              0 +
               DEFAULT_CONTEXT_LENGTH +
               OpaquePskExchangeRspSize +
               HmacSize;
@@ -515,8 +515,8 @@ SpdmRequesterPskExchangeTestReceiveMessage (
       SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
       SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
       Ptr = (VOID *)(SpdmResponse + 1);
-      ZeroMem (Ptr, HashSize);
-      Ptr += HashSize;
+      // ZeroMem (Ptr, HashSize);
+      // Ptr += HashSize;
       SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
       Ptr += DEFAULT_CONTEXT_LENGTH;
       SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);

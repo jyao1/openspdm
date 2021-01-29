@@ -198,7 +198,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
     TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
-              HashSize +
+              0 +
               sizeof(UINT16) +
               OpaqueKeyExchangeRspSize +
               SignatureSize +
@@ -219,8 +219,8 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     SpdmDheComputeKey (mUseDheAlgo, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
     SpdmDheFree (mUseDheAlgo, DHEContext);
     Ptr += DheKeySize;
-    ZeroMem (Ptr, HashSize);
-    Ptr += HashSize;
+    // ZeroMem (Ptr, HashSize);
+    // Ptr += HashSize;
     *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
     Ptr += sizeof(UINT16);
     SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
@@ -304,7 +304,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
     TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
-              HashSize +
+              0 +
               sizeof(UINT16) +
               OpaqueKeyExchangeRspSize +
               SignatureSize +
@@ -325,8 +325,8 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     SpdmDheComputeKey (mUseDheAlgo, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
     SpdmDheFree (mUseDheAlgo, DHEContext);
     Ptr += DheKeySize;
-    ZeroMem (Ptr, HashSize);
-    Ptr += HashSize;
+    // ZeroMem (Ptr, HashSize);
+    // Ptr += HashSize;
     *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
     Ptr += sizeof(UINT16);
     SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
@@ -448,7 +448,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
       TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
-              HashSize +
+              0 +
               sizeof(UINT16) +
               OpaqueKeyExchangeRspSize +
               SignatureSize +
@@ -469,8 +469,8 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       SpdmDheComputeKey (mUseDheAlgo, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
       SpdmDheFree (mUseDheAlgo, DHEContext);
       Ptr += DheKeySize;
-      ZeroMem (Ptr, HashSize);
-      Ptr += HashSize;
+      // ZeroMem (Ptr, HashSize);
+      // Ptr += HashSize;
       *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
       Ptr += sizeof(UINT16);
       SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
@@ -601,7 +601,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
       TempBufSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
-              HashSize +
+              0 +
               sizeof(UINT16) +
               OpaqueKeyExchangeRspSize +
               SignatureSize +
@@ -622,8 +622,8 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       SpdmDheComputeKey (mUseDheAlgo, DHEContext, (UINT8 *)&LocalBuffer[0] + sizeof(SPDM_KEY_EXCHANGE_REQUEST), DheKeySize, FinalKey, &FinalKeySize);
       SpdmDheFree (mUseDheAlgo, DHEContext);
       Ptr += DheKeySize;
-      ZeroMem (Ptr, HashSize);
-      Ptr += HashSize;
+      // ZeroMem (Ptr, HashSize);
+      // Ptr += HashSize;
       *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
       Ptr += sizeof(UINT16);
       SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaqueKeyExchangeRspSize, Ptr);
