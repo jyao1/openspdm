@@ -63,7 +63,7 @@ TrySpdmSendReceivePskExchange (
   UINTN                                     SpdmRequestSize;
   SPDM_PSK_EXCHANGE_RESPONSE_MAX            SpdmResponse;
   UINTN                                     SpdmResponseSize;
-  UINT32                                    HashSize;
+  UINT32                                    MeasurementSummaryHashSize;
   UINT32                                    HmacSize;
   UINT8                                     *Ptr;
   VOID                                      *MeasurementSummaryHash;
@@ -158,19 +158,19 @@ TrySpdmSendReceivePskExchange (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, MeasurementHashType);
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (SpdmResponseSize < sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
                          SpdmResponse.ResponderContextLength +
                          SpdmResponse.OpaqueLength +
-                         HashSize +
+                         MeasurementSummaryHashSize +
                          HmacSize) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
     return RETURN_DEVICE_ERROR;
   }
 
-  Ptr = (UINT8 *)&SpdmResponse + sizeof(SPDM_PSK_EXCHANGE_RESPONSE) + HashSize + SpdmResponse.ResponderContextLength;
+  Ptr = (UINT8 *)&SpdmResponse + sizeof(SPDM_PSK_EXCHANGE_RESPONSE) + MeasurementSummaryHashSize + SpdmResponse.ResponderContextLength;
   Status = SpdmProcessOpaqueDataVersionSelectionData (SpdmContext, SpdmResponse.OpaqueLength, Ptr);
   if (RETURN_ERROR(Status)) {
     SpdmFreeSessionId (SpdmContext, *SessionId);
@@ -180,16 +180,16 @@ TrySpdmSendReceivePskExchange (
   SpdmResponseSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
                      SpdmResponse.ResponderContextLength +
                      SpdmResponse.OpaqueLength +
-                     HashSize +
+                     MeasurementSummaryHashSize +
                      HmacSize;
 
   Ptr = (UINT8 *)(SpdmResponse.MeasurementSummaryHash);
   MeasurementSummaryHash = Ptr;
-  DEBUG((DEBUG_INFO, "MeasurementSummaryHash (0x%x) - ", HashSize));
-  InternalDumpData (MeasurementSummaryHash, HashSize);
+  DEBUG((DEBUG_INFO, "MeasurementSummaryHash (0x%x) - ", MeasurementSummaryHashSize));
+  InternalDumpData (MeasurementSummaryHash, MeasurementSummaryHashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  Ptr += HashSize;
+  Ptr += MeasurementSummaryHashSize;
 
   DEBUG((DEBUG_INFO, "ServerRandomData (0x%x) - ", SpdmResponse.ResponderContextLength));
   InternalDumpData (Ptr, SpdmResponse.ResponderContextLength);
@@ -234,7 +234,7 @@ TrySpdmSendReceivePskExchange (
   }
 
   if (MeasurementHash != NULL) {
-    CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);
+    CopyMem (MeasurementHash, MeasurementSummaryHash, MeasurementSummaryHashSize);
   }
 
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);

@@ -43,6 +43,7 @@ SpdmGetResponseChallengeAuth (
   UINTN                                     SignatureSize;
   UINT8                                     SlotNum;
   UINT32                                    HashSize;
+  UINT32                                    MeasurementSummaryHashSize;
   UINT8                                     *Ptr;
   UINTN                                     TotalSize;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
@@ -83,11 +84,12 @@ SpdmGetResponseChallengeAuth (
 
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, SpdmRequest->Header.Param2);
 
   TotalSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
               HashSize +
               SPDM_NONCE_SIZE +
-              HashSize +
+              MeasurementSummaryHashSize +
               sizeof(UINT16) +
               SpdmContext->LocalContext.OpaqueChallengeAuthRspSize +
               SignatureSize;
@@ -129,7 +131,7 @@ SpdmGetResponseChallengeAuth (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  Ptr += HashSize;
+  Ptr += MeasurementSummaryHashSize;
 
   *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueChallengeAuthRspSize;
   Ptr += sizeof(UINT16);

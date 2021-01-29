@@ -564,6 +564,35 @@ SpdmVerifyChallengeAuthSignature (
 }
 
 /**
+  This function calculate the measurement summary hash size.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MeasurementSummaryHashType   The type of the measurement summary hash.
+
+  @return 0 measurement summary hash type is invalid.
+  @return measurement summary hash size according to type.
+**/
+UINT32
+SpdmGetMeasurementSummaryHashSize (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                MeasurementSummaryHashType
+  )
+{
+  switch (MeasurementSummaryHashType) {
+  case SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH:
+    return 0;
+    break;
+
+  case SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH:
+  case SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH:
+    return GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+    break;
+  }
+
+  return 0;
+}
+
+/**
   This function calculate the measurement summary hash.
 
   @param  SpdmContext                  A pointer to the SPDM context.
@@ -592,7 +621,6 @@ SpdmGenerateMeasurementSummaryHash (
 
   switch (MeasurementSummaryHashType) {
   case SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH:
-    ZeroMem (MeasurementSummaryHash, GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo));
     break;
 
   case SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH:

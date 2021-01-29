@@ -39,7 +39,7 @@ SpdmGetResponseKeyExchange (
   SPDM_KEY_EXCHANGE_REQUEST     *SpdmRequest;
   SPDM_KEY_EXCHANGE_RESPONSE    *SpdmResponse;
   UINTN                         DheKeySize;
-  UINT32                        HashSize;
+  UINT32                        MeasurementSummaryHashSize;
   UINT32                        SignatureSize;
   UINT32                        HmacSize;
   UINT8                         *Ptr;
@@ -87,9 +87,9 @@ SpdmGetResponseKeyExchange (
   }
 
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
-  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   DheKeySize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, SpdmRequest->Header.Param1);
 
   if (RequestSize < sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
                     DheKeySize +
@@ -125,7 +125,7 @@ SpdmGetResponseKeyExchange (
 
   TotalSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
               DheKeySize +
-              HashSize +
+              MeasurementSummaryHashSize +
               sizeof(UINT16) +
               OpaqueKeyExchangeRspSize +
               SignatureSize +
@@ -192,7 +192,7 @@ SpdmGetResponseKeyExchange (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  Ptr += HashSize;
+  Ptr += MeasurementSummaryHashSize;
 
   *(UINT16 *)Ptr = (UINT16)OpaqueKeyExchangeRspSize;
   Ptr += sizeof(UINT16);

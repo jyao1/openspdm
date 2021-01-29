@@ -41,7 +41,7 @@ SpdmGetResponsePskExchange (
   BOOLEAN                       Result;
   UINT8                         SlotNum;
   UINT32                        SessionId;
-  UINT32                        HashSize;
+  UINT32                        MeasurementSummaryHashSize;
   UINT32                        HmacSize;
   UINT8                         *Ptr;
   SPDM_SESSION_INFO             *SessionInfo;
@@ -78,7 +78,7 @@ SpdmGetResponsePskExchange (
     return RETURN_SUCCESS;
   }
 
-  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, SpdmRequest->Header.Param1);
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (RequestSize < sizeof(SPDM_PSK_EXCHANGE_REQUEST)) {
@@ -106,7 +106,7 @@ SpdmGetResponsePskExchange (
 
   OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
   TotalSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
-              HashSize +
+              MeasurementSummaryHashSize +
               DEFAULT_CONTEXT_LENGTH +
               OpaquePskExchangeRspSize +
               HmacSize;
@@ -150,7 +150,7 @@ SpdmGetResponsePskExchange (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  Ptr += HashSize;
+  Ptr += MeasurementSummaryHashSize;
   
   SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
   Ptr += DEFAULT_CONTEXT_LENGTH;

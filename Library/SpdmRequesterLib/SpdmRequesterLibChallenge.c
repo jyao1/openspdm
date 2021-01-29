@@ -57,6 +57,7 @@ TrySpdmChallenge (
   UINT8                                     *Ptr;
   VOID                                      *CertChainHash;
   UINTN                                     HashSize;
+  UINTN                                     MeasurementSummaryHashSize;
   VOID                                      *ServerNonce;
   VOID                                      *MeasurementSummaryHash;
   UINT16                                    OpaqueLength;
@@ -156,11 +157,12 @@ TrySpdmChallenge (
   }
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, MeasurementHashType);
 
   if (SpdmResponseSize <= sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
                           HashSize +
                           SPDM_NONCE_SIZE +
-                          HashSize +
+                          MeasurementSummaryHashSize +
                           sizeof(UINT16)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -185,9 +187,9 @@ TrySpdmChallenge (
   Ptr += SPDM_NONCE_SIZE;
 
   MeasurementSummaryHash = Ptr;
-  Ptr += HashSize;
-  DEBUG((DEBUG_INFO, "MeasurementSummaryHash (0x%x) - ", HashSize));
-  InternalDumpData (MeasurementSummaryHash, HashSize);
+  Ptr += MeasurementSummaryHashSize;
+  DEBUG((DEBUG_INFO, "MeasurementSummaryHash (0x%x) - ", MeasurementSummaryHashSize));
+  InternalDumpData (MeasurementSummaryHash, MeasurementSummaryHashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   OpaqueLength = *(UINT16 *)Ptr;
@@ -199,7 +201,7 @@ TrySpdmChallenge (
   if (SpdmResponseSize < sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
                          HashSize +
                          SPDM_NONCE_SIZE +
-                         HashSize +
+                         MeasurementSummaryHashSize +
                          sizeof(UINT16) +
                          OpaqueLength +
                          SignatureSize) {
@@ -208,7 +210,7 @@ TrySpdmChallenge (
   SpdmResponseSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
                      HashSize +
                      SPDM_NONCE_SIZE +
-                     HashSize +
+                     MeasurementSummaryHashSize +
                      sizeof(UINT16) +
                      OpaqueLength +
                      SignatureSize;
@@ -234,7 +236,7 @@ TrySpdmChallenge (
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
 
   if (MeasurementHash != NULL) {
-    CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);
+    CopyMem (MeasurementHash, MeasurementSummaryHash, MeasurementSummaryHashSize);
   }
 
   if (AuthAttribute.BasicMutAuthReq == 1) {

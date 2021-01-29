@@ -590,6 +590,21 @@ SpdmVerifyChallengeAuthSignature (
   );
 
 /**
+  This function calculate the measurement summary hash size.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  MeasurementSummaryHashType   The type of the measurement summary hash.
+
+  @return 0 measurement summary hash type is invalid.
+  @return measurement summary hash size according to type.
+**/
+UINT32
+SpdmGetMeasurementSummaryHashSize (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                MeasurementSummaryHashType
+  );
+
+/**
   This function calculate the measurement summary hash.
 
   @param  SpdmContext                  A pointer to the SPDM context.

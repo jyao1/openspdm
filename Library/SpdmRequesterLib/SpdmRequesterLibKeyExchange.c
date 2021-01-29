@@ -69,7 +69,7 @@ TrySpdmSendReceiveKeyExchange (
   SPDM_KEY_EXCHANGE_RESPONSE_MAX            SpdmResponse;
   UINTN                                     SpdmResponseSize;
   UINTN                                     DheKeySize;
-  UINT32                                    HashSize;
+  UINT32                                    MeasurementSummaryHashSize;
   UINT32                                    SignatureSize;
   UINT32                                    HmacSize;
   UINT8                                     *Ptr;
@@ -197,7 +197,7 @@ TrySpdmSendReceiveKeyExchange (
   }
 
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
-  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, MeasurementHashType);
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
@@ -206,7 +206,7 @@ TrySpdmSendReceiveKeyExchange (
 
   if (SpdmResponseSize <  sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
                           DheKeySize +
-                          HashSize +
+                          MeasurementSummaryHashSize +
                           sizeof(UINT16) +
                           SignatureSize +
                           HmacSize) {
@@ -226,11 +226,11 @@ TrySpdmSendReceiveKeyExchange (
   Ptr += DheKeySize;
 
   MeasurementSummaryHash = Ptr;
-  DEBUG((DEBUG_INFO, "MeasurementSummaryHash (0x%x) - ", HashSize));
-  InternalDumpData (MeasurementSummaryHash, HashSize);
+  DEBUG((DEBUG_INFO, "MeasurementSummaryHash (0x%x) - ", MeasurementSummaryHashSize));
+  InternalDumpData (MeasurementSummaryHash, MeasurementSummaryHashSize);
   DEBUG((DEBUG_INFO, "\n"));
 
-  Ptr += HashSize;
+  Ptr += MeasurementSummaryHashSize;
 
   OpaqueLength = *(UINT16 *)Ptr;
   if (OpaqueLength > MAX_SPDM_OPAQUE_DATA_SIZE) {
@@ -239,7 +239,7 @@ TrySpdmSendReceiveKeyExchange (
   Ptr += sizeof(UINT16);
   if (SpdmResponseSize < sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
                          DheKeySize +
-                         HashSize +
+                         MeasurementSummaryHashSize +
                          sizeof(UINT16) +
                          OpaqueLength +
                          SignatureSize +
@@ -259,7 +259,7 @@ TrySpdmSendReceiveKeyExchange (
 
   SpdmResponseSize = sizeof(SPDM_KEY_EXCHANGE_RESPONSE) +
                      DheKeySize +
-                     HashSize +
+                     MeasurementSummaryHashSize +
                      sizeof(UINT16) +
                      OpaqueLength +
                      SignatureSize +
@@ -333,7 +333,7 @@ TrySpdmSendReceiveKeyExchange (
   }
 
   if (MeasurementHash != NULL) {
-    CopyMem (MeasurementHash, MeasurementSummaryHash, HashSize);
+    CopyMem (MeasurementHash, MeasurementSummaryHash, MeasurementSummaryHashSize);
   }
   SessionInfo->MutAuthRequested = SpdmResponse.MutAuthRequested;
 
