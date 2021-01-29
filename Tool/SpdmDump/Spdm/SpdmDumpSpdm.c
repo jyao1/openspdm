@@ -1091,6 +1091,13 @@ DumpSpdmMeasurements (
         printf ("\n    Signature(");
         DumpData (Signature, SignatureSize);
         printf (")");
+      } else {
+        OpaqueLength = *(UINT16 *)(MeasurementRecord + MeasurementRecordLength);
+        OpaqueData = MeasurementRecord + MeasurementRecordLength + sizeof(UINT16);
+        printf ("\n    OpaqueData(");
+        DumpData (OpaqueData, OpaqueLength);
+        printf (")");
+        DumpSpdmOpaqueData (OpaqueData, OpaqueLength);
       }
     }
   }
