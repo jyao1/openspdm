@@ -234,7 +234,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -280,7 +280,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -364,7 +364,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = 0;
       SpdmResponse->NumberOfBlocks = 1;
-      *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+      SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
       MeasurmentBlock = (VOID *)(SpdmResponse + 1);
       SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
       Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -457,7 +457,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       SpdmResponse->Header.Param1 = 0;
       SpdmResponse->Header.Param2 = 0;
       SpdmResponse->NumberOfBlocks = 1;
-      *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+      SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
       MeasurmentBlock = (VOID *)(SpdmResponse + 1);
       SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
       Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -494,7 +494,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 4;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 0;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = 0;
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, 0);
     *(UINT16 *)((UINT8 *)SpdmResponse + sizeof(SPDM_MEASUREMENTS_RESPONSE)) = 0;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -517,7 +517,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     *(UINT16 *)((UINT8 *)SpdmResponse + sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)) = 0;
@@ -549,7 +549,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -588,7 +588,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -632,7 +632,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -668,7 +668,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -714,7 +714,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = alternativeDefaultSlotID;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -757,17 +757,17 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     if (SubIndex0x11 == 0) {
       TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
       SpdmResponse->NumberOfBlocks = 1;
-      *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+      SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
       MeasurmentBlock = (VOID *)(SpdmResponse + 1);
       SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     } else if (SubIndex0x11 == 1) {
       TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE);
       SpdmResponse->NumberOfBlocks = 1;
-      *(UINT32 *)SpdmResponse->MeasurementRecordLength = 0;
+      SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, 0);
     } else if (SubIndex0x11 == 2) {
       TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
       SpdmResponse->NumberOfBlocks = 0;
-      *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+      SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
       MeasurmentBlock = (VOID *)(SpdmResponse + 1);
       SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     }
@@ -795,7 +795,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(largeMeasurementSize);
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(largeMeasurementSize));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, largeMeasurementSize, 1);
 
@@ -821,7 +821,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     MeasurmentBlock->MeasurementBlockCommonHeader.Index = 1;
@@ -848,7 +848,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     MeasurmentBlock->MeasurementBlockCommonHeader.Index = 1;
@@ -875,7 +875,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     MeasurmentBlock->MeasurementBlockCommonHeader.Index = 1;
@@ -902,7 +902,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
 
@@ -927,7 +927,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     // adding extra fields: NONCE, OpaqueLength, OpaqueData
@@ -960,7 +960,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     // adding extra fields: NONCE, OpaqueLength, OpaqueData
@@ -1000,7 +1000,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -1055,7 +1055,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -1109,7 +1109,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -1162,7 +1162,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
@@ -1207,7 +1207,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     // adding extra fields: NONCE, OpaqueLength, OpaqueData
@@ -1242,7 +1242,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     // adding extra fields: NONCE, OpaqueLength, OpaqueData
@@ -1276,7 +1276,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SpdmResponse->Header.Param1 = 0;
     SpdmResponse->Header.Param2 = 0;
     SpdmResponse->NumberOfBlocks = 1;
-    *(UINT32 *)SpdmResponse->MeasurementRecordLength = (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
+    SpdmWriteUint24 (SpdmResponse->MeasurementRecordLength, (UINT32)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo)));
     MeasurmentBlock = (VOID *)(SpdmResponse + 1);
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     // adding extra fields: NONCE, OpaqueLength, OpaqueData
