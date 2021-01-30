@@ -16,6 +16,7 @@ VOID               *mSpdmLastMessageBuffer;
 UINTN              mSpdmLastMessageBufferSize;
 UINT8              mCachedGetMeasurementRequestAttribute;
 UINT8              mCachedGetMeasurementOperation;
+UINT8              mCachedMeasurementSummaryHashType;
 UINT32             mCachedSessionId;
 VOID               *mCurrentSessionInfo;
 UINT32             mCurrentSessionId;
@@ -179,6 +180,25 @@ VALUE_STRING_ENTRY  mSpdmKeyUpdateOperationStringTable[] = {
 VALUE_STRING_ENTRY  mSpdmEndSessionAttributeStringTable[] = {
   {SPDM_END_SESSION_REQUEST_ATTRIBUTES_PRESERVE_NEGOTIATED_STATE, "PreserveState"},
 };
+
+UINT32
+SpdmDumpGetMeasurementSummaryHashSize (
+  IN     UINT8                MeasurementSummaryHashType
+  )
+{
+  switch (MeasurementSummaryHashType) {
+  case SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH:
+    return 0;
+    break;
+
+  case SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH:
+  case SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH:
+    return GetSpdmHashSize (mSpdmBaseHashAlgo);
+    break;
+  }
+
+  return 0;
+}
 
 VOID
 DumpSpdmGetVersion (
@@ -784,6 +804,8 @@ DumpSpdmChallenge (
 
   SpdmRequest = Buffer;
 
+  mCachedMeasurementSummaryHashType = SpdmRequest->Header.Param1;
+
   if (!mParamQuiteMode) {
     printf ("(SlotID=0x%02x, HashType=0x%02x(", SpdmRequest->Header.Param1, SpdmRequest->Header.Param2);
     DumpEntryValue (mSpdmRequestHashTypeStringTable, ARRAY_SIZE(mSpdmRequestHashTypeStringTable), SpdmRequest->Header.Param2);
@@ -808,6 +830,7 @@ DumpSpdmChallengeAuth (
   SPDM_CHALLENGE_AUTH_RESPONSE  *SpdmResponse;
   UINTN                         MessageSize;
   UINTN                         HashSize;
+  UINTN                         MeasurementSummaryHashSize;
   UINTN                         SignatureSize;
   UINT16                        OpaqueLength;
   UINT8                         *CertChainHash;
@@ -820,14 +843,15 @@ DumpSpdmChallengeAuth (
 
   HashSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
   SignatureSize = GetSpdmAsymSize (mSpdmBaseAsymAlgo);
+  MeasurementSummaryHashSize = SpdmDumpGetMeasurementSummaryHashSize (mCachedMeasurementSummaryHashType);
 
-  MessageSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + HashSize + 32 + HashSize + sizeof(UINT16);
+  MessageSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + HashSize + 32 + MeasurementSummaryHashSize + sizeof(UINT16);
   if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
   }
 
-  OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + HashSize + 32 + HashSize);
+  OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + HashSize + 32 + MeasurementSummaryHashSize);
   MessageSize += OpaqueLength + SignatureSize;
   if (BufferSize < MessageSize) {
     printf ("\n");
@@ -856,11 +880,14 @@ DumpSpdmChallengeAuth (
       DumpData (Nonce, 32);
       printf (")");
       MeasurementSummaryHash = Nonce + 32;
-      printf ("\n    MeasurementSummaryHash(");
-      DumpData (MeasurementSummaryHash, HashSize);
-      printf (")");
-      OpaqueLength = *(UINT16 *)(MeasurementSummaryHash + HashSize);
-      OpaqueData = MeasurementSummaryHash + HashSize + sizeof(UINT16);
+      if ((mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH) ||
+          (mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH)) {
+        printf ("\n    MeasurementSummaryHash(");
+        DumpData (MeasurementSummaryHash, MeasurementSummaryHashSize);
+        printf (")");
+      }
+      OpaqueLength = *(UINT16 *)(MeasurementSummaryHash + MeasurementSummaryHashSize);
+      OpaqueData = MeasurementSummaryHash + MeasurementSummaryHashSize + sizeof(UINT16);
       printf ("\n    OpaqueData(");
       DumpData (OpaqueData, OpaqueLength);
       printf (")");
@@ -1262,6 +1289,8 @@ DumpSpdmKeyExchange (
     return ;
   }
 
+  mCachedMeasurementSummaryHashType = SpdmRequest->Header.Param1;
+
   if (!mParamQuiteMode) {
     printf ("(HashType=0x%02x(", SpdmRequest->Header.Param1);
     DumpEntryValue (mSpdmRequestHashTypeStringTable, ARRAY_SIZE(mSpdmRequestHashTypeStringTable), SpdmRequest->Header.Param1);
@@ -1300,7 +1329,7 @@ DumpSpdmKeyExchangeRsp (
   SPDM_KEY_EXCHANGE_RESPONSE  *SpdmResponse;
   UINTN                       MessageSize;
   UINTN                       DheKeySize;
-  UINTN                       HashSize;
+  UINTN                       MeasurementSummaryHashSize;
   UINTN                       SignatureSize;
   UINTN                       HmacSize;
   UINT16                      OpaqueLength;
@@ -1325,16 +1354,16 @@ DumpSpdmKeyExchangeRsp (
   SpdmResponse = Buffer;
   DheKeySize = GetSpdmDheKeySize (mSpdmDHENamedGroup);
   SignatureSize = GetSpdmAsymSize (mSpdmBaseAsymAlgo);
-  HashSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
+  MeasurementSummaryHashSize = SpdmDumpGetMeasurementSummaryHashSize (mCachedMeasurementSummaryHashType);
   HmacSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
 
-  MessageSize += DheKeySize + HashSize + sizeof(UINT16);
+  MessageSize += DheKeySize + MeasurementSummaryHashSize + sizeof(UINT16);
   if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
   }
 
-  OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_KEY_EXCHANGE_RESPONSE) + DheKeySize + HashSize);
+  OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_KEY_EXCHANGE_RESPONSE) + DheKeySize + MeasurementSummaryHashSize);
   MessageSize += OpaqueLength + SignatureSize;
   IncludeHmac = ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0);
   if (IncludeHmac) {
@@ -1359,11 +1388,14 @@ DumpSpdmKeyExchangeRsp (
       DumpData (ExchangeData, DheKeySize);
       printf (")");
       MeasurementSummaryHash = ExchangeData + DheKeySize;
-      printf ("\n    MeasurementSummaryHash(");
-      DumpData (MeasurementSummaryHash, HashSize);
-      printf (")");
-      OpaqueLength = *(UINT16 *)((UINT8 *)MeasurementSummaryHash + HashSize);
-      OpaqueData = (VOID *)((UINT8 *)MeasurementSummaryHash + HashSize + sizeof(UINT16));
+      if ((mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH) ||
+          (mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH)) {
+        printf ("\n    MeasurementSummaryHash(");
+        DumpData (MeasurementSummaryHash, MeasurementSummaryHashSize);
+        printf (")");
+      }
+      OpaqueLength = *(UINT16 *)((UINT8 *)MeasurementSummaryHash + MeasurementSummaryHashSize);
+      OpaqueData = (VOID *)((UINT8 *)MeasurementSummaryHash + MeasurementSummaryHashSize + sizeof(UINT16));
       printf ("\n    OpaqueData(");
       DumpData (OpaqueData, OpaqueLength);
       printf (")");
@@ -1567,6 +1599,8 @@ DumpSpdmPskExchange (
     return ;
   }
 
+  mCachedMeasurementSummaryHashType = SpdmRequest->Header.Param1;
+
   if (!mParamQuiteMode) {
     printf ("(HashType=0x%02x(", SpdmRequest->Header.Param1);
     DumpEntryValue (mSpdmRequestHashTypeStringTable, ARRAY_SIZE(mSpdmRequestHashTypeStringTable), SpdmRequest->Header.Param1);
@@ -1603,7 +1637,7 @@ DumpSpdmPskExchangeRsp (
 {
   SPDM_PSK_EXCHANGE_RESPONSE  *SpdmResponse;
   UINTN                       MessageSize;
-  UINTN                       HashSize;
+  UINTN                       MeasurementSummaryHashSize;
   UINTN                       HmacSize;
   UINT8                       *MeasurementSummaryHash;
   UINT8                       *ResponderContext;
@@ -1622,9 +1656,9 @@ DumpSpdmPskExchangeRsp (
   }
 
   SpdmResponse = Buffer;
-  HashSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
+  MeasurementSummaryHashSize = SpdmDumpGetMeasurementSummaryHashSize (mCachedMeasurementSummaryHashType);
   HmacSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
-  MessageSize += HashSize + SpdmResponse->ResponderContextLength + SpdmResponse->OpaqueLength + HmacSize;
+  MessageSize += MeasurementSummaryHashSize + SpdmResponse->ResponderContextLength + SpdmResponse->OpaqueLength + HmacSize;
   if (BufferSize < MessageSize) {
     printf ("\n");
     return ;
@@ -1635,10 +1669,13 @@ DumpSpdmPskExchangeRsp (
 
     if (mParamAllMode) {
       MeasurementSummaryHash = (VOID *)(SpdmResponse + 1);
-      printf ("\n    MeasurementSummaryHash(");
-      DumpData (MeasurementSummaryHash, HashSize);
-      printf (")");
-      ResponderContext = MeasurementSummaryHash + HashSize;
+      if ((mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH) ||
+          (mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH)) {
+        printf ("\n    MeasurementSummaryHash(");
+        DumpData (MeasurementSummaryHash, MeasurementSummaryHashSize);
+        printf (")");
+      }
+      ResponderContext = MeasurementSummaryHash + MeasurementSummaryHashSize;
       printf ("\n    Context(");
       DumpData (ResponderContext, SpdmResponse->ResponderContextLength);
       printf (")");
