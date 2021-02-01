@@ -40,6 +40,7 @@ SpdmGetResponseDigest (
   UINTN                         SpdmRequestSize;
   SPDM_DIGESTS_RESPONSE         *SpdmResponse;
   UINTN                         Index;
+  UINTN                         NoLocalCertChain;
   UINT32                        HashSize;
   UINT8                         *Digest;
   SPDM_DEVICE_CONTEXT           *SpdmContext;
@@ -70,6 +71,17 @@ SpdmGetResponseDigest (
   }
 
   if (SpdmContext->LocalContext.LocalCertChainProvision == NULL) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
+  NoLocalCertChain = 1;
+  for (Index = 0; Index < MAX_SPDM_SLOT_COUNT; Index++) {
+    if (SpdmContext->LocalContext.LocalCertChainProvision[Index] != NULL) {
+      NoLocalCertChain = 0;
+    }
+  }
+  if (NoLocalCertChain) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
