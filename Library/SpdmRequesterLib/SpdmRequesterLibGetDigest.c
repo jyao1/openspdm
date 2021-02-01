@@ -110,7 +110,15 @@ TrySpdmGetDigest (
   }
 
   DigestSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
-  DigestCount = (SpdmResponseSize - sizeof(SPDM_DIGESTS_RESPONSE)) / DigestSize;
+  if (SlotMask != NULL) {
+    *SlotMask = SpdmResponse.Header.Param2;
+  }
+  DigestCount = 0;
+  for (Index = 0; Index < MAX_SPDM_SLOT_COUNT; Index++) {
+    if (*SlotMask & (1 << Index)) {
+      DigestCount++;
+    }
+  }
   if (DigestCount == 0) {
     return RETURN_DEVICE_ERROR;
   }
@@ -140,9 +148,6 @@ TrySpdmGetDigest (
 
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
 
-  if (SlotMask != NULL) {
-    *SlotMask = SpdmResponse.Header.Param2;
-  }
   if (TotalDigestBuffer != NULL) {
     CopyMem (TotalDigestBuffer, SpdmResponse.Digest, DigestSize * DigestCount);
   }
