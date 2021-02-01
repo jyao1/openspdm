@@ -43,6 +43,30 @@ SpdmRequesterGetDigestTestSendMessage (
     return RETURN_SUCCESS;
   case 0x9:
     return RETURN_SUCCESS;
+  case 0xA:
+    return RETURN_SUCCESS;
+  case 0xB:
+    return RETURN_SUCCESS;
+  case 0xC:
+    return RETURN_SUCCESS;
+  case 0xD:
+    return RETURN_SUCCESS;
+  case 0xE:
+    return RETURN_SUCCESS;
+  case 0xF:
+    return RETURN_SUCCESS;
+  case 0x10:
+    return RETURN_SUCCESS;
+  case 0x11:
+    return RETURN_SUCCESS;
+  case 0x12:
+    return RETURN_SUCCESS;
+  case 0x13:
+    return RETURN_SUCCESS;
+  case 0x14:
+    return RETURN_SUCCESS;
+  case 0x15:
+    return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -247,6 +271,231 @@ SpdmRequesterGetDigestTestReceiveMessage (
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     }
     SubIndex2 ++;
+  }
+    return RETURN_SUCCESS;
+
+  case 0xA:
+    return RETURN_SUCCESS;
+
+  case 0xB:
+    return RETURN_DEVICE_ERROR;
+
+  case 0xC:
+  {
+    SPDM_DIGESTS_RESPONSE    *SpdmResponse;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
+
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    TempBufSize = 2;
+    SpdmResponse = (VOID *)TempBuf;
+
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse->Header.Param1 = 0;
+    SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
+    SpdmResponse->Header.Param2 = 0;
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+  }
+    return RETURN_SUCCESS;
+
+  case 0xD:
+  {
+    SPDM_DIGESTS_RESPONSE    *SpdmResponse;
+    UINT8                    *Digest;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
+
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (mUseHashAlgo);
+    SpdmResponse = (VOID *)TempBuf;
+
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse->Header.Param1 = 0;
+    SpdmResponse->Header.RequestResponseCode = SPDM_CERTIFICATE;
+    SpdmResponse->Header.Param2 = 0;
+    SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+
+    Digest = (VOID *)(SpdmResponse + 1);
+    SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    SpdmResponse->Header.Param2 |= (1 << 0);
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+  }
+    return RETURN_SUCCESS;
+
+  case 0xE:
+  {
+    SPDM_DIGESTS_RESPONSE    SpdmResponse;
+
+    SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse.Header.Param1 = 0;
+    SpdmResponse.Header.RequestResponseCode = SPDM_DIGESTS;
+    SpdmResponse.Header.Param2 = 0;
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+  }
+    return RETURN_SUCCESS;
+
+  case 0xF:
+    return RETURN_SUCCESS;
+
+  case 0x10:
+  {
+    SPDM_DIGESTS_RESPONSE    *SpdmResponse;
+    UINT8                    *Digest;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
+
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (mUseHashAlgo);
+    SpdmResponse = (VOID *)TempBuf;
+
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse->Header.Param1 = 0;
+    SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
+    SpdmResponse->Header.Param2 = 0;
+    SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+
+    Digest = (VOID *)(SpdmResponse + 1);
+    SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    SpdmResponse->Header.Param2 |= (1 << 0);
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+  }
+    return RETURN_SUCCESS;
+
+  case 0x11:
+  {
+    SPDM_DIGESTS_RESPONSE    *SpdmResponse;
+    UINT8                    *Digest;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
+
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (mUseHashAlgo);
+    SpdmResponse = (VOID *)TempBuf;
+
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse->Header.Param1 = 0;
+    SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
+    SpdmResponse->Header.Param2 = 0;
+    SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+
+    Digest = (VOID *)(SpdmResponse + 1);
+    SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    Digest[GetSpdmHashSize (mUseHashAlgo) - 1] = 0;
+    SpdmResponse->Header.Param2 |= (1 << 0);
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+  }
+    return RETURN_SUCCESS;
+
+  case 0x12:
+  {
+    SPDM_DIGESTS_RESPONSE    *SpdmResponse;
+    UINT8                    *Digest;
+    UINTN                    DigestCount;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
+    UINTN                    Index;
+
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    DigestCount = 4;
+    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (mUseHashAlgo);
+    SpdmResponse = (VOID *)TempBuf;
+
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse->Header.Param1 = 0;
+    SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
+    SpdmResponse->Header.Param2 = 0;
+    SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+
+    Digest = (VOID *)(SpdmResponse + 1);
+    
+    SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    for (Index = 0; Index < DigestCount; Index++) {
+      SpdmResponse->Header.Param2 |= (1 << Index);
+    }
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+  }
+    return RETURN_SUCCESS;
+
+  case 0x13:
+  {
+    SPDM_DIGESTS_RESPONSE    *SpdmResponse;
+    UINT8                    *Digest;
+    UINTN                    DigestCount;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
+    UINTN                    Index;
+
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    DigestCount = 4;
+    TempBufSize = sizeof(SPDM_DIGESTS_RESPONSE) + DigestCount * GetSpdmHashSize (mUseHashAlgo);
+    SpdmResponse = (VOID *)TempBuf;
+
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse->Header.Param1 = 0;
+    SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
+    SpdmResponse->Header.Param2 = 0;
+    SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+
+    Digest = (VOID *)(SpdmResponse + 1);
+    
+    for (Index = 0; Index < DigestCount; Index++) {
+      SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[Index * GetSpdmHashSize (mUseHashAlgo)]);
+      SpdmResponse->Header.Param2 |= (1 << Index);
+      if (Index == 0) continue;
+      Digest[(Index + 1) * GetSpdmHashSize (mUseHashAlgo) - 1] = 0;
+    }
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+  }
+    return RETURN_SUCCESS;
+
+  case 0x14:
+  {
+    SPDM_DIGESTS_RESPONSE    *SpdmResponse;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
+
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    TempBufSize = 5;
+    SpdmResponse = (VOID *)TempBuf;
+
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse->Header.Param1 = 0;
+    SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
+    SpdmResponse->Header.Param2 = 0;
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+  }
+    return RETURN_SUCCESS;
+
+  case 0x15:
+  {
+    SPDM_DIGESTS_RESPONSE    *SpdmResponse;
+    UINT8                    *Digest;
+    UINT8                    TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+    UINTN                    TempBufSize;
+
+    ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+    TempBufSize = sizeof(SPDM_MESSAGE_HEADER) + MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT + 1;
+    SpdmResponse = (VOID *)TempBuf;
+
+    SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+    SpdmResponse->Header.Param1 = 0;
+    SpdmResponse->Header.RequestResponseCode = SPDM_DIGESTS;
+    SpdmResponse->Header.Param2 = 0;
+    SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+
+    Digest = (VOID *)(SpdmResponse + 1);
+    SpdmHashAll (mUseHashAlgo, LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, &Digest[0]);
+    SpdmResponse->Header.Param2 |= (1 << 0);
+
+    SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
     return RETURN_SUCCESS;
 
@@ -479,6 +728,304 @@ void TestSpdmRequesterGetDigestCase9(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + 32);
 }
 
+void TestSpdmRequesterGetDigestCase10(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xA;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags = 0;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, 0);
+}
+
+void TestSpdmRequesterGetDigestCase11(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xB;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
+}
+
+void TestSpdmRequesterGetDigestCase12(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xC;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
+}
+
+void TestSpdmRequesterGetDigestCase13(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xD;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
+}
+
+void TestSpdmRequesterGetDigestCase14(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xE;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
+}
+
+void TestSpdmRequesterGetDigestCase15(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xF;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = SpdmContext->Transcript.MessageB.MaxBufferSize;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
+}
+
+void TestSpdmRequesterGetDigestCase16(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x10;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = SpdmContext->Transcript.MessageB.MaxBufferSize - (sizeof(SPDM_DIGESTS_RESPONSE));
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
+}
+
+void TestSpdmRequesterGetDigestCase17(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x11;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
+  assert_int_equal (SpdmContext->ErrorState, SPDM_STATUS_ERROR_CERTIFICATE_FAILURE);
+}
+
+void TestSpdmRequesterGetDigestCase18(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x12;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
+}
+
+void TestSpdmRequesterGetDigestCase19(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x13;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
+  assert_int_equal (SpdmContext->ErrorState, SPDM_STATUS_ERROR_CERTIFICATE_FAILURE);
+}
+
+void TestSpdmRequesterGetDigestCase20(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x14;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
+}
+
+void TestSpdmRequesterGetDigestCase21(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x15;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+  ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+  Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
+}
+
 SPDM_TEST_CONTEXT       mSpdmRequesterGetDigestTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
@@ -506,6 +1053,30 @@ int SpdmRequesterGetDigestTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterGetDigestCase8),
       // SPDM_ERROR_CODE_RESPONSE_NOT_READY + Successful response
       cmocka_unit_test(TestSpdmRequesterGetDigestCase9),
+      // Capability flags check failed
+      cmocka_unit_test(TestSpdmRequesterGetDigestCase10),
+      // ReceiveResponse failed
+      cmocka_unit_test(TestSpdmRequesterGetDigestCase11),
+      // Size of response < SPDM_MESSAGE_HEADER
+      //cmocka_unit_test(TestSpdmRequesterGetDigestCase12),
+      // RequestResponseCode wrong in response
+      cmocka_unit_test(TestSpdmRequesterGetDigestCase13),
+      // Zero digests received
+      cmocka_unit_test(TestSpdmRequesterGetDigestCase14),
+      // Internal cache full (request message)
+      cmocka_unit_test(TestSpdmRequesterGetDigestCase15),
+      // Internal cache full (response message)
+      cmocka_unit_test(TestSpdmRequesterGetDigestCase16),
+      // Invalid digest
+      cmocka_unit_test(TestSpdmRequesterGetDigestCase17),
+      // Slot mask != number of digests
+      cmocka_unit_test(TestSpdmRequesterGetDigestCase18),
+      // Several invalid digests
+      //cmocka_unit_test(TestSpdmRequesterGetDigestCase19),
+      // Size of response < SPDM_DIGESTS_RESPONSE
+      //cmocka_unit_test(TestSpdmRequesterGetDigestCase20),
+      // Size of response > Max size of SPDM DIGESTS response
+      //cmocka_unit_test(TestSpdmRequesterGetDigestCase21),
   };
   
   SetupSpdmTestContext (&mSpdmRequesterGetDigestTestContext);
