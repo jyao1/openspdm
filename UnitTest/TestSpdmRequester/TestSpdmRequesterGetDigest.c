@@ -504,6 +504,10 @@ SpdmRequesterGetDigestTestReceiveMessage (
   }
 }
 
+/**
+  Test 1: a failure occurs during the sending of the request message
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no DIGESTS message received
+**/
 void TestSpdmRequesterGetDigestCase1(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -529,6 +533,10 @@ void TestSpdmRequesterGetDigestCase1(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, 0);
 }
 
+/**
+  Test 2: a request message is successfully sent and a response message is successfully received
+  Expected Behavior: requester returns the status RETURN_SUCCESS and a DIGESTS message is received
+**/
 void TestSpdmRequesterGetDigestCase2(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -554,6 +562,11 @@ void TestSpdmRequesterGetDigestCase2(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + 32);
 }
 
+/**
+  Test 3: SpdmCmdReceiveState equals to zero and makes the check fail, meaning that steps 
+  GET_CAPABILITIES-CAPABILITIES and NEGOTIATE_ALGORITHMS-ALGORITHMS of the protocol were not previously completed
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no DIGESTS message received
+**/
 void TestSpdmRequesterGetDigestCase3(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -578,6 +591,10 @@ void TestSpdmRequesterGetDigestCase3(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, 0);
 }
 
+/**
+  Test 4: a request message is successfully sent and an ERROR response message with error code = InvalidRequest is received
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no DIGESTS message received
+**/
 void TestSpdmRequesterGetDigestCase4(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -603,6 +620,10 @@ void TestSpdmRequesterGetDigestCase4(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, 0);
 }
 
+/**
+  Test 5: request messages are successfully sent and ERROR response messages with error code = Busy are received in all attempts 
+  Expected Behavior: requester returns the status RETURN_NO_RESPONSE, with no DIGESTS message received
+**/
 void TestSpdmRequesterGetDigestCase5(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -628,6 +649,11 @@ void TestSpdmRequesterGetDigestCase5(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, 0);
 }
 
+/**
+  Test 6: request messages are successfully sent and an ERROR response message with error code = Busy is received in the 
+  first attempt followed by a successful response
+  Expected Behavior: requester returns the status RETURN_SUCCESS and a DIGESTS message is received
+**/
 void TestSpdmRequesterGetDigestCase6(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -653,6 +679,11 @@ void TestSpdmRequesterGetDigestCase6(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + 32);
 }
 
+/**
+  Test 7: a request message is successfully sent and an ERROR response message with error code = RequestResynch 
+  (Meaning Responder is requesting Requester to reissue GET_VERSION to resynchronize) is received
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no DIGESTS message received
+**/
 void TestSpdmRequesterGetDigestCase7(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -679,6 +710,11 @@ void TestSpdmRequesterGetDigestCase7(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, 0);
 }
 
+/**
+  Test 8: request messages are successfully sent and ERROR response messages with error code = ResponseNotReady 
+  are received in all attempts 
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR
+**/
 void TestSpdmRequesterGetDigestCase8(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -703,6 +739,11 @@ void TestSpdmRequesterGetDigestCase8(void **state) {
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
+/**
+  Test 9: request messages are successfully sent and an ERROR response message with error code = ResponseNotReady 
+  is received in the first attempt followed by a successful response to RESPOND_IF_READY
+  Expected Behavior: requester returns the status RETURN_SUCCESS and a DIGESTS message is received
+**/
 void TestSpdmRequesterGetDigestCase9(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -728,6 +769,11 @@ void TestSpdmRequesterGetDigestCase9(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + 32);
 }
 
+/**
+  Test 10: flag CERT_CAP from CAPABILITIES is not setted meaning the Requester does not support DIGESTS and 
+  CERTIFICATE response messages
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no DIGESTS message received
+**/
 void TestSpdmRequesterGetDigestCase10(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -753,6 +799,10 @@ void TestSpdmRequesterGetDigestCase10(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, 0);
 }
 
+/**
+  Test 11: a request message is successfully sent but a failure occurs during the receiving of the response message
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no DIGESTS message received (managed buffer not shrinked)
+**/
 void TestSpdmRequesterGetDigestCase11(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -778,6 +828,11 @@ void TestSpdmRequesterGetDigestCase11(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
 }
 
+/**
+  Test 12: a request message is successfully sent but the size of the response message is smaller than the size of the SPDM message header, 
+  meaning it is an invalid response message
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no successful DIGESTS message received (managed buffer not shrinked)
+**/
 void TestSpdmRequesterGetDigestCase12(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -803,6 +858,10 @@ void TestSpdmRequesterGetDigestCase12(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
 }
 
+/**
+  Test 13: a request message is successfully sent but the RequestResponseCode from the response message is different than the code of SPDM_DIGESTS
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no DIGESTS message received (managed buffer not shrinked)
+**/
 void TestSpdmRequesterGetDigestCase13(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -828,6 +887,10 @@ void TestSpdmRequesterGetDigestCase13(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
 }
 
+/**
+  Test 14: a request message is successfully sent but the number of digests in the response message is equal to zero
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no successful DIGESTS message received (managed buffer not shrinked)
+**/
 void TestSpdmRequesterGetDigestCase14(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -853,6 +916,10 @@ void TestSpdmRequesterGetDigestCase14(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
 }
 
+/**
+  Test 15: a request message is successfully sent but it cannot be appended to the internal cache since the internal cache is full
+  Expected Behavior: requester returns the status RETURN_SECURITY_VIOLATION
+**/
 void TestSpdmRequesterGetDigestCase15(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -877,6 +944,10 @@ void TestSpdmRequesterGetDigestCase15(void **state) {
   assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
 }
 
+/**
+  Test 16: a request message is successfully sent but the response message cannot be appended to the internal cache since the internal cache is full
+  Expected Behavior: requester returns the status RETURN_SECURITY_VIOLATION
+**/
 void TestSpdmRequesterGetDigestCase16(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -901,6 +972,10 @@ void TestSpdmRequesterGetDigestCase16(void **state) {
   assert_int_equal (Status, RETURN_SECURITY_VIOLATION);
 }
 
+/**
+  Test 17: a request message is successfully sent but the single digest received in the response message is invalid
+  Expected Behavior: requester returns the status RETURN_SECURITY_VIOLATION, with error state SPDM_STATUS_ERROR_CERTIFICATE_FAILURE
+**/
 void TestSpdmRequesterGetDigestCase17(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -926,6 +1001,11 @@ void TestSpdmRequesterGetDigestCase17(void **state) {
   assert_int_equal (SpdmContext->ErrorState, SPDM_STATUS_ERROR_CERTIFICATE_FAILURE);
 }
 
+/**
+  Test 18: a request message is successfully sent but the number of digests received in the response message is different than 
+  the number of bits set in Param2 - Slot mask
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no successful DIGESTS message received (managed buffer not shrinked)
+**/
 void TestSpdmRequesterGetDigestCase18(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -951,6 +1031,10 @@ void TestSpdmRequesterGetDigestCase18(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
 }
 
+/**
+  Test 19: a request message is successfully sent but several digests (except the first) received in the response message are invalid
+  Expected Behavior: requester returns the status RETURN_SECURITY_VIOLATION, with error state SPDM_STATUS_ERROR_CERTIFICATE_FAILURE
+**/
 void TestSpdmRequesterGetDigestCase19(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -976,6 +1060,11 @@ void TestSpdmRequesterGetDigestCase19(void **state) {
   assert_int_equal (SpdmContext->ErrorState, SPDM_STATUS_ERROR_CERTIFICATE_FAILURE);
 }
 
+/**
+  Test 20: a request message is successfully sent but the size of the response message is smaller than the minimum size of a SPDM DIGESTS response, 
+  meaning it is an invalid response message.
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no successful DIGESTS message received (managed buffer not shrinked)
+**/
 void TestSpdmRequesterGetDigestCase20(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -1001,6 +1090,11 @@ void TestSpdmRequesterGetDigestCase20(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
 }
 
+/**
+  Test 21: a request message is successfully sent but the size of the response message is bigger than the maximum size of a SPDM DIGESTS response, 
+  meaning it is an invalid response message.
+  Expected Behavior: requester returns the status RETURN_DEVICE_ERROR, with no successful DIGESTS message received (managed buffer not shrinked)
+**/
 void TestSpdmRequesterGetDigestCase21(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
