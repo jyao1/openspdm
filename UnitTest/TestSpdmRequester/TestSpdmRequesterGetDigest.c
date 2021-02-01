@@ -559,7 +559,7 @@ void TestSpdmRequesterGetDigestCase2(void **state) {
   ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
   Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + 32);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo));
 }
 
 /**
@@ -676,7 +676,7 @@ void TestSpdmRequesterGetDigestCase6(void **state) {
   ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
   Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + 32);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo));
 }
 
 /**
@@ -766,7 +766,7 @@ void TestSpdmRequesterGetDigestCase9(void **state) {
   ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
   Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + 32);
+  assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST) + sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo));
 }
 
 /**
