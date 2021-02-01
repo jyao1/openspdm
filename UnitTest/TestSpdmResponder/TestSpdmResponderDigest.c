@@ -214,6 +214,102 @@ void TestSpdmResponderDigestCase6(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
 }
 
+void TestSpdmResponderDigestCase7(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINTN                ResponseSize;
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  SPDM_DIGESTS_RESPONSE *SpdmResponse;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x7;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->LocalContext.SlotCount = 1;
+
+  ResponseSize = sizeof(Response);
+  SpdmContext->Transcript.MessageB.BufferSize = SpdmContext->Transcript.MessageB.MaxBufferSize;
+  Status = SpdmGetResponseDigest (SpdmContext, mSpdmGetDigestRequest1Size, &mSpdmGetDigestRequest1, &ResponseSize, Response);
+  assert_int_equal (Status, RETURN_SUCCESS);
+  assert_int_equal (ResponseSize, sizeof(SPDM_ERROR_RESPONSE));
+  SpdmResponse = (VOID *)Response;
+  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
+  assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
+  assert_int_equal (SpdmResponse->Header.Param2, 0);
+}
+
+void TestSpdmResponderDigestCase8(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINTN                ResponseSize;
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  SPDM_DIGESTS_RESPONSE *SpdmResponse;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x8;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+  SpdmContext->LocalContext.SlotCount = 1;
+
+  ResponseSize = sizeof(Response);
+  SpdmContext->Transcript.MessageB.BufferSize = SpdmContext->Transcript.MessageB.MaxBufferSize - sizeof(SPDM_GET_DIGESTS_REQUEST);
+  Status = SpdmGetResponseDigest (SpdmContext, mSpdmGetDigestRequest1Size, &mSpdmGetDigestRequest1, &ResponseSize, Response);
+  assert_int_equal (Status, RETURN_SUCCESS);
+  assert_int_equal (ResponseSize, sizeof(SPDM_ERROR_RESPONSE));
+  SpdmResponse = (VOID *)Response;
+  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
+  assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_INVALID_REQUEST);
+  assert_int_equal (SpdmResponse->Header.Param2, 0);
+}
+
+void TestSpdmResponderDigestCase9(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINTN                ResponseSize;
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  SPDM_DIGESTS_RESPONSE *SpdmResponse;
+  UINTN                Index;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x9;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  
+  for (Index = 0; Index < MAX_SPDM_SLOT_COUNT; Index++) {
+    SpdmContext->LocalContext.LocalCertChainProvision[Index] = NULL;
+    SpdmContext->LocalContext.LocalCertChainProvisionSize[Index] = 0;
+  }
+  SpdmContext->LocalContext.SlotCount = 0;
+
+  ResponseSize = sizeof(Response);
+  SpdmContext->Transcript.MessageB.BufferSize = 0;
+  Status = SpdmGetResponseDigest (SpdmContext, mSpdmGetDigestRequest1Size, &mSpdmGetDigestRequest1, &ResponseSize, Response);
+  assert_int_equal (Status, RETURN_SUCCESS);
+  assert_int_equal (ResponseSize, sizeof(SPDM_ERROR_RESPONSE));
+  SpdmResponse = (VOID *)Response;
+  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
+  assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST);
+  assert_int_equal (SpdmResponse->Header.Param2, SPDM_GET_DIGESTS);
+}
+
 SPDM_TEST_CONTEXT       mSpdmResponderDigestTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   FALSE,
@@ -233,6 +329,12 @@ int SpdmResponderDigestTestMain(void) {
     cmocka_unit_test(TestSpdmResponderDigestCase5),
     // SpdmCmdReceiveState Check
     cmocka_unit_test(TestSpdmResponderDigestCase6),
+    // Internal cache full (request message)
+    cmocka_unit_test(TestSpdmResponderDigestCase7),
+    // Internal cache full (response message)
+    cmocka_unit_test(TestSpdmResponderDigestCase8),
+    // No digest to send
+    cmocka_unit_test(TestSpdmResponderDigestCase9),
   };
 
   SetupSpdmTestContext (&mSpdmResponderDigestTestContext);
