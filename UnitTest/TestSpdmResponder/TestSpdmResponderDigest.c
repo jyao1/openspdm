@@ -28,6 +28,10 @@ UINTN mSpdmGetDigestRequest2Size = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 
 STATIC UINT8                  LocalCertificateChain[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
+/**
+  Test 1: receives a valid GET_DIGESTS request message from Requester
+  Expected Behavior: produces a valid DIGESTS response message
+**/
 void TestSpdmResponderDigestCase1(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -56,6 +60,10 @@ void TestSpdmResponderDigestCase1(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_DIGESTS);
 }
 
+/**
+  Test 2: receives a GET_DIGESTS request message with bad size from Requester
+  Expected Behavior: produces an ERROR response message with error code = InvalidRequest
+**/
 void TestSpdmResponderDigestCase2(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -86,6 +94,11 @@ void TestSpdmResponderDigestCase2(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
 }
 
+/**
+  Test 3: receives a valid GET_DIGESTS request message from Requester, but Responder is not ready to accept the new 
+  request message (is busy) and may be able to process the request message if it is sent again in the future
+  Expected Behavior: produces an ERROR response message with error code = Busy
+**/
 void TestSpdmResponderDigestCase3(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -118,6 +131,10 @@ void TestSpdmResponderDigestCase3(void **state) {
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateBusy);
 }
 
+/**
+  Test 4: receives a valid GET_DIGESTS request message from Requester, but Responder needs the Requester to reissue GET_VERSION to resynchronize
+  Expected Behavior: produces an ERROR response message with error code = RequestResynch
+**/
 void TestSpdmResponderDigestCase4(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -150,6 +167,10 @@ void TestSpdmResponderDigestCase4(void **state) {
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
 }
 
+/**
+  Test 5: receives a valid GET_DIGESTS request message from Requester, but Responder cannot produce the response message in time 
+  Expected Behavior: produces an ERROR response message with error code = ResponseNotReady
+**/
 void TestSpdmResponderDigestCase5(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -185,6 +206,11 @@ void TestSpdmResponderDigestCase5(void **state) {
   assert_int_equal (ErrorData->RequestCode, SPDM_GET_DIGESTS);
 }
 
+/**
+  Test 6: receives a valid GET_DIGESTS request message from Requester, but SpdmCmdReceiveState equals to zero and makes the check fail, 
+  meaning that steps GET_CAPABILITIES-CAPABILITIES and NEGOTIATE_ALGORITHMS-ALGORITHMS of the protocol were not previously completed
+  Expected Behavior: produces an ERROR response message with error code = UnexpectedRequest
+**/
 void TestSpdmResponderDigestCase6(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -214,6 +240,10 @@ void TestSpdmResponderDigestCase6(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
 }
 
+/**
+  Test 7: receives a valid GET_DIGESTS request message from Requester, but the request message cannot be appended to the internal cache since the internal cache is full
+  Expected Behavior: produces an ERROR response message with error code = InvalidRequest
+**/
 void TestSpdmResponderDigestCase7(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -245,6 +275,10 @@ void TestSpdmResponderDigestCase7(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
 }
 
+/**
+  Test 8: receives a valid GET_DIGESTS request message from Requester, but the response message cannot be appended to the internal cache since the internal cache is full
+  Expected Behavior: produces an ERROR response message with error code = InvalidRequest
+**/
 void TestSpdmResponderDigestCase8(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
@@ -276,6 +310,10 @@ void TestSpdmResponderDigestCase8(void **state) {
   assert_int_equal (SpdmResponse->Header.Param2, 0);
 }
 
+/**
+  Test 9: receives a valid GET_DIGESTS request message from Requester, but there is no local certificate chain, i.e. there is no digest to send
+  Expected Behavior: produces an ERROR response message with error code = UnsupportedRequest
+**/
 void TestSpdmResponderDigestCase9(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
