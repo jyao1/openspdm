@@ -55,7 +55,7 @@ void TestSpdmResponderDigestCase1(void **state) {
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseDigest (SpdmContext, mSpdmGetDigestRequest1Size, &mSpdmGetDigestRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_DIGESTS_RESPONSE) + 32);
+  assert_int_equal (ResponseSize, sizeof(SPDM_DIGESTS_RESPONSE) + GetSpdmHashSize(SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo));
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_DIGESTS);
 }
