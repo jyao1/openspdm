@@ -109,7 +109,7 @@ TrySpdmGetVersion (
   }
   CompatibleVersionCount = 0;
 
-  ZeroMem (&CompatibleVersionNumberEntry, sizeof(CompatibleVersionNumberEntry) * sizeof(SPDM_VERSION_NUMBER));
+  ZeroMem (&CompatibleVersionNumberEntry, sizeof(CompatibleVersionNumberEntry));
   for (Index = 0; Index < SpdmResponse.VersionNumberEntryCount; Index++) {
     Version = (UINT8)((SpdmResponse.VersionNumberEntry[Index].MajorVersion << 4) |
                                                          SpdmResponse.VersionNumberEntry[Index].MinorVersion);
