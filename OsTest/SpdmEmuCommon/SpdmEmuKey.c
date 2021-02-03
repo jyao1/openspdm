@@ -20,8 +20,8 @@ UINT32  mUseRequesterCapabilityFlags = (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT
                                         SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP | \
                                         SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP | \
                                         SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP |
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP);
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP /*|
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP*/);
 UINT32  mUseResonderCapabilityFlags =  (SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP |
                                         // SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG |
@@ -36,8 +36,8 @@ UINT32  mUseResonderCapabilityFlags =  (SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CER
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP |
-                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP |
-                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP);
+                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP /*|
+                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP*/);
 
 UINT32  mUseCapabilityFlags = 0;
 /*

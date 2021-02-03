@@ -15,6 +15,12 @@ typedef struct {
   // Param1: OriginalRequestCode
   // Param2: Token
 } SPDM_RESPOND_IF_READY_REQUEST;
+
+typedef struct {
+  SPDM_MESSAGE_HEADER  Header;
+  // Param1: Error code
+  // Param2: Error data
+} SPDM_ERROR_MESSAGE;
 #pragma pack()
 
 /**
@@ -146,19 +152,26 @@ SpdmHandleResponseNotReady (
   SPDM_ERROR_RESPONSE                  *SpdmResponse;
   SPDM_ERROR_DATA_RESPONSE_NOT_READY   *ExtendErrorData;
 
-  SpdmResponse = Response;
-  ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
-  ASSERT(SpdmResponse->Header.RequestResponseCode == SPDM_ERROR);
-  ASSERT(SpdmResponse->Header.Param1 == SPDM_ERROR_CODE_RESPONSE_NOT_READY);
-  ASSERT(*ResponseSize == sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY));
-  ASSERT(ExtendErrorData->RequestCode == OriginalRequestCode);
+  if (OriginalRequestCode == SPDM_GET_VERSION ||
+      OriginalRequestCode == SPDM_GET_CAPABILITIES ||
+      OriginalRequestCode == SPDM_NEGOTIATE_ALGORITHMS) {
+    SpdmContext->SpdmCmdReceiveState &= 0;
+    return RETURN_DEVICE_ERROR;
+  } else {
+    SpdmResponse = Response;
+    ExtendErrorData = (SPDM_ERROR_DATA_RESPONSE_NOT_READY*)(SpdmResponse + 1);
+    ASSERT(SpdmResponse->Header.RequestResponseCode == SPDM_ERROR);
+    ASSERT(SpdmResponse->Header.Param1 == SPDM_ERROR_CODE_RESPONSE_NOT_READY);
+    ASSERT(*ResponseSize == sizeof(SPDM_ERROR_RESPONSE) + sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY));
+    ASSERT(ExtendErrorData->RequestCode == OriginalRequestCode);
 
-  SpdmContext->ErrorData.RDTExponent = ExtendErrorData->RDTExponent;
-  SpdmContext->ErrorData.RequestCode = ExtendErrorData->RequestCode;
-  SpdmContext->ErrorData.Token       = ExtendErrorData->Token;
-  SpdmContext->ErrorData.RDTM        = ExtendErrorData->RDTM;
+    SpdmContext->ErrorData.RDTExponent = ExtendErrorData->RDTExponent;
+    SpdmContext->ErrorData.RequestCode = ExtendErrorData->RequestCode;
+    SpdmContext->ErrorData.Token       = ExtendErrorData->Token;
+    SpdmContext->ErrorData.RDTM        = ExtendErrorData->RDTM;
 
-  return SpdmRequesterRespondIfReady(SpdmContext, SessionId, ResponseSize, Response, ExpectedResponseCode, ExpectedResponseSize);
+    return SpdmRequesterRespondIfReady(SpdmContext, SessionId, ResponseSize, Response, ExpectedResponseCode, ExpectedResponseSize);
+  }
 }
 
 /**
@@ -209,3 +222,41 @@ SpdmHandleErrorResponseMain (
   }
 }
 
+
+/**
+  This function sends an error message to the responder.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ErrorCode                    Indicate the message error code.
+  @param  ErrorData                    Indicate the message error data.
+
+  @retval RETURN_SUCCESS               The error message is sent.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmRequesterSendSimpleErrorMessage (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                 ErrorCode,
+  IN     UINT8                 ErrorData
+  )
+{
+  RETURN_STATUS                             Status;
+  SPDM_ERROR_MESSAGE                        SpdmRequest;
+
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
+
+  SpdmRequest.Header.RequestResponseCode = SPDM_ERROR;
+  SpdmRequest.Header.Param1 = ErrorCode;
+  SpdmRequest.Header.Param2 = ErrorData;
+  Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
+  if (RETURN_ERROR(Status)) {
+    return RETURN_DEVICE_ERROR;
+  }
+
+  return RETURN_SUCCESS;
+}
