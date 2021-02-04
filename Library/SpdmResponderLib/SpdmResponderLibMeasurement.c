@@ -351,6 +351,7 @@ SpdmGetResponseMeasurement (
         MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize;
         if (Index + 1 == SpdmRequest->Header.Param2) {
           CopyMem (MeasurmentBlock, CachedMeasurmentBlock, MeasurmentBlockSize);
+          MeasurmentBlock->MeasurementBlockCommonHeader.Index = 1; // always set to 1, since we only have 1 block.
           break;
         }
         CachedMeasurmentBlock = (VOID *)((UINTN)CachedMeasurmentBlock + MeasurmentBlockSize);
