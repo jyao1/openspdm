@@ -755,9 +755,9 @@ void TestSpdmRequesterGetCapabilityCase9(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_FLAG);
+  assert_int_equal (Status, RETURN_SUCCESS);
+  assert_int_equal (ResponderCTExponent, 0);
+  assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_FLAG);
 }
 
 void TestSpdmRequesterGetCapabilityCase10(void **state) {
@@ -935,7 +935,7 @@ void TestSpdmRequesterGetCapabilityCase17(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
@@ -958,7 +958,7 @@ void TestSpdmRequesterGetCapabilityCase18(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
@@ -982,7 +982,7 @@ void TestSpdmRequesterGetCapabilityCase19(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
@@ -1006,7 +1006,7 @@ void TestSpdmRequesterGetCapabilityCase20(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
@@ -1030,7 +1030,7 @@ void TestSpdmRequesterGetCapabilityCase21(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
@@ -1054,7 +1054,7 @@ void TestSpdmRequesterGetCapabilityCase22(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
@@ -1078,7 +1078,7 @@ void TestSpdmRequesterGetCapabilityCase23(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP)));
 }
@@ -1102,7 +1102,7 @@ void TestSpdmRequesterGetCapabilityCase24(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)));
 }
@@ -1126,7 +1126,7 @@ void TestSpdmRequesterGetCapabilityCase25(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)));
 }
@@ -1150,7 +1150,7 @@ void TestSpdmRequesterGetCapabilityCase26(void **state) {
   RequesterCTExponent = 0;
   RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
   Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
-  assert_int_equal (Status, RETURN_INVALID_PARAMETER);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
   //assert_int_equal (ResponderCTExponent, 0);
   //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP);
 }

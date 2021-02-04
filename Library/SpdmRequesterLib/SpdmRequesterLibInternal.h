@@ -53,24 +53,6 @@ SpdmHandleErrorResponseMain (
   IN     UINTN                 ExpectedResponseSize
   );
 
-  /**
-    This function sends an error message to the responder.
-
-    @param  SpdmContext                  A pointer to the SPDM context.
-    @param  ErrorCode                    Indicate the message error code.
-    @param  ErrorData                    Indicate the message error data.
-
-    @retval RETURN_SUCCESS               The error message is sent.
-    @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
-  **/
-  RETURN_STATUS
-  EFIAPI
-  SpdmRequesterSendSimpleErrorMessage (
-    IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-    IN     UINT8                 ErrorCode,
-    IN     UINT8                 ErrorData
-    );
-
 /**
   This function sends GET_VERSION and receives VERSION.
 

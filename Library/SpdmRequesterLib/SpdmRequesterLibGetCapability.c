@@ -180,12 +180,7 @@ TrySpdmGetCapabilities (
   SpdmResponseSize = sizeof(SPDM_CAPABILITIES_RESPONSE);
 
   if(!SpdmCheckFlagCompability(SpdmResponse.Flags,SpdmResponse.Header.SPDMVersion)){
-    //Status = RETURN_SUCCESS;
-    Status = SpdmRequesterSendSimpleErrorMessage(SpdmContext,SPDM_ERROR_CODE_INVALID_REQUEST,0x00);
-    if (RETURN_ERROR(Status)) {
-      return RETURN_DEVICE_ERROR;
-    }
-    return RETURN_INVALID_PARAMETER;
+    return RETURN_DEVICE_ERROR;
   }
 
   //
