@@ -52,8 +52,10 @@ AeadAesGcmEncrypt (
   OUT  UINTN        *DataOutSize
   )
 {
-  ASSERT(FALSE);
-  return FALSE;
+  CopyMem (DataOut, DataIn, DataInSize);
+  *DataOutSize = DataInSize;
+  ZeroMem (TagOut, TagSize);
+  return TRUE;
 }
 
 /**
@@ -98,8 +100,9 @@ AeadAesGcmDecrypt (
   OUT  UINTN        *DataOutSize
   )
 {
-  ASSERT(FALSE);
-  return FALSE;
+  CopyMem (DataOut, DataIn, DataInSize);
+  *DataOutSize = DataInSize;
+  return TRUE;
 }
 
 
