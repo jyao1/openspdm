@@ -166,6 +166,7 @@ SpdmClientInit (
     printf ("SpdmInitConnection - 0x%x\n", (UINT32)Status);
     free (mSpdmContext);
     mSpdmContext = NULL;
+    return NULL;
   }
 
   ZeroMem (&Parameter, sizeof(Parameter));
