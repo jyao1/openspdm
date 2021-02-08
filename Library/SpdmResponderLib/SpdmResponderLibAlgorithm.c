@@ -331,11 +331,31 @@ SpdmGetResponseAlgorithm (
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse->BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse->BaseHashSel;
 
+  if ((SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec == 0) ||
+      (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo == 0) ||
+      (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo == 0) ||
+      (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo == 0)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
     SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = SpdmResponse->StructTable[0].AlgSupported;
     SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = SpdmResponse->StructTable[1].AlgSupported;
     SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = SpdmResponse->StructTable[2].AlgSupported;
     SpdmContext->ConnectionInfo.Algorithm.KeySchedule = SpdmResponse->StructTable[3].AlgSupported;
+
+    if ((SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup == 0) ||
+        (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite == 0)) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
+      if (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg == 0) {
+        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+        return RETURN_SUCCESS;
+      }
+    }
   }
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;

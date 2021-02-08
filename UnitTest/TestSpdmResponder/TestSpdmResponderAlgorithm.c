@@ -47,6 +47,10 @@ void TestSpdmResponderAlgorithmCase1(void **state) {
   SpdmTestContext->CaseId = 0x1;  
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseAlgorithm (SpdmContext, mSpdmNegotiateAlgorithmRequest1Size, &mSpdmNegotiateAlgorithmRequest1, &ResponseSize, Response);
@@ -69,6 +73,10 @@ void TestSpdmResponderAlgorithmCase2(void **state) {
   SpdmTestContext->CaseId = 0x2;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;  
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseAlgorithm (SpdmContext, mSpdmNegotiateAlgorithmRequest2Size, &mSpdmNegotiateAlgorithmRequest2, &ResponseSize, Response);
@@ -94,6 +102,10 @@ void TestSpdmResponderAlgorithmCase3(void **state) {
   SpdmContext->ResponseState = SpdmResponseStateBusy;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseAlgorithm (SpdmContext, mSpdmNegotiateAlgorithmRequest1Size, &mSpdmNegotiateAlgorithmRequest1, &ResponseSize, Response);
@@ -120,6 +132,10 @@ void TestSpdmResponderAlgorithmCase4(void **state) {
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseAlgorithm (SpdmContext, mSpdmNegotiateAlgorithmRequest1Size, &mSpdmNegotiateAlgorithmRequest1, &ResponseSize, Response);
@@ -147,6 +163,10 @@ void TestSpdmResponderAlgorithmCase5(void **state) {
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseAlgorithm (SpdmContext, mSpdmNegotiateAlgorithmRequest1Size, &mSpdmNegotiateAlgorithmRequest1, &ResponseSize, Response);
@@ -173,6 +193,10 @@ void TestSpdmResponderAlgorithmCase6(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseAlgorithm (SpdmContext, mSpdmNegotiateAlgorithmRequest1Size, &mSpdmNegotiateAlgorithmRequest1, &ResponseSize, Response);
