@@ -158,7 +158,10 @@ SpdmGetResponseKeyExchange (
 
   SpdmResponse->RspSessionID = RspSessionId;
 
-  SpdmResponse->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
+  SpdmResponse->MutAuthRequested = 0;
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
+    SpdmResponse->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
+  }
   if (SpdmResponse->MutAuthRequested != 0) {
     SpdmResponse->ReqSlotIDParam = (SpdmContext->EncapContext.ReqSlotNum & 0xF);
   } else {
@@ -256,7 +259,10 @@ SpdmGetResponseKeyExchange (
     Ptr += HmacSize;
   }
 
-  SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
+  SessionInfo->MutAuthRequested = 0;
+  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
+    SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
+  }
   SpdmInitEncapState (Context, SessionInfo->MutAuthRequested);
 
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
