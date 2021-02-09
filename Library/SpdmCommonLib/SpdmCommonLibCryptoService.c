@@ -401,7 +401,6 @@ SpdmGenerateChallengeAuthSignature (
   UINTN                         SignatureSize;
   UINT32                        HashSize;
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   Result = SpdmCalculateM1M2Hash (SpdmContext, IsRequester, HashData);
@@ -410,6 +409,7 @@ SpdmGenerateChallengeAuthSignature (
   }
 
   if (IsRequester) {
+    SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
     Result = SpdmRequesterDataSignFunc (
               SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
               HashData,
@@ -418,6 +418,7 @@ SpdmGenerateChallengeAuthSignature (
               &SignatureSize
               );
   } else {
+    SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
     Result = SpdmResponderDataSignFunc (
               SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
               HashData,
