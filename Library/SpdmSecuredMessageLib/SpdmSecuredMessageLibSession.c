@@ -75,7 +75,7 @@ SpdmBinConcat (
 {
   UINTN  FinalSize;
 
-  FinalSize = sizeof(UINT16) + sizeof(BIN_CONCAT_LABEL) + LabelSize;
+  FinalSize = sizeof(UINT16) + sizeof(BIN_CONCAT_LABEL) - 1 + LabelSize;
   if (Context != NULL) {
     FinalSize += HashSize;
   }
@@ -87,10 +87,10 @@ SpdmBinConcat (
   *OutBinSize = FinalSize;
 
   CopyMem (OutBin, &Length, sizeof(UINT16));
-  CopyMem (OutBin + sizeof(UINT16), BIN_CONCAT_LABEL, sizeof(BIN_CONCAT_LABEL));
-  CopyMem (OutBin + sizeof(UINT16) + sizeof(BIN_CONCAT_LABEL), Label, LabelSize);
+  CopyMem (OutBin + sizeof(UINT16), BIN_CONCAT_LABEL, sizeof(BIN_CONCAT_LABEL) - 1);
+  CopyMem (OutBin + sizeof(UINT16) + sizeof(BIN_CONCAT_LABEL) - 1, Label, LabelSize);
   if (Context != NULL) {
-    CopyMem (OutBin + sizeof(UINT16) + sizeof(BIN_CONCAT_LABEL) + LabelSize, Context, HashSize);
+    CopyMem (OutBin + sizeof(UINT16) + sizeof(BIN_CONCAT_LABEL) - 1 + LabelSize, Context, HashSize);
   }
 
   return RETURN_SUCCESS;
@@ -129,7 +129,7 @@ SpdmGenerateAeadKeyAndIv (
   IvLength = SecuredMessageContext->AeadIvSize;
   
   BinStr5Size = sizeof(BinStr5);
-  Status = SpdmBinConcat (BIN_STR_5_LABEL, sizeof(BIN_STR_5_LABEL), NULL, (UINT16)KeyLength, HashSize, BinStr5, &BinStr5Size);
+  Status = SpdmBinConcat (BIN_STR_5_LABEL, sizeof(BIN_STR_5_LABEL) - 1, NULL, (UINT16)KeyLength, HashSize, BinStr5, &BinStr5Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr5 (0x%x):\n", BinStr5Size));
   InternalDumpHex (BinStr5, BinStr5Size);
@@ -140,7 +140,7 @@ SpdmGenerateAeadKeyAndIv (
   DEBUG((DEBUG_INFO, "\n"));
   
   BinStr6Size = sizeof(BinStr6);
-  Status = SpdmBinConcat (BIN_STR_6_LABEL, sizeof(BIN_STR_6_LABEL), NULL, (UINT16)IvLength, HashSize, BinStr6, &BinStr6Size);
+  Status = SpdmBinConcat (BIN_STR_6_LABEL, sizeof(BIN_STR_6_LABEL) - 1, NULL, (UINT16)IvLength, HashSize, BinStr6, &BinStr6Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr6 (0x%x):\n", BinStr6Size));
   InternalDumpHex (BinStr6, BinStr6Size);
@@ -178,7 +178,7 @@ SpdmGenerateFinishedKey (
   HashSize = SecuredMessageContext->HashSize;
 
   BinStr7Size = sizeof(BinStr7);
-  Status = SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+  Status = SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr7 (0x%x):\n", BinStr7Size));
   InternalDumpHex (BinStr7, BinStr7Size);
@@ -222,7 +222,7 @@ SpdmGenerateSessionHandshakeKey (
   HashSize = SecuredMessageContext->HashSize;
 
   BinStr0Size = sizeof(BinStr0);
-  Status = SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+  Status = SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr0 (0x%x):\n", BinStr0Size));
   InternalDumpHex (BinStr0, BinStr0Size);
@@ -241,7 +241,7 @@ SpdmGenerateSessionHandshakeKey (
   }
 
   BinStr1Size = sizeof(BinStr1);
-  Status = SpdmBinConcat (BIN_STR_1_LABEL, sizeof(BIN_STR_1_LABEL), TH1HashData, (UINT16)HashSize, HashSize, BinStr1, &BinStr1Size);
+  Status = SpdmBinConcat (BIN_STR_1_LABEL, sizeof(BIN_STR_1_LABEL) - 1, TH1HashData, (UINT16)HashSize, HashSize, BinStr1, &BinStr1Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr1 (0x%x):\n", BinStr1Size));
   InternalDumpHex (BinStr1, BinStr1Size);
@@ -258,7 +258,7 @@ SpdmGenerateSessionHandshakeKey (
   InternalDumpData (SecuredMessageContext->HandshakeSecret.RequestHandshakeSecret, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   BinStr2Size = sizeof(BinStr2);
-  Status = SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), TH1HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+  Status = SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL) - 1, TH1HashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr2 (0x%x):\n", BinStr2Size));
   InternalDumpHex (BinStr2, BinStr2Size);
@@ -343,7 +343,7 @@ SpdmGenerateSessionDataKey (
     // No MasterSecret generation for PSK.
   } else {
     BinStr0Size = sizeof(BinStr0);
-    Status = SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+    Status = SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
     ASSERT_RETURN_ERROR (Status);
     RetVal = SpdmHkdfExpand (SecuredMessageContext->BaseHashAlgo, SecuredMessageContext->MasterSecret.HandshakeSecret, HashSize, BinStr0, BinStr0Size, Salt1, HashSize);
     ASSERT (RetVal);
@@ -359,7 +359,7 @@ SpdmGenerateSessionDataKey (
   }
 
   BinStr3Size = sizeof(BinStr3);
-  Status = SpdmBinConcat (BIN_STR_3_LABEL, sizeof(BIN_STR_3_LABEL), TH2HashData, (UINT16)HashSize, HashSize, BinStr3, &BinStr3Size);
+  Status = SpdmBinConcat (BIN_STR_3_LABEL, sizeof(BIN_STR_3_LABEL) - 1, TH2HashData, (UINT16)HashSize, HashSize, BinStr3, &BinStr3Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr3 (0x%x):\n", BinStr3Size));
   InternalDumpHex (BinStr3, BinStr3Size);
@@ -376,7 +376,7 @@ SpdmGenerateSessionDataKey (
   InternalDumpData (SecuredMessageContext->ApplicationSecret.RequestDataSecret, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
   BinStr4Size = sizeof(BinStr4);
-  Status = SpdmBinConcat (BIN_STR_4_LABEL, sizeof(BIN_STR_4_LABEL), TH2HashData, (UINT16)HashSize, HashSize, BinStr4, &BinStr4Size);
+  Status = SpdmBinConcat (BIN_STR_4_LABEL, sizeof(BIN_STR_4_LABEL) - 1, TH2HashData, (UINT16)HashSize, HashSize, BinStr4, &BinStr4Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr4 (0x%x):\n", BinStr4Size));
   InternalDumpHex (BinStr4, BinStr4Size);
@@ -394,7 +394,7 @@ SpdmGenerateSessionDataKey (
   DEBUG((DEBUG_INFO, "\n"));
 
   BinStr8Size = sizeof(BinStr8);
-  Status = SpdmBinConcat (BIN_STR_8_LABEL, sizeof(BIN_STR_8_LABEL), TH2HashData, (UINT16)HashSize, HashSize, BinStr8, &BinStr8Size);
+  Status = SpdmBinConcat (BIN_STR_8_LABEL, sizeof(BIN_STR_8_LABEL) - 1, TH2HashData, (UINT16)HashSize, HashSize, BinStr8, &BinStr8Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr8 (0x%x):\n", BinStr8Size));
   InternalDumpHex (BinStr8, BinStr8Size);
@@ -457,7 +457,7 @@ SpdmCreateUpdateSessionDataKey (
   HashSize = SecuredMessageContext->HashSize;
 
   BinStr9Size = sizeof(BinStr9);
-  Status = SpdmBinConcat (BIN_STR_9_LABEL, sizeof(BIN_STR_9_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr9, &BinStr9Size);
+  Status = SpdmBinConcat (BIN_STR_9_LABEL, sizeof(BIN_STR_9_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr9, &BinStr9Size);
   ASSERT_RETURN_ERROR (Status);
   DEBUG((DEBUG_INFO, "BinStr9 (0x%x):\n", BinStr9Size));
   InternalDumpHex (BinStr9, BinStr9Size);

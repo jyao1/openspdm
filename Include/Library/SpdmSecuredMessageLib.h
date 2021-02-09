@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmCryptLib.h>
 #include <Library/SpdmDeviceSecretLib.h>
 
-#define BIN_CONCAT_LABEL "spdm1.1"
+#define BIN_CONCAT_LABEL "spdm1.1 "
 #define BIN_STR_0_LABEL  "derived"
 #define BIN_STR_1_LABEL  "req hs data"
 #define BIN_STR_2_LABEL  "rsp hs data"

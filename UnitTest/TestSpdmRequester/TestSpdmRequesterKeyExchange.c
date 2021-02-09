@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmUnitTest.h"
 #include <SpdmRequesterLibInternal.h>
 
-#define BIN_CONCAT_LABEL      "spdm1.1"
+#define BIN_CONCAT_LABEL      "spdm1.1 "
 #define BIN_STR_0_LABEL       "derived"
 #define BIN_STR_2_LABEL       "rsp hs data"
 
@@ -246,13 +246,13 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     Ptr += SignatureSize;
     SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
     BinStr0Size = sizeof(BinStr0);
-    SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+    SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
     SpdmHmacAll (mUseHashAlgo, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
     BinStr2Size = sizeof(BinStr2);
-    SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+    SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL) - 1, THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
     SpdmHkdfExpand (mUseHashAlgo, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
     BinStr7Size = sizeof(BinStr7);
-    SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+    SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
     SpdmHkdfExpand (mUseHashAlgo, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
     SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
     Ptr += HmacSize;
@@ -352,13 +352,13 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     Ptr += SignatureSize;
     SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
     BinStr0Size = sizeof(BinStr0);
-    SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+    SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
     SpdmHmacAll (mUseHashAlgo, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
     BinStr2Size = sizeof(BinStr2);
-    SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+    SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL) - 1, THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
     SpdmHkdfExpand (mUseHashAlgo, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
     BinStr7Size = sizeof(BinStr7);
-    SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+    SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
     SpdmHkdfExpand (mUseHashAlgo, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
     SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
     Ptr += HmacSize;
@@ -496,13 +496,13 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       Ptr += SignatureSize;
       SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
       BinStr0Size = sizeof(BinStr0);
-      SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+      SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
       SpdmHmacAll (mUseHashAlgo, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
       BinStr2Size = sizeof(BinStr2);
-      SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+      SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL) - 1, THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
       SpdmHkdfExpand (mUseHashAlgo, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
       BinStr7Size = sizeof(BinStr7);
-      SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+      SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
       SpdmHkdfExpand (mUseHashAlgo, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
       SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
       Ptr += HmacSize;
@@ -649,13 +649,13 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       Ptr += SignatureSize;
       SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), THCurrHashData);
       BinStr0Size = sizeof(BinStr0);
-      SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
+      SpdmBinConcat (BIN_STR_0_LABEL, sizeof(BIN_STR_0_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr0, &BinStr0Size);
       SpdmHmacAll (mUseHashAlgo, mZeroFilledBuffer, HashSize, FinalKey, FinalKeySize, HandshakeSecret);
       BinStr2Size = sizeof(BinStr2);
-      SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL), THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
+      SpdmBinConcat (BIN_STR_2_LABEL, sizeof(BIN_STR_2_LABEL) - 1, THCurrHashData, (UINT16)HashSize, HashSize, BinStr2, &BinStr2Size);
       SpdmHkdfExpand (mUseHashAlgo, HandshakeSecret, HashSize, BinStr2, BinStr2Size, ResponseHandshakeSecret, HashSize);
       BinStr7Size = sizeof(BinStr7);
-      SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL), NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
+      SpdmBinConcat (BIN_STR_7_LABEL, sizeof(BIN_STR_7_LABEL) - 1, NULL, (UINT16)HashSize, HashSize, BinStr7, &BinStr7Size);
       SpdmHkdfExpand (mUseHashAlgo, ResponseHandshakeSecret, HashSize, BinStr7, BinStr7Size, ResponseFinishedKey, HashSize);
       SpdmHmacAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), ResponseFinishedKey, HashSize, Ptr);
       Ptr += HmacSize;
