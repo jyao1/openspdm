@@ -46,6 +46,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmRequesterPskExchange.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterPskFinish.obj \
     $(OUTPUT_DIR)\TestSpdmRequesterHeartbeat.obj \
+    $(OUTPUT_DIR)\TestSpdmRequesterEndSession.obj \
     $(OUTPUT_DIR)\SpdmUnitTestCommon.obj \
     $(OUTPUT_DIR)\SpdmTestKey.obj \
     $(OUTPUT_DIR)\SpdmTestSupport.obj \
@@ -182,6 +183,9 @@ $(OUTPUT_DIR)\TestSpdmRequesterPskFinish.obj : $(SOURCE_DIR)\TestSpdmRequesterPs
 
 $(OUTPUT_DIR)\TestSpdmRequesterHeartbeat.obj : $(SOURCE_DIR)\TestSpdmRequesterHeartbeat.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterHeartbeat.c
+
+$(OUTPUT_DIR)\TestSpdmRequesterEndSession.obj : $(SOURCE_DIR)\TestSpdmRequesterEndSession.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmRequesterEndSession.c
 
 $(OUTPUT_DIR)\SpdmUnitTestCommon.obj : $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmUnitTestCommon\SpdmUnitTestCommon.c
