@@ -351,7 +351,7 @@ SpdmGenerateSessionDataKey (
     InternalDumpData (Salt1, HashSize);
     DEBUG((DEBUG_INFO, "\n"));
 
-    RetVal = SpdmHmacAll (SecuredMessageContext->BaseHashAlgo, Salt1, HashSize, mZeroFilledBuffer, HashSize, SecuredMessageContext->MasterSecret.MasterSecret);
+    RetVal = SpdmHmacAll (SecuredMessageContext->BaseHashAlgo, mZeroFilledBuffer, HashSize, Salt1, HashSize, SecuredMessageContext->MasterSecret.MasterSecret);
     ASSERT (RetVal);
     DEBUG((DEBUG_INFO, "MasterSecret (0x%x) - ", HashSize));
     InternalDumpData (SecuredMessageContext->MasterSecret.MasterSecret, HashSize);

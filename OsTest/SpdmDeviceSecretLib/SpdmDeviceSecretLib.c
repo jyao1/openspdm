@@ -386,7 +386,7 @@ SpdmPskMasterSecretHkdfExpandFunc (
     return Result;
   }
 
-  Result = SpdmHmacAll (BaseHashAlgo, Salt1, HashSize, mMyZeroFilledBuffer, HashSize, MasterSecret);
+  Result = SpdmHmacAll (BaseHashAlgo, mMyZeroFilledBuffer, HashSize, Salt1, HashSize, MasterSecret);
   ZeroMem (Salt1, HashSize);
   if (!Result) {
     return Result;
