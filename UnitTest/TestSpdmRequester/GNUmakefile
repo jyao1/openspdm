@@ -46,6 +46,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/TestSpdmRequesterPskExchange.o \
     $(OUTPUT_DIR)/TestSpdmRequesterPskFinish.o \
     $(OUTPUT_DIR)/TestSpdmRequesterHeartbeat.o \
+    $(OUTPUT_DIR)/TestSpdmRequesterEndSession.o \
     $(OUTPUT_DIR)/SpdmUnitTestCommon.o \
     $(OUTPUT_DIR)/SpdmTestKey.o \
     $(OUTPUT_DIR)/SpdmTestSupport.o \
@@ -181,6 +182,9 @@ $(OUTPUT_DIR)/TestSpdmRequesterPskFinish.o : $(SOURCE_DIR)/TestSpdmRequesterPskF
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/TestSpdmRequesterHeartbeat.o : $(SOURCE_DIR)/TestSpdmRequesterHeartbeat.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/TestSpdmRequesterEndSession.o : $(SOURCE_DIR)/TestSpdmRequesterEndSession.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmUnitTestCommon.o : $(SOURCE_DIR)/../SpdmUnitTestCommon/SpdmUnitTestCommon.c

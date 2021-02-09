@@ -9,6 +9,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmRequesterLibInternal.h"
 
+#pragma pack(1)
+
+typedef struct {
+  SPDM_MESSAGE_HEADER  Header;
+  UINT8                DummyData[sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY)];
+} SPDM_END_SESSION_RESPONSE_MINE;
+
+#pragma pack()
+
 /**
   This function sends END_SESSION and receives END_SESSION_ACK for SPDM session end.
 
@@ -20,7 +29,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
-SpdmSendReceiveEndSession (
+TrySpdmSendReceiveEndSession (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT32               SessionId,
   IN     UINT8                EndSessionAttributes
@@ -29,10 +38,14 @@ SpdmSendReceiveEndSession (
   RETURN_STATUS                             Status;
   SPDM_END_SESSION_REQUEST                  SpdmRequest;
   UINTN                                     SpdmRequestSize;
-  SPDM_END_SESSION_RESPONSE                 SpdmResponse;
+  SPDM_END_SESSION_RESPONSE_MINE            SpdmResponse;
   UINTN                                     SpdmResponseSize;
   SPDM_SESSION_INFO                         *SessionInfo;
-  
+
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_FINISH_RECEIVE_FLAG) == 0) &&
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_FINISH_RECEIVE_FLAG) == 0)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) == 0) &&
       ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP) == 0)) {
     return RETURN_DEVICE_ERROR;
@@ -63,10 +76,15 @@ SpdmSendReceiveEndSession (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponseSize != sizeof(SPDM_END_SESSION_RESPONSE)) {
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, &SessionId, NULL, 0, &SpdmResponseSize, &SpdmResponse, SPDM_END_SESSION, SPDM_END_SESSION_ACK, sizeof(SPDM_END_SESSION_RESPONSE_MINE));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_END_SESSION_ACK) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_END_SESSION_ACK) {
+  if (SpdmResponseSize != sizeof(SPDM_END_SESSION_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
 
@@ -74,7 +92,29 @@ SpdmSendReceiveEndSession (
  
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateNotStarted);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-  
+
+  SpdmContext->SpdmCmdReceiveState |= SPDM_END_SESSION_RECEIVE_FLAG;
   return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+SpdmSendReceiveEndSession (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT32               SessionId,
+  IN     UINT8                EndSessionAttributes
+  )
+{
+  UINTN                   Retry;
+  RETURN_STATUS           Status;
+
+  Retry = SpdmContext->RetryTimes;
+  do {
+    Status = TrySpdmSendReceiveEndSession(SpdmContext, SessionId, EndSessionAttributes);
+    if (RETURN_NO_RESPONSE != Status) {
+      return Status;
+    }
+  } while (Retry-- != 0);
+
+  return Status;
 }
 
