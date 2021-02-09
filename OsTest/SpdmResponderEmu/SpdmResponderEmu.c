@@ -200,7 +200,8 @@ PlatformServer (
           return TRUE;
         }
       } else {
-        ASSERT (FALSE);
+        // unknown message
+        return TRUE;
       }
       break;
     default:
