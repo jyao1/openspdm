@@ -219,7 +219,11 @@ SpdmGenerateKeyExchangeRspSignature (
              Signature,
              &SignatureSize
              );
-
+  if (Result) {
+    DEBUG((DEBUG_INFO, "Signature - "));
+    InternalDumpData (Signature, SignatureSize);
+    DEBUG((DEBUG_INFO, "\n"));
+  }
   return Result;
 }
 
@@ -317,6 +321,10 @@ SpdmVerifyKeyExchangeRspSignature (
   SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, THCurrData, THCurrDataSize, HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
+  DEBUG((DEBUG_INFO, "\n"));
+
+  DEBUG((DEBUG_INFO, "Signature - "));
+  InternalDumpData (SignData, SignDataSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   //
@@ -464,6 +472,11 @@ SpdmGenerateFinishReqSignature (
              Signature,
              &SignatureSize
              );
+  if (Result) {
+    DEBUG((DEBUG_INFO, "Signature - "));
+    InternalDumpData (Signature, SignatureSize);
+    DEBUG((DEBUG_INFO, "\n"));
+  }
 
   return Result;
 }
@@ -581,6 +594,10 @@ SpdmVerifyFinishReqSignature (
   SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, THCurrData, THCurrDataSize, HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
+  DEBUG((DEBUG_INFO, "\n"));
+
+  DEBUG((DEBUG_INFO, "Signature - "));
+  InternalDumpData (SignData, SignDataSize);
   DEBUG((DEBUG_INFO, "\n"));
 
   //
