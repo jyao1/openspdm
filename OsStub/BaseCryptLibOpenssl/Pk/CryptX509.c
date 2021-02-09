@@ -1724,6 +1724,12 @@ X509VerifyCert (
   if (EVP_add_digest (EVP_sha256 ()) == 0) {
     goto _Exit;
   }
+  if (EVP_add_digest (EVP_sha384 ()) == 0) {
+    goto _Exit;
+  }
+  if (EVP_add_digest (EVP_sha512 ()) == 0) {
+    goto _Exit;
+  }
 
   //
   // Read DER-encoded certificate to be verified and Construct X509 object.
