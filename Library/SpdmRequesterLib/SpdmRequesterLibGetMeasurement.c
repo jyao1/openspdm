@@ -292,6 +292,14 @@ TrySpdmGetMeasurement (
 
   if (MeasurementOperation == SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS) {
     *NumberOfBlocks = SpdmResponse.Header.Param1;
+    if (*NumberOfBlocks == 0xFF) {
+      // the number of block cannot be 0xFF, because index 0xFF will brings confusing.
+      return RETURN_DEVICE_ERROR;
+    }
+    if (*NumberOfBlocks == 0x0) {
+      // the number of block cannot be 0x0, because a responder without measurement should clear capability flags.
+      return RETURN_DEVICE_ERROR;
+    }
   } else {
     *NumberOfBlocks = SpdmResponse.NumberOfBlocks;
     if (*MeasurementRecordLength < MeasurementRecordDataLength) {
