@@ -577,19 +577,15 @@ void TestSpdmRequesterGetCapabilityCase1(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -597,41 +593,33 @@ void TestSpdmRequesterGetCapabilityCase2(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponderCTExponent, 0);
-  assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_FLAG);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_FLAG);
 }
 
 void TestSpdmRequesterGetCapabilityCase3(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -639,19 +627,15 @@ void TestSpdmRequesterGetCapabilityCase4(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -659,19 +643,15 @@ void TestSpdmRequesterGetCapabilityCase5(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_NO_RESPONSE);
 }
 
@@ -679,41 +659,33 @@ void TestSpdmRequesterGetCapabilityCase6(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponderCTExponent, 0);
-  assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_FLAG);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_FLAG);
 }
 
 void TestSpdmRequesterGetCapabilityCase7(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
   assert_int_equal (SpdmContext->SpdmCmdReceiveState, 0);
 }
@@ -722,19 +694,15 @@ void TestSpdmRequesterGetCapabilityCase8(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -742,44 +710,36 @@ void TestSpdmRequesterGetCapabilityCase9(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponderCTExponent, 0);
-  assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_FLAG);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_FLAG);
 }
 
 void TestSpdmRequesterGetCapabilityCase10(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xa;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponderCTExponent, 0);
-  assert_int_equal (ResponderFlags, (SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP |
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, (SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP |
                                      SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP |
                                      SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP |
                                      SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG |
@@ -790,22 +750,18 @@ void TestSpdmRequesterGetCapabilityCase11(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xb;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponderCTExponent, 0);
-  assert_int_equal (ResponderFlags, !(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP |
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, !(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP |
                                      SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP |
                                      SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP |
                                      SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG |
@@ -816,41 +772,33 @@ void TestSpdmRequesterGetCapabilityCase12(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xc;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponderCTExponent, 0);
-  assert_int_equal (ResponderFlags, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_FRESH_CAP);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_FRESH_CAP);
 }
 
 void TestSpdmRequesterGetCapabilityCase13(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xd;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -858,19 +806,15 @@ void TestSpdmRequesterGetCapabilityCase14(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xe;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -878,19 +822,15 @@ void TestSpdmRequesterGetCapabilityCase15(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xf;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -898,282 +838,258 @@ void TestSpdmRequesterGetCapabilityCase16(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x10;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponderCTExponent, 0);
-  assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11);
 }
 
 void TestSpdmRequesterGetCapabilityCase17(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x11;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
 
 void TestSpdmRequesterGetCapabilityCase18(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x12;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
 
 void TestSpdmRequesterGetCapabilityCase19(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x13;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
 
 void TestSpdmRequesterGetCapabilityCase20(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x14;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
 
 void TestSpdmRequesterGetCapabilityCase21(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x15;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
 
 void TestSpdmRequesterGetCapabilityCase22(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x16;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)));
 }
 
 void TestSpdmRequesterGetCapabilityCase23(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x17;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP)));
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP)));
 }
 
 void TestSpdmRequesterGetCapabilityCase24(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x18;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)));
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)));
 }
 
 void TestSpdmRequesterGetCapabilityCase25(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x19;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)));
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 & (0xFFFFFFFF^(SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)));
 }
 
 void TestSpdmRequesterGetCapabilityCase26(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1a;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  //assert_int_equal (ResponderCTExponent, 0);
-  //assert_int_equal (ResponderFlags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+  //assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_RESPONSE_FLAG_VERSION_11 | SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP);
 }
 
 void TestSpdmRequesterGetCapabilityCase27(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1b;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -1181,21 +1097,19 @@ void TestSpdmRequesterGetCapabilityCase28(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                RequesterCTExponent;
-  UINT32               RequesterFlags;
-  UINT8                ResponderCTExponent;
-  UINT32               ResponderFlags;
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1c;
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
-  RequesterCTExponent = 0;
-  RequesterFlags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
-  Status = SpdmGetCapabilities (SpdmContext, RequesterCTExponent, RequesterFlags, &ResponderCTExponent, &ResponderFlags);
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+  Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 

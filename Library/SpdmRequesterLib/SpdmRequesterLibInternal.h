@@ -57,8 +57,6 @@ SpdmHandleErrorResponseMain (
   This function sends GET_VERSION and receives VERSION.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  VersionCount                 VersionCount from the VERSION response.
-  @param  VersionNumberEntries         VersionNumberEntries from the VERSION response.
 
   @retval RETURN_SUCCESS               The GET_VERSION is sent and the VERSION is received.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
@@ -66,9 +64,7 @@ SpdmHandleErrorResponseMain (
 RETURN_STATUS
 EFIAPI
 SpdmGetVersion (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN OUT UINT8                *VersionCount,
-     OUT VOID                 *VersionNumberEntries
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   );
 
 /**
@@ -86,11 +82,7 @@ SpdmGetVersion (
 RETURN_STATUS
 EFIAPI
 SpdmGetCapabilities (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                RequesterCTExponent,
-  IN     UINT32               RequesterFlags,
-     OUT UINT8                *ResponderCTExponent,
-     OUT UINT32               *ResponderFlags
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   );
 
 /**

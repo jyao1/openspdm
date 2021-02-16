@@ -14,8 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SpdmSecuredMessageLib.h>
 #include "SpdmCommonLibInternal.h"
 
-#define MY_SPDM_VERSION_ENTRY_COUNT 2
-
 /**
   Process the SPDM request and return the response.
 

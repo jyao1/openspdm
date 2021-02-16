@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmUnitTest.h"
 #include <SpdmResponderLibInternal.h>
 
+#define DEFAULT_SPDM_VERSION_ENTRY_COUNT 2
+
 #pragma pack(1)
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
@@ -71,7 +73,7 @@ void TestSpdmResponderVersionCase1(void **state) {
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseVersion (SpdmContext, mSpdmGetVersionRequest1Size, &mSpdmGetVersionRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_VERSION_RESPONSE) + MY_SPDM_VERSION_ENTRY_COUNT * sizeof(SPDM_VERSION_NUMBER));
+  assert_int_equal (ResponseSize, sizeof(SPDM_VERSION_RESPONSE) + DEFAULT_SPDM_VERSION_ENTRY_COUNT * sizeof(SPDM_VERSION_NUMBER));
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_VERSION);
 }
@@ -156,7 +158,7 @@ void TestSpdmResponderVersionCase4(void **state) {
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseVersion (SpdmContext, mSpdmGetVersionRequest1Size, &mSpdmGetVersionRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (ResponseSize, sizeof(SPDM_VERSION_RESPONSE) + MY_SPDM_VERSION_ENTRY_COUNT * sizeof(SPDM_VERSION_NUMBER));
+  assert_int_equal (ResponseSize, sizeof(SPDM_VERSION_RESPONSE) + DEFAULT_SPDM_VERSION_ENTRY_COUNT * sizeof(SPDM_VERSION_NUMBER));
   SpdmResponse = (VOID *)Response;
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_VERSION);
   assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);

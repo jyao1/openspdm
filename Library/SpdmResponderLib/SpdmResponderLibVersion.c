@@ -82,7 +82,7 @@ SpdmGetResponseVersion (
   }
 
   ASSERT (*ResponseSize >= sizeof(MY_SPDM_VERSION_RESPONSE));
-  *ResponseSize = sizeof(SPDM_VERSION_RESPONSE) + MY_SPDM_VERSION_ENTRY_COUNT * sizeof(SPDM_VERSION_NUMBER);
+  *ResponseSize = sizeof(SPDM_VERSION_RESPONSE) + SpdmContext->LocalContext.Version.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER);
   ZeroMem (Response, *ResponseSize);
   SpdmResponse = Response;
 
@@ -90,11 +90,9 @@ SpdmGetResponseVersion (
   SpdmResponse->Header.RequestResponseCode = SPDM_VERSION;
   SpdmResponse->Header.Param1 = 0;
   SpdmResponse->Header.Param2 = 0;
-  SpdmResponse->VersionNumberEntryCount = MY_SPDM_VERSION_ENTRY_COUNT; // = 2
-  SpdmResponse->VersionNumberEntry[0].MajorVersion = 1;
-  SpdmResponse->VersionNumberEntry[0].MinorVersion = 0;
-  SpdmResponse->VersionNumberEntry[1].MajorVersion = 1;
-  SpdmResponse->VersionNumberEntry[1].MinorVersion = 1;
+  SpdmResponse->VersionNumberEntryCount = SpdmContext->LocalContext.Version.SpdmVersionCount;
+  CopyMem (SpdmResponse->VersionNumberEntry, SpdmContext->LocalContext.Version.SpdmVersion, sizeof(SPDM_VERSION_NUMBER) * SpdmContext->LocalContext.Version.SpdmVersionCount);
+
   //
   // Cache
   //
@@ -104,8 +102,8 @@ SpdmGetResponseVersion (
     return RETURN_SUCCESS;
   }
 
-  SpdmContext->ConnectionInfo.SpdmVersion[0] = SPDM_MESSAGE_VERSION_10;
-  SpdmContext->ConnectionInfo.SpdmVersion[1] = SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = SpdmContext->LocalContext.Version.SpdmVersionCount;
+  CopyMem (SpdmContext->ConnectionInfo.Version.SpdmVersion, SpdmContext->LocalContext.Version.SpdmVersion, sizeof(SPDM_VERSION_NUMBER) * SpdmContext->LocalContext.Version.SpdmVersionCount);
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiating;
 

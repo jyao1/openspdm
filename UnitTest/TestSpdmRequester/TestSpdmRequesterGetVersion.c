@@ -332,16 +332,12 @@ void TestSpdmRequesterGetVersionCase1(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -353,16 +349,12 @@ void TestSpdmRequesterGetVersionCase2(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
 }
 
@@ -374,16 +366,12 @@ void TestSpdmRequesterGetVersionCase3(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -395,16 +383,12 @@ void TestSpdmRequesterGetVersionCase4(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -416,16 +400,12 @@ void TestSpdmRequesterGetVersionCase5(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_NO_RESPONSE);
 }
 
@@ -438,16 +418,12 @@ void TestSpdmRequesterGetVersionCase6(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
 }
 
@@ -462,16 +438,12 @@ void TestSpdmRequesterGetVersionCase7(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
   assert_int_equal (SpdmContext->SpdmCmdReceiveState, 0);
 }
@@ -486,16 +458,12 @@ void TestSpdmRequesterGetVersionCase8(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -510,16 +478,12 @@ void TestSpdmRequesterGetVersionCase9(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
 }
 
@@ -534,18 +498,14 @@ void TestSpdmRequesterGetVersionCase10(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xA;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (VersionNumberEntryCount, 2);
+  assert_int_equal (SpdmContext->ConnectionInfo.Version.SpdmVersionCount, 2);
 }
 
 /**
@@ -557,16 +517,12 @@ void TestSpdmRequesterGetVersionCase11(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xB;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -579,16 +535,12 @@ void TestSpdmRequesterGetVersionCase12(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xC;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
@@ -602,16 +554,12 @@ void TestSpdmRequesterGetVersionCase13(void **state) {
   RETURN_STATUS        Status;
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xD;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 

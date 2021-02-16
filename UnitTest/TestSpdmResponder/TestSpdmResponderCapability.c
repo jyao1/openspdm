@@ -562,7 +562,9 @@ void TestSpdmResponderCapabilityCase7(void **state) {
   SpdmContext->ResponseState = SpdmResponseStateNormal;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
 
-  SpdmContext->ConnectionInfo.SpdmVersion[0]=SPDM_MESSAGE_VERSION_11;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest3Size, &mSpdmGetCapabilityRequest3, &ResponseSize, Response);

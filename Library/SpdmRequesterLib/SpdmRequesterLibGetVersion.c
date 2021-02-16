@@ -22,17 +22,13 @@ typedef struct {
   This function sends GET_VERSION and receives VERSION.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  VersionCount                 VersionCount from the VERSION response.
-  @param  VersionNumberEntries         VersionNumberEntries from the VERSION response.
 
   @retval RETURN_SUCCESS               The GET_VERSION is sent and the VERSION is received.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
 TrySpdmGetVersion (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN OUT UINT8                *VersionCount,
-     OUT VOID                 *VersionNumberEntries
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
 {
   RETURN_STATUS                             Status;
@@ -115,7 +111,6 @@ TrySpdmGetVersion (
                                                          SpdmResponse.VersionNumberEntry[Index].MinorVersion);
 
     if (Version == SPDM_MESSAGE_VERSION_11 || Version == SPDM_MESSAGE_VERSION_10) {
-      SpdmContext->ConnectionInfo.SpdmVersion[Index] = Version;
       CompatibleVersionNumberEntry[CompatibleVersionCount] = SpdmResponse.VersionNumberEntry[Index];
       CompatibleVersionCount++;
     }
@@ -123,21 +118,9 @@ TrySpdmGetVersion (
   if(CompatibleVersionCount == 0) {
     return RETURN_DEVICE_ERROR;
   }
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = CompatibleVersionCount;
+  CopyMem (SpdmContext->ConnectionInfo.Version.SpdmVersion, CompatibleVersionNumberEntry, sizeof(SPDM_VERSION_NUMBER) * CompatibleVersionCount);
 
-  if (VersionCount != NULL) {
-    if (*VersionCount < CompatibleVersionCount) {
-      *VersionCount = CompatibleVersionCount;
-      return RETURN_BUFFER_TOO_SMALL;
-    }
-    *VersionCount = CompatibleVersionCount;
-    if (VersionNumberEntries != NULL) {
-      CopyMem (
-        VersionNumberEntries,
-        CompatibleVersionNumberEntry,
-        CompatibleVersionCount * sizeof(SPDM_VERSION_NUMBER)
-        );
-    }
-  }
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiating;
   return RETURN_SUCCESS;
@@ -156,9 +139,7 @@ TrySpdmGetVersion (
 RETURN_STATUS
 EFIAPI
 SpdmGetVersion (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN OUT UINT8                *VersionCount,
-     OUT VOID                 *VersionNumberEntries
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
 {
   UINTN         Retry;
@@ -166,7 +147,7 @@ SpdmGetVersion (
 
   Retry = SpdmContext->RetryTimes;
   do {
-    Status = TrySpdmGetVersion(SpdmContext, VersionCount, VersionNumberEntries);
+    Status = TrySpdmGetVersion(SpdmContext);
     if (RETURN_NO_RESPONSE != Status) {
       return Status;
     }

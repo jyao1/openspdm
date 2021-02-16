@@ -98,21 +98,13 @@ SpdmCheckFlagCompability (
   This function sends GET_CAPABILITIES and receives CAPABILITIES.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  RequesterCTExponent          RequesterCTExponent to the GET_CAPABILITIES request.
-  @param  RequesterFlags               RequesterFlags to the GET_CAPABILITIES request.
-  @param  ResponderCTExponent          ResponderCTExponent from the CAPABILITIES response.
-  @param  ResponderFlags               ResponderFlags from the CAPABILITIES response.
 
   @retval RETURN_SUCCESS               The GET_CAPABILITIES is sent and the CAPABILITIES is received.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
 **/
 RETURN_STATUS
 TrySpdmGetCapabilities (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                RequesterCTExponent,
-  IN     UINT32               RequesterFlags,
-     OUT UINT8                *ResponderCTExponent,
-     OUT UINT32               *ResponderFlags
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
 {
   RETURN_STATUS                             Status;
@@ -135,8 +127,8 @@ TrySpdmGetCapabilities (
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_CAPABILITIES;
   SpdmRequest.Header.Param1 = 0;
   SpdmRequest.Header.Param2 = 0;
-  SpdmRequest.CTExponent = RequesterCTExponent;
-  SpdmRequest.Flags = RequesterFlags;
+  SpdmRequest.CTExponent = SpdmContext->LocalContext.Capability.CTExponent;
+  SpdmRequest.Flags = SpdmContext->LocalContext.Capability.Flags;
   Status = SpdmSendSpdmRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
@@ -194,8 +186,6 @@ TrySpdmGetCapabilities (
   SpdmContext->ConnectionInfo.Capability.CTExponent = SpdmResponse.CTExponent;
   SpdmContext->ConnectionInfo.Capability.Flags = SpdmResponse.Flags;
 
-  *ResponderCTExponent = SpdmResponse.CTExponent;
-  *ResponderFlags = SpdmResponse.Flags;
   SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;
@@ -205,10 +195,6 @@ TrySpdmGetCapabilities (
   This function sends GET_CAPABILITIES and receives CAPABILITIES.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  RequesterCTExponent          RequesterCTExponent to the GET_CAPABILITIES request.
-  @param  RequesterFlags               RequesterFlags to the GET_CAPABILITIES request.
-  @param  ResponderCTExponent          ResponderCTExponent from the CAPABILITIES response.
-  @param  ResponderFlags               ResponderFlags from the CAPABILITIES response.
 
   @retval RETURN_SUCCESS               The GET_CAPABILITIES is sent and the CAPABILITIES is received.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
@@ -216,11 +202,7 @@ TrySpdmGetCapabilities (
 RETURN_STATUS
 EFIAPI
 SpdmGetCapabilities (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                RequesterCTExponent,
-  IN     UINT32               RequesterFlags,
-     OUT UINT8                *ResponderCTExponent,
-     OUT UINT32               *ResponderFlags
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext
   )
 {
   UINTN         Retry;
@@ -228,7 +210,7 @@ SpdmGetCapabilities (
 
   Retry = SpdmContext->RetryTimes;
   do {
-    Status = TrySpdmGetCapabilities(SpdmContext, RequesterCTExponent, RequesterFlags, ResponderCTExponent, ResponderFlags);
+    Status = TrySpdmGetCapabilities(SpdmContext);
     if (RETURN_NO_RESPONSE != Status) {
       return Status;
     }

@@ -148,10 +148,6 @@ SpdmGetResponseCapability (
     }
   }
 
-  // if (RequestSize != sizeof(SPDM_GET_CAPABILITIES_REQUEST)) {
-  //   SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-  //   return RETURN_SUCCESS;
-  // }
   if (!SpdmCheckFlagCompability(SpdmRequest->Flags,SpdmRequest->Header.SPDMVersion)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

@@ -28,26 +28,16 @@ SpdmInitConnection (
   )
 {
   RETURN_STATUS        Status;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
   SPDM_DEVICE_CONTEXT  *SpdmContext;
 
   SpdmContext = Context;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  Status = SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  Status = SpdmGetVersion (SpdmContext);
   if (RETURN_ERROR(Status)) {
     return Status;
   }
 
-  Status = SpdmGetCapabilities (
-           SpdmContext,
-           SpdmContext->LocalContext.Capability.CTExponent,
-           SpdmContext->LocalContext.Capability.Flags,
-           &SpdmContext->ConnectionInfo.Capability.CTExponent,
-           &SpdmContext->ConnectionInfo.Capability.Flags
-           );
+  Status = SpdmGetCapabilities (SpdmContext);
   if (RETURN_ERROR(Status)) {
     return Status;
   }

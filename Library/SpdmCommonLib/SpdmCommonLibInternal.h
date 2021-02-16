@@ -16,6 +16,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define INVALID_SESSION_ID  0
 
 typedef struct {
+  UINT8                SpdmVersionCount;
+  SPDM_VERSION_NUMBER  SpdmVersion[MAX_SPDM_VERSION_COUNT];
+} SPDM_DEVICE_VERSION;
+
+typedef struct {
   UINT8                CTExponent;
   UINT32               Flags;
 } SPDM_DEVICE_CAPABILITY;
@@ -35,10 +40,10 @@ typedef struct {
   //
   // Local device info
   //
-  UINT16                          SpdmVersion;
-  UINT16                          SecuredMessageVersion;
+  SPDM_DEVICE_VERSION             Version;
   SPDM_DEVICE_CAPABILITY          Capability;
   SPDM_DEVICE_ALGORITHM           Algorithm;
+  SPDM_DEVICE_VERSION             SecuredMessageVersion;
   //
   // My Certificate
   //
@@ -84,10 +89,10 @@ typedef struct {
   //
   // Peer device info (negotiated)
   //
-  UINT8                           SpdmVersion[MAX_SPDM_VERSION_COUNT];
-  UINT8                           SecuredMessageVersion[MAX_SPDM_VERSION_COUNT];
+  SPDM_DEVICE_VERSION             Version;
   SPDM_DEVICE_CAPABILITY          Capability;
   SPDM_DEVICE_ALGORITHM           Algorithm;
+  SPDM_DEVICE_VERSION             SecuredMessageVersion;
   //
   // Peer CertificateChain
   //
@@ -484,6 +489,25 @@ BOOLEAN
 SpdmIsVersionSupported (
   IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
   IN     UINT8                     Version
+  );
+
+/**
+  This function returns if a capablities flag is supported in current SPDM connection.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsRequester                  Is the function called from a requester.
+  @param  RequesterCapabilitiesFlag    The requester capabilities flag to be checked
+  @param  ResponderCapabilitiesFlag    The responder capabilities flag to be checked
+
+  @retval TRUE  the capablities flag is supported.
+  @retval FALSE the capablities flag is not supported.
+**/
+BOOLEAN
+SpdmIsCapabilitiesFlagSupported (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     BOOLEAN                   IsRequester,
+  IN     UINT32                    RequesterCapabilitiesFlag,
+  IN     UINT32                    ResponderCapabilitiesFlag
   );
 
 /**

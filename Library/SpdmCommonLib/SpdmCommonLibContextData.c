@@ -749,13 +749,57 @@ SpdmIsVersionSupported (
   )
 {
   UINTN  Index;
+  UINT8  MajorVersion;
+  UINT8  MinorVersion;
 
-  for (Index = 0; Index < MAX_SPDM_VERSION_COUNT; Index++) {
-    if (Version == SpdmContext->ConnectionInfo.SpdmVersion[Index]) {
+  MajorVersion = ((Version >> 4) & 0xF);
+  MinorVersion = (Version & 0xF);
+
+  for (Index = 0; Index < SpdmContext->ConnectionInfo.Version.SpdmVersionCount; Index++) {
+    if ((MajorVersion == SpdmContext->ConnectionInfo.Version.SpdmVersion[Index].MajorVersion) &&
+        (MinorVersion == SpdmContext->ConnectionInfo.Version.SpdmVersion[Index].MinorVersion) ) {
       return TRUE;
     }
   }
   return FALSE;
+}
+
+/**
+  This function returns if a capablities flag is supported in current SPDM connection.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsRequester                  Is the function called from a requester.
+  @param  RequesterCapabilitiesFlag    The requester capabilities flag to be checked
+  @param  ResponderCapabilitiesFlag    The responder capabilities flag to be checked
+
+  @retval TRUE  the capablities flag is supported.
+  @retval FALSE the capablities flag is not supported.
+**/
+BOOLEAN
+SpdmIsCapabilitiesFlagSupported (
+  IN     SPDM_DEVICE_CONTEXT       *SpdmContext,
+  IN     BOOLEAN                   IsRequester, 
+  IN     UINT32                    RequesterCapabilitiesFlag,
+  IN     UINT32                    ResponderCapabilitiesFlag
+  )
+{
+  UINT32  NegotiatedRequesterCapabilitiesFlag;
+  UINT32  NegotiatedResponderCapabilitiesFlag;
+
+  if (IsRequester) {
+    NegotiatedRequesterCapabilitiesFlag = SpdmContext->LocalContext.Capability.Flags;
+    NegotiatedResponderCapabilitiesFlag = SpdmContext->ConnectionInfo.Capability.Flags;
+  } else {
+    NegotiatedRequesterCapabilitiesFlag = SpdmContext->ConnectionInfo.Capability.Flags;
+    NegotiatedResponderCapabilitiesFlag = SpdmContext->LocalContext.Capability.Flags;
+  }
+
+  if (((RequesterCapabilitiesFlag == 0) || ((NegotiatedRequesterCapabilitiesFlag & RequesterCapabilitiesFlag) != 0)) &&
+      ((ResponderCapabilitiesFlag == 0) || ((NegotiatedResponderCapabilitiesFlag & ResponderCapabilitiesFlag) != 0)) ) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
 }
 
 /**
@@ -857,6 +901,15 @@ SpdmInitContext (
   SpdmContext->RetryTimes                           = MAX_SPDM_REQUEST_RETRY_TIMES;
   SpdmContext->ResponseState                        = SpdmResponseStateNormal;
   SpdmContext->CurrentToken                         = 0;
+  SpdmContext->LocalContext.Version.SpdmVersionCount = 2;
+  SpdmContext->LocalContext.Version.SpdmVersion[0].MajorVersion        = 1;
+  SpdmContext->LocalContext.Version.SpdmVersion[0].MinorVersion        = 0;
+  SpdmContext->LocalContext.Version.SpdmVersion[0].Alpha               = 0;
+  SpdmContext->LocalContext.Version.SpdmVersion[0].UpdateVersionNumber = 0;
+  SpdmContext->LocalContext.Version.SpdmVersion[1].MajorVersion        = 1;
+  SpdmContext->LocalContext.Version.SpdmVersion[1].MinorVersion        = 1;
+  SpdmContext->LocalContext.Version.SpdmVersion[1].Alpha               = 0;
+  SpdmContext->LocalContext.Version.SpdmVersion[1].UpdateVersionNumber = 0;
   SpdmContext->EncapContext.CertificateChainBuffer.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 
   SecuredMessageContext = (VOID *)((UINTN)(SpdmContext + 1));

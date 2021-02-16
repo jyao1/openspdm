@@ -53,15 +53,11 @@ SpdmDeviceReceiveMessage (
 VOID TestSpdmRequesterGetVersion (VOID **State) {
   SPDM_TEST_CONTEXT    *SpdmTestContext;
   SPDM_DEVICE_CONTEXT  *SpdmContext;
-  UINT8                VersionNumberEntryCount;
-  SPDM_VERSION_NUMBER  VersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
   SpdmTestContext = *State;
   SpdmContext = SpdmTestContext->SpdmContext;
 
-  VersionNumberEntryCount = MAX_SPDM_VERSION_COUNT;
-  ZeroMem (VersionNumberEntry, sizeof(VersionNumberEntry));
-  SpdmGetVersion (SpdmContext, &VersionNumberEntryCount, VersionNumberEntry);
+  SpdmGetVersion (SpdmContext);
 }
 
 SPDM_TEST_CONTEXT       mSpdmRequesterGetVersionTestContext = {
