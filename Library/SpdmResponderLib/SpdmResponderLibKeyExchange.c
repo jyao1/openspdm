@@ -69,11 +69,17 @@ SpdmGetResponseKeyExchange (
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
-  if (((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) &&
-      (SpdmContext->EncapContext.ErrorState != SPDM_STATUS_SUCCESS)) {
-    DEBUG((DEBUG_INFO, "SpdmGetResponseKeyExchange fail due to Mutual Auth fail\n"));
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE, ResponseSize, Response);
     return RETURN_SUCCESS;
+  }
+
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
+    if (SpdmContext->EncapContext.ErrorState != SPDM_STATUS_SUCCESS) {
+      DEBUG((DEBUG_INFO, "SpdmGetResponseKeyExchange fail due to Mutual Auth fail\n"));
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
   }
 
   SlotNum = SpdmRequest->Header.Param2;
@@ -119,7 +125,7 @@ SpdmGetResponseKeyExchange (
 
   OpaqueKeyExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
 
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
     HmacSize = 0;
   }
 
@@ -159,7 +165,7 @@ SpdmGetResponseKeyExchange (
   SpdmResponse->RspSessionID = RspSessionId;
 
   SpdmResponse->MutAuthRequested = 0;
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
     SpdmResponse->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
   }
   if (SpdmResponse->MutAuthRequested != 0) {
@@ -242,7 +248,7 @@ SpdmGetResponseKeyExchange (
 
   Ptr += SignatureSize;
 
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
     Result = SpdmGenerateKeyExchangeRspHmac (SpdmContext, SessionInfo, Ptr);
     if (!Result) {
       SpdmFreeSessionId (SpdmContext, SessionId);
@@ -260,7 +266,7 @@ SpdmGetResponseKeyExchange (
   }
 
   SessionInfo->MutAuthRequested = 0;
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
     SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
   }
   SpdmInitEncapState (Context, SessionInfo->MutAuthRequested);

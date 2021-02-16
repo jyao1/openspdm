@@ -507,6 +507,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase10(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = 0;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
@@ -530,6 +531,8 @@ void TestSpdmRequesterNegotiateAlgorithmCase11(void **state) {
   SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = 0;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);

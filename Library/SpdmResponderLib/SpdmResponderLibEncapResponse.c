@@ -275,6 +275,11 @@ SpdmGetResponseEncapsulatedRequest (
     return RETURN_SUCCESS;
   }
 
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_ENCAPSULATED_REQUEST, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   ASSERT (*ResponseSize > sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE));
   ZeroMem (Response, *ResponseSize);
 
@@ -339,6 +344,11 @@ SpdmGetResponseEncapsulatedResponseAck (
   SpdmContext = Context;
   if (RequestSize <= sizeof(SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_DELIVER_ENCAPSULATED_RESPONSE, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 

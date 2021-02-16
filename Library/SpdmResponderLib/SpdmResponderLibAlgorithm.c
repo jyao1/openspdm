@@ -183,6 +183,7 @@ SpdmGetResponseAlgorithm (
   UINTN                                          Index;
   SPDM_DEVICE_CONTEXT                            *SpdmContext;
   RETURN_STATUS                                  Status;
+  UINT32                                         AlgoSize;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -331,12 +332,31 @@ SpdmGetResponseAlgorithm (
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse->BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse->BaseHashSel;
 
-  if ((SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec == 0) ||
-      (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo == 0) ||
-      (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo == 0) ||
-      (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo == 0)) {
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP)) {
+    if (SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec != SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+    AlgoSize = GetSpdmMeasurementHashSize (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo);
+    if (AlgoSize == 0) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+  }
+  AlgoSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  if (AlgoSize == 0) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
+  }
+  if ((SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
+       SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) ||
+      (!SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
+       SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) ) {
+    AlgoSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+    if (AlgoSize == 0) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
   }
 
   if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
@@ -345,15 +365,32 @@ SpdmGetResponseAlgorithm (
     SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = SpdmResponse->StructTable[2].AlgSupported;
     SpdmContext->ConnectionInfo.Algorithm.KeySchedule = SpdmResponse->StructTable[3].AlgSupported;
 
-    if ((SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup == 0) ||
-        (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite == 0)) {
-      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-      return RETURN_SUCCESS;
-    }
-    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
-      if (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg == 0) {
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)) {
+      AlgoSize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+      if (AlgoSize == 0) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
         return RETURN_SUCCESS;
+      }
+    }
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP) ||
+        SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP)) {
+      AlgoSize = GetSpdmAeadKeySize (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite);
+      if (AlgoSize == 0) {
+        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+        return RETURN_SUCCESS;
+      }
+    }
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
+      AlgoSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
+      if (AlgoSize == 0) {
+        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+        return RETURN_SUCCESS;
+      }
+    }
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) ||
+        SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)) {
+    if (SpdmContext->ConnectionInfo.Algorithm.KeySchedule != SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH) {
+        return RETURN_SECURITY_VIOLATION;
       }
     }
   }

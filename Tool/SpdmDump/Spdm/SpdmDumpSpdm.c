@@ -1365,7 +1365,8 @@ DumpSpdmKeyExchangeRsp (
 
   OpaqueLength = *(UINT16 *)((UINTN)Buffer + sizeof(SPDM_KEY_EXCHANGE_RESPONSE) + DheKeySize + MeasurementSummaryHashSize);
   MessageSize += OpaqueLength + SignatureSize;
-  IncludeHmac = ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0);
+  IncludeHmac = ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) ||
+                ((mSpdmRequesterCapabilitiesFlags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0);
   if (IncludeHmac) {
     MessageSize += HmacSize;
   }
@@ -1428,7 +1429,7 @@ DumpSpdmKeyExchangeRsp (
 
   HmacSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
   SpdmAppendMessageK (mCurrentSessionInfo, mSpdmLastMessageBuffer, mSpdmLastMessageBufferSize);
-  if ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+  if (IncludeHmac) {
     SpdmAppendMessageK (mCurrentSessionInfo, Buffer, MessageSize - HmacSize);
   } else {
     SpdmAppendMessageK (mCurrentSessionInfo, Buffer, MessageSize);
@@ -1440,7 +1441,7 @@ DumpSpdmKeyExchangeRsp (
   }
   SpdmCalculateTH1Hash (mSpdmContext, mCurrentSessionInfo, TRUE, TH1HashData);
   SpdmGenerateSessionHandshakeKey (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), TH1HashData);
-  if ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) == 0) {
+  if (IncludeHmac) {
     SpdmAppendMessageK (mCurrentSessionInfo, (UINT8 *)Buffer + MessageSize - HmacSize, HmacSize);
   }
 
@@ -1536,7 +1537,8 @@ DumpSpdmFinishRsp (
   SpdmResponse = Buffer;
   HmacSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
 
-  IncludeHmac = ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0);
+  IncludeHmac = ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) &&
+                ((mSpdmRequesterCapabilitiesFlags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0);
   if (IncludeHmac) {
     MessageSize += HmacSize;
   }

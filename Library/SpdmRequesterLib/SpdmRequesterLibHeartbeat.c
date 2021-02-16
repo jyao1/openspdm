@@ -47,7 +47,7 @@ TrySpdmHeartbeat (
       ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_FINISH_RECEIVE_FLAG) == 0)) {
     return RETURN_DEVICE_ERROR;
   }
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP) == 0) {
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP)) {
     return RETURN_DEVICE_ERROR;
   }
 

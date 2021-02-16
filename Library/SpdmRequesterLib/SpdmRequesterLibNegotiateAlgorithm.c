@@ -155,21 +155,27 @@ TrySpdmNegotiateAlgorithms (
   SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = SpdmResponse.BaseAsymSel;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = SpdmResponse.BaseHashSel;
 
-  if (SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec != SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF) {
-    return RETURN_SECURITY_VIOLATION;
-  }
-
-  AlgoSize = GetSpdmMeasurementHashSize (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo);
-  if (AlgoSize == 0) {
-    return RETURN_SECURITY_VIOLATION;
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP)) {
+    if (SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec != SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF) {
+      return RETURN_SECURITY_VIOLATION;
+    }
+    AlgoSize = GetSpdmMeasurementHashSize (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo);
+    if (AlgoSize == 0) {
+      return RETURN_SECURITY_VIOLATION;
+    }
   }
   AlgoSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   if (AlgoSize == 0) {
     return RETURN_SECURITY_VIOLATION;
   }
-  AlgoSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
-  if (AlgoSize == 0) {
-    return RETURN_SECURITY_VIOLATION;
+  if ((SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
+       SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) ||
+      (!SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
+       SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) ) {
+    AlgoSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+    if (AlgoSize == 0) {
+      return RETURN_SECURITY_VIOLATION;
+    }
   }
 
   if (SpdmResponse.Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
@@ -195,17 +201,28 @@ TrySpdmNegotiateAlgorithms (
       }
     }
 
-    AlgoSize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
-    if (AlgoSize == 0) {
-      return RETURN_SECURITY_VIOLATION;
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)) {
+      AlgoSize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+      if (AlgoSize == 0) {
+        return RETURN_SECURITY_VIOLATION;
+      }
     }
-    AlgoSize = GetSpdmAeadKeySize (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite);
-    if (AlgoSize == 0) {
-      return RETURN_SECURITY_VIOLATION;
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP) ||
+        SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP)) {
+      AlgoSize = GetSpdmAeadKeySize (SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite);
+      if (AlgoSize == 0) {
+        return RETURN_SECURITY_VIOLATION;
+      }
     }
-    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
       AlgoSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
       if (AlgoSize == 0) {
+        return RETURN_SECURITY_VIOLATION;
+      }
+    }
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) ||
+        SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)) {
+      if (SpdmContext->ConnectionInfo.Algorithm.KeySchedule != SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH) {
         return RETURN_SECURITY_VIOLATION;
       }
     }

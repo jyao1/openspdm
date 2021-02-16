@@ -24,8 +24,10 @@ SpdmSessionInfoInit (
   )
 {
   SPDM_SESSION_TYPE          SessionType;
+  UINT32                     CapabilitiesFlag;
 
-  switch (SpdmContext->ConnectionInfo.Capability.Flags &
+  CapabilitiesFlag = SpdmContext->ConnectionInfo.Capability.Flags & SpdmContext->LocalContext.Capability.Flags;
+  switch (CapabilitiesFlag &
           (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP)) {
   case 0:
     SessionType = SpdmSessionTypeNone;

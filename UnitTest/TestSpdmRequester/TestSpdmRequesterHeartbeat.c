@@ -100,7 +100,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
     SPDM_HEARTBEAT_RESPONSE       *SpdmResponse; 
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
-	UINT32                        SessionId;
+    UINT32                        SessionId;
     SPDM_SESSION_INFO             *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
@@ -114,7 +114,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);    
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-	/* WALKAROUND: If just use single context to encode message and then decode message */
+    /* WALKAROUND: If just use single context to encode message and then decode message */
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -124,7 +124,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
     SPDM_HEARTBEAT_RESPONSE       *SpdmResponse; 
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
-	UINT32                        SessionId;	
+    UINT32                        SessionId;    
     SPDM_SESSION_INFO             *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
@@ -137,7 +137,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
     SpdmResponse->Header.Param2 = 0;
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-	SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -145,7 +145,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
   case 0x4:
   {
     SPDM_ERROR_RESPONSE    SpdmResponse;
-	UINT32                 SessionId;
+    UINT32                 SessionId;
     SPDM_SESSION_INFO      *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
@@ -155,7 +155,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
     SpdmResponse.Header.Param2 = 0;
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
-	SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -163,7 +163,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
   case 0x5:
   {
     SPDM_ERROR_RESPONSE  SpdmResponse;
-	UINT32               SessionId;
+    UINT32               SessionId;
     SPDM_SESSION_INFO    *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
@@ -183,7 +183,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
     STATIC UINTN SubIndex1 = 0;
     if (SubIndex1 == 0) {
       SPDM_ERROR_RESPONSE  SpdmResponse;
-	  UINT32               SessionId; 
+      UINT32               SessionId; 
       SPDM_SESSION_INFO    *SessionInfo;
 
       SessionId = 0xFFFFFFFF;
@@ -194,14 +194,14 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
       SubIndex1 ++;
-	  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     } else if (SubIndex1 == 1) {
       SPDM_HEARTBEAT_RESPONSE      *SpdmResponse; 
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
-	  UINT32                        SessionId;
-	  SPDM_SESSION_INFO             *SessionInfo;
+      UINT32                        SessionId;
+      SPDM_SESSION_INFO             *SessionInfo;
 
       SessionId = 0xFFFFFFFF;
       TempBufSize = sizeof(SPDM_HEARTBEAT_RESPONSE);
@@ -213,7 +213,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
       SpdmResponse->Header.Param2 = 0;
 
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-	  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     }
   }
@@ -222,8 +222,8 @@ SpdmRequesterHeartbeatTestReceiveMessage (
   case 0x7:
   {
     SPDM_ERROR_RESPONSE  SpdmResponse;
-	UINT32               SessionId;
-	SPDM_SESSION_INFO    *SessionInfo;
+    UINT32               SessionId;
+    SPDM_SESSION_INFO    *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -240,7 +240,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
   case 0x8:
   {
     SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
-	UINT32                                       SessionId;
+    UINT32                                       SessionId;
     SPDM_SESSION_INFO                            *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
@@ -264,9 +264,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
     STATIC UINTN SubIndex2 = 0;
     if (SubIndex2 == 0) {
       SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
-	  UINT32                                       SessionId;
-	  SPDM_SESSION_INFO                            *SessionInfo;
-	  
+      UINT32                                       SessionId;
+      SPDM_SESSION_INFO                            *SessionInfo;
+      
       SessionId = 0xFFFFFFFF;
       SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
       SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
@@ -279,14 +279,14 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
       SubIndex2 ++;
-	  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     } else if (SubIndex2 == 1) {
       SPDM_HEARTBEAT_RESPONSE       *SpdmResponse; 
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
-	  UINT32                        SessionId;
-	  SPDM_SESSION_INFO             *SessionInfo;
+      UINT32                        SessionId;
+      SPDM_SESSION_INFO             *SessionInfo;
 
       SessionId = 0xFFFFFFFF;
       TempBufSize = sizeof(SPDM_HEARTBEAT_RESPONSE);
@@ -300,7 +300,7 @@ SpdmRequesterHeartbeatTestReceiveMessage (
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
       SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
-	}
+    }
   }
     return RETURN_SUCCESS;
 
@@ -328,8 +328,11 @@ void TestSpdmRequesterHeartbeatCase1(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;  
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;  
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -372,8 +375,11 @@ void TestSpdmRequesterHeartbeatCase2(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;  
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -418,8 +424,11 @@ void TestSpdmRequesterHeartbeatCase3(void **state) {
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;  
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -467,8 +476,11 @@ void TestSpdmRequesterHeartbeatCase4(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;  
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -516,8 +528,11 @@ void TestSpdmRequesterHeartbeatCase5(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;  
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -565,8 +580,11 @@ void TestSpdmRequesterHeartbeatCase6(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;  
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -614,8 +632,11 @@ void TestSpdmRequesterHeartbeatCase7(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;  
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -664,8 +685,11 @@ void TestSpdmRequesterHeartbeatCase8(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;  
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -713,8 +737,11 @@ void TestSpdmRequesterHeartbeatCase9(void **state) {
   SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;  
-  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageA.BufferSize = 0;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;

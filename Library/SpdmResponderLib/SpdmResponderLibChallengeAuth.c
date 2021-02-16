@@ -62,6 +62,13 @@ SpdmGetResponseChallengeAuth (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
+  if ((SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
+       !SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) ||
+      (!SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
+       !SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) ) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
@@ -108,7 +115,7 @@ SpdmGetResponseChallengeAuth (
   AuthAttribute.SlotNum = (UINT8)(SlotNum & 0xF);
   AuthAttribute.Reserved = 0;
   AuthAttribute.BasicMutAuthReq = 0;
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) != 0) {
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
     AuthAttribute.BasicMutAuthReq = SpdmContext->LocalContext.BasicMutAuthRequested;
   }
   SpdmResponse->Header.Param1 = *(UINT8 *)&AuthAttribute;

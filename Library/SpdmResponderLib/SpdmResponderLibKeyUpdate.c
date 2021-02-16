@@ -44,6 +44,11 @@ SpdmGetResponseKeyUpdate (
 
   SpdmContext = Context;
 
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_UPDATE, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   ASSERT (SpdmContext->LastSpdmRequestSessionIdValid);
   if (!SpdmContext->LastSpdmRequestSessionIdValid) {
     SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);

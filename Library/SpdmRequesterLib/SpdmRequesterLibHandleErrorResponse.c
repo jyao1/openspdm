@@ -53,7 +53,7 @@ SpdmRequesterRespondIfReady (
   if (ExpectedResponseCode != SPDM_FINISH_RSP) {
     Status = SpdmSendSpdmRequest (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
   } else {
-    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
       Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
     } else {
       Status = SpdmSendSpdmRequest (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
@@ -68,7 +68,7 @@ SpdmRequesterRespondIfReady (
   if (ExpectedResponseCode != SPDM_FINISH_RSP) {
     Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, ResponseSize, Response);
   } else {
-    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP) != 0) {
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
       Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, ResponseSize, Response);
     } else {
       Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, ResponseSize, Response);

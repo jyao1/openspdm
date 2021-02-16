@@ -50,6 +50,10 @@ SpdmGetResponseHeartbeat (
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   if (RequestSize != sizeof(SPDM_HEARTBEAT_REQUEST)) {
     SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

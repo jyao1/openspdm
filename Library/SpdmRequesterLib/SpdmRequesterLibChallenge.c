@@ -73,8 +73,14 @@ TrySpdmChallenge (
       ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
     return RETURN_DEVICE_ERROR;
   }
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP) == 0) {
-    return RETURN_DEVICE_ERROR;
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) {
+      return RETURN_DEVICE_ERROR;
+    }
+  } else {
+    if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) {
+      return RETURN_DEVICE_ERROR;
+    }
   }
 
   if ((SlotNum >= MAX_SPDM_SLOT_COUNT) && (SlotNum != 0xFF)) {
@@ -151,7 +157,7 @@ TrySpdmChallenge (
     }
   }
   if (AuthAttribute.BasicMutAuthReq == 1) {
-    if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP) == 0) {
+    if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
       return RETURN_DEVICE_ERROR;
     }
   }

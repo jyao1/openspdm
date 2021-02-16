@@ -153,7 +153,7 @@ SpdmEncapsulatedRequest (
   UINTN                                       EncapsulatedResponseSize;
   SPDM_GET_DIGESTS_REQUEST                    GetDigests;
   
-  if ((SpdmContext->ConnectionInfo.Capability.Flags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP) == 0) {
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP)) {
     return RETURN_DEVICE_ERROR;
   }
 
