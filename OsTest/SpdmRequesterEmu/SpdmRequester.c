@@ -161,7 +161,7 @@ SpdmClientInit (
   Data16 = mSupportKeyScheduleAlgo;
   SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
 
-  Status = SpdmInitConnection (SpdmContext);
+  Status = SpdmInitConnection (SpdmContext, FALSE);
   if (RETURN_ERROR(Status)) {
     printf ("SpdmInitConnection - 0x%x\n", (UINT32)Status);
     free (mSpdmContext);

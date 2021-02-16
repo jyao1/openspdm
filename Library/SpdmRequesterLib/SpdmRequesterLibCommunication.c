@@ -24,7 +24,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 RETURN_STATUS
 EFIAPI
 SpdmInitConnection (
-  IN     VOID                 *Context
+  IN     VOID                 *Context,
+  IN     BOOLEAN              GetVersionOnly
   )
 {
   RETURN_STATUS        Status;
@@ -37,15 +38,16 @@ SpdmInitConnection (
     return Status;
   }
 
-  Status = SpdmGetCapabilities (SpdmContext);
-  if (RETURN_ERROR(Status)) {
-    return Status;
+  if (!GetVersionOnly) {
+    Status = SpdmGetCapabilities (SpdmContext);
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+    Status = SpdmNegotiateAlgorithms (SpdmContext);
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
   }
-  Status = SpdmNegotiateAlgorithms (SpdmContext);
-  if (RETURN_ERROR(Status)) {
-    return Status;
-  }
-
   return RETURN_SUCCESS;
 }
 

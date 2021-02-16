@@ -73,8 +73,7 @@ TrySpdmGetMeasurement (
 
   SpdmContext = Context;
   if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0)) {
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_CHALLENGE_RECEIVE_FLAG) == 0)) {
     return RETURN_DEVICE_ERROR;
   }
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP)) {

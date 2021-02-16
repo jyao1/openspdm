@@ -62,8 +62,7 @@ TrySpdmGetCertificate (
   Length = MIN(Length, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
 
   SpdmContext = Context;
-  if (((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0)) {
+  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {

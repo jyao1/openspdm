@@ -63,8 +63,7 @@ TrySpdmNegotiateAlgorithms (
   UINTN                                          Index;
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  *StructTable;
 
-  if (((SpdmContext->SpdmCmdReceiveState & SPDM_GET_VERSION_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0)) {
+  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) {
     return RETURN_DEVICE_ERROR;
   }
   ZeroMem (&SpdmRequest, sizeof(SpdmRequest));

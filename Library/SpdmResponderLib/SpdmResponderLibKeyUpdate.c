@@ -43,10 +43,19 @@ SpdmGetResponseKeyUpdate (
   SPDM_SESSION_INFO            *SessionInfo;
 
   SpdmContext = Context;
+  SpdmRequest = Request;
 
+  if (((SpdmContext->SpdmCmdReceiveState & SPDM_FINISH_RECEIVE_FLAG) == 0) &&
+      ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_FINISH_RECEIVE_FLAG) == 0)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_UPDATE, ResponseSize, Response);
     return RETURN_SUCCESS;
+  }
+  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
 
   ASSERT (SpdmContext->LastSpdmRequestSessionIdValid);
@@ -62,7 +71,6 @@ SpdmGetResponseKeyUpdate (
     return RETURN_SUCCESS;
   }
 
-  SpdmRequest = Request;
   if (RequestSize != sizeof(SPDM_KEY_UPDATE_REQUEST)) {
     SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

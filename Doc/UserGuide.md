@@ -89,7 +89,7 @@ Please refer to SpdmClientInit() in [SpdmRequester.c](https://github.com/jyao1/o
 
    Send GET_VERSION, GET_CAPABILITIES and NEGOTIATE_ALGORITHM.
    ```
-   SpdmInitConnection (SpdmContext);
+   SpdmInitConnection (SpdmContext, FALSE);
    ```
 
 3. Authentication the responder

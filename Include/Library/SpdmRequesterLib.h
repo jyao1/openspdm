@@ -72,6 +72,7 @@ SpdmReceiveResponse (
   After this function, the negotiated configuration data can be got via SpdmGetData.
 
   @param  SpdmContext                  A pointer to the SPDM context.
+  @param  GetVersionOnly               If the requester sends GET_VERSION only or not.
 
   @retval RETURN_SUCCESS               The connection is initialized successfully.
   @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
@@ -79,7 +80,8 @@ SpdmReceiveResponse (
 RETURN_STATUS
 EFIAPI
 SpdmInitConnection (
-  IN     VOID                 *SpdmContext
+  IN     VOID                 *SpdmContext,
+  IN     BOOLEAN              GetVersionOnly
   );
 
 /**

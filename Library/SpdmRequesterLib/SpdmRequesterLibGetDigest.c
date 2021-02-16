@@ -53,8 +53,7 @@ TrySpdmGetDigest (
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
 
   SpdmContext = Context;
-  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0)) {
+  if ((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {

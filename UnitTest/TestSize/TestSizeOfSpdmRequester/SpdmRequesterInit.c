@@ -90,7 +90,7 @@ SpdmClientInit (
   Data16 = SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH;
   SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
 
-  Status = SpdmInitConnection (SpdmContext);
+  Status = SpdmInitConnection (SpdmContext, FALSE);
   if (RETURN_ERROR(Status)) {
     DEBUG ((DEBUG_ERROR, "SpdmInitConnection - %r\n", Status));
     FreePool (SpdmContext);
