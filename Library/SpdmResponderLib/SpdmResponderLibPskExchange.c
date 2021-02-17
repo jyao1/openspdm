@@ -52,6 +52,7 @@ SpdmGetResponsePskExchange (
   RETURN_STATUS                 Status;
   UINTN                         OpaquePskExchangeRspSize;
   UINT8                         TH1HashData[64];
+  UINT32                        AlgoSize;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -60,9 +61,34 @@ SpdmGetResponsePskExchange (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
+  // Check capabilities even if GET_CAPABILITIES is not sent.
+  // Assuming capabilities are provisioned.
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_PSK_EXCHANGE, ResponseSize, Response);
     return RETURN_SUCCESS;
+  }
+  if ((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) {
+    // Double check if algorithm has been provisioned.
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP)) {
+      if (SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec != SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF) {
+        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_PSK_EXCHANGE, ResponseSize, Response);
+        return RETURN_SUCCESS;
+      }
+      AlgoSize = GetSpdmMeasurementHashSize (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo);
+      if (AlgoSize == 0) {
+        SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_PSK_EXCHANGE, ResponseSize, Response);
+        return RETURN_SUCCESS;
+      }
+    }
+    AlgoSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+    if (AlgoSize == 0) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_PSK_EXCHANGE, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+    if (SpdmContext->ConnectionInfo.Algorithm.KeySchedule != SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_PSK_EXCHANGE, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
   }
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);

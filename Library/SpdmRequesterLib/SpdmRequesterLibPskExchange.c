@@ -73,12 +73,34 @@ TrySpdmSendReceivePskExchange (
   SPDM_SESSION_INFO                         *SessionInfo;
   UINTN                                     OpaquePskExchangeReqSize;
   UINT8                                     TH1HashData[64];
+  UINT32                                    AlgoSize;
 
   if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_VERSION_RECEIVE_FLAG) == 0) {
     return RETURN_DEVICE_ERROR;
   }
+  // Check capabilities even if GET_CAPABILITIES is not sent.
+  // Assuming capabilities are provisioned.
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)) {
     return RETURN_DEVICE_ERROR;
+  }
+  if ((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) {
+    // Double check if algorithm has been provisioned.
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP)) {
+      if (SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec != SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF) {
+        return RETURN_DEVICE_ERROR;
+      }
+      AlgoSize = GetSpdmMeasurementHashSize (SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo);
+      if (AlgoSize == 0) {
+        return RETURN_DEVICE_ERROR;
+      }
+    }
+    AlgoSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+    if (AlgoSize == 0) {
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmContext->ConnectionInfo.Algorithm.KeySchedule != SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH) {
+      return RETURN_DEVICE_ERROR;
+    }
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
