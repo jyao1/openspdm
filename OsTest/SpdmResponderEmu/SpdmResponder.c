@@ -216,7 +216,7 @@ SpdmServerCallback (
     // do not free it
   }
 
-  if (mUseSlotId == 0xFF) {
+  if ((mUseSlotId == 0xFF) || ((mUseResonderCapabilityFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP) != 0)) {
     Res = ReadRequesterPublicCertificateChain (mUseHashAlgo, mUseReqAsymAlgo, &Data, &DataSize, NULL, NULL);
     if (Res) {
       ZeroMem (&Parameter, sizeof(Parameter));

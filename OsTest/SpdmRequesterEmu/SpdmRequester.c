@@ -189,7 +189,7 @@ SpdmClientInit (
   SpdmGetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, &DataSize);
   mUseReqAsymAlgo = Data16;
 
-  if (mUseSlotId == 0xFF) {
+  if ((mUseSlotId == 0xFF) || ((mUseRequesterCapabilityFlags & SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP) != 0)) {
     Res = ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
     if (Res) {
       ZeroMem (&Parameter, sizeof(Parameter));
