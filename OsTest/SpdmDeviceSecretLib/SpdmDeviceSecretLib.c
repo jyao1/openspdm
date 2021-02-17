@@ -124,10 +124,16 @@ SpdmMeasurementCollectionFunc (
   }
 
   HashSize = GetSpdmMeasurementHashSize (MeasurementHashAlgo);
+  ASSERT (HashSize != 0);
 
   *DeviceMeasurementCount = MEASUREMENT_BLOCK_NUMBER;
-  TotalSize = (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize) +
+  if (HashSize != 0xFFFFFFFF) {
+    TotalSize = (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize) +
                            (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + sizeof(Data));
+  } else {
+    TotalSize = (MEASUREMENT_BLOCK_NUMBER - 1) * (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + sizeof(Data)) +
+                           (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + sizeof(Data));
+  }
   ASSERT (*DeviceMeasurementSize >= TotalSize);
   *DeviceMeasurementSize = TotalSize;
 
@@ -135,7 +141,7 @@ SpdmMeasurementCollectionFunc (
   for (Index = 0; Index < MEASUREMENT_BLOCK_NUMBER; Index++) {
     MeasurementBlock->MeasurementBlockCommonHeader.Index = Index + 1;
     MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
-    if (Index < 4) {
+    if ((Index < 4) && (HashSize != 0xFFFFFFFF)) {
       MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType = Index;
       MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize = (UINT16)HashSize;
     } else {
@@ -145,12 +151,12 @@ SpdmMeasurementCollectionFunc (
     MeasurementBlock->MeasurementBlockCommonHeader.MeasurementSize = (UINT16)(sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + 
                                                                      MeasurementBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueSize);
     SetMem (Data, sizeof(Data), (UINT8)(Index + 1));
-    if (Index < 4) {
+    if ((Index < 4) && (HashSize != 0xFFFFFFFF)) {
       SpdmMeasurementHashAll (MeasurementHashAlgo, Data, sizeof(Data), (VOID *)(MeasurementBlock + 1));
       MeasurementBlock = (VOID *)((UINT8 *)MeasurementBlock + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + HashSize);
     } else {
       CopyMem ((VOID *)(MeasurementBlock + 1), Data, sizeof(Data));
-      break;
+      MeasurementBlock = (VOID *)((UINT8 *)MeasurementBlock + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + sizeof(Data));
     }
   }
 

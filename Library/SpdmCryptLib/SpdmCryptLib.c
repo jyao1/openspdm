@@ -116,6 +116,7 @@ SpdmHashAll (
   @param  MeasurementHashAlgo          SPDM MeasurementHashAlgo
 
   @return SPDM measurement hash algorithm size.
+  @return 0xFFFFFFFF for RAW_BIT_STREAM_ONLY.
 **/
 UINT32
 EFIAPI
@@ -134,7 +135,7 @@ GetSpdmMeasurementHashSize (
   case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_512:
     return 64;
   case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_RAW_BIT_STREAM_ONLY:
-    return 0;
+    return 0xFFFFFFFF;
   }
   return 0;
 }

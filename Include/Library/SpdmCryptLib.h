@@ -381,6 +381,7 @@ SpdmHashAll (
   @param  MeasurementHashAlgo          SPDM MeasurementHashAlgo
 
   @return SPDM measurement hash algorithm size.
+  @return 0xFFFFFFFF for RAW_BIT_STREAM_ONLY.
 **/
 UINT32
 EFIAPI

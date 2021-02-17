@@ -626,7 +626,7 @@ SpdmGenerateMeasurementSummaryHash (
 
   case SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH:
   case SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH:
-
+    // get all measurement data
     DeviceMeasurementSize = sizeof(DeviceMeasurement);
     Ret = SpdmMeasurementCollectionFunc (
             SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec,
@@ -641,6 +641,7 @@ SpdmGenerateMeasurementSummaryHash (
 
     ASSERT(DeviceMeasurementCount <= MAX_SPDM_MEASUREMENT_BLOCK_COUNT);
 
+    // double confirm that MeasurmentData internal size is correct
     MeasurmentDataSize = 0;
     CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
     for (Index = 0; Index < DeviceMeasurementCount; Index++) {
@@ -652,11 +653,14 @@ SpdmGenerateMeasurementSummaryHash (
 
     ASSERT (MeasurmentDataSize <= MAX_SPDM_MEASUREMENT_RECORD_SIZE);
 
+    // get required data and hash them
     CachedMeasurmentBlock = (VOID *)DeviceMeasurement;
     MeasurmentDataSize = 0;
     for (Index = 0; Index < DeviceMeasurementCount; Index++) {
       MeasurmentBlockSize = sizeof(SPDM_MEASUREMENT_BLOCK_COMMON_HEADER) + CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize;
-      if ((MeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH) ||
+      // filter unneeded data
+      if (((MeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH) && 
+           ((CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType & SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MASK) < SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MEASUREMENT_MANIFEST)) ||
           ((CachedMeasurmentBlock->MeasurementBlockDmtfHeader.DMTFSpecMeasurementValueType & SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_MASK) == SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_IMMUTABLE_ROM)) {
         CopyMem (&MeasurementData[MeasurmentDataSize], &CachedMeasurmentBlock->MeasurementBlockDmtfHeader, CachedMeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize);
       }
