@@ -89,10 +89,7 @@ SpdmAuthentication (
 
   SpdmContext = Context;
 
-  if ((SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
-       SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP)) ||
-      (!SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
-       SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP)) ) {
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP)) {
     Status = SpdmGetDigest (SpdmContext, SlotMask, TotalDigestBuffer);
     if (RETURN_ERROR(Status)) {
       return Status;

@@ -57,10 +57,7 @@ SpdmGetResponseChallengeAuth (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  if ((SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
-       !SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) ||
-      (!SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11) &&
-       !SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) ) {
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
