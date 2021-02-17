@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmEmu.h"
 
 UINT8   mUseVersion = SPDM_MESSAGE_VERSION_11;
+UINT8   mUseSecuredMessageVersion = SPDM_MESSAGE_VERSION_11;
 UINT32  mUseRequesterCapabilityFlags = (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP | \
                                         SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP | \
                                         SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | \

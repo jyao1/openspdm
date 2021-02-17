@@ -75,6 +75,28 @@ SpdmSetData (
   }
 
   switch (DataType) {
+  case SpdmDataSpdmVersion:
+    if (DataSize > sizeof(SPDM_VERSION_NUMBER) * MAX_SPDM_VERSION_COUNT) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->LocalContext.Version.SpdmVersionCount = (UINT8)(DataSize / sizeof(SPDM_VERSION_NUMBER));
+    CopyMem (
+      SpdmContext->LocalContext.Version.SpdmVersion,
+      Data,
+      SpdmContext->LocalContext.Version.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER)
+      );
+    break;
+  case SpdmDataSecuredMessageVersion:
+    if (DataSize > sizeof(SPDM_VERSION_NUMBER) * MAX_SPDM_VERSION_COUNT) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount = (UINT8)(DataSize / sizeof(SPDM_VERSION_NUMBER));
+    CopyMem (
+      SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersion,
+      Data,
+      SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER)
+      );
+    break;
   case SpdmDataCapabilityFlags:
     if (DataSize != sizeof(UINT32)) {
       return RETURN_INVALID_PARAMETER;
@@ -880,7 +902,7 @@ SpdmInitContext (
   SpdmContext->RetryTimes                           = MAX_SPDM_REQUEST_RETRY_TIMES;
   SpdmContext->ResponseState                        = SpdmResponseStateNormal;
   SpdmContext->CurrentToken                         = 0;
-  SpdmContext->LocalContext.Version.SpdmVersionCount = 2;
+  SpdmContext->LocalContext.Version.SpdmVersionCount                   = 2;
   SpdmContext->LocalContext.Version.SpdmVersion[0].MajorVersion        = 1;
   SpdmContext->LocalContext.Version.SpdmVersion[0].MinorVersion        = 0;
   SpdmContext->LocalContext.Version.SpdmVersion[0].Alpha               = 0;
@@ -889,6 +911,11 @@ SpdmInitContext (
   SpdmContext->LocalContext.Version.SpdmVersion[1].MinorVersion        = 1;
   SpdmContext->LocalContext.Version.SpdmVersion[1].Alpha               = 0;
   SpdmContext->LocalContext.Version.SpdmVersion[1].UpdateVersionNumber = 0;
+  SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount                   = 1;
+  SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersion[0].MajorVersion        = 1;
+  SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersion[0].MinorVersion        = 1;
+  SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersion[0].Alpha               = 0;
+  SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersion[0].UpdateVersionNumber = 0;
   SpdmContext->EncapContext.CertificateChainBuffer.MaxBufferSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
 
   SecuredMessageContext = (VOID *)((UINTN)(SpdmContext + 1));

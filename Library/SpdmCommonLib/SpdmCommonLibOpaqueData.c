@@ -23,6 +23,10 @@ SpdmGetOpaqueDataVersionSelectionDataSize (
 {
   UINTN  Size;
 
+  if (SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount == 0) {
+    return 0;
+  }
+
   Size = sizeof(SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER) +
          sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) +
          sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION);
@@ -43,6 +47,10 @@ SpdmGetOpaqueDataSupportedVersionDataSize (
   )
 {
   UINTN  Size;
+
+  if (SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount == 0) {
+    return 0;
+  }
 
   Size = sizeof(SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER) +
          sizeof(SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER) +
@@ -79,6 +87,11 @@ SpdmBuildOpaqueDataSupportedVersionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION   *OpaqueElementSupportVersion;
   SPDM_VERSION_NUMBER                                *VersionsList;
   VOID                                               *End;
+
+  if (SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount == 0) {
+    *DataOutSize = 0;
+    return RETURN_SUCCESS;
+  }
 
   FinalDataSize = SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext);
   if (*DataOutSize < FinalDataSize) {
@@ -138,6 +151,10 @@ SpdmProcessOpaqueDataSupportedVersionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_SUPPORTED_VERSION   *OpaqueElementSupportVersion;
   SPDM_VERSION_NUMBER                                *VersionsList;
 
+  if (SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount == 0) {
+    return RETURN_SUCCESS;
+  }
+
   if (DataInSize != SpdmGetOpaqueDataSupportedVersionDataSize (SpdmContext)) {
     return RETURN_UNSUPPORTED;
   }
@@ -196,6 +213,11 @@ SpdmBuildOpaqueDataVersionSelectionData (
   SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
   VOID                                               *End;
 
+  if (SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount == 0) {
+    *DataOutSize = 0;
+    return RETURN_SUCCESS;
+  }
+
   FinalDataSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
   if (*DataOutSize < FinalDataSize) {
     *DataOutSize = FinalDataSize;
@@ -249,6 +271,10 @@ SpdmProcessOpaqueDataVersionSelectionData (
   SECURED_MESSAGE_GENERAL_OPAQUE_DATA_TABLE_HEADER   *GeneralOpaqueDataTableHeader;
   SECURED_MESSAGE_OPAQUE_ELEMENT_TABLE_HEADER        *OpaqueElementTableHeader;
   SECURED_MESSAGE_OPAQUE_ELEMENT_VERSION_SELECTION   *OpaqueElementVersionSection;
+
+  if (SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount == 0) {
+    return RETURN_SUCCESS;
+  }
 
   if (DataInSize != SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext)) {
     return RETURN_UNSUPPORTED;

@@ -106,6 +106,7 @@ SpdmServerInit (
   UINT8                        Data8;
   UINT16                       Data16;
   UINT32                       Data32;
+  SPDM_VERSION_NUMBER          SpdmVersion;
 
   mSpdmContext = (VOID *)malloc (SpdmGetContextSize());
   if (mSpdmContext == NULL) {
@@ -120,6 +121,30 @@ SpdmServerInit (
     SpdmRegisterTransportLayerFunc (SpdmContext, SpdmTransportPciDoeEncodeMessage, SpdmTransportPciDoeDecodeMessage);
   } else {
     return NULL;
+  }
+
+  if (mUseVersion != SPDM_MESSAGE_VERSION_11) {
+    ZeroMem (&Parameter, sizeof(Parameter));
+    Parameter.Location = SpdmDataLocationLocal;
+    SpdmVersion.MajorVersion = (mUseVersion >> 4) & 0xF;
+    SpdmVersion.MinorVersion = mUseVersion & 0xF;
+    SpdmVersion.Alpha = 0;
+    SpdmVersion.UpdateVersionNumber = 0;
+    SpdmSetData (SpdmContext, SpdmDataSpdmVersion, &Parameter, &SpdmVersion, sizeof(SpdmVersion));
+  }
+
+  if (mUseSecuredMessageVersion != SPDM_MESSAGE_VERSION_11) {
+    ZeroMem (&Parameter, sizeof(Parameter));
+    if (mUseSecuredMessageVersion != 0) {
+      Parameter.Location = SpdmDataLocationLocal;
+      SpdmVersion.MajorVersion = (mUseSecuredMessageVersion >> 4) & 0xF;
+      SpdmVersion.MinorVersion = mUseSecuredMessageVersion & 0xF;
+      SpdmVersion.Alpha = 0;
+      SpdmVersion.UpdateVersionNumber = 0;
+      SpdmSetData (SpdmContext, SpdmDataSecuredMessageVersion, &Parameter, &SpdmVersion, sizeof(SpdmVersion));
+    } else {
+      SpdmSetData (SpdmContext, SpdmDataSecuredMessageVersion, &Parameter, NULL, 0);
+    }
   }
 
   Data8 = 0;

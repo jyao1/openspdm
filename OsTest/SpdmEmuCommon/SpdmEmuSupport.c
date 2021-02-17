@@ -134,8 +134,10 @@ PrintUsage (
 {
   printf ("\n%s [--trans MCTP|PCI_DOE]\n", Name);
   printf ("   [--ver 1.0|1.1]\n");
+  printf ("   [--sec_ver 0|1.1]\n");
   printf ("   [--cap CACHE|CERT|CHAL|MEAS_NO_SIG|MEAS_SIG|MEAS_FRESH|ENCRYPT|MAC|MUT_AUTH|KEY_EX|PSK|PSK_WITH_CONTEXT|ENCAP|HBEAT|KEY_UPD|HANDSHAKE_IN_CLEAR|PUB_KEY_ID]\n");
   printf ("   [--hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]\n");
+  printf ("   [--meas_spec DMTF]\n");
   printf ("   [--meas_hash RAW_BIT|SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]\n");
   printf ("   [--asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]\n");
   printf ("   [--req_asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]\n");
@@ -152,10 +154,12 @@ PrintUsage (
   printf ("NOTE:\n");
   printf ("   [--trans] is used to select transport layer message. By default, MCTP is used.\n");
   printf ("   [--ver] is version. By default, 1.1 is used.\n");
+  printf ("   [--sec_ver] is secured message version. By default, 1.1 is used. 0 means no secured message version negotiation.\n");
   printf ("   [--cap] is capability flags. Multiple flags can be set together. Please use ',' for them.\n");
   printf ("           By default, CERT,CHAL,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Requester.\n");
   printf ("           By default, CERT,CHAL,MEAS_SIG,MEAS_FRESH,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Responder.\n");
   printf ("   [--hash] is hash algorithm. By default, SHA_384,SHA_256 is used.\n");
+  printf ("   [--meas_spec] is measurement hash spec. By default, DMTF is used.\n");
   printf ("   [--meas_hash] is measurement hash algorithm. By default, SHA_512,SHA_384,SHA_256 is used.\n");
   printf ("   [--asym] is asym algorithm. By default, ECDSA_P384,ECDSA_P256 is used.\n");
   printf ("   [--req_asym] is requester asym algorithm. By default, RSAPSS_3072,RSAPSS_2048,RSASSA_3072,RSASSA_2048 is used.\n");
@@ -185,6 +189,11 @@ VALUE_STRING_ENTRY  mTransportValueStringTable[] = {
 
 VALUE_STRING_ENTRY  mVersionValueStringTable[] = {
   {SPDM_MESSAGE_VERSION_10,  "1.0"},
+  {SPDM_MESSAGE_VERSION_11,  "1.1"},
+};
+
+VALUE_STRING_ENTRY  mSecuredMessageVersionValueStringTable[] = {
+  {0,                        "0"},
   {SPDM_MESSAGE_VERSION_11,  "1.1"},
 };
 
@@ -230,6 +239,10 @@ VALUE_STRING_ENTRY  mHashValueStringTable[] = {
   {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_256, "SHA3_256"},
   {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_384, "SHA3_384"},
   {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512, "SHA3_512"},
+};
+
+VALUE_STRING_ENTRY  mMeasurementSpecValueStringTable[] = {
+  {SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,        "DMTF"},
 };
 
 VALUE_STRING_ENTRY  mMeasurementHashValueStringTable[] = {
@@ -438,6 +451,25 @@ ProcessArgs (
       }
     }
 
+    if (strcmp (argv[0], "--sec_ver") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSecuredMessageVersionValueStringTable, ARRAY_SIZE(mSecuredMessageVersionValueStringTable), argv[1], &Data32)) {
+          printf ("invalid --sec_ver %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mUseSecuredMessageVersion = (UINT8)Data32;
+        printf ("sec_ver - 0x%02x\n", mUseSecuredMessageVersion);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --sec_ver\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
     if (strcmp (argv[0], "--cap") == 0) {
       if (argc >= 2) {
         VALUE_STRING_ENTRY  *CapabilitiesStringTable;
@@ -484,6 +516,25 @@ ProcessArgs (
         continue;
       } else {
         printf ("invalid --hash\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--meas_spec") == 0) {
+      if (argc >= 2) {
+        if (!GetFlagsFromName (mMeasurementSpecValueStringTable, ARRAY_SIZE(mMeasurementSpecValueStringTable), argv[1], &Data32)) {
+          printf ("invalid --meas_spec %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mSupportMeasurementSpec = (UINT8)Data32;
+        printf ("meas_spec - 0x%02x\n", mSupportMeasurementSpec);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --meas_spec\n");
         PrintUsage (ProgramName);
         exit (0);
       }
