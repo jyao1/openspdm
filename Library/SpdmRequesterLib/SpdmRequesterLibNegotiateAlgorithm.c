@@ -62,6 +62,8 @@ TrySpdmNegotiateAlgorithms (
   UINT32                                         AlgoSize;
   UINTN                                          Index;
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  *StructTable;
+  UINT8                                          FixedAlgSize;
+  UINT8                                          ExtAlgCount;
 
   if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) {
     return RETURN_DEVICE_ERROR;
@@ -131,16 +133,50 @@ TrySpdmNegotiateAlgorithms (
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.ExtAsymSelCount > 1) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponse.ExtHashSelCount > 1) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_ALGORITHMS_RESPONSE) + 
                          sizeof(UINT32) * SpdmResponse.ExtAsymSelCount +
                          sizeof(UINT32) * SpdmResponse.ExtHashSelCount +
                          sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) * SpdmResponse.Header.Param1) {
     return RETURN_DEVICE_ERROR;
   }
-  SpdmResponseSize = sizeof(SPDM_ALGORITHMS_RESPONSE) + 
-                     sizeof(UINT32) * SpdmResponse.ExtAsymSelCount +
-                     sizeof(UINT32) * SpdmResponse.ExtHashSelCount +
-                     sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) * SpdmResponse.Header.Param1;
+  StructTable = (VOID *)((UINTN)&SpdmResponse +
+                            sizeof(SPDM_ALGORITHMS_RESPONSE) +
+                            sizeof(UINT32) * SpdmResponse.ExtAsymSelCount +
+                            sizeof(UINT32) * SpdmResponse.ExtHashSelCount
+                            );
+  if (SpdmResponse.Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+    for (Index = 0; Index < SpdmResponse.Header.Param1; Index++) {
+      if ((UINTN)&SpdmResponse + SpdmResponseSize < (UINTN)StructTable) {
+        return RETURN_DEVICE_ERROR;
+      }
+      if ((UINTN)&SpdmResponse + SpdmResponseSize - (UINTN)StructTable < sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE)) {
+        return RETURN_DEVICE_ERROR;
+      }
+      FixedAlgSize = (StructTable->AlgCount >> 4) & 0xF;
+      ExtAlgCount = StructTable->AlgCount & 0xF;
+      if (FixedAlgSize != 2) {
+        return RETURN_DEVICE_ERROR;
+      }
+      if (ExtAlgCount > 1) {
+        return RETURN_DEVICE_ERROR;
+      }
+      if ((UINTN)&SpdmResponse + SpdmResponseSize - (UINTN)StructTable - sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) < sizeof(UINT32) * ExtAlgCount) {
+        return RETURN_DEVICE_ERROR;
+      }
+      StructTable = (VOID *)((UINTN)StructTable + sizeof (SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) + sizeof(UINT32) * ExtAlgCount);
+    }
+  }
+  SpdmResponseSize = (UINTN)StructTable - (UINTN)&SpdmResponse;
+  if (SpdmResponseSize != SpdmResponse.Length) {
+    return RETURN_DEVICE_ERROR;
+  }
+
   //
   // Cache data
   //
@@ -181,20 +217,22 @@ TrySpdmNegotiateAlgorithms (
                             sizeof(UINT32) * SpdmResponse.ExtHashSelCount
                             );
     for (Index = 0; Index < SpdmResponse.Header.Param1; Index++) {
-      switch (StructTable[Index].AlgType) {
+      switch (StructTable->AlgType) {
       case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-        SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = StructTable[Index].AlgSupported;
+        SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = StructTable->AlgSupported;
         break;
       case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-        SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = StructTable[Index].AlgSupported;
+        SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = StructTable->AlgSupported;
         break;
       case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-        SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = StructTable[Index].AlgSupported;
+        SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = StructTable->AlgSupported;
         break;
       case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-        SpdmContext->ConnectionInfo.Algorithm.KeySchedule = StructTable[Index].AlgSupported;
+        SpdmContext->ConnectionInfo.Algorithm.KeySchedule = StructTable->AlgSupported;
         break;
       }
+      ExtAlgCount = StructTable->AlgCount & 0xF;
+      StructTable = (VOID *)((UINTN)StructTable + sizeof (SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) + sizeof(UINT32) * ExtAlgCount);
     }
 
     if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)) {

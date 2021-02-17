@@ -391,6 +391,7 @@ DumpSpdmNegotiateAlgorithms (
   SPDM_NEGOTIATE_ALGORITHMS_REQUEST              *SpdmRequest;
   UINTN                                          Index;
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  *StructTable;
+  UINT8                                          ExtAlgCount;
 
   printf ("SPDM_NEGOTIATE_ALGORITHMS ");
 
@@ -424,24 +425,26 @@ DumpSpdmNegotiateAlgorithms (
                               SpdmRequest->ExtHashCount * sizeof(SPDM_EXTENDED_ALGORITHM)
                               );
       for (Index = 0; Index <SpdmRequest->Header.Param1; Index++) {
-        switch (StructTable[Index].AlgType) {
+        switch (StructTable->AlgType) {
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-          printf ("), DHE=0x%04x(", StructTable[Index].AlgSupported);
-          DumpEntryFlags (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable[Index].AlgSupported);
+          printf ("), DHE=0x%04x(", StructTable->AlgSupported);
+          DumpEntryFlags (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable->AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-          printf ("), AEAD=0x%04x(", StructTable[Index].AlgSupported);
-          DumpEntryFlags (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable[Index].AlgSupported);
+          printf ("), AEAD=0x%04x(", StructTable->AlgSupported);
+          DumpEntryFlags (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable->AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-          printf ("), ReqAsym=0x%04x(", StructTable[Index].AlgSupported);
-          DumpEntryFlags (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable[Index].AlgSupported);
+          printf ("), ReqAsym=0x%04x(", StructTable->AlgSupported);
+          DumpEntryFlags (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable->AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-          printf ("), KeySchedule=0x%04x(", StructTable[Index].AlgSupported);
-          DumpEntryFlags (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable[Index].AlgSupported);
+          printf ("), KeySchedule=0x%04x(", StructTable->AlgSupported);
+          DumpEntryFlags (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable->AlgSupported);
           break;
         }
+        ExtAlgCount = StructTable->AlgCount & 0xF;
+        StructTable = (VOID *)((UINTN)StructTable + sizeof (SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) + sizeof(UINT32) * ExtAlgCount);
       }
     }
     printf (")) ");
@@ -467,6 +470,7 @@ DumpSpdmAlgorithms (
   UINTN                                          Index;
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  *StructTable;
   SPDM_DATA_PARAMETER                            Parameter;
+  UINT8                                          ExtAlgCount;
 
   printf ("SPDM_ALGORITHMS ");
 
@@ -502,24 +506,26 @@ DumpSpdmAlgorithms (
                               SpdmResponse->ExtHashSelCount * sizeof(SPDM_EXTENDED_ALGORITHM)
                               );
       for (Index = 0; Index <SpdmResponse->Header.Param1; Index++) {
-        switch (StructTable[Index].AlgType) {
+        switch (StructTable->AlgType) {
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-          printf ("), DHE=0x%04x(", StructTable[Index].AlgSupported);
-          DumpEntryValue (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable[Index].AlgSupported);
+          printf ("), DHE=0x%04x(", StructTable->AlgSupported);
+          DumpEntryValue (mSpdmDheValueStringTable, ARRAY_SIZE(mSpdmDheValueStringTable), StructTable->AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-          printf ("), AEAD=0x%04x(", StructTable[Index].AlgSupported);
-          DumpEntryValue (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable[Index].AlgSupported);
+          printf ("), AEAD=0x%04x(", StructTable->AlgSupported);
+          DumpEntryValue (mSpdmAeadValueStringTable, ARRAY_SIZE(mSpdmAeadValueStringTable), StructTable->AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-          printf ("), ReqAsym=0x%04x(", StructTable[Index].AlgSupported);
-          DumpEntryValue (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable[Index].AlgSupported);
+          printf ("), ReqAsym=0x%04x(", StructTable->AlgSupported);
+          DumpEntryValue (mSpdmAsymValueStringTable, ARRAY_SIZE(mSpdmAsymValueStringTable), StructTable->AlgSupported);
           break;
         case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-          printf ("), KeySchedule=0x%04x(", StructTable[Index].AlgSupported);
-          DumpEntryValue (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable[Index].AlgSupported);
+          printf ("), KeySchedule=0x%04x(", StructTable->AlgSupported);
+          DumpEntryValue (mSpdmKeyScheduleValueStringTable, ARRAY_SIZE(mSpdmKeyScheduleValueStringTable), StructTable->AlgSupported);
           break;
         }
+        ExtAlgCount = StructTable->AlgCount & 0xF;
+        StructTable = (VOID *)((UINTN)StructTable + sizeof (SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) + sizeof(UINT32) * ExtAlgCount);
       }
     }
     printf (")) ");
@@ -543,20 +549,22 @@ DumpSpdmAlgorithms (
                             SpdmResponse->ExtHashSelCount * sizeof(SPDM_EXTENDED_ALGORITHM)
                             );
     for (Index = 0; Index <SpdmResponse->Header.Param1; Index++) {
-      switch (StructTable[Index].AlgType) {
+      switch (StructTable->AlgType) {
       case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_DHE:
-        mSpdmDHENamedGroup = StructTable[Index].AlgSupported;
+        mSpdmDHENamedGroup = StructTable->AlgSupported;
         break;
       case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_AEAD:
-        mSpdmAEADCipherSuite = StructTable[Index].AlgSupported;
+        mSpdmAEADCipherSuite = StructTable->AlgSupported;
         break;
       case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_REQ_BASE_ASYM_ALG:
-        mSpdmReqBaseAsymAlg = StructTable[Index].AlgSupported;
+        mSpdmReqBaseAsymAlg = StructTable->AlgSupported;
         break;
       case SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE_ALG_TYPE_KEY_SCHEDULE:
-        mSpdmKeySchedule = StructTable[Index].AlgSupported;
+        mSpdmKeySchedule = StructTable->AlgSupported;
         break;
       }
+      ExtAlgCount = StructTable->AlgCount & 0xF;
+      StructTable = (VOID *)((UINTN)StructTable + sizeof (SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) + sizeof(UINT32) * ExtAlgCount);
     }
   }
 
