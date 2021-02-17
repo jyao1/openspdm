@@ -52,7 +52,9 @@ SpdmGetResponsePskExchange (
   RETURN_STATUS                 Status;
   UINTN                         OpaquePskExchangeRspSize;
   UINT8                         TH1HashData[64];
+  UINT8                         TH2HashData[64];
   UINT32                        AlgoSize;
+  UINT16                        ResponderContextLength;
 
   SpdmContext = Context;
   SpdmRequest = Request;
@@ -135,9 +137,14 @@ SpdmGetResponsePskExchange (
   }
 
   OpaquePskExchangeRspSize = SpdmGetOpaqueDataVersionSelectionDataSize (SpdmContext);
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT)) {
+    ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
+  } else {
+    ResponderContextLength = 0;
+  }
   TotalSize = sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +
               MeasurementSummaryHashSize +
-              DEFAULT_CONTEXT_LENGTH +
+              ResponderContextLength +
               OpaquePskExchangeRspSize +
               HmacSize;
 
@@ -169,7 +176,7 @@ SpdmGetResponsePskExchange (
   SpdmResponse->RspSessionID = RspSessionId;
   SpdmResponse->Reserved = 0;
 
-  SpdmResponse->ResponderContextLength = DEFAULT_CONTEXT_LENGTH;
+  SpdmResponse->ResponderContextLength = ResponderContextLength;
   SpdmResponse->OpaqueLength = (UINT16)OpaquePskExchangeRspSize;
 
   Ptr = (VOID *)(SpdmResponse + 1);
@@ -182,8 +189,10 @@ SpdmGetResponsePskExchange (
   }
   Ptr += MeasurementSummaryHashSize;
   
-  SpdmGetRandomNumber (DEFAULT_CONTEXT_LENGTH, Ptr);
-  Ptr += DEFAULT_CONTEXT_LENGTH;
+  if (ResponderContextLength != 0) {
+    SpdmGetRandomNumber (ResponderContextLength, Ptr);
+    Ptr += ResponderContextLength;
+  }
 
   Status = SpdmBuildOpaqueDataVersionSelectionData (SpdmContext, &OpaquePskExchangeRspSize, Ptr);
   ASSERT_RETURN_ERROR(Status);
@@ -226,6 +235,25 @@ SpdmGetResponsePskExchange (
 
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
+
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT)) {
+    // No need to receive PSK_FINISH, enter application phase directly.
+
+    DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
+    Status = SpdmCalculateTH2Hash (SpdmContext, SessionInfo, FALSE, TH2HashData);
+    if (RETURN_ERROR(Status)) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+    Status = SpdmGenerateSessionDataKey (SessionInfo->SecuredMessageContext, TH2HashData);
+    if (RETURN_ERROR(Status)) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+
+    SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+    SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  }
 
   return RETURN_SUCCESS;
 }

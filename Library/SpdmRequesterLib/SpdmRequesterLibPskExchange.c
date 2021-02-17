@@ -73,6 +73,7 @@ TrySpdmSendReceivePskExchange (
   SPDM_SESSION_INFO                         *SessionInfo;
   UINTN                                     OpaquePskExchangeReqSize;
   UINT8                                     TH1HashData[64];
+  UINT8                                     TH2HashData[64];
   UINT32                                    AlgoSize;
 
   if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_VERSION_RECEIVE_FLAG) == 0) {
@@ -260,7 +261,24 @@ TrySpdmSendReceivePskExchange (
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
   SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
-  
+
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT)) {
+    // No need to send PSK_FINISH, enter application phase directly.
+
+    DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", SessionId));
+    Status = SpdmCalculateTH2Hash (SpdmContext, SessionInfo, TRUE, TH2HashData);
+    if (RETURN_ERROR(Status)) {
+      return RETURN_SECURITY_VIOLATION;
+    }
+    Status = SpdmGenerateSessionDataKey (SessionInfo->SecuredMessageContext, TH2HashData);
+    if (RETURN_ERROR(Status)) {
+      return RETURN_SECURITY_VIOLATION;
+    }
+
+    SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+    SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  }
+
   return RETURN_SUCCESS;
 }
 

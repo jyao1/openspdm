@@ -1654,6 +1654,7 @@ DumpSpdmPskExchangeRsp (
   UINT8                       *OpaqueData;
   UINT8                       *VerifyData;
   UINT8                       TH1HashData[64];
+  UINT8                       TH2HashData[64];
   SPDM_DATA_PARAMETER         Parameter;
   BOOLEAN                     UsePsk;
 
@@ -1735,6 +1736,30 @@ DumpSpdmPskExchangeRsp (
   SpdmAppendMessageK (mCurrentSessionInfo, (UINT8 *)Buffer + MessageSize - HmacSize, HmacSize);
 
   SpdmSecuredMessageSetSessionState (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), SpdmSessionStateHandshaking);
+
+  if ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT) == 0) {
+    // No need to receive PSK_FINISH, enter application phase directly.
+
+    SpdmCalculateTH2Hash (mSpdmContext, mCurrentSessionInfo, TRUE, TH2HashData);
+    SpdmSecuredMessageSetUsePsk (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), FALSE);
+
+    UsePsk = FALSE;
+    ZeroMem (&Parameter, sizeof(Parameter));
+    Parameter.Location = SpdmDataLocationSession;
+    *(UINT32 *)Parameter.AdditionalData = mCurrentSessionId;
+    SpdmSetData (mSpdmContext, SpdmDataSessionUsePsk, &Parameter, &UsePsk, sizeof(UsePsk));
+
+    SpdmGenerateSessionDataKey (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), TH2HashData);
+
+    UsePsk = TRUE;
+    ZeroMem (&Parameter, sizeof(Parameter));
+    Parameter.Location = SpdmDataLocationSession;
+    *(UINT32 *)Parameter.AdditionalData = mCurrentSessionId;
+    SpdmSetData (mSpdmContext, SpdmDataSessionUsePsk, &Parameter, &UsePsk, sizeof(UsePsk));
+
+    SpdmSecuredMessageSetUsePsk (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), TRUE);
+    SpdmSecuredMessageSetSessionState (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), SpdmSessionStateEstablished);
+  }
 }
 
 VOID

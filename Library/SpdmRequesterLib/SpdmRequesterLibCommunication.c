@@ -195,8 +195,11 @@ SpdmStartSession (
       return Status;
     }
 
-    Status = SpdmSendReceivePskFinish (SpdmContext, *SessionId);
-    DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceivePskFinish - %p\n", Status));
+    // send PSK_FINISH only if Responder supports Context.
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT)) {
+      Status = SpdmSendReceivePskFinish (SpdmContext, *SessionId);
+      DEBUG ((DEBUG_INFO, "SpdmStartSession - SpdmSendReceivePskFinish - %p\n", Status));
+    }
   }
   return Status;
 }
