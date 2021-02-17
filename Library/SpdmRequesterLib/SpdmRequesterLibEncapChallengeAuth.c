@@ -51,6 +51,12 @@ SpdmGetEncapResponseChallengeAuth (
 
   SpdmContext = Context;
   SpdmRequest = Request;
+
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, 0)) {
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   if (RequestSize != sizeof(SPDM_CHALLENGE_REQUEST)) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

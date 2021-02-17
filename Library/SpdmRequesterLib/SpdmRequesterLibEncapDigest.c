@@ -47,6 +47,12 @@ SpdmGetEncapResponseDigest (
 
   SpdmContext = Context;
   SpdmRequest = Request;
+
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP, 0)) {
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   if (RequestSize != sizeof(SPDM_GET_DIGESTS_REQUEST)) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
