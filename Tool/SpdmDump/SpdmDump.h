@@ -201,6 +201,7 @@ RETURN_STATUS
 SpdmDumpSessionDataProvision (
   IN VOID                         *SpdmContext,
   IN UINT32                       SessionId,
+  IN BOOLEAN                      NeedMutAuth,
   IN BOOLEAN                      IsRequester
   );
 

@@ -1444,7 +1444,7 @@ DumpSpdmKeyExchangeRsp (
   }
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", mCurrentSessionId));
-  if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionId, TRUE) != RETURN_SUCCESS) {
+  if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionId, FALSE, TRUE) != RETURN_SUCCESS) {
     return ;
   }
   SpdmCalculateTH1Hash (mSpdmContext, mCurrentSessionInfo, TRUE, TH1HashData);
@@ -1574,6 +1574,9 @@ DumpSpdmFinishRsp (
   SpdmAppendMessageF (mCurrentSessionInfo, Buffer, MessageSize);
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", mCurrentSessionId));
+  if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionId, TRUE, TRUE) != RETURN_SUCCESS) {
+    return ;
+  }
   if (SpdmDumpSessionDataCheck (mSpdmContext, mCurrentSessionId, TRUE) != RETURN_SUCCESS) {
     return ;
   }
@@ -1712,7 +1715,7 @@ DumpSpdmPskExchangeRsp (
   SpdmAppendMessageK (mCurrentSessionInfo, Buffer, MessageSize - HmacSize);
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionHandshakeKey[%x]\n", mCurrentSessionId));
-  if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionId, TRUE) != RETURN_SUCCESS) {
+  if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionId, FALSE, TRUE) != RETURN_SUCCESS) {
     return ;
   }
   SpdmCalculateTH1Hash (mSpdmContext, mCurrentSessionInfo, TRUE, TH1HashData);
@@ -1835,6 +1838,9 @@ DumpSpdmPskFinishRsp (
   SpdmAppendMessageF (mCurrentSessionInfo, Buffer, MessageSize);
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", mCurrentSessionId));
+  if (SpdmDumpSessionDataProvision (mSpdmContext, mCurrentSessionId, TRUE, TRUE) != RETURN_SUCCESS) {
+    return ;
+  }
   if (SpdmDumpSessionDataCheck (mSpdmContext, mCurrentSessionId, TRUE) != RETURN_SUCCESS) {
     return ;
   }

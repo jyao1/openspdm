@@ -28,6 +28,7 @@ RETURN_STATUS
 SpdmDumpSessionDataProvision (
   IN VOID                         *SpdmContext,
   IN UINT32                       SessionId,
+  IN BOOLEAN                      NeedMutAuth,
   IN BOOLEAN                      IsRequester
   )
 {
@@ -63,7 +64,7 @@ SpdmDumpSessionDataProvision (
     SpdmSecuredMessageImportDheSecret (SecuredMessageContext, mDheSecretBuffer, mDheSecretBufferSize);
 
     if (IsRequester) {
-      if (MutAuthRequested) {
+      if (NeedMutAuth && MutAuthRequested) {
         if (mRequesterCertChainBuffer == NULL || mRequesterCertChainBufferSize == 0) {
           return RETURN_UNSUPPORTED;
         }
@@ -90,7 +91,7 @@ SpdmDumpSessionDataProvision (
       ZeroMem (&Parameter, sizeof(Parameter));
       Parameter.Location = SpdmDataLocationConnection;
       SpdmSetData (SpdmContext, SpdmDataLocalUsedCertChainBuffer, &Parameter, mLocalUsedCertChainBuffer, mLocalUsedCertChainBufferSize);
-      if (MutAuthRequested) {
+      if (NeedMutAuth && MutAuthRequested) {
         if (mRequesterCertChainBuffer == NULL || mRequesterCertChainBufferSize == 0) {
           return RETURN_UNSUPPORTED;
         }
