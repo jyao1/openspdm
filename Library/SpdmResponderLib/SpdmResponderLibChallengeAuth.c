@@ -91,7 +91,7 @@ SpdmGetResponseChallengeAuth (
 
   SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
-  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, SpdmRequest->Header.Param2);
+  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, FALSE, SpdmRequest->Header.Param2);
 
   TotalSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
               HashSize +
@@ -133,7 +133,7 @@ SpdmGetResponseChallengeAuth (
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
   Ptr += SPDM_NONCE_SIZE;
 
-  Result = SpdmGenerateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param2, Ptr);
+  Result = SpdmGenerateMeasurementSummaryHash (SpdmContext, FALSE, SpdmRequest->Header.Param2, Ptr);
   if (!Result) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

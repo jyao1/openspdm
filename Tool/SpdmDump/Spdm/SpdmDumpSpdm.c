@@ -187,6 +187,15 @@ SpdmDumpGetMeasurementSummaryHashSize (
   IN     UINT8                MeasurementSummaryHashType
   )
 {
+  // Requester does not support measurement
+  if (mEncapsulated) {
+    return 0;
+  }
+  // Check responder capabilities
+  if ((mSpdmResponderCapabilitiesFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP) == 0) {
+    return 0;
+  }
+
   switch (MeasurementSummaryHashType) {
   case SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH:
     return 0;
@@ -805,7 +814,7 @@ DumpSpdmChallenge (
 
   SpdmRequest = Buffer;
 
-  mCachedMeasurementSummaryHashType = SpdmRequest->Header.Param1;
+  mCachedMeasurementSummaryHashType = SpdmRequest->Header.Param2;
 
   if (!mParamQuiteMode) {
     printf ("(SlotID=0x%02x, HashType=0x%02x(", SpdmRequest->Header.Param1, SpdmRequest->Header.Param2);
@@ -881,8 +890,7 @@ DumpSpdmChallengeAuth (
       DumpData (Nonce, 32);
       printf (")");
       MeasurementSummaryHash = Nonce + 32;
-      if ((mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH) ||
-          (mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH)) {
+      if (MeasurementSummaryHashSize != 0) {
         printf ("\n    MeasurementSummaryHash(");
         DumpData (MeasurementSummaryHash, MeasurementSummaryHashSize);
         printf (")");
@@ -1390,8 +1398,7 @@ DumpSpdmKeyExchangeRsp (
       DumpData (ExchangeData, DheKeySize);
       printf (")");
       MeasurementSummaryHash = ExchangeData + DheKeySize;
-      if ((mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH) ||
-          (mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH)) {
+      if (MeasurementSummaryHashSize != 0) {
         printf ("\n    MeasurementSummaryHash(");
         DumpData (MeasurementSummaryHash, MeasurementSummaryHashSize);
         printf (")");
@@ -1672,8 +1679,7 @@ DumpSpdmPskExchangeRsp (
 
     if (mParamAllMode) {
       MeasurementSummaryHash = (VOID *)(SpdmResponse + 1);
-      if ((mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_TCB_COMPONENT_MEASUREMENT_HASH) ||
-          (mCachedMeasurementSummaryHashType == SPDM_CHALLENGE_REQUEST_ALL_MEASUREMENTS_HASH)) {
+      if (MeasurementSummaryHashSize != 0) {
         printf ("\n    MeasurementSummaryHash(");
         DumpData (MeasurementSummaryHash, MeasurementSummaryHashSize);
         printf (")");

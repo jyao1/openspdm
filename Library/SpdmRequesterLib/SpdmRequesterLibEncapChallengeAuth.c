@@ -73,7 +73,7 @@ SpdmGetEncapResponseChallengeAuth (
 
   SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
-  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, SpdmRequest->Header.Param2);
+  MeasurementSummaryHashSize = 0;
 
   TotalSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +
               HashSize +
@@ -112,11 +112,6 @@ SpdmGetEncapResponseChallengeAuth (
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
   Ptr += SPDM_NONCE_SIZE;
 
-  Result = SpdmGenerateMeasurementSummaryHash (SpdmContext, SpdmRequest->Header.Param2, Ptr);
-  if (!Result) {
-    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
   Ptr += MeasurementSummaryHashSize;
 
   *(UINT16 *)Ptr = (UINT16)SpdmContext->LocalContext.OpaqueChallengeAuthRspSize;

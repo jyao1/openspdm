@@ -178,7 +178,7 @@ TrySpdmSendReceivePskExchange (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, MeasurementHashType);
+  MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, TRUE, MeasurementHashType);
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   if (SpdmResponseSize < sizeof(SPDM_PSK_EXCHANGE_RESPONSE) +

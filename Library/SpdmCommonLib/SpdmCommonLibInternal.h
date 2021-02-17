@@ -618,14 +618,16 @@ SpdmVerifyChallengeAuthSignature (
   This function calculate the measurement summary hash size.
 
   @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsRequester                  Is the function called from a requester.
   @param  MeasurementSummaryHashType   The type of the measurement summary hash.
 
-  @return 0 measurement summary hash type is invalid.
+  @return 0 measurement summary hash type is invalid, NO_MEAS hash type or no MEAS capabilities.
   @return measurement summary hash size according to type.
 **/
 UINT32
 SpdmGetMeasurementSummaryHashSize (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     BOOLEAN              IsRequester,
   IN     UINT8                MeasurementSummaryHashType
   );
 
@@ -633,15 +635,17 @@ SpdmGetMeasurementSummaryHashSize (
   This function calculate the measurement summary hash.
 
   @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsRequester                  Is the function called from a requester.
   @param  MeasurementSummaryHashType   The type of the measurement summary hash.
   @param  MeasurementSummaryHash       The buffer to store the measurement summary hash.
 
-  @retval TRUE  measurement summary hash is generated.
+  @retval TRUE  measurement summary hash is generated or skipped.
   @retval FALSE measurement summary hash is not generated.
 **/
 BOOLEAN
 SpdmGenerateMeasurementSummaryHash (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     BOOLEAN              IsRequester,
   IN     UINT8                MeasurementSummaryHashType,
      OUT UINT8                *MeasurementSummaryHash
   );

@@ -240,7 +240,7 @@ SpdmServerCallback (
       Data8 |= SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED;
     }
     Parameter.AdditionalData[0] = mUseSlotId; // ReqSlotNum;
-    Parameter.AdditionalData[1] = mUseMeasurementSummaryHashType; // MeasurementHashType;
+    Parameter.AdditionalData[1] = SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH; // MeasurementHashType;
     SpdmSetData (SpdmContext, SpdmDataMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
 
     Data8 = (mUseMutAuth & 0x1);
