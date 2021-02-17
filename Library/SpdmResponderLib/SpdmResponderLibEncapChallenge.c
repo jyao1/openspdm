@@ -49,7 +49,7 @@ SpdmGetEncapReqestChallenge (
   }
   SpdmRequest->Header.RequestResponseCode = SPDM_CHALLENGE;
   SpdmRequest->Header.Param1 = SpdmContext->EncapContext.ReqSlotNum;
-  SpdmRequest->Header.Param2 = SpdmContext->EncapContext.MeasurementHashType;
+  SpdmRequest->Header.Param2 = SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH;
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, SpdmRequest->Nonce);
   DEBUG((DEBUG_INFO, "Encap ClientNonce - "));
   InternalDumpData (SpdmRequest->Nonce, SPDM_NONCE_SIZE);

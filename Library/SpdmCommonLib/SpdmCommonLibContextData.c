@@ -10,29 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmCommonLibInternal.h"
 
 /**
-  This function initializes the encapsulated context.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
-  @param  ReqSlotNum                   SlotNum to the peer in in CHALLENGE_AUTH request or RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER.
-  @param  MeasurementHashType          MeasurementHashType to the peer in CHALLENGE_AUTH request.
-**/
-VOID
-SpdmInitEncapEnv (
-  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
-  IN     UINT8                MutAuthRequested,
-  IN     UINT8                ReqSlotNum,
-  IN     UINT8                MeasurementHashType
-  )
-{
-  SpdmContext->EncapContext.ErrorState = 0;
-  SpdmContext->EncapContext.EncapState = 0;
-  SpdmContext->EncapContext.RequestId = 0;
-  SpdmContext->EncapContext.ReqSlotNum = ReqSlotNum;
-  SpdmContext->EncapContext.MeasurementHashType = MeasurementHashType;
-}
-
-/**
   Returns if an SPDM DataType requires session info.
 
   @param DataType  SPDM data type.
@@ -257,7 +234,9 @@ SpdmSetData (
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.MutAuthRequested = MutAuthRequested;
-    SpdmInitEncapEnv (Context, MutAuthRequested, Parameter->AdditionalData[0], Parameter->AdditionalData[1]);
+    SpdmContext->EncapContext.ErrorState = 0;
+    SpdmContext->EncapContext.RequestId = 0;
+    SpdmContext->EncapContext.ReqSlotNum = Parameter->AdditionalData[0];
     break;
   case SpdmDataPskHint:
     if (DataSize > MAX_SPDM_PSK_HINT_LENGTH) {

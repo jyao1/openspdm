@@ -157,12 +157,19 @@ SpdmGetResponseChallengeAuth (
   }
   Ptr += SignatureSize;
 
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
+  if (AuthAttribute.BasicMutAuthReq != 0) {
+    Status = SpdmInitEncapState (Context, 0);
+    if (RETURN_ERROR(Status)) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+  }
 
   if (AuthAttribute.BasicMutAuthReq == 0) {
     SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   }
 
+  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
+
   return RETURN_SUCCESS;
 }
-

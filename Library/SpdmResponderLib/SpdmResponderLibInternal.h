@@ -669,7 +669,7 @@ SpdmGetResponseFuncViaRequestCode (
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
 **/
-VOID
+RETURN_STATUS
 SpdmInitEncapState (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MutAuthRequested

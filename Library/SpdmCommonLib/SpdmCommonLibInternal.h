@@ -216,9 +216,14 @@ typedef struct {
   VOID                                 *SecuredMessageContext;
 } SPDM_SESSION_INFO;
 
+#define MAX_ENCAP_REQUEST_OP_CODE_SEQUENCE_COUNT 3
 typedef struct {
   UINT32                               ErrorState;
-  UINT32                               EncapState;
+  // Valid OpCode: GET_DIEGST/GET_CERTIFICATE/CHALLENGE
+  // The last one is 0x00, as guard.
+  UINT8                                RequestOpCodeSequence[MAX_ENCAP_REQUEST_OP_CODE_SEQUENCE_COUNT + 1];
+  UINT8                                RequestOpCodeCount;
+  UINT8                                CurrentRequestOpCode;
   UINT8                                RequestId;
   UINT8                                ReqSlotNum;
   UINT8                                MeasurementHashType;

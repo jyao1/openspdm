@@ -267,7 +267,13 @@ SpdmGetResponseKeyExchange (
   if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
     SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
   }
-  SpdmInitEncapState (Context, SessionInfo->MutAuthRequested);
+  if (SessionInfo->MutAuthRequested != 0) {
+    Status = SpdmInitEncapState (Context, SessionInfo->MutAuthRequested);
+    if (RETURN_ERROR(Status)) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+  }
 
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
   SpdmContext->SpdmCmdReceiveState |= SPDM_KEY_EXCHANGE_RECEIVE_FLAG;
