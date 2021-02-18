@@ -124,6 +124,15 @@ SpdmProcessRequest (
   Status = SpdmContext->TransportDecodeMessage (SpdmContext, &MessageSessionId, IsAppMessage, TRUE, RequestSize, Request, &SpdmContext->LastSpdmRequestSize, SpdmContext->LastSpdmRequest);
   if (RETURN_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "TransportDecodeMessage : %p\n", Status));
+    if (SpdmContext->LastSpdmError.ErrorCode != 0) {
+      //
+      // If the SPDM error code is Non-Zero, that means we need send the error message back to requester.
+      // In this case, we need return SUCCESS and let caller invoke SpdmBuildResponse() to send an ERROR message.
+      //
+      *SessionId = &SpdmContext->LastSpdmError.SessionId;
+      *IsAppMessage = FALSE;
+      return RETURN_SUCCESS;
+    }
     return Status;
   }
 
@@ -203,6 +212,40 @@ SpdmBuildResponse (
   SPDM_MESSAGE_HEADER               *SpdmResponse;
 
   SpdmContext = Context;
+
+  if (SpdmContext->LastSpdmError.ErrorCode != 0) {
+    //
+    // Error in SpdmProcessRequest(), and we need send error message directly.
+    //
+    MyResponseSize = sizeof(MyResponse);
+    ZeroMem (MyResponse, sizeof(MyResponse));
+    switch (SpdmContext->LastSpdmError.ErrorCode) {
+    case SPDM_ERROR_CODE_DECRYPT_ERROR:
+      // session ID is valid. Use it to encrypt the error message.
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_DECRYPT_ERROR, 0, &MyResponseSize, MyResponse);
+      break;
+    case SPDM_ERROR_CODE_INVALID_SESSION:
+      // don't use session ID, because we dont know which right session ID should be used.
+      SpdmGenerateExtendedErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_SESSION, 0, sizeof(UINT32), (VOID *)SessionId, &MyResponseSize, MyResponse);
+      SessionId = NULL;
+      break;
+    default:
+      ASSERT(FALSE);
+      return RETURN_UNSUPPORTED;
+    }
+    
+    DEBUG((DEBUG_INFO, "SpdmSendResponse[%x] (0x%x): \n", (SessionId != NULL) ? *SessionId : 0, MyResponseSize));
+    InternalDumpHex (MyResponse, MyResponseSize);
+
+    Status = SpdmContext->TransportEncodeMessage (SpdmContext, SessionId, FALSE, FALSE, MyResponseSize, MyResponse, ResponseSize, Response);
+    if (RETURN_ERROR(Status)) {
+      DEBUG((DEBUG_INFO, "TransportEncodeMessage : %p\n", Status));
+      return Status;
+    }
+
+    ZeroMem (&SpdmContext->LastSpdmError, sizeof(SpdmContext->LastSpdmError));
+    return RETURN_SUCCESS;
+  }
 
   if (SessionId != NULL) {
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);

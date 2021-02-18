@@ -513,6 +513,11 @@ typedef struct {
   SPDM_SECURED_MESSAGE_GET_MAX_RANDOM_NUMBER_COUNT  GetMaxRandomNumberCount;
 } SPDM_SECURED_MESSAGE_CALLBACKS;
 
+typedef struct {
+  UINT8   ErrorCode;
+  UINT32  SessionId;
+} SPDM_ERROR_STRUCT;
+
 /**
   Encode an application message to a secured message.
 
@@ -568,6 +573,32 @@ SpdmDecodeSecuredMessage (
   IN OUT UINTN                          *AppMessageSize,
      OUT VOID                           *AppMessage,
   IN     SPDM_SECURED_MESSAGE_CALLBACKS *SpdmSecuredMessageCallbacks
+  );
+
+/**
+  Get the last SPDM error struct of an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  LastSpdmError                Last SPDM error struct of an SPDM secured message context.
+*/
+VOID
+EFIAPI
+SpdmSecuredMessageGetLastSpdmErrorStruct (
+  IN     VOID                      *SpdmSecuredMessageContext,
+     OUT SPDM_ERROR_STRUCT         *LastSpdmError
+  );
+
+/**
+  Set the last SPDM error struct of an SPDM secured message context.
+
+  @param  SpdmSecuredMessageContext    A pointer to the SPDM secured message context.
+  @param  LastSpdmError                Last SPDM error struct of an SPDM secured message context.
+*/
+VOID
+EFIAPI
+SpdmSecuredMessageSetLastSpdmErrorStruct (
+  IN     VOID                      *SpdmSecuredMessageContext,
+  IN     SPDM_ERROR_STRUCT         *LastSpdmError
   );
 
 #endif

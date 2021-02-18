@@ -157,7 +157,7 @@ SpdmTransportPciDoeEncodeMessage (
 
   TransportEncodeMessage = PciDoeEncodeMessage;
   if (SessionId != NULL) {
-    
+
     SecuredMessageContext = SpdmGetSecuredMessageContextViaSessionId (SpdmContext, *SessionId);
     if (SecuredMessageContext == NULL) {
       return RETURN_UNSUPPORTED;
@@ -256,6 +256,11 @@ SpdmTransportPciDoeDecodeMessage (
   UINTN                               SecuredMessageSize;
   SPDM_SECURED_MESSAGE_CALLBACKS      SpdmSecuredMessageCallbacks;
   VOID                                *SecuredMessageContext;
+  SPDM_ERROR_STRUCT                   SpdmError;
+
+  SpdmError.ErrorCode = 0;
+  SpdmError.SessionId = 0;
+  SpdmSetLastSpdmErrorStruct (SpdmContext, &SpdmError);
 
   SpdmSecuredMessageCallbacks.Version = SPDM_SECURED_MESSAGE_CALLBACKS_VERSION;
   SpdmSecuredMessageCallbacks.GetSequenceNumber = PciDoeGetSequenceNumber;
@@ -288,6 +293,9 @@ SpdmTransportPciDoeDecodeMessage (
     
     SecuredMessageContext = SpdmGetSecuredMessageContextViaSessionId (SpdmContext, *SecuredMessageSessionId);
     if (SecuredMessageContext == NULL) {
+      SpdmError.ErrorCode = SPDM_ERROR_CODE_INVALID_SESSION;
+      SpdmError.SessionId = *SecuredMessageSessionId;
+      SpdmSetLastSpdmErrorStruct (SpdmContext, &SpdmError);
       return RETURN_UNSUPPORTED;
     }
 
@@ -304,6 +312,8 @@ SpdmTransportPciDoeDecodeMessage (
                );
     if (RETURN_ERROR(Status)) {
       DEBUG ((DEBUG_ERROR, "SpdmDecodeSecuredMessage - %p\n", Status));
+      SpdmSecuredMessageGetLastSpdmErrorStruct (SecuredMessageContext, &SpdmError);
+      SpdmSetLastSpdmErrorStruct (SpdmContext, &SpdmError);
       return RETURN_UNSUPPORTED;
     }
     return RETURN_SUCCESS;

@@ -106,7 +106,7 @@ SpdmEncodeSecuredMessage (
   }
 
   if (SequenceNumber == (UINT64)-1) {
-    return RETURN_SECURITY_VIOLATION;
+    return RETURN_OUT_OF_RESOURCES;
   }
 
   *(UINT64 *)Salt = *(UINT64 *)Salt ^ SequenceNumber;
@@ -284,6 +284,14 @@ SpdmDecodeSecuredMessage (
   UINT8                              SequenceNumInHeaderSize;
   SPDM_SESSION_TYPE                  SessionType;
   SPDM_SESSION_STATE                 SessionState;
+  SPDM_ERROR_STRUCT                  SpdmError;
+
+  SpdmError.ErrorCode = 0;
+  SpdmError.SessionId = 0;
+  SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+
+  SpdmError.ErrorCode = SPDM_ERROR_CODE_DECRYPT_ERROR;
+  SpdmError.SessionId = SessionId;
 
   SecuredMessageContext = SpdmSecuredMessageContext;
 
@@ -326,6 +334,7 @@ SpdmDecodeSecuredMessage (
   }
 
   if (SequenceNumber == (UINT64)-1) {
+    SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
     return RETURN_SECURITY_VIOLATION;
   }
 
@@ -358,21 +367,26 @@ SpdmDecodeSecuredMessage (
   switch (SessionType) {
   case SpdmSessionTypeEncMac:
     if (SecuredMessageSize < RecordHeaderSize + AeadBlockSize + AeadTagSize) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     RecordHeader1 = (VOID *)SecuredMessage;
     RecordHeader2 = (VOID *)((UINT8 *)RecordHeader1 + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_1) + SequenceNumInHeaderSize);
     if (RecordHeader1->SessionId != SessionId) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     if (CompareMem (RecordHeader1 + 1, &SequenceNumInHeader, SequenceNumInHeaderSize) != 0) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     if (RecordHeader2->Length > SecuredMessageSize - RecordHeaderSize) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     if (RecordHeader2->Length < AeadTagSize) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     CipherTextSize = (RecordHeader2->Length - AeadTagSize) / AeadBlockSize * AeadBlockSize;
     EncMsgHeader = (VOID *)(RecordHeader2 + 1);
@@ -396,11 +410,13 @@ SpdmDecodeSecuredMessage (
               &CipherTextSize
               );
     if (!Result) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     PlainTextSize = EncMsgHeader->ApplicationDataLength;
     if (PlainTextSize > CipherTextSize) {
-      return RETURN_DEVICE_ERROR;      
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
 
     ASSERT (*AppMessageSize >= PlainTextSize);
@@ -414,21 +430,26 @@ SpdmDecodeSecuredMessage (
 
   case SpdmSessionTypeMacOnly:
     if (SecuredMessageSize < RecordHeaderSize + AeadTagSize) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     RecordHeader1 = (VOID *)SecuredMessage;
     RecordHeader2 = (VOID *)((UINT8 *)RecordHeader1 + sizeof(SPDM_SECURED_MESSAGE_ADATA_HEADER_1) + SequenceNumInHeaderSize);
     if (RecordHeader1->SessionId != SessionId) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     if (CompareMem (RecordHeader1 + 1, &SequenceNumInHeader, SequenceNumInHeaderSize) != 0) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     if (RecordHeader2->Length > SecuredMessageSize - RecordHeaderSize) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     if (RecordHeader2->Length < AeadTagSize) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
     AData = (UINT8 *)RecordHeader1;
     Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + RecordHeader2->Length - AeadTagSize;
@@ -448,7 +469,8 @@ SpdmDecodeSecuredMessage (
               NULL
               );
     if (!Result) {
-      return RETURN_DEVICE_ERROR;
+      SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
+      return RETURN_SECURITY_VIOLATION;
     }
 
     PlainTextSize = RecordHeader2->Length - AeadTagSize;

@@ -63,6 +63,10 @@ typedef struct {
   SPDM_SESSION_INFO_APPLICATION_SECRET ApplicationSecretBackup;
   UINTN                                PskHintSize;
   VOID                                 *PskHint;
+  //
+  // Cache the error in SpdmDecodeSecuredMessage. It is handled in SpdmBuildResponse.
+  //
+  SPDM_ERROR_STRUCT                    LastSpdmError;
 } SPDM_SECURED_MESSAGE_CONTEXT;
 
 #endif

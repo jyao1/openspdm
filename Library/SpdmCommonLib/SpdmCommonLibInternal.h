@@ -279,6 +279,10 @@ typedef struct {
   //
   UINT32                          LastSpdmRequestSessionId;
   BOOLEAN                         LastSpdmRequestSessionIdValid;
+  //
+  // Cache the error in SpdmProcessRequest. It is handled in SpdmBuildResponse.
+  //
+  SPDM_ERROR_STRUCT               LastSpdmError;
 
   //
   // Register GetResponse function (responder only)

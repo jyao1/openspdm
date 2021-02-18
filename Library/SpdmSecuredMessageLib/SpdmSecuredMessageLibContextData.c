@@ -337,3 +337,40 @@ SpdmSecuredMessageImportSessionKeys (
   return RETURN_SUCCESS;
 }
 
+/**
+  Get the last SPDM error struct of an SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  LastSpdmError                Last SPDM error struct of an SPDM context.
+*/
+VOID
+EFIAPI
+SpdmSecuredMessageGetLastSpdmErrorStruct (
+  IN     VOID                      *SpdmSecuredMessageContext,
+     OUT SPDM_ERROR_STRUCT         *LastSpdmError
+  )
+{
+  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
+
+  SecuredMessageContext = SpdmSecuredMessageContext;
+  CopyMem (LastSpdmError, &SecuredMessageContext->LastSpdmError, sizeof(SPDM_ERROR_STRUCT));
+}
+
+/**
+  Set the last SPDM error struct of an SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  LastSpdmError                Last SPDM error struct of an SPDM context.
+*/
+VOID
+EFIAPI
+SpdmSecuredMessageSetLastSpdmErrorStruct (
+  IN     VOID                      *SpdmSecuredMessageContext,
+  IN     SPDM_ERROR_STRUCT         *LastSpdmError
+  )
+{
+  SPDM_SECURED_MESSAGE_CONTEXT           *SecuredMessageContext;
+
+  SecuredMessageContext = SpdmSecuredMessageContext;
+  CopyMem (&SecuredMessageContext->LastSpdmError, LastSpdmError, sizeof(SPDM_ERROR_STRUCT));
+}

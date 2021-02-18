@@ -254,6 +254,32 @@ SpdmGetLastError (
   );
 
 /**
+  Get the last SPDM error struct of an SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  LastSpdmError                Last SPDM error struct of an SPDM context.
+*/
+VOID
+EFIAPI
+SpdmGetLastSpdmErrorStruct (
+  IN     VOID                      *SpdmContext,
+     OUT SPDM_ERROR_STRUCT         *LastSpdmError
+  );
+
+/**
+  Set the last SPDM error struct of an SPDM context.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  LastSpdmError                Last SPDM error struct of an SPDM context.
+*/
+VOID
+EFIAPI
+SpdmSetLastSpdmErrorStruct (
+  IN     VOID                      *SpdmContext,
+  IN     SPDM_ERROR_STRUCT         *LastSpdmError
+  );
+
+/**
   Initialize an SPDM context.
 
   The size in bytes of the SpdmContext can be returned by SpdmGetContextSize.
