@@ -261,13 +261,11 @@ SpdmServerCallback (
 
   if (Res) {
     Data8 = mUseMutAuth;
-    if (Data8 != 0) {
-      Data8 |= SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED;
-    }
     Parameter.AdditionalData[0] = mUseSlotId; // ReqSlotNum;
     SpdmSetData (SpdmContext, SpdmDataMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
 
-    Data8 = (mUseMutAuth & 0x1);
+    Data8 = mUseBasicMutAuth;
+    Parameter.AdditionalData[0] = mUseSlotId; // ReqSlotNum;
     SpdmSetData (SpdmContext, SpdmDataBasicMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
   }
 

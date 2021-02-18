@@ -112,9 +112,16 @@ SpdmGetResponseChallengeAuth (
   AuthAttribute.SlotNum = (UINT8)(SlotNum & 0xF);
   AuthAttribute.Reserved = 0;
   AuthAttribute.BasicMutAuthReq = 0;
-  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP) &&
+      SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, 0) &&
+      (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP, 0) ||
+       SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP, 0))) {
     AuthAttribute.BasicMutAuthReq = SpdmContext->LocalContext.BasicMutAuthRequested;
   }
+  if (AuthAttribute.BasicMutAuthReq != 0) {
+    SpdmInitBasicMutAuthEncapState (Context, AuthAttribute.BasicMutAuthReq);
+  }
+
   SpdmResponse->Header.Param1 = *(UINT8 *)&AuthAttribute;
   SpdmResponse->Header.Param2 = (1 << SlotNum);
   if (SlotNum == 0xFF) {
@@ -156,14 +163,6 @@ SpdmGetResponseChallengeAuth (
     return RETURN_SUCCESS;
   }
   Ptr += SignatureSize;
-
-  if (AuthAttribute.BasicMutAuthReq != 0) {
-    Status = SpdmInitEncapState (Context, 0);
-    if (RETURN_ERROR(Status)) {
-      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-      return RETURN_SUCCESS;
-    }
-  }
 
   if (AuthAttribute.BasicMutAuthReq == 0) {
     SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;

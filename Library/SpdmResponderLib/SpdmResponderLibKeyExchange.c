@@ -163,10 +163,13 @@ SpdmGetResponseKeyExchange (
   SpdmResponse->RspSessionID = RspSessionId;
 
   SpdmResponse->MutAuthRequested = 0;
-  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP) &&
+      (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP, 0) ||
+       SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP, 0))) {
     SpdmResponse->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
   }
   if (SpdmResponse->MutAuthRequested != 0) {
+    SpdmInitMutAuthEncapState (Context, SpdmResponse->MutAuthRequested);
     SpdmResponse->ReqSlotIDParam = (SpdmContext->EncapContext.ReqSlotNum & 0xF);
   } else {
     SpdmResponse->ReqSlotIDParam = 0;
@@ -263,18 +266,7 @@ SpdmGetResponseKeyExchange (
     Ptr += HmacSize;
   }
 
-  SessionInfo->MutAuthRequested = 0;
-  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
-    SessionInfo->MutAuthRequested = SpdmContext->LocalContext.MutAuthRequested;
-  }
-  if (SessionInfo->MutAuthRequested != 0) {
-    Status = SpdmInitEncapState (Context, SessionInfo->MutAuthRequested);
-    if (RETURN_ERROR(Status)) {
-      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-      return RETURN_SUCCESS;
-    }
-  }
-
+  SessionInfo->MutAuthRequested = SpdmResponse->MutAuthRequested;
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
   SpdmContext->SpdmCmdReceiveState |= SPDM_KEY_EXCHANGE_RECEIVE_FLAG;
 

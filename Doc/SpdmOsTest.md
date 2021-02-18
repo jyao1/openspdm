@@ -17,7 +17,8 @@ This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be us
          [--dhe FFDHE_2048|FFDHE_3072|FFDHE_4096|SECP_256_R1|SECP_384_R1|SECP_521_R1]
          [--aead AES_128_GCM|AES_256_GCM|CHACHA20_POLY1305]
          [--key_schedule HMAC_HASH]
-         [--mut_auth BASIC|ENCAP|DIGESTS]
+         [--basic_mut_auth NO|BASIC]
+         [--mut_auth NO|WO_ENCAP|W_ENCAP|DIGESTS]
          [--meas_sum NO|TCB|ALL]
          [--meas_op ONE_BY_ONE|ALL]
          [--slot_id <0~7|0xFF>]
@@ -41,7 +42,8 @@ This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be us
          [--key_schedule] is key schedule algorithm. By default, HMAC_HASH is used.
                  Above algorithms also support multiple flags. Please use ',' for them.
                  SHA3 is not supported so far.
-         [--mut_auth] is the mutual authentication policy. BASIC is used in CHALLENGE_AUTH, ENCAP or DIGESTS is used in KEY_EXCHANGE_RSP. By default, BASIC,ENCAP is used.
+         [--basic_mut_auth] is the basic mutual authentication policy. BASIC is used in CHALLENGE_AUTH. By default, BASIC is used.
+         [--mut_auth] is the mutual authentication policy. WO_ENCAP, W_ENCAP or DIGESTS is used in KEY_EXCHANGE_RSP. By default, W_ENCAP is used.
          [--meas_sum] is the measurment summary hash type in CHALLENGE_AUTH, KEY_EXCHANGE_RSP and PSK_EXCHANGE_RSP. By default, ALL is used.
          [--meas_op] is the measurement operation in GET_MEASUREMEMT. By default, ONE_BY_ONE is used.
          [--slot_id] is to select the peer slot ID in GET_MEASUREMENT, CHALLENGE_AUTH, KEY_EXCHANGE and FINISH. By default, 0 is used.

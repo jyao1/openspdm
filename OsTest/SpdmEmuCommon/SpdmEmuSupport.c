@@ -144,7 +144,8 @@ PrintUsage (
   printf ("   [--dhe FFDHE_2048|FFDHE_3072|FFDHE_4096|SECP_256_R1|SECP_384_R1|SECP_521_R1]\n");
   printf ("   [--aead AES_128_GCM|AES_256_GCM|CHACHA20_POLY1305]\n");
   printf ("   [--key_schedule HMAC_HASH]\n");
-  printf ("   [--mut_auth BASIC|ENCAP|DIGESTS]\n");
+  printf ("   [--basic_mut_auth NO|BASIC]\n");
+  printf ("   [--mut_auth NO|WO_ENCAP|W_ENCAP|DIGESTS]\n");
   printf ("   [--meas_sum NO|TCB|ALL]\n");
   printf ("   [--meas_op ONE_BY_ONE|ALL]\n");
   printf ("   [--slot <0~7|0xFF>]\n");
@@ -168,7 +169,8 @@ PrintUsage (
   printf ("   [--key_schedule] is key schedule algorithm. By default, HMAC_HASH is used.\n");
   printf ("           Above algorithms also support multiple flags. Please use ',' for them.\n");
   printf ("           SHA3 is not supported so far.\n");
-  printf ("   [--mut_auth] is the mutual authentication policy. BASIC is used in CHALLENGE_AUTH, ENCAP or DIGESTS is used in KEY_EXCHANGE_RSP. By default, BASIC,ENCAP is used.\n");
+  printf ("   [--basic_mut_auth] is the basic mutual authentication policy. BASIC is used in CHALLENGE_AUTH. By default, BASIC is used.\n");
+  printf ("   [--mut_auth] is the mutual authentication policy. WO_ENCAP, W_ENCAP or DIGESTS is used in KEY_EXCHANGE_RSP. By default, W_ENCAP is used.\n");
   printf ("   [--meas_sum] is the measurment summary hash type in CHALLENGE_AUTH, KEY_EXCHANGE_RSP and PSK_EXCHANGE_RSP. By default, ALL is used.\n");
   printf ("   [--meas_op] is the measurement operation in GET_MEASUREMEMT. By default, ONE_BY_ONE is used.\n");
   printf ("   [--slot_id] is to select the peer slot ID in GET_MEASUREMENT, CHALLENGE_AUTH, KEY_EXCHANGE and FINISH. By default, 0 is used.\n");
@@ -286,9 +288,15 @@ VALUE_STRING_ENTRY  mKeyScheduleValueStringTable[] = {
   {SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH,        "HMAC_HASH"},
 };
 
+VALUE_STRING_ENTRY  mBasicMutAuthPolicyStringTable[] = {
+  {0,                                                                "NO"},
+  {1,                                                                "BASIC"},
+};
+
 VALUE_STRING_ENTRY  mMutAuthPolicyStringTable[] = {
-  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED,                    "BASIC"},
-  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST, "ENCAP"},
+  {0,                                                                "NO"},
+  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED,                    "WO_ENCAP"},
+  {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST, "W_ENCAP"},
   {SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS,   "DIGESTS"},
 };
 
@@ -652,9 +660,28 @@ ProcessArgs (
       }
     }
 
+    if (strcmp (argv[0], "--basic_mut_auth") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mBasicMutAuthPolicyStringTable, ARRAY_SIZE(mBasicMutAuthPolicyStringTable), argv[1], &Data32)) {
+          printf ("invalid --basic_mut_auth %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mUseBasicMutAuth = (UINT8)Data32;
+        printf ("basic_mut_auth - 0x%02x\n", mUseBasicMutAuth);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --basic_mut_auth\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
     if (strcmp (argv[0], "--mut_auth") == 0) {
       if (argc >= 2) {
-        if (!GetFlagsFromName (mMutAuthPolicyStringTable, ARRAY_SIZE(mMutAuthPolicyStringTable), argv[1], &Data32)) {
+        if (!GetValueFromName (mMutAuthPolicyStringTable, ARRAY_SIZE(mMutAuthPolicyStringTable), argv[1], &Data32)) {
           printf ("invalid --mut_auth %s\n", argv[1]);
           PrintUsage (ProgramName);
           exit (0);

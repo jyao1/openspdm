@@ -664,15 +664,27 @@ SpdmGetResponseFuncViaRequestCode (
   );
 
 /**
-  This function initializes the encapsulated state.
+  This function initializes the mut_auth encapsulated state.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
+  @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE response.
 **/
-RETURN_STATUS
-SpdmInitEncapState (
+VOID
+SpdmInitMutAuthEncapState (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MutAuthRequested
+  );
+
+/**
+  This function initializes the basic_mut_auth encapsulated state.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BasicMutAuthRequested        Indicate of the MutAuthRequested through CHALLENG response.
+**/
+VOID
+SpdmInitBasicMutAuthEncapState (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                BasicMutAuthRequested
   );
 
 #endif

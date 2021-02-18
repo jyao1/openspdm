@@ -167,28 +167,63 @@ SpdmProcessEncapsulatedResponse (
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
 **/
-RETURN_STATUS
-SpdmInitEncapState (
+VOID
+SpdmInitMutAuthEncapState (
   IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
   IN     UINT8                MutAuthRequested
   )
 {
-  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP, 0) &&
-      !SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP, 0)) {
-    return RETURN_UNSUPPORTED;
-  }
-  if (MutAuthRequested == 0) {
-    // Basic Mutual Auth
-    if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, 0)) {
-      return RETURN_UNSUPPORTED;
-    }
-  }
-
   SpdmContext->EncapContext.ErrorState = 0;
   SpdmContext->EncapContext.CurrentRequestOpCode = 0x00;
-  if (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)) {
+  if (MutAuthRequested == SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS) {
     SpdmContext->EncapContext.CurrentRequestOpCode = SPDM_GET_DIGESTS;
   }
+  SpdmContext->EncapContext.RequestId = 0;
+  SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
+
+  //
+  // Clear Cache
+  //
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
+  
+  //
+  // Possible Sequence:
+  // 2. Session Mutual Auth: (SpdmContext->LastSpdmRequestSessionIdValid)
+  //    2.1 GET_DIGEST/GET_CERTIFICATE (SpdmContext->EncapContext.ReqSlotNum != 0xFF)
+  //    2.2 GET_DIGEST (SpdmContext->EncapContext.ReqSlotNum == 0xFF)
+  //    2.3 N/A (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP)
+  //
+  ZeroMem (SpdmContext->EncapContext.RequestOpCodeSequence, sizeof(SpdmContext->EncapContext.RequestOpCodeSequence));
+  // Session Mutual Auth
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP, 0) ||
+      (MutAuthRequested == SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED)) {
+    // no encap is required
+    SpdmContext->EncapContext.RequestOpCodeCount = 0;
+  } else if (SpdmContext->EncapContext.ReqSlotNum != 0xFF) {
+    SpdmContext->EncapContext.RequestOpCodeCount = 2;
+    SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_GET_DIGESTS;
+    SpdmContext->EncapContext.RequestOpCodeSequence[1] = SPDM_GET_CERTIFICATE;
+  } else {
+    SpdmContext->EncapContext.RequestOpCodeCount = 1;
+    SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_GET_DIGESTS;
+  }
+}
+
+/**
+  This function initializes the basic_mut_auth encapsulated state.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  BasicMutAuthRequested        Indicate of the MutAuthRequested through CHALLENG response.
+**/
+VOID
+SpdmInitBasicMutAuthEncapState (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINT8                BasicMutAuthRequested
+  )
+{
+  SpdmContext->EncapContext.ErrorState = 0;
+  SpdmContext->EncapContext.CurrentRequestOpCode = 0x00;
   SpdmContext->EncapContext.RequestId = 0;
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
 
@@ -204,43 +239,22 @@ SpdmInitEncapState (
   //    1.1 GET_DIGEST/GET_CERTIFICATE/CHALLENGE (SpdmContext->EncapContext.ReqSlotNum != 0xFF)
   //    1.2 GET_DIGEST/CHALLENGE (SpdmContext->EncapContext.ReqSlotNum == 0xFF)
   //    1.3 CHALLENGE (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP)
-  // 2. Session Mutual Auth: (SpdmContext->LastSpdmRequestSessionIdValid)
-  //    2.1 GET_DIGEST/GET_CERTIFICATE (SpdmContext->EncapContext.ReqSlotNum != 0xFF)
-  //    2.2 GET_DIGEST (SpdmContext->EncapContext.ReqSlotNum == 0xFF)
-  //    2.3 N/A (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP)
   //
   ZeroMem (SpdmContext->EncapContext.RequestOpCodeSequence, sizeof(SpdmContext->EncapContext.RequestOpCodeSequence));
-  if (MutAuthRequested == 0) {
-    // Basic Mutual Auth
-    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP, 0)) {
-      SpdmContext->EncapContext.RequestOpCodeCount = 1;
-      SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_CHALLENGE;
-    } else if (SpdmContext->EncapContext.ReqSlotNum != 0xFF) {
-      SpdmContext->EncapContext.RequestOpCodeCount = 3;
-      SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_GET_DIGESTS;
-      SpdmContext->EncapContext.RequestOpCodeSequence[1] = SPDM_GET_CERTIFICATE;
-      SpdmContext->EncapContext.RequestOpCodeSequence[2] = SPDM_CHALLENGE;
-    } else {
-      SpdmContext->EncapContext.RequestOpCodeCount = 2;
-      SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_GET_DIGESTS;
-      SpdmContext->EncapContext.RequestOpCodeSequence[1] = SPDM_CHALLENGE;
-    }
+  // Basic Mutual Auth
+  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP, 0)) {
+    SpdmContext->EncapContext.RequestOpCodeCount = 1;
+    SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_CHALLENGE;
+  } else if (SpdmContext->EncapContext.ReqSlotNum != 0xFF) {
+    SpdmContext->EncapContext.RequestOpCodeCount = 3;
+    SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_GET_DIGESTS;
+    SpdmContext->EncapContext.RequestOpCodeSequence[1] = SPDM_GET_CERTIFICATE;
+    SpdmContext->EncapContext.RequestOpCodeSequence[2] = SPDM_CHALLENGE;
   } else {
-    // Session Mutual Auth
-    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP, 0)) {
-      // no encap is required
-      SpdmContext->EncapContext.RequestOpCodeCount = 0;
-    } else if (SpdmContext->EncapContext.ReqSlotNum != 0xFF) {
-      SpdmContext->EncapContext.RequestOpCodeCount = 2;
-      SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_GET_DIGESTS;
-      SpdmContext->EncapContext.RequestOpCodeSequence[1] = SPDM_GET_CERTIFICATE;
-    } else {
-      SpdmContext->EncapContext.RequestOpCodeCount = 1;
-      SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_GET_DIGESTS;
-    }
+    SpdmContext->EncapContext.RequestOpCodeCount = 2;
+    SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_GET_DIGESTS;
+    SpdmContext->EncapContext.RequestOpCodeSequence[1] = SPDM_CHALLENGE;
   }
-
-  return RETURN_SUCCESS;
 }
 
 /**

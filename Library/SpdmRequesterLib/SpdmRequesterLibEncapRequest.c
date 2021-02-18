@@ -163,8 +163,8 @@ SpdmEncapsulatedRequest (
       ASSERT (FALSE);
       return RETURN_UNSUPPORTED;
     }
-    ASSERT ((MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST)) ||
-            (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)));
+    ASSERT ((MutAuthRequested == SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST) ||
+            (MutAuthRequested == SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS));
   } else {
     ASSERT (MutAuthRequested == 0);
   }
@@ -175,7 +175,7 @@ SpdmEncapsulatedRequest (
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
 
-  if (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)) {
+  if (MutAuthRequested == SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS) {
     GetDigests.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
     GetDigests.Header.RequestResponseCode = SPDM_GET_DIGESTS;
     GetDigests.Header.Param1 = 0;

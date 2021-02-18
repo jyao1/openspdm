@@ -34,6 +34,7 @@ extern UINT32  mUseRequesterCapabilityFlags;
 extern UINT32  mUseResonderCapabilityFlags;
 extern UINT32  mUseCapabilityFlags;
 
+extern UINT8   mUseBasicMutAuth;
 extern UINT8   mUseMutAuth;
 extern UINT8   mUseMeasurementSummaryHashType;
 extern UINT8   mUseMeasurementOperation;

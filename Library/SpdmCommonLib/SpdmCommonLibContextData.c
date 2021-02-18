@@ -243,16 +243,25 @@ SpdmSetData (
     if (DataSize != sizeof(BOOLEAN)) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.BasicMutAuthRequested = *(UINT8 *)Data;
+    MutAuthRequested = *(UINT8 *)Data;
+    if (((MutAuthRequested != 0) &&
+         (MutAuthRequested != 1)) ) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->LocalContext.BasicMutAuthRequested = MutAuthRequested;
+    SpdmContext->EncapContext.ErrorState = 0;
+    SpdmContext->EncapContext.RequestId = 0;
+    SpdmContext->EncapContext.ReqSlotNum = Parameter->AdditionalData[0];
     break;
   case SpdmDataMutAuthRequested:
     if (DataSize != sizeof(UINT8)) {
       return RETURN_INVALID_PARAMETER;
     }
     MutAuthRequested = *(UINT8 *)Data;
-    if (!((MutAuthRequested == 0) ||
-          (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST)) ||
-          (MutAuthRequested == (SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED | SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS))) ) {
+    if (((MutAuthRequested != 0) &&
+         (MutAuthRequested != SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED) &&
+         (MutAuthRequested != SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST) &&
+         (MutAuthRequested != SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS)) ) {
       return RETURN_INVALID_PARAMETER;
     }
     SpdmContext->LocalContext.MutAuthRequested = MutAuthRequested;
