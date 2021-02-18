@@ -491,7 +491,7 @@ void TestSpdmResponderCapabilityCase4(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_REQUEST_RESYNCH);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
-  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
+  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNeedResync);
 }
 
 // According to spec, a responder shall not answer a get_capabilties with a ResponseNotReady
@@ -520,7 +520,7 @@ void TestSpdmResponderCapabilityCase5(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_RESPONSE_NOT_READY);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
-  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
+  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNotReady);
   assert_int_equal (ErrorData->RequestCode, SPDM_GET_CAPABILITIES);
 }
 
@@ -535,6 +535,7 @@ void TestSpdmResponderCapabilityCase6(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
+  SpdmContext->ResponseState = SpdmResponseStateNormal;
   SpdmContext->SpdmCmdReceiveState = 0;
 
   ResponseSize = sizeof(Response);

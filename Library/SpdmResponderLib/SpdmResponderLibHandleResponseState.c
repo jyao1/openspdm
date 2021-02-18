@@ -40,11 +40,11 @@ SpdmResponderHandleResponseState (
   switch (SpdmContext->ResponseState) {
   case SpdmResponseStateBusy:
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_BUSY, 0, ResponseSize, Response);
-    //NOTE: Need to reset status to Normal in up level
+    // NOTE: Need to reset status to Normal in up level
     return RETURN_SUCCESS;
   case SpdmResponseStateNeedResync:
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_REQUEST_RESYNCH, 0, ResponseSize, Response);
-    SpdmContext->ResponseState = SpdmResponseStateNormal;
+    // NOTE: Need let SPDM_VERSION reset the State
     return RETURN_SUCCESS;
   case SpdmResponseStateNotReady:
     SpdmContext->CachSpdmRequestSize = SpdmContext->LastSpdmRequestSize;
@@ -54,7 +54,11 @@ SpdmResponderHandleResponseState (
     SpdmContext->ErrorData.RequestCode = RequestCode;
     SpdmContext->ErrorData.Token       = SpdmContext->CurrentToken++;
     SpdmGenerateExtendedErrorResponse (SpdmContext, SPDM_ERROR_CODE_RESPONSE_NOT_READY, 0, sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY), (UINT8*)(void*)&SpdmContext->ErrorData, ResponseSize, Response);
-    SpdmContext->ResponseState = SpdmResponseStateNormal;
+    // NOTE: Need to reset status to Normal in up level
+    return RETURN_SUCCESS;
+  case SpdmResponseStateProcessingEncap:
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_REQUEST_IN_FLIGHT, 0, ResponseSize, Response);
+    // NOTE: Need let SPDM_ENCAPSULATED_RESPONSE_ACK reset the State
     return RETURN_SUCCESS;
   default:
     return RETURN_SUCCESS;

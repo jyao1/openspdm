@@ -181,6 +181,10 @@ typedef enum {
   //
   SpdmResponseStateNeedResync,
   //
+  // Processing Encapsulated message.
+  //
+  SpdmResponseStateProcessingEncap,
+  //
   // MAX
   //
   SpdmResponseStateMax,

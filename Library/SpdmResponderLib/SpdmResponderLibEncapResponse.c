@@ -180,6 +180,7 @@ SpdmInitMutAuthEncapState (
   }
   SpdmContext->EncapContext.RequestId = 0;
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
+  SpdmContext->ResponseState = SpdmResponseStateProcessingEncap;
 
   //
   // Clear Cache
@@ -226,6 +227,7 @@ SpdmInitBasicMutAuthEncapState (
   SpdmContext->EncapContext.CurrentRequestOpCode = 0x00;
   SpdmContext->EncapContext.RequestId = 0;
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
+  SpdmContext->ResponseState = SpdmResponseStateProcessingEncap;
 
   //
   // Clear Cache
@@ -289,11 +291,21 @@ SpdmGetResponseEncapsulatedRequest (
   VOID                                   *EncapRequest;
   UINTN                                  EncapRequestSize;
   RETURN_STATUS                          Status;
+  SPDM_GET_ENCAPSULATED_REQUEST_REQUEST  *SpdmRequest;
 
   SpdmContext = Context;
+  SpdmRequest = Request;
+
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_ENCAPSULATED_REQUEST, ResponseSize, Response);
     return RETURN_SUCCESS;
+  }
+  if (SpdmContext->ResponseState != SpdmResponseStateProcessingEncap) {
+    if (SpdmContext->ResponseState == SpdmResponseStateNormal) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
 
   if (RequestSize != sizeof(SPDM_GET_ENCAPSULATED_REQUEST_REQUEST)) {
@@ -320,6 +332,10 @@ SpdmGetResponseEncapsulatedRequest (
   }
   *ResponseSize = sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE) + EncapRequestSize;
   SpdmResponse->Header.Param1 = SpdmContext->EncapContext.RequestId;
+
+  if (EncapRequestSize == 0) {
+    SpdmContext->ResponseState = SpdmResponseStateNormal;
+  }
 
   return RETURN_SUCCESS;
 }
@@ -362,10 +378,18 @@ SpdmGetResponseEncapsulatedResponseAck (
   RETURN_STATUS                               Status;
 
   SpdmContext = Context;
+  SpdmRequest = Request;
 
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_DELIVER_ENCAPSULATED_RESPONSE, ResponseSize, Response);
     return RETURN_SUCCESS;
+  }
+  if (SpdmContext->ResponseState != SpdmResponseStateProcessingEncap) {
+    if (SpdmContext->ResponseState == SpdmResponseStateNormal) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
 
   if (RequestSize <= sizeof(SPDM_DELIVER_ENCAPSULATED_RESPONSE_REQUEST)) {
@@ -373,7 +397,6 @@ SpdmGetResponseEncapsulatedResponseAck (
     return RETURN_SUCCESS;
   }
 
-  SpdmRequest = Request;
   SpdmRequestSize = RequestSize;
 
   if (SpdmRequest->Header.Param1 != SpdmContext->EncapContext.RequestId) {
@@ -415,6 +438,7 @@ SpdmGetResponseEncapsulatedResponseAck (
       *ResponseSize = sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE) + 1;
       *(UINT8 *)(SpdmResponse + 1) = SpdmContext->EncapContext.ReqSlotNum;
     }
+    SpdmContext->ResponseState = SpdmResponseStateNormal;
   }
 
   return RETURN_SUCCESS;

@@ -61,7 +61,8 @@ SpdmGetResponseVersion (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  if (SpdmContext->ResponseState == SpdmResponseStateNeedResync) {
+  if ((SpdmContext->ResponseState == SpdmResponseStateNeedResync) ||
+      (SpdmContext->ResponseState == SpdmResponseStateProcessingEncap)) {
     // receiving a GET_VERSION resets a need to resynchronization
     SpdmContext->ResponseState = SpdmResponseStateNormal;
   }

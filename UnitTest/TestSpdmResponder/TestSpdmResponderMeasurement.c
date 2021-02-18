@@ -295,7 +295,7 @@ void TestSpdmResponderMeasurementCase4(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_REQUEST_RESYNCH);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
-  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
+  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNeedResync);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
 
@@ -337,7 +337,7 @@ void TestSpdmResponderMeasurementCase5(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_RESPONSE_NOT_READY);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
-  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
+  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNotReady);
   assert_int_equal (ErrorData->RequestCode, SPDM_GET_MEASUREMENTS);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
 }
@@ -358,6 +358,7 @@ void TestSpdmResponderMeasurementCase6(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
+  SpdmContext->ResponseState = SpdmResponseStateNormal;
   SpdmContext->SpdmCmdReceiveState = 0;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;

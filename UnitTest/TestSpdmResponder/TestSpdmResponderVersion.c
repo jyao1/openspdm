@@ -193,7 +193,7 @@ void TestSpdmResponderVersionCase5(void **state) {
   assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
   assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_RESPONSE_NOT_READY);
   assert_int_equal (SpdmResponse->Header.Param2, 0);
-  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNormal);
+  assert_int_equal (SpdmContext->ResponseState, SpdmResponseStateNotReady);
   assert_int_equal (ErrorData->RequestCode, SPDM_GET_VERSION);
 }
 
@@ -214,6 +214,7 @@ void TestSpdmResponderVersionCase6(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
+  SpdmContext->ResponseState = SpdmResponseStateNormal;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseVersion (SpdmContext, mSpdmGetVersionRequest3Size, &mSpdmGetVersionRequest3, &ResponseSize, Response);
