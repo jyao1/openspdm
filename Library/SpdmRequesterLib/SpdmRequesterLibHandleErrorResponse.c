@@ -45,6 +45,9 @@ SpdmRequesterRespondIfReady (
 {
   RETURN_STATUS                             Status;
   SPDM_RESPOND_IF_READY_REQUEST             SpdmRequest;
+  SPDM_MESSAGE_HEADER                       *SpdmResponse;
+
+  SpdmResponse = Response;
 
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   SpdmRequest.Header.RequestResponseCode = SPDM_RESPOND_IF_READY;
@@ -61,7 +64,10 @@ SpdmRequesterRespondIfReady (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (((SPDM_MESSAGE_HEADER*)Response)->RequestResponseCode != ExpectedResponseCode) {
+  if (*ResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponse->RequestResponseCode != ExpectedResponseCode) {
     return RETURN_DEVICE_ERROR;
   }
   // For response like SPDM_ALGORITHMS, we just can expect the max response size
@@ -87,16 +93,24 @@ SpdmHandleSimpleErrorResponse (
   IN     UINT8                ErrorCode
   )
 {
-  SPDM_DEVICE_CONTEXT  *SpdmContext = Context;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
 
-  ASSERT (ErrorCode != SPDM_ERROR_CODE_RESPONSE_NOT_READY);
+  SpdmContext = Context;
+
+  //
+  // NOT_READY is treated as error here.
+  // Use SpdmHandleErrorResponseMain to handle NOT_READY message in long latency command.
+  //
+  if (ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) {
+    return RETURN_DEVICE_ERROR;
+  }
 
   if (ErrorCode == SPDM_ERROR_CODE_BUSY) {
     return RETURN_NO_RESPONSE;
   }
 
   if (ErrorCode == SPDM_ERROR_CODE_REQUEST_RESYNCH) {
-    SpdmContext->SpdmCmdReceiveState &= 0;
+    SpdmContext->SpdmCmdReceiveState = 0;
   }
 
   return RETURN_DEVICE_ERROR;
@@ -185,10 +199,13 @@ SpdmHandleErrorResponseMain (
   IN     UINTN                 ExpectedResponseSize
   )
 {
-  ASSERT(((SPDM_MESSAGE_HEADER*)Response)->RequestResponseCode == SPDM_ERROR);
-  if (((SPDM_MESSAGE_HEADER*)Response)->Param1 != SPDM_ERROR_CODE_RESPONSE_NOT_READY) {
+  SPDM_MESSAGE_HEADER  *SpdmResponse;
+
+  SpdmResponse = Response;
+  ASSERT(SpdmResponse->RequestResponseCode == SPDM_ERROR);
+  if (SpdmResponse->Param1 != SPDM_ERROR_CODE_RESPONSE_NOT_READY) {
     ShrinkManagedBuffer(MBuffer, ShrinkBufferSize);
-    return SpdmHandleSimpleErrorResponse(SpdmContext, ((SPDM_MESSAGE_HEADER*)Response)->Param1);
+    return SpdmHandleSimpleErrorResponse(SpdmContext, SpdmResponse->Param1);
   } else {
     return SpdmHandleResponseNotReady(SpdmContext, SessionId, ResponseSize, Response, OriginalRequestCode, ExpectedResponseCode, ExpectedResponseSize);
   }

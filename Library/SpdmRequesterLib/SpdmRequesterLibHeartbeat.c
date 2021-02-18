@@ -66,6 +66,9 @@ TrySpdmHeartbeat (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
     Status = SpdmHandleErrorResponseMain(SpdmContext, &SessionId, NULL, 0, &SpdmResponseSize, &SpdmResponse, SPDM_HEARTBEAT, SPDM_HEARTBEAT_ACK, sizeof(SPDM_HEARTBEAT_RESPONSE_MINE));
     if (RETURN_ERROR(Status)) {

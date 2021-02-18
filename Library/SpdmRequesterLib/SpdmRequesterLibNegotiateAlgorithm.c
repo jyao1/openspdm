@@ -120,7 +120,8 @@ TrySpdmNegotiateAlgorithms (
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
-    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.MessageA, SpdmRequest.Length, &SpdmResponseSize, &SpdmResponse, SPDM_NEGOTIATE_ALGORITHMS, SPDM_ALGORITHMS, sizeof(SPDM_ALGORITHMS_RESPONSE_MAX));
+    ShrinkManagedBuffer(&SpdmContext->Transcript.MessageA, SpdmRequest.Length);
+    Status = SpdmHandleSimpleErrorResponse(SpdmContext, SpdmResponse.Header.Param1);
     if (RETURN_ERROR(Status)) {
       return Status;
     }

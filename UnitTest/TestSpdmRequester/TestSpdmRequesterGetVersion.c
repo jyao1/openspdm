@@ -470,8 +470,8 @@ void TestSpdmRequesterGetVersionCase8(void **state) {
 /**
   Test 9: on the first try, receiving a ResponseNotReady ERROR message, and on retry,
   receiving a correct VERSION message with available version 1.0 and 1.1.
-  Expected behavior: client returns a Status of RETURN_SUCCESS.
-  Note: As from 1.0.0, this is an unexpected behavior, as the responder should not
+  Expected behavior: client returns a Status of RETURN_DEVICE_ERROR.
+  Note: The responder should not
   respond a GET_VERSION message with a ResponseNotReady.
 **/
 void TestSpdmRequesterGetVersionCase9(void **state) {
@@ -484,7 +484,7 @@ void TestSpdmRequesterGetVersionCase9(void **state) {
   SpdmTestContext->CaseId = 0x9;
 
   Status = SpdmGetVersion (SpdmContext);
-  assert_int_equal (Status, RETURN_SUCCESS);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
 /**

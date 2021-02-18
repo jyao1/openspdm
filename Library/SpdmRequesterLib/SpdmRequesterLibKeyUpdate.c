@@ -116,10 +116,18 @@ SpdmKeyUpdate (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponseSize != sizeof(SPDM_KEY_UPDATE_RESPONSE)) {
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_UPDATE_ACK) {
+  if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, NULL, 0, &SpdmResponseSize, &SpdmResponse, SPDM_KEY_UPDATE, SPDM_KEY_UPDATE_ACK, sizeof(SPDM_KEY_UPDATE_RESPONSE));
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse.Header.RequestResponseCode != SPDM_KEY_UPDATE_ACK) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponseSize != sizeof(SPDM_KEY_UPDATE_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.Param1 != SpdmRequest.Header.Param1) {

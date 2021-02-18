@@ -147,6 +147,9 @@ TrySpdmSendReceivePskExchange (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
     Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, NULL, 0, &SpdmResponseSize, &SpdmResponse, SPDM_PSK_EXCHANGE, SPDM_PSK_EXCHANGE_RSP, sizeof(SPDM_PSK_EXCHANGE_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {

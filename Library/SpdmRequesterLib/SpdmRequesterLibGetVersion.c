@@ -73,7 +73,8 @@ TrySpdmGetVersion (
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
-    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.MessageA, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_VERSION, SPDM_VERSION, sizeof(SPDM_VERSION_RESPONSE_MAX));
+    ShrinkManagedBuffer(&SpdmContext->Transcript.MessageA, sizeof(SpdmRequest));
+    Status = SpdmHandleSimpleErrorResponse(SpdmContext, SpdmResponse.Header.Param1);
     if (RETURN_ERROR(Status)) {
       return Status;
     }

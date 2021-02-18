@@ -719,9 +719,9 @@ void TestSpdmRequesterGetCapabilityCase9(void **state) {
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
   Status = SpdmGetCapabilities (SpdmContext);
-  assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
-  assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_FLAG);
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+//  assert_int_equal (SpdmContext->ConnectionInfo.Capability.CTExponent, 0);
+//  assert_int_equal (SpdmContext->ConnectionInfo.Capability.Flags, DEFAULT_CAPABILITY_FLAG);
 }
 
 void TestSpdmRequesterGetCapabilityCase10(void **state) {

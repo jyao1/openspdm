@@ -146,6 +146,9 @@ TrySpdmGetMeasurement (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
     Status = SpdmHandleErrorResponseMain(SpdmContext, SessionId, &SpdmContext->Transcript.MessageM, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_GET_MEASUREMENTS, SPDM_MEASUREMENTS, sizeof(SPDM_MEASUREMENTS_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {
@@ -153,9 +156,6 @@ TrySpdmGetMeasurement (
     }
   } else if (SpdmResponse.Header.RequestResponseCode != SPDM_MEASUREMENTS) {
     ResetManagedBuffer (&SpdmContext->Transcript.MessageM);
-    return RETURN_DEVICE_ERROR;
-  }
-  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponseSize < sizeof(SPDM_MEASUREMENTS_RESPONSE)) {

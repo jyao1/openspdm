@@ -137,7 +137,7 @@ TrySpdmGetCapabilities (
   //
   // Cache data
   //
-  Status = SpdmAppendMessageA (SpdmContext, &SpdmRequest, sizeof(SpdmRequest));
+  Status = SpdmAppendMessageA (SpdmContext, &SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
     return RETURN_SECURITY_VIOLATION;
   }
@@ -152,7 +152,8 @@ TrySpdmGetCapabilities (
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
-    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.MessageA, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_GET_CAPABILITIES, SPDM_CAPABILITIES, sizeof(SPDM_CAPABILITIES_RESPONSE));
+    ShrinkManagedBuffer(&SpdmContext->Transcript.MessageA, SpdmRequestSize);
+    Status = SpdmHandleSimpleErrorResponse(SpdmContext, SpdmResponse.Header.Param1);
     if (RETURN_ERROR(Status)) {
       return Status;
     }

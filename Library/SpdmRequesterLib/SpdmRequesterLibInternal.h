@@ -15,6 +15,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SpdmCommonLibInternal.h"
 
 /**
+  This function handles simple error code.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ErrorCode                    Indicate the error code.
+
+  @retval RETURN_NO_RESPONSE           If the error code is BUSY.
+  @retval RETURN_DEVICE_ERROR          If the error code is REQUEST_RESYNCH or others.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmHandleSimpleErrorResponse (
+  IN     VOID                 *Context,
+  IN     UINT8                ErrorCode
+  );
+
+/**
   This function handles the error response.
 
   The SPDM response code must be SPDM_ERROR.

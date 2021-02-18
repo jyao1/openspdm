@@ -137,6 +137,9 @@ TrySpdmSendReceiveFinish (
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
     Status = SpdmHandleErrorResponseMain(SpdmContext, &SessionId, &SessionInfo->SessionTranscript.MessageF, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_FINISH, SPDM_FINISH_RSP, sizeof(SPDM_FINISH_RESPONSE_MINE));
     if (RETURN_ERROR(Status)) {

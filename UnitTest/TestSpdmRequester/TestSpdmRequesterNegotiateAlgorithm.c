@@ -479,8 +479,8 @@ void TestSpdmRequesterNegotiateAlgorithmCase9(void **state) {
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
-  assert_int_equal (Status, RETURN_SUCCESS);
-  assert_int_equal (SpdmContext->Transcript.MessageA.BufferSize, sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) + sizeof(SPDM_ALGORITHMS_RESPONSE));
+  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+//  assert_int_equal (SpdmContext->Transcript.MessageA.BufferSize, sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) + sizeof(SPDM_ALGORITHMS_RESPONSE));
 }
 
 void TestSpdmRequesterNegotiateAlgorithmCase10(void **state) {
