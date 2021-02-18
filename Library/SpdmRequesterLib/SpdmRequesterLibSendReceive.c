@@ -162,6 +162,19 @@ SpdmSendSpdmRequest (
   IN     VOID                 *Request
   )
 {
+  SPDM_SESSION_INFO                         *SessionInfo;
+  SPDM_SESSION_STATE                        SessionState;
+
+  if ((SessionId != NULL) &&
+      SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);
+    ASSERT (SessionInfo != NULL);
+    SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+    if ((SessionState == SpdmSessionStateHandshaking) && !SessionInfo->UsePsk) {
+      SessionId = NULL;
+    }
+  }
+
   return SpdmSendRequest (SpdmContext, SessionId, FALSE, RequestSize, Request);
 }
 
@@ -188,5 +201,18 @@ SpdmReceiveSpdmResponse (
      OUT VOID                 *Response
   )
 {
+  SPDM_SESSION_INFO                         *SessionInfo;
+  SPDM_SESSION_STATE                        SessionState;
+
+  if ((SessionId != NULL) &&
+      SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);
+    ASSERT (SessionInfo != NULL);
+    SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+    if ((SessionState == SpdmSessionStateHandshaking) && !SessionInfo->UsePsk) {
+      SessionId = NULL;
+    }
+  }
+
   return SpdmReceiveResponse (SpdmContext, SessionId, FALSE, ResponseSize, Response);
 }

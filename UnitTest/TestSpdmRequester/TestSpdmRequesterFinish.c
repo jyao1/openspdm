@@ -443,6 +443,7 @@ void TestSpdmRequesterFinishCase1(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
@@ -489,6 +490,7 @@ void TestSpdmRequesterFinishCase2(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
@@ -536,6 +538,7 @@ void TestSpdmRequesterFinishCase3(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
@@ -583,6 +586,7 @@ void TestSpdmRequesterFinishCase4(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
@@ -630,6 +634,7 @@ void TestSpdmRequesterFinishCase5(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
@@ -677,6 +682,7 @@ void TestSpdmRequesterFinishCase6(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
@@ -725,6 +731,7 @@ void TestSpdmRequesterFinishCase7(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
@@ -773,6 +780,7 @@ void TestSpdmRequesterFinishCase8(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
@@ -820,6 +828,7 @@ void TestSpdmRequesterFinishCase9(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetResponseFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP;

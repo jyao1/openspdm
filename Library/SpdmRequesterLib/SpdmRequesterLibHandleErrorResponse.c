@@ -50,30 +50,14 @@ SpdmRequesterRespondIfReady (
   SpdmRequest.Header.RequestResponseCode = SPDM_RESPOND_IF_READY;
   SpdmRequest.Header.Param1 = SpdmContext->ErrorData.RequestCode;
   SpdmRequest.Header.Param2 = SpdmContext->ErrorData.Token;
-  if (ExpectedResponseCode != SPDM_FINISH_RSP) {
-    Status = SpdmSendSpdmRequest (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
-  } else {
-    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
-      Status = SpdmSendSpdmRequest (SpdmContext, NULL, sizeof(SpdmRequest), &SpdmRequest);
-    } else {
-      Status = SpdmSendSpdmRequest (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
-    }
-  }
+  Status = SpdmSendSpdmRequest (SpdmContext, SessionId, sizeof(SpdmRequest), &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
 
   *ResponseSize = ExpectedResponseSize;
   ZeroMem (Response, ExpectedResponseSize);
-  if (ExpectedResponseCode != SPDM_FINISH_RSP) {
-    Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, ResponseSize, Response);
-  } else {
-    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
-      Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, ResponseSize, Response);
-    } else {
-      Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, ResponseSize, Response);
-    }
-  }
+  Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, ResponseSize, Response);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
