@@ -63,6 +63,8 @@ SpdmGetEncapReqestChallenge (
     return RETURN_SECURITY_VIOLATION;
   }
 
+  SpdmContext->EncapContext.LastEncapRequestSize = *EncapRequestSize;
+
   return RETURN_SUCCESS;
 }
 
@@ -107,13 +109,22 @@ SpdmProcessEncapResponseChallengeAuth (
 
   SpdmResponse = EncapResponse;
   SpdmResponseSize = EncapResponseSize;
+
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponse->Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleEncapErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageMutC, SpdmContext->EncapContext.LastEncapRequestSize, SpdmResponse->Header.Param1);
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse->Header.RequestResponseCode != SPDM_CHALLENGE_AUTH) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponseSize < sizeof(SPDM_CHALLENGE_AUTH_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
 
-  if (SpdmResponse->Header.RequestResponseCode != SPDM_CHALLENGE_AUTH) {
-    return RETURN_DEVICE_ERROR;
-  }
   *(UINT8 *)&AuthAttribute = SpdmResponse->Header.Param1;
   if (SpdmContext->EncapContext.ReqSlotNum == 0xFF) {
     if (AuthAttribute.SlotNum != 0xF) {

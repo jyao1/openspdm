@@ -687,4 +687,23 @@ SpdmInitBasicMutAuthEncapState (
   IN     UINT8                BasicMutAuthRequested
   );
 
+/**
+  This function handles the encap error response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ManagedBuffer                The managed buffer to be shrinked.
+  @param  ShrinkBufferSize             The size in bytes of the size of the buffer to be shrinked.
+  @param  ErrorCode                    Indicate the error code.
+
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmHandleEncapErrorResponseMain (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT VOID                 *MBuffer,
+  IN     UINTN                ShrinkBufferSize,
+  IN     UINT8                ErrorCode
+  );
+
 #endif

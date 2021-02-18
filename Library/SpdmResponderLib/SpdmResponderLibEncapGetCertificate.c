@@ -62,6 +62,8 @@ SpdmGetEncapReqestGetCertificate (
     return RETURN_SECURITY_VIOLATION;
   }
 
+  SpdmContext->EncapContext.LastEncapRequestSize = *EncapRequestSize;
+
   return RETURN_SUCCESS;
 }
 
@@ -95,11 +97,19 @@ SpdmProcessEncapResponseCertificate (
 
   SpdmResponse = EncapResponse;
   SpdmResponseSize = EncapResponseSize;
-  if (EncapResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
+
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
     return RETURN_DEVICE_ERROR;
   }
-
-  if (SpdmResponse->Header.RequestResponseCode != SPDM_CERTIFICATE) {
+  if (SpdmResponse->Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleEncapErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageMutB, SpdmContext->EncapContext.LastEncapRequestSize, SpdmResponse->Header.Param1);
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse->Header.RequestResponseCode != SPDM_CERTIFICATE) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (EncapResponseSize < sizeof(SPDM_CERTIFICATE_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse->PortionLength > MAX_SPDM_CERT_CHAIN_BLOCK_LEN) {

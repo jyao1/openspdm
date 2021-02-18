@@ -179,6 +179,7 @@ SpdmInitMutAuthEncapState (
     SpdmContext->EncapContext.CurrentRequestOpCode = SPDM_GET_DIGESTS;
   }
   SpdmContext->EncapContext.RequestId = 0;
+  SpdmContext->EncapContext.LastEncapRequestSize = 0;
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
   SpdmContext->ResponseState = SpdmResponseStateProcessingEncap;
 
@@ -226,6 +227,7 @@ SpdmInitBasicMutAuthEncapState (
   SpdmContext->EncapContext.ErrorState = 0;
   SpdmContext->EncapContext.CurrentRequestOpCode = 0x00;
   SpdmContext->EncapContext.RequestId = 0;
+  SpdmContext->EncapContext.LastEncapRequestSize = 0;
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
   SpdmContext->ResponseState = SpdmResponseStateProcessingEncap;
 
@@ -328,6 +330,7 @@ SpdmGetResponseEncapsulatedRequest (
   Status = SpdmProcessEncapsulatedResponse (Context, 0, NULL, &EncapRequestSize, EncapRequest);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_RESPONSE_CODE, 0, ResponseSize, Response);
+    SpdmContext->ResponseState = SpdmResponseStateNormal;
     return RETURN_SUCCESS;
   }
   *ResponseSize = sizeof(SPDM_ENCAPSULATED_REQUEST_RESPONSE) + EncapRequestSize;
@@ -426,6 +429,7 @@ SpdmGetResponseEncapsulatedResponseAck (
   Status = SpdmProcessEncapsulatedResponse (Context, EncapResponseSize, EncapResponse, &EncapRequestSize, EncapRequest);
   if (RETURN_ERROR(Status)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_RESPONSE_CODE, 0, ResponseSize, Response);
+    SpdmContext->ResponseState = SpdmResponseStateNormal;
     return RETURN_SUCCESS;
   }
 
@@ -442,4 +446,36 @@ SpdmGetResponseEncapsulatedResponseAck (
   }
 
   return RETURN_SUCCESS;
+}
+
+/**
+  This function handles the encap error response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ManagedBuffer                The managed buffer to be shrinked.
+  @param  ShrinkBufferSize             The size in bytes of the size of the buffer to be shrinked.
+  @param  ErrorCode                    Indicate the error code.
+
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmHandleEncapErrorResponseMain (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT VOID                 *MBuffer,
+  IN     UINTN                ShrinkBufferSize,
+  IN     UINT8                ErrorCode
+  )
+{
+  //
+  // According to "Timing Specification for SPDM messages", RESPONSE_NOT_READY is only for responder.
+  // RESPONSE_NOT_READY should not be sent by requester. No need to check it.
+  //
+
+  //
+  // No need to shrink MessageMutB and MessageMutC, because any error will terminate the ENCAP MUT AUTH.
+  // The sequence is fixed in CHALLENG_AUTH or KEY_EXCHANGE_RSP, the responder cannot issue encap request again.
+  // If the requester restarts the mutual auth via CHALLENG or KEY_EXCHANGE, the encap will also restart.
+  //
+  return RETURN_DEVICE_ERROR;
 }

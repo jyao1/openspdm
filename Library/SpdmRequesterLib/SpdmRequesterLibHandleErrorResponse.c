@@ -49,7 +49,11 @@ SpdmRequesterRespondIfReady (
 
   SpdmResponse = Response;
 
-  SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+  } else {
+    SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  }
   SpdmRequest.Header.RequestResponseCode = SPDM_RESPOND_IF_READY;
   SpdmRequest.Header.Param1 = SpdmContext->ErrorData.RequestCode;
   SpdmRequest.Header.Param2 = SpdmContext->ErrorData.Token;

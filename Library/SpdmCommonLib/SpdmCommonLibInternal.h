@@ -226,7 +226,7 @@ typedef struct {
   UINT8                                CurrentRequestOpCode;
   UINT8                                RequestId;
   UINT8                                ReqSlotNum;
-  UINT8                                MeasurementHashType;
+  UINTN                                LastEncapRequestSize;
   LARGE_MANAGED_BUFFER                 CertificateChainBuffer;
 } SPDM_ENCAP_CONTEXT;
 

@@ -59,6 +59,8 @@ SpdmGetEncapReqestGetDigest (
     return RETURN_SECURITY_VIOLATION;
   }
 
+  SpdmContext->EncapContext.LastEncapRequestSize = *EncapRequestSize;
+
   return RETURN_SUCCESS;
 }
 
@@ -94,11 +96,19 @@ SpdmProcessEncapResponseDigest (
 
   SpdmResponse = EncapResponse;
   SpdmResponseSize = EncapResponseSize;
-  if (EncapResponseSize < sizeof(SPDM_DIGESTS_RESPONSE)) {
+
+  if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
     return RETURN_DEVICE_ERROR;
   }
-
-  if (SpdmResponse->Header.RequestResponseCode != SPDM_DIGESTS) {
+  if (SpdmResponse->Header.RequestResponseCode == SPDM_ERROR) {
+    Status = SpdmHandleEncapErrorResponseMain(SpdmContext, &SpdmContext->Transcript.MessageMutB, SpdmContext->EncapContext.LastEncapRequestSize, SpdmResponse->Header.Param1);
+    if (RETURN_ERROR(Status)) {
+      return Status;
+    }
+  } else if (SpdmResponse->Header.RequestResponseCode != SPDM_DIGESTS) {
+    return RETURN_DEVICE_ERROR;
+  }
+  if (SpdmResponseSize < sizeof(SPDM_DIGESTS_RESPONSE)) {
     return RETURN_DEVICE_ERROR;
   }
 
