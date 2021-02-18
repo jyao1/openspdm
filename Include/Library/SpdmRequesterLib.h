@@ -236,6 +236,9 @@ SpdmAuthentication (
   If the signature is requested, this function verifies the signature of the measurement.
 
   @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
   @param  RequestAttribute             The request attribute of the request message.
   @param  MeasurementOperation         The measurement operation of the request message.
   @param  SlotNum                      The number of slot for the certificate chain.
@@ -252,6 +255,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetMeasurement (
   IN     VOID                 *SpdmContext,
+  IN     UINT32               *SessionId,
   IN     UINT8                RequestAttribute,
   IN     UINT8                MeasurementOperation,
   IN     UINT8                SlotNum,

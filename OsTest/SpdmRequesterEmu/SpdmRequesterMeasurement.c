@@ -19,7 +19,8 @@ extern VOID          *mSpdmContext;
 **/
 RETURN_STATUS
 SpdmSendReceiveGetMeasurement (
-  IN VOID          *SpdmContext
+  IN VOID          *SpdmContext,
+  IN UINT32        *SessionId
   )
 {
   RETURN_STATUS                             Status;
@@ -38,6 +39,7 @@ SpdmSendReceiveGetMeasurement (
     MeasurementRecordLength = sizeof(MeasurementRecord);
     Status = SpdmGetMeasurement (
                SpdmContext,
+               SessionId,
                RequestAttribute,
                SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS,
                mUseSlotId & 0xF,
@@ -55,6 +57,7 @@ SpdmSendReceiveGetMeasurement (
     //
     Status = SpdmGetMeasurement (
               SpdmContext,
+              SessionId,
               RequestAttribute,
               SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS,
               mUseSlotId & 0xF,
@@ -78,6 +81,7 @@ SpdmSendReceiveGetMeasurement (
       MeasurementRecordLength = sizeof(MeasurementRecord);
       Status = SpdmGetMeasurement (
                 SpdmContext,
+                SessionId,
                 RequestAttribute,
                 Index,
                 mUseSlotId & 0xF,
@@ -102,7 +106,7 @@ SpdmSendReceiveGetMeasurement (
 **/
 RETURN_STATUS
 DoMeasurementViaSpdm (
-  VOID
+  IN UINT32        *SessionId
   )
 {
   RETURN_STATUS         Status;
@@ -110,7 +114,7 @@ DoMeasurementViaSpdm (
 
   SpdmContext = mSpdmContext;
   
-  Status = SpdmSendReceiveGetMeasurement (SpdmContext);
+  Status = SpdmSendReceiveGetMeasurement (SpdmContext, SessionId);
   if (RETURN_ERROR(Status)) {
     return Status;
   }

@@ -40,7 +40,7 @@ CommunicatePlatformData (
 
 RETURN_STATUS
 DoMeasurementViaSpdm (
-  VOID
+  IN UINT32        *SessionId
   );
 
 RETURN_STATUS
@@ -190,7 +190,7 @@ PlatformClientRoutine (
     goto Done;
   }
 
-  Status = DoMeasurementViaSpdm ();
+  Status = DoMeasurementViaSpdm (NULL);
   if (RETURN_ERROR(Status)) {
     printf ("DoMeasurementViaSpdm - %x\n", (UINT32)Status);
     goto Done;

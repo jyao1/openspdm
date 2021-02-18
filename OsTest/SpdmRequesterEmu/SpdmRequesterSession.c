@@ -11,6 +11,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 extern VOID          *mSpdmContext;
 
+RETURN_STATUS
+DoMeasurementViaSpdm (
+  IN UINT32        *SessionId
+  );
+
 typedef struct {
   SPDM_DATA_TYPE        DataType;
   CHAR8                 *String;
@@ -164,6 +169,11 @@ DoSessionViaSpdm (
   Status = SpdmKeyUpdate (SpdmContext, SessionId2, FALSE);
   if (RETURN_ERROR(Status)) {
     printf ("SpdmKeyUpdate - %x\n", (UINT32)Status);
+  }
+
+  Status = DoMeasurementViaSpdm (&SessionId);
+  if (RETURN_ERROR(Status)) {
+    printf ("DoMeasurementViaSpdm - %x\n", (UINT32)Status);
   }
 
   Status = SpdmStopSession (SpdmContext, SessionId, 0);

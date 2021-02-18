@@ -29,6 +29,9 @@ typedef struct {
   If the signature is requested, this function verifies the signature of the measurement.
 
   @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    Indicates if it is a secured message protected via SPDM session.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
   @param  RequestAttribute             The request attribute of the request message.
   @param  MeasurementOperation         The measurement operation of the request message.
   @param  SlotNum                      The number of slot for the certificate chain.
@@ -44,6 +47,7 @@ typedef struct {
 RETURN_STATUS
 TrySpdmGetMeasurement (
   IN     VOID                 *Context,
+  IN     UINT32               *SessionId,
   IN     UINT8                RequestAttribute,
   IN     UINT8                MeasurementOperation,
   IN     UINT8                SlotIdParam,
@@ -123,7 +127,7 @@ TrySpdmGetMeasurement (
   } else {
     SpdmRequestSize = sizeof(SpdmRequest.Header);
   }
-  Status = SpdmSendSpdmRequest (SpdmContext, NULL, SpdmRequestSize, &SpdmRequest);
+  Status = SpdmSendSpdmRequest (SpdmContext, SessionId, SpdmRequestSize, &SpdmRequest);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
@@ -138,12 +142,12 @@ TrySpdmGetMeasurement (
 
   SpdmResponseSize = sizeof(SpdmResponse);
   ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
-  Status = SpdmReceiveSpdmResponse (SpdmContext, NULL, &SpdmResponseSize, &SpdmResponse);
+  Status = SpdmReceiveSpdmResponse (SpdmContext, SessionId, &SpdmResponseSize, &SpdmResponse);
   if (RETURN_ERROR(Status)) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
-    Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.MessageM, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_GET_MEASUREMENTS, SPDM_MEASUREMENTS, sizeof(SPDM_MEASUREMENTS_RESPONSE_MAX));
+    Status = SpdmHandleErrorResponseMain(SpdmContext, SessionId, &SpdmContext->Transcript.MessageM, SpdmRequestSize, &SpdmResponseSize, &SpdmResponse, SPDM_GET_MEASUREMENTS, SPDM_MEASUREMENTS, sizeof(SPDM_MEASUREMENTS_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {
       return Status;
     }
@@ -345,6 +349,7 @@ RETURN_STATUS
 EFIAPI
 SpdmGetMeasurement (
   IN     VOID                 *Context,
+  IN     UINT32               *SessionId,
   IN     UINT8                RequestAttribute,
   IN     UINT8                MeasurementOperation,
   IN     UINT8                SlotIdParam,
@@ -360,7 +365,7 @@ SpdmGetMeasurement (
   SpdmContext = Context;
   Retry = SpdmContext->RetryTimes;
   do {
-    Status = TrySpdmGetMeasurement(SpdmContext, RequestAttribute, MeasurementOperation, SlotIdParam, NumberOfBlocks, MeasurementRecordLength, MeasurementRecord);
+    Status = TrySpdmGetMeasurement(SpdmContext, SessionId, RequestAttribute, MeasurementOperation, SlotIdParam, NumberOfBlocks, MeasurementRecordLength, MeasurementRecord);
     if (RETURN_NO_RESPONSE != Status) {
       return Status;
     }
