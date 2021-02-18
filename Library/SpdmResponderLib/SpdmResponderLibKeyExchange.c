@@ -146,10 +146,14 @@ SpdmGetResponseKeyExchange (
 
   ReqSessionId = SpdmRequest->ReqSessionID;
   RspSessionId = SpdmAllocateRspSessionId (SpdmContext);
+  if (RspSessionId == (INVALID_SESSION_ID & 0xFFFF)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_SESSION_LIMIT_EXCEEDED, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
   SessionId = (ReqSessionId << 16) | RspSessionId;
   SessionInfo = SpdmAssignSessionId (SpdmContext, SessionId, FALSE);
   if (SessionInfo == NULL) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_SESSION_LIMIT_EXCEEDED, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 

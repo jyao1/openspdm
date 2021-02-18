@@ -199,7 +199,6 @@ SpdmAssignSessionId (
   }
 
   DEBUG ((DEBUG_ERROR, "SpdmAssignSessionId - MAX SessionId\n"));
-  ASSERT(FALSE);
   return NULL;
 }
 
@@ -228,7 +227,6 @@ SpdmAllocateReqSessionId (
   }
 
   DEBUG ((DEBUG_ERROR, "SpdmAllocateReqSessionId - MAX SessionId\n"));
-  ASSERT(FALSE);
   return (INVALID_SESSION_ID & 0xFFFF0000) >> 16;
 }
 
@@ -257,7 +255,6 @@ SpdmAllocateRspSessionId (
   }
 
   DEBUG ((DEBUG_ERROR, "SpdmAllocateRspSessionId - MAX SessionId\n"));
-  ASSERT(FALSE);
   return (INVALID_SESSION_ID & 0xFFFF);
 }
 
