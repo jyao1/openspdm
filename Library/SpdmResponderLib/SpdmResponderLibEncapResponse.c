@@ -395,6 +395,10 @@ SpdmGetResponseEncapsulatedResponseAck (
 
   EncapRequestSize = *ResponseSize - sizeof(SPDM_ENCAPSULATED_RESPONSE_ACK_RESPONSE);
   EncapRequest = SpdmResponse + 1;
+  if (EncapResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   Status = SpdmProcessEncapsulatedResponse (Context, EncapResponseSize, EncapResponse, &EncapRequestSize, EncapRequest);
   if (RETURN_ERROR(Status)) {

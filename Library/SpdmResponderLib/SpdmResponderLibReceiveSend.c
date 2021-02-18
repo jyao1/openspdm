@@ -135,6 +135,9 @@ SpdmProcessRequest (
     }
     return Status;
   }
+  if (SpdmContext->LastSpdmRequestSize < sizeof(SPDM_MESSAGE_HEADER)) {
+    return RETURN_UNSUPPORTED;
+  }
 
   *SessionId = MessageSessionId;
 
