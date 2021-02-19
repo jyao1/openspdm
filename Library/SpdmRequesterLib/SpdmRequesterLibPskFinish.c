@@ -46,9 +46,13 @@ TrySpdmSendReceivePskFinish (
   UINTN                                     SpdmResponseSize;
   SPDM_SESSION_INFO                         *SessionInfo;
   UINT8                                     TH2HashData[64];
+  SPDM_SESSION_STATE                        SessionState;
 
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_EXCHANGE_RECEIVE_FLAG) == 0) {
-    return RETURN_DEVICE_ERROR;
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)) {
+    return RETURN_UNSUPPORTED;
+  }
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+    return RETURN_UNSUPPORTED;
   }
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
@@ -56,7 +60,11 @@ TrySpdmSendReceivePskFinish (
     ASSERT (FALSE);
     return RETURN_UNSUPPORTED;
   }
-  
+  SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+  if (SessionState != SpdmSessionStateHandshaking) {
+    return RETURN_UNSUPPORTED;
+  }
+
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
    
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -122,7 +130,6 @@ TrySpdmSendReceivePskFinish (
 
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   
   return RETURN_SUCCESS;
 }

@@ -570,7 +570,7 @@ void TestSpdmRequesterPskExchangeCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
@@ -609,7 +609,7 @@ void TestSpdmRequesterPskExchangeCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
@@ -650,7 +650,7 @@ void TestSpdmRequesterPskExchangeCase3(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
@@ -670,7 +670,7 @@ void TestSpdmRequesterPskExchangeCase3(void **state) {
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmSendReceivePskExchange (SpdmContext, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH,
            &SessionId, &HeartbeatPeriod, MeasurementHash);
-  assert_int_equal (Status, RETURN_DEVICE_ERROR);  
+  assert_int_equal (Status, RETURN_UNSUPPORTED);  
   free(Data);
 }
 
@@ -689,7 +689,7 @@ void TestSpdmRequesterPskExchangeCase4(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
@@ -728,7 +728,7 @@ void TestSpdmRequesterPskExchangeCase5(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
@@ -767,7 +767,7 @@ void TestSpdmRequesterPskExchangeCase6(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
@@ -808,7 +808,7 @@ void TestSpdmRequesterPskExchangeCase7(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
@@ -829,7 +829,7 @@ void TestSpdmRequesterPskExchangeCase7(void **state) {
   Status = SpdmSendReceivePskExchange (SpdmContext, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH,
            &SessionId, &HeartbeatPeriod, MeasurementHash);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  assert_int_equal (SpdmContext->SpdmCmdReceiveState, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.ConnectionState, SpdmConnectionStateNotStarted);
   free(Data);
 }
 
@@ -848,7 +848,7 @@ void TestSpdmRequesterPskExchangeCase8(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
@@ -887,7 +887,7 @@ void TestSpdmRequesterPskExchangeCase9(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
@@ -926,7 +926,7 @@ int SpdmRequesterPskExchangeTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterPskExchangeCase1),
       // Successful response
       cmocka_unit_test(TestSpdmRequesterPskExchangeCase2),
-      // SpdmCmdReceiveState check failed
+      // ConnectionState check failed
       cmocka_unit_test(TestSpdmRequesterPskExchangeCase3),
       // Error response: SPDM_ERROR_CODE_INVALID_REQUEST
       cmocka_unit_test(TestSpdmRequesterPskExchangeCase4),

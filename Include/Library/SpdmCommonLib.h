@@ -142,19 +142,27 @@ typedef struct {
 
 typedef enum {
   //
-  // Before send GET_VERSION
+  // Before GET_VERSION/VERSION
   //
   SpdmConnectionStateNotStarted,
   //
-  // After send GET_VERSION, before send NEGOTIATE_ALGORITHMS
+  // After GET_VERSION/VERSION
   //
-  SpdmConnectionStateNegotiating,
+  SpdmConnectionStateAfterVersion,
   //
-  // After send NEGOTIATE_ALGORITHMS
+  // After GET_CAPABILITIES/CAPABILITIES
+  //
+  SpdmConnectionStateAfterCapabilities,
+  //
+  // After NEGOTIATE_ALGORITHMS/ALGORITHMS
   //
   SpdmConnectionStateNegotiated,
   //
-  // After send CHALLENGE_AUTH
+  // After GET_DIGESTS/DIGESTS
+  //
+  SpdmConnectionStateAfterDigests,
+  //
+  // After CHALLENGE/CHALLENGE_AUTH, and ENCAP CALLENGE/CHALLENG_AUTH if MUT_AUTH is enabled.
   //
   SpdmConnectionStateAuthenticated,
   //

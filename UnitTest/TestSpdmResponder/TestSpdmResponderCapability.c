@@ -407,7 +407,7 @@ void TestSpdmResponderCapabilityCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest1Size, &mSpdmGetCapabilityRequest1, &ResponseSize, Response);
@@ -429,7 +429,7 @@ void TestSpdmResponderCapabilityCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest2Size, &mSpdmGetCapabilityRequest2, &ResponseSize, Response);
@@ -454,7 +454,7 @@ void TestSpdmResponderCapabilityCase3(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->ResponseState = SpdmResponseStateBusy;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest1Size, &mSpdmGetCapabilityRequest1, &ResponseSize, Response);
@@ -480,7 +480,7 @@ void TestSpdmResponderCapabilityCase4(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest1Size, &mSpdmGetCapabilityRequest1, &ResponseSize, Response);
@@ -508,7 +508,7 @@ void TestSpdmResponderCapabilityCase5(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest1Size, &mSpdmGetCapabilityRequest1, &ResponseSize, Response);
@@ -536,7 +536,7 @@ void TestSpdmResponderCapabilityCase6(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->ResponseState = SpdmResponseStateNormal;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest1Size, &mSpdmGetCapabilityRequest1, &ResponseSize, Response);
@@ -561,7 +561,7 @@ void TestSpdmResponderCapabilityCase7(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
   SpdmContext->ResponseState = SpdmResponseStateNormal;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
@@ -589,7 +589,7 @@ void TestSpdmResponderCapabilityCase8(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest4Size, &mSpdmGetCapabilityRequest4, &ResponseSize, Response);
@@ -611,7 +611,7 @@ void TestSpdmResponderCapabilityCase9(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest5Size, &mSpdmGetCapabilityRequest5, &ResponseSize, Response);
@@ -633,7 +633,7 @@ void TestSpdmResponderCapabilityCase10(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xa;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest6Size, &mSpdmGetCapabilityRequest6, &ResponseSize, Response);
@@ -657,7 +657,7 @@ void TestSpdmResponderCapabilityCase11(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xb;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest7Size, &mSpdmGetCapabilityRequest7, &ResponseSize, Response);
@@ -681,7 +681,7 @@ void TestSpdmResponderCapabilityCase12(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xc;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest8Size, &mSpdmGetCapabilityRequest8, &ResponseSize, Response);
@@ -703,7 +703,7 @@ void TestSpdmResponderCapabilityCase13(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xd;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest9Size, &mSpdmGetCapabilityRequest9, &ResponseSize, Response);
@@ -727,7 +727,7 @@ void TestSpdmResponderCapabilityCase14(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xe;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest10Size, &mSpdmGetCapabilityRequest10, &ResponseSize, Response);
@@ -751,7 +751,7 @@ void TestSpdmResponderCapabilityCase15(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xf;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest11Size, &mSpdmGetCapabilityRequest11, &ResponseSize, Response);
@@ -775,7 +775,7 @@ void TestSpdmResponderCapabilityCase16(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x10;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest12Size, &mSpdmGetCapabilityRequest12, &ResponseSize, Response);
@@ -799,7 +799,7 @@ void TestSpdmResponderCapabilityCase17(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x11;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest13Size, &mSpdmGetCapabilityRequest13, &ResponseSize, Response);
@@ -823,7 +823,7 @@ void TestSpdmResponderCapabilityCase18(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x12;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
@@ -849,7 +849,7 @@ void TestSpdmResponderCapabilityCase19(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x13;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest15Size, &mSpdmGetCapabilityRequest15, &ResponseSize, Response);
@@ -873,7 +873,7 @@ void TestSpdmResponderCapabilityCase20(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x14;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest16Size, &mSpdmGetCapabilityRequest16, &ResponseSize, Response);
@@ -897,7 +897,7 @@ void TestSpdmResponderCapabilityCase21(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x15;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest17Size, &mSpdmGetCapabilityRequest17, &ResponseSize, Response);
@@ -921,7 +921,7 @@ void TestSpdmResponderCapabilityCase22(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x16;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseCapability (SpdmContext, mSpdmGetCapabilityRequest18Size, &mSpdmGetCapabilityRequest18, &ResponseSize, Response);
@@ -949,7 +949,7 @@ int SpdmResponderCapabilityTestMain(void) {
     cmocka_unit_test(TestSpdmResponderCapabilityCase4),
     // ResponseState: SpdmResponseStateNotReady
     cmocka_unit_test(TestSpdmResponderCapabilityCase5),
-    // SpdmCmdReceiveState Check
+    // ConnectionState Check
     cmocka_unit_test(TestSpdmResponderCapabilityCase6),
     // Invalid requester capabilities flag (random flag)
     cmocka_unit_test(TestSpdmResponderCapabilityCase7),

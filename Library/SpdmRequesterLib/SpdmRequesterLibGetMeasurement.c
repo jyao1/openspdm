@@ -74,14 +74,30 @@ TrySpdmGetMeasurement (
   VOID                                      *Signature;
   UINTN                                     SignatureSize;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
+  SPDM_SESSION_INFO                         *SessionInfo;
+  SPDM_SESSION_STATE                        SessionState;
 
   SpdmContext = Context;
-  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_CHALLENGE_RECEIVE_FLAG) == 0)) {
-    return RETURN_DEVICE_ERROR;
-  }
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP)) {
-    return RETURN_DEVICE_ERROR;
+    return RETURN_UNSUPPORTED;
+  }
+  if (SessionId == NULL) {
+    if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAuthenticated) {
+      return RETURN_UNSUPPORTED;
+    }
+  } else {
+    if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+      return RETURN_UNSUPPORTED;
+    }
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);
+    if (SessionInfo == NULL) {
+      ASSERT (FALSE);
+      return RETURN_UNSUPPORTED;
+    }
+    SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+    if (SessionState != SpdmSessionStateEstablished) {
+      return RETURN_UNSUPPORTED;
+    }
   }
 
   if ((SlotIdParam >= MAX_SPDM_SLOT_COUNT) && (SlotIdParam != 0xF)) {
@@ -341,7 +357,6 @@ TrySpdmGetMeasurement (
   }
 
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_MEASUREMENTS_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }
 

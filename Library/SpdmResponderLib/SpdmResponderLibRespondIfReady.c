@@ -43,6 +43,11 @@ SpdmGetResponseRespondIfReady (
 
   SpdmContext = Context;
   SpdmRequest = Request;
+
+  if (SpdmContext->ResponseState == SpdmResponseStateNeedResync) {
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->RequestResponseCode, ResponseSize, Response);
+  }
+
   if (RequestSize != sizeof(SPDM_MESSAGE_HEADER)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;

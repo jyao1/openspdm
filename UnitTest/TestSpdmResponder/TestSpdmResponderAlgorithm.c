@@ -45,7 +45,7 @@ void TestSpdmResponderAlgorithmCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;  
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
@@ -70,8 +70,7 @@ void TestSpdmResponderAlgorithmCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;  
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
@@ -99,7 +98,7 @@ void TestSpdmResponderAlgorithmCase3(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->ResponseState = SpdmResponseStateBusy;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
@@ -128,7 +127,7 @@ void TestSpdmResponderAlgorithmCase4(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
@@ -158,7 +157,7 @@ void TestSpdmResponderAlgorithmCase5(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
@@ -189,7 +188,7 @@ void TestSpdmResponderAlgorithmCase6(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->ResponseState = SpdmResponseStateNormal;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.MeasurementSpec = mUseMeasurementSpec;
@@ -222,7 +221,7 @@ int SpdmResponderAlgorithmTestMain(void) {
     cmocka_unit_test(TestSpdmResponderAlgorithmCase4),
     // ResponseState: SpdmResponseStateNotReady
     cmocka_unit_test(TestSpdmResponderAlgorithmCase5),
-    // SpdmCmdReceiveState Check
+    // ConnectionState Check
     cmocka_unit_test(TestSpdmResponderAlgorithmCase6),
   };
 

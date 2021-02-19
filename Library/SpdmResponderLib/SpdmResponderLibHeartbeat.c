@@ -39,21 +39,37 @@ SpdmGetResponseHeartbeat (
   SPDM_HEARTBEAT_RESPONSE     *SpdmResponse;
   SPDM_HEARTBEAT_REQUEST      *SpdmRequest;
   SPDM_DEVICE_CONTEXT         *SpdmContext;
+  SPDM_SESSION_INFO           *SessionInfo;
+  SPDM_SESSION_STATE          SessionState;
 
   SpdmContext = Context;
   SpdmRequest = Request;
 
-  if (((SpdmContext->SpdmCmdReceiveState & SPDM_FINISH_RECEIVE_FLAG) == 0) &&
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_FINISH_RECEIVE_FLAG) == 0)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
+  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
-    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
+  if (!SpdmContext->LastSpdmRequestSessionIdValid) {
+    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SpdmContext->LastSpdmRequestSessionId);
+  if (SessionInfo == NULL) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+  if (SessionState != SpdmSessionStateEstablished) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
 
   if (RequestSize != sizeof(SPDM_HEARTBEAT_REQUEST)) {
@@ -71,7 +87,6 @@ SpdmGetResponseHeartbeat (
   SpdmResponse->Header.Param1 = 0;
   SpdmResponse->Header.Param2 = 0;
 
-  SpdmContext->SpdmCmdReceiveState |= SPDM_HEART_BEAT_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }
 

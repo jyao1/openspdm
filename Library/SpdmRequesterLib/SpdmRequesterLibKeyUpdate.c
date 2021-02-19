@@ -39,19 +39,23 @@ SpdmKeyUpdate (
   SPDM_KEY_UPDATE_ACTION             Action;
   SPDM_DEVICE_CONTEXT                *SpdmContext;
   SPDM_SESSION_INFO                  *SessionInfo;
+  SPDM_SESSION_STATE                 SessionState;
 
   SpdmContext = Context;
-  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-  if (SessionInfo == NULL) {
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP)) {
     return RETURN_UNSUPPORTED;
   }
-
-  if (((SpdmContext->SpdmCmdReceiveState & SPDM_FINISH_RECEIVE_FLAG) == 0) &&
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_FINISH_RECEIVE_FLAG) == 0)) {
-    return RETURN_DEVICE_ERROR;
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+    return RETURN_UNSUPPORTED;
   }
-  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP)) {
-    return RETURN_DEVICE_ERROR;
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    ASSERT (FALSE);
+    return RETURN_UNSUPPORTED;
+  }
+  SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+  if (SessionState != SpdmSessionStateEstablished) {
+    return RETURN_UNSUPPORTED;
   }
 
   if (SingleDirection) {

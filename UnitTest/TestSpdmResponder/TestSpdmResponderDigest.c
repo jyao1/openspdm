@@ -43,7 +43,7 @@ void TestSpdmResponderDigestCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;  
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG; 
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated; 
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
@@ -74,8 +74,7 @@ void TestSpdmResponderDigestCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;  
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
@@ -110,7 +109,7 @@ void TestSpdmResponderDigestCase3(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->ResponseState = SpdmResponseStateBusy;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
@@ -145,7 +144,7 @@ void TestSpdmResponderDigestCase4(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
@@ -181,7 +180,7 @@ void TestSpdmResponderDigestCase5(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
@@ -203,7 +202,7 @@ void TestSpdmResponderDigestCase5(void **state) {
 }
 
 /**
-  Test 6: receives a valid GET_DIGESTS request message from Requester, but SpdmCmdReceiveState equals to zero and makes the check fail, 
+  Test 6: receives a valid GET_DIGESTS request message from Requester, but ConnectionState equals to zero and makes the check fail, 
   meaning that steps GET_CAPABILITIES-CAPABILITIES and NEGOTIATE_ALGORITHMS-ALGORITHMS of the protocol were not previously completed
   Expected Behavior: produces an ERROR response message with error code = UnexpectedRequest
 **/
@@ -219,7 +218,7 @@ void TestSpdmResponderDigestCase6(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->ResponseState = SpdmResponseStateNormal;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
@@ -252,7 +251,7 @@ void TestSpdmResponderDigestCase7(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
@@ -286,7 +285,7 @@ void TestSpdmResponderDigestCase8(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->LocalContext.LocalCertChainProvision[0] = LocalCertificateChain;
@@ -321,7 +320,7 @@ void TestSpdmResponderDigestCase9(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
   
@@ -359,7 +358,7 @@ int SpdmResponderDigestTestMain(void) {
     cmocka_unit_test(TestSpdmResponderDigestCase4),
     // ResponseState: SpdmResponseStateNotReady
     cmocka_unit_test(TestSpdmResponderDigestCase5),
-    // SpdmCmdReceiveState Check
+    // ConnectionState Check
     cmocka_unit_test(TestSpdmResponderDigestCase6),
     // Internal cache full (request message)
     cmocka_unit_test(TestSpdmResponderDigestCase7),

@@ -78,7 +78,7 @@ void TestSpdmResponderPskFinishCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -109,6 +109,7 @@ void TestSpdmResponderPskFinishCase1(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetRequestFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   HmacSize = GetSpdmHashSize (mUseHashAlgo);
@@ -148,7 +149,7 @@ void TestSpdmResponderPskFinishCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -179,6 +180,7 @@ void TestSpdmResponderPskFinishCase2(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetRequestFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   Ptr = mSpdmPskFinishRequest2.VerifyData;
@@ -220,7 +222,7 @@ void TestSpdmResponderPskFinishCase3(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->ResponseState = SpdmResponseStateBusy;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -251,6 +253,7 @@ void TestSpdmResponderPskFinishCase3(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetRequestFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   HmacSize = GetSpdmHashSize (mUseHashAlgo);
@@ -295,7 +298,7 @@ void TestSpdmResponderPskFinishCase4(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -326,6 +329,7 @@ void TestSpdmResponderPskFinishCase4(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetRequestFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   HmacSize = GetSpdmHashSize (mUseHashAlgo);
@@ -371,7 +375,7 @@ void TestSpdmResponderPskFinishCase5(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -402,6 +406,7 @@ void TestSpdmResponderPskFinishCase5(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetRequestFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   HmacSize = GetSpdmHashSize (mUseHashAlgo);
@@ -448,7 +453,7 @@ void TestSpdmResponderPskFinishCase6(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->ResponseState = SpdmResponseStateNormal;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -479,6 +484,7 @@ void TestSpdmResponderPskFinishCase6(void **state) {
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   SetMem (mDummyBuffer, HashSize, (UINT8)(0xFF));
   SpdmSecuredMessageSetRequestFinishedKey (SessionInfo->SecuredMessageContext, mDummyBuffer, HashSize);
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
 
   HashSize = GetSpdmHashSize (mUseHashAlgo);
   HmacSize = GetSpdmHashSize (mUseHashAlgo);
@@ -518,7 +524,7 @@ int SpdmResponderPskFinishTestMain(void) {
     cmocka_unit_test(TestSpdmResponderPskFinishCase4),
     // ResponseState: SpdmResponseStateNotReady
     cmocka_unit_test(TestSpdmResponderPskFinishCase5),
-    // SpdmCmdReceiveState Check
+    // ConnectionState Check
     cmocka_unit_test(TestSpdmResponderPskFinishCase6),
   };
 

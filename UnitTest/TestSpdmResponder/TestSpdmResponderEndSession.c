@@ -48,7 +48,7 @@ void TestSpdmResponderEndSessionCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -76,7 +76,8 @@ void TestSpdmResponderEndSessionCase1(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseEndSession (SpdmContext, mSpdmEndSessionRequest1Size, &mSpdmEndSessionRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -101,7 +102,7 @@ void TestSpdmResponderEndSessionCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -129,7 +130,8 @@ void TestSpdmResponderEndSessionCase2(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseEndSession (SpdmContext, mSpdmEndSessionRequest2Size, &mSpdmEndSessionRequest2, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -157,7 +159,7 @@ void TestSpdmResponderEndSessionCase3(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->ResponseState = SpdmResponseStateBusy;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -185,7 +187,8 @@ void TestSpdmResponderEndSessionCase3(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseEndSession (SpdmContext, mSpdmEndSessionRequest1Size, &mSpdmEndSessionRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -214,7 +217,7 @@ void TestSpdmResponderEndSessionCase4(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -242,7 +245,8 @@ void TestSpdmResponderEndSessionCase4(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseEndSession (SpdmContext, mSpdmEndSessionRequest1Size, &mSpdmEndSessionRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -272,7 +276,7 @@ void TestSpdmResponderEndSessionCase5(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -300,7 +304,8 @@ void TestSpdmResponderEndSessionCase5(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseEndSession (SpdmContext, mSpdmEndSessionRequest1Size, &mSpdmEndSessionRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -331,7 +336,7 @@ void TestSpdmResponderEndSessionCase6(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->ResponseState = SpdmResponseStateNormal;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -359,7 +364,8 @@ void TestSpdmResponderEndSessionCase6(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseEndSession (SpdmContext, mSpdmEndSessionRequest1Size, &mSpdmEndSessionRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -388,7 +394,7 @@ int SpdmResponderEndSessionTestMain(void) {
     cmocka_unit_test(TestSpdmResponderEndSessionCase4),
     // ResponseState: SpdmResponseStateNotReady
     cmocka_unit_test(TestSpdmResponderEndSessionCase5),
-    // SpdmCmdReceiveState Check
+    // ConnectionState Check
     cmocka_unit_test(TestSpdmResponderEndSessionCase6),
   };
 

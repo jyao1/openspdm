@@ -320,7 +320,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -339,7 +339,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;  
@@ -358,14 +358,14 @@ void TestSpdmRequesterNegotiateAlgorithmCase3(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
   SpdmContext->Transcript.MessageA.BufferSize = 0;
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
-  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (Status, RETURN_UNSUPPORTED);
   assert_int_equal (SpdmContext->Transcript.MessageA.BufferSize, 0);
 }
 
@@ -377,7 +377,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase4(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -396,7 +396,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase5(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -415,7 +415,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase6(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -434,7 +434,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase7(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -442,7 +442,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase7(void **state) {
 
   Status = SpdmNegotiateAlgorithms (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  assert_int_equal (SpdmContext->SpdmCmdReceiveState, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.ConnectionState, SpdmConnectionStateNotStarted);
   assert_int_equal (SpdmContext->Transcript.MessageA.BufferSize, 0);
 }
 
@@ -454,7 +454,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase8(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -472,7 +472,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase9(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -491,7 +491,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase10(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xA;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -514,7 +514,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase11(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xB;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -538,7 +538,7 @@ void TestSpdmRequesterNegotiateAlgorithmCase12(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xC;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
   SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
   SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
   SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -565,7 +565,7 @@ int SpdmRequesterNegotiateAlgorithmTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterNegotiateAlgorithmCase1),
       // Successful response
       cmocka_unit_test(TestSpdmRequesterNegotiateAlgorithmCase2),
-      // SpdmCmdReceiveState check failed
+      // ConnectionState check failed
       cmocka_unit_test(TestSpdmRequesterNegotiateAlgorithmCase3),
       // Error response: SPDM_ERROR_CODE_INVALID_REQUEST
       cmocka_unit_test(TestSpdmRequesterNegotiateAlgorithmCase4),

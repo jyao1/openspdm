@@ -47,18 +47,35 @@ SpdmGetResponseFinish (
   SPDM_SESSION_INFO        *SessionInfo;
   UINT8                    TH2HashData[64];
   RETURN_STATUS            Status;
+  SPDM_SESSION_STATE       SessionState;
 
   SpdmContext = Context;
   SpdmRequest = Request;
 
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_KEY_EXCHANGE_RECEIVE_FLAG) == 0) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
-
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_EXCHANGE, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
+    // No handshake in clear, then it must be in a session.
+    if (!SpdmContext->LastSpdmRequestSessionIdValid) {
+      SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+  } else {
+    // handshake in clear, then it must not be in a session.
+    if (SpdmContext->LastSpdmRequestSessionIdValid) {
+      SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+  }
   if (SpdmContext->LastSpdmRequestSessionIdValid) {
     SessionId = SpdmContext->LastSpdmRequestSessionId;
   } else {
@@ -66,6 +83,11 @@ SpdmGetResponseFinish (
   }
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+  SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+  if (SessionState != SpdmSessionStateHandshaking) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
@@ -176,8 +198,6 @@ SpdmGetResponseFinish (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-
-  SpdmContext->SpdmCmdReceiveState |= SPDM_FINISH_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;
 }

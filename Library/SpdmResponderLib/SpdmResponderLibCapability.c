@@ -136,12 +136,12 @@ SpdmGetResponseCapability (
   SpdmContext = Context;
   SpdmRequest = Request;
 
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_VERSION_RECEIVE_FLAG) == 0) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
+  }
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAfterVersion) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
 
   if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
@@ -189,8 +189,11 @@ SpdmGetResponseCapability (
   if (SpdmResponse->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
     SpdmContext->ConnectionInfo.Capability.CTExponent = SpdmRequest->CTExponent;
     SpdmContext->ConnectionInfo.Capability.Flags = SpdmRequest->Flags;
+  } else {
+    SpdmContext->ConnectionInfo.Capability.CTExponent = 0;
+    SpdmContext->ConnectionInfo.Capability.Flags = 0;
   }
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CAPABILITIES_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
 
   return RETURN_SUCCESS;
 }

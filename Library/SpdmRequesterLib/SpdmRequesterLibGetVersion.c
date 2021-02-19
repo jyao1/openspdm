@@ -40,6 +40,8 @@ TrySpdmGetVersion (
   UINT8                                     CompatibleVersionCount;
   SPDM_VERSION_NUMBER                       CompatibleVersionNumberEntry[MAX_SPDM_VERSION_COUNT];
 
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
+
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   SpdmRequest.Header.RequestResponseCode = SPDM_GET_VERSION;
   SpdmRequest.Header.Param1 = 0;
@@ -122,8 +124,7 @@ TrySpdmGetVersion (
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = CompatibleVersionCount;
   CopyMem (SpdmContext->ConnectionInfo.Version.SpdmVersion, CompatibleVersionNumberEntry, sizeof(SPDM_VERSION_NUMBER) * CompatibleVersionCount);
 
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
-  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiating;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   return RETURN_SUCCESS;
 }
 

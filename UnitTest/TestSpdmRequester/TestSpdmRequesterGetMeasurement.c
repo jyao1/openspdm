@@ -1476,8 +1476,7 @@ void TestSpdmRequesterGetMeasurementCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1516,8 +1515,7 @@ void TestSpdmRequesterGetMeasurementCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1538,7 +1536,7 @@ void TestSpdmRequesterGetMeasurementCase2(void **state) {
 
 /**
   Test 3: Error case, attempt to get measurements before GET_DIGESTS, GET_CAPABILITIES, and NEGOTIATE_ALGORITHMS
-  Expected Behavior: get a RETURN_DEVICE_ERROR return code, with an empty Transcript.MessageM
+  Expected Behavior: get a RETURN_UNSUPPORTED return code, with an empty Transcript.MessageM
 **/
 void TestSpdmRequesterGetMeasurementCase3(void **state) {
   RETURN_STATUS        Status;
@@ -1556,7 +1554,7 @@ void TestSpdmRequesterGetMeasurementCase3(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1570,7 +1568,7 @@ void TestSpdmRequesterGetMeasurementCase3(void **state) {
 
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, NULL, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
-  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (Status, RETURN_UNSUPPORTED);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
@@ -1595,8 +1593,7 @@ void TestSpdmRequesterGetMeasurementCase4(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1635,8 +1632,7 @@ void TestSpdmRequesterGetMeasurementCase5(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1675,8 +1671,7 @@ void TestSpdmRequesterGetMeasurementCase6(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1697,7 +1692,7 @@ void TestSpdmRequesterGetMeasurementCase6(void **state) {
 
 /**
   Test 7: Error case, get an error response with code SPDM_ERROR_CODE_REQUEST_RESYNCH
-  Expected Behavior: get a RETURN_DEVICE_ERROR return code, with an empty Transcript.MessageM, and cleared SpdmCmdReceiveState
+  Expected Behavior: get a RETURN_DEVICE_ERROR return code, with an empty Transcript.MessageM
 **/
 void TestSpdmRequesterGetMeasurementCase7(void **state) {
   RETURN_STATUS        Status;
@@ -1715,8 +1710,7 @@ void TestSpdmRequesterGetMeasurementCase7(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1731,7 +1725,7 @@ void TestSpdmRequesterGetMeasurementCase7(void **state) {
   MeasurementRecordLength = sizeof(MeasurementRecord);
   Status = SpdmGetMeasurement (SpdmContext, NULL, RequestAttribute, 1, 0, &NumberOfBlock, &MeasurementRecordLength, MeasurementRecord);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  assert_int_equal (SpdmContext->SpdmCmdReceiveState, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.ConnectionState, SpdmConnectionStateNotStarted);
   assert_int_equal (SpdmContext->Transcript.MessageM.BufferSize, 0);
   free(Data);
 }
@@ -1756,8 +1750,7 @@ void TestSpdmRequesterGetMeasurementCase8(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1795,8 +1788,7 @@ void TestSpdmRequesterGetMeasurementCase9(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1833,8 +1825,7 @@ void TestSpdmRequesterGetMeasurementCase10(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xA;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1876,8 +1867,7 @@ void TestSpdmRequesterGetMeasurementCase11(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xB;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1919,8 +1909,7 @@ void TestSpdmRequesterGetMeasurementCase12(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -1962,8 +1951,7 @@ void TestSpdmRequesterGetMeasurementCase13(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2005,8 +1993,7 @@ void TestSpdmRequesterGetMeasurementCase14(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2048,8 +2035,7 @@ void TestSpdmRequesterGetMeasurementCase15(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2092,8 +2078,7 @@ void TestSpdmRequesterGetMeasurementCase16(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
@@ -2142,8 +2127,7 @@ void TestSpdmRequesterGetMeasurementCase17(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2192,8 +2176,7 @@ void TestSpdmRequesterGetMeasurementCase18(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2235,8 +2218,7 @@ void TestSpdmRequesterGetMeasurementCase19(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2278,8 +2260,7 @@ void TestSpdmRequesterGetMeasurementCase20(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2321,8 +2302,7 @@ void TestSpdmRequesterGetMeasurementCase21(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2366,8 +2346,7 @@ void TestSpdmRequesterGetMeasurementCase22(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2416,8 +2395,7 @@ void TestSpdmRequesterGetMeasurementCase23(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2459,8 +2437,7 @@ void TestSpdmRequesterGetMeasurementCase24(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2502,8 +2479,7 @@ void TestSpdmRequesterGetMeasurementCase25(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2545,8 +2521,7 @@ void TestSpdmRequesterGetMeasurementCase26(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2588,8 +2563,7 @@ void TestSpdmRequesterGetMeasurementCase27(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2632,8 +2606,7 @@ void TestSpdmRequesterGetMeasurementCase28(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2676,8 +2649,7 @@ void TestSpdmRequesterGetMeasurementCase29(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2718,8 +2690,7 @@ void TestSpdmRequesterGetMeasurementCase30(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1E;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2761,8 +2732,7 @@ void TestSpdmRequesterGetMeasurementCase31(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2801,8 +2771,7 @@ void TestSpdmRequesterGetMeasurementCase32(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x20;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
   SpdmContext->Transcript.MessageM.BufferSize = 0;
@@ -2834,7 +2803,7 @@ int SpdmRequesterGetMeasurementTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase1),
       // Successful response to get measurement with signature
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase2),
-      // SpdmCmdReceiveState check failed
+      // ConnectionState check failed
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase3),
       // Error response: SPDM_ERROR_CODE_INVALID_REQUEST
       cmocka_unit_test(TestSpdmRequesterGetMeasurementCase4),

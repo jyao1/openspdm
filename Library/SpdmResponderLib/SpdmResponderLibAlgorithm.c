@@ -190,12 +190,12 @@ SpdmGetResponseAlgorithm (
   SpdmContext = Context;
   SpdmRequest = Request;
 
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
+  }
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAfterCapabilities) {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
 
   if (RequestSize < sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST)) {
@@ -427,8 +427,12 @@ SpdmGetResponseAlgorithm (
         return RETURN_SECURITY_VIOLATION;
       }
     }
+  } else {
+    SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = 0;
+    SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = 0;
+    SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = 0;
+    SpdmContext->ConnectionInfo.Algorithm.KeySchedule = 0;
   }
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
 
   return RETURN_SUCCESS;

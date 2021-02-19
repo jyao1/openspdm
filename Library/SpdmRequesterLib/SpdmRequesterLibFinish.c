@@ -52,14 +52,22 @@ TrySpdmSendReceiveFinish (
   UINT8                                     *Ptr;
   BOOLEAN                                   Result;
   UINT8                                     TH2HashData[64];
+  SPDM_SESSION_STATE                        SessionState;
 
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_KEY_EXCHANGE_RECEIVE_FLAG) == 0) {
-    return RETURN_DEVICE_ERROR;
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)) {
+    return RETURN_UNSUPPORTED;
+  }
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+    return RETURN_UNSUPPORTED;
   }
 
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     ASSERT (FALSE);
+    return RETURN_UNSUPPORTED;
+  }
+  SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+  if (SessionState != SpdmSessionStateHandshaking) {
     return RETURN_UNSUPPORTED;
   }
 
@@ -188,7 +196,6 @@ TrySpdmSendReceiveFinish (
 
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_FINISH_RECEIVE_FLAG;
   
   return RETURN_SUCCESS;
 }

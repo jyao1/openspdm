@@ -40,15 +40,24 @@ TrySpdmHeartbeat (
   SPDM_HEARTBEAT_RESPONSE_MINE              SpdmResponse;
   UINTN                                     SpdmResponseSize;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
+  SPDM_SESSION_INFO                         *SessionInfo;
+  SPDM_SESSION_STATE                        SessionState;
 
   SpdmContext = Context;
-
-  if (((SpdmContext->SpdmCmdReceiveState & SPDM_FINISH_RECEIVE_FLAG) == 0) &&
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_PSK_FINISH_RECEIVE_FLAG) == 0)) {
-    return RETURN_DEVICE_ERROR;
-  }
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP)) {
-    return RETURN_DEVICE_ERROR;
+    return RETURN_UNSUPPORTED;
+  }
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+    return RETURN_UNSUPPORTED;
+  }
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    ASSERT (FALSE);
+    return RETURN_UNSUPPORTED;
+  }
+  SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+  if (SessionState != SpdmSessionStateEstablished) {
+    return RETURN_UNSUPPORTED;
   }
 
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -81,7 +90,6 @@ TrySpdmHeartbeat (
     return RETURN_DEVICE_ERROR;
   }
 
-  SpdmContext->SpdmCmdReceiveState |= SPDM_HEART_BEAT_RECEIVE_FLAG;
   return RETURN_SUCCESS;
 }
 

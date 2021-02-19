@@ -36,7 +36,7 @@ SpdmHandleSimpleErrorResponse (
   The SPDM response code must be SPDM_ERROR.
   For error code RESPONSE_NOT_READY, this function sends RESPOND_IF_READY and receives an expected SPDM response.
   For error code BUSY, this function shrinks the managed buffer, and return RETURN_NO_RESPONSE.
-  For error code REQUEST_RESYNCH, this function shrinks the managed buffer, clears SpdmCmdReceiveState, and return RETURN_DEVICE_ERROR.
+  For error code REQUEST_RESYNCH, this function shrinks the managed buffer, clears ConnectionState, and return RETURN_DEVICE_ERROR.
   For any other error code, this function shrinks the managed buffer, and return RETURN_DEVICE_ERROR.
 
   @param  SpdmContext                  A pointer to the SPDM context.

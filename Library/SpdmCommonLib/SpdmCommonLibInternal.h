@@ -310,10 +310,6 @@ typedef struct {
   //
   UINT32                          LatestSessionId;
   //
-  // Register Spdm request command receive Status (responder only)
-  //
-  UINT64                          SpdmCmdReceiveState;
-  //
   // Register for Responder state, be initial to Normal (responder only)
   //
   SPDM_RESPONSE_STATE             ResponseState;

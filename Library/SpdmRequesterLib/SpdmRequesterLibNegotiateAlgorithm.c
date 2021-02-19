@@ -65,9 +65,10 @@ TrySpdmNegotiateAlgorithms (
   UINT8                                          FixedAlgSize;
   UINT8                                          ExtAlgCount;
 
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_CAPABILITIES_RECEIVE_FLAG) == 0) {
-    return RETURN_DEVICE_ERROR;
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAfterCapabilities) {
+    return RETURN_UNSUPPORTED;
   }
+
   ZeroMem (&SpdmRequest, sizeof(SpdmRequest));
   if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
     SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -261,8 +262,13 @@ TrySpdmNegotiateAlgorithms (
         return RETURN_SECURITY_VIOLATION;
       }
     }
+  } else {
+    SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = 0;
+    SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = 0;
+    SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = 0;
+    SpdmContext->ConnectionInfo.Algorithm.KeySchedule = 0;
   }
-  SpdmContext->SpdmCmdReceiveState |= SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG;
+
   SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   return RETURN_SUCCESS;
 }

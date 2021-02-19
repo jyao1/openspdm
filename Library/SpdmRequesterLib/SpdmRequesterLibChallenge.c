@@ -68,11 +68,11 @@ TrySpdmChallenge (
   SPDM_CHALLENGE_AUTH_RESPONSE_ATTRIBUTE    AuthAttribute;
 
   SpdmContext = Context;
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) {
-    return RETURN_DEVICE_ERROR;
-  }
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) {
-    return RETURN_DEVICE_ERROR;
+    return RETURN_UNSUPPORTED;
+  }
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+    return RETURN_UNSUPPORTED;
   }
 
   if ((SlotNum >= MAX_SPDM_SLOT_COUNT) && (SlotNum != 0xFF)) {
@@ -247,7 +247,6 @@ TrySpdmChallenge (
     }
   }
 
-  SpdmContext->SpdmCmdReceiveState |= SPDM_CHALLENGE_RECEIVE_FLAG;
   SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
 
   return RETURN_SUCCESS;

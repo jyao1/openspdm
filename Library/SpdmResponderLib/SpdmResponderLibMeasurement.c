@@ -131,22 +131,40 @@ SpdmGetResponseMeasurement (
   UINT8                          DeviceMeasurementCount;
   UINTN                          DeviceMeasurementSize;
   BOOLEAN                        Ret;
+  SPDM_SESSION_INFO              *SessionInfo;
+  SPDM_SESSION_STATE             SessionState;
 
   SpdmContext = Context;
   SpdmRequest = Request;
 
-  if (((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) ||
-      ((SpdmContext->SpdmCmdReceiveState & SPDM_CHALLENGE_RECEIVE_FLAG) == 0)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
+  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
+    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
   // check local context here, because MEAS_CAP is reserved for requester.
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_MEASUREMENTS, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
-    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
+  if (!SpdmContext->LastSpdmRequestSessionIdValid) {
+    if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAuthenticated) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+  } else {
+    if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SpdmContext->LastSpdmRequestSessionId);
+    if (SessionInfo == NULL) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+      return RETURN_SUCCESS;
+    }
+    SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+    if (SessionState != SpdmSessionStateEstablished) {
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+      return RETURN_UNSUPPORTED;
+    }
   }
 
   if (SpdmRequest->Header.Param1 == SPDM_GET_MEASUREMENTS_REQUEST_ATTRIBUTES_GENERATE_SIGNATURE) {
@@ -404,7 +422,7 @@ SpdmGetResponseMeasurement (
       return RETURN_SUCCESS;
     }
   }
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_MEASUREMENTS_RECEIVE_FLAG;
+
   return RETURN_SUCCESS;
 }
 

@@ -581,7 +581,7 @@ void TestSpdmRequesterGetCapabilityCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -597,7 +597,7 @@ void TestSpdmRequesterGetCapabilityCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -615,12 +615,12 @@ void TestSpdmRequesterGetCapabilityCase3(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
   Status = SpdmGetCapabilities (SpdmContext);
-  assert_int_equal (Status, RETURN_DEVICE_ERROR);
+  assert_int_equal (Status, RETURN_UNSUPPORTED);
 }
 
 void TestSpdmRequesterGetCapabilityCase4(void **state) {
@@ -631,7 +631,7 @@ void TestSpdmRequesterGetCapabilityCase4(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -647,7 +647,7 @@ void TestSpdmRequesterGetCapabilityCase5(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -663,7 +663,7 @@ void TestSpdmRequesterGetCapabilityCase6(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -681,13 +681,13 @@ void TestSpdmRequesterGetCapabilityCase7(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x7;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
   Status = SpdmGetCapabilities (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  assert_int_equal (SpdmContext->SpdmCmdReceiveState, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.ConnectionState, SpdmConnectionStateNotStarted);
 }
 
 void TestSpdmRequesterGetCapabilityCase8(void **state) {
@@ -698,7 +698,7 @@ void TestSpdmRequesterGetCapabilityCase8(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x8;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -714,7 +714,7 @@ void TestSpdmRequesterGetCapabilityCase9(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x9;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -732,7 +732,7 @@ void TestSpdmRequesterGetCapabilityCase10(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xa;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -754,7 +754,7 @@ void TestSpdmRequesterGetCapabilityCase11(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xb;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -776,7 +776,7 @@ void TestSpdmRequesterGetCapabilityCase12(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xc;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -794,7 +794,7 @@ void TestSpdmRequesterGetCapabilityCase13(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xd;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -810,7 +810,7 @@ void TestSpdmRequesterGetCapabilityCase14(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xe;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -826,7 +826,7 @@ void TestSpdmRequesterGetCapabilityCase15(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xf;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG;
@@ -845,7 +845,7 @@ void TestSpdmRequesterGetCapabilityCase16(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
@@ -866,7 +866,7 @@ void TestSpdmRequesterGetCapabilityCase17(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
@@ -887,7 +887,7 @@ void TestSpdmRequesterGetCapabilityCase18(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
   SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
@@ -908,7 +908,7 @@ void TestSpdmRequesterGetCapabilityCase19(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -930,7 +930,7 @@ void TestSpdmRequesterGetCapabilityCase20(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -952,7 +952,7 @@ void TestSpdmRequesterGetCapabilityCase21(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -974,7 +974,7 @@ void TestSpdmRequesterGetCapabilityCase22(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -996,7 +996,7 @@ void TestSpdmRequesterGetCapabilityCase23(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -1018,7 +1018,7 @@ void TestSpdmRequesterGetCapabilityCase24(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -1040,7 +1040,7 @@ void TestSpdmRequesterGetCapabilityCase25(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -1062,7 +1062,7 @@ void TestSpdmRequesterGetCapabilityCase26(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -1084,7 +1084,7 @@ void TestSpdmRequesterGetCapabilityCase27(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -1104,7 +1104,7 @@ void TestSpdmRequesterGetCapabilityCase28(void **state) {
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
   SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
   ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
 
   SpdmContext->LocalContext.Capability.CTExponent = 0;
@@ -1126,7 +1126,7 @@ int SpdmRequesterGetCapabilityTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterGetCapabilityCase1),
       // Successful response
       cmocka_unit_test(TestSpdmRequesterGetCapabilityCase2),
-      // SpdmCmdReceiveState check failed
+      // ConnectionState check failed
       cmocka_unit_test(TestSpdmRequesterGetCapabilityCase3),
       // Error response: SPDM_ERROR_CODE_INVALID_REQUEST
       cmocka_unit_test(TestSpdmRequesterGetCapabilityCase4),

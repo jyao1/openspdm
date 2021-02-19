@@ -53,6 +53,9 @@ SpdmGetResponseVersion (
 
   SpdmContext = Context;
   SpdmRequest = Request;
+
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
+
   if (SpdmRequest->Header.SPDMVersion != SPDM_MESSAGE_VERSION_10)  {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
@@ -105,8 +108,8 @@ SpdmGetResponseVersion (
 
   SpdmContext->ConnectionInfo.Version.SpdmVersionCount = SpdmContext->LocalContext.Version.SpdmVersionCount;
   CopyMem (SpdmContext->ConnectionInfo.Version.SpdmVersion, SpdmContext->LocalContext.Version.SpdmVersion, sizeof(SPDM_VERSION_NUMBER) * SpdmContext->LocalContext.Version.SpdmVersionCount);
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_VERSION_RECEIVE_FLAG;
-  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiating;
+
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
 
   return RETURN_SUCCESS;
 }

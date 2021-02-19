@@ -76,16 +76,17 @@ TrySpdmSendReceivePskExchange (
   UINT8                                     TH2HashData[64];
   UINT32                                    AlgoSize;
 
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_VERSION_RECEIVE_FLAG) == 0) {
-    return RETURN_DEVICE_ERROR;
-  }
   // Check capabilities even if GET_CAPABILITIES is not sent.
   // Assuming capabilities are provisioned.
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)) {
-    return RETURN_DEVICE_ERROR;
+    return RETURN_UNSUPPORTED;
   }
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) {
-    // Double check if algorithm has been provisioned.
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  {
+    // Double check if algorithm has been provisioned, because ALGORITHM might be skipped.
     if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP)) {
       if (SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec != SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF) {
         return RETURN_DEVICE_ERROR;
@@ -263,7 +264,6 @@ TrySpdmSendReceivePskExchange (
 
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_EXCHANGE_RECEIVE_FLAG;
 
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT)) {
     // No need to send PSK_FINISH, enter application phase directly.
@@ -279,7 +279,6 @@ TrySpdmSendReceivePskExchange (
     }
 
     SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
-    SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
   }
 
   return RETURN_SUCCESS;

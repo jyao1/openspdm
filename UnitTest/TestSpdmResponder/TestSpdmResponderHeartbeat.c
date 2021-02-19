@@ -48,7 +48,7 @@ void TestSpdmResponderHeartbeatCase1(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x1;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -76,7 +76,8 @@ void TestSpdmResponderHeartbeatCase1(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseHeartbeat (SpdmContext, mSpdmHeartbeatRequest1Size, &mSpdmHeartbeatRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -101,7 +102,7 @@ void TestSpdmResponderHeartbeatCase2(void **state) {
   SpdmTestContext = *state;
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x2;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -129,7 +130,8 @@ void TestSpdmResponderHeartbeatCase2(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseHeartbeat (SpdmContext, mSpdmHeartbeatRequest2Size, &mSpdmHeartbeatRequest2, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -157,7 +159,7 @@ void TestSpdmResponderHeartbeatCase3(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x3;
   SpdmContext->ResponseState = SpdmResponseStateBusy;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -185,7 +187,8 @@ void TestSpdmResponderHeartbeatCase3(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseHeartbeat (SpdmContext, mSpdmHeartbeatRequest1Size, &mSpdmHeartbeatRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -214,7 +217,7 @@ void TestSpdmResponderHeartbeatCase4(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x4;
   SpdmContext->ResponseState = SpdmResponseStateNeedResync;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -242,7 +245,8 @@ void TestSpdmResponderHeartbeatCase4(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseHeartbeat (SpdmContext, mSpdmHeartbeatRequest1Size, &mSpdmHeartbeatRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -272,7 +276,7 @@ void TestSpdmResponderHeartbeatCase5(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x5;
   SpdmContext->ResponseState = SpdmResponseStateNotReady;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_PSK_FINISH_RECEIVE_FLAG;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -300,7 +304,8 @@ void TestSpdmResponderHeartbeatCase5(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseHeartbeat (SpdmContext, mSpdmHeartbeatRequest1Size, &mSpdmHeartbeatRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -331,7 +336,7 @@ void TestSpdmResponderHeartbeatCase6(void **state) {
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0x6;
   SpdmContext->ResponseState = SpdmResponseStateNormal;
-  SpdmContext->SpdmCmdReceiveState = 0;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
   SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP;
   SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP;
   SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
@@ -359,7 +364,8 @@ void TestSpdmResponderHeartbeatCase6(void **state) {
   SpdmContext->LastSpdmRequestSessionId = SessionId;
   SessionInfo = &SpdmContext->SessionInfo[0];
   SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
-  
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseHeartbeat (SpdmContext, mSpdmHeartbeatRequest1Size, &mSpdmHeartbeatRequest1, &ResponseSize, Response);
   assert_int_equal (Status, RETURN_SUCCESS);
@@ -388,7 +394,7 @@ int SpdmResponderHeartbeatTestMain(void) {
     cmocka_unit_test(TestSpdmResponderHeartbeatCase4),
     // ResponseState: SpdmResponseStateNotReady
     cmocka_unit_test(TestSpdmResponderHeartbeatCase5),
-    // SpdmCmdReceiveState Check
+    // ConnectionState Check
     cmocka_unit_test(TestSpdmResponderHeartbeatCase6),
   };
 

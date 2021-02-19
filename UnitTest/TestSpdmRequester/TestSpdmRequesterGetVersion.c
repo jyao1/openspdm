@@ -445,7 +445,7 @@ void TestSpdmRequesterGetVersionCase7(void **state) {
 
   Status = SpdmGetVersion (SpdmContext);
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
-  assert_int_equal (SpdmContext->SpdmCmdReceiveState, 0);
+  assert_int_equal (SpdmContext->ConnectionInfo.ConnectionState, SpdmConnectionStateNotStarted);
 }
 
 /**

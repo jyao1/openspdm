@@ -84,11 +84,11 @@ TrySpdmSendReceiveKeyExchange (
   UINTN                                     OpaqueKeyExchangeReqSize;
   UINT8                                     TH1HashData[64];
 
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG) == 0) {
-    return RETURN_DEVICE_ERROR;
-  }
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)) {
-    return RETURN_DEVICE_ERROR;
+    return RETURN_UNSUPPORTED;
+  }
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+    return RETURN_UNSUPPORTED;
   }
 
   if ((SlotNum >= MAX_SPDM_SLOT_COUNT) && (SlotNum != 0xFF)) {
@@ -341,7 +341,6 @@ TrySpdmSendReceiveKeyExchange (
 
   SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
-  SpdmContext->SpdmCmdReceiveState |= SPDM_KEY_EXCHANGE_RECEIVE_FLAG;
 
   return RETURN_SUCCESS;
 }

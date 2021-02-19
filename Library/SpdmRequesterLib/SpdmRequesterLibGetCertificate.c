@@ -58,16 +58,16 @@ TrySpdmGetCertificate (
   LARGE_MANAGED_BUFFER                      CertificateChainBuffer;
   SPDM_DEVICE_CONTEXT                       *SpdmContext;
 
+  SpdmContext = Context;
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP)) {
+    return RETURN_UNSUPPORTED;
+  }
+  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAfterDigests) {
+    return RETURN_UNSUPPORTED;
+  }
+
   InitManagedBuffer (&CertificateChainBuffer, MAX_SPDM_MESSAGE_BUFFER_SIZE);
   Length = MIN(Length, MAX_SPDM_CERT_CHAIN_BLOCK_LEN);
-
-  SpdmContext = Context;
-  if ((SpdmContext->SpdmCmdReceiveState & SPDM_GET_DIGESTS_RECEIVE_FLAG) == 0) {
-    return RETURN_DEVICE_ERROR;
-  }
-  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP)) {
-    return RETURN_DEVICE_ERROR;
-  }
 
   if (SlotNum >= MAX_SPDM_SLOT_COUNT) {
     return RETURN_INVALID_PARAMETER;
@@ -189,7 +189,7 @@ TrySpdmGetCertificate (
         );
     }
   }
-  SpdmContext->SpdmCmdReceiveState |= SPDM_GET_CERTIFICATE_RECEIVE_FLAG;
+
   Status = RETURN_SUCCESS;
 Done:
   return Status;
