@@ -226,6 +226,11 @@ SpdmSaveNegotiatedState (
     NegotiatedState.RequesterCapCTExponent = Data8;
   }
 
+  if ((NegotiatedState.ResponderCapFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP) == 0) {
+    printf ("responder has no CACHE_CAP\n");
+    return SpdmClearNegotiatedState (SpdmContext);
+  }
+
   DataSize = sizeof(Data8);
   SpdmGetData (SpdmContext, SpdmDataMeasurementSpec, &Parameter, &Data8, &DataSize);
   NegotiatedState.MeasurementSpec = Data8;
