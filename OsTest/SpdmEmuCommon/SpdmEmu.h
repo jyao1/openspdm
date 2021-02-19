@@ -26,12 +26,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "assert.h"
 #include "time.h"
 #include "SpdmEmuCommand.h"
+#include "SpdmEmuNvStorage.h"
 
 extern UINT32  mUseTransportLayer;
 extern UINT8   mUseVersion;
 extern UINT8   mUseSecuredMessageVersion;
 extern UINT32  mUseRequesterCapabilityFlags;
-extern UINT32  mUseResonderCapabilityFlags;
+extern UINT32  mUseResponderCapabilityFlags;
 extern UINT32  mUseCapabilityFlags;
 
 extern UINT8   mUseBasicMutAuth;
@@ -54,6 +55,9 @@ extern UINT16  mSupportReqAsymAlgo;
 extern UINT16  mSupportDheAlgo;
 extern UINT16  mSupportAeadAlgo;
 extern UINT16  mSupportKeyScheduleAlgo;
+
+extern CHAR8 *mLoadStateFileName;
+extern CHAR8 *mSaveStateFileName;
 
 VOID
 DumpHexStr (

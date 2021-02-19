@@ -37,9 +37,10 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmResponderSession.o \
     $(OUTPUT_DIR)/SpdmResponderEmu.o \
     $(OUTPUT_DIR)/SpdmEmuCommand.o \
-    $(OUTPUT_DIR)/SpdmTestKey.o \
-    $(OUTPUT_DIR)/SpdmTestPcap.o \
-    $(OUTPUT_DIR)/SpdmTestSupport.o \
+    $(OUTPUT_DIR)/SpdmEmuKey.o \
+    $(OUTPUT_DIR)/SpdmEmuPcap.o \
+    $(OUTPUT_DIR)/SpdmEmuSupport.o \
+    $(OUTPUT_DIR)/SpdmEmuNvStorage.o \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -142,13 +143,16 @@ $(OUTPUT_DIR)/SpdmResponderEmu.o : $(SOURCE_DIR)/SpdmResponderEmu.c
 $(OUTPUT_DIR)/SpdmEmuCommand.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuCommand.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestKey.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuKey.c
+$(OUTPUT_DIR)/SpdmEmuKey.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuKey.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestPcap.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuPcap.c
+$(OUTPUT_DIR)/SpdmEmuPcap.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuPcap.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/SpdmTestSupport.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuSupport.c
+$(OUTPUT_DIR)/SpdmEmuSupport.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuSupport.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmEmuNvStorage.o : $(SOURCE_DIR)/../SpdmEmuCommon/SpdmEmuNvStorage.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

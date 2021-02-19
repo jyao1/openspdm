@@ -17,6 +17,7 @@ SET(src_SpdmResponderTest
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuKey.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuPcap.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuSupport.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuNvStorage.c
 )
 
 SET(SpdmResponderTest_LIBRARY

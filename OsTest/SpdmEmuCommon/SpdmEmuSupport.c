@@ -150,6 +150,8 @@ PrintUsage (
   printf ("   [--meas_op ONE_BY_ONE|ALL]\n");
   printf ("   [--slot <0~7|0xFF>]\n");
   printf ("   [--slot_count <1~8>]\n");
+  printf ("   [--save_state <NegotiateStateFileName>]\n");
+  printf ("   [--load_state <NegotiateStateFileName>]\n");
   printf ("   [--pcap <PcapFileName>]\n");
   printf ("\n");
   printf ("NOTE:\n");
@@ -175,7 +177,19 @@ PrintUsage (
   printf ("   [--meas_op] is the measurement operation in GET_MEASUREMEMT. By default, ONE_BY_ONE is used.\n");
   printf ("   [--slot_id] is to select the peer slot ID in GET_MEASUREMENT, CHALLENGE_AUTH, KEY_EXCHANGE and FINISH. By default, 0 is used.\n");
   printf ("           0xFF can be used to indicate provisioned certificate chain. No GET_CERTIFICATE is needed.\n");
+  printf ("           0xFF must be used to if PUB_KEY_ID is set. No GET_DIGEST/GET_CERTIFICATE is sent.\n");
   printf ("   [--slot_count] is to select the local slot count. By default, 3 is used.\n");
+  printf ("   [--save_state] is to save the current negotiated state to a write-only file.\n");
+  printf ("           The requester and responder will save state after GET_VERSION/GET_CAPABILLITIES/NEGOTIATE_ALGORITHMS.\n");
+  printf ("           (negotiated state == ver|cap|hash|meas_spec|meas_hash|asym|req_asym|dhe|aead|key_schedule)\n");
+  printf ("           The responder should set CACHE capabilities, otherwise the state will not be saved.\n");
+  printf ("           The requester will clear PRESERVE_NEGOTIATED_STATE_CLEAR bit in END_SESSION to preserve, otherwise this bit is set.\n");
+  printf ("           The responder will save empty state, if the requester sets PRESERVE_NEGOTIATED_STATE_CLEAR bit in END_SESSION.\n");
+  printf ("   [--load_state] is to load the negotiated state to current session from a read-only file.\n");
+  printf ("           The requester and responder will provision the state just after SPDM context is created.\n");
+  printf ("           The user need guarantee the state file is gnerated correctly.\n");
+  printf ("           The command line input - ver|cap|hash|meas_spec|meas_hash|asym|req_asym|dhe|aead|key_schedule are ignored.\n");
+  printf ("           The requester will skip GET_VERSION/GET_CAPABILLITIES/NEGOTIATE_ALGORITHMS.\n");
   printf ("   [--pcap] is used to generate PCAP dump file for offline analysis.\n");
 }
 
@@ -769,6 +783,32 @@ ProcessArgs (
         continue;
       } else {
         printf ("invalid --slot_count\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--save_state") == 0) {
+      if (argc >= 2) {
+        mSaveStateFileName = argv[1];
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --save_state\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--load_state") == 0) {
+      if (argc >= 2) {
+        mLoadStateFileName = argv[1];
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --load_state\n");
         PrintUsage (ProgramName);
         exit (0);
       }

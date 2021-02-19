@@ -136,6 +136,10 @@ SpdmClientInit (
     return NULL;
   }
 
+  if (mLoadStateFileName != NULL) {
+    SpdmLoadNegotiatedState (SpdmContext, TRUE);
+  }
+
   if (mUseVersion != SPDM_MESSAGE_VERSION_11) {
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
@@ -160,11 +164,11 @@ SpdmClientInit (
     }
   }
 
-  Data8 = 0;
   ZeroMem (&Parameter, sizeof(Parameter));
   Parameter.Location = SpdmDataLocationLocal;
-  SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof(Data8));
 
+  Data8 = 0;
+  SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof(Data8));
   Data32 = mUseRequesterCapabilityFlags;
   if (mUseCapabilityFlags != 0) {
     Data32 = mUseCapabilityFlags;
@@ -186,12 +190,15 @@ SpdmClientInit (
   Data16 = mSupportKeyScheduleAlgo;
   SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
 
-  Status = SpdmInitConnection (SpdmContext, FALSE);
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmInitConnection - 0x%x\n", (UINT32)Status);
-    free (mSpdmContext);
-    mSpdmContext = NULL;
-    return NULL;
+  if (mLoadStateFileName == NULL) {
+    // Skip if state is loaded
+    Status = SpdmInitConnection (SpdmContext, FALSE);
+    if (RETURN_ERROR(Status)) {
+      printf ("SpdmInitConnection - 0x%x\n", (UINT32)Status);
+      free (mSpdmContext);
+      mSpdmContext = NULL;
+      return NULL;
+    }
   }
 
   ZeroMem (&Parameter, sizeof(Parameter));
@@ -250,6 +257,8 @@ SpdmClientInit (
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);
   }
+
+  SpdmSaveNegotiatedState (SpdmContext, TRUE);
 
   return mSpdmContext;
 }

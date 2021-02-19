@@ -17,6 +17,11 @@ extern UINT8  mReceiveBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
 extern SOCKET mServerSocket;
 
+VOID
+SpdmServerCallback (
+  VOID
+  );
+
 RETURN_STATUS
 EFIAPI
 SpdmGetResponseVendorDefinedRequest (
@@ -123,6 +128,10 @@ SpdmServerInit (
     return NULL;
   }
 
+  if (mLoadStateFileName != NULL) {
+    SpdmLoadNegotiatedState (SpdmContext, FALSE);
+  }
+
   if (mUseVersion != SPDM_MESSAGE_VERSION_11) {
     ZeroMem (&Parameter, sizeof(Parameter));
     Parameter.Location = SpdmDataLocationLocal;
@@ -147,12 +156,12 @@ SpdmServerInit (
     }
   }
 
-  Data8 = 0;
   ZeroMem (&Parameter, sizeof(Parameter));
   Parameter.Location = SpdmDataLocationLocal;
-  SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof(Data8));
 
-  Data32 = mUseResonderCapabilityFlags;
+  Data8 = 0;
+  SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof(Data8));
+  Data32 = mUseResponderCapabilityFlags;
   if (mUseCapabilityFlags != 0) {
     Data32 = mUseCapabilityFlags;
   }
@@ -176,6 +185,11 @@ SpdmServerInit (
   SpdmSetData (SpdmContext, SpdmDataKeySchedule, &Parameter, &Data16, sizeof(Data16));
 
   SpdmRegisterGetResponseFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
+
+  if (mLoadStateFileName != NULL) {
+    // Invoke callback to provision the rest
+    SpdmServerCallback ();
+  }
 
   return mSpdmContext;
 }
@@ -241,7 +255,7 @@ SpdmServerCallback (
     // do not free it
   }
 
-  if ((mUseSlotId == 0xFF) || ((mUseResonderCapabilityFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP) != 0)) {
+  if ((mUseSlotId == 0xFF) || ((mUseResponderCapabilityFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP) != 0)) {
     Res = ReadRequesterPublicCertificateChain (mUseHashAlgo, mUseReqAsymAlgo, &Data, &DataSize, NULL, NULL);
     if (Res) {
       ZeroMem (&Parameter, sizeof(Parameter));
@@ -273,6 +287,8 @@ SpdmServerCallback (
   if (RETURN_ERROR(Status)) {
     printf ("SpdmSetData - %x\n", (UINT32)Status);
   }
+
+  SpdmSaveNegotiatedState (SpdmContext, FALSE);
 
   AlgoProvisioned = TRUE;
 

@@ -79,23 +79,41 @@ SpdmSetData (
     if (DataSize > sizeof(SPDM_VERSION_NUMBER) * MAX_SPDM_VERSION_COUNT) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.Version.SpdmVersionCount = (UINT8)(DataSize / sizeof(SPDM_VERSION_NUMBER));
-    CopyMem (
-      SpdmContext->LocalContext.Version.SpdmVersion,
-      Data,
-      SpdmContext->LocalContext.Version.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER)
-      );
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.Version.SpdmVersionCount = (UINT8)(DataSize / sizeof(SPDM_VERSION_NUMBER));
+      CopyMem (
+        SpdmContext->ConnectionInfo.Version.SpdmVersion,
+        Data,
+        SpdmContext->ConnectionInfo.Version.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER)
+        );
+    } else {
+      SpdmContext->LocalContext.Version.SpdmVersionCount = (UINT8)(DataSize / sizeof(SPDM_VERSION_NUMBER));
+      CopyMem (
+        SpdmContext->LocalContext.Version.SpdmVersion,
+        Data,
+        SpdmContext->LocalContext.Version.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER)
+        );
+    }
     break;
   case SpdmDataSecuredMessageVersion:
     if (DataSize > sizeof(SPDM_VERSION_NUMBER) * MAX_SPDM_VERSION_COUNT) {
       return RETURN_INVALID_PARAMETER;
     }
-    SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount = (UINT8)(DataSize / sizeof(SPDM_VERSION_NUMBER));
-    CopyMem (
-      SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersion,
-      Data,
-      SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER)
-      );
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      SpdmContext->ConnectionInfo.SecuredMessageVersion.SpdmVersionCount = (UINT8)(DataSize / sizeof(SPDM_VERSION_NUMBER));
+      CopyMem (
+        SpdmContext->ConnectionInfo.SecuredMessageVersion.SpdmVersion,
+        Data,
+        SpdmContext->ConnectionInfo.SecuredMessageVersion.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER)
+        );
+    } else {
+      SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount = (UINT8)(DataSize / sizeof(SPDM_VERSION_NUMBER));
+      CopyMem (
+        SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersion,
+        Data,
+        SpdmContext->LocalContext.SecuredMessageVersion.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER)
+        );
+    }
     break;
   case SpdmDataCapabilityFlags:
     if (DataSize != sizeof(UINT32)) {
@@ -192,6 +210,12 @@ SpdmSetData (
     } else {
       SpdmContext->LocalContext.Algorithm.KeySchedule = *(UINT16 *)Data;
     }
+    break;
+  case SpdmDataConnectionState:
+    if (DataSize != sizeof(UINT32)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SpdmContext->ConnectionInfo.ConnectionState = *(UINT32 *)Data;
     break;
   case SpdmDataResponseState:
     if (DataSize != sizeof(UINT32)) {
@@ -345,19 +369,35 @@ SpdmGetData (
   }
 
   switch (DataType) {
-  case SpdmDataCapabilityFlags:
+  case SpdmDataSpdmVersion:
     if (Parameter->Location != SpdmDataLocationConnection) {
       return RETURN_INVALID_PARAMETER;
     }
+    TargetDataSize = SpdmContext->ConnectionInfo.Version.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER);
+    TargetData = SpdmContext->ConnectionInfo.Version.SpdmVersion;
+    break;
+  case SpdmDataSecuredMessageVersion:
+    if (Parameter->Location != SpdmDataLocationConnection) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    TargetDataSize = SpdmContext->ConnectionInfo.SecuredMessageVersion.SpdmVersionCount * sizeof(SPDM_VERSION_NUMBER);
+    TargetData = SpdmContext->ConnectionInfo.SecuredMessageVersion.SpdmVersion;
+    break;
+  case SpdmDataCapabilityFlags:
     TargetDataSize = sizeof(UINT32);
-    TargetData = &SpdmContext->ConnectionInfo.Capability.Flags;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      TargetData = &SpdmContext->ConnectionInfo.Capability.Flags;
+    } else {
+      TargetData = &SpdmContext->LocalContext.Capability.Flags;
+    }
     break;
   case SpdmDataCapabilityCTExponent:
-    if (Parameter->Location != SpdmDataLocationConnection) {
-      return RETURN_INVALID_PARAMETER;
-    }
     TargetDataSize = sizeof(UINT8);
-    TargetData = &SpdmContext->ConnectionInfo.Capability.CTExponent;
+    if (Parameter->Location == SpdmDataLocationConnection) {
+      TargetData = &SpdmContext->ConnectionInfo.Capability.CTExponent;
+    } else {
+      TargetData = &SpdmContext->LocalContext.Capability.CTExponent;
+    }
     break;
   case SpdmDataMeasurementSpec:
     if (Parameter->Location != SpdmDataLocationConnection) {
