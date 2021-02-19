@@ -58,6 +58,10 @@ TrySpdmSendReceiveEndSession (
 
   SpdmContext->ErrorState = SPDM_STATUS_ERROR_DEVICE_NO_CAPABILITIES;
 
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP)) {
+    EndSessionAttributes = 0;
+  }
+
   SpdmRequest.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
   SpdmRequest.Header.RequestResponseCode = SPDM_END_SESSION;
   SpdmRequest.Header.Param1 = EndSessionAttributes;
