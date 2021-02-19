@@ -90,9 +90,11 @@ TrySpdmSendReceiveEndSession (
     return RETURN_DEVICE_ERROR;
   }
 
+  SessionInfo->EndSessionAttributes = EndSessionAttributes;
+
+  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateNotStarted);
   SpdmFreeSessionId (SpdmContext, SessionId);
  
-  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateNotStarted);
   SpdmContext->ErrorState = SPDM_STATUS_SUCCESS;
 
   return RETURN_SUCCESS;

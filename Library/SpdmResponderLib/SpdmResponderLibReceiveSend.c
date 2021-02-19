@@ -180,6 +180,74 @@ SpdmTriggerSessionStateCallback (
 }
 
 /**
+  Set SessionState to an SPDM secured message context and trigger callback.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    Indicate the SPDM session ID.
+  @param  SessionState                 Indicate the SPDM session state.
+*/
+VOID
+SpdmSetSessionState (
+  IN     SPDM_DEVICE_CONTEXT      *SpdmContext,
+  IN     UINT32                   SessionId,
+  IN     SPDM_SESSION_STATE       SessionState
+  )
+{
+  SPDM_SESSION_INFO                 *SessionInfo;
+  SPDM_SESSION_STATE                OldSessionState;
+
+  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+  if (SessionInfo == NULL) {
+    ASSERT (FALSE);
+  }
+
+  OldSessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
+  if (OldSessionState != SessionState) {
+    SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SessionState);
+    SpdmTriggerSessionStateCallback (SpdmContext, SessionInfo->SessionId, SessionState);
+  }
+}
+
+/**
+  Notify the connection state to an SPDM context register.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ConnectionState              Indicate the SPDM connection state.
+**/
+VOID
+SpdmTriggerConnectionStateCallback (
+  IN     SPDM_DEVICE_CONTEXT      *SpdmContext,
+  IN     SPDM_CONNECTION_STATE    ConnectionState
+  )
+{
+  UINTN                    Index;
+
+  for (Index = 0; Index < MAX_SPDM_CONNECTION_STATE_CALLBACK_NUM; Index++) {
+    if (SpdmContext->SpdmConnectionStateCallback[Index] != 0) {
+      ((SPDM_CONNECTION_STATE_CALLBACK)SpdmContext->SpdmConnectionStateCallback[Index]) (SpdmContext, ConnectionState);
+    }
+  }
+}
+
+/**
+  Set ConnectionState to an SPDM context and trigger callback.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ConnectionState              Indicate the SPDM connection state.
+*/
+VOID
+SpdmSetConnectionState (
+  IN     SPDM_DEVICE_CONTEXT      *SpdmContext,
+  IN     SPDM_CONNECTION_STATE    ConnectionState
+  )
+{
+  if (SpdmContext->ConnectionInfo.ConnectionState != ConnectionState) {
+    SpdmContext->ConnectionInfo.ConnectionState = ConnectionState;
+    SpdmTriggerConnectionStateCallback (SpdmContext, ConnectionState);
+  }
+}
+
+/**
   Build a SPDM response to a device.
   
   @param  SpdmContext                  The SPDM context for the device.
@@ -309,17 +377,14 @@ SpdmBuildResponse (
     switch (SpdmResponse->RequestResponseCode) {
     case SPDM_FINISH_RSP:
       if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
-        SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
-        SpdmTriggerSessionStateCallback (Context, SessionInfo->SessionId, SpdmSessionStateEstablished);
+        SpdmSetSessionState (SpdmContext, *SessionId, SpdmSessionStateEstablished);
       }
       break;
     case SPDM_PSK_FINISH_RSP:
-      SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
-      SpdmTriggerSessionStateCallback (Context, SessionInfo->SessionId, SpdmSessionStateEstablished);
+      SpdmSetSessionState (SpdmContext, *SessionId, SpdmSessionStateEstablished);
       break;
     case SPDM_END_SESSION_ACK:
-      SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateNotStarted);
-      SpdmTriggerSessionStateCallback (Context, SessionInfo->SessionId, SpdmSessionStateNotStarted);
+      SpdmSetSessionState (SpdmContext, *SessionId, SpdmSessionStateNotStarted);
       SpdmFreeSessionId(SpdmContext, *SessionId);
       break;
     }
@@ -327,13 +392,7 @@ SpdmBuildResponse (
     switch (SpdmResponse->RequestResponseCode) {
     case SPDM_FINISH_RSP:
       if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
-        SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SpdmContext->LatestSessionId);
-        if (SessionInfo == NULL) {
-          ASSERT(FALSE);
-          return RETURN_SUCCESS;
-        }
-        SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
-        SpdmTriggerSessionStateCallback (Context, SessionInfo->SessionId, SpdmSessionStateEstablished);
+        SpdmSetSessionState (SpdmContext, SpdmContext->LatestSessionId, SpdmSessionStateEstablished);
       }
       break;
     }
@@ -367,7 +426,7 @@ SpdmRegisterGetResponseFunc (
 }
 
 /**
-  Register an SPDM state callback function.
+  Register an SPDM session state callback function.
 
   This function can be called multiple times to let different session APPs register its own callback.
 
@@ -391,6 +450,39 @@ SpdmRegisterSessionStateCallback (
   for (Index = 0; Index < MAX_SPDM_SESSION_STATE_CALLBACK_NUM; Index++) {
     if (SpdmContext->SpdmSessionStateCallback[Index] == 0) {
       SpdmContext->SpdmSessionStateCallback[Index] = (UINTN)SpdmSessionStateCallback;
+      return RETURN_SUCCESS;
+    }
+  }
+  ASSERT(FALSE);
+
+  return RETURN_ALREADY_STARTED;
+}
+
+/**
+  Register an SPDM connection state callback function.
+
+  This function can be called multiple times to let different register its own callback.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SpdmConnectionStateCallback  The function to be called in SPDM connection state change.
+
+  @retval RETURN_SUCCESS          The callback is registered.
+  @retval RETURN_ALREADY_STARTED  No enough memory to register the callback.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmRegisterConnectionStateCallback (
+  IN  VOID                            *Context,
+  IN  SPDM_CONNECTION_STATE_CALLBACK  SpdmConnectionStateCallback
+  )
+{
+  SPDM_DEVICE_CONTEXT      *SpdmContext;
+  UINTN                    Index;
+
+  SpdmContext = Context;
+  for (Index = 0; Index < MAX_SPDM_CONNECTION_STATE_CALLBACK_NUM; Index++) {
+    if (SpdmContext->SpdmConnectionStateCallback[Index] == 0) {
+      SpdmContext->SpdmConnectionStateCallback[Index] = (UINTN)SpdmConnectionStateCallback;
       return RETURN_SUCCESS;
     }
   }

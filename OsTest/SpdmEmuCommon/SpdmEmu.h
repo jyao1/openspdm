@@ -56,6 +56,8 @@ extern UINT16  mSupportDheAlgo;
 extern UINT16  mSupportAeadAlgo;
 extern UINT16  mSupportKeyScheduleAlgo;
 
+extern UINT8   mEndSessionAttributes;
+
 extern CHAR8 *mLoadStateFileName;
 extern CHAR8 *mSaveStateFileName;
 

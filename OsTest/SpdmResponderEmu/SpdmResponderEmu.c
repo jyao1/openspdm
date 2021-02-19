@@ -22,11 +22,6 @@ SpdmServerInit (
   VOID
   );
 
-VOID
-SpdmServerCallback (
-  VOID
-  );
-
 BOOLEAN
 CreateSocket(
   IN  UINT16              PortNumber,
@@ -115,7 +110,7 @@ PlatformServer (
   while (TRUE) {
     Status = SpdmResponderDispatchMessage (mSpdmContext);
     if (Status == RETURN_SUCCESS) {
-      SpdmServerCallback ();
+      // success dispatch SPDM message
     }
     if (Status != RETURN_UNSUPPORTED) {
       continue;

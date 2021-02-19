@@ -23,6 +23,8 @@ This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be us
          [--meas_op ONE_BY_ONE|ALL]
          [--slot_id <0~7|0xFF>]
          [--slot_count <1~8>]
+         [--save_state <NegotiateStateFileName>]
+         [--load_state <NegotiateStateFileName>]
          [--pcap <PcapFileName>]
 
       NOTE:
@@ -49,6 +51,17 @@ This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be us
          [--slot_id] is to select the peer slot ID in GET_MEASUREMENT, CHALLENGE_AUTH, KEY_EXCHANGE and FINISH. By default, 0 is used.
                  0xFF can be used to indicate provisioned certificate chain. No GET_CERTIFICATE is needed.
          [--slot_count] is to select the local slot count. By default, 3 is used.
+         [--save_state] is to save the current negotiated state to a write-only file.\n");
+                 The requester and responder will save state after GET_VERSION/GET_CAPABILLITIES/NEGOTIATE_ALGORITHMS.\n");
+                 (negotiated state == ver|cap|hash|meas_spec|meas_hash|asym|req_asym|dhe|aead|key_schedule)\n");
+                 The responder should set CACHE capabilities, otherwise the state will not be saved.\n");
+                 The requester will clear PRESERVE_NEGOTIATED_STATE_CLEAR bit in END_SESSION to preserve, otherwise this bit is set.\n");
+                 The responder will save empty state, if the requester sets PRESERVE_NEGOTIATED_STATE_CLEAR bit in END_SESSION.\n");
+         [--load_state] is to load the negotiated state to current session from a read-only file.\n");
+                 The requester and responder will provision the state just after SPDM context is created.\n");
+                 The user need guarantee the state file is gnerated correctly.\n");
+                 The command line input - ver|cap|hash|meas_spec|meas_hash|asym|req_asym|dhe|aead|key_schedule are ignored.\n");
+                 The requester will skip GET_VERSION/GET_CAPABILLITIES/NEGOTIATE_ALGORITHMS.\n");
          [--pcap] is used to generate PCAP dump file for offline analysis.
    </pre>
 

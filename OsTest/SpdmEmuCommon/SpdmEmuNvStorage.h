@@ -56,4 +56,13 @@ SpdmSaveNegotiatedState (
   IN BOOLEAN                      IsRequester
   );
 
+/**
+  Clear the NegotiatedState in the NV storage.
+*/
+RETURN_STATUS
+EFIAPI
+SpdmClearNegotiatedState (
+  IN VOID                         *SpdmContext
+  );
+
 #endif

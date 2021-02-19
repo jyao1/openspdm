@@ -271,7 +271,7 @@ SpdmGetResponseKeyExchange (
   }
 
   SessionInfo->MutAuthRequested = SpdmResponse->MutAuthRequested;
-  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
+  SpdmSetSessionState (SpdmContext, SessionId, SpdmSessionStateHandshaking);
 
   return RETURN_SUCCESS;
 }

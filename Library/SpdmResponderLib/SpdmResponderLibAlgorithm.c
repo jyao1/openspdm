@@ -433,7 +433,7 @@ SpdmGetResponseAlgorithm (
     SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = 0;
     SpdmContext->ConnectionInfo.Algorithm.KeySchedule = 0;
   }
-  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
+  SpdmSetConnectionState (SpdmContext, SpdmConnectionStateNegotiated);
 
   return RETURN_SUCCESS;
 }

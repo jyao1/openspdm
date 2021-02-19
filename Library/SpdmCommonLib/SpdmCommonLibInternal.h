@@ -212,6 +212,7 @@ typedef struct {
   UINT32                               SessionId;
   BOOLEAN                              UsePsk;
   UINT8                                MutAuthRequested;
+  UINT8                                EndSessionAttributes;
   SPDM_SESSION_TRANSCRIPT              SessionTranscript;
   VOID                                 *SecuredMessageContext;
 } SPDM_SESSION_INFO;
@@ -295,9 +296,14 @@ typedef struct {
   SPDM_ENCAP_CONTEXT              EncapContext;
   //
   // Register SpdmSessionStateCallback function (responder only)
-  // Requester can know the state after StartSession / EndSession.
+  // Register can know the state after StartSession / EndSession.
   //
   UINTN                           SpdmSessionStateCallback[MAX_SPDM_SESSION_STATE_CALLBACK_NUM];
+  //
+  // Register SpdmConnectionStateCallback function (responder only)
+  // Register can know the connection state such as negotiated.
+  //
+  UINTN                           SpdmConnectionStateCallback[MAX_SPDM_CONNECTION_STATE_CALLBACK_NUM];
 
   SPDM_LOCAL_CONTEXT              LocalContext;
 

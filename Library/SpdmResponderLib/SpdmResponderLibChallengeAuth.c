@@ -165,7 +165,7 @@ SpdmGetResponseChallengeAuth (
   Ptr += SignatureSize;
 
   if (AuthAttribute.BasicMutAuthReq == 0) {
-    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
+    SpdmSetConnectionState (SpdmContext, SpdmConnectionStateAuthenticated);
   }
 
   return RETURN_SUCCESS;

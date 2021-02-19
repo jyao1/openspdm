@@ -176,13 +176,13 @@ DoSessionViaSpdm (
     printf ("DoMeasurementViaSpdm - %x\n", (UINT32)Status);
   }
 
-  Status = SpdmStopSession (SpdmContext, SessionId, 0);
+  Status = SpdmStopSession (SpdmContext, SessionId, mEndSessionAttributes);
   if (RETURN_ERROR(Status)) {
     printf ("SpdmStopSession - %x\n", (UINT32)Status);
     return Status;
   }
 
-  Status = SpdmStopSession (SpdmContext, SessionId2, 0);
+  Status = SpdmStopSession (SpdmContext, SessionId2, mEndSessionAttributes);
   if (RETURN_ERROR(Status)) {
     printf ("SpdmStopSession - %x\n", (UINT32)Status);
     return Status;

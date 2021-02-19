@@ -17,9 +17,32 @@ extern UINT8  mReceiveBuffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
 extern SOCKET mServerSocket;
 
+/**
+  Notify the session state to a session APP.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SessionId of a session.
+  @param  SessionState                 The state of a session.
+**/
 VOID
-SpdmServerCallback (
-  VOID
+EFIAPI
+SpdmServerSessionStateCallback (
+  IN     VOID                 *SpdmContext,
+  IN     UINT32               SessionId,
+  IN     SPDM_SESSION_STATE   SessionState
+  );
+
+/**
+  Notify the connection state to an SPDM context register.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ConnectionState              Indicate the SPDM connection state.
+**/
+VOID
+EFIAPI
+SpdmServerConnectionStateCallback (
+  IN     VOID                     *SpdmContext,
+  IN     SPDM_CONNECTION_STATE    ConnectionState
   );
 
 RETURN_STATUS
@@ -186,21 +209,30 @@ SpdmServerInit (
 
   SpdmRegisterGetResponseFunc (SpdmContext, SpdmGetResponseVendorDefinedRequest);
 
+  SpdmRegisterSessionStateCallback (SpdmContext, SpdmServerSessionStateCallback);
+  SpdmRegisterConnectionStateCallback (SpdmContext, SpdmServerConnectionStateCallback);
+
   if (mLoadStateFileName != NULL) {
     // Invoke callback to provision the rest
-    SpdmServerCallback ();
+    SpdmServerConnectionStateCallback (SpdmContext, SpdmConnectionStateNegotiated);
   }
 
   return mSpdmContext;
 }
 
+/**
+  Notify the connection state to an SPDM context register.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ConnectionState              Indicate the SPDM connection state.
+**/
 VOID
-SpdmServerCallback (
-  VOID
+EFIAPI
+SpdmServerConnectionStateCallback (
+  IN     VOID                     *SpdmContext,
+  IN     SPDM_CONNECTION_STATE    ConnectionState
   )
 {
-  VOID                         *SpdmContext;
-  STATIC BOOLEAN               AlgoProvisioned = FALSE;
   BOOLEAN                      Res;
   VOID                         *Data;
   UINTN                        DataSize;
@@ -213,84 +245,137 @@ SpdmServerCallback (
   UINTN                        HashSize;
   UINT8                        Index;
 
-  SpdmContext = mSpdmContext;
-
-  if (AlgoProvisioned) {
-    return ;
-  }
-
-  ZeroMem (&Parameter, sizeof(Parameter));
-  Parameter.Location = SpdmDataLocationConnection;
-
-  DataSize = sizeof(Data32);
-  SpdmGetData (SpdmContext, SpdmDataConnectionState, &Parameter, &Data32, &DataSize);
-  if (Data32 != SpdmConnectionStateNegotiated) {
-    return ;
-  }
-
-  DataSize = sizeof(Data32);
-  SpdmGetData (SpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &Data32, &DataSize);
-  mUseMeasurementHashAlgo = Data32;
-  DataSize = sizeof(Data32);
-  SpdmGetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, &DataSize);
-  mUseAsymAlgo = Data32;
-  DataSize = sizeof(Data32);
-  SpdmGetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &Data32, &DataSize);
-  mUseHashAlgo = Data32;
-  DataSize = sizeof(Data16);
-  SpdmGetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, &DataSize);
-  mUseReqAsymAlgo = Data16;
-
-  Res = ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  if (Res) {
+  switch (ConnectionState) {
+  case SpdmConnectionStateNegotiated:
+    //
+    // Provision new content
+    //
     ZeroMem (&Parameter, sizeof(Parameter));
-    Parameter.Location = SpdmDataLocationLocal;
-    Data8 = mUseSlotCount;
-    SpdmSetData (SpdmContext, SpdmDataLocalSlotCount, &Parameter, &Data8, sizeof(Data8));
+    Parameter.Location = SpdmDataLocationConnection;
 
-    for (Index = 0; Index < mUseSlotCount; Index++) {
-      Parameter.AdditionalData[0] = Index;
-      SpdmSetData (SpdmContext, SpdmDataLocalPublicCertChain, &Parameter, Data, DataSize);
-    }
-    // do not free it
-  }
+    DataSize = sizeof(Data32);
+    SpdmGetData (SpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &Data32, &DataSize);
+    mUseMeasurementHashAlgo = Data32;
+    DataSize = sizeof(Data32);
+    SpdmGetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, &DataSize);
+    mUseAsymAlgo = Data32;
+    DataSize = sizeof(Data32);
+    SpdmGetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &Data32, &DataSize);
+    mUseHashAlgo = Data32;
+    DataSize = sizeof(Data16);
+    SpdmGetData (SpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &Data16, &DataSize);
+    mUseReqAsymAlgo = Data16;
 
-  if ((mUseSlotId == 0xFF) || ((mUseResponderCapabilityFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP) != 0)) {
-    Res = ReadRequesterPublicCertificateChain (mUseHashAlgo, mUseReqAsymAlgo, &Data, &DataSize, NULL, NULL);
+    Res = ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
     if (Res) {
       ZeroMem (&Parameter, sizeof(Parameter));
       Parameter.Location = SpdmDataLocationLocal;
-      SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
-      // Do not free it.
+      Data8 = mUseSlotCount;
+      SpdmSetData (SpdmContext, SpdmDataLocalSlotCount, &Parameter, &Data8, sizeof(Data8));
+
+      for (Index = 0; Index < mUseSlotCount; Index++) {
+        Parameter.AdditionalData[0] = Index;
+        SpdmSetData (SpdmContext, SpdmDataLocalPublicCertChain, &Parameter, Data, DataSize);
+      }
+      // do not free it
     }
-  } else {
-    Res = ReadRequesterRootPublicCertificate (mUseHashAlgo, mUseReqAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
+
+    if ((mUseSlotId == 0xFF) || ((mUseResponderCapabilityFlags & SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP) != 0)) {
+      Res = ReadRequesterPublicCertificateChain (mUseHashAlgo, mUseReqAsymAlgo, &Data, &DataSize, NULL, NULL);
+      if (Res) {
+        ZeroMem (&Parameter, sizeof(Parameter));
+        Parameter.Location = SpdmDataLocationLocal;
+        SpdmSetData (SpdmContext, SpdmDataPeerPublicCertChains, &Parameter, Data, DataSize);
+        // Do not free it.
+      }
+    } else {
+      Res = ReadRequesterRootPublicCertificate (mUseHashAlgo, mUseReqAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
+      if (Res) {
+        ZeroMem (&Parameter, sizeof(Parameter));
+        Parameter.Location = SpdmDataLocationLocal;
+        SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
+        // Do not free it.
+      }
+    }
+
     if (Res) {
-      ZeroMem (&Parameter, sizeof(Parameter));
-      Parameter.Location = SpdmDataLocationLocal;
-      SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCertHash, &Parameter, Hash, HashSize);
-      // Do not free it.
+      Data8 = mUseMutAuth;
+      Parameter.AdditionalData[0] = mUseSlotId; // ReqSlotNum;
+      SpdmSetData (SpdmContext, SpdmDataMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
+
+      Data8 = mUseBasicMutAuth;
+      Parameter.AdditionalData[0] = mUseSlotId; // ReqSlotNum;
+      SpdmSetData (SpdmContext, SpdmDataBasicMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
     }
+
+    Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
+    if (RETURN_ERROR(Status)) {
+      printf ("SpdmSetData - %x\n", (UINT32)Status);
+    }
+
+    if (mSaveStateFileName != NULL) {
+      SpdmSaveNegotiatedState (SpdmContext, FALSE);
+    }
+
+    break;
+
+  default:
+    break;
   }
-
-  if (Res) {
-    Data8 = mUseMutAuth;
-    Parameter.AdditionalData[0] = mUseSlotId; // ReqSlotNum;
-    SpdmSetData (SpdmContext, SpdmDataMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
-
-    Data8 = mUseBasicMutAuth;
-    Parameter.AdditionalData[0] = mUseSlotId; // ReqSlotNum;
-    SpdmSetData (SpdmContext, SpdmDataBasicMutAuthRequested, &Parameter, &Data8, sizeof(Data8));
-  }
-
-  Status = SpdmSetData (SpdmContext, SpdmDataPskHint, NULL, TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmSetData - %x\n", (UINT32)Status);
-  }
-
-  SpdmSaveNegotiatedState (SpdmContext, FALSE);
-
-  AlgoProvisioned = TRUE;
 
   return ;
+}
+
+/**
+  Notify the session state to a session APP.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    The SessionId of a session.
+  @param  SessionState                 The state of a session.
+**/
+VOID
+EFIAPI
+SpdmServerSessionStateCallback (
+  IN     VOID                 *SpdmContext,
+  IN     UINT32               SessionId,
+  IN     SPDM_SESSION_STATE   SessionState
+  )
+{
+  UINTN                        DataSize;
+  SPDM_DATA_PARAMETER          Parameter;
+  UINT8                        Data8;
+
+  switch (SessionState) {
+  case SpdmSessionStateNotStarted :
+    // Session End
+
+    if (mSaveStateFileName != NULL) {
+      ZeroMem (&Parameter, sizeof(Parameter));
+      Parameter.Location = SpdmDataLocationSession;
+      *(UINT32 *)Parameter.AdditionalData = SessionId;
+
+      DataSize = sizeof(Data8);
+      SpdmGetData (SpdmContext, SpdmDataSessionEndSessionAttributes, &Parameter, &Data8, &DataSize);
+      if ((Data8 & SPDM_END_SESSION_REQUEST_ATTRIBUTES_PRESERVE_NEGOTIATED_STATE_CLEAR) != 0) {
+        // clear
+        SpdmClearNegotiatedState (SpdmContext);
+      } else {
+        // preserve - already done in SpdmConnectionStateNegotiated.
+        // SpdmSaveNegotiatedState (SpdmContext, FALSE);
+      }
+    }
+    break;
+
+  case SpdmSessionStateHandshaking :
+    // no action
+    break;
+
+  case SpdmSessionStateEstablished :
+    // no action
+    break;
+
+  default :
+    ASSERT(FALSE);
+    break;
+  }
 }

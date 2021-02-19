@@ -45,7 +45,7 @@ SpdmResponderHandleResponseState (
   case SpdmResponseStateNeedResync:
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_REQUEST_RESYNCH, 0, ResponseSize, Response);
     // NOTE: Need to let SPDM_VERSION reset the State
-    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNotStarted;
+    SpdmSetConnectionState (SpdmContext, SpdmConnectionStateNotStarted);
     return RETURN_SUCCESS;
   case SpdmResponseStateNotReady:
     SpdmContext->CachSpdmRequestSize = SpdmContext->LastSpdmRequestSize;

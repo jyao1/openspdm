@@ -73,6 +73,8 @@ SpdmGetResponseEndSession (
     return RETURN_SUCCESS;
   }
 
+  SessionInfo->EndSessionAttributes = SpdmRequest->Header.Param1;
+
   ASSERT (*ResponseSize >= sizeof(SPDM_END_SESSION_RESPONSE));
   *ResponseSize = sizeof(SPDM_END_SESSION_RESPONSE);
   ZeroMem (Response, *ResponseSize);

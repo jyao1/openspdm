@@ -116,10 +116,12 @@ WriteOutputFile (
     return FALSE;
   }
 
-  if ((fwrite (FileData, 1, FileSize, FpOut)) != FileSize) {
-    printf ("Write output file error %s\n", FileName);
-    fclose (FpOut);
-    return FALSE;
+  if (FileSize != 0) {
+    if ((fwrite (FileData, 1, FileSize, FpOut)) != FileSize) {
+      printf ("Write output file error %s\n", FileName);
+      fclose (FpOut);
+      return FALSE;
+    }
   }
 
   fclose (FpOut);

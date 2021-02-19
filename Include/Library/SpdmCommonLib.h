@@ -117,6 +117,7 @@ typedef enum {
   //
   SpdmDataSessionUsePsk,
   SpdmDataSessionMutAuthRequested,
+  SpdmDataSessionEndSessionAttributes,
 
   //
   // MAX

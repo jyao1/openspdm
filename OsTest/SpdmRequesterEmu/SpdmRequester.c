@@ -258,7 +258,9 @@ SpdmClientInit (
     printf ("SpdmSetData - %x\n", (UINT32)Status);
   }
 
-  SpdmSaveNegotiatedState (SpdmContext, TRUE);
+  if (mSaveStateFileName != NULL) {
+    SpdmSaveNegotiatedState (SpdmContext, TRUE);
+  }
 
   return mSpdmContext;
 }

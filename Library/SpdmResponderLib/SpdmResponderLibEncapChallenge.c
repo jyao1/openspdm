@@ -222,7 +222,7 @@ SpdmProcessEncapResponseChallengeAuth (
   }
 
   SpdmContext->EncapContext.ErrorState = SPDM_STATUS_SUCCESS;
-  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAuthenticated;
+  SpdmSetConnectionState (SpdmContext, SpdmConnectionStateAuthenticated);
 
   *Continue = FALSE;
 

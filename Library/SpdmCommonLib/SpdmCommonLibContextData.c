@@ -25,6 +25,7 @@ NeedSessionInfoForData (
   switch (DataType) {
   case SpdmDataSessionUsePsk:
   case SpdmDataSessionMutAuthRequested:
+  case SpdmDataSessionEndSessionAttributes:
     return TRUE;
   }
   return FALSE;
@@ -312,6 +313,12 @@ SpdmSetData (
     }
     SessionInfo->MutAuthRequested = *(UINT8 *)Data;
     break;
+  case SpdmDataSessionEndSessionAttributes:
+    if (DataSize != sizeof(UINT8)) {
+      return RETURN_INVALID_PARAMETER;
+    }
+    SessionInfo->EndSessionAttributes = *(UINT8 *)Data;
+    break;
   default:
     return RETURN_UNSUPPORTED;
     break;
@@ -473,6 +480,10 @@ SpdmGetData (
   case SpdmDataSessionMutAuthRequested:
     TargetDataSize = sizeof(UINT8);
     TargetData = &SessionInfo->MutAuthRequested;
+    break;
+  case SpdmDataSessionEndSessionAttributes:
+    TargetDataSize = sizeof(UINT8);
+    TargetData = &SessionInfo->EndSessionAttributes;
     break;
   default:
     return RETURN_UNSUPPORTED;

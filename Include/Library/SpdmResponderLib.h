@@ -265,4 +265,35 @@ SpdmRegisterSessionStateCallback (
   IN  SPDM_SESSION_STATE_CALLBACK  SpdmSessionStateCallback
   );
 
+/**
+  Notify the connection state to an SPDM context register.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ConnectionState              Indicate the SPDM connection state.
+**/
+typedef
+VOID
+(EFIAPI *SPDM_CONNECTION_STATE_CALLBACK) (
+  IN     VOID                     *SpdmContext,
+  IN     SPDM_CONNECTION_STATE    ConnectionState
+  );
+
+/**
+  Register an SPDM connection state callback function.
+
+  This function can be called multiple times to let different register its own callback.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SpdmConnectionStateCallback  The function to be called in SPDM connection state change.
+
+  @retval RETURN_SUCCESS          The callback is registered.
+  @retval RETURN_ALREADY_STARTED  No enough memory to register the callback.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmRegisterConnectionStateCallback (
+  IN  VOID                            *SpdmContext,
+  IN  SPDM_CONNECTION_STATE_CALLBACK  SpdmConnectionStateCallback
+  );
+
 #endif

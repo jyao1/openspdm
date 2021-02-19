@@ -238,7 +238,7 @@ SpdmGetResponsePskExchange (
   }
   Ptr += HmacSize;
 
-  SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);
+  SpdmSetSessionState (SpdmContext, SessionId, SpdmSessionStateHandshaking);
 
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT)) {
     // No need to receive PSK_FINISH, enter application phase directly.
@@ -255,7 +255,7 @@ SpdmGetResponsePskExchange (
       return RETURN_SUCCESS;
     }
 
-    SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateEstablished);
+    SpdmSetSessionState (SpdmContext, SessionId, SpdmSessionStateEstablished);
   }
 
   return RETURN_SUCCESS;

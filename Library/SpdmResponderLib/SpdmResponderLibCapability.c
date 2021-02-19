@@ -193,7 +193,7 @@ SpdmGetResponseCapability (
     SpdmContext->ConnectionInfo.Capability.CTExponent = 0;
     SpdmContext->ConnectionInfo.Capability.Flags = 0;
   }
-  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
+  SpdmSetConnectionState (SpdmContext, SpdmConnectionStateAfterCapabilities);
 
   return RETURN_SUCCESS;
 }

@@ -706,4 +706,30 @@ SpdmHandleEncapErrorResponseMain (
   IN     UINT8                ErrorCode
   );
 
+/**
+  Set SessionState to an SPDM secured message context and trigger callback.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    Indicate the SPDM session ID.
+  @param  SessionState                 Indicate the SPDM session state.
+*/
+VOID
+SpdmSetSessionState (
+  IN     SPDM_DEVICE_CONTEXT      *SpdmContext,
+  IN     UINT32                   SessionId,
+  IN     SPDM_SESSION_STATE       SessionState
+  );
+
+/**
+  Set ConnectionState to an SPDM context and trigger callback.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  ConnectionState              Indicate the SPDM connection state.
+*/
+VOID
+SpdmSetConnectionState (
+  IN     SPDM_DEVICE_CONTEXT      *SpdmContext,
+  IN     SPDM_CONNECTION_STATE    ConnectionState
+  );
+
 #endif

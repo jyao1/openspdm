@@ -121,7 +121,7 @@ SpdmGetResponseDigest (
     return RETURN_SUCCESS;
   }
 
-  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterDigests;
+  SpdmSetConnectionState (SpdmContext, SpdmConnectionStateAfterDigests);
 
   return RETURN_SUCCESS;
 }

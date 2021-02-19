@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 CHAR8 *mLoadStateFileName;
 CHAR8 *mSaveStateFileName;
+UINT8  mEndSessionAttributes = SPDM_END_SESSION_REQUEST_ATTRIBUTES_PRESERVE_NEGOTIATED_STATE_CLEAR;
 
 /**
   Load the NegotiatedState from NV storage to an SPDM context.
@@ -162,6 +163,8 @@ SpdmSaveNegotiatedState (
     return RETURN_UNSUPPORTED;
   }
 
+  mEndSessionAttributes = 0;
+
   printf ("SaveState to %s\n", mSaveStateFileName);
 
   ZeroMem (&NegotiatedState, sizeof(NegotiatedState));
@@ -251,6 +254,31 @@ SpdmSaveNegotiatedState (
   Ret = WriteOutputFile (mSaveStateFileName, &NegotiatedState, sizeof(NegotiatedState));
   if (!Ret) {
     printf ("SaveState fail - write file error\n");
+    return RETURN_DEVICE_ERROR;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Clear the NegotiatedState in the NV storage.
+*/
+RETURN_STATUS
+EFIAPI
+SpdmClearNegotiatedState (
+  IN VOID                         *SpdmContext
+  )
+{
+  BOOLEAN                      Ret;
+
+  if (mSaveStateFileName == NULL) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  printf ("ClearState in %s\n", mSaveStateFileName);
+
+  Ret = WriteOutputFile (mSaveStateFileName, NULL, 0);
+  if (!Ret) {
+    printf ("ClearState fail - write file error\n");
     return RETURN_DEVICE_ERROR;
   }
   return RETURN_SUCCESS;
