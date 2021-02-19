@@ -37,7 +37,6 @@ SpdmGetEncapResponseDigest (
   )
 {
   SPDM_GET_DIGESTS_REQUEST      *SpdmRequest;
-  UINTN                         SpdmRequestSize;
   SPDM_DIGESTS_RESPONSE         *SpdmResponse;
   UINTN                         Index;
   UINT32                        HashSize;
@@ -57,18 +56,18 @@ SpdmGetEncapResponseDigest (
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  SpdmRequestSize = RequestSize;
-  //
-  // Cache
-  //
-  Status = SpdmAppendMessageMutB (SpdmContext, SpdmRequest, SpdmRequestSize);
-  if (RETURN_ERROR(Status)) {
-    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
 
   if (SpdmContext->LocalContext.LocalCertChainProvision == NULL) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
+  //
+  // Cache
+  //
+  Status = SpdmAppendMessageMutB (SpdmContext, SpdmRequest, RequestSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 

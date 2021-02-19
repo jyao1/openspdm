@@ -37,7 +37,6 @@ SpdmGetEncapResponseCertificate (
   )
 {
   SPDM_GET_CERTIFICATE_REQUEST  *SpdmRequest;
-  UINTN                         SpdmRequestSize;
   SPDM_CERTIFICATE_RESPONSE     *SpdmResponse;
   UINT16                        Offset;
   UINT16                        Length;
@@ -55,15 +54,6 @@ SpdmGetEncapResponseCertificate (
   }
 
   if (RequestSize != sizeof(SPDM_GET_CERTIFICATE_REQUEST)) {
-    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
-  SpdmRequestSize = RequestSize;
-  //
-  // Cache
-  //
-  Status = SpdmAppendMessageMutB (SpdmContext, SpdmRequest, SpdmRequestSize);
-  if (RETURN_ERROR(Status)) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
@@ -95,6 +85,15 @@ SpdmGetEncapResponseCertificate (
     Length = (UINT16)(SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotNum] - Offset);
   }
   RemainderLength = SpdmContext->LocalContext.LocalCertChainProvisionSize[SlotNum] - (Length + Offset);
+
+  //
+  // Cache
+  //
+  Status = SpdmAppendMessageMutB (SpdmContext, SpdmRequest, RequestSize);
+  if (RETURN_ERROR(Status)) {
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
 
   ASSERT (*ResponseSize >= sizeof(SPDM_CERTIFICATE_RESPONSE) + Length);
   *ResponseSize = sizeof(SPDM_CERTIFICATE_RESPONSE) + Length;

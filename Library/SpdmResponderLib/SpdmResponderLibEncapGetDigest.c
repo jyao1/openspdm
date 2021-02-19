@@ -33,6 +33,8 @@ SpdmGetEncapReqestGetDigest (
   SPDM_GET_DIGESTS_REQUEST                  *SpdmRequest;
   RETURN_STATUS                             Status;
 
+  SpdmContext->EncapContext.LastEncapRequestSize = 0;
+
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP, 0)) {
     return RETURN_DEVICE_ERROR;
   }

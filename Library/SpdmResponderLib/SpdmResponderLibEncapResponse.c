@@ -476,6 +476,8 @@ SpdmHandleEncapErrorResponseMain (
   // No need to shrink MessageMutB and MessageMutC, because any error will terminate the ENCAP MUT AUTH.
   // The sequence is fixed in CHALLENG_AUTH or KEY_EXCHANGE_RSP, the responder cannot issue encap request again.
   // If the requester restarts the mutual auth via CHALLENG or KEY_EXCHANGE, the encap will also restart.
+  // Do it here just to align with requester.
   //
+  ShrinkManagedBuffer(MBuffer, ShrinkBufferSize);
   return RETURN_DEVICE_ERROR;
 }

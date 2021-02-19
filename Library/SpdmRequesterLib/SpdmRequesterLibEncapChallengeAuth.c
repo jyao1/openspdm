@@ -61,18 +61,19 @@ SpdmGetEncapResponseChallengeAuth (
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
+
+  SlotNum = SpdmRequest->Header.Param1;
+
+  if ((SlotNum != 0xFF) && (SlotNum >= SpdmContext->LocalContext.SlotCount)) {
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
+  }
+
   //
   // Cache
   //
   Status = SpdmAppendMessageMutC (SpdmContext, SpdmRequest, RequestSize);
   if (RETURN_ERROR(Status)) {
-    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
-
-  SlotNum = SpdmRequest->Header.Param1;
-
-  if ((SlotNum != 0xFF) && (SlotNum >= SpdmContext->LocalContext.SlotCount)) {
     SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
