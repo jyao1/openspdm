@@ -246,6 +246,15 @@ SpdmServerConnectionStateCallback (
   UINT8                        Index;
 
   switch (ConnectionState) {
+  case SpdmConnectionStateNotStarted:
+    //
+    // clear perserved state
+    //  
+    if (mSaveStateFileName != NULL) {
+      SpdmClearNegotiatedState (SpdmContext);
+    }
+    break;
+
   case SpdmConnectionStateNegotiated:
     //
     // Provision new content
