@@ -23,6 +23,16 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
          [-x] (dump message in hex)
          [--psk <pre-shared key>]
          [--dhe_secret <session DHE secret>]
+         [--req_cap       CERT|CHAL|                                ENCRYPT|MAC|MUT_AUTH|KEY_EX|PSK|                 ENCAP|HBEAT|KEY_UPD|HANDSHAKE_IN_CLEAR|PUB_KEY_ID]
+         [--rsp_cap CACHE|CERT|CHAL|MEAS_NO_SIG|MEAS_SIG|MEAS_FRESH|ENCRYPT|MAC|MUT_AUTH|KEY_EX|PSK|PSK_WITH_CONTEXT|ENCAP|HBEAT|KEY_UPD|HANDSHAKE_IN_CLEAR|PUB_KEY_ID]
+         [--hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]
+         [--meas_spec DMTF]
+         [--meas_hash RAW_BIT|SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]
+         [--asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]
+         [--req_asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]
+         [--dhe FFDHE_2048|FFDHE_3072|FFDHE_4096|SECP_256_R1|SECP_384_R1|SECP_521_R1]
+         [--aead AES_128_GCM|AES_256_GCM|CHACHA20_POLY1305]
+         [--key_schedule HMAC_HASH]
          [--req_cert_chain <input requester public cert chain file>]
          [--rsp_cert_chain <input responder public cert chain file>]
          [--out_req_cert_chain <output requester public cert chain file>]
@@ -35,6 +45,13 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
                   It must not have prefix '0x'. The leading '0' must be included.
                   '0123CDEF' means 4 bytes 0x01, 0x23, 0xCD, 0xEF,
                   where 0x01 is the first byte and 0xEF is the last byte in memory
+
+         [--req_cap] and [--rsp_cap] means requester capability flags and responder capability flags.
+            Format: Capabilities can be multiple flags. Please use ',' for them.
+         [--hash], [--meas_spec], [--meas_hash], [--asym], [--req_asym], [--dhe], [--aead], [--key_schedule] means negotiated algorithms.
+            Format: Algorithms must include only one flag.
+            Capabilities and algorithms are required if GET_CAPABILITIES or NEGOTIATE_ALGORITHMS is not sent.
+                  For example, the negotiated state session or quick PSK session.
 
          [--req_cert_chain] is required to if encapsulated GET_CERTIFICATE is not sent
          [--rsp_cert_chain] is required to if GET_CERTIFICATE is not sent
@@ -181,7 +198,7 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
       82 (1608625474) MCTP(6) RSP->REQ SecuredSPDM(0xfffefffe, Seq=0x0002) MCTP(5) SPDM(11, 0x6c) SPDM_END_SESSION_ACK ()
    </pre>
 
-3. If GET_CERTIFICATE or encapsulated GET_CERTIFICATE is not sent (e.g. when SlotId 0xFF is used), the user need use `--rsp_cert_chain` or `--req_cert_chain` to indicate the responder certificate chain or the requester certificate chain, to dump the secured session data.
+3. If GET_CERTIFICATE or encapsulated GET_CERTIFICATE is not sent (e.g. when SlotId 0xFF is used or PUB_KEY_ID is used), the user need use `--rsp_cert_chain` or `--req_cert_chain` to indicate the responder certificate chain or the requester certificate chain, to dump the secured session data.
 
    For example, `SpdmDump -r SpdmRequester.pcap --psk 5465737450736b4461746100 --dhe_secret c7ac17ee29b6a4f84e978223040b7eddff792477a6f7fc0f51faa553fee58175 --req_cert_chain Rsa3072/bundle_requester.certchain.der --rsp_cert_chain EcP384/bundle_responder.certchain.der`
 
@@ -189,7 +206,11 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
    
    Then the user may use other tool to view the certificate chain, such as `openssl x509 -in cert.der -inform der -noout -text` or `openssl asn1parse -in cert.der -inform der`.
 
-4. By default, SpdmDump only displays SPDM messge. If you want to dump other application message, you need use `-d`.
+4. If GET_CAPABILITIES or NEGOTIATE_ALGORITHMS is not sent (e.g. when negotiated state is used or quick PSK path is used), the user need indicate the capabilities and algorithms to dump the rest data.
+
+   For example, `SpdmDump -r SpdmNegotiatedState.pcap --psk 5465737450736b4461746100 --dhe_secret c7ac17ee29b6a4f84e978223040b7eddff792477a6f7fc0f51faa553fee58175 --req_cap CERT,CHAL,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR --rsp_cap CACHE,CERT,CHAL,MEAS_SIG,MEAS_FRESH,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR --hash SHA_384 --meas_spec DMTF --meas_hash SHA_512 --asym ECDSA_P384 --req_asym RSAPSS_3072 --dhe SECP_384_R1 --aead AES_256_GCM --key_schedule HMAC_HASH`
+
+5. By default, SpdmDump only displays SPDM messge. If you want to dump other application message, you need use `-d`.
 
    Then you can see the MCTP message, such as:
 
@@ -223,7 +244,7 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
       ......
    </pre>
 
-5. You can also choose different dump level. By default, SpdmDump dumps most important fields. `-q` means quite mode, which only dumps header. `-a` means all mode, which dumps all fields as well as detailed parsing. `-x` means to dump the message in hex.
+6. You can also choose different dump level. By default, SpdmDump dumps most important fields. `-q` means quite mode, which only dumps header. `-a` means all mode, which dumps all fields as well as detailed parsing. `-x` means to dump the message in hex.
 
    Below is quite mode dump:
 

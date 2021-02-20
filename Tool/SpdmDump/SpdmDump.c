@@ -16,6 +16,36 @@ BOOLEAN  mParamDumpHex;
 CHAR8    *mParamOutRspCertChainFileName;
 CHAR8    *mParamOutReqCertChainFileName;
 
+extern UINT32             mSpdmRequesterCapabilitiesFlags;
+extern UINT32             mSpdmResponderCapabilitiesFlags;
+extern UINT8              mSpdmMeasurementSpec;
+extern UINT32             mSpdmMeasurementHashAlgo;
+extern UINT32             mSpdmBaseAsymAlgo;
+extern UINT32             mSpdmBaseHashAlgo;
+extern UINT16             mSpdmDHENamedGroup;
+extern UINT16             mSpdmAEADCipherSuite;
+extern UINT16             mSpdmReqBaseAsymAlg;
+extern UINT16             mSpdmKeySchedule;
+
+extern VALUE_STRING_ENTRY  mSpdmRequesterCapabilitiesStringTable[];
+extern UINTN               mSpdmRequesterCapabilitiesStringTableCount;
+extern VALUE_STRING_ENTRY  mSpdmResponderCapabilitiesStringTable[];
+extern UINTN               mSpdmResponderCapabilitiesStringTableCount;
+extern VALUE_STRING_ENTRY  mSpdmHashValueStringTable[];
+extern UINTN               mSpdmHashValueStringTableCount;
+extern VALUE_STRING_ENTRY  mSpdmMeasurementHashValueStringTable[];
+extern UINTN               mSpdmMeasurementHashValueStringTableCount;
+extern VALUE_STRING_ENTRY  mSpdmAsymValueStringTable[];
+extern UINTN               mSpdmAsymValueStringTableCount;
+extern VALUE_STRING_ENTRY  mSpdmDheValueStringTable[];
+extern UINTN               mSpdmDheValueStringTableCount;
+extern VALUE_STRING_ENTRY  mSpdmAeadValueStringTable[];
+extern UINTN               mSpdmAeadValueStringTableCount;
+extern VALUE_STRING_ENTRY  mSpdmKeyScheduleValueStringTable[];
+extern UINTN               mSpdmKeyScheduleValueStringTableCount;
+extern VALUE_STRING_ENTRY  mSpdmMeasurementSpecValueStringTable[];
+extern UINTN               mSpdmMeasurementSpecValueStringTableCount;
+
 DISPATCH_TABLE_ENTRY *
 GetDispatchEntryById (
   IN DISPATCH_TABLE_ENTRY  *DispatchTable,
@@ -117,6 +147,68 @@ DumpEntryValue (
   printf ("<Unknown>");
 }
 
+BOOLEAN
+GetValueFromName (
+  IN VALUE_STRING_ENTRY  *Table,
+  IN UINTN               EntryCount,
+  IN CHAR8               *Name,
+  OUT UINT32             *Value
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < EntryCount; Index++) {
+    if (strcmp (Name, Table[Index].Name) == 0) {
+      *Value = Table[Index].Value;
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+BOOLEAN
+GetFlagsFromName (
+  IN VALUE_STRING_ENTRY  *Table,
+  IN UINTN               EntryCount,
+  IN CHAR8               *Name,
+  OUT UINT32             *Flags
+  )
+{
+  UINT32  Value;
+  CHAR8   *FlagName;
+  CHAR8   *LocalName;
+  BOOLEAN Ret;
+
+  LocalName = (VOID *)malloc (strlen(Name) + 1);
+  if (LocalName == NULL) {
+    return FALSE;
+  }
+  strcpy (LocalName, Name);
+
+  //
+  // Name = Flag1,Flag2,...,FlagN
+  //
+  *Flags = 0;
+  FlagName = strtok (LocalName, ",");
+  while (FlagName != NULL) {
+    if (!GetValueFromName (Table, EntryCount, FlagName, &Value)) {
+      printf ("unsupported flag - %s\n", FlagName);
+      Ret = FALSE;
+      goto Done;
+    }
+    *Flags |= Value;
+    FlagName = strtok (NULL, ",");
+  }
+  if (*Flags == 0) {
+    Ret = FALSE;
+  } else {
+    Ret = TRUE;
+  }
+Done:
+  free (LocalName);
+  return Ret;
+}
+
 void
 PrintUsage (
   void
@@ -129,6 +221,16 @@ PrintUsage (
   printf ("   [-x] (dump message in hex)\n");
   printf ("   [--psk <pre-shared key>]\n");
   printf ("   [--dhe_secret <session DHE secret>]\n");
+  printf ("   [--req_cap       CERT|CHAL|                                ENCRYPT|MAC|MUT_AUTH|KEY_EX|PSK|                 ENCAP|HBEAT|KEY_UPD|HANDSHAKE_IN_CLEAR|PUB_KEY_ID]\n");
+  printf ("   [--rsp_cap CACHE|CERT|CHAL|MEAS_NO_SIG|MEAS_SIG|MEAS_FRESH|ENCRYPT|MAC|MUT_AUTH|KEY_EX|PSK|PSK_WITH_CONTEXT|ENCAP|HBEAT|KEY_UPD|HANDSHAKE_IN_CLEAR|PUB_KEY_ID]\n");
+  printf ("   [--hash SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]\n");
+  printf ("   [--meas_spec DMTF]\n");
+  printf ("   [--meas_hash RAW_BIT|SHA_256|SHA_384|SHA_512|SHA3_256|SHA3_384|SHA3_512]\n");
+  printf ("   [--asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]\n");
+  printf ("   [--req_asym RSASSA_2048|RSASSA_3072|RSASSA_4096|RSAPSS_2048|RSAPSS_3072|RSAPSS_4096|ECDSA_P256|ECDSA_P384|ECDSA_P521]\n");
+  printf ("   [--dhe FFDHE_2048|FFDHE_3072|FFDHE_4096|SECP_256_R1|SECP_384_R1|SECP_521_R1]\n");
+  printf ("   [--aead AES_128_GCM|AES_256_GCM|CHACHA20_POLY1305]\n");
+  printf ("   [--key_schedule HMAC_HASH]\n");
   printf ("   [--req_cert_chain <input requester public cert chain file>]\n");
   printf ("   [--rsp_cert_chain <input responder public cert chain file>]\n");
   printf ("   [--out_req_cert_chain <output requester public cert chain file>]\n");
@@ -141,6 +243,13 @@ PrintUsage (
   printf ("              It must not have prefix '0x'. The leading '0' must be included.\n");
   printf ("              '0123CDEF' means 4 bytes 0x01, 0x23, 0xCD, 0xEF,\n");
   printf ("              where 0x01 is the first byte and 0xEF is the last byte in memory\n");
+  printf ("\n");
+  printf ("   [--req_cap] and [--rsp_cap] means requester capability flags and responder capability flags.\n");
+  printf ("      Format: Capabilities can be multiple flags. Please use ',' for them.\n");
+  printf ("   [--hash], [--meas_spec], [--meas_hash], [--asym], [--req_asym], [--dhe], [--aead], [--key_schedule] means negotiated algorithms.\n");
+  printf ("      Format: Algorithms must include only one flag.\n");
+  printf ("      Capabilities and algorithms are required if GET_CAPABILITIES or NEGOTIATE_ALGORITHMS is not sent.\n");
+  printf ("              For example, the negotiated state session or quick PSK session.\n");
   printf ("\n");
   printf ("   [--req_cert_chain] is required to if encapsulated GET_CERTIFICATE is not sent\n");
   printf ("   [--rsp_cert_chain] is required to if GET_CERTIFICATE is not sent\n");
@@ -159,6 +268,7 @@ ProcessArgs (
   )
 {
   CHAR8   *PcapFileName;
+  UINT32  Data32;
 
   PcapFileName = NULL;
 
@@ -246,6 +356,191 @@ ProcessArgs (
         continue;
       } else {
         printf ("invalid --dhe_secret\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--req_cap") == 0) {
+      if (argc >= 2) {
+        if (!GetFlagsFromName (mSpdmRequesterCapabilitiesStringTable, mSpdmRequesterCapabilitiesStringTableCount, argv[1], &mSpdmRequesterCapabilitiesFlags)) {
+          printf ("invalid --req_cap %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        printf ("req_cap - 0x%08x\n", mSpdmRequesterCapabilitiesFlags);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --req_cap\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--rsp_cap") == 0) {
+      if (argc >= 2) {
+        if (!GetFlagsFromName (mSpdmResponderCapabilitiesStringTable, mSpdmResponderCapabilitiesStringTableCount, argv[1], &mSpdmResponderCapabilitiesFlags)) {
+          printf ("invalid --rsp_cap %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        printf ("rsp_cap - 0x%08x\n", mSpdmResponderCapabilitiesFlags);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --rsp_cap\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--hash") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSpdmHashValueStringTable, mSpdmHashValueStringTableCount, argv[1], &mSpdmBaseHashAlgo)) {
+          printf ("invalid --hash %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        printf ("hash - 0x%08x\n", mSpdmBaseHashAlgo);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --hash\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--meas_spec") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSpdmMeasurementSpecValueStringTable, mSpdmMeasurementSpecValueStringTableCount, argv[1], &Data32)) {
+          printf ("invalid --meas_spec %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        mSpdmMeasurementSpec = (UINT8)Data32;
+        printf ("meas_spec - 0x%02x\n", mSpdmMeasurementSpec);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --meas_spec\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--meas_hash") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSpdmMeasurementHashValueStringTable, mSpdmMeasurementHashValueStringTableCount, argv[1], &mSpdmMeasurementHashAlgo)) {
+          printf ("invalid --meas_hash %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        printf ("meas_hash - 0x%08x\n", mSpdmMeasurementHashAlgo);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --meas_hash\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--asym") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSpdmAsymValueStringTable, mSpdmAsymValueStringTableCount, argv[1], &mSpdmBaseAsymAlgo)) {
+          printf ("invalid --asym %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        printf ("asym - 0x%08x\n", mSpdmBaseAsymAlgo);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --asym\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--req_asym") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSpdmAsymValueStringTable, mSpdmAsymValueStringTableCount, argv[1], &Data32)) {
+          printf ("invalid --req_asym %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        mSpdmReqBaseAsymAlg = (UINT16)Data32;
+        printf ("req_asym - 0x%04x\n", mSpdmReqBaseAsymAlg);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --req_asym\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--dhe") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSpdmDheValueStringTable, mSpdmDheValueStringTableCount, argv[1], &Data32)) {
+          printf ("invalid --dhe %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        mSpdmDHENamedGroup = (UINT16)Data32;
+        printf ("dhe - 0x%04x\n", mSpdmDHENamedGroup);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --dhe\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--aead") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSpdmAeadValueStringTable, mSpdmAeadValueStringTableCount, argv[1], &Data32)) {
+          printf ("invalid --aead %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        mSpdmAEADCipherSuite = (UINT16)Data32;
+        printf ("aead - 0x%04x\n", mSpdmAEADCipherSuite);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --aead\n");
+        PrintUsage ();
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--key_schedule") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mSpdmKeyScheduleValueStringTable, mSpdmKeyScheduleValueStringTableCount, argv[1], &Data32)) {
+          printf ("invalid --key_schedule %s\n", argv[1]);
+          PrintUsage ();
+          exit (0);
+        }
+        mSpdmKeySchedule = (UINT16)Data32;
+        printf ("key_schedule - 0x%04x\n", mSpdmKeySchedule);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --key_schedule\n");
         PrintUsage ();
         exit (0);
       }

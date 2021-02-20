@@ -69,6 +69,7 @@ VALUE_STRING_ENTRY  mSpdmRequesterCapabilitiesStringTable[] = {
   {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, "HANDSHAKE_IN_CLEAR"},
   {SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP,             "PUB_KEY_ID"},
 };
+UINTN mSpdmRequesterCapabilitiesStringTableCount = ARRAY_SIZE(mSpdmRequesterCapabilitiesStringTable);
 
 VALUE_STRING_ENTRY  mSpdmResponderCapabilitiesStringTable[] = {
   {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP,                      "CACHE"},
@@ -89,6 +90,7 @@ VALUE_STRING_ENTRY  mSpdmResponderCapabilitiesStringTable[] = {
   {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP,     "HANDSHAKE_IN_CLEAR"},
   {SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP,                 "PUB_KEY_ID"},
 };
+UINTN mSpdmResponderCapabilitiesStringTableCount = ARRAY_SIZE(mSpdmResponderCapabilitiesStringTable);
 
 VALUE_STRING_ENTRY  mSpdmHashValueStringTable[] = {
   {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256,  "SHA_256"},
@@ -98,6 +100,7 @@ VALUE_STRING_ENTRY  mSpdmHashValueStringTable[] = {
   {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_384, "SHA3_384"},
   {SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512, "SHA3_512"},
 };
+UINTN mSpdmHashValueStringTableCount = ARRAY_SIZE(mSpdmHashValueStringTable);
 
 VALUE_STRING_ENTRY  mSpdmMeasurementHashValueStringTable[] = {
   {SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_RAW_BIT_STREAM_ONLY,  "RAW_BIT"},
@@ -108,6 +111,7 @@ VALUE_STRING_ENTRY  mSpdmMeasurementHashValueStringTable[] = {
   {SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_384,     "SHA3_384"},
   {SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA3_512,     "SHA3_512"},
 };
+UINTN mSpdmMeasurementHashValueStringTableCount = ARRAY_SIZE(mSpdmMeasurementHashValueStringTable);
 
 VALUE_STRING_ENTRY  mSpdmAsymValueStringTable[] = {
   {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048,          "RSASSA_2048"},
@@ -120,6 +124,7 @@ VALUE_STRING_ENTRY  mSpdmAsymValueStringTable[] = {
   {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384,  "ECDSA_P384"},
   {SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521,  "ECDSA_P521"},
 };
+UINTN mSpdmAsymValueStringTableCount = ARRAY_SIZE(mSpdmAsymValueStringTable);
 
 VALUE_STRING_ENTRY  mSpdmDheValueStringTable[] = {
   {SPDM_ALGORITHMS_DHE_NAMED_GROUP_FFDHE_2048,  "FFDHE_2048"},
@@ -129,20 +134,24 @@ VALUE_STRING_ENTRY  mSpdmDheValueStringTable[] = {
   {SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_384_R1, "SECP_384_R1"},
   {SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1, "SECP_521_R1"},
 };
+UINTN mSpdmDheValueStringTableCount = ARRAY_SIZE(mSpdmDheValueStringTable);
 
 VALUE_STRING_ENTRY  mSpdmAeadValueStringTable[] = {
   {SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM,        "AES_128_GCM"},
   {SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM,        "AES_256_GCM"},
   {SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_CHACHA20_POLY1305,  "CHACHA20_POLY1305"},
 };
+UINTN mSpdmAeadValueStringTableCount = ARRAY_SIZE(mSpdmAeadValueStringTable);
 
 VALUE_STRING_ENTRY  mSpdmKeyScheduleValueStringTable[] = {
   {SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH,        "HMAC_HASH"},
 };
+UINTN mSpdmKeyScheduleValueStringTableCount = ARRAY_SIZE(mSpdmKeyScheduleValueStringTable);
 
 VALUE_STRING_ENTRY  mSpdmMeasurementSpecValueStringTable[] = {
   {SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF,        "DMTF"},
 };
+UINTN mSpdmMeasurementSpecValueStringTableCount = ARRAY_SIZE(mSpdmMeasurementSpecValueStringTable);
 
 VALUE_STRING_ENTRY  mSpdmMeasurementTypeValueStringTable[] = {
   {SPDM_MEASUREMENT_BLOCK_MEASUREMENT_TYPE_IMMUTABLE_ROM,          "ImmutableROM"},
@@ -2227,6 +2236,8 @@ InitSpdmDump (
   VOID
   )
 {
+  SPDM_DATA_PARAMETER                            Parameter;
+
   mSpdmDecMessageBuffer = (VOID *)malloc (GetMaxPacketLength());
   if (mSpdmDecMessageBuffer == NULL) {
     printf ("!!!memory out of resources!!!\n");
@@ -2259,6 +2270,23 @@ InitSpdmDump (
     goto Error;
   }
   SpdmInitContext (mSpdmContext);
+
+  //
+  // Provision data in case the GET_CAPABILITIES or NEGOTIATE_ALGORITHMS are not sent.
+  //
+  ZeroMem (&Parameter, sizeof(Parameter));
+  Parameter.Location = SpdmDataLocationLocal;
+  SpdmSetData (mSpdmContext, SpdmDataCapabilityFlags, &Parameter, &mSpdmRequesterCapabilitiesFlags, sizeof(UINT32));
+  Parameter.Location = SpdmDataLocationConnection;
+  SpdmSetData (mSpdmContext, SpdmDataCapabilityFlags, &Parameter, &mSpdmResponderCapabilitiesFlags, sizeof(UINT32));
+  SpdmSetData (mSpdmContext, SpdmDataMeasurementSpec, &Parameter, &mSpdmMeasurementSpec, sizeof(UINT8));
+  SpdmSetData (mSpdmContext, SpdmDataMeasurementHashAlgo, &Parameter, &mSpdmMeasurementHashAlgo, sizeof(UINT32));
+  SpdmSetData (mSpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &mSpdmBaseAsymAlgo, sizeof(UINT32));
+  SpdmSetData (mSpdmContext, SpdmDataBaseHashAlgo, &Parameter, &mSpdmBaseHashAlgo, sizeof(UINT32));
+  SpdmSetData (mSpdmContext, SpdmDataDHENamedGroup, &Parameter, &mSpdmDHENamedGroup, sizeof(UINT16));
+  SpdmSetData (mSpdmContext, SpdmDataAEADCipherSuite, &Parameter, &mSpdmAEADCipherSuite, sizeof(UINT16));
+  SpdmSetData (mSpdmContext, SpdmDataReqBaseAsymAlg, &Parameter, &mSpdmReqBaseAsymAlg, sizeof(UINT16));
+  SpdmSetData (mSpdmContext, SpdmDataKeySchedule, &Parameter, &mSpdmKeySchedule, sizeof(UINT16));
 
   return TRUE;
 
