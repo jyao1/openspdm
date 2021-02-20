@@ -42,7 +42,7 @@ PrintUsage (
   printf ("   [--sec_ver] is secured message version. By default, 1.1 is used. 0 means no secured message version negotiation.\n");
   printf ("   [--cap] is capability flags. Multiple flags can be set together. Please use ',' for them.\n");
   printf ("           By default, CERT,CHAL,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Requester.\n");
-  printf ("           By default, CERT,CHAL,MEAS_SIG,MEAS_FRESH,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Responder.\n");
+  printf ("           By default, CACHE,CERT,CHAL,MEAS_SIG,MEAS_FRESH,ENCRYPT,MAC,MUT_AUTH,KEY_EX,PSK_WITH_CONTEXT,ENCAP,HBEAT,KEY_UPD,HANDSHAKE_IN_CLEAR is used for Responder.\n");
   printf ("   [--hash] is hash algorithm. By default, SHA_384,SHA_256 is used.\n");
   printf ("   [--meas_spec] is measurement hash spec. By default, DMTF is used.\n");
   printf ("   [--meas_hash] is measurement hash algorithm. By default, SHA_512,SHA_384,SHA_256 is used.\n");

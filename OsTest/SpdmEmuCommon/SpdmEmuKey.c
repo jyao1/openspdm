@@ -11,34 +11,39 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 UINT8   mUseVersion = SPDM_MESSAGE_VERSION_11;
 UINT8   mUseSecuredMessageVersion = SPDM_MESSAGE_VERSION_11;
-UINT32  mUseRequesterCapabilityFlags = (SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP_REQUESTER | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP | \
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP /*|
-                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP*/);
-UINT32  mUseResponderCapabilityFlags =  (SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP |
+UINT32  mUseRequesterCapabilityFlags = (0 |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP | /* conflict with SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP */
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP_REQUESTER |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCAP_CAP |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HBEAT_CAP |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP |
+                                        SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP |
+                                        // SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP | /* conflict with SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP */
+                                        0);
+UINT32  mUseResponderCapabilityFlags =  (0 |
+                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CACHE_CAP |
+                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP | /* conflict with SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP */
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP |
-                                        // SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG |
-                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG |
+                                        // SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG | /* conflict with SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG */
+                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_SIG | /* conflict with SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP_NO_SIG */
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_FRESH_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP |
-                                        // SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER |
-                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT |
+                                        // SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER | /* conflict with SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT */
+                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER_WITH_CONTEXT | /* conflict with SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP_RESPONDER */
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCAP_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HBEAT_CAP |
                                         SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP |
-                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP /*|
-                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP*/);
+                                        SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP |
+                                        // SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PUB_KEY_ID_CAP | /* conflict with SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP */
+                                        0);
 
 UINT32  mUseCapabilityFlags = 0;
 /*
