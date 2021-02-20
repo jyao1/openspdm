@@ -13,11 +13,12 @@ SET(src_SpdmResponderTest
     SpdmResponder.c
     SpdmResponderSession.c
     SpdmResponderEmu.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmu.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuCommand.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuKey.c
+    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuNvStorage.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuPcap.c
     ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuSupport.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuNvStorage.c
 )
 
 SET(SpdmResponderTest_LIBRARY

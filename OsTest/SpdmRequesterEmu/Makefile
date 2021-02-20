@@ -38,11 +38,12 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\SpdmRequesterMeasurement.obj \
     $(OUTPUT_DIR)\SpdmRequesterSession.obj \
     $(OUTPUT_DIR)\SpdmRequesterEmu.obj \
+    $(OUTPUT_DIR)\SpdmEmu.obj \
     $(OUTPUT_DIR)\SpdmEmuCommand.obj \
     $(OUTPUT_DIR)\SpdmEmuKey.obj \
+    $(OUTPUT_DIR)\SpdmEmuNvStorage.obj \
     $(OUTPUT_DIR)\SpdmEmuPcap.obj \
     $(OUTPUT_DIR)\SpdmEmuSupport.obj \
-    $(OUTPUT_DIR)\SpdmEmuNvStorage.obj \
 
 
 STATIC_LIBRARY_FILES =  \
@@ -148,20 +149,23 @@ $(OUTPUT_DIR)\SpdmRequesterSession.obj : $(SOURCE_DIR)\SpdmRequesterSession.c
 $(OUTPUT_DIR)\SpdmRequesterEmu.obj : $(SOURCE_DIR)\SpdmRequesterEmu.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterEmu.c
 
+$(OUTPUT_DIR)\SpdmEmu.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmu.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmu.c
+
 $(OUTPUT_DIR)\SpdmEmuCommand.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuCommand.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuCommand.c
 
 $(OUTPUT_DIR)\SpdmEmuKey.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuKey.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuKey.c
 
+$(OUTPUT_DIR)\SpdmEmuNvStorage.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuNvStorage.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuNvStorage.c
+
 $(OUTPUT_DIR)\SpdmEmuPcap.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuPcap.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuPcap.c
 
 $(OUTPUT_DIR)\SpdmEmuSupport.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuSupport.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuSupport.c
-
-$(OUTPUT_DIR)\SpdmEmuNvStorage.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuNvStorage.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmuNvStorage.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@
