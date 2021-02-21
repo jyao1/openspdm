@@ -104,7 +104,7 @@ SpdmGetResponsePskFinish (
 
   Result = SpdmVerifyPskFinishReqHmac (SpdmContext, SessionInfo, (UINT8 *)Request + sizeof(SPDM_PSK_FINISH_REQUEST), HmacSize);
   if (!Result) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_DECRYPT_ERROR, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   Status = SpdmAppendMessageF (SessionInfo, (UINT8 *)Request + RequestSize - HmacSize, HmacSize);

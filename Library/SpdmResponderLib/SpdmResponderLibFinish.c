@@ -131,7 +131,7 @@ SpdmGetResponseFinish (
   if (SessionInfo->MutAuthRequested) {
     Result = SpdmVerifyFinishReqSignature (SpdmContext, SessionInfo, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST), SignatureSize);
     if (!Result) {
-      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+      SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_DECRYPT_ERROR, 0, ResponseSize, Response);
       return RETURN_SUCCESS;
     }
     Status = SpdmAppendMessageF (SessionInfo, (UINT8 *)Request + sizeof(SPDM_FINISH_REQUEST), SignatureSize);
@@ -143,7 +143,7 @@ SpdmGetResponseFinish (
 
   Result = SpdmVerifyFinishReqHmac (SpdmContext, SessionInfo, (UINT8 *)Request + SignatureSize + sizeof(SPDM_FINISH_REQUEST), HmacSize);
   if (!Result) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_DECRYPT_ERROR, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
