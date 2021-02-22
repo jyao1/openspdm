@@ -620,6 +620,10 @@ OBJECT_37_FILES =  \
     $(OUTPUT_DIR)\openssl\crypto\x509v3\v3err.obj \
 
 OBJECT_38_FILES =  \
+    $(OUTPUT_DIR)\openssl\crypto\sm2\sm2_crypt.obj \
+    $(OUTPUT_DIR)\openssl\crypto\sm2\sm2_err.obj \
+    $(OUTPUT_DIR)\openssl\crypto\sm2\sm2_pmeth.obj \
+    $(OUTPUT_DIR)\openssl\crypto\sm2\sm2_sign.obj \
     $(OUTPUT_DIR)\openssl\crypto\sm3\m_sm3.obj \
     $(OUTPUT_DIR)\openssl\crypto\sm3\sm3.obj \
     $(OUTPUT_DIR)\openssl\crypto\sm4\sm4.obj \
@@ -670,6 +674,7 @@ INC =  \
     -I$(SOURCE_DIR)\openssl\crypto\asn1 \
     -I$(SOURCE_DIR)\openssl\crypto\aria \
     -I$(SOURCE_DIR)\openssl\crypto\aes \
+    -I$(SOURCE_DIR)\openssl\crypto\sm2 \
     -I$(SOURCE_DIR)\openssl\crypto\sm3 \
     -I$(SOURCE_DIR)\openssl\crypto\sm4 \
     -I$(SOURCE_DIR)\openssl\ms \
@@ -746,6 +751,7 @@ init:
 	-@if not exist $(OUTPUT_DIR)\openssl\crypto\asn1 $(MD) $(OUTPUT_DIR)\openssl\crypto\asn1
 	-@if not exist $(OUTPUT_DIR)\openssl\crypto\aria $(MD) $(OUTPUT_DIR)\openssl\crypto\aria
 	-@if not exist $(OUTPUT_DIR)\openssl\crypto\aes $(MD) $(OUTPUT_DIR)\openssl\crypto\aes
+	-@if not exist $(OUTPUT_DIR)\openssl\crypto\sm2 $(MD) $(OUTPUT_DIR)\openssl\crypto\sm2
 	-@if not exist $(OUTPUT_DIR)\openssl\crypto\sm3 $(MD) $(OUTPUT_DIR)\openssl\crypto\sm3
 	-@if not exist $(OUTPUT_DIR)\openssl\crypto\sm4 $(MD) $(OUTPUT_DIR)\openssl\crypto\sm4
 	-@if not exist $(OUTPUT_DIR)\openssl\ms $(MD) $(OUTPUT_DIR)\openssl\ms
@@ -2168,6 +2174,18 @@ $(OUTPUT_DIR)\openssl\crypto\x509v3\v3_utl.obj : $(SOURCE_DIR)\openssl\crypto\x5
 
 $(OUTPUT_DIR)\openssl\crypto\x509v3\v3err.obj : $(SOURCE_DIR)\openssl\crypto\x509v3\v3err.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\openssl\crypto\x509v3\v3err.c
+
+$(OUTPUT_DIR)\openssl\crypto\sm2\sm2_crypt.obj : $(SOURCE_DIR)\openssl\crypto\sm2\sm2_crypt.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\openssl\crypto\sm2\sm2_crypt.c
+
+$(OUTPUT_DIR)\openssl\crypto\sm2\sm2_err.obj : $(SOURCE_DIR)\openssl\crypto\sm2\sm2_err.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\openssl\crypto\sm2\sm2_err.c
+
+$(OUTPUT_DIR)\openssl\crypto\sm2\sm2_pmeth.obj : $(SOURCE_DIR)\openssl\crypto\sm2\sm2_pmeth.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\openssl\crypto\sm2\sm2_pmeth.c
+
+$(OUTPUT_DIR)\openssl\crypto\sm2\sm2_sign.obj : $(SOURCE_DIR)\openssl\crypto\sm2\sm2_sign.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\openssl\crypto\sm2\sm2_sign.c
 
 $(OUTPUT_DIR)\openssl\crypto\sm3\m_sm3.obj : $(SOURCE_DIR)\openssl\crypto\sm3\m_sm3.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\openssl\crypto\sm3\m_sm3.c

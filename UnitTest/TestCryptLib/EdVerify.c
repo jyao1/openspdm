@@ -35,7 +35,7 @@ ValidateCryptEd (
   Ed1 = EdNewByNid (CRYPTO_NID_ED25519);
   if (Ed1 == NULL) {
     Print ("[Fail]");
-    return EFI_ABORTED;
+    goto Exit;
   }
 
   //
@@ -47,7 +47,7 @@ ValidateCryptEd (
   if (!Status) {
     Print ("[Fail]");
     EdFree (Ed1);
-    return EFI_ABORTED;
+    goto Exit;
   }
 
   Print ("Ed-DSA Verification ... ");
@@ -55,7 +55,7 @@ ValidateCryptEd (
   if (!Status) {
     Print ("[Fail]");
     EdFree (Ed1);
-    return EFI_ABORTED;
+    goto Exit;
   } else {
     Print ("[Pass]\n");
   }
@@ -65,7 +65,7 @@ ValidateCryptEd (
   Ed2 = EdNewByNid (CRYPTO_NID_ED448);
   if (Ed2 == NULL) {
     Print ("[Fail]");
-    return EFI_ABORTED;
+    goto Exit;
   }
 
   Sig2Size = sizeof(Signature2);
@@ -74,7 +74,7 @@ ValidateCryptEd (
   if (!Status) {
     Print ("[Fail]");
     EdFree (Ed2);
-    return EFI_ABORTED;
+    goto Exit;
   }
 
   Print ("Ed-DSA Verification ... ");
@@ -82,12 +82,13 @@ ValidateCryptEd (
   if (!Status) {
     Print ("[Fail]");
     EdFree (Ed2);
-    return EFI_ABORTED;
+    goto Exit;
   } else {
     Print ("[Pass]\n");
   }
 
   EdFree (Ed2);
 
+Exit:
   return EFI_SUCCESS;
 }

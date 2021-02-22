@@ -35,11 +35,12 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\Cipher\CryptAeadAesCcm.obj \
     $(OUTPUT_DIR)\Cipher\CryptAeadAesGcm.obj \
     $(OUTPUT_DIR)\Cipher\CryptAeadChaCha20Poly1305.obj \
+    $(OUTPUT_DIR)\Cipher\CryptAeadSm4Gcm.obj \
     $(OUTPUT_DIR)\Cipher\CryptAes.obj \
     $(OUTPUT_DIR)\Hash\CryptSha256.obj \
     $(OUTPUT_DIR)\Hash\CryptSha512.obj \
-	$(OUTPUT_DIR)\Hash\CryptSha3.obj \
-	$(OUTPUT_DIR)\Hash\CryptSm3.obj \
+    $(OUTPUT_DIR)\Hash\CryptSha3.obj \
+    $(OUTPUT_DIR)\Hash\CryptSm3.obj \
     $(OUTPUT_DIR)\Hmac\CryptHmacSha256.obj \
     $(OUTPUT_DIR)\Kdf\CryptHkdf.obj \
     $(OUTPUT_DIR)\Mac\CryptCmacAes.obj \
@@ -48,6 +49,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\Pk\CryptDh.obj \
     $(OUTPUT_DIR)\Pk\CryptEc.obj \
     $(OUTPUT_DIR)\Pk\CryptEd.obj \
+    $(OUTPUT_DIR)\Pk\CryptSm2.obj \
     $(OUTPUT_DIR)\Pk\CryptPkcs1Oaep.obj \
     $(OUTPUT_DIR)\Pk\CryptPkcs7Sign.obj \
     $(OUTPUT_DIR)\Pk\CryptPkcs7VerifyBase.obj \
@@ -115,6 +117,9 @@ $(OUTPUT_DIR)\Cipher\CryptAeadAesGcm.obj : $(SOURCE_DIR)\Cipher\CryptAeadAesGcm.
 $(OUTPUT_DIR)\Cipher\CryptAeadChaCha20Poly1305.obj : $(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c
 
+$(OUTPUT_DIR)\Cipher\CryptAeadSm4Gcm.obj : $(SOURCE_DIR)\Cipher\CryptAeadSm4Gcm.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher\CryptAeadSm4Gcm.c
+
 $(OUTPUT_DIR)\Cipher\CryptAes.obj : $(SOURCE_DIR)\Cipher\CryptAes.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher\CryptAes.c
 
@@ -153,6 +158,9 @@ $(OUTPUT_DIR)\Pk\CryptEd.obj : $(SOURCE_DIR)\Pk\CryptEd.c
 
 $(OUTPUT_DIR)\Pk\CryptDh.obj : $(SOURCE_DIR)\Pk\CryptDh.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptDh.c
+
+$(OUTPUT_DIR)\Pk\CryptSm2.obj : $(SOURCE_DIR)\Pk\CryptSm2.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptSm2.c
 
 $(OUTPUT_DIR)\Pk\CryptPkcs1Oaep.obj : $(SOURCE_DIR)\Pk\CryptPkcs1Oaep.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptPkcs1Oaep.c

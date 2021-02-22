@@ -51,6 +51,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Include
                     ${PROJECT_SOURCE_DIR}/OsStub/OpensslLib/openssl/crypto/asn1
                     ${PROJECT_SOURCE_DIR}/OsStub/OpensslLib/openssl/crypto/aria
                     ${PROJECT_SOURCE_DIR}/OsStub/OpensslLib/openssl/crypto/aes
+                    ${PROJECT_SOURCE_DIR}/OsStub/OpensslLib/openssl/crypto/sm2
                     ${PROJECT_SOURCE_DIR}/OsStub/OpensslLib/openssl/crypto/sm3
                     ${PROJECT_SOURCE_DIR}/OsStub/OpensslLib/openssl/crypto/sm4
                     ${PROJECT_SOURCE_DIR}/OsStub/OpensslLib/openssl/ms
@@ -447,9 +448,13 @@ SET(src_OpensslLib
     openssl/crypto/siphash/siphash.c
     openssl/crypto/siphash/siphash_ameth.c
     openssl/crypto/siphash/siphash_pmeth.c
+    openssl/crypto/sm2/sm2_crypt.c
+    openssl/crypto/sm2/sm2_err.c
+    openssl/crypto/sm2/sm2_pmeth.c
+    openssl/crypto/sm2/sm2_sign.c
     openssl/crypto/sm3/m_sm3.c
     openssl/crypto/sm3/sm3.c
-    openssl/crypto/sm3/sm4.c
+    openssl/crypto/sm4/sm4.c
     openssl/crypto/stack/stack.c
     openssl/crypto/threads_none.c
     openssl/crypto/threads_pthread.c

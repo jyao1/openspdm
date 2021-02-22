@@ -14,6 +14,7 @@ SET(src_BaseCryptLibOpenssl
     Cipher/CryptAeadAesCcm.c
     Cipher/CryptAeadAesGcm.c
     Cipher/CryptAeadChaCha20Poly1305.c
+    Cipher/CryptAeadSm4Gcm
     Cipher/CryptAes.c
     Hash/CryptSha256.c
     Hash/CryptSha512.c
@@ -27,6 +28,7 @@ SET(src_BaseCryptLibOpenssl
     Pk/CryptEc.c
     Pk/CryptEd.c
     Pk/CryptDh.c
+    Pk/CryptSm2.c
     Pk/CryptPkcs1Oaep.c
     Pk/CryptPkcs7Sign.c
     Pk/CryptPkcs7VerifyBase.c

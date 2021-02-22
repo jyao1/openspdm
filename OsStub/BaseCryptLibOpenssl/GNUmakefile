@@ -35,6 +35,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/Cipher/CryptAeadAesCcm.o \
     $(OUTPUT_DIR)/Cipher/CryptAeadAesGcm.o \
     $(OUTPUT_DIR)/Cipher/CryptAeadChaCha20Poly1305.o \
+    $(OUTPUT_DIR)/Cipher/CryptAeadSm4Gcm.o \
     $(OUTPUT_DIR)/Cipher/CryptAes.o \
     $(OUTPUT_DIR)/Hash/CryptSha256.o \
     $(OUTPUT_DIR)/Hash/CryptSha512.o \
@@ -48,6 +49,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/Pk/CryptDh.o \
     $(OUTPUT_DIR)/Pk/CryptEc.o \
     $(OUTPUT_DIR)/Pk/CryptEd.o \
+    $(OUTPUT_DIR)/Pk/CryptSm2.o \
     $(OUTPUT_DIR)/Pk/CryptPkcs1Oaep.o \
     $(OUTPUT_DIR)/Pk/CryptPkcs7Sign.o \
     $(OUTPUT_DIR)/Pk/CryptPkcs7VerifyBase.o \
@@ -115,6 +117,9 @@ $(OUTPUT_DIR)/Cipher/CryptAeadAesGcm.o : $(SOURCE_DIR)/Cipher/CryptAeadAesGcm.c
 $(OUTPUT_DIR)/Cipher/CryptAeadChaCha20Poly1305.o : $(SOURCE_DIR)/Cipher/CryptAeadChaCha20Poly1305.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
+$(OUTPUT_DIR)/Cipher/CryptAeadSm4Gcm.o : $(SOURCE_DIR)/Cipher/CryptAeadSm4Gcm.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
 $(OUTPUT_DIR)/Cipher/CryptAes.o : $(SOURCE_DIR)/Cipher/CryptAes.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
@@ -152,6 +157,9 @@ $(OUTPUT_DIR)/Pk/CryptEd.o : $(SOURCE_DIR)/Pk/CryptEd.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/Pk/CryptDh.o : $(SOURCE_DIR)/Pk/CryptDh.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/Pk/CryptSm2.o : $(SOURCE_DIR)/Pk/CryptSm2.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/Pk/CryptPkcs1Oaep.o : $(SOURCE_DIR)/Pk/CryptPkcs1Oaep.c

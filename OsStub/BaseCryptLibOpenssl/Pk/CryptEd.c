@@ -126,7 +126,7 @@ EdDsaSign (
     return FALSE;
   }
 
-  if (Signature == NULL) {
+  if (Signature == NULL || SigSize == NULL) {
     return FALSE;
   }
 
@@ -202,11 +202,11 @@ EdDsaVerify (
   UINTN      HalfSize;
   INT32      Result;
 
-  if (EdContext == NULL || Message == NULL) {
+  if (EdContext == NULL || Message == NULL || Signature == NULL) {
     return FALSE;
   }
 
-  if (Signature == NULL) {
+  if (SigSize > INT_MAX || SigSize == 0) {
     return FALSE;
   }
 

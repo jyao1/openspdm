@@ -77,7 +77,7 @@ ValidateCryptEd2 (
   Status = EdGetPrivateKeyFromPem (EdTestPemKey, sizeof (EdTestPemKey), NULL, &EdPrivKey);
   if (!Status) {
     Print ("[Fail]");
-    return EFI_ABORTED;
+    goto Exit;
   } else {
     Print ("[Pass]");
   }
@@ -90,7 +90,7 @@ ValidateCryptEd2 (
   if (!Status) {
     Print ("[Fail]");
     EdFree (EdPrivKey);
-    return EFI_ABORTED;
+    goto Exit;
   } else {
     Print ("[Pass]");
   }
@@ -105,7 +105,7 @@ ValidateCryptEd2 (
     Print ("[Fail]");
     EdFree (EdPrivKey);
     EdFree (EdPubKey);
-    return EFI_ABORTED;
+    goto Exit;
   } else {
     Print ("[Pass]");
   }
@@ -116,12 +116,14 @@ ValidateCryptEd2 (
     Print ("[Fail]");
     EdFree (EdPrivKey);
     EdFree (EdPubKey);
-    return EFI_ABORTED;
+    goto Exit;
   } else {
     Print ("[Pass]\n");
   }
 
   EdFree (EdPrivKey);
   EdFree (EdPubKey);
+
+Exit:
   return EFI_SUCCESS;
 }

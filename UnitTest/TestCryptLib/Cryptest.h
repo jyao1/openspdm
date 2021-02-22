@@ -260,6 +260,30 @@ ValidateCryptEd2 (
   );
 
 /**
+  Validate UEFI-OpenSSL Sm2 Interfaces.
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateCryptSm2 (
+  VOID
+  );
+
+/**
+  Validate UEFI-OpenSSL Sm2 Key Retrieving (from PEM & X509) & Signature Interfaces.
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateCryptSm2_2 (
+  VOID
+  );
+
+/**
   Validate UEFI-OpenSSL PKCS#7 Signing & Verification Interfaces for EC.
 
   @retval  EFI_SUCCESS  Validation succeeded.

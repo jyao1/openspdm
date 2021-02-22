@@ -423,6 +423,10 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/openssl/crypto/siphash/siphash.o \
     $(OUTPUT_DIR)/openssl/crypto/siphash/siphash_ameth.o \
     $(OUTPUT_DIR)/openssl/crypto/siphash/siphash_pmeth.o \
+    $(OUTPUT_DIR)/openssl/crypto/sm2/sm2_crypt.o \
+    $(OUTPUT_DIR)/openssl/crypto/sm2/sm2_err.o \
+    $(OUTPUT_DIR)/openssl/crypto/sm2/sm2_pmeth.o \
+    $(OUTPUT_DIR)/openssl/crypto/sm2/sm2_sign.o \
     $(OUTPUT_DIR)/openssl/crypto/sm3/m_sm3.o \
     $(OUTPUT_DIR)/openssl/crypto/sm3/sm3.o \
     $(OUTPUT_DIR)/openssl/crypto/sm4/sm4.o \
@@ -556,6 +560,7 @@ INC =  \
     -I$(SOURCE_DIR)/openssl/crypto/asn1 \
     -I$(SOURCE_DIR)/openssl/crypto/aria \
     -I$(SOURCE_DIR)/openssl/crypto/aes \
+    -I$(SOURCE_DIR)/openssl/crypto/sm2 \
     -I$(SOURCE_DIR)/openssl/crypto/sm3 \
     -I$(SOURCE_DIR)/openssl/crypto/sm4 \
     -I$(SOURCE_DIR)/openssl/ms \
@@ -633,6 +638,7 @@ init:
 	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/asn1
 	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/aria
 	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/aes
+	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/sm2
 	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/sm3
 	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/sm4
 	-@$(MD) $(OUTPUT_DIR)/openssl/ms
@@ -2054,6 +2060,18 @@ $(OUTPUT_DIR)/openssl/crypto/x509v3/v3_utl.o : $(SOURCE_DIR)/openssl/crypto/x509
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/openssl/crypto/x509v3/v3err.o : $(SOURCE_DIR)/openssl/crypto/x509v3/v3err.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/openssl/crypto/sm2/sm2_crypt.o : $(SOURCE_DIR)/openssl/crypto/sm2/sm2_crypt.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/openssl/crypto/sm2/sm2_err.o : $(SOURCE_DIR)/openssl/crypto/sm2/sm2_err.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/openssl/crypto/sm2/sm2_pmeth.o : $(SOURCE_DIR)/openssl/crypto/sm2/sm2_pmeth.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/openssl/crypto/sm2/sm2_sign.o : $(SOURCE_DIR)/openssl/crypto/sm2/sm2_sign.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/openssl/crypto/sm3/m_sm3.o : $(SOURCE_DIR)/openssl/crypto/sm3/m_sm3.c

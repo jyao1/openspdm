@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalCryptLib.h"
 #include <openssl/pem.h>
+#include <openssl/evp.h>
 
 STATIC
 UINTN
@@ -304,6 +305,90 @@ EdGetPrivateKeyFromPem (
     goto _Exit;
   }
   *EdContext = Pkey;
+  Status = TRUE;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  BIO_free (PemBio);
+
+  return Status;
+}
+
+/**
+  Retrieve the Sm2 Private Key from the password-protected PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] Sm2Context   Pointer to new-generated Sm2 context which contain the retrieved
+                           Sm2 private key component. Use Sm2Free() function to free the
+                           resource.
+
+  If PemData is NULL, then return FALSE.
+  If Sm2Context is NULL, then return FALSE.
+
+  @retval  TRUE   Sm2 Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+Sm2GetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **Sm2Context
+  )
+{
+  BOOLEAN  Status;
+  BIO      *PemBio;
+  EVP_PKEY *Pkey;
+  INT32    Result;
+
+  //
+  // Check input parameters.
+  //
+  if (PemData == NULL || Sm2Context == NULL || PemSize > INT_MAX) {
+    return FALSE;
+  }
+
+  //
+  // Add possible block-cipher descriptor for PEM data decryption.
+  // NOTE: Only support SM4 for the encrypted PEM.
+  //
+  //if (EVP_add_cipher (EVP_sm4_cbc ()) == 0) {
+  //  return FALSE;
+  //}
+
+  Status = FALSE;
+
+  //
+  // Read encrypted PEM Data.
+  //
+  PemBio = BIO_new (BIO_s_mem ());
+  if (PemBio == NULL) {
+    goto _Exit;
+  }
+
+  if (BIO_write (PemBio, PemData, (int) PemSize) <= 0) {
+    goto _Exit;
+  }
+
+  //
+  // Retrieve Sm2 Private Key from encrypted PEM data.
+  //
+  Pkey = PEM_read_bio_PrivateKey (PemBio, NULL, (pem_password_cb *) &PasswordCallback, (void *) Password);
+  if (Pkey == NULL) {
+    goto _Exit;
+  }
+  Result = EVP_PKEY_set_alias_type(Pkey, EVP_PKEY_SM2);
+  if (Result == 0) {
+    goto _Exit;
+  }
+
+  *Sm2Context = Pkey;
   Status = TRUE;
 
 _Exit:

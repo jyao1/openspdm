@@ -58,9 +58,6 @@ extern "C" {
 #ifndef OPENSSL_NO_MD4
 # define OPENSSL_NO_MD4
 #endif
-#ifndef OPENSSL_NO_SM2
-# define OPENSSL_NO_SM23
-#endif
 #ifndef OPENSSL_NO_RC4
 # define OPENSSL_NO_RC4
 #endif
@@ -81,9 +78,6 @@ extern "C" {
 #endif
 #ifndef OPENSSL_NO_SEED
 # define OPENSSL_NO_SEED
-#endif
-#ifndef OPENSSL_NO_SM2
-# define OPENSSL_NO_SM2
 #endif
 #ifndef OPENSSL_NO_SRP
 # define OPENSSL_NO_SRP

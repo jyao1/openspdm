@@ -245,3 +245,33 @@ EdGetPrivateKeyFromPem (
 {
   return FALSE;
 }
+
+/**
+  Retrieve the Sm2 Private Key from the password-protected PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] Sm2Context   Pointer to new-generated Sm2 context which contain the retrieved
+                           Sm2 private key component. Use Sm2Free() function to free the
+                           resource.
+
+  If PemData is NULL, then return FALSE.
+  If Sm2Context is NULL, then return FALSE.
+
+  @retval  TRUE   Sm2 Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+Sm2GetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **Sm2Context
+  )
+{
+  return FALSE;
+}
+

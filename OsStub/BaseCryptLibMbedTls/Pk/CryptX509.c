@@ -588,6 +588,33 @@ EdGetPublicKeyFromX509 (
 }
 
 /**
+  Retrieve the Sm2 Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize     Size of the X509 certificate in bytes.
+  @param[out] Sm2Context   Pointer to new-generated Sm2 context which contain the retrieved
+                           Sm2 public key component. Use Sm2Free() function to free the
+                           resource.
+
+  If Cert is NULL, then return FALSE.
+  If EdContext is NULL, then return FALSE.
+
+  @retval  TRUE   Sm2 Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve Sm2 public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+Sm2GetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **Sm2Context
+  )
+{
+  return FALSE;
+}
+
+/**
   Verify one X509 certificate was issued by the trusted CA.
 
   @param[in]      Cert         Pointer to the DER-encoded X509 certificate to be verified.
