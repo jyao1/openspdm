@@ -28,6 +28,7 @@ SET(src_BaseCryptLibMbedTls
     Mac/CryptGmacAes.c
     Pem/CryptPem.c
     Pk/CryptEc.c
+    Pk/CryptEd.c
     Pk/CryptDh.c
     Pk/CryptRsaBasic.c
     Pk/CryptRsaExt.c

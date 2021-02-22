@@ -154,6 +154,16 @@ CryptestMain (
     return Status;
   }
 
+  Status = ValidateCryptEd ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ValidateCryptEd2 ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Status = ValidateCryptPrng ();
   if (EFI_ERROR (Status)) {
     return Status;

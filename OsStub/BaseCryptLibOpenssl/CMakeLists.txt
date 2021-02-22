@@ -23,6 +23,7 @@ SET(src_BaseCryptLibOpenssl
     Mac/CryptGmacAes.c
     Pem/CryptPem.c
     Pk/CryptEc.c
+    Pk/CryptEd.c
     Pk/CryptDh.c
     Pk/CryptPkcs1Oaep.c
     Pk/CryptPkcs7Sign.c

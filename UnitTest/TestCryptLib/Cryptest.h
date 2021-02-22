@@ -236,6 +236,30 @@ ValidateCryptEc2 (
   );
 
 /**
+  Validate UEFI-OpenSSL Ed Interfaces.
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateCryptEd (
+  VOID
+  );
+
+/**
+  Validate UEFI-OpenSSL Ed Key Retrieving (from PEM & X509) & Signature Interfaces.
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateCryptEd2 (
+  VOID
+  );
+
+/**
   Validate UEFI-OpenSSL PKCS#7 Signing & Verification Interfaces for EC.
 
   @retval  EFI_SUCCESS  Validation succeeded.

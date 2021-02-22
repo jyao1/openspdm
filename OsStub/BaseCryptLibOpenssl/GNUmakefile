@@ -46,6 +46,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/Pem/CryptPem.o \
     $(OUTPUT_DIR)/Pk/CryptDh.o \
     $(OUTPUT_DIR)/Pk/CryptEc.o \
+    $(OUTPUT_DIR)/Pk/CryptEd.o \
     $(OUTPUT_DIR)/Pk/CryptPkcs1Oaep.o \
     $(OUTPUT_DIR)/Pk/CryptPkcs7Sign.o \
     $(OUTPUT_DIR)/Pk/CryptPkcs7VerifyBase.o \
@@ -141,6 +142,9 @@ $(OUTPUT_DIR)/Pem/CryptPem.o : $(SOURCE_DIR)/Pem/CryptPem.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/Pk/CryptEc.o : $(SOURCE_DIR)/Pk/CryptEc.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/Pk/CryptEd.o : $(SOURCE_DIR)/Pk/CryptEd.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/Pk/CryptDh.o : $(SOURCE_DIR)/Pk/CryptDh.c

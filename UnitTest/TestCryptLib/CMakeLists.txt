@@ -18,6 +18,8 @@ SET(src_TestCryptLib
     DhVerify.c
     EcVerify.c
     EcVerify2.c
+    EdVerify.c
+    EdVerify2.c
     RandVerify.c
     X509Verify.c
     OsSupport.c

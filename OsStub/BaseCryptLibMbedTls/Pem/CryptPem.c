@@ -216,3 +216,32 @@ EcGetPrivateKeyFromPem (
   return TRUE;
 }
 
+
+/**
+  Retrieve the Ed Private Key from the password-protected PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted PEM key data.
+  @param[out] EdContext    Pointer to new-generated Ed DSA context which contain the retrieved
+                           Ed private key component. Use EdFree() function to free the
+                           resource.
+
+  If PemData is NULL, then return FALSE.
+  If EdContext is NULL, then return FALSE.
+
+  @retval  TRUE   Ed Private Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+EdGetPrivateKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EdContext
+  )
+{
+  return FALSE;
+}

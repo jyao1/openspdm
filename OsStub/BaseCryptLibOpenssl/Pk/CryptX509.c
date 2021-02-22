@@ -1675,6 +1675,82 @@ _Exit:
 }
 
 /**
+  Retrieve the Ed Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize     Size of the X509 certificate in bytes.
+  @param[out] EdContext    Pointer to new-generated Ed DSA context which contain the retrieved
+                           Ed public key component. Use EdFree() function to free the
+                           resource.
+
+  If Cert is NULL, then return FALSE.
+  If EdContext is NULL, then return FALSE.
+
+  @retval  TRUE   Ed Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve Ed public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+EdGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **EdContext
+  )
+{
+  BOOLEAN   Status;
+  EVP_PKEY  *Pkey;
+  X509      *X509Cert;
+  INT32     Type;
+
+  //
+  // Check input parameters.
+  //
+  if (Cert == NULL || EdContext == NULL) {
+    return FALSE;
+  }
+
+  Pkey     = NULL;
+  X509Cert = NULL;
+
+  //
+  // Read DER-encoded X509 Certificate and Construct X509 object.
+  //
+  Status = X509ConstructCertificate (Cert, CertSize, (UINT8 **) &X509Cert);
+  if ((X509Cert == NULL) || (!Status)) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  Status = FALSE;
+
+  //
+  // Retrieve and check EVP_PKEY data from X509 Certificate.
+  //
+  Pkey = X509_get_pubkey (X509Cert);
+  if (Pkey == NULL) {
+    goto _Exit;
+  }
+  Type = EVP_PKEY_id (Pkey);
+  if ((Type != EVP_PKEY_ED25519) && (Type != EVP_PKEY_ED448)) {
+    goto _Exit;
+  }
+
+  *EdContext = Pkey;
+  Status = TRUE;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  if (X509Cert != NULL) {
+    X509_free (X509Cert);
+  }
+
+  return Status;
+}
+
+/**
   Verify one X509 certificate was issued by the trusted CA.
 
   @param[in]      Cert         Pointer to the DER-encoded X509 certificate to be verified.

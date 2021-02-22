@@ -561,6 +561,33 @@ EcGetPublicKeyFromX509 (
 }
 
 /**
+  Retrieve the Ed Public Key from one DER-encoded X509 certificate.
+
+  @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
+  @param[in]  CertSize     Size of the X509 certificate in bytes.
+  @param[out] EdContext    Pointer to new-generated Ed DSA context which contain the retrieved
+                           Ed public key component. Use EdFree() function to free the
+                           resource.
+
+  If Cert is NULL, then return FALSE.
+  If EdContext is NULL, then return FALSE.
+
+  @retval  TRUE   Ed Public Key was retrieved successfully.
+  @retval  FALSE  Fail to retrieve Ed public key from X509 certificate.
+
+**/
+BOOLEAN
+EFIAPI
+EdGetPublicKeyFromX509 (
+  IN   CONST UINT8  *Cert,
+  IN   UINTN        CertSize,
+  OUT  VOID         **EdContext
+  )
+{
+  return FALSE;
+}
+
+/**
   Verify one X509 certificate was issued by the trusted CA.
 
   @param[in]      Cert         Pointer to the DER-encoded X509 certificate to be verified.

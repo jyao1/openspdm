@@ -43,6 +43,8 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\DhVerify.obj \
     $(OUTPUT_DIR)\EcVerify.obj \
     $(OUTPUT_DIR)\EcVerify2.obj \
+    $(OUTPUT_DIR)\EdVerify.obj \
+    $(OUTPUT_DIR)\EdVerify2.obj \
     $(OUTPUT_DIR)\RandVerify.obj \
     $(OUTPUT_DIR)\X509Verify.obj \
     $(OUTPUT_DIR)\OsSupport.obj \
@@ -142,6 +144,12 @@ $(OUTPUT_DIR)\EcVerify.obj : $(SOURCE_DIR)\EcVerify.c
 
 $(OUTPUT_DIR)\EcVerify2.obj : $(SOURCE_DIR)\EcVerify2.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\EcVerify2.c
+
+$(OUTPUT_DIR)\EdVerify.obj : $(SOURCE_DIR)\EdVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\EdVerify.c
+
+$(OUTPUT_DIR)\EdVerify2.obj : $(SOURCE_DIR)\EdVerify2.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\EdVerify2.c
 
 $(OUTPUT_DIR)\RandVerify.obj : $(SOURCE_DIR)\RandVerify.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\RandVerify.c
