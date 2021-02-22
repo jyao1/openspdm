@@ -20,6 +20,16 @@ Generate a self-signed root certificate:
     openssl x509 -in EccTestRoot.crt -out EccTestRoot.cer -outform DER
     openssl x509 -inform DER -in EccTestRoot.cer -outform PEM -out EccTestRoot.pub.pem
 
+==== EdDSA ====
+Generate a root key: ED25519  / ED448
+
+    openssl genpkey -algorithm ED25519 > ed25519.key
+
+Generate a self-signed root certificate:
+
+    openssl req -new -out ed25519.csr -key ed25519.key -config openssl-25519.cnf
+    openssl x509 -req -days 700 -in ed25519.csr -signkey ed25519.key -out ed25519.crt
+
 === RSA Certificate Chains ===
 
 NOTE: replace "//CN" with "/CN" for Linux system.
@@ -122,4 +132,55 @@ openssl pkcs8 -in end_responder.key.der -inform DER -topk8 -nocrypt -outform DER
 openssl ec -inform PEM -outform DER -in end_requester.key -out end_requester.key.der
 openssl pkcs8 -in end_requester.key.der -inform DER -topk8 -nocrypt -outform DER > end_requester.key.p8
 popd
+
+=== Ed Certificate Chains ===
+
+pushd Ed25519
+openssl genpkey -algorithm Ed25519 -out ca.key
+openssl req -nodes -x509 -days 3650 -key ca.key -out ca.cert -subj "/CN=intel test ED25519 CA"
+openssl genpkey -algorithm Ed25519 -out inter.key
+openssl genpkey -algorithm Ed25519 -out end_requester.key
+openssl genpkey -algorithm Ed25519 -out end_responder.key
+openssl req -new -key inter.key -out inter.req -batch -subj "/CN=intel test ED25519 intermediate cert"
+openssl req -new -key end_requester.key -out end_requester.req -batch -subj "/CN=intel test ED25519 requseter cert"
+openssl req -new -key end_responder.key -out end_responder.req -batch -subj "/CN=intel test ED25519 responder cert"
+openssl x509 -req -days 3650 -in inter.req -CA ca.cert -CAkey ca.key -out inter.cert -set_serial 1 -extensions v3_inter -extfile ../openssl.cnf
+openssl x509 -req -days 3650 -in end_requester.req -CA inter.cert -CAkey inter.key -out end_requester.cert -set_serial 2 -extensions v3_end -extfile ../openssl.cnf
+openssl x509 -req -days 3650 -in end_responder.req -CA inter.cert -CAkey inter.key -out end_responder.cert -set_serial 3 -extensions v3_end -extfile ../openssl.cnf
+openssl asn1parse -in ca.cert -out ca.cert.der
+openssl asn1parse -in inter.cert -out inter.cert.der
+openssl asn1parse -in end_requester.cert -out end_requester.cert.der
+openssl asn1parse -in end_responder.cert -out end_responder.cert.der
+cat ca.cert.der inter.cert.der end_requester.cert.der > bundle_requester.certchain.der
+cat ca.cert.der inter.cert.der end_responder.cert.der > bundle_responder.certchain.der
+openssl pkey -inform PEM -outform DER -in end_responder.key -out end_responder.key.der
+openssl pkcs8 -in end_responder.key.der -inform DER -topk8 -nocrypt -outform DER > end_responder.key.p8
+openssl pkey -inform PEM -outform DER -in end_requester.key -out end_requester.key.der
+openssl pkcs8 -in end_requester.key.der -inform DER -topk8 -nocrypt -outform DER > end_requester.key.p8
+popd
+
+pushd Ed448
+openssl genpkey -algorithm Ed448 -out ca.key
+openssl req -nodes -x509 -days 3650 -key ca.key -out ca.cert -subj "/CN=intel test ED448 CA"
+openssl genpkey -algorithm Ed448 -out inter.key
+openssl genpkey -algorithm Ed448 -out end_requester.key
+openssl genpkey -algorithm Ed448 -out end_responder.key
+openssl req -new -key inter.key -out inter.req -batch -subj "/CN=intel test ED448 intermediate cert"
+openssl req -new -key end_requester.key -out end_requester.req -batch -subj "/CN=intel test ED448 requseter cert"
+openssl req -new -key end_responder.key -out end_responder.req -batch -subj "/CN=intel test ED448 responder cert"
+openssl x509 -req -days 3650 -in inter.req -CA ca.cert -CAkey ca.key -out inter.cert -set_serial 1 -extensions v3_inter -extfile ../openssl.cnf
+openssl x509 -req -days 3650 -in end_requester.req -CA inter.cert -CAkey inter.key -out end_requester.cert -set_serial 2 -extensions v3_end -extfile ../openssl.cnf
+openssl x509 -req -days 3650 -in end_responder.req -CA inter.cert -CAkey inter.key -out end_responder.cert -set_serial 3 -extensions v3_end -extfile ../openssl.cnf
+openssl asn1parse -in ca.cert -out ca.cert.der
+openssl asn1parse -in inter.cert -out inter.cert.der
+openssl asn1parse -in end_requester.cert -out end_requester.cert.der
+openssl asn1parse -in end_responder.cert -out end_responder.cert.der
+cat ca.cert.der inter.cert.der end_requester.cert.der > bundle_requester.certchain.der
+cat ca.cert.der inter.cert.der end_responder.cert.der > bundle_responder.certchain.der
+openssl pkey -inform PEM -outform DER -in end_responder.key -out end_responder.key.der
+openssl pkcs8 -in end_responder.key.der -inform DER -topk8 -nocrypt -outform DER > end_responder.key.p8
+openssl pkey -inform PEM -outform DER -in end_requester.key -out end_requester.key.der
+openssl pkcs8 -in end_requester.key.der -inform DER -topk8 -nocrypt -outform DER > end_requester.key.p8
+popd
+
 
