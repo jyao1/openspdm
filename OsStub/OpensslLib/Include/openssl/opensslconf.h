@@ -61,9 +61,6 @@ extern "C" {
 #ifndef OPENSSL_NO_SM2
 # define OPENSSL_NO_SM23
 #endif
-#ifndef OPENSSL_NO_SM4
-# define OPENSSL_NO_SM4
-#endif
 #ifndef OPENSSL_NO_RC4
 # define OPENSSL_NO_RC4
 #endif

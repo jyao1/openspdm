@@ -37,6 +37,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/CryptAeadAesCcm.o \
     $(OUTPUT_DIR)/CryptAeadAesGcm.o \
     $(OUTPUT_DIR)/CryptAeadChaCha20Poly1305.o \
+    $(OUTPUT_DIR)/CryptAeadSm4Gcm.o \
     $(OUTPUT_DIR)/CryptSha256.o \
     $(OUTPUT_DIR)/CryptSha512.o \
     $(OUTPUT_DIR)/CryptSha3.o \
@@ -104,6 +105,9 @@ $(OUTPUT_DIR)/CryptAeadAesGcm.o : $(SOURCE_DIR)/Cipher/CryptAeadAesGcm.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptAeadChaCha20Poly1305.o : $(SOURCE_DIR)/Cipher/CryptAeadChaCha20Poly1305.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/CryptAeadSm4Gcm.o : $(SOURCE_DIR)/Cipher/CryptAeadSm4Gcm.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptSha256.o : $(SOURCE_DIR)/Hash/CryptSha256.c

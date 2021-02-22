@@ -622,6 +622,7 @@ OBJECT_37_FILES =  \
 OBJECT_38_FILES =  \
     $(OUTPUT_DIR)\openssl\crypto\sm3\m_sm3.obj \
     $(OUTPUT_DIR)\openssl\crypto\sm3\sm3.obj \
+    $(OUTPUT_DIR)\openssl\crypto\sm4\sm4.obj \
 
 OBJECT_39_FILES =  \
     $(OUTPUT_DIR)\ossl_store.obj \
@@ -670,6 +671,7 @@ INC =  \
     -I$(SOURCE_DIR)\openssl\crypto\aria \
     -I$(SOURCE_DIR)\openssl\crypto\aes \
     -I$(SOURCE_DIR)\openssl\crypto\sm3 \
+    -I$(SOURCE_DIR)\openssl\crypto\sm4 \
     -I$(SOURCE_DIR)\openssl\ms \
     -I$(SOURCE_DIR)\openssl \
     -I$(SOURCE_DIR) \
@@ -745,6 +747,7 @@ init:
 	-@if not exist $(OUTPUT_DIR)\openssl\crypto\aria $(MD) $(OUTPUT_DIR)\openssl\crypto\aria
 	-@if not exist $(OUTPUT_DIR)\openssl\crypto\aes $(MD) $(OUTPUT_DIR)\openssl\crypto\aes
 	-@if not exist $(OUTPUT_DIR)\openssl\crypto\sm3 $(MD) $(OUTPUT_DIR)\openssl\crypto\sm3
+	-@if not exist $(OUTPUT_DIR)\openssl\crypto\sm4 $(MD) $(OUTPUT_DIR)\openssl\crypto\sm4
 	-@if not exist $(OUTPUT_DIR)\openssl\ms $(MD) $(OUTPUT_DIR)\openssl\ms
 
 #
@@ -2171,6 +2174,9 @@ $(OUTPUT_DIR)\openssl\crypto\sm3\m_sm3.obj : $(SOURCE_DIR)\openssl\crypto\sm3\m_
 
 $(OUTPUT_DIR)\openssl\crypto\sm3\sm3.obj : $(SOURCE_DIR)\openssl\crypto\sm3\sm3.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\openssl\crypto\sm3\sm3.c
+
+$(OUTPUT_DIR)\openssl\crypto\sm4\sm4.obj : $(SOURCE_DIR)\openssl\crypto\sm4\sm4.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\openssl\crypto\sm4\sm4.c
 
 $(OUTPUT_DIR)\ossl_store.obj : $(SOURCE_DIR)\ossl_store.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\ossl_store.c

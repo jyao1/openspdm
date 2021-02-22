@@ -425,6 +425,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/openssl/crypto/siphash/siphash_pmeth.o \
     $(OUTPUT_DIR)/openssl/crypto/sm3/m_sm3.o \
     $(OUTPUT_DIR)/openssl/crypto/sm3/sm3.o \
+    $(OUTPUT_DIR)/openssl/crypto/sm4/sm4.o \
     $(OUTPUT_DIR)/openssl/crypto/stack/stack.o \
     $(OUTPUT_DIR)/openssl/crypto/threads_none.o \
     $(OUTPUT_DIR)/openssl/crypto/threads_pthread.o \
@@ -556,6 +557,7 @@ INC =  \
     -I$(SOURCE_DIR)/openssl/crypto/aria \
     -I$(SOURCE_DIR)/openssl/crypto/aes \
     -I$(SOURCE_DIR)/openssl/crypto/sm3 \
+    -I$(SOURCE_DIR)/openssl/crypto/sm4 \
     -I$(SOURCE_DIR)/openssl/ms \
     -I$(SOURCE_DIR)/openssl \
     -I$(SOURCE_DIR) \
@@ -632,6 +634,7 @@ init:
 	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/aria
 	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/aes
 	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/sm3
+	-@$(MD) $(OUTPUT_DIR)/openssl/crypto/sm4
 	-@$(MD) $(OUTPUT_DIR)/openssl/ms
 	-@$(MD) $(OUTPUT_DIR)/openssl
 #
@@ -2057,6 +2060,9 @@ $(OUTPUT_DIR)/openssl/crypto/sm3/m_sm3.o : $(SOURCE_DIR)/openssl/crypto/sm3/m_sm
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/openssl/crypto/sm3/sm3.o : $(SOURCE_DIR)/openssl/crypto/sm3/sm3.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/openssl/crypto/sm4/sm4.o : $(SOURCE_DIR)/openssl/crypto/sm4/sm4.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/ossl_store.o : $(SOURCE_DIR)/ossl_store.c
