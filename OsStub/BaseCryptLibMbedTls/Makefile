@@ -38,6 +38,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\CryptSha256.obj \
     $(OUTPUT_DIR)\CryptSha512.obj \
     $(OUTPUT_DIR)\CryptSha3.obj \
+    $(OUTPUT_DIR)\CryptSm3.obj \
     $(OUTPUT_DIR)\CryptHmacSha256.obj \
     $(OUTPUT_DIR)\CryptHkdf.obj \
     $(OUTPUT_DIR)\CryptCmacAes.obj \
@@ -94,74 +95,77 @@ init:
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\CryptAeadAesCcm.obj : $(SOURCE_DIR)\Cipher/CryptAeadAesCcm.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher/CryptAeadAesCcm.c
+$(OUTPUT_DIR)\CryptAeadAesCcm.obj : $(SOURCE_DIR)\Cipher\CryptAeadAesCcm.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher\CryptAeadAesCcm.c
 
-$(OUTPUT_DIR)\CryptAeadAesGcm.obj : $(SOURCE_DIR)\Cipher/CryptAeadAesGcm.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher/CryptAeadAesGcm.c
+$(OUTPUT_DIR)\CryptAeadAesGcm.obj : $(SOURCE_DIR)\Cipher\CryptAeadAesGcm.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher\CryptAeadAesGcm.c
 
-$(OUTPUT_DIR)\CryptAeadChaCha20Poly1305.obj : $(SOURCE_DIR)\Cipher/CryptAeadChaCha20Poly1305.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher/CryptAeadChaCha20Poly1305.c
+$(OUTPUT_DIR)\CryptAeadChaCha20Poly1305.obj : $(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher\CryptAeadChaCha20Poly1305.c
 
-$(OUTPUT_DIR)\CryptSha256.obj : $(SOURCE_DIR)\Hash/CryptSha256.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash/CryptSha256.c
+$(OUTPUT_DIR)\CryptSha256.obj : $(SOURCE_DIR)\Hash\CryptSha256.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash\CryptSha256.c
 
-$(OUTPUT_DIR)\CryptSha512.obj : $(SOURCE_DIR)\Hash/CryptSha512.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash/CryptSha512.c
+$(OUTPUT_DIR)\CryptSha512.obj : $(SOURCE_DIR)\Hash\CryptSha512.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash\CryptSha512.c
 
-$(OUTPUT_DIR)\CryptSha3.obj : $(SOURCE_DIR)\Hash/CryptSha3.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash/CryptSha3.c
+$(OUTPUT_DIR)\CryptSha3.obj : $(SOURCE_DIR)\Hash\CryptSha3.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash\CryptSha3.c
 
-$(OUTPUT_DIR)\CryptHmacSha256.obj : $(SOURCE_DIR)\Hmac/CryptHmacSha256.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hmac/CryptHmacSha256.c
+$(OUTPUT_DIR)\CryptSm3.obj : $(SOURCE_DIR)\Hash\CryptSm3.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash\CryptSm3.c
 
-$(OUTPUT_DIR)\CryptHkdf.obj : $(SOURCE_DIR)\Kdf/CryptHkdf.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Kdf/CryptHkdf.c
+$(OUTPUT_DIR)\CryptHmacSha256.obj : $(SOURCE_DIR)\Hmac\CryptHmacSha256.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hmac\CryptHmacSha256.c
 
-$(OUTPUT_DIR)\CryptCmacAes.obj : $(SOURCE_DIR)\Mac/CryptCmacAes.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Mac/CryptCmacAes.c
+$(OUTPUT_DIR)\CryptHkdf.obj : $(SOURCE_DIR)\Kdf\CryptHkdf.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Kdf\CryptHkdf.c
 
-$(OUTPUT_DIR)\CryptGmacAes.obj : $(SOURCE_DIR)\Mac/CryptGmacAes.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Mac/CryptGmacAes.c
+$(OUTPUT_DIR)\CryptCmacAes.obj : $(SOURCE_DIR)\Mac\CryptCmacAes.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Mac\CryptCmacAes.c
 
-$(OUTPUT_DIR)\CryptPem.obj : $(SOURCE_DIR)\Pem/CryptPem.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pem/CryptPem.c
+$(OUTPUT_DIR)\CryptGmacAes.obj : $(SOURCE_DIR)\Mac\CryptGmacAes.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Mac\CryptGmacAes.c
 
-$(OUTPUT_DIR)\CryptEc.obj : $(SOURCE_DIR)\Pk/CryptEc.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptEc.c
+$(OUTPUT_DIR)\CryptPem.obj : $(SOURCE_DIR)\Pem\CryptPem.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pem\CryptPem.c
 
-$(OUTPUT_DIR)\CryptEd.obj : $(SOURCE_DIR)\Pk/CryptEd.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptEd.c
+$(OUTPUT_DIR)\CryptEc.obj : $(SOURCE_DIR)\Pk\CryptEc.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptEc.c
 
-$(OUTPUT_DIR)\CryptDh.obj : $(SOURCE_DIR)\Pk/CryptDh.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptDh.c
+$(OUTPUT_DIR)\CryptEd.obj : $(SOURCE_DIR)\Pk\CryptEd.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptEd.c
 
-$(OUTPUT_DIR)\CryptRsaBasic.obj : $(SOURCE_DIR)\Pk/CryptRsaBasic.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptRsaBasic.c
+$(OUTPUT_DIR)\CryptDh.obj : $(SOURCE_DIR)\Pk\CryptDh.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptDh.c
 
-$(OUTPUT_DIR)\CryptRsaExt.obj : $(SOURCE_DIR)\Pk/CryptRsaExt.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptRsaExt.c
+$(OUTPUT_DIR)\CryptRsaBasic.obj : $(SOURCE_DIR)\Pk\CryptRsaBasic.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptRsaBasic.c
 
-$(OUTPUT_DIR)\CryptX509.obj : $(SOURCE_DIR)\Pk/CryptX509.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptX509.c
+$(OUTPUT_DIR)\CryptRsaExt.obj : $(SOURCE_DIR)\Pk\CryptRsaExt.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptRsaExt.c
 
-$(OUTPUT_DIR)\CryptPkcs7Sign.obj : $(SOURCE_DIR)\Pk/CryptPkcs7Sign.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptPkcs7Sign.c
+$(OUTPUT_DIR)\CryptX509.obj : $(SOURCE_DIR)\Pk\CryptX509.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptX509.c
 
-$(OUTPUT_DIR)\CryptPkcs7VerifyCommon.obj : $(SOURCE_DIR)\Pk/CryptPkcs7VerifyCommon.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk/CryptPkcs7VerifyCommon.c
+$(OUTPUT_DIR)\CryptPkcs7Sign.obj : $(SOURCE_DIR)\Pk\CryptPkcs7Sign.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptPkcs7Sign.c
 
-$(OUTPUT_DIR)\CryptRand.obj : $(SOURCE_DIR)\Rand/CryptRand.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Rand/CryptRand.c
+$(OUTPUT_DIR)\CryptPkcs7VerifyCommon.obj : $(SOURCE_DIR)\Pk\CryptPkcs7VerifyCommon.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptPkcs7VerifyCommon.c
 
-$(OUTPUT_DIR)\BaseMemAllocation.obj : $(SOURCE_DIR)\SysCall/BaseMemAllocation.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SysCall/BaseMemAllocation.c
+$(OUTPUT_DIR)\CryptRand.obj : $(SOURCE_DIR)\Rand\CryptRand.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Rand\CryptRand.c
 
-$(OUTPUT_DIR)\CrtWrapperHost.obj : $(SOURCE_DIR)\SysCall/CrtWrapperHost.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SysCall/CrtWrapperHost.c
+$(OUTPUT_DIR)\BaseMemAllocation.obj : $(SOURCE_DIR)\SysCall\BaseMemAllocation.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SysCall\BaseMemAllocation.c
 
-$(OUTPUT_DIR)\TimerWrapperHost.obj : $(SOURCE_DIR)\SysCall/TimerWrapperHost.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SysCall/TimerWrapperHost.c
+$(OUTPUT_DIR)\CrtWrapperHost.obj : $(SOURCE_DIR)\SysCall\CrtWrapperHost.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SysCall\CrtWrapperHost.c
+
+$(OUTPUT_DIR)\TimerWrapperHost.obj : $(SOURCE_DIR)\SysCall\TimerWrapperHost.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SysCall\TimerWrapperHost.c
 
 $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 	$(SLINK) $(SLINK_FLAGS) $(OBJECT_FILES) $(SLINK_OBJ_FLAG)$@

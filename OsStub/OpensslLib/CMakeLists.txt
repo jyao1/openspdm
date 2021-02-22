@@ -445,6 +445,8 @@ SET(src_OpensslLib
     openssl/crypto/siphash/siphash.c
     openssl/crypto/siphash/siphash_ameth.c
     openssl/crypto/siphash/siphash_pmeth.c
+    openssl/crypto/sm3/m_sm3.c
+    openssl/crypto/sm3/sm3.c
     openssl/crypto/stack/stack.c
     openssl/crypto/threads_none.c
     openssl/crypto/threads_pthread.c

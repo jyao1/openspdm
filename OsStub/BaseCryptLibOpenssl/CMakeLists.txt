@@ -17,6 +17,8 @@ SET(src_BaseCryptLibOpenssl
     Cipher/CryptAes.c
     Hash/CryptSha256.c
     Hash/CryptSha512.c
+    Hash/CryptSha3.c
+    Hash/CryptSm3.c
     Hmac/CryptHmacSha256.c
     Kdf/CryptHkdf.c
     Mac/CryptCmacAes.c
