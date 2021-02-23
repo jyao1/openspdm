@@ -81,7 +81,7 @@ void TestSpdmResponderKeyExchangeCase1(void **state) {
   mSpdmKeyExchangeRequest1.ReqSessionID = 0xFFFF;
   mSpdmKeyExchangeRequest1.Reserved = 0;
   Ptr = mSpdmKeyExchangeRequest1.ExchangeData;
-  DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
+  DheKeySize = GetSpdmDhePubKeySize (mUseDheAlgo);
   DHEContext = SpdmDheNew (mUseDheAlgo);
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
@@ -138,7 +138,7 @@ void TestSpdmResponderKeyExchangeCase2(void **state) {
   mSpdmKeyExchangeRequest2.ReqSessionID = 0xFFFF;
   mSpdmKeyExchangeRequest2.Reserved = 0;
   Ptr = mSpdmKeyExchangeRequest2.ExchangeData;
-  DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
+  DheKeySize = GetSpdmDhePubKeySize (mUseDheAlgo);
   DHEContext = SpdmDheNew (mUseDheAlgo);
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
@@ -197,7 +197,7 @@ void TestSpdmResponderKeyExchangeCase3(void **state) {
   mSpdmKeyExchangeRequest1.ReqSessionID = 0xFFFF;
   mSpdmKeyExchangeRequest1.Reserved = 0;
   Ptr = mSpdmKeyExchangeRequest1.ExchangeData;
-  DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
+  DheKeySize = GetSpdmDhePubKeySize (mUseDheAlgo);
   DHEContext = SpdmDheNew (mUseDheAlgo);
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
@@ -257,7 +257,7 @@ void TestSpdmResponderKeyExchangeCase4(void **state) {
   mSpdmKeyExchangeRequest1.ReqSessionID = 0xFFFF;
   mSpdmKeyExchangeRequest1.Reserved = 0;
   Ptr = mSpdmKeyExchangeRequest1.ExchangeData;
-  DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
+  DheKeySize = GetSpdmDhePubKeySize (mUseDheAlgo);
   DHEContext = SpdmDheNew (mUseDheAlgo);
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
@@ -318,7 +318,7 @@ void TestSpdmResponderKeyExchangeCase5(void **state) {
   mSpdmKeyExchangeRequest1.ReqSessionID = 0xFFFF;
   mSpdmKeyExchangeRequest1.Reserved = 0;
   Ptr = mSpdmKeyExchangeRequest1.ExchangeData;
-  DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
+  DheKeySize = GetSpdmDhePubKeySize (mUseDheAlgo);
   DHEContext = SpdmDheNew (mUseDheAlgo);
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;
@@ -380,7 +380,7 @@ void TestSpdmResponderKeyExchangeCase6(void **state) {
   mSpdmKeyExchangeRequest1.ReqSessionID = 0xFFFF;
   mSpdmKeyExchangeRequest1.Reserved = 0;
   Ptr = mSpdmKeyExchangeRequest1.ExchangeData;
-  DheKeySize = GetSpdmDheKeySize (mUseDheAlgo);
+  DheKeySize = GetSpdmDhePubKeySize (mUseDheAlgo);
   DHEContext = SpdmDheNew (mUseDheAlgo);
   SpdmDheGenerateKey (mUseDheAlgo, DHEContext, Ptr, &DheKeySize);
   Ptr += DheKeySize;

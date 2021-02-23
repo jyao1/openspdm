@@ -206,7 +206,7 @@ TrySpdmNegotiateAlgorithms (
     return RETURN_SECURITY_VIOLATION;
   }
   if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) {
-    AlgoSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+    AlgoSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
     if (AlgoSize == 0) {
       return RETURN_SECURITY_VIOLATION;
     }
@@ -238,7 +238,7 @@ TrySpdmNegotiateAlgorithms (
     }
 
     if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)) {
-      AlgoSize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+      AlgoSize = GetSpdmDhePubKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
       if (AlgoSize == 0) {
         return RETURN_SECURITY_VIOLATION;
       }
@@ -251,7 +251,7 @@ TrySpdmNegotiateAlgorithms (
       }
     }
     if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
-      AlgoSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
+      AlgoSize = GetSpdmReqAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
       if (AlgoSize == 0) {
         return RETURN_SECURITY_VIOLATION;
       }

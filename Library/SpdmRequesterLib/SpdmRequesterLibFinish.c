@@ -88,7 +88,7 @@ TrySpdmSendReceiveFinish (
   if (SessionInfo->MutAuthRequested) {
     SpdmRequest.Header.Param1 = SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED;
     SpdmRequest.Header.Param2 = ReqSlotIdParam;
-    SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
+    SignatureSize = GetSpdmReqAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
   } else {
     SpdmRequest.Header.Param1 = 0;
     SpdmRequest.Header.Param2 = 0;

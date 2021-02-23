@@ -401,7 +401,7 @@ void TestSpdmResponderMeasurementCase7(void **state) {
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest5.Nonce);
@@ -439,7 +439,7 @@ void TestSpdmResponderMeasurementCase8(void **state) {
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest3.Nonce);
   Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest3Size, &mSpdmGetMeasurementRequest3, &ResponseSize, Response);
@@ -547,7 +547,7 @@ void TestSpdmResponderMeasurementCase11(void **state) {
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest8.Nonce);
@@ -718,7 +718,7 @@ void TestSpdmResponderMeasurementCase15(void **state) {
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest10.Nonce);
@@ -760,7 +760,7 @@ void TestSpdmResponderMeasurementCase16(void **state) {
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   Status = SpdmGetResponseMeasurement (SpdmContext, mSpdmGetMeasurementRequest9Size, &mSpdmGetMeasurementRequest10, &ResponseSize, Response);
@@ -800,7 +800,7 @@ void TestSpdmResponderMeasurementCase17(void **state) {
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;;
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest9.Nonce);
@@ -844,7 +844,7 @@ void TestSpdmResponderMeasurementCase18(void **state) {
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
   ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, NULL, NULL);
-  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
   SpdmContext->LocalContext.SlotCount = MAX_SPDM_SLOT_COUNT;
   for (int i=1  ; i<SpdmContext->LocalContext.SlotCount; i++) {
     SpdmContext->LocalContext.LocalCertChainProvisionSize[i] = DataSize;
@@ -892,7 +892,7 @@ void TestSpdmResponderMeasurementCase19(void **state) {
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest12.Nonce);
@@ -933,7 +933,7 @@ void TestSpdmResponderMeasurementCase20(void **state) {
   SpdmContext->Transcript.MessageM.BufferSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRspSize = 0;
   SpdmContext->LocalContext.OpaqueMeasurementRsp = NULL;
-  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSize (mUseAsymAlgo);
+  // MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
 
   ResponseSize = sizeof(Response);
   SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmGetMeasurementRequest11.Nonce);

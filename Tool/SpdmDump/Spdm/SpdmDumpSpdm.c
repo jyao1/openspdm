@@ -869,7 +869,7 @@ DumpSpdmChallengeAuth (
   printf ("SPDM_CHALLENGE_AUTH ");
 
   HashSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
-  SignatureSize = GetSpdmAsymSize (mSpdmBaseAsymAlgo);
+  SignatureSize = GetSpdmAsymSignatureSize (mSpdmBaseAsymAlgo);
   MeasurementSummaryHashSize = SpdmDumpGetMeasurementSummaryHashSize (mCachedMeasurementSummaryHashType);
 
   MessageSize = sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) + HashSize + 32 + MeasurementSummaryHashSize + sizeof(UINT16);
@@ -1089,7 +1089,7 @@ DumpSpdmMeasurements (
   }
 
   if (IncludeSignature) {
-    SignatureSize = GetSpdmAsymSize (mSpdmBaseAsymAlgo);
+    SignatureSize = GetSpdmAsymSignatureSize (mSpdmBaseAsymAlgo);
 
     MessageSize += 32 + sizeof(UINT16);
     if (BufferSize < MessageSize) {
@@ -1301,7 +1301,7 @@ DumpSpdmKeyExchange (
   }
 
   SpdmRequest = Buffer;
-  DheKeySize = GetSpdmDheKeySize (mSpdmDHENamedGroup);
+  DheKeySize = GetSpdmDhePubKeySize (mSpdmDHENamedGroup);
   MessageSize += DheKeySize + sizeof(UINT16);
   if (BufferSize < MessageSize) {
     printf ("\n");
@@ -1378,8 +1378,8 @@ DumpSpdmKeyExchangeRsp (
   }
 
   SpdmResponse = Buffer;
-  DheKeySize = GetSpdmDheKeySize (mSpdmDHENamedGroup);
-  SignatureSize = GetSpdmAsymSize (mSpdmBaseAsymAlgo);
+  DheKeySize = GetSpdmDhePubKeySize (mSpdmDHENamedGroup);
+  SignatureSize = GetSpdmAsymSignatureSize (mSpdmBaseAsymAlgo);
   MeasurementSummaryHashSize = SpdmDumpGetMeasurementSummaryHashSize (mCachedMeasurementSummaryHashType);
   HmacSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
 
@@ -1496,7 +1496,7 @@ DumpSpdmFinish (
   }
 
   SpdmRequest = Buffer;
-  SignatureSize = GetSpdmReqAsymSize (mSpdmReqBaseAsymAlg);
+  SignatureSize = GetSpdmReqAsymSignatureSize (mSpdmReqBaseAsymAlg);
   HmacSize = GetSpdmHashSize (mSpdmBaseHashAlgo);
 
   IncludeSignature = ((SpdmRequest->Header.Param1 & SPDM_FINISH_REQUEST_ATTRIBUTES_SIGNATURE_INCLUDED) != 0);

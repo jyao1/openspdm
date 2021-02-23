@@ -148,7 +148,7 @@ SpdmSecuredMessageSetAlgorithms (
   SecuredMessageContext->KeySchedule = KeySchedule;
   
   SecuredMessageContext->HashSize      = GetSpdmHashSize (SecuredMessageContext->BaseHashAlgo);
-  SecuredMessageContext->DheKeySize    = GetSpdmDheKeySize (SecuredMessageContext->DHENamedGroup);
+  SecuredMessageContext->DheKeySize    = GetSpdmDhePubKeySize (SecuredMessageContext->DHENamedGroup);
   SecuredMessageContext->AeadKeySize   = GetSpdmAeadKeySize (SecuredMessageContext->AEADCipherSuite);
   SecuredMessageContext->AeadIvSize    = GetSpdmAeadIvSize (SecuredMessageContext->AEADCipherSuite);
   SecuredMessageContext->AeadBlockSize = GetSpdmAeadBlockSize (SecuredMessageContext->AEADCipherSuite);

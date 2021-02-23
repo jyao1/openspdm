@@ -41,8 +41,9 @@ SpdmMeasurementCollectionFunc (
   Sign an SPDM message data.
 
   @param  ReqBaseAsymAlg               Indicates the signing algorithm.
-  @param  MessageHash                  A pointer to a message hash to be signed.
-  @param  HashSize                     The size in bytes of the message hash to be signed.
+  @param  BaseHashAlgo                 Indicates the hash algorithm.
+  @param  Message                      A pointer to a message to be signed (before hash).
+  @param  MessageSize                  The size in bytes of the message to be signed.
   @param  Signature                    A pointer to a destination buffer to store the signature.
   @param  SigSize                      On input, indicates the size in bytes of the destination buffer to store the signature.
                                        On output, indicates the size in bytes of the signature in the buffer.
@@ -54,8 +55,9 @@ BOOLEAN
 EFIAPI
 SpdmRequesterDataSignFunc (
   IN      UINT16       ReqBaseAsymAlg,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
+  IN      UINT32       BaseHashAlgo,
+  IN      CONST UINT8  *Message,
+  IN      UINTN        MessageSize,
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
   )
@@ -67,8 +69,9 @@ SpdmRequesterDataSignFunc (
   Sign an SPDM message data.
 
   @param  BaseAsymAlgo                 Indicates the signing algorithm.
-  @param  MessageHash                  A pointer to a message hash to be signed.
-  @param  HashSize                     The size in bytes of the message hash to be signed.
+  @param  BaseHashAlgo                 Indicates the hash algorithm.
+  @param  Message                      A pointer to a message to be signed (before hash).
+  @param  MessageSize                  The size in bytes of the message to be signed.
   @param  Signature                    A pointer to a destination buffer to store the signature.
   @param  SigSize                      On input, indicates the size in bytes of the destination buffer to store the signature.
                                        On output, indicates the size in bytes of the signature in the buffer.
@@ -80,8 +83,9 @@ BOOLEAN
 EFIAPI
 SpdmResponderDataSignFunc (
   IN      UINT32       BaseAsymAlgo,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
+  IN      UINT32       BaseHashAlgo,
+  IN      CONST UINT8  *Message,
+  IN      UINTN        MessageSize,
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
   )

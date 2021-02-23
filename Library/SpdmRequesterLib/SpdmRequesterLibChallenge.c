@@ -154,7 +154,7 @@ TrySpdmChallenge (
     }
   }
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
-  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  SignatureSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, TRUE, MeasurementHashType);
 
   if (SpdmResponseSize <= sizeof(SPDM_CHALLENGE_AUTH_RESPONSE) +

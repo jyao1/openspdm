@@ -521,6 +521,42 @@ SpdmIsCapabilitiesFlagSupported (
   IN     UINT32                    ResponderCapabilitiesFlag
   );
 
+/*
+  This function calculates M1M2.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  IsMut                        Indicate if this is from mutual authentication.
+  @param  M1M2BufferSize               Size in bytes of the M1M2
+  @param  M1M2Buffer                   The buffer to store the M1M2
+
+  @retval RETURN_SUCCESS  M1M2 is calculated.
+*/
+BOOLEAN
+EFIAPI
+SpdmCalculateM1M2 (
+  IN     VOID                   *Context,
+  IN     BOOLEAN                IsMut,
+  IN OUT UINTN                  *M1M2BufferSize,
+     OUT VOID                   *M1M2Buffer
+  );
+
+/*
+  This function calculates L1L2.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  L1L2BufferSize               Size in bytes of the L1L2
+  @param  L1L2Buffer                   The buffer to store the L1L2
+
+  @retval RETURN_SUCCESS  L1L2 is calculated.
+*/
+BOOLEAN
+EFIAPI
+SpdmCalculateL1L2 (
+  IN     VOID                   *Context,
+  IN OUT UINTN                  *L1L2BufferSize,
+     OUT VOID                   *L1L2Buffer
+  );
+
 /**
   This function generates the certificate chain hash.
 

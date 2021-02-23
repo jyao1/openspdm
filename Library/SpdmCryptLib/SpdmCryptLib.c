@@ -379,7 +379,7 @@ SpdmHkdfExpand (
 **/
 UINT32
 EFIAPI
-GetSpdmAsymSize (
+GetSpdmAsymSignatureSize (
   IN   UINT32                       BaseAsymAlgo
   )
 {
@@ -534,6 +534,36 @@ SpdmAsymFree (
 }
 
 /**
+  Return if asymmetric function need message hash.
+
+  @param  BaseAsymAlgo               SPDM BaseAsymAlgo
+
+  @retval TRUE  asymmetric function need message hash
+  @retval FALSE asymmetric function need raw message
+**/
+BOOLEAN
+SpdmAsymFuncNeedHash (
+  IN   UINT32                       BaseAsymAlgo
+  )
+{
+  switch (BaseAsymAlgo) {
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_3072:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_4096:
+    return TRUE;
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P256:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P384:
+  case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521:
+    return TRUE;
+  }
+  ASSERT (FALSE);
+  return FALSE;
+}
+
+/**
   Return asymmetric verify function, based upon the negotiated asymmetric algorithm.
 
   @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
@@ -583,9 +613,10 @@ GetSpdmAsymVerify (
   based upon negotiated asymmetric algorithm.
 
   @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Context                      Pointer to asymmetric context for signature verification.
-  @param  MessageHash                  Pointer to octet message hash to be checked.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be checked (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to asymmetric signature to be verified.
   @param  SigSize                      Size of signature in bytes.
 
@@ -596,19 +627,36 @@ BOOLEAN
 EFIAPI
 SpdmAsymVerify (
   IN   UINT32                       BaseAsymAlgo,
+  IN   UINT32                       BaseHashAlgo,
   IN   VOID                         *Context,
-  IN   CONST UINT8                  *MessageHash,
-  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Message,
+  IN   UINTN                        MessageSize,
   IN   CONST UINT8                  *Signature,
   IN   UINTN                        SigSize
   )
 {
   ASYM_VERIFY   VerifyFunction;
+  BOOLEAN       NeedHash;
+  UINT8         MessageHash[MAX_HASH_SIZE];
+  UINTN         HashSize;
+  BOOLEAN       Result;
+
+  NeedHash = SpdmAsymFuncNeedHash (BaseAsymAlgo);
+
   VerifyFunction = GetSpdmAsymVerify (BaseAsymAlgo);
   if (VerifyFunction == NULL) {
     return FALSE;
   }
-  return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
+  if (NeedHash) {
+    HashSize = GetSpdmHashSize (BaseHashAlgo);
+    Result = SpdmHashAll (BaseHashAlgo, Message, MessageSize, MessageHash);
+    if (!Result) {
+      return FALSE;
+    }
+    return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
+  } else {
+    return VerifyFunction (Context, Message, MessageSize, Signature, SigSize);
+  }
 }
 
 /**
@@ -733,9 +781,10 @@ GetSpdmAsymSign (
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
   @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Context                      Pointer to asymmetric context for signature generation.
-  @param  MessageHash                  Pointer to octet message hash to be signed.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be signed (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to buffer to receive signature.
   @param  SigSize                      On input, the size of Signature buffer in bytes.
                                        On output, the size of data returned in Signature buffer in bytes.
@@ -748,19 +797,36 @@ BOOLEAN
 EFIAPI
 SpdmAsymSign (
   IN      UINT32                       BaseAsymAlgo,
+  IN      UINT32                       BaseHashAlgo,
   IN      VOID                         *Context,
-  IN      CONST UINT8                  *MessageHash,
-  IN      UINTN                        HashSize,
+  IN      CONST UINT8                  *Message,
+  IN      UINTN                        MessageSize,
   OUT     UINT8                        *Signature,
   IN OUT  UINTN                        *SigSize
   )
 {
-  ASYM_SIGN   AsymSign;
+  ASYM_SIGN     AsymSign;
+  BOOLEAN       NeedHash;
+  UINT8         MessageHash[MAX_HASH_SIZE];
+  UINTN         HashSize;
+  BOOLEAN       Result;
+
+  NeedHash = SpdmAsymFuncNeedHash (BaseAsymAlgo);
+
   AsymSign = GetSpdmAsymSign (BaseAsymAlgo);
   if (AsymSign == NULL) {
     return FALSE;
   }
-  return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
+  if (NeedHash) {
+    HashSize = GetSpdmHashSize (BaseHashAlgo);
+    Result = SpdmHashAll (BaseHashAlgo, Message, MessageSize, MessageHash);
+    if (!Result) {
+      return FALSE;
+    }
+    return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
+  } else {
+    return AsymSign (Context, Message, MessageSize, Signature, SigSize);
+  }
 }
 
 /**
@@ -772,11 +838,11 @@ SpdmAsymSign (
 **/
 UINT32
 EFIAPI
-GetSpdmReqAsymSize (
+GetSpdmReqAsymSignatureSize (
   IN   UINT16                       ReqBaseAsymAlg
   )
 {
-  return GetSpdmAsymSize (ReqBaseAsymAlg);
+  return GetSpdmAsymSignatureSize (ReqBaseAsymAlg);
 }
 
 /**
@@ -862,6 +928,22 @@ SpdmReqAsymFree (
 }
 
 /**
+  Return if requester asymmetric function need message hash.
+
+  @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+
+  @retval TRUE  requester asymmetric function need message hash
+  @retval FALSE requester asymmetric function need raw message
+**/
+BOOLEAN
+SpdmReqAsymFuncNeedHash (
+  IN   UINT16                       ReqBaseAsymAlg
+  )
+{
+  return SpdmAsymFuncNeedHash (ReqBaseAsymAlg);
+}
+
+/**
   Return requester asymmetric verify function, based upon the negotiated requester asymmetric algorithm.
 
   @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
@@ -881,9 +963,10 @@ GetSpdmReqAsymVerify (
   based upon negotiated requester asymmetric algorithm.
 
   @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Context                      Pointer to asymmetric context for signature verification.
-  @param  MessageHash                  Pointer to octet message hash to be checked.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be checked (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to asymmetric signature to be verified.
   @param  SigSize                      Size of signature in bytes.
 
@@ -894,19 +977,36 @@ BOOLEAN
 EFIAPI
 SpdmReqAsymVerify (
   IN   UINT16                       ReqBaseAsymAlg,
+  IN   UINT32                       BaseHashAlgo,
   IN   VOID                         *Context,
-  IN   CONST UINT8                  *MessageHash,
-  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Message,
+  IN   UINTN                        MessageSize,
   IN   CONST UINT8                  *Signature,
   IN   UINTN                        SigSize
   )
 {
   ASYM_VERIFY   VerifyFunction;
+  BOOLEAN       NeedHash;
+  UINT8         MessageHash[MAX_HASH_SIZE];
+  UINTN         HashSize;
+  BOOLEAN       Result;
+
+  NeedHash = SpdmReqAsymFuncNeedHash (ReqBaseAsymAlg);
+
   VerifyFunction = GetSpdmReqAsymVerify (ReqBaseAsymAlg);
   if (VerifyFunction == NULL) {
     return FALSE;
   }
-  return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
+  if (NeedHash) {
+    HashSize = GetSpdmHashSize (BaseHashAlgo);
+    Result = SpdmHashAll (BaseHashAlgo, Message, MessageSize, MessageHash);
+    if (!Result) {
+      return FALSE;
+    }
+    return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
+  } else {
+    return VerifyFunction (Context, Message, MessageSize, Signature, SigSize);
+  }
 }
 
 /**
@@ -977,9 +1077,10 @@ GetSpdmReqAsymSign (
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
   @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Context                      Pointer to asymmetric context for signature generation.
-  @param  MessageHash                  Pointer to octet message hash to be signed.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be signed (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to buffer to receive signature.
   @param  SigSize                      On input, the size of Signature buffer in bytes.
                                        On output, the size of data returned in Signature buffer in bytes.
@@ -992,19 +1093,36 @@ BOOLEAN
 EFIAPI
 SpdmReqAsymSign (
   IN      UINT16                       ReqBaseAsymAlg,
+  IN      UINT32                       BaseHashAlgo,
   IN      VOID                         *Context,
-  IN      CONST UINT8                  *MessageHash,
-  IN      UINTN                        HashSize,
+  IN      CONST UINT8                  *Message,
+  IN      UINTN                        MessageSize,
   OUT     UINT8                        *Signature,
   IN OUT  UINTN                        *SigSize
   )
 {
-  ASYM_SIGN   AsymSign;
+  ASYM_SIGN     AsymSign;
+  BOOLEAN       NeedHash;
+  UINT8         MessageHash[MAX_HASH_SIZE];
+  UINTN         HashSize;
+  BOOLEAN       Result;
+
+  NeedHash = SpdmReqAsymFuncNeedHash (ReqBaseAsymAlg);
+
   AsymSign = GetSpdmReqAsymSign (ReqBaseAsymAlg);
   if (AsymSign == NULL) {
     return FALSE;
   }
-  return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
+  if (NeedHash) {
+    HashSize = GetSpdmHashSize (BaseHashAlgo);
+    Result = SpdmHashAll (BaseHashAlgo, Message, MessageSize, MessageHash);
+    if (!Result) {
+      return FALSE;
+    }
+    return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
+  } else {
+    return AsymSign (Context, Message, MessageSize, Signature, SigSize);
+  }
 }
 
 /**
@@ -1016,7 +1134,7 @@ SpdmReqAsymSign (
 **/
 UINT32
 EFIAPI
-GetSpdmDheKeySize (
+GetSpdmDhePubKeySize (
   IN   UINT16                       DHENamedGroup
   )
 {

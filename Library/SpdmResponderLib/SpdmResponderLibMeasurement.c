@@ -31,7 +31,7 @@ SpdmCreateMeasurementSignature (
   BOOLEAN                       Result;
   RETURN_STATUS                 Status;
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  SignatureSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   MeasurmentSigSize = SPDM_NONCE_SIZE +
                       sizeof(UINT16) +
                       SpdmContext->LocalContext.OpaqueMeasurementRspSize +
@@ -218,7 +218,7 @@ SpdmGetResponseMeasurement (
     return RETURN_SUCCESS;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  SignatureSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   MeasurmentSigSize = SPDM_NONCE_SIZE +
                       sizeof(UINT16) +
                       SpdmContext->LocalContext.OpaqueMeasurementRspSize +

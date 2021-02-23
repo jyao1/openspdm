@@ -145,25 +145,28 @@ SpdmGetLocalCertChainData (
 }
 
 /*
-  This function calculates M1M2 hash.
+  This function calculates M1M2.
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  IsMut                        Indicate if this is from mutual authentication.
-  @param  HashData                     M1M2 hash
+  @param  M1M2BufferSize               Size in bytes of the M1M2
+  @param  M1M2Buffer                   The buffer to store the M1M2
 
-  @retval RETURN_SUCCESS  M1M2 hash is calculated.
+  @retval RETURN_SUCCESS  M1M2 is calculated.
 */
 BOOLEAN
 EFIAPI
-SpdmCalculateM1M2Hash (
+SpdmCalculateM1M2 (
   IN     VOID                   *Context,
   IN     BOOLEAN                IsMut,
-     OUT VOID                   *HashData
+  IN OUT UINTN                  *M1M2BufferSize,
+     OUT VOID                   *M1M2Buffer
   )
 {
   SPDM_DEVICE_CONTEXT           *SpdmContext;
   RETURN_STATUS                 Status;
   UINT32                        HashSize;
+  UINT8                         HashData[MAX_HASH_SIZE];
   LARGE_MANAGED_BUFFER          M1M2;
 
   SpdmContext = Context;
@@ -188,6 +191,7 @@ SpdmCalculateM1M2Hash (
       return FALSE;
     }
 
+    // debug only
     SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&M1M2), GetManagedBufferSize(&M1M2), HashData);
     DEBUG((DEBUG_INFO, "M1M2 Mut Hash - "));
     InternalDumpData (HashData, HashSize);
@@ -216,32 +220,39 @@ SpdmCalculateM1M2Hash (
       return FALSE;
     }
 
+    // debug only
     SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&M1M2), GetManagedBufferSize(&M1M2), HashData);
     DEBUG((DEBUG_INFO, "M1M2 Hash - "));
     InternalDumpData (HashData, HashSize);
     DEBUG((DEBUG_INFO, "\n"));
   }
 
+  *M1M2BufferSize = GetManagedBufferSize(&M1M2);
+  CopyMem (M1M2Buffer, GetManagedBuffer(&M1M2), *M1M2BufferSize);
+
   return TRUE;
 }
 
 /*
-  This function calculates L1L2 hash.
+  This function calculates L1L2.
 
   @param  SpdmContext                  A pointer to the SPDM context.
-  @param  HashData                     L1L2 hash
+  @param  L1L2BufferSize               Size in bytes of the L1L2
+  @param  L1L2Buffer                   The buffer to store the L1L2
 
-  @retval RETURN_SUCCESS  L1L2 hash is calculated.
+  @retval RETURN_SUCCESS  L1L2 is calculated.
 */
 BOOLEAN
 EFIAPI
-SpdmCalculateL1L2Hash (
+SpdmCalculateL1L2 (
   IN     VOID                   *Context,
-     OUT VOID                   *HashData
+  IN OUT UINTN                  *L1L2BufferSize,
+     OUT VOID                   *L1L2Buffer
   )
 {
   SPDM_DEVICE_CONTEXT           *SpdmContext;
   UINT32                        HashSize;
+  UINT8                         HashData[MAX_HASH_SIZE];
 
   SpdmContext = Context;
 
@@ -250,10 +261,14 @@ SpdmCalculateL1L2Hash (
   DEBUG((DEBUG_INFO, "MessageM Data :\n"));
   InternalDumpHex (GetManagedBuffer(&SpdmContext->Transcript.MessageM), GetManagedBufferSize(&SpdmContext->Transcript.MessageM));
 
+  // debug only
   SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, GetManagedBuffer(&SpdmContext->Transcript.MessageM), GetManagedBufferSize(&SpdmContext->Transcript.MessageM), HashData);
   DEBUG((DEBUG_INFO, "L1L2 Hash - "));
   InternalDumpData (HashData, HashSize);
   DEBUG((DEBUG_INFO, "\n"));
+
+  *L1L2BufferSize = GetManagedBufferSize(&SpdmContext->Transcript.MessageM);
+  CopyMem (L1L2Buffer, GetManagedBuffer(&SpdmContext->Transcript.MessageM), *L1L2BufferSize);
 
   return TRUE;
 }
@@ -396,33 +411,34 @@ SpdmGenerateChallengeAuthSignature (
      OUT UINT8                      *Signature
   )
 {
-  UINT8                         HashData[MAX_HASH_SIZE];
   BOOLEAN                       Result;
   UINTN                         SignatureSize;
-  UINT32                        HashSize;
+  UINT8                         M1M2Buffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINTN                         M1M2BufferSize;
 
-  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
-
-  Result = SpdmCalculateM1M2Hash (SpdmContext, IsRequester, HashData);
+  M1M2BufferSize = sizeof(M1M2Buffer);
+  Result = SpdmCalculateM1M2 (SpdmContext, IsRequester, &M1M2BufferSize, &M1M2Buffer);
   if (!Result) {
     return FALSE;
   }
 
   if (IsRequester) {
-    SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
+    SignatureSize = GetSpdmReqAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
     Result = SpdmRequesterDataSignFunc (
               SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
-              HashData,
-              HashSize,
+              SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
+              M1M2Buffer,
+              M1M2BufferSize,
               Signature,
               &SignatureSize
               );
   } else {
-    SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+    SignatureSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
     Result = SpdmResponderDataSignFunc (
               SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
-              HashData,
-              HashSize,
+              SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
+              M1M2Buffer,
+              M1M2BufferSize,
               Signature,
               &SignatureSize
               );
@@ -494,21 +510,20 @@ SpdmVerifyChallengeAuthSignature (
   IN  UINTN                        SignDataSize
   )
 {
-  UINTN                                     HashSize;
-  UINT8                                     HashData[MAX_HASH_SIZE];
   BOOLEAN                                   Result;
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   VOID                                      *Context;
   UINT8                                     *CertChainData;
   UINTN                                     CertChainDataSize;
+  UINT8                                     M1M2Buffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINTN                                     M1M2BufferSize;
 
-  Result = SpdmCalculateM1M2Hash (SpdmContext, !IsRequester, HashData);
+  M1M2BufferSize = sizeof(M1M2Buffer);
+  Result = SpdmCalculateM1M2 (SpdmContext, !IsRequester, &M1M2BufferSize, &M1M2Buffer);
   if (!Result) {
     return FALSE;
   }
-
-  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   Result = SpdmGetPeerCertChainData (SpdmContext, (VOID **)&CertChainData, &CertChainDataSize);
   if (!Result) {
@@ -531,9 +546,10 @@ SpdmVerifyChallengeAuthSignature (
 
     Result = SpdmAsymVerify (
               SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
+              SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
               Context,
-              HashData,
-              HashSize,
+              M1M2Buffer,
+              M1M2BufferSize,
               SignData,
               SignDataSize
               );
@@ -546,9 +562,10 @@ SpdmVerifyChallengeAuthSignature (
 
     Result = SpdmReqAsymVerify (
               SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
+              SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
               Context,
-              HashData,
-              HashSize,
+              M1M2Buffer,
+              M1M2BufferSize,
               SignData,
               SignDataSize
               );
@@ -705,20 +722,21 @@ SpdmGenerateMeasurementSignature (
 {
   UINTN                         SignatureSize;
   BOOLEAN                       Result;
-  UINT8                         HashData[MAX_HASH_SIZE];
-  UINT32                        HashSize;
+  UINT8                         L1L2Buffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINTN                         L1L2BufferSize;
 
-  Result = SpdmCalculateL1L2Hash (SpdmContext, HashData);
+  L1L2BufferSize = sizeof(L1L2Buffer);
+  Result = SpdmCalculateL1L2 (SpdmContext, &L1L2BufferSize, L1L2Buffer);
   if (!Result) {
     return FALSE;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
-  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
+  SignatureSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   Result = SpdmResponderDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
-             HashData,
-             HashSize,
+             SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
+             L1L2Buffer,
+             L1L2BufferSize,
              Signature,
              &SignatureSize
              );
@@ -742,21 +760,20 @@ SpdmVerifyMeasurementSignature (
   IN UINTN                        SignDataSize
   )
 {
-  UINTN                                     HashSize;
-  UINT8                                     HashData[MAX_HASH_SIZE];
   BOOLEAN                                   Result;
   UINT8                                     *CertBuffer;
   UINTN                                     CertBufferSize;
   VOID                                      *Context;
   UINT8                                     *CertChainData;
   UINTN                                     CertChainDataSize;
+  UINT8                                     L1L2Buffer[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  UINTN                                     L1L2BufferSize;
 
-  Result = SpdmCalculateL1L2Hash (SpdmContext, HashData);
+  L1L2BufferSize = sizeof(L1L2Buffer);
+  Result = SpdmCalculateL1L2 (SpdmContext, &L1L2BufferSize, L1L2Buffer);
   if (!Result) {
     return FALSE;
   }
-
-  HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   Result = SpdmGetPeerCertChainData (SpdmContext, (VOID **)&CertChainData, &CertChainDataSize);
   if (!Result) {
@@ -778,9 +795,10 @@ SpdmVerifyMeasurementSignature (
 
   Result = SpdmAsymVerify (
              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
+             SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
              Context,
-             HashData,
-             HashSize,
+             L1L2Buffer,
+             L1L2BufferSize,
              SignData,
              SignDataSize
              );

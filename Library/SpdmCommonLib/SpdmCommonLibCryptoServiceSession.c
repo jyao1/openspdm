@@ -193,7 +193,7 @@ SpdmGenerateKeyExchangeRspSignature (
   UINT8                         THCurrData[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                         THCurrDataSize;
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  SignatureSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   Result = SpdmGetLocalCertChainData (SpdmContext, (VOID **)&CertChainData, &CertChainDataSize);
@@ -207,6 +207,7 @@ SpdmGenerateKeyExchangeRspSignature (
     return FALSE;
   }
 
+  // debug only
   SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, THCurrData, THCurrDataSize, HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
@@ -214,8 +215,9 @@ SpdmGenerateKeyExchangeRspSignature (
 
   Result = SpdmResponderDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
-             HashData,
-             HashSize,
+             SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
+             THCurrData,
+             THCurrDataSize,
              Signature,
              &SignatureSize
              );
@@ -318,6 +320,7 @@ SpdmVerifyKeyExchangeRspSignature (
     return FALSE;
   }
 
+  // debug only
   SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, THCurrData, THCurrDataSize, HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
@@ -342,9 +345,10 @@ SpdmVerifyKeyExchangeRspSignature (
 
   Result = SpdmAsymVerify (
              SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo,
+             SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
              Context,
-             HashData,
-             HashSize,
+             THCurrData,
+             THCurrDataSize,
              SignData,
              SignDataSize
              );
@@ -441,7 +445,7 @@ SpdmGenerateFinishReqSignature (
   UINT8                         THCurrData[MAX_SPDM_MESSAGE_BUFFER_SIZE];
   UINTN                         THCurrDataSize;
 
-  SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
+  SignatureSize = GetSpdmReqAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 
   Result = SpdmGetPeerCertChainData (SpdmContext, (VOID **)&CertChainData, &CertChainDataSize);
@@ -460,6 +464,7 @@ SpdmGenerateFinishReqSignature (
     return FALSE;
   }
 
+  // debug only
   SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, THCurrData, THCurrDataSize, HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
@@ -467,8 +472,9 @@ SpdmGenerateFinishReqSignature (
 
   Result = SpdmRequesterDataSignFunc (
              SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
-             HashData,
-             HashSize,
+             SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
+             THCurrData,
+             THCurrDataSize,
              Signature,
              &SignatureSize
              );
@@ -591,6 +597,7 @@ SpdmVerifyFinishReqSignature (
     return FALSE;
   }
 
+  // debug only
   SpdmHashAll (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, THCurrData, THCurrDataSize, HashData);
   DEBUG((DEBUG_INFO, "THCurr Hash - "));
   InternalDumpData (HashData, HashSize);
@@ -615,9 +622,10 @@ SpdmVerifyFinishReqSignature (
 
   Result = SpdmReqAsymVerify (
              SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg,
+             SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo,
              Context,
-             HashData,
-             HashSize,
+             THCurrData,
+             THCurrDataSize,
              SignData,
              SignDataSize
              );

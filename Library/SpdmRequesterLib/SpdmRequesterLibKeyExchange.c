@@ -114,7 +114,7 @@ TrySpdmSendReceiveKeyExchange (
   SpdmRequest.Reserved = 0;
 
   Ptr = SpdmRequest.ExchangeData;
-  DheKeySize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+  DheKeySize = GetSpdmDhePubKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
   DHEContext = SpdmSecuredMessageDheNew (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
   SpdmSecuredMessageDheGenerateKey (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup, DHEContext, Ptr, &DheKeySize);
   DEBUG((DEBUG_INFO, "ClientKey (0x%x):\n", DheKeySize));
@@ -198,7 +198,7 @@ TrySpdmSendReceiveKeyExchange (
     return RETURN_SECURITY_VIOLATION;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  SignatureSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, TRUE, MeasurementHashType);
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
 

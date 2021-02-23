@@ -100,7 +100,7 @@ SpdmGetResponseFinish (
 
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   if (SessionInfo->MutAuthRequested) {
-    SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
+    SignatureSize = GetSpdmReqAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
   } else {
     SignatureSize = 0;
   }

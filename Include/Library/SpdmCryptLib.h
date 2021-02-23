@@ -126,8 +126,8 @@ VOID
   Verifies the asymmetric signature.
 
   @param  Context                      Pointer to asymmetric context for signature verification.
-  @param  MessageHash                  Pointer to octet message hash to be checked.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be checked (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to asymmetric signature to be verified.
   @param  SigSize                      Size of signature in bytes.
 
@@ -138,8 +138,8 @@ typedef
 BOOLEAN
 (EFIAPI *ASYM_VERIFY) (
   IN  VOID         *Context,
-  IN  CONST UINT8  *MessageHash,
-  IN  UINTN        HashSize,
+  IN  CONST UINT8  *Message,
+  IN  UINTN        MessageSizeSize,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   );
@@ -172,8 +172,8 @@ BOOLEAN
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
   @param  Context                      Pointer to asymmetric context for signature generation.
-  @param  MessageHash                  Pointer to octet message hash to be signed.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be signed (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to buffer to receive signature.
   @param  SigSize                      On input, the size of Signature buffer in bytes.
                                        On output, the size of data returned in Signature buffer in bytes.
@@ -186,8 +186,8 @@ typedef
 BOOLEAN
 (EFIAPI *ASYM_SIGN) (
   IN      VOID         *Context,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
+  IN      CONST UINT8  *Message,
+  IN      UINTN        MessageSize,
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
   );
@@ -472,7 +472,7 @@ SpdmHkdfExpand (
 **/
 UINT32
 EFIAPI
-GetSpdmAsymSize (
+GetSpdmAsymSignatureSize (
   IN   UINT32                       BaseAsymAlgo
   );
 
@@ -517,9 +517,10 @@ SpdmAsymFree (
   based upon negotiated asymmetric algorithm.
 
   @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Context                      Pointer to asymmetric context for signature verification.
-  @param  MessageHash                  Pointer to octet message hash to be checked.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be checked (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to asymmetric signature to be verified.
   @param  SigSize                      Size of signature in bytes.
 
@@ -530,9 +531,10 @@ BOOLEAN
 EFIAPI
 SpdmAsymVerify (
   IN   UINT32                       BaseAsymAlgo,
+  IN   UINT32                       BaseHashAlgo,
   IN   VOID                         *Context,
-  IN   CONST UINT8                  *MessageHash,
-  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Message,
+  IN   UINTN                        MessageSize,
   IN   CONST UINT8                  *Signature,
   IN   UINTN                        SigSize
   );
@@ -567,9 +569,10 @@ SpdmAsymGetPrivateKeyFromPem (
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
   @param  BaseAsymAlgo                 SPDM BaseAsymAlgo
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Context                      Pointer to asymmetric context for signature generation.
-  @param  MessageHash                  Pointer to octet message hash to be signed.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be signed (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to buffer to receive signature.
   @param  SigSize                      On input, the size of Signature buffer in bytes.
                                        On output, the size of data returned in Signature buffer in bytes.
@@ -582,9 +585,10 @@ BOOLEAN
 EFIAPI
 SpdmAsymSign (
   IN      UINT32                       BaseAsymAlgo,
+  IN      UINT32                       BaseHashAlgo,
   IN      VOID                         *Context,
-  IN      CONST UINT8                  *MessageHash,
-  IN      UINTN                        HashSize,
+  IN      CONST UINT8                  *Message,
+  IN      UINTN                        MessageSize,
   OUT     UINT8                        *Signature,
   IN OUT  UINTN                        *SigSize
   );
@@ -598,7 +602,7 @@ SpdmAsymSign (
 **/
 UINT32
 EFIAPI
-GetSpdmReqAsymSize (
+GetSpdmReqAsymSignatureSize (
   IN   UINT16                       ReqBaseAsymAlg
   );
 
@@ -643,9 +647,10 @@ SpdmReqAsymFree (
   based upon negotiated requester asymmetric algorithm.
 
   @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Context                      Pointer to asymmetric context for signature verification.
-  @param  MessageHash                  Pointer to octet message hash to be checked.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be checked (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to asymmetric signature to be verified.
   @param  SigSize                      Size of signature in bytes.
 
@@ -656,9 +661,10 @@ BOOLEAN
 EFIAPI
 SpdmReqAsymVerify (
   IN   UINT16                       ReqBaseAsymAlg,
+  IN   UINT32                       BaseHashAlgo,
   IN   VOID                         *Context,
-  IN   CONST UINT8                  *MessageHash,
-  IN   UINTN                        HashSize,
+  IN   CONST UINT8                  *Message,
+  IN   UINTN                        MessageSize,
   IN   CONST UINT8                  *Signature,
   IN   UINTN                        SigSize
   );
@@ -693,9 +699,10 @@ SpdmReqAsymGetPrivateKeyFromPem (
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
   @param  ReqBaseAsymAlg               SPDM ReqBaseAsymAlg
+  @param  BaseHashAlgo                 SPDM BaseHashAlgo
   @param  Context                      Pointer to asymmetric context for signature generation.
-  @param  MessageHash                  Pointer to octet message hash to be signed.
-  @param  HashSize                     Size of the message hash in bytes.
+  @param  Message                      Pointer to octet message to be signed (before hash).
+  @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to buffer to receive signature.
   @param  SigSize                      On input, the size of Signature buffer in bytes.
                                        On output, the size of data returned in Signature buffer in bytes.
@@ -708,9 +715,10 @@ BOOLEAN
 EFIAPI
 SpdmReqAsymSign (
   IN      UINT16                       ReqBaseAsymAlg,
+  IN      UINT32                       BaseHashAlgo,
   IN      VOID                         *Context,
-  IN      CONST UINT8                  *MessageHash,
-  IN      UINTN                        HashSize,
+  IN      CONST UINT8                  *Message,
+  IN      UINTN                        MessageSize,
   OUT     UINT8                        *Signature,
   IN OUT  UINTN                        *SigSize
   );
@@ -724,7 +732,7 @@ SpdmReqAsymSign (
 **/
 UINT32
 EFIAPI
-GetSpdmDheKeySize (
+GetSpdmDhePubKeySize (
   IN   UINT16                       DHENamedGroup
   );
 

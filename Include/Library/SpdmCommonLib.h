@@ -787,38 +787,6 @@ SpdmFreeSessionId (
   );
 
 /*
-  This function calculates M1M2 hash.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  IsMut                        Indicate if this is from mutual authentication.
-  @param  HashData                     M1M2 hash
-
-  @retval RETURN_SUCCESS  M1M2 hash is calculated.
-*/
-BOOLEAN
-EFIAPI
-SpdmCalculateM1M2Hash (
-  IN     VOID                   *SpdmContext,
-  IN     BOOLEAN                IsMut,
-     OUT VOID                   *HashData
-  );
-
-/*
-  This function calculates L1L2 hash.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  HashData                     L1L2 hash
-
-  @retval RETURN_SUCCESS  L1L2 hash is calculated.
-*/
-BOOLEAN
-EFIAPI
-SpdmCalculateL1L2Hash (
-  IN     VOID                   *SpdmContext,
-     OUT VOID                   *HashData
-  );
-
-/*
   This function calculates current TH data with Message A and Message K.
 
   @param  SpdmContext                  A pointer to the SPDM context.

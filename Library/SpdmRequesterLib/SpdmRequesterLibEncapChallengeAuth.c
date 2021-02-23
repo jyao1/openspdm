@@ -78,7 +78,7 @@ SpdmGetEncapResponseChallengeAuth (
     return RETURN_SUCCESS;
   }
 
-  SignatureSize = GetSpdmReqAsymSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
+  SignatureSize = GetSpdmReqAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
   HashSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
   MeasurementSummaryHashSize = 0;
 

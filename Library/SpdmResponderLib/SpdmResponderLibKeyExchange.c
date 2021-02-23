@@ -90,9 +90,9 @@ SpdmGetResponseKeyExchange (
     SlotNum = SpdmContext->LocalContext.ProvisionedSlotNum;
   }
 
-  SignatureSize = GetSpdmAsymSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
+  SignatureSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
   HmacSize = GetSpdmHashSize (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo);
-  DheKeySize = GetSpdmDheKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
+  DheKeySize = GetSpdmDhePubKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
   MeasurementSummaryHashSize = SpdmGetMeasurementSummaryHashSize (SpdmContext, FALSE, SpdmRequest->Header.Param1);
 
   if (RequestSize < sizeof(SPDM_KEY_EXCHANGE_REQUEST) +
