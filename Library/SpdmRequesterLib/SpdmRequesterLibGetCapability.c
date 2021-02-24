@@ -113,7 +113,7 @@ TrySpdmGetCapabilities (
   SPDM_CAPABILITIES_RESPONSE                SpdmResponse;
   UINTN                                     SpdmResponseSize;
 
-  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAfterVersion) {
+  if (SpdmContext->ConnectionInfo.ConnectionState != SpdmConnectionStateAfterVersion) {
     return RETURN_UNSUPPORTED;
   }
 

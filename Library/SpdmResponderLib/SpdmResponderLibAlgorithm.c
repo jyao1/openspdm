@@ -193,7 +193,7 @@ SpdmGetResponseAlgorithm (
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
-  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAfterCapabilities) {
+  if (SpdmContext->ConnectionInfo.ConnectionState != SpdmConnectionStateAfterCapabilities) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }

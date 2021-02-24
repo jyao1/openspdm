@@ -56,7 +56,7 @@ SpdmGetResponseDigest (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_GET_DIGESTS, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+  if (SpdmContext->ConnectionInfo.ConnectionState != SpdmConnectionStateNegotiated) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }

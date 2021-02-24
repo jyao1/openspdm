@@ -52,7 +52,9 @@ SpdmGetResponseCertificate (
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
-  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAfterDigests) {
+  if ((SpdmContext->ConnectionInfo.ConnectionState != SpdmConnectionStateNegotiated) &&
+      (SpdmContext->ConnectionInfo.ConnectionState != SpdmConnectionStateAfterDigests) &&
+      (SpdmContext->ConnectionInfo.ConnectionState != SpdmConnectionStateAfterCertificate)) {
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
@@ -127,6 +129,8 @@ SpdmGetResponseCertificate (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
+
+  SpdmSetConnectionState (SpdmContext, SpdmConnectionStateAfterCertificate);
 
   return RETURN_SUCCESS;
 }

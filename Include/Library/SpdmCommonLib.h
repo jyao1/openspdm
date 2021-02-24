@@ -163,6 +163,10 @@ typedef enum {
   //
   SpdmConnectionStateAfterDigests,
   //
+  // After GET_CERTIFICATE/CERTIFICATE
+  //
+  SpdmConnectionStateAfterCertificate,
+  //
   // After CHALLENGE/CHALLENGE_AUTH, and ENCAP CALLENGE/CHALLENG_AUTH if MUT_AUTH is enabled.
   //
   SpdmConnectionStateAuthenticated,

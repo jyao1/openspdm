@@ -56,7 +56,7 @@ TrySpdmGetDigest (
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP)) {
     return RETURN_UNSUPPORTED;
   }
-  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
+  if (SpdmContext->ConnectionInfo.ConnectionState != SpdmConnectionStateNegotiated) {
     return RETURN_UNSUPPORTED;
   }
 

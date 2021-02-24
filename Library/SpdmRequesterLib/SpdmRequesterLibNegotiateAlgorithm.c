@@ -65,7 +65,7 @@ TrySpdmNegotiateAlgorithms (
   UINT8                                          FixedAlgSize;
   UINT8                                          ExtAlgCount;
 
-  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateAfterCapabilities) {
+  if (SpdmContext->ConnectionInfo.ConnectionState != SpdmConnectionStateAfterCapabilities) {
     return RETURN_UNSUPPORTED;
   }
 
