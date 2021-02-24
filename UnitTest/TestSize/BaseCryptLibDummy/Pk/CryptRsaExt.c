@@ -158,20 +158,64 @@ RsaPkcs1Sign (
 }
 
 /**
-  Carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme.
+  Carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme.
 
-  This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
-  RSA PKCS#1 v2.2.
-  The salt length is same as digest length.
+  This function carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme defined in
+  RSA PKCS#1.
   If the Signature buffer is too small to hold the contents of signature, FALSE
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
   If RsaContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If HashSize is not equal to the size of MD5, SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      RsaContext   Pointer to RSA context for signature generation.
+  @param[in]      MessageHash  Pointer to octet message hash to be signed.
+  @param[in]      HashSize     Size of the message hash in bytes.
+  @param[out]     Signature    Pointer to buffer to receive RSA PKCS1-v1_5 signature.
+  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
+                               On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in PKCS1-v1_5.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPkcs1Sign (
+  IN      VOID         *RsaContext,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  ASSERT(FALSE);
+  return FALSE;
+}
+
+/**
+  Carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme.
+
+  This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
+  RSA PKCS#1 v2.2.
+
+  The salt length is same as digest length.
+
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  If RsaContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If HashSize need match the HashNid. Nid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
   @param[in]       RsaContext   Pointer to RSA context for signature generation.
+  @param[in]       HashNid      hash NID
   @param[in]       MessageHash  Pointer to octet message hash to be signed.
   @param[in]       HashSize     Size of the message hash in bytes.
   @param[out]      Signature    Pointer to buffer to receive RSA-SSA PSS signature.
@@ -187,6 +231,7 @@ BOOLEAN
 EFIAPI
 RsaPssSign (
   IN      VOID         *RsaContext,
+  IN      UINTN        HashNid,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,

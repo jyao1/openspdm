@@ -415,7 +415,7 @@ ValidateCryptRsa2 (
   //
   Print ("\n- PKCS#1 Signature ... ");
   SigSize = 0;
-  Status  = RsaPkcs1Sign (RsaPrivKey, MsgHash, SHA256_DIGEST_SIZE, NULL, &SigSize);
+  Status  = RsaPkcs1SignWithNid (RsaPrivKey, CRYPTO_NID_SHA256, MsgHash, SHA256_DIGEST_SIZE, NULL, &SigSize);
   if (Status || SigSize == 0) {
     Print ("[Fail]");
     RsaFree  (RsaPubKey);
@@ -424,7 +424,7 @@ ValidateCryptRsa2 (
   }
 
   Signature = AllocatePool (SigSize);
-  Status    = RsaPkcs1Sign (RsaPrivKey, MsgHash, SHA256_DIGEST_SIZE, Signature, &SigSize);
+  Status    = RsaPkcs1SignWithNid (RsaPrivKey, CRYPTO_NID_SHA256, MsgHash, SHA256_DIGEST_SIZE, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
     FreePool (Signature);
@@ -439,7 +439,7 @@ ValidateCryptRsa2 (
   // Verify RSA PKCS#1-encoded Signature.
   //
   Print ("\n- PKCS#1 Signature Verification ... ");
-  Status = RsaPkcs1Verify (RsaPubKey, MsgHash, SHA256_DIGEST_SIZE, Signature, SigSize);
+  Status = RsaPkcs1VerifyWithNid (RsaPubKey, CRYPTO_NID_SHA256, MsgHash, SHA256_DIGEST_SIZE, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
     FreePool (Signature);

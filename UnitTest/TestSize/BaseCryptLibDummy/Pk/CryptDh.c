@@ -11,22 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "InternalCryptLib.h"
 
 /**
-  Allocates and Initializes one Diffie-Hellman Context for subsequent use.
-
-  @return  Pointer to the Diffie-Hellman Context that has been initialized.
-           If the allocations fails, DhNew() returns NULL.
-
-**/
-VOID *
-EFIAPI
-DhNew (
-  VOID
-  )
-{
-  return NULL;
-}
-
-/**
   Allocates and Initializes one Diffie-Hellman Context for subsequent use
   with the NID.
 

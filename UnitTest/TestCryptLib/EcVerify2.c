@@ -127,7 +127,7 @@ ValidateCryptEc2 (
   HashSize = sizeof(HashValue);
   SigSize = sizeof(Signature);
   Print ("\n- EC-DSA Signing ... ");
-  Status  = EcDsaSign (EcPrivKey, HashValue, HashSize, Signature, &SigSize);
+  Status  = EcDsaSign (EcPrivKey, CRYPTO_NID_SHA256, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
     EcFree (EcPrivKey);
@@ -138,7 +138,7 @@ ValidateCryptEc2 (
   }
 
   Print ("\n- EC-DSA Verification ... ");
-  Status = EcDsaVerify (EcPubKey, HashValue, HashSize, Signature, SigSize);
+  Status = EcDsaVerify (EcPubKey, CRYPTO_NID_SHA256, HashValue, HashSize, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
     EcFree (EcPrivKey);

@@ -146,7 +146,7 @@ ValidateCryptSm2 (
   //
   SigSize = sizeof(Signature);
   Print ("\n- SM2 Signing ... ");
-  Status  = Sm2Sign (Sm2_1, Message, sizeof(Message), Signature, &SigSize);
+  Status  = Sm2Sign (Sm2_1, CRYPTO_NID_SM3_256, Message, sizeof(Message), Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
     Sm2Free (Sm2_1);
@@ -154,7 +154,7 @@ ValidateCryptSm2 (
   }
 
   Print ("SM2 Verification ... ");
-  Status = Sm2Verify (Sm2_1, Message, sizeof(Message), Signature, SigSize);
+  Status = Sm2Verify (Sm2_1, CRYPTO_NID_SM3_256, Message, sizeof(Message), Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
     Sm2Free (Sm2_1);

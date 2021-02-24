@@ -519,12 +519,14 @@ EccSignatureBinToDer (
 
   If Sm2Context is NULL, then return FALSE.
   If Message is NULL, then return FALSE.
+  HashNid must be SM3_256.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
   The SigSize is 64. First 32-byte is R, Second 32-byte is S.
 
   @param[in]       Sm2Context   Pointer to Sm2 context for signature generation.
-  @param[in]       Message      Pointer to octet message to be signed.
+  @param[in]       HashNid      hash NID
+  @param[in]       Message      Pointer to octet message to be signed (before hash).
   @param[in]       Size         Size of the message in bytes.
   @param[out]      Signature    Pointer to buffer to receive SM2 signature.
   @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
@@ -539,6 +541,7 @@ BOOLEAN
 EFIAPI
 Sm2Sign (
   IN      VOID         *Sm2Context,
+  IN      UINTN        HashNid,
   IN      CONST UINT8  *Message,
   IN      UINTN        Size,
   OUT     UINT8        *Signature,
@@ -575,6 +578,14 @@ Sm2Sign (
   }
   *SigSize = HalfSize * 2;
   ZeroMem (Signature, *SigSize);
+
+  switch (HashNid) {
+  case CRYPTO_NID_SM3_256:
+    break;
+
+  default:
+    return FALSE;
+  }
 
   Ctx = EVP_MD_CTX_new();
   if (Ctx == NULL) {
@@ -620,11 +631,13 @@ Sm2Sign (
   If Sm2Context is NULL, then return FALSE.
   If Message is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
+  HashNid must be SM3_256.
 
   The SigSize is 64. First 32-byte is R, Second 32-byte is S.
 
   @param[in]  Sm2Context   Pointer to SM2 context for signature verification.
-  @param[in]  Message      Pointer to octet message to be checked.
+  @param[in]  HashNid      hash NID
+  @param[in]  Message      Pointer to octet message to be checked (before hash).
   @param[in]  Size         Size of the message in bytes.
   @param[in]  Signature    Pointer to SM2 signature to be verified.
   @param[in]  SigSize      Size of signature in bytes.
@@ -637,6 +650,7 @@ BOOLEAN
 EFIAPI
 Sm2Verify (
   IN  VOID         *Sm2Context,
+  IN  UINTN        HashNid,
   IN  CONST UINT8  *Message,
   IN  UINTN        Size,
   IN  CONST UINT8  *Signature,
@@ -668,6 +682,14 @@ Sm2Verify (
     return FALSE;
   }
   if (SigSize != (UINTN)(HalfSize * 2)) {
+    return FALSE;
+  }
+
+  switch (HashNid) {
+  case CRYPTO_NID_SM3_256:
+    break;
+
+  default:
     return FALSE;
   }
 

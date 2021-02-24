@@ -421,7 +421,7 @@ ValidateCryptRsa (
   }
 
   SigSize = 0;
-  Status  = RsaPkcs1Sign (Rsa, HashValue, HashSize, NULL, &SigSize);
+  Status  = RsaPkcs1SignWithNid (Rsa, CRYPTO_NID_SHA256, HashValue, HashSize, NULL, &SigSize);
   if (Status || SigSize == 0) {
     Print ("[Fail]");
     RsaFree (Rsa);
@@ -434,7 +434,7 @@ ValidateCryptRsa (
     RsaFree (Rsa);
     return EFI_ABORTED;
   }
-  Status  = RsaPkcs1Sign (Rsa, HashValue, HashSize, Signature, &SigSize);
+  Status  = RsaPkcs1SignWithNid (Rsa, CRYPTO_NID_SHA256, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
     FreePool (Signature);
@@ -455,7 +455,7 @@ ValidateCryptRsa (
 
   Print ("PKCS#1 Signature Verification ... ");
 
-  Status = RsaPkcs1Verify (Rsa, HashValue, HashSize, Signature, SigSize);
+  Status = RsaPkcs1VerifyWithNid (Rsa, CRYPTO_NID_SHA256, HashValue, HashSize, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
     RsaFree (Rsa);
@@ -500,7 +500,7 @@ ValidateCryptRsa (
   }
 
   SigSize = 0;
-  Status  = RsaPssSign (Rsa, HashValue, HashSize, NULL, &SigSize);
+  Status  = RsaPssSign (Rsa, CRYPTO_NID_SHA256, HashValue, HashSize, NULL, &SigSize);
   if (Status || SigSize == 0) {
     Print ("[Fail]");
     RsaFree (Rsa);
@@ -513,7 +513,7 @@ ValidateCryptRsa (
     RsaFree (Rsa);
     return EFI_ABORTED;
   }
-  Status  = RsaPssSign (Rsa, HashValue, HashSize, Signature, &SigSize);
+  Status  = RsaPssSign (Rsa, CRYPTO_NID_SHA256, HashValue, HashSize, Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
     FreePool (Signature);
@@ -527,7 +527,7 @@ ValidateCryptRsa (
 
   Print ("PSS Signature Verification ... ");
 
-  Status = RsaPssVerify (Rsa, HashValue, HashSize, Signature, SigSize);
+  Status = RsaPssVerify (Rsa, CRYPTO_NID_SHA256, HashValue, HashSize, Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
     FreePool (Signature);

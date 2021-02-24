@@ -12,19 +12,45 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __BASE_CRYPT_LIB_H__
 #define __BASE_CRYPT_LIB_H__
 
-///
-/// NameGroup ID - See TLS1.3 (RFC 8446)
-///
-#define CRYPTO_NID_FFDHE2048 0x0100  // NID_ffdhe2048
-#define CRYPTO_NID_FFDHE3072 0x0101  // NID_ffdhe3072
-#define CRYPTO_NID_FFDHE4096 0x0102  // NID_ffdhe4096
+#define CRYPTO_NID_NULL        0x0000
 
-#define CRYPTO_NID_SECP256R1 0x0017  // NID_X9_62_prime256v1 (NIST P-256)
-#define CRYPTO_NID_SECP384R1 0x0018  // NID_secp384r1 (NIST P-384)
-#define CRYPTO_NID_SECP521R1 0x0019  // NID_secp521r1 (NIST P-521)
+// Hash
+#define CRYPTO_NID_SHA256      0x0001
+#define CRYPTO_NID_SHA384      0x0002
+#define CRYPTO_NID_SHA512      0x0003
+#define CRYPTO_NID_SHA3_256    0x0004
+#define CRYPTO_NID_SHA3_384    0x0005
+#define CRYPTO_NID_SHA3_512    0x0006
+#define CRYPTO_NID_SM3_256     0x0007
 
-#define CRYPTO_NID_ED25519   0x0807  // NID_ED25519
-#define CRYPTO_NID_ED448     0x0808  // NID_ED448
+// Signing
+#define CRYPTO_NID_RSASSA2048          0x0101
+#define CRYPTO_NID_RSASSA3072          0x0102
+#define CRYPTO_NID_RSASSA4096          0x0103
+#define CRYPTO_NID_RSAPSS2048          0x0104
+#define CRYPTO_NID_RSAPSS3072          0x0105
+#define CRYPTO_NID_RSAPSS4096          0x0106
+#define CRYPTO_NID_ECDSA_NIST_P256     0x0106
+#define CRYPTO_NID_ECDSA_NIST_P384     0x0107
+#define CRYPTO_NID_ECDSA_NIST_P521     0x0108
+#define CRYPTO_NID_ECDSA_SM2_P256      0x0109
+#define CRYPTO_NID_EDDSA_ED25519       0x010A
+#define CRYPTO_NID_EDDSA_ED448         0x010B
+
+// Key Exchange
+#define CRYPTO_NID_FFDHE2048           0x0201
+#define CRYPTO_NID_FFDHE3072           0x0202
+#define CRYPTO_NID_FFDHE4096           0x0203
+#define CRYPTO_NID_SECP256R1           0x0204
+#define CRYPTO_NID_SECP384R1           0x0205
+#define CRYPTO_NID_SECP521R1           0x0206
+#define CRYPTO_NID_SM2_P256            0x0207
+
+// AEAD
+#define CRYPTO_NID_AES_128_GCM         0x0301
+#define CRYPTO_NID_AES_256_GCM         0x0302
+#define CRYPTO_NID_CHACHA20_POLY1305   0x0303
+#define CRYPTO_NID_SM4_128_GCM         0x0304
 
 ///
 /// X.509 v3 Key Usage Extension flags
@@ -2685,6 +2711,76 @@ RsaPkcs1Verify (
   );
 
 /**
+  Carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme.
+
+  This function carries out the RSA-SSA signature generation with EMSA-PKCS1-v1_5 encoding scheme defined in
+  RSA PKCS#1.
+  If the Signature buffer is too small to hold the contents of signature, FALSE
+  is returned and SigSize is set to the required buffer size to obtain the signature.
+
+  If RsaContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
+  If SigSize is large enough but Signature is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]      RsaContext   Pointer to RSA context for signature generation.
+  @param[in]      HashNid      hash NID
+  @param[in]      MessageHash  Pointer to octet message hash to be signed.
+  @param[in]      HashSize     Size of the message hash in bytes.
+  @param[out]     Signature    Pointer to buffer to receive RSA PKCS1-v1_5 signature.
+  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
+                               On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in PKCS1-v1_5.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPkcs1SignWithNid (
+  IN      VOID         *RsaContext,
+  IN      UINTN        HashNid,
+  IN      CONST UINT8  *MessageHash,
+  IN      UINTN        HashSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  );
+
+/**
+  Verifies the RSA-SSA signature with EMSA-PKCS1-v1_5 encoding scheme defined in
+  RSA PKCS#1.
+
+  If RsaContext is NULL, then return FALSE.
+  If MessageHash is NULL, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
+
+  @param[in]  RsaContext   Pointer to RSA context for signature verification.
+  @param[in]  HashNid      hash NID
+  @param[in]  MessageHash  Pointer to octet message hash to be checked.
+  @param[in]  HashSize     Size of the message hash in bytes.
+  @param[in]  Signature    Pointer to RSA PKCS1-v1_5 signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in PKCS1-v1_5.
+  @retval  FALSE  Invalid signature or invalid RSA context.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPkcs1VerifyWithNid (
+  IN  VOID         *RsaContext,
+  IN  UINTN        HashNid,
+  IN  CONST UINT8  *MessageHash,
+  IN  UINTN        HashSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  );
+
+/**
   Carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme.
 
   This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
@@ -2697,10 +2793,11 @@ RsaPkcs1Verify (
 
   If RsaContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If HashSize need match the HashNid. Nid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
   @param[in]       RsaContext   Pointer to RSA context for signature generation.
+  @param[in]       HashNid      hash NID
   @param[in]       MessageHash  Pointer to octet message hash to be signed.
   @param[in]       HashSize     Size of the message hash in bytes.
   @param[out]      Signature    Pointer to buffer to receive RSA-SSA PSS signature.
@@ -2716,6 +2813,7 @@ BOOLEAN
 EFIAPI
 RsaPssSign (
   IN      VOID         *RsaContext,
+  IN      UINTN        HashNid,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
@@ -2731,9 +2829,10 @@ RsaPssSign (
   If RsaContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If HashSize need match the HashNid. Nid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
 
   @param[in]  RsaContext   Pointer to RSA context for signature verification.
+  @param[in]  HashNid      hash NID
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
   @param[in]  HashSize     Size of the message hash in bytes.
   @param[in]  Signature    Pointer to RSA-SSA PSS signature to be verified.
@@ -2747,6 +2846,7 @@ BOOLEAN
 EFIAPI
 RsaPssVerify (
   IN  VOID         *RsaContext,
+  IN  UINTN        HashNid,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
@@ -4093,19 +4193,6 @@ DhComputeKey (
 //=====================================================================================
 
 /**
-  Allocates and Initializes one Elliptic Curve Context for subsequent use.
-
-  @return  Pointer to the Elliptic Curve Context that has been initialized.
-           If the allocations fails, EcNew() returns NULL.
-
-**/
-VOID *
-EFIAPI
-EcNew (
-  VOID
-  );
-
-/**
   Allocates and Initializes one Elliptic Curve Context for subsequent use
   with the NID.
 
@@ -4238,7 +4325,7 @@ EcComputeKey (
 
   If EcContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
   For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
@@ -4246,6 +4333,7 @@ EcComputeKey (
   For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
 
   @param[in]       EcContext    Pointer to EC context for signature generation.
+  @param[in]       HashNid      hash NID
   @param[in]       MessageHash  Pointer to octet message hash to be signed.
   @param[in]       HashSize     Size of the message hash in bytes.
   @param[out]      Signature    Pointer to buffer to receive EC-DSA signature.
@@ -4261,6 +4349,7 @@ BOOLEAN
 EFIAPI
 EcDsaSign (
   IN      VOID         *EcContext,
+  IN      UINTN        HashNid,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
@@ -4273,13 +4362,14 @@ EcDsaSign (
   If EcContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-1, SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
 
   For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
   For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
   For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
 
   @param[in]  EcContext    Pointer to EC context for signature verification.
+  @param[in]  HashNid      hash NID
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
   @param[in]  HashSize     Size of the message hash in bytes.
   @param[in]  Signature    Pointer to EC-DSA signature to be verified.
@@ -4293,6 +4383,7 @@ BOOLEAN
 EFIAPI
 EcDsaVerify (
   IN  VOID         *EcContext,
+  IN  UINTN        HashNid,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
@@ -4342,13 +4433,15 @@ EdFree (
 
   If EdContext is NULL, then return FALSE.
   If Message is NULL, then return FALSE.
+  HashNid must be NULL.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
   For Ed25519, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
   For Ed448, the SigSize is 114. First 57-byte is R, Second 57-byte is S.
 
   @param[in]       EdContext    Pointer to Ed context for signature generation.
-  @param[in]       Message      Pointer to octet message to be signed.
+  @param[in]       HashNid      hash NID
+  @param[in]       Message      Pointer to octet message to be signed (before hash).
   @param[in]       Size         Size of the message in bytes.
   @param[out]      Signature    Pointer to buffer to receive Ed-DSA signature.
   @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
@@ -4363,6 +4456,7 @@ BOOLEAN
 EFIAPI
 EdDsaSign (
   IN      VOID         *EdContext,
+  IN      UINTN        HashNid,
   IN      CONST UINT8  *Message,
   IN      UINTN        Size,
   OUT     UINT8        *Signature,
@@ -4375,12 +4469,14 @@ EdDsaSign (
   If EdContext is NULL, then return FALSE.
   If Message is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
+  HashNid must be NULL.
 
   For Ed25519, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
   For Ed448, the SigSize is 114. First 57-byte is R, Second 57-byte is S.
 
   @param[in]  EdContext    Pointer to Ed context for signature verification.
-  @param[in]  Message      Pointer to octet message to be checked.
+  @param[in]  HashNid      hash NID
+  @param[in]  Message      Pointer to octet message to be checked (before hash).
   @param[in]  Size         Size of the message in bytes.
   @param[in]  Signature    Pointer to Ed-DSA signature to be verified.
   @param[in]  SigSize      Size of signature in bytes.
@@ -4393,8 +4489,9 @@ BOOLEAN
 EFIAPI
 EdDsaVerify (
   IN  VOID         *EdContext,
-  IN  CONST UINT8  *MessageHash,
-  IN  UINTN        HashSize,
+  IN  UINTN        HashNid,
+  IN  CONST UINT8  *Message,
+  IN  UINTN        Size,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   );
@@ -4530,15 +4627,16 @@ Sm2ComputeKey (
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
   If Sm2Context is NULL, then return FALSE.
-  If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of SM3-256 digest, then return FALSE.
+  If Message is NULL, then return FALSE.
+  HashNid must be SM3_256.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
   The SigSize is 64. First 32-byte is R, Second 32-byte is S.
 
   @param[in]       Sm2Context   Pointer to Sm2 context for signature generation.
-  @param[in]       MessageHash  Pointer to octet message hash to be signed.
-  @param[in]       HashSize     Size of the message hash in bytes.
+  @param[in]       HashNid      hash NID
+  @param[in]       Message      Pointer to octet message to be signed (before hash).
+  @param[in]       Size         Size of the message in bytes.
   @param[out]      Signature    Pointer to buffer to receive SM2 signature.
   @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
                                 On output, the size of data returned in Signature buffer in bytes.
@@ -4552,8 +4650,9 @@ BOOLEAN
 EFIAPI
 Sm2Sign (
   IN      VOID         *Sm2Context,
-  IN      CONST UINT8  *MessageHash,
-  IN      UINTN        HashSize,
+  IN      UINTN        HashNid,
+  IN      CONST UINT8  *Message,
+  IN      UINTN        Size,
   OUT     UINT8        *Signature,
   IN OUT  UINTN        *SigSize
   );
@@ -4562,14 +4661,15 @@ Sm2Sign (
   Verifies the SM2 signature.
 
   If Sm2Context is NULL, then return FALSE.
-  If MessageHash is NULL, then return FALSE.
+  If Message is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
-  If HashSize is not equal to the size of SM3-256 digest, then return FALSE.
+  HashNid must be SM3_256.
 
   The SigSize is 64. First 32-byte is R, Second 32-byte is S.
 
   @param[in]  Sm2Context   Pointer to SM2 context for signature verification.
-  @param[in]  Message      Pointer to octet message to be checked.
+  @param[in]  HashNid      hash NID
+  @param[in]  Message      Pointer to octet message to be checked (before hash).
   @param[in]  Size         Size of the message in bytes.
   @param[in]  Signature    Pointer to SM2 signature to be verified.
   @param[in]  SigSize      Size of signature in bytes.
@@ -4581,9 +4681,10 @@ Sm2Sign (
 BOOLEAN
 EFIAPI
 Sm2Verify (
-  IN  VOID         *EdContext,
-  IN  CONST UINT8  *MessageHash,
-  IN  UINTN        HashSize,
+  IN  VOID         *Sm2Context,
+  IN  UINTN        HashNid,
+  IN  CONST UINT8  *Message,
+  IN  UINTN        Size,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   );

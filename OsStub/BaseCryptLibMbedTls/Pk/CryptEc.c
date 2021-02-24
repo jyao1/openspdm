@@ -283,7 +283,7 @@ EcComputeKey (
 
   If EcContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
   For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
@@ -291,6 +291,7 @@ EcComputeKey (
   For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
 
   @param[in]       EcContext    Pointer to EC context for signature generation.
+  @param[in]       HashNid      hash NID
   @param[in]       MessageHash  Pointer to octet message hash to be signed.
   @param[in]       HashSize     Size of the message hash in bytes.
   @param[out]      Signature    Pointer to buffer to receive EC-DSA signature.
@@ -306,6 +307,7 @@ BOOLEAN
 EFIAPI
 EcDsaSign (
   IN      VOID         *EcContext,
+  IN      UINTN        HashNid,
   IN      CONST UINT8  *MessageHash,
   IN      UINTN        HashSize,
   OUT     UINT8        *Signature,
@@ -349,11 +351,25 @@ EcDsaSign (
   *SigSize = HalfSize * 2;
   ZeroMem (Signature, *SigSize);
 
-  switch (HashSize) {
-  case SHA256_DIGEST_SIZE:
-  case SHA384_DIGEST_SIZE:
-  case SHA512_DIGEST_SIZE:
+  switch (HashNid) {
+  case CRYPTO_NID_SHA256:
+    if (HashSize != SHA256_DIGEST_SIZE) {
+      return FALSE;
+    }
     break;
+
+  case CRYPTO_NID_SHA384:
+    if (HashSize != SHA384_DIGEST_SIZE) {
+      return FALSE;
+    }
+    break;
+
+  case CRYPTO_NID_SHA512:
+    if (HashSize != SHA512_DIGEST_SIZE) {
+      return FALSE;
+    }
+    break;
+
   default:
     return FALSE;
   }
@@ -396,13 +412,14 @@ EcDsaSign (
   If EcContext is NULL, then return FALSE.
   If MessageHash is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
-  If HashSize is not equal to the size of SHA-256, SHA-384 or SHA-512 digest, then return FALSE.
+  If HashSize need match the HashNid. HashNid could be SHA256, SHA384, SHA512, SHA3_256, SHA3_384, SHA3_512.
 
   For P-256, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
   For P-384, the SigSize is 96. First 48-byte is R, Second 48-byte is S.
   For P-521, the SigSize is 132. First 66-byte is R, Second 66-byte is S.
 
   @param[in]  EcContext    Pointer to EC context for signature verification.
+  @param[in]  HashNid      hash NID
   @param[in]  MessageHash  Pointer to octet message hash to be checked.
   @param[in]  HashSize     Size of the message hash in bytes.
   @param[in]  Signature    Pointer to EC-DSA signature to be verified.
@@ -416,6 +433,7 @@ BOOLEAN
 EFIAPI
 EcDsaVerify (
   IN  VOID         *EcContext,
+  IN  UINTN        HashNid,
   IN  CONST UINT8  *MessageHash,
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
@@ -454,11 +472,25 @@ EcDsaVerify (
     return FALSE;
   }
 
-  switch (HashSize) {
-  case SHA256_DIGEST_SIZE:
-  case SHA384_DIGEST_SIZE:
-  case SHA512_DIGEST_SIZE:
+  switch (HashNid) {
+  case CRYPTO_NID_SHA256:
+    if (HashSize != SHA256_DIGEST_SIZE) {
+      return FALSE;
+    }
     break;
+
+  case CRYPTO_NID_SHA384:
+    if (HashSize != SHA384_DIGEST_SIZE) {
+      return FALSE;
+    }
+    break;
+
+  case CRYPTO_NID_SHA512:
+    if (HashSize != SHA512_DIGEST_SIZE) {
+      return FALSE;
+    }
+    break;
+
   default:
     return FALSE;
   }

@@ -20,22 +20,6 @@ static const unsigned char mffehde3072_G[] = MBEDTLS_DHM_RFC7919_FFDHE3072_G_BIN
 static const unsigned char mffehde4096_G[] = MBEDTLS_DHM_RFC7919_FFDHE4096_G_BIN;
 
 /**
-  Allocates and Initializes one Diffie-Hellman Context for subsequent use.
-
-  @return  Pointer to the Diffie-Hellman Context that has been initialized.
-           If the allocations fails, DhNew() returns NULL.
-
-**/
-VOID *
-EFIAPI
-DhNew (
-  VOID
-  )
-{
-  return NULL;
-}
-
-/**
   Allocates and Initializes one Diffie-Hellman Context for subsequent use
   with the NID.
 

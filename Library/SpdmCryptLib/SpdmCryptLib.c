@@ -37,6 +37,35 @@ GetSpdmHashSize (
 }
 
 /**
+  Return cipher ID, based upon the negotiated Hash algorithm.
+
+  @param  BaseHashAlgo                  SPDM BaseHashAlgo
+
+  @return Hash cipher ID
+**/
+UINTN
+GetSpdmHashNid (
+  IN      UINT32       BaseHashAlgo
+  )
+{
+  switch (BaseHashAlgo) {
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
+    return CRYPTO_NID_SHA256;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
+    return CRYPTO_NID_SHA384;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
+    return CRYPTO_NID_SHA512;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_256:
+    return CRYPTO_NID_SHA3_256;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_384:
+    return CRYPTO_NID_SHA3_384;
+  case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA3_512:
+    return CRYPTO_NID_SHA3_512;
+  }
+  return CRYPTO_NID_NULL;
+}
+
+/**
   Return hash function, based upon the negotiated hash algorithm.
 
   @param  BaseHashAlgo                  SPDM BaseHashAlgo
@@ -580,7 +609,7 @@ GetSpdmAsymVerify (
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
 #if OPENSPDM_RSA_SSA_SUPPORT == 1
-    return RsaPkcs1Verify;
+    return RsaPkcs1VerifyWithNid;
 #else
     ASSERT (FALSE);
     break;
@@ -640,7 +669,9 @@ SpdmAsymVerify (
   UINT8         MessageHash[MAX_HASH_SIZE];
   UINTN         HashSize;
   BOOLEAN       Result;
+  UINTN         HashNid;
 
+  HashNid = GetSpdmHashNid (BaseHashAlgo);
   NeedHash = SpdmAsymFuncNeedHash (BaseAsymAlgo);
 
   VerifyFunction = GetSpdmAsymVerify (BaseAsymAlgo);
@@ -653,9 +684,9 @@ SpdmAsymVerify (
     if (!Result) {
       return FALSE;
     }
-    return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
+    return VerifyFunction (Context, HashNid, MessageHash, HashSize, Signature, SigSize);
   } else {
-    return VerifyFunction (Context, Message, MessageSize, Signature, SigSize);
+    return VerifyFunction (Context, HashNid, Message, MessageSize, Signature, SigSize);
   }
 }
 
@@ -746,7 +777,7 @@ GetSpdmAsymSign (
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_3072:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_4096:
 #if OPENSPDM_RSA_SSA_SUPPORT == 1
-    return RsaPkcs1Sign;
+    return RsaPkcs1SignWithNid;
 #else
     ASSERT (FALSE);
     break;
@@ -810,7 +841,9 @@ SpdmAsymSign (
   UINT8         MessageHash[MAX_HASH_SIZE];
   UINTN         HashSize;
   BOOLEAN       Result;
+  UINTN         HashNid;
 
+  HashNid = GetSpdmHashNid (BaseHashAlgo);
   NeedHash = SpdmAsymFuncNeedHash (BaseAsymAlgo);
 
   AsymSign = GetSpdmAsymSign (BaseAsymAlgo);
@@ -823,9 +856,9 @@ SpdmAsymSign (
     if (!Result) {
       return FALSE;
     }
-    return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
+    return AsymSign (Context, HashNid, MessageHash, HashSize, Signature, SigSize);
   } else {
-    return AsymSign (Context, Message, MessageSize, Signature, SigSize);
+    return AsymSign (Context, HashNid, Message, MessageSize, Signature, SigSize);
   }
 }
 
@@ -990,7 +1023,9 @@ SpdmReqAsymVerify (
   UINT8         MessageHash[MAX_HASH_SIZE];
   UINTN         HashSize;
   BOOLEAN       Result;
+  UINTN         HashNid;
 
+  HashNid = GetSpdmHashNid (BaseHashAlgo);
   NeedHash = SpdmReqAsymFuncNeedHash (ReqBaseAsymAlg);
 
   VerifyFunction = GetSpdmReqAsymVerify (ReqBaseAsymAlg);
@@ -1003,9 +1038,9 @@ SpdmReqAsymVerify (
     if (!Result) {
       return FALSE;
     }
-    return VerifyFunction (Context, MessageHash, HashSize, Signature, SigSize);
+    return VerifyFunction (Context, HashNid, MessageHash, HashSize, Signature, SigSize);
   } else {
-    return VerifyFunction (Context, Message, MessageSize, Signature, SigSize);
+    return VerifyFunction (Context, HashNid, Message, MessageSize, Signature, SigSize);
   }
 }
 
@@ -1106,7 +1141,9 @@ SpdmReqAsymSign (
   UINT8         MessageHash[MAX_HASH_SIZE];
   UINTN         HashSize;
   BOOLEAN       Result;
+  UINTN         HashNid;
 
+  HashNid = GetSpdmHashNid (BaseHashAlgo);
   NeedHash = SpdmReqAsymFuncNeedHash (ReqBaseAsymAlg);
 
   AsymSign = GetSpdmReqAsymSign (ReqBaseAsymAlg);
@@ -1119,9 +1156,9 @@ SpdmReqAsymSign (
     if (!Result) {
       return FALSE;
     }
-    return AsymSign (Context, MessageHash, HashSize, Signature, SigSize);
+    return AsymSign (Context, HashNid, MessageHash, HashSize, Signature, SigSize);
   } else {
-    return AsymSign (Context, Message, MessageSize, Signature, SigSize);
+    return AsymSign (Context, HashNid, Message, MessageSize, Signature, SigSize);
   }
 }
 
@@ -1156,11 +1193,11 @@ GetSpdmDhePubKeySize (
 }
 
 /**
-  Return cipher ID, based upon the negotiated HKDF algorithm.
+  Return cipher ID, based upon the negotiated DHE algorithm.
 
   @param  DHENamedGroup                SPDM DHENamedGroup
 
-  @return HKDF expand function
+  @return DHE cipher ID
 **/
 UINTN
 GetSpdmDheNid (
@@ -1181,7 +1218,7 @@ GetSpdmDheNid (
   case SPDM_ALGORITHMS_DHE_NAMED_GROUP_SECP_521_R1:
     return CRYPTO_NID_SECP521R1;
   }
-  return 0;
+  return CRYPTO_NID_NULL;
 }
 
 /**

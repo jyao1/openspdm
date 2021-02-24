@@ -126,6 +126,7 @@ VOID
   Verifies the asymmetric signature.
 
   @param  Context                      Pointer to asymmetric context for signature verification.
+  @param  HashNid                      hash NID
   @param  Message                      Pointer to octet message to be checked (before hash).
   @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to asymmetric signature to be verified.
@@ -138,8 +139,9 @@ typedef
 BOOLEAN
 (EFIAPI *ASYM_VERIFY) (
   IN  VOID         *Context,
+  IN  UINTN        HashNid,
   IN  CONST UINT8  *Message,
-  IN  UINTN        MessageSizeSize,
+  IN  UINTN        MessageSize,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   );
@@ -172,6 +174,7 @@ BOOLEAN
   is returned and SigSize is set to the required buffer size to obtain the signature.
 
   @param  Context                      Pointer to asymmetric context for signature generation.
+  @param  HashNid                      hash NID
   @param  Message                      Pointer to octet message to be signed (before hash).
   @param  MessageSize                  Size of the message in bytes.
   @param  Signature                    Pointer to buffer to receive signature.
@@ -186,6 +189,7 @@ typedef
 BOOLEAN
 (EFIAPI *ASYM_SIGN) (
   IN      VOID         *Context,
+  IN      UINTN        HashNid,
   IN      CONST UINT8  *Message,
   IN      UINTN        MessageSize,
   OUT     UINT8        *Signature,

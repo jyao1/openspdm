@@ -100,7 +100,7 @@ ValidateCryptEd2 (
   //
   SigSize = sizeof(Signature);
   Print ("\n- Ed-DSA Signing ... ");
-  Status  = EdDsaSign (EdPrivKey, Message, sizeof(Message), Signature, &SigSize);
+  Status  = EdDsaSign (EdPrivKey, CRYPTO_NID_NULL, Message, sizeof(Message), Signature, &SigSize);
   if (!Status) {
     Print ("[Fail]");
     EdFree (EdPrivKey);
@@ -111,7 +111,7 @@ ValidateCryptEd2 (
   }
 
   Print ("\n- Ed-DSA Verification ... ");
-  Status = EdDsaVerify (EdPubKey, Message, sizeof(Message), Signature, SigSize);
+  Status = EdDsaVerify (EdPubKey, CRYPTO_NID_NULL, Message, sizeof(Message), Signature, SigSize);
   if (!Status) {
     Print ("[Fail]");
     EdFree (EdPrivKey);

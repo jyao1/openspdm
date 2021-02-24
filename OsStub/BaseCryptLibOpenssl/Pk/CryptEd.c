@@ -36,10 +36,10 @@ EdNewByNid (
   INT32         OpenSslPkeyType;
 
   switch (Nid) {
-  case CRYPTO_NID_ED25519:
+  case CRYPTO_NID_EDDSA_ED25519:
     OpenSslPkeyType = EVP_PKEY_ED25519;
     break;
-  case CRYPTO_NID_ED448:
+  case CRYPTO_NID_EDDSA_ED448:
     OpenSslPkeyType = EVP_PKEY_ED448;
     break;
   default:
@@ -90,13 +90,15 @@ EdFree (
 
   If EdContext is NULL, then return FALSE.
   If Message is NULL, then return FALSE.
+  HashNid must be NULL.
   If SigSize is large enough but Signature is NULL, then return FALSE.
 
   For Ed25519, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
   For Ed448, the SigSize is 114. First 57-byte is R, Second 57-byte is S.
 
   @param[in]       EdContext    Pointer to Ed context for signature generation.
-  @param[in]       Message      Pointer to octet message to be signed.
+  @param[in]       HashNid      hash NID
+  @param[in]       Message      Pointer to octet message to be signed (before hash).
   @param[in]       Size         Size of the message in bytes.
   @param[out]      Signature    Pointer to buffer to receive Ed-DSA signature.
   @param[in, out]  SigSize      On input, the size of Signature buffer in bytes.
@@ -111,6 +113,7 @@ BOOLEAN
 EFIAPI
 EdDsaSign (
   IN      VOID         *EdContext,
+  IN      UINTN        HashNid,
   IN      CONST UINT8  *Message,
   IN      UINTN        Size,
   OUT     UINT8        *Signature,
@@ -148,6 +151,14 @@ EdDsaSign (
   *SigSize = HalfSize * 2;
   ZeroMem (Signature, *SigSize);
 
+  switch (HashNid) {
+  case CRYPTO_NID_NULL:
+    break;
+
+  default:
+    return FALSE;
+  }
+
   Ctx = EVP_MD_CTX_new();
   if (Ctx == NULL) {
     return FALSE;
@@ -173,12 +184,14 @@ EdDsaSign (
   If EdContext is NULL, then return FALSE.
   If Message is NULL, then return FALSE.
   If Signature is NULL, then return FALSE.
+  HashNid must be NULL.
 
   For Ed25519, the SigSize is 64. First 32-byte is R, Second 32-byte is S.
   For Ed448, the SigSize is 114. First 57-byte is R, Second 57-byte is S.
 
   @param[in]  EdContext    Pointer to Ed context for signature verification.
-  @param[in]  Message      Pointer to octet message to be checked.
+  @param[in]  HashNid      hash NID
+  @param[in]  Message      Pointer to octet message to be checked (before hash).
   @param[in]  Size         Size of the message in bytes.
   @param[in]  Signature    Pointer to Ed-DSA signature to be verified.
   @param[in]  SigSize      Size of signature in bytes.
@@ -191,6 +204,7 @@ BOOLEAN
 EFIAPI
 EdDsaVerify (
   IN  VOID         *EdContext,
+  IN  UINTN        HashNid,
   IN  CONST UINT8  *Message,
   IN  UINTN        Size,
   IN  CONST UINT8  *Signature,
@@ -222,6 +236,14 @@ EdDsaVerify (
     return FALSE;
   }
   if (SigSize != (UINTN)(HalfSize * 2)) {
+    return FALSE;
+  }
+
+  switch (HashNid) {
+  case CRYPTO_NID_NULL:
+    break;
+
+  default:
     return FALSE;
   }
 

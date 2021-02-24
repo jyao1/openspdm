@@ -32,7 +32,7 @@ ValidateCryptEd (
   Print ("\nUEFI-OpenSSL Ed-DSA Signing Verification Testing:\n");
 
   Print ("- Context1 ... ");
-  Ed1 = EdNewByNid (CRYPTO_NID_ED25519);
+  Ed1 = EdNewByNid (CRYPTO_NID_EDDSA_ED25519);
   if (Ed1 == NULL) {
     Print ("[Fail]");
     goto Exit;
@@ -43,7 +43,7 @@ ValidateCryptEd (
   //
   Sig1Size = sizeof(Signature1);
   Print ("\n- Ed-DSA Signing ... ");
-  Status  = EdDsaSign (Ed1, Message, sizeof(Message), Signature1, &Sig1Size);
+  Status  = EdDsaSign (Ed1, CRYPTO_NID_NULL, Message, sizeof(Message), Signature1, &Sig1Size);
   if (!Status) {
     Print ("[Fail]");
     EdFree (Ed1);
@@ -51,7 +51,7 @@ ValidateCryptEd (
   }
 
   Print ("Ed-DSA Verification ... ");
-  Status = EdDsaVerify (Ed1, Message, sizeof(Message), Signature1, Sig1Size);
+  Status = EdDsaVerify (Ed1, CRYPTO_NID_NULL, Message, sizeof(Message), Signature1, Sig1Size);
   if (!Status) {
     Print ("[Fail]");
     EdFree (Ed1);
@@ -62,7 +62,7 @@ ValidateCryptEd (
   EdFree (Ed1);
 
   Print ("Context2 ... ");
-  Ed2 = EdNewByNid (CRYPTO_NID_ED448);
+  Ed2 = EdNewByNid (CRYPTO_NID_EDDSA_ED448);
   if (Ed2 == NULL) {
     Print ("[Fail]");
     goto Exit;
@@ -70,7 +70,7 @@ ValidateCryptEd (
 
   Sig2Size = sizeof(Signature2);
   Print ("\n- Ed-DSA Signing ... ");
-  Status  = EdDsaSign (Ed2, Message, sizeof(Message), Signature2, &Sig2Size);
+  Status  = EdDsaSign (Ed2, CRYPTO_NID_NULL, Message, sizeof(Message), Signature2, &Sig2Size);
   if (!Status) {
     Print ("[Fail]");
     EdFree (Ed2);
@@ -78,7 +78,7 @@ ValidateCryptEd (
   }
 
   Print ("Ed-DSA Verification ... ");
-  Status = EdDsaVerify (Ed2, Message, sizeof(Message), Signature2, Sig2Size);
+  Status = EdDsaVerify (Ed2, CRYPTO_NID_NULL, Message, sizeof(Message), Signature2, Sig2Size);
   if (!Status) {
     Print ("[Fail]");
     EdFree (Ed2);
