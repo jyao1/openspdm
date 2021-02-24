@@ -328,9 +328,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+    InternalDumpHex (LocalBuffer, LocalBufferSize);
     SigSize = GetSpdmAsymSignatureSize (mUseAsymAlgo);
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
     Ptr += SigSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -376,9 +376,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+    InternalDumpHex (LocalBuffer, LocalBufferSize);
     SigSize = GetSpdmAsymSignatureSize (mUseAsymAlgo);
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
     Ptr += SigSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -462,9 +462,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       InternalDumpHex (LocalBuffer, LocalBufferSize);
       SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
       DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-      InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+      InternalDumpHex (LocalBuffer, LocalBufferSize);
       SigSize = GetSpdmAsymSignatureSize (mUseAsymAlgo);
-      SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+      SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
       Ptr += SigSize;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -557,9 +557,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
       InternalDumpHex (LocalBuffer, LocalBufferSize);
       SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
       DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-      InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+      InternalDumpHex (LocalBuffer, LocalBufferSize);
       SigSize = GetSpdmAsymSignatureSize (mUseAsymAlgo);
-      SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+      SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
       Ptr += SigSize;
 
       SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -694,7 +694,7 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+    InternalDumpHex (LocalBuffer, LocalBufferSize);
     SigSize = GetSpdmAsymSignatureSize (mUseAsymAlgo);
     SpdmGetRandomNumber (SigSize, Ptr);
     Ptr += SigSize;
@@ -778,9 +778,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+    InternalDumpHex (LocalBuffer, LocalBufferSize);
     SigSize = GetSpdmAsymSignatureSize (mUseAsymAlgo);
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
     Ptr += SigSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -826,9 +826,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+    InternalDumpHex (LocalBuffer, LocalBufferSize);
     SigSize = GetSpdmAsymSignatureSize (mUseAsymAlgo);
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
     Ptr += SigSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -1135,9 +1135,9 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
+    InternalDumpHex (LocalBuffer, LocalBufferSize);
     SigSize = GetSpdmAsymSignatureSize (mUseAsymAlgo);
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
     Ptr += SigSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -1192,8 +1192,8 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    InternalDumpHex (LocalBuffer, LocalBufferSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
     Ptr += SigSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -1248,8 +1248,8 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    InternalDumpHex (LocalBuffer, LocalBufferSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
     Ptr += SigSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
@@ -1303,8 +1303,8 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     InternalDumpHex (LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, LocalBuffer, LocalBufferSize, HashData);
     DEBUG((DEBUG_INFO, "HashDataSize (0x%x):\n", GetSpdmHashSize (mUseHashAlgo)));
-    InternalDumpHex (HashData, GetSpdmHashSize (mUseHashAlgo));
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SigSize);
+    InternalDumpHex (LocalBuffer, LocalBufferSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, LocalBuffer, LocalBufferSize, Ptr, &SigSize);
     Ptr += SigSize;
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);

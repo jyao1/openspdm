@@ -239,7 +239,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
     free(Data);
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SignatureSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), Ptr, &SignatureSize);
     CopyMem (&LocalBuffer[LocalBufferSize], Ptr, SignatureSize);
     LocalBufferSize += SignatureSize;
     AppendManagedBuffer (&THCurr, Ptr, SignatureSize);
@@ -345,7 +345,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
     AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
     SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
     free(Data);
-    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SignatureSize);
+    SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), Ptr, &SignatureSize);
     CopyMem (&LocalBuffer[LocalBufferSize], Ptr, SignatureSize);
     LocalBufferSize += SignatureSize;
     AppendManagedBuffer (&THCurr, Ptr, SignatureSize);
@@ -489,7 +489,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
       SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
       free(Data);
-      SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SignatureSize);
+      SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), Ptr, &SignatureSize);
       CopyMem (&LocalBuffer[LocalBufferSize], Ptr, SignatureSize);
       LocalBufferSize += SignatureSize;
       AppendManagedBuffer (&THCurr, Ptr, SignatureSize);
@@ -642,7 +642,7 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
       AppendManagedBuffer (&THCurr, LocalBuffer, LocalBufferSize);
       SpdmHashAll (mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), HashData);
       free(Data);
-      SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, HashData, GetSpdmHashSize (mUseHashAlgo), Ptr, &SignatureSize);
+      SpdmResponderDataSignFunc (mUseAsymAlgo, mUseHashAlgo, GetManagedBuffer(&THCurr), GetManagedBufferSize(&THCurr), Ptr, &SignatureSize);
       CopyMem (&LocalBuffer[LocalBufferSize], Ptr, SignatureSize);
       LocalBufferSize += SignatureSize;
       AppendManagedBuffer (&THCurr, Ptr, SignatureSize);
