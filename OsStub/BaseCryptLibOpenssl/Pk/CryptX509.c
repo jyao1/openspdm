@@ -1778,6 +1778,8 @@ Sm2GetPublicKeyFromX509 (
   EVP_PKEY  *Pkey;
   X509      *X509Cert;
   INT32     Result;
+  EC_KEY    *EcKey;
+  INT32     OpenSslNid;
 
   //
   // Check input parameters.
@@ -1805,6 +1807,11 @@ Sm2GetPublicKeyFromX509 (
   //
   Pkey = X509_get_pubkey (X509Cert);
   if (Pkey == NULL) {
+    goto _Exit;
+  }
+  EcKey = EVP_PKEY_get0_EC_KEY(Pkey);
+  OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
+  if (OpenSslNid != NID_sm2) {
     goto _Exit;
   }
   Result = EVP_PKEY_set_alias_type(Pkey, EVP_PKEY_SM2);
