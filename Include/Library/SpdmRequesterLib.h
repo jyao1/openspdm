@@ -197,39 +197,6 @@ SpdmChallenge (
   );
 
 /**
-  This function sends GET_DIGEST, GET_CERTIFICATE, CHALLENGE
-  to authenticate the device.
-
-  This function is combination of SpdmGetDigest, SpdmGetCertificate, SpdmChallenge.
-
-  @param  SpdmContext                  A pointer to the SPDM context.
-  @param  SlotMask                     The slots which deploy the CertificateChain.
-  @param  TotalDigestBuffer            A pointer to a destination buffer to store the digest buffer.
-  @param  SlotNum                      The number of slot for the certificate chain.
-  @param  CertChainSize                On input, indicate the size in bytes of the destination buffer to store the digest buffer.
-                                       On output, indicate the size in bytes of the certificate chain.
-  @param  CertChain                    A pointer to a destination buffer to store the certificate chain.
-  @param  MeasurementHashType          The type of the measurement hash.
-  @param  MeasurementHash              A pointer to a destination buffer to store the measurement hash.
-
-  @retval RETURN_SUCCESS               The authentication is got successfully.
-  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
-  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
-**/
-RETURN_STATUS
-EFIAPI
-SpdmAuthentication (
-  IN     VOID                 *SpdmContext,
-     OUT UINT8                *SlotMask,
-     OUT VOID                 *TotalDigestBuffer,
-  IN     UINT8                SlotNum,
-  IN OUT UINTN                *CertChainSize,
-     OUT VOID                 *CertChain,
-  IN     UINT8                MeasurementHashType,
-     OUT VOID                 *MeasurementHash
-  );
-
-/**
   This function sends GET_MEASUREMENT
   to get measurement from the device.
 

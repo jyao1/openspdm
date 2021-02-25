@@ -71,20 +71,22 @@ DoAppSessionViaSpdm (
 
   SpdmContext = mSpdmContext;
 
-  CopyMem (&Request, &mVendorDefinedRequest, sizeof(Request));
+  if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_PCI_DOE) {
+    CopyMem (&Request, &mVendorDefinedRequest, sizeof(Request));
 
-  RequestSize = sizeof(Request);
-  ResponseSize = sizeof(Response);
-  Status = SpdmSendReceiveData (SpdmContext, &SessionId, FALSE, &Request, RequestSize, &Response, &ResponseSize);
-  ASSERT_RETURN_ERROR(Status);
+    RequestSize = sizeof(Request);
+    ResponseSize = sizeof(Response);
+    Status = SpdmSendReceiveData (SpdmContext, &SessionId, FALSE, &Request, RequestSize, &Response, &ResponseSize);
+    ASSERT_RETURN_ERROR(Status);
 
-  ASSERT (ResponseSize == sizeof(SPDM_VENDOR_DEFINED_RESPONSE_MINE));
-  ASSERT (Response.Header.RequestResponseCode == SPDM_VENDOR_DEFINED_RESPONSE);
-  ASSERT (Response.StandardID == SPDM_REGISTRY_ID_PCISIG);
-  ASSERT (Response.VendorID == SPDM_VENDOR_ID_PCISIG);
-  ASSERT (Response.PayloadLength == sizeof(PCI_PROTOCOL_HEADER) + sizeof(PCI_IDE_KM_QUERY_RESP));
-  ASSERT (Response.PciProtocol.ProtocolId == PCI_PROTOCAL_ID_IDE_KM);
-  ASSERT (Response.PciIdeKmQueryResp.Header.ObjectId == PCI_IDE_KM_OBJECT_ID_QUERY_RESP);
+    ASSERT (ResponseSize == sizeof(SPDM_VENDOR_DEFINED_RESPONSE_MINE));
+    ASSERT (Response.Header.RequestResponseCode == SPDM_VENDOR_DEFINED_RESPONSE);
+    ASSERT (Response.StandardID == SPDM_REGISTRY_ID_PCISIG);
+    ASSERT (Response.VendorID == SPDM_VENDOR_ID_PCISIG);
+    ASSERT (Response.PayloadLength == sizeof(PCI_PROTOCOL_HEADER) + sizeof(PCI_IDE_KM_QUERY_RESP));
+    ASSERT (Response.PciProtocol.ProtocolId == PCI_PROTOCAL_ID_IDE_KM);
+    ASSERT (Response.PciIdeKmQueryResp.Header.ObjectId == PCI_IDE_KM_OBJECT_ID_QUERY_RESP);
+  }
 
   if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_MCTP) {
     AppResponseSize = sizeof(AppResponse);
@@ -103,13 +105,12 @@ DoAppSessionViaSpdm (
 
 RETURN_STATUS
 DoSessionViaSpdm (
-  VOID
+  IN     BOOLEAN              UsePsk
   )
 {
   VOID                             *SpdmContext;
   RETURN_STATUS                    Status;
   UINT32                           SessionId;
-  UINT32                           SessionId2;
   UINT8                            HeartbeatPeriod;
   UINT8                            MeasurementHash[MAX_HASH_SIZE];
 
@@ -119,7 +120,7 @@ DoSessionViaSpdm (
   ZeroMem(MeasurementHash, sizeof(MeasurementHash));
   Status = SpdmStartSession (
              SpdmContext,
-             FALSE, // KeyExchange
+             UsePsk,
              mUseMeasurementSummaryHashType,
              mUseSlotId,
              &SessionId,
@@ -130,62 +131,36 @@ DoSessionViaSpdm (
     printf ("SpdmStartSession - %x\n", (UINT32)Status);
     return Status;
   }
-  
-  HeartbeatPeriod = 0;
-  ZeroMem(MeasurementHash, sizeof(MeasurementHash));
-  Status = SpdmStartSession (
-             SpdmContext,
-             TRUE, // PSK
-             mUseMeasurementSummaryHashType,
-             mUseSlotId,
-             &SessionId2,
-             &HeartbeatPeriod,
-             MeasurementHash
-             );
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmStartSession - %x\n", (UINT32)Status);
-    return Status;
-  }
 
   DoAppSessionViaSpdm (SessionId);
 
-  DoAppSessionViaSpdm (SessionId2);
-
-  Status = SpdmHeartbeat (SpdmContext, SessionId);
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmHeartbeat - %x\n", (UINT32)Status);
+  if ((mExeSession & EXE_SESSION_HEARTBEAT) != 0) {
+    Status = SpdmHeartbeat (SpdmContext, SessionId);
+    if (RETURN_ERROR(Status)) {
+      printf ("SpdmHeartbeat - %x\n", (UINT32)Status);
+    }
   }
 
-  Status = SpdmHeartbeat (SpdmContext, SessionId2);
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmHeartbeat - %x\n", (UINT32)Status);
+  if ((mExeSession & EXE_SESSION_KEY_UPDATE) != 0) {
+    Status = SpdmKeyUpdate (SpdmContext, SessionId, TRUE);
+    if (RETURN_ERROR(Status)) {
+      printf ("SpdmKeyUpdate - %x\n", (UINT32)Status);
+    }
   }
 
-  Status = SpdmKeyUpdate (SpdmContext, SessionId, TRUE);
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmKeyUpdate - %x\n", (UINT32)Status);
+  if ((mExeSession & EXE_SESSION_MEAS) != 0) {
+    Status = DoMeasurementViaSpdm (&SessionId);
+    if (RETURN_ERROR(Status)) {
+      printf ("DoMeasurementViaSpdm - %x\n", (UINT32)Status);
+    }
   }
 
-  Status = SpdmKeyUpdate (SpdmContext, SessionId2, FALSE);
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmKeyUpdate - %x\n", (UINT32)Status);
-  }
-
-  Status = DoMeasurementViaSpdm (&SessionId);
-  if (RETURN_ERROR(Status)) {
-    printf ("DoMeasurementViaSpdm - %x\n", (UINT32)Status);
-  }
-
-  Status = SpdmStopSession (SpdmContext, SessionId, mEndSessionAttributes);
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmStopSession - %x\n", (UINT32)Status);
-    return Status;
-  }
-
-  Status = SpdmStopSession (SpdmContext, SessionId2, mEndSessionAttributes);
-  if (RETURN_ERROR(Status)) {
-    printf ("SpdmStopSession - %x\n", (UINT32)Status);
-    return Status;
+  if ((mExeSession & EXE_SESSION_NO_END) == 0) {
+    Status = SpdmStopSession (SpdmContext, SessionId, mEndSessionAttributes);
+    if (RETURN_ERROR(Status)) {
+      printf ("SpdmStopSession - %x\n", (UINT32)Status);
+      return Status;
+    }
   }
 
   return Status;

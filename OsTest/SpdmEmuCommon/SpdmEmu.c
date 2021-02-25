@@ -9,6 +9,29 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmEmu.h"
 
+/*
+  EXE_MODE_SHUTDOWN
+  EXE_MODE_CONTINUE
+*/
+UINT32  mExeMode = EXE_MODE_SHUTDOWN;
+
+UINT32  mExeConnection = (0 |
+                          // EXE_CONNECTION_VERSION_ONLY |
+                          EXE_CONNECTION_DIGEST |
+                          EXE_CONNECTION_CERT |
+                          EXE_CONNECTION_CHAL |
+                          EXE_CONNECTION_MEAS |
+                          0);
+
+UINT32  mExeSession = (0 |
+                       EXE_SESSION_KEY_EX |
+                       EXE_SESSION_PSK |
+                       // EXE_SESSION_NO_END |
+                       EXE_SESSION_KEY_UPDATE |
+                       EXE_SESSION_HEARTBEAT |
+                       EXE_SESSION_MEAS |
+                       0);
+
 VOID
 PrintUsage (
   IN CHAR8* Name
@@ -30,10 +53,14 @@ PrintUsage (
   printf ("   [--mut_auth NO|WO_ENCAP|W_ENCAP|DIGESTS]\n");
   printf ("   [--meas_sum NO|TCB|ALL]\n");
   printf ("   [--meas_op ONE_BY_ONE|ALL]\n");
+  printf ("   [--key_op ALL|SINGLE|ENC_ALL|ENC_SINGLE]\n");
   printf ("   [--slot <0~7|0xFF>]\n");
   printf ("   [--slot_count <1~8>]\n");
   printf ("   [--save_state <NegotiateStateFileName>]\n");
   printf ("   [--load_state <NegotiateStateFileName>]\n");
+  printf ("   [--exe_mode SHUTDOWN|CONTINUE\n");
+  printf ("   [--exe_conn VER_ONLY|DIGEST|CERT|CHAL|MEAS\n");
+  printf ("   [--exe_session KEY_EX|PSK|NO_END|KEY_UPDATE|HEARTBEAT|MEAS\n");
   printf ("   [--pcap <PcapFileName>]\n");
   printf ("\n");
   printf ("NOTE:\n");
@@ -57,6 +84,7 @@ PrintUsage (
   printf ("   [--mut_auth] is the mutual authentication policy. WO_ENCAP, W_ENCAP or DIGESTS is used in KEY_EXCHANGE_RSP. By default, W_ENCAP is used.\n");
   printf ("   [--meas_sum] is the measurment summary hash type in CHALLENGE_AUTH, KEY_EXCHANGE_RSP and PSK_EXCHANGE_RSP. By default, ALL is used.\n");
   printf ("   [--meas_op] is the measurement operation in GET_MEASUREMEMT. By default, ONE_BY_ONE is used.\n");
+  printf ("   [--key_op] is the key update operation in KEY_UPDATE. By default, ALL is used.\n");
   printf ("   [--slot_id] is to select the peer slot ID in GET_MEASUREMENT, CHALLENGE_AUTH, KEY_EXCHANGE and FINISH. By default, 0 is used.\n");
   printf ("           0xFF can be used to indicate provisioned certificate chain. No GET_CERTIFICATE is needed.\n");
   printf ("           0xFF must be used to if PUB_KEY_ID is set. No GET_DIGEST/GET_CERTIFICATE is sent.\n");
@@ -72,6 +100,22 @@ PrintUsage (
   printf ("           The user need guarantee the state file is gnerated correctly.\n");
   printf ("           The command line input - ver|cap|hash|meas_spec|meas_hash|asym|req_asym|dhe|aead|key_schedule are ignored.\n");
   printf ("           The requester will skip GET_VERSION/GET_CAPABILLITIES/NEGOTIATE_ALGORITHMS.\n");
+  printf ("   [--exe_mode] is used to control the execution mode. By default, it is SHUTDOWN.\n");
+  printf ("           SHUTDOWN means the requester asks the responder to stop.\n");
+  printf ("           CONTINUE means the requester asks the responder to preserve the current SPDM context.\n");
+  printf ("   [--exe_conn] is used to control the SPDM connection. By default, it is DIGEST,CERT,CHAL,MEAS.\n");
+  printf ("           VER_ONLY means REQUESTER does not send GET_CAPABILITIES/NEGOTIATE_ALGORITHMS. It is used for quick symmetric authentication with PSK.\n");
+  printf ("           DIGEST means send GET_DIGESTS command.\n");
+  printf ("           CERT means send GET_CERTIFICATE command.\n");
+  printf ("           CHAL means send CHALLENGE command.\n");
+  printf ("           MEAS means send GET_MEASUREMENT command.\n");
+  printf ("   [--exe_session] is used to control the SPDM session. By default, it is KEY_EX,PSK,KEY_UPDATE,HEARTBEAT,MEAS.\n");
+  printf ("           KEY_EX means to setup KEY_EXCHANGE session.\n");
+  printf ("           PSK means to setup PSK_EXCHANGE session.\n");
+  printf ("           NO_END means to not send END_SESSION.\n");
+  printf ("           KEY_UPDATE means to send KEY_UPDATE in session.\n");
+  printf ("           HEARTBEAT means to send HEARTBEAT in session.\n");
+  printf ("           MEAS means send GET_MEASUREMENT command in session.\n");
   printf ("   [--pcap] is used to generate PCAP dump file for offline analysis.\n");
 }
 
@@ -228,6 +272,28 @@ VALUE_STRING_ENTRY  mSlotCountStringTable[] = {
   {0x6, "6"},
   {0x7, "7"},
   {0x8, "8"},
+};
+
+VALUE_STRING_ENTRY  mExeModeStringTable[] = {
+  {EXE_MODE_SHUTDOWN, "SHUTDOWN"},
+  {EXE_MODE_CONTINUE, "CONTINUE"},
+};
+
+VALUE_STRING_ENTRY  mExeConnectionStringTable[] = {
+  {EXE_CONNECTION_VERSION_ONLY,    "VER_ONLY"},
+  {EXE_CONNECTION_DIGEST,          "DIGEST"},
+  {EXE_CONNECTION_CERT,            "CERT"},
+  {EXE_CONNECTION_CHAL,            "CHAL"},
+  {EXE_CONNECTION_MEAS,            "MEAS"},
+};
+
+VALUE_STRING_ENTRY  mExeSessionStringTable[] = {
+  {EXE_SESSION_KEY_EX,     "KEY_EX"},
+  {EXE_SESSION_PSK,        "PSK"},
+  {EXE_SESSION_NO_END,     "NO_END"},
+  {EXE_SESSION_KEY_UPDATE, "KEY_UPDATE"},
+  {EXE_SESSION_HEARTBEAT,  "HEARTBEAT"},
+  {EXE_SESSION_MEAS,       "MEAS"},
 };
 
 BOOLEAN
@@ -691,6 +757,60 @@ ProcessArgs (
         continue;
       } else {
         printf ("invalid --load_state\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--exe_mode") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mExeModeStringTable, ARRAY_SIZE(mExeModeStringTable), argv[1], &mExeMode)) {
+          printf ("invalid --exe_mode %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        printf ("exe_mode - 0x%08x\n", mExeMode);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --exe_mode\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--exe_conn") == 0) {
+      if (argc >= 2) {
+        if (!GetFlagsFromName (mExeConnectionStringTable, ARRAY_SIZE(mExeConnectionStringTable), argv[1], &mExeConnection)) {
+          printf ("invalid --exe_conn %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        printf ("exe_conn - 0x%08x\n", mExeConnection);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --exe_conn\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--exe_session") == 0) {
+      if (argc >= 2) {
+        if (!GetFlagsFromName (mExeSessionStringTable, ARRAY_SIZE(mExeSessionStringTable), argv[1], &mExeSession)) {
+          printf ("invalid --exe_session %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        printf ("exe_session - 0x%08x\n", mExeSession);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --exe_session\n");
         PrintUsage (ProgramName);
         exit (0);
       }

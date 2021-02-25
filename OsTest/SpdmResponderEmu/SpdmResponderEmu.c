@@ -112,12 +112,12 @@ PlatformServer (
     if (Status == RETURN_SUCCESS) {
       // success dispatch SPDM message
     }
-    if (Status != RETURN_UNSUPPORTED) {
-      continue;
-    }
     if (Status == RETURN_DEVICE_ERROR) {
       printf ("Server Critical Error - STOP\n");
       return FALSE;
+    }
+    if (Status != RETURN_UNSUPPORTED) {
+      continue;
     }
     switch(mCommand) {
     case SOCKET_SPDM_COMMAND_TEST:
@@ -138,8 +138,8 @@ PlatformServer (
         return TRUE;
       }
       break;
-    case SOCKET_SPDM_COMMAND_STOP:
-      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_STOP, NULL, 0);
+    case SOCKET_SPDM_COMMAND_SHUTDOWN:
+      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_SHUTDOWN, NULL, 0);
       if (!Result) {
         printf ("SendPlatformData Error - %x\n",
 #ifdef _MSC_VER
@@ -151,6 +151,20 @@ PlatformServer (
         return TRUE;
       }
       return FALSE;
+      break;
+    case SOCKET_SPDM_COMMAND_CONTINUE:
+      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_CONTINUE, NULL, 0);
+      if (!Result) {
+        printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+          WSAGetLastError()
+#else
+          errno
+#endif
+          );
+        return TRUE;
+      }
+      return TRUE;
       break;
     case SOCKET_SPDM_COMMAND_NORMAL:
       if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_PCI_DOE) {

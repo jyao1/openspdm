@@ -158,7 +158,7 @@ ReceivePlatformData (
   *BytesToReceive = BytesReceived;
 
   switch (*Command) {
-  case SOCKET_SPDM_COMMAND_STOP:
+  case SOCKET_SPDM_COMMAND_SHUTDOWN:
     ClosePcapPacketFile ();
     break;
   case SOCKET_SPDM_COMMAND_NORMAL:
@@ -304,7 +304,7 @@ SendPlatformData (
   }
 
   switch (Command) {
-  case SOCKET_SPDM_COMMAND_STOP:
+  case SOCKET_SPDM_COMMAND_SHUTDOWN:
     ClosePcapPacketFile ();
     break;
   case SOCKET_SPDM_COMMAND_NORMAL:

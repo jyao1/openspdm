@@ -192,7 +192,7 @@ SpdmClientInit (
 
   if (mLoadStateFileName == NULL) {
     // Skip if state is loaded
-    Status = SpdmInitConnection (SpdmContext, FALSE);
+    Status = SpdmInitConnection (SpdmContext, (mExeConnection & EXE_CONNECTION_VERSION_ONLY) != 0);
     if (RETURN_ERROR(Status)) {
       printf ("SpdmInitConnection - 0x%x\n", (UINT32)Status);
       free (mSpdmContext);

@@ -61,6 +61,25 @@ extern UINT8   mEndSessionAttributes;
 extern CHAR8 *mLoadStateFileName;
 extern CHAR8 *mSaveStateFileName;
 
+#define EXE_MODE_SHUTDOWN  0
+#define EXE_MODE_CONTINUE  1
+extern UINT32  mExeMode;
+
+#define EXE_CONNECTION_VERSION_ONLY     0x1
+#define EXE_CONNECTION_DIGEST           0x2
+#define EXE_CONNECTION_CERT             0x4
+#define EXE_CONNECTION_CHAL             0x8
+#define EXE_CONNECTION_MEAS             0x10
+extern UINT32  mExeConnection;
+
+#define EXE_SESSION_KEY_EX              0x1
+#define EXE_SESSION_PSK                 0x2
+#define EXE_SESSION_NO_END              0x4
+#define EXE_SESSION_KEY_UPDATE          0x8
+#define EXE_SESSION_HEARTBEAT           0x10
+#define EXE_SESSION_MEAS                0x20
+extern UINT32  mExeSession;
+
 VOID
 DumpHexStr (
   IN UINT8 *Buffer,

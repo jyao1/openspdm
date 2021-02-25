@@ -50,7 +50,7 @@ DoAuthenticationViaSpdm (
 
 RETURN_STATUS
 DoSessionViaSpdm (
-  VOID
+  IN     BOOLEAN              UsePsk
   );
 
 BOOLEAN
@@ -190,16 +190,28 @@ PlatformClientRoutine (
     goto Done;
   }
 
-  Status = DoMeasurementViaSpdm (NULL);
-  if (RETURN_ERROR(Status)) {
-    printf ("DoMeasurementViaSpdm - %x\n", (UINT32)Status);
-    goto Done;
+  if ((mExeConnection & EXE_CONNECTION_MEAS) != 0) {
+    Status = DoMeasurementViaSpdm (NULL);
+    if (RETURN_ERROR(Status)) {
+      printf ("DoMeasurementViaSpdm - %x\n", (UINT32)Status);
+      goto Done;
+    }
   }
 
-  Status = DoSessionViaSpdm ();
-  if (RETURN_ERROR(Status)) {
-    printf ("DoSessionViaSpdm - %x\n", (UINT32)Status);
-    goto Done;
+  if ((mExeSession & EXE_SESSION_KEY_EX) != 0) {
+    Status = DoSessionViaSpdm (FALSE);
+    if (RETURN_ERROR(Status)) {
+      printf ("DoSessionViaSpdm - %x\n", (UINT32)Status);
+      goto Done;
+    }
+  }
+
+  if ((mExeSession & EXE_SESSION_PSK) != 0) {
+    Status = DoSessionViaSpdm (TRUE);
+    if (RETURN_ERROR(Status)) {
+      printf ("DoSessionViaSpdm - %x\n", (UINT32)Status);
+      goto Done;
+    }
   }
 
   // Do test - end
@@ -207,14 +219,14 @@ PlatformClientRoutine (
 Done:
   ResponseSize = 0;
   Result = CommunicatePlatformData (
-             PlatformSocket,
-             SOCKET_SPDM_COMMAND_STOP,
-             NULL,
-             0,
-             &Response,
-             &ResponseSize,
-             NULL
-             );
+            PlatformSocket,
+            SOCKET_SPDM_COMMAND_SHUTDOWN - mExeMode,
+            NULL,
+            0,
+            &Response,
+            &ResponseSize,
+            NULL
+            );
 
   if (mSpdmContext != NULL) {
     free (mSpdmContext);
