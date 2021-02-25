@@ -41,6 +41,7 @@ SpdmEncodeSecuredMessage (
   UINTN                              TotalSecuredMessageSize;
   UINTN                              PlainTextSize;
   UINTN                              CipherTextSize;
+  UINTN                              AeadPadSize;
   UINTN                              AeadBlockSize;
   UINTN                              AeadTagSize;
   UINTN                              AeadKeySize;
@@ -147,6 +148,7 @@ SpdmEncodeSecuredMessage (
 
     PlainTextSize = sizeof(SPDM_SECURED_MESSAGE_CIPHER_HEADER) + AppMessageSize + RandCount;
     CipherTextSize = (PlainTextSize + AeadBlockSize - 1) / AeadBlockSize * AeadBlockSize;
+    AeadPadSize = CipherTextSize - PlainTextSize;
     TotalSecuredMessageSize = RecordHeaderSize + CipherTextSize + AeadTagSize;
 
     ASSERT (*SecuredMessageSize >= TotalSecuredMessageSize);
@@ -164,6 +166,7 @@ SpdmEncodeSecuredMessage (
     EncMsgHeader->ApplicationDataLength = (UINT16)AppMessageSize;
     CopyMem (EncMsgHeader + 1, AppMessage, AppMessageSize);
     RandomBytes ((UINT8 *)EncMsgHeader + sizeof(SPDM_SECURED_MESSAGE_CIPHER_HEADER) + AppMessageSize, RandCount);
+    ZeroMem ((UINT8 *)EncMsgHeader + PlainTextSize, AeadPadSize);
 
     AData = (UINT8 *)RecordHeader1;
     EncMsg = (UINT8 *)EncMsgHeader;
