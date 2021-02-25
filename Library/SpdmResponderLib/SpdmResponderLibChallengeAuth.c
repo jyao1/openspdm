@@ -103,23 +103,30 @@ SpdmGetResponseChallengeAuth (
   ZeroMem (Response, *ResponseSize);
   SpdmResponse = Response;
 
-  if (SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
+  if (SpdmRequest->Header.SPDMVersion == SPDM_MESSAGE_VERSION_11 &&
+      SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_11)) {
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
-  } else {
+  } else if (SpdmRequest->Header.SPDMVersion == SPDM_MESSAGE_VERSION_10 &&
+      SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_10)) {
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
+  } else {
+    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    return RETURN_SUCCESS;
   }
   SpdmResponse->Header.RequestResponseCode = SPDM_CHALLENGE_AUTH;
   AuthAttribute.SlotNum = (UINT8)(SlotNum & 0xF);
-  AuthAttribute.Reserved = 0;
-  AuthAttribute.BasicMutAuthReq = 0;
-  if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP) &&
-      SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, 0) &&
-      (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP, 0) ||
-       SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP, 0))) {
-    AuthAttribute.BasicMutAuthReq = SpdmContext->LocalContext.BasicMutAuthRequested;
-  }
-  if (AuthAttribute.BasicMutAuthReq != 0) {
-    SpdmInitBasicMutAuthEncapState (Context, AuthAttribute.BasicMutAuthReq);
+  if(SpdmRequest->Header.SPDMVersion == SPDM_MESSAGE_VERSION_11) {
+    AuthAttribute.Reserved = 0;
+    AuthAttribute.BasicMutAuthReq = 0;
+    if (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP) &&
+        SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CHAL_CAP, 0) &&
+        (SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_CERT_CAP, 0) ||
+         SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PUB_KEY_ID_CAP, 0))) {
+      AuthAttribute.BasicMutAuthReq = SpdmContext->LocalContext.BasicMutAuthRequested;
+    }
+    if (AuthAttribute.BasicMutAuthReq != 0) {
+      SpdmInitBasicMutAuthEncapState (Context, AuthAttribute.BasicMutAuthReq);
+    }
   }
 
   SpdmResponse->Header.Param1 = *(UINT8 *)&AuthAttribute;

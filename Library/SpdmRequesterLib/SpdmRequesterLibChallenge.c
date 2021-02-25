@@ -118,6 +118,9 @@ TrySpdmChallenge (
   if (SpdmResponseSize < sizeof(SPDM_MESSAGE_HEADER)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.SPDMVersion != SpdmRequest.Header.SPDMVersion) {
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponse.Header.RequestResponseCode == SPDM_ERROR) {
     Status = SpdmHandleErrorResponseMain(SpdmContext, NULL, &SpdmContext->Transcript.MessageC, sizeof(SpdmRequest), &SpdmResponseSize, &SpdmResponse, SPDM_CHALLENGE, SPDM_CHALLENGE_AUTH, sizeof(SPDM_CHALLENGE_AUTH_RESPONSE_MAX));
     if (RETURN_ERROR(Status)) {
@@ -133,7 +136,7 @@ TrySpdmChallenge (
     return RETURN_DEVICE_ERROR;
   }
   *(UINT8 *)&AuthAttribute = SpdmResponse.Header.Param1;
-  if (SlotNum == 0xFF) {
+  if (SpdmResponse.Header.SPDMVersion == SPDM_MESSAGE_VERSION_11 && SlotNum == 0xFF) {
     if (AuthAttribute.SlotNum != 0xF) {
       return RETURN_DEVICE_ERROR;
     }
@@ -141,7 +144,8 @@ TrySpdmChallenge (
       return RETURN_DEVICE_ERROR;
     }
   } else {
-    if (AuthAttribute.SlotNum != SlotNum) {
+    if ((SpdmResponse.Header.SPDMVersion == SPDM_MESSAGE_VERSION_11 && AuthAttribute.SlotNum != SlotNum) ||
+        (SpdmResponse.Header.SPDMVersion == SPDM_MESSAGE_VERSION_10 && *(UINT8 *)&AuthAttribute != SlotNum)) {
       return RETURN_DEVICE_ERROR;
     }
     if (SpdmResponse.Header.Param2 != (1 << SlotNum)) {
