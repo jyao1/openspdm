@@ -1962,13 +1962,22 @@ DumpSpdmKeyUpdate (
   printf ("\n");
 
   ASSERT (mCurrentSessionInfo != NULL);
-  switch (((SPDM_MESSAGE_HEADER *)Buffer)->Param1) {
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
-    SpdmCreateUpdateSessionDataKey (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), SpdmKeyUpdateActionRequester);
-    break;
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
-    SpdmCreateUpdateSessionDataKey (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), SpdmKeyUpdateActionAll);
-    break;
+  if (mEncapsulated) {
+    ASSERT (mCurrentSessionInfo != NULL);
+    switch (((SPDM_MESSAGE_HEADER *)Buffer)->Param1) {
+    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
+      SpdmCreateUpdateSessionDataKey (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), SpdmKeyUpdateActionResponder);
+      break;
+    }
+  } else {
+    switch (((SPDM_MESSAGE_HEADER *)Buffer)->Param1) {
+    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
+      SpdmCreateUpdateSessionDataKey (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), SpdmKeyUpdateActionRequester);
+      break;
+    case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
+      SpdmCreateUpdateSessionDataKey (SpdmGetSecuredMessageContextViaSessionInfo (mCurrentSessionInfo), SpdmKeyUpdateActionAll);
+      break;
+    }
   }
 }
 

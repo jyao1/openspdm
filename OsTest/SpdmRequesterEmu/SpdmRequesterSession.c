@@ -9,7 +9,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SpdmRequesterEmu.h"
 
+extern SOCKET                       mSocket;
+
 extern VOID          *mSpdmContext;
+
+BOOLEAN
+CommunicatePlatformData (
+  IN SOCKET           Socket,
+  IN UINT32           Command,
+  IN UINT8            *SendBuffer,
+  IN UINTN            BytesToSend,
+  OUT UINT32          *Response,
+  IN OUT UINTN        *BytesToReceive,
+  OUT UINT8           *ReceiveBuffer
+  );
 
 RETURN_STATUS
 DoMeasurementViaSpdm (
@@ -113,6 +126,9 @@ DoSessionViaSpdm (
   UINT32                           SessionId;
   UINT8                            HeartbeatPeriod;
   UINT8                            MeasurementHash[MAX_HASH_SIZE];
+  UINTN                            ResponseSize;
+  BOOLEAN                          Result;
+  UINT32                           Response;
 
   SpdmContext = mSpdmContext;
 
@@ -142,9 +158,45 @@ DoSessionViaSpdm (
   }
 
   if ((mExeSession & EXE_SESSION_KEY_UPDATE) != 0) {
-    Status = SpdmKeyUpdate (SpdmContext, SessionId, TRUE);
-    if (RETURN_ERROR(Status)) {
-      printf ("SpdmKeyUpdate - %x\n", (UINT32)Status);
+    switch (mUseKeyUpdateAction) {
+    case SpdmKeyUpdateActionRequester:
+      Status = SpdmKeyUpdate (SpdmContext, SessionId, TRUE);
+      if (RETURN_ERROR(Status)) {
+        printf ("SpdmKeyUpdate - %x\n", (UINT32)Status);
+      }
+      break;
+
+    case SpdmKeyUpdateActionAll:
+      Status = SpdmKeyUpdate (SpdmContext, SessionId, FALSE);
+      if (RETURN_ERROR(Status)) {
+        printf ("SpdmKeyUpdate - %x\n", (UINT32)Status);
+      }
+      break;
+
+    case SpdmKeyUpdateActionResponder:
+      ResponseSize = 0;
+      Result = CommunicatePlatformData (
+                 mSocket,
+                 SOCKET_SPDM_COMMAND_OOB_ENCAP_KEY_UPDATE,
+                 NULL,
+                 0,
+                 &Response,
+                 &ResponseSize,
+                 NULL
+                 );
+      if (!Result) {
+        printf ("CommunicatePlatformData - SOCKET_SPDM_COMMAND_OOB_ENCAP_KEY_UPDATE fail\n");
+      } else {
+        Status = SpdmSendReceiveEncapsulatedRequest (SpdmContext, &SessionId);
+        if (RETURN_ERROR(Status)) {
+          printf ("SpdmSendReceiveEncapsulatedRequest - SpdmKeyUpdate - %x\n", (UINT32)Status);
+        }
+      }
+      break;
+
+    default:
+      ASSERT (FALSE);
+      break;
     }
   }
 

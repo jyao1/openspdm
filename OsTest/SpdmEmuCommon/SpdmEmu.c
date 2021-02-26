@@ -53,14 +53,14 @@ PrintUsage (
   printf ("   [--mut_auth NO|WO_ENCAP|W_ENCAP|DIGESTS]\n");
   printf ("   [--meas_sum NO|TCB|ALL]\n");
   printf ("   [--meas_op ONE_BY_ONE|ALL]\n");
-  printf ("   [--key_op ALL|SINGLE|ENC_ALL|ENC_SINGLE]\n");
+  printf ("   [--key_upd REQ|ALL|RSP]\n");
   printf ("   [--slot <0~7|0xFF>]\n");
   printf ("   [--slot_count <1~8>]\n");
   printf ("   [--save_state <NegotiateStateFileName>]\n");
   printf ("   [--load_state <NegotiateStateFileName>]\n");
-  printf ("   [--exe_mode SHUTDOWN|CONTINUE\n");
-  printf ("   [--exe_conn VER_ONLY|DIGEST|CERT|CHAL|MEAS\n");
-  printf ("   [--exe_session KEY_EX|PSK|NO_END|KEY_UPDATE|HEARTBEAT|MEAS\n");
+  printf ("   [--exe_mode SHUTDOWN|CONTINUE]\n");
+  printf ("   [--exe_conn VER_ONLY|DIGEST|CERT|CHAL|MEAS]\n");
+  printf ("   [--exe_session KEY_EX|PSK|NO_END|KEY_UPDATE|HEARTBEAT|MEAS]\n");
   printf ("   [--pcap <PcapFileName>]\n");
   printf ("\n");
   printf ("NOTE:\n");
@@ -84,7 +84,7 @@ PrintUsage (
   printf ("   [--mut_auth] is the mutual authentication policy. WO_ENCAP, W_ENCAP or DIGESTS is used in KEY_EXCHANGE_RSP. By default, W_ENCAP is used.\n");
   printf ("   [--meas_sum] is the measurment summary hash type in CHALLENGE_AUTH, KEY_EXCHANGE_RSP and PSK_EXCHANGE_RSP. By default, ALL is used.\n");
   printf ("   [--meas_op] is the measurement operation in GET_MEASUREMEMT. By default, ONE_BY_ONE is used.\n");
-  printf ("   [--key_op] is the key update operation in KEY_UPDATE. By default, ALL is used.\n");
+  printf ("   [--key_upd] is the key update operation in KEY_UPDATE. By default, ALL is used. RSP will trigger encapsulated KEY_UPDATE.\n");
   printf ("   [--slot_id] is to select the peer slot ID in GET_MEASUREMENT, CHALLENGE_AUTH, KEY_EXCHANGE and FINISH. By default, 0 is used.\n");
   printf ("           0xFF can be used to indicate provisioned certificate chain. No GET_CERTIFICATE is needed.\n");
   printf ("           0xFF must be used to if PUB_KEY_ID is set. No GET_DIGEST/GET_CERTIFICATE is sent.\n");
@@ -249,6 +249,12 @@ VALUE_STRING_ENTRY  mMeasurementSummaryHashTypeStringTable[] = {
 VALUE_STRING_ENTRY  mMeasurementOperationStringTable[] = {
   {SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_TOTAL_NUMBER_OF_MEASUREMENTS, "ONE_BY_ONE"},
   {SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPERATION_ALL_MEASUREMENTS,              "ALL"},
+};
+
+VALUE_STRING_ENTRY  mKeyUpdateActionStringTable[] = {
+  {SpdmKeyUpdateActionRequester,  "REQ"},
+  {SpdmKeyUpdateActionResponder,  "RSP"},
+  {SpdmKeyUpdateActionAll,        "ALL"},
 };
 
 VALUE_STRING_ENTRY  mSlotIdStringTable[] = {
@@ -693,6 +699,25 @@ ProcessArgs (
         continue;
       } else {
         printf ("invalid --meas_op\n");
+        PrintUsage (ProgramName);
+        exit (0);
+      }
+    }
+
+    if (strcmp (argv[0], "--key_upd") == 0) {
+      if (argc >= 2) {
+        if (!GetValueFromName (mKeyUpdateActionStringTable, ARRAY_SIZE(mKeyUpdateActionStringTable), argv[1], &Data32)) {
+          printf ("invalid --key_upd %s\n", argv[1]);
+          PrintUsage (ProgramName);
+          exit (0);
+        }
+        mUseKeyUpdateAction = Data32;
+        printf ("key_upd - 0x%08x\n", mUseKeyUpdateAction);
+        argc -= 2;
+        argv += 2;
+        continue;
+      } else {
+        printf ("invalid --key_upd\n");
         PrintUsage (ProgramName);
         exit (0);
       }

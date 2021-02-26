@@ -7,10 +7,10 @@
 
 **/
 
-#include "SpdmResponderLibInternal.h"
+#include "SpdmRequesterLibInternal.h"
 
 /**
-  Process the SPDM KEY_UPDATE request and return the response.
+  Process the SPDM encapsulated KEY_UPDATE request and return the response.
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  RequestSize                  Size in bytes of the request data.
@@ -28,7 +28,7 @@
 **/
 RETURN_STATUS
 EFIAPI
-SpdmGetResponseKeyUpdate (
+SpdmGetEncapResponseKeyUpdate (
   IN     VOID                 *Context,
   IN     UINTN                RequestSize,
   IN     VOID                 *Request,
@@ -46,59 +46,46 @@ SpdmGetResponseKeyUpdate (
   SpdmContext = Context;
   SpdmRequest = Request;
 
-  if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
-    return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
-  }
-  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_UPDATE, ResponseSize, Response);
-    return RETURN_SUCCESS;
-  }
-  if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_UPD_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_UPD_CAP)) {
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_KEY_UPDATE, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
   if (!SpdmContext->LastSpdmRequestSessionIdValid) {
-    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateEncapErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   SessionId = SpdmContext->LastSpdmRequestSessionId;
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
-    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateEncapErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
   SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
   if (SessionState != SpdmSessionStateEstablished) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
   if (RequestSize != sizeof(SPDM_KEY_UPDATE_REQUEST)) {
-    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 
   switch (SpdmRequest->Header.Param1) {
   case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_KEY:
-    DEBUG ((DEBUG_INFO, "SpdmCreateUpdateSessionDataKey[%x] Requester\n", SessionId));
-    SpdmCreateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, SpdmKeyUpdateActionRequester);
-    break;
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
-    DEBUG ((DEBUG_INFO, "SpdmCreateUpdateSessionDataKey[%x] Responder\n", SessionId));
-    SpdmCreateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, SpdmKeyUpdateActionRequester);
     DEBUG ((DEBUG_INFO, "SpdmCreateUpdateSessionDataKey[%x] Responder\n", SessionId));
     SpdmCreateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, SpdmKeyUpdateActionResponder);
-
+    break;
+  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_UPDATE_ALL_KEYS:
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    break;
+  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
     DEBUG ((DEBUG_INFO, "SpdmActivateUpdateSessionDataKey[%x] Responder new\n", SessionId));
     SpdmActivateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, SpdmKeyUpdateActionResponder, TRUE);
     break;
-  case SPDM_KEY_UPDATE_OPERATIONS_TABLE_VERIFY_NEW_KEY:
-    DEBUG ((DEBUG_INFO, "SpdmActivateUpdateSessionDataKey[%x] Requester new\n", SessionId));
-    SpdmActivateUpdateSessionDataKey (SessionInfo->SecuredMessageContext, SpdmKeyUpdateActionRequester, TRUE);
-    break;
   default:
-    SpdmGenerateErrorResponse (Context, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
+    SpdmGenerateEncapErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
 

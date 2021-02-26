@@ -42,6 +42,9 @@ extern UINT8   mUseMeasurementOperation;
 extern UINT8   mUseSlotId;
 extern UINT8   mUseSlotCount;
 
+#define ENCAP_KEY_UPDATE 0x8000
+extern SPDM_KEY_UPDATE_ACTION  mUseKeyUpdateAction;
+
 extern UINT32  mUseHashAlgo;
 extern UINT32  mUseMeasurementHashAlgo;
 extern UINT32  mUseAsymAlgo;

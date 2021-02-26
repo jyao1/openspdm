@@ -17,6 +17,7 @@ SET(src_SpdmResponderLib
     SpdmResponderLibEncapChallenge.c
     SpdmResponderLibEncapGetCertificate.c
     SpdmResponderLibEncapGetDigest.c
+    SpdmResponderLibEncapKeyUpdate.c
     SpdmResponderLibEncapResponse.c
     SpdmResponderLibEndSession.c
     SpdmResponderLibError.c

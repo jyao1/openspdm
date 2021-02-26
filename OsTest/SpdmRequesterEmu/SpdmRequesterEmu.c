@@ -198,19 +198,21 @@ PlatformClientRoutine (
     }
   }
 
-  if ((mExeSession & EXE_SESSION_KEY_EX) != 0) {
-    Status = DoSessionViaSpdm (FALSE);
-    if (RETURN_ERROR(Status)) {
-      printf ("DoSessionViaSpdm - %x\n", (UINT32)Status);
-      goto Done;
+  if (mUseVersion >= SPDM_MESSAGE_VERSION_11) {
+    if ((mExeSession & EXE_SESSION_KEY_EX) != 0) {
+      Status = DoSessionViaSpdm (FALSE);
+      if (RETURN_ERROR(Status)) {
+        printf ("DoSessionViaSpdm - %x\n", (UINT32)Status);
+        goto Done;
+      }
     }
-  }
 
-  if ((mExeSession & EXE_SESSION_PSK) != 0) {
-    Status = DoSessionViaSpdm (TRUE);
-    if (RETURN_ERROR(Status)) {
-      printf ("DoSessionViaSpdm - %x\n", (UINT32)Status);
-      goto Done;
+    if ((mExeSession & EXE_SESSION_PSK) != 0) {
+      Status = DoSessionViaSpdm (TRUE);
+      if (RETURN_ERROR(Status)) {
+        printf ("DoSessionViaSpdm - %x\n", (UINT32)Status);
+        goto Done;
+      }
     }
   }
 

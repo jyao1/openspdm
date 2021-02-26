@@ -64,6 +64,7 @@ SpdmGetEncapReqestGetCertificate (
     return RETURN_SECURITY_VIOLATION;
   }
 
+  CopyMem (&SpdmContext->EncapContext.LastEncapRequestHeader, &SpdmRequest->Header, sizeof(SPDM_MESSAGE_HEADER));
   SpdmContext->EncapContext.LastEncapRequestSize = *EncapRequestSize;
 
   return RETURN_SUCCESS;

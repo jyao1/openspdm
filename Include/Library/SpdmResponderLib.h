@@ -296,4 +296,15 @@ SpdmRegisterConnectionStateCallback (
   IN  SPDM_CONNECTION_STATE_CALLBACK  SpdmConnectionStateCallback
   );
 
+/**
+  This function initializes the key_update encapsulated state.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
+VOID
+EFIAPI
+SpdmInitKeyUpdateEncapState (
+  IN     VOID                 *SpdmContext
+  );
+
 #endif

@@ -652,6 +652,48 @@ SpdmProcessEncapResponseChallengeAuth (
   );
 
 /**
+  Get the SPDM encapsulated KEY_UPDATE request.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapRequestSize             Size in bytes of the encapsulated request data.
+                                       On input, it means the size in bytes of encapsulated request data buffer.
+                                       On output, it means the size in bytes of copied encapsulated request data buffer if RETURN_SUCCESS is returned,
+                                       and means the size in bytes of desired encapsulated request data buffer if RETURN_BUFFER_TOO_SMALL is returned.
+  @param  EncapRequest                 A pointer to the encapsulated request data.
+
+  @retval RETURN_SUCCESS               The encapsulated request is returned.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmGetEncapReqestKeyUpdate (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN OUT UINTN                *EncapRequestSize,
+     OUT VOID                 *EncapRequest
+  );
+
+/**
+  Process the SPDM encapsulated KEY_UPDATE response.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  EncapResponseSize            Size in bytes of the encapsulated response data.
+  @param  EncapResponse                A pointer to the encapsulated response data.
+  @param  Continue                     Indicate if encapsulated communication need continue.
+
+  @retval RETURN_SUCCESS               The encapsulated response is processed.
+  @retval RETURN_BUFFER_TOO_SMALL      The buffer is too small to hold the data.
+  @retval RETURN_SECURITY_VIOLATION    Any verification fails.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmProcessEncapResponseKeyUpdate (
+  IN     SPDM_DEVICE_CONTEXT  *SpdmContext,
+  IN     UINTN                EncapResponseSize,
+  IN     VOID                 *EncapResponse,
+  OUT    BOOLEAN              *Continue
+  );
+
+/**
   Return the GET_SPDM_RESPONSE function via request code.
 
   @param  RequestCode                  The SPDM request code.

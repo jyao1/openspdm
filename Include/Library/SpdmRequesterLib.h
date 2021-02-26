@@ -364,6 +364,27 @@ SpdmKeyUpdate (
   );
 
 /**
+  This function executes a series of SPDM encapsulated requests and receives SPDM encapsulated responses.
+
+  This function starts with the first encapsulated request (such as GET_ENCAPSULATED_REQUEST)
+  and ends with last encapsulated response (such as RESPONSE_PAYLOAD_TYPE_ABSENT or RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER).
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    Indicate if the encapsulated request is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+
+  @retval RETURN_SUCCESS               The SPDM Encapsulated requests are sent and the responses are received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmSendReceiveEncapsulatedRequest (
+  IN     VOID                 *SpdmContext,
+  IN     UINT32               *SessionId
+  );
+
+/**
   Process the encapsulated request and return the encapsulated response.
 
   @param  SpdmContext                  A pointer to the SPDM context.

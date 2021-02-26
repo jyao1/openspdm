@@ -220,37 +220,19 @@ typedef struct {
 #define MAX_ENCAP_REQUEST_OP_CODE_SEQUENCE_COUNT 3
 typedef struct {
   UINT32                               ErrorState;
-  // Valid OpCode: GET_DIEGST/GET_CERTIFICATE/CHALLENGE
-  // The last one is 0x00, as guard.
+  // Valid OpCode: GET_DIEGST/GET_CERTIFICATE/CHALLENGE/KEY_UPDATE
+  // The last one is 0x00, as terminator.
   UINT8                                RequestOpCodeSequence[MAX_ENCAP_REQUEST_OP_CODE_SEQUENCE_COUNT + 1];
   UINT8                                RequestOpCodeCount;
   UINT8                                CurrentRequestOpCode;
   UINT8                                RequestId;
   UINT8                                ReqSlotNum;
+  SPDM_MESSAGE_HEADER                  LastEncapRequestHeader;
   UINTN                                LastEncapRequestSize;
   LARGE_MANAGED_BUFFER                 CertificateChainBuffer;
 } SPDM_ENCAP_CONTEXT;
 
 #define SPDM_DEVICE_CONTEXT_VERSION 0x1
-
-///
-/// SPDM request command receive Flags (responder only)
-///
-#define SPDM_GET_VERSION_RECEIVE_FLAG                   BIT0 // responder only
-#define SPDM_GET_CAPABILITIES_RECEIVE_FLAG              BIT1
-#define SPDM_NEGOTIATE_ALGORITHMS_RECEIVE_FLAG          BIT2
-#define SPDM_GET_DIGESTS_RECEIVE_FLAG                   BIT3
-#define SPDM_GET_CERTIFICATE_RECEIVE_FLAG               BIT4
-#define SPDM_CHALLENGE_RECEIVE_FLAG                     BIT5
-#define SPDM_GET_MEASUREMENTS_RECEIVE_FLAG              BIT6
-#define SPDM_KEY_EXCHANGE_RECEIVE_FLAG                  BIT7
-#define SPDM_FINISH_RECEIVE_FLAG                        BIT8
-#define SPDM_PSK_EXCHANGE_RECEIVE_FLAG                  BIT9
-#define SPDM_PSK_FINISH_RECEIVE_FLAG                    BIT10
-#define SPDM_HEART_BEAT_RECEIVE_FLAG                    BIT11
-#define SPDM_END_SESSION_RECEIVE_FLAG                   BIT12
-
-
 
 typedef struct {
   UINT32                          Version;

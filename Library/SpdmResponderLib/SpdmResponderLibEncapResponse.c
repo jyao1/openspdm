@@ -61,6 +61,7 @@ SPDM_ENCAP_RESPONSE_STRUCT mEncapResponsestruct[] = {
   {SPDM_GET_DIGESTS,     SpdmGetEncapReqestGetDigest,      SpdmProcessEncapResponseDigest},
   {SPDM_GET_CERTIFICATE, SpdmGetEncapReqestGetCertificate, SpdmProcessEncapResponseCertificate},
   {SPDM_CHALLENGE,       SpdmGetEncapReqestChallenge,      SpdmProcessEncapResponseChallengeAuth},
+  {SPDM_KEY_UPDATE,      SpdmGetEncapReqestKeyUpdate,      SpdmProcessEncapResponseKeyUpdate},
 };
 
 SPDM_ENCAP_RESPONSE_STRUCT *
@@ -162,7 +163,7 @@ SpdmProcessEncapsulatedResponse (
 }
 
 /**
-  This function initializes the encapsulated state.
+  This function initializes the mut_auth encapsulated state.
 
   @param  SpdmContext                  A pointer to the SPDM context.
   @param  MutAuthRequested             Indicate of the MutAuthRequested through KEY_EXCHANGE or CHALLENG response.
@@ -180,6 +181,7 @@ SpdmInitMutAuthEncapState (
   }
   SpdmContext->EncapContext.RequestId = 0;
   SpdmContext->EncapContext.LastEncapRequestSize = 0;
+  ZeroMem (&SpdmContext->EncapContext.LastEncapRequestHeader, sizeof(SpdmContext->EncapContext.LastEncapRequestHeader));
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
   SpdmContext->ResponseState = SpdmResponseStateProcessingEncap;
 
@@ -228,6 +230,7 @@ SpdmInitBasicMutAuthEncapState (
   SpdmContext->EncapContext.CurrentRequestOpCode = 0x00;
   SpdmContext->EncapContext.RequestId = 0;
   SpdmContext->EncapContext.LastEncapRequestSize = 0;
+  ZeroMem (&SpdmContext->EncapContext.LastEncapRequestHeader, sizeof(SpdmContext->EncapContext.LastEncapRequestHeader));
   SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
   SpdmContext->ResponseState = SpdmResponseStateProcessingEncap;
 
@@ -259,6 +262,37 @@ SpdmInitBasicMutAuthEncapState (
     SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_GET_DIGESTS;
     SpdmContext->EncapContext.RequestOpCodeSequence[1] = SPDM_CHALLENGE;
   }
+}
+
+/**
+  This function initializes the key_update encapsulated state.
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+**/
+VOID
+EFIAPI
+SpdmInitKeyUpdateEncapState (
+  IN     VOID                 *Context
+  )
+{
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+
+  SpdmContext = Context;
+
+  SpdmContext->EncapContext.ErrorState = 0;
+  SpdmContext->EncapContext.CurrentRequestOpCode = 0x00;
+  SpdmContext->EncapContext.RequestId = 0;
+  SpdmContext->EncapContext.LastEncapRequestSize = 0;
+  ZeroMem (&SpdmContext->EncapContext.LastEncapRequestHeader, sizeof(SpdmContext->EncapContext.LastEncapRequestHeader));
+  SpdmContext->EncapContext.CertificateChainBuffer.BufferSize = 0;
+  SpdmContext->ResponseState = SpdmResponseStateProcessingEncap;
+
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
+  ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
+
+  ZeroMem (SpdmContext->EncapContext.RequestOpCodeSequence, sizeof(SpdmContext->EncapContext.RequestOpCodeSequence));
+  SpdmContext->EncapContext.RequestOpCodeCount = 1;
+  SpdmContext->EncapContext.RequestOpCodeSequence[0] = SPDM_KEY_UPDATE;
 }
 
 /**

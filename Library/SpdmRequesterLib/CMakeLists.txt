@@ -14,6 +14,7 @@ SET(src_SpdmRequesterLib
     SpdmRequesterLibEncapChallengeAuth.c
     SpdmRequesterLibEncapDigest.c
     SpdmRequesterLibEncapError.c
+    SpdmRequesterLibEncapKeyUpdate.c
     SpdmRequesterLibEncapRequest.c
     SpdmRequesterLibEndSession.c
     SpdmRequesterLibFinish.c

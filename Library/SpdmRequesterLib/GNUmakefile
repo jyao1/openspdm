@@ -38,6 +38,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmRequesterLibEncapChallengeAuth.o \
     $(OUTPUT_DIR)/SpdmRequesterLibEncapDigest.o \
     $(OUTPUT_DIR)/SpdmRequesterLibEncapError.o \
+    $(OUTPUT_DIR)/SpdmRequesterLibEncapKeyUpdate.o \
     $(OUTPUT_DIR)/SpdmRequesterLibEncapRequest.o \
     $(OUTPUT_DIR)/SpdmRequesterLibEndSession.o \
     $(OUTPUT_DIR)/SpdmRequesterLibFinish.o \
@@ -106,6 +107,9 @@ $(OUTPUT_DIR)/SpdmRequesterLibEncapDigest.o : $(SOURCE_DIR)/SpdmRequesterLibEnca
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterLibEncapError.o : $(SOURCE_DIR)/SpdmRequesterLibEncapError.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/SpdmRequesterLibEncapKeyUpdate.o : $(SOURCE_DIR)/SpdmRequesterLibEncapKeyUpdate.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/SpdmRequesterLibEncapRequest.o : $(SOURCE_DIR)/SpdmRequesterLibEncapRequest.c

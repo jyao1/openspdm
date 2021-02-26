@@ -18,6 +18,7 @@ SPDM_GET_ENCAP_RESPONSE_STRUCT  mSpdmGetEncapResponseStruct[] = {
   {SPDM_GET_DIGESTS,            SpdmGetEncapResponseDigest},
   {SPDM_GET_CERTIFICATE,        SpdmGetEncapResponseCertificate},
   {SPDM_CHALLENGE,              SpdmGetEncapResponseChallengeAuth},
+  {SPDM_KEY_UPDATE,             SpdmGetEncapResponseKeyUpdate},
 };
 
 /**
@@ -163,7 +164,8 @@ SpdmEncapsulatedRequest (
       ASSERT (FALSE);
       return RETURN_UNSUPPORTED;
     }
-    ASSERT ((MutAuthRequested == SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST) ||
+    ASSERT ((MutAuthRequested == 0) ||
+            (MutAuthRequested == SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_ENCAP_REQUEST) ||
             (MutAuthRequested == SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS));
   } else {
     ASSERT (MutAuthRequested == 0);
@@ -174,6 +176,14 @@ SpdmEncapsulatedRequest (
   //
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutB);
   ResetManagedBuffer (&SpdmContext->Transcript.MessageMutC);
+
+  if (SessionId == NULL) {
+    SpdmContext->LastSpdmRequestSessionIdValid = FALSE;
+    SpdmContext->LastSpdmRequestSessionId = 0;
+  } else {
+    SpdmContext->LastSpdmRequestSessionIdValid = TRUE;
+    SpdmContext->LastSpdmRequestSessionId = *SessionId;
+  }
 
   if (MutAuthRequested == SPDM_KEY_EXCHANGE_RESPONSE_MUT_AUTH_REQUESTED_WITH_GET_DIGESTS) {
     GetDigests.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -292,3 +302,26 @@ SpdmEncapsulatedRequest (
   return RETURN_SUCCESS;
 }
 
+/**
+  This function executes a series of SPDM encapsulated requests and receives SPDM encapsulated responses.
+
+  This function starts with the first encapsulated request (such as GET_ENCAPSULATED_REQUEST)
+  and ends with last encapsulated response (such as RESPONSE_PAYLOAD_TYPE_ABSENT or RESPONSE_PAYLOAD_TYPE_SLOT_NUMBER).
+
+  @param  SpdmContext                  A pointer to the SPDM context.
+  @param  SessionId                    Indicate if the encapsulated request is a secured message.
+                                       If SessionId is NULL, it is a normal message.
+                                       If SessionId is NOT NULL, it is a secured message.
+
+  @retval RETURN_SUCCESS               The SPDM Encapsulated requests are sent and the responses are received.
+  @retval RETURN_DEVICE_ERROR          A device error occurs when communicates with the device.
+**/
+RETURN_STATUS
+EFIAPI
+SpdmSendReceiveEncapsulatedRequest (
+  IN     VOID                 *SpdmContext,
+  IN     UINT32               *SessionId
+  )
+{
+  return SpdmEncapsulatedRequest (SpdmContext, SessionId, 0, NULL);
+}

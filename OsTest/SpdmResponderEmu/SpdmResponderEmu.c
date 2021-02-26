@@ -138,6 +138,22 @@ PlatformServer (
         return TRUE;
       }
       break;
+
+    case SOCKET_SPDM_COMMAND_OOB_ENCAP_KEY_UPDATE:
+      SpdmInitKeyUpdateEncapState (mSpdmContext);
+      Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_OOB_ENCAP_KEY_UPDATE, NULL, 0);
+      if (!Result) {
+        printf ("SendPlatformData Error - %x\n",
+#ifdef _MSC_VER
+          WSAGetLastError()
+#else
+          errno
+#endif
+          );
+        return TRUE;
+      }
+      break;
+
     case SOCKET_SPDM_COMMAND_SHUTDOWN:
       Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_SHUTDOWN, NULL, 0);
       if (!Result) {
@@ -152,6 +168,7 @@ PlatformServer (
       }
       return FALSE;
       break;
+
     case SOCKET_SPDM_COMMAND_CONTINUE:
       Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_CONTINUE, NULL, 0);
       if (!Result) {
@@ -166,14 +183,18 @@ PlatformServer (
       }
       return TRUE;
       break;
+
     case SOCKET_SPDM_COMMAND_NORMAL:
       if (mUseTransportLayer == SOCKET_TRANSPORT_TYPE_PCI_DOE) {
         DOE_DISCOVERY_REQUEST_MINE  *DoeRequest;
 
         DoeRequest = (VOID *)mReceiveBuffer;
+        if ((DoeRequest->DoeHeader.VendorId != PCI_DOE_VENDOR_ID_PCISIG) ||
+            (DoeRequest->DoeHeader.DataObjectType != PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY)) {
+          // unknown message
+          return TRUE;
+        }
         ASSERT (mReceiveBufferSize == sizeof(DOE_DISCOVERY_REQUEST_MINE));
-        ASSERT (DoeRequest->DoeHeader.VendorId == PCI_DOE_VENDOR_ID_PCISIG);
-        ASSERT (DoeRequest->DoeHeader.DataObjectType == PCI_DOE_DATA_OBJECT_TYPE_DOE_DISCOVERY);
         ASSERT (DoeRequest->DoeHeader.Length == sizeof(*DoeRequest) / sizeof(UINT32));
 
         switch (DoeRequest->DoeDiscoveryRequest.Index) {
@@ -213,6 +234,7 @@ PlatformServer (
         return TRUE;
       }
       break;
+
     default:
       printf ("Unrecognized platform interface command %x\n", mCommand);
       Result = SendPlatformData (Socket, SOCKET_SPDM_COMMAND_UNKOWN, NULL, 0);

@@ -72,6 +72,13 @@ UINT8   mUseMeasurementOperation = SPDM_GET_MEASUREMENTS_REQUEST_MEASUREMENT_OPE
 UINT8   mUseSlotId = 0;
 UINT8   mUseSlotCount = 3;
 
+/*
+  SpdmKeyUpdateActionRequester
+  SpdmKeyUpdateActionResponder
+  SpdmKeyUpdateActionAll
+*/
+SPDM_KEY_UPDATE_ACTION  mUseKeyUpdateAction = SpdmKeyUpdateActionAll;
+
 UINT32  mUseHashAlgo;
 UINT32  mUseMeasurementHashAlgo;
 UINT32  mUseAsymAlgo;
