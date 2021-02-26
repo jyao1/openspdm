@@ -66,6 +66,11 @@ SpdmGetResponseChallengeAuth (
   if (RequestSize != sizeof(SPDM_CHALLENGE_REQUEST)) {
     return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
   }
+  if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP) &&
+    SpdmRequest->Header.Param2 > 0) {
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE, ResponseSize, Response);
+  }
+  
   SpdmRequestSize = RequestSize;
   //
   // Cache

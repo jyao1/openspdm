@@ -709,6 +709,56 @@ void TestSpdmResponderChallengeAuthCase13(void **state) {
   free(Data1);
 }
 
+/**
+  Test 14: the responder does not have measurements capabilities, but
+  receives a correct CHALLENGE message from the requester with
+  no opaque data, all measurement hashes, and slot number 0.
+  Expected behavior: the responder refuses the CHALLENGE message and produces an
+  ERROR message indicating the UnsupportedRequest.
+**/
+void TestSpdmResponderChallengeAuthCase14(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINTN                ResponseSize;
+  UINT8                Response[MAX_SPDM_MESSAGE_BUFFER_SIZE];
+  SPDM_CHALLENGE_AUTH_RESPONSE *SpdmResponse;
+  VOID                 *Data1;
+  UINTN                DataSize1;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xE;
+  SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
+  SpdmContext->LocalContext.Capability.Flags = 0;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP;
+  // SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MEAS_CAP; //no measurement capability
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementSpec = mUseMeasurementSpec;
+  SpdmContext->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data1, &DataSize1, NULL, NULL);
+  SpdmContext->LocalContext.LocalCertChainProvision[0] = Data1;
+  SpdmContext->LocalContext.LocalCertChainProvisionSize[0] = DataSize1;
+  SpdmContext->LocalContext.SlotCount = 1;
+  SpdmContext->LocalContext.OpaqueChallengeAuthRspSize = 0;
+  SpdmContext->Transcript.MessageC.BufferSize = 0;
+
+  ResponseSize = sizeof(Response);
+  SpdmGetRandomNumber (SPDM_NONCE_SIZE, mSpdmChallengeRequest1.Nonce);
+  Status = SpdmGetResponseChallengeAuth (SpdmContext, mSpdmChallengeRequest6Size, &mSpdmChallengeRequest6, &ResponseSize, Response);
+  assert_int_equal (Status, RETURN_SUCCESS);
+  assert_int_equal (ResponseSize, sizeof(SPDM_ERROR_RESPONSE));
+  SpdmResponse = (VOID *)Response;
+  assert_int_equal (SpdmResponse->Header.RequestResponseCode, SPDM_ERROR);
+  assert_int_equal (SpdmResponse->Header.Param1, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST);
+  assert_int_equal (SpdmResponse->Header.Param2, SPDM_CHALLENGE);
+  free(Data1);
+}
+
 SPDM_TEST_CONTEXT       mSpdmResponderChallengeAuthTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   FALSE,
@@ -735,6 +785,7 @@ int SpdmResponderChallengeAuthTestMain(void) {
     cmocka_unit_test(TestSpdmResponderChallengeAuthCase11),
     cmocka_unit_test(TestSpdmResponderChallengeAuthCase12),
     cmocka_unit_test(TestSpdmResponderChallengeAuthCase13),
+    cmocka_unit_test(TestSpdmResponderChallengeAuthCase14),
   };
 
   SetupSpdmTestContext (&mSpdmResponderChallengeAuthTestContext);
