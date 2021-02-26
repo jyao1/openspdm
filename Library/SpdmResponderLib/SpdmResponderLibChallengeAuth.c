@@ -57,17 +57,14 @@ SpdmGetResponseChallengeAuth (
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
   }
   if (!SpdmIsCapabilitiesFlagSupported(SpdmContext, FALSE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE, ResponseSize, Response);
-    return RETURN_SUCCESS;
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE, ResponseSize, Response);
   }
   if (SpdmContext->ConnectionInfo.ConnectionState < SpdmConnectionStateNegotiated) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNEXPECTED_REQUEST, 0, ResponseSize, Response);
   }
 
   if (RequestSize != sizeof(SPDM_CHALLENGE_REQUEST)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
   }
   SpdmRequestSize = RequestSize;
   //
@@ -75,15 +72,13 @@ SpdmGetResponseChallengeAuth (
   //
   Status = SpdmAppendMessageC (SpdmContext, SpdmRequest, SpdmRequestSize);
   if (RETURN_ERROR(Status)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
   }
 
   SlotNum = SpdmRequest->Header.Param1;
 
   if ((SlotNum != 0xFF) && (SlotNum >= SpdmContext->LocalContext.SlotCount)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
   }
 
   SignatureSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
@@ -110,8 +105,7 @@ SpdmGetResponseChallengeAuth (
       SpdmIsVersionSupported (SpdmContext, SPDM_MESSAGE_VERSION_10)) {
     SpdmResponse->Header.SPDMVersion = SPDM_MESSAGE_VERSION_10;
   } else {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
   }
   SpdmResponse->Header.RequestResponseCode = SPDM_CHALLENGE_AUTH;
   AuthAttribute.SlotNum = (UINT8)(SlotNum & 0xF);
@@ -146,8 +140,7 @@ SpdmGetResponseChallengeAuth (
 
   Result = SpdmGenerateMeasurementSummaryHash (SpdmContext, FALSE, SpdmRequest->Header.Param2, Ptr);
   if (!Result) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
   }
   Ptr += MeasurementSummaryHashSize;
 
@@ -161,13 +154,11 @@ SpdmGetResponseChallengeAuth (
   //
   Status = SpdmAppendMessageC (SpdmContext, SpdmResponse, (UINTN)Ptr - (UINTN)SpdmResponse);
   if (RETURN_ERROR(Status)) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
-    return RETURN_SUCCESS;
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
   }
   Result = SpdmGenerateChallengeAuthSignature (SpdmContext, FALSE, Ptr);
   if (!Result) {
-    SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE_AUTH, ResponseSize, Response);
-    return RETURN_SUCCESS;
+    return SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_UNSUPPORTED_REQUEST, SPDM_CHALLENGE_AUTH, ResponseSize, Response);
   }
   Ptr += SignatureSize;
 
