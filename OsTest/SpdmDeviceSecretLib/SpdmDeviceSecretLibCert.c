@@ -39,6 +39,10 @@ ReadResponderRootPublicCertificate (
   CHAR8               *File;
   UINTN               DigestSize;
 
+  if (BaseAsymAlgo == 0) {
+    return FALSE;
+  }
+
   switch (BaseAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSAPSS_2048:
@@ -111,6 +115,10 @@ ReadRequesterRootPublicCertificate (
   UINTN               CertChainSize;
   CHAR8               *File;
   UINTN               DigestSize;
+
+  if (ReqBaseAsymAlg == 0) {
+    return FALSE;
+  }
 
   switch (ReqBaseAsymAlg) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
@@ -186,6 +194,10 @@ ReadResponderPublicCertificateChain (
   UINT8               *RootCert;
   UINTN               RootCertLen;
   UINTN               DigestSize;
+
+  if (BaseAsymAlgo == 0) {
+    return FALSE;
+  }
 
   switch (BaseAsymAlgo) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
@@ -278,6 +290,10 @@ ReadRequesterPublicCertificateChain (
   UINT8               *RootCert;
   UINTN               RootCertLen;
   UINTN               DigestSize;
+
+  if (ReqBaseAsymAlg == 0) {
+    return FALSE;
+  }
 
   switch (ReqBaseAsymAlg) {
   case SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_RSASSA_2048:
