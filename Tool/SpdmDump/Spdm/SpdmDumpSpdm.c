@@ -1216,6 +1216,10 @@ DumpSpdmError (
     }
   }
 
+  if (SpdmResponse->Header.Param1 == SPDM_ERROR_CODE_DECRYPT_ERROR) {
+    SpdmFreeSessionId (mSpdmContext, mCurrentSessionId);
+  }
+
   printf ("\n");
 }
 
@@ -1442,6 +1446,11 @@ DumpSpdmKeyExchangeRsp (
   printf ("\n");
 
   mCachedSessionId = mCachedSessionId | SpdmResponse->RspSessionID;
+  // double check if current is occupied
+  if (SpdmGetSessionInfoViaSessionId (mSpdmContext, mCachedSessionId) != NULL) {
+    // this might happen if a session is terminated without EndSession
+    SpdmFreeSessionId (mSpdmContext, mCachedSessionId);
+  }
   mCurrentSessionInfo = SpdmAssignSessionId (mSpdmContext, mCachedSessionId, FALSE);
   ASSERT (mCurrentSessionInfo != NULL);
   mCurrentSessionId = mCachedSessionId;
@@ -1724,6 +1733,11 @@ DumpSpdmPskExchangeRsp (
   printf ("\n");
 
   mCachedSessionId = mCachedSessionId | SpdmResponse->RspSessionID;
+  // double check if current is occupied
+  if (SpdmGetSessionInfoViaSessionId (mSpdmContext, mCachedSessionId) != NULL) {
+    // this might happen if a session is terminated without EndSession
+    SpdmFreeSessionId (mSpdmContext, mCachedSessionId);
+  }
   mCurrentSessionInfo = SpdmAssignSessionId (mSpdmContext, mCachedSessionId, TRUE);
   ASSERT (mCurrentSessionInfo != NULL);
   mCurrentSessionId = mCachedSessionId;
