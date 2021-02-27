@@ -288,6 +288,7 @@ SpdmDecodeSecuredMessage (
   SPDM_SESSION_TYPE                  SessionType;
   SPDM_SESSION_STATE                 SessionState;
   SPDM_ERROR_STRUCT                  SpdmError;
+  UINT8                              DecMessage[MAX_SPDM_MESSAGE_BUFFER_SIZE];
 
   SpdmError.ErrorCode = 0;
   SpdmError.SessionId = 0;
@@ -392,10 +393,15 @@ SpdmDecodeSecuredMessage (
       return RETURN_SECURITY_VIOLATION;
     }
     CipherTextSize = (RecordHeader2->Length - AeadTagSize) / AeadBlockSize * AeadBlockSize;
+    if (CipherTextSize > sizeof(DecMessage)) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
+    ZeroMem (DecMessage, sizeof(DecMessage));
     EncMsgHeader = (VOID *)(RecordHeader2 + 1);
     AData = (UINT8 *)RecordHeader1;
     EncMsg = (UINT8 *)EncMsgHeader;
-    DecMsg = (UINT8 *)EncMsgHeader;
+    DecMsg = (UINT8 *)DecMessage;
+    EncMsgHeader = (VOID *)DecMsg;
     Tag = (UINT8 *)RecordHeader1 + RecordHeaderSize + CipherTextSize;
     Result = SpdmAeadDecryption (
               SecuredMessageContext->AEADCipherSuite,
