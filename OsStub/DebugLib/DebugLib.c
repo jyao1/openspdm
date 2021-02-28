@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <assert.h>
 #include <stdarg.h>
 
+#include <Library/DebugLib.h>
+
 //
 // Define the maximum debug and assert message length that this library supports
 //
@@ -22,8 +24,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define DEBUG_ASSERT_DEADLOOP    1
 #define DEBUG_ASSERT_BREAKPOINT  2
 
-#ifndef DEBUG_ASSERT_CHOICE
-#define DEBUG_ASSERT_CHOICE      DEBUG_ASSERT_DEADLOOP
+#ifndef DEBUG_ASSERT_CONFIG
+#define DEBUG_ASSERT_CONFIG      DEBUG_ASSERT_DEADLOOP
+#endif
+
+#ifndef DEBUG_LEVEL_CONFIG
+#define DEBUG_LEVEL_CONFIG       (DEBUG_INFO | DEBUG_ERROR)
 #endif
 
 VOID
@@ -36,9 +42,9 @@ DebugAssert (
 {
   printf ("ASSERT: %s(%d): %s\n", FileName, (INT32)(UINT32)LineNumber, Description);
 
-#if (DEBUG_ASSERT_CHOICE == DEBUG_ASSERT_DEADLOOP)
+#if (DEBUG_ASSERT_CONFIG == DEBUG_ASSERT_DEADLOOP)
   {volatile INTN ___i = 1; while (___i);}
-#elif (DEBUG_ASSERT_CHOICE == DEBUG_ASSERT_BREAKPOINT)
+#elif (DEBUG_ASSERT_CONFIG == DEBUG_ASSERT_BREAKPOINT)
 #if defined(_MSC_EXTENSIONS)
   __debugbreak();
 #endif
@@ -60,7 +66,11 @@ DebugPrint (
 {
   CHAR8    Buffer[MAX_DEBUG_MESSAGE_LENGTH];
   va_list  Marker;
-  
+
+  if ((ErrorLevel & DEBUG_LEVEL_CONFIG) == 0) {
+    return ;
+  }
+
   va_start (Marker, Format);
 
   vsnprintf (Buffer, sizeof(Buffer), Format, Marker);
