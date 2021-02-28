@@ -1,6 +1,6 @@
 # Test in openspdm
 
-Besides OsTest and UnitTest introduced in readme, openspdm also supports some other tests.
+Besides SpdmEmu and UnitTest introduced in readme, openspdm also supports some other tests.
 
 ## Prerequisit
 

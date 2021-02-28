@@ -138,7 +138,7 @@ This document describes SpdmDump tool. It can be used to parse the SPDM message 
 2. In order to dump the SPDM secure session, you need use `--psk` or `--dhe_secret`.
 
    The DHE secret can be found from SPDM debug message.
-   Take [SpdmOsTest](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmOsTest.md) tool as an example, a user may use `SpdmRequesterEmu --pcap SpdmRequester.pcap > SpdmRequester.log` or `SpdmResponderEmu --pcap SpdmResponder.pcap > SpdmResponder.log` to get the PCAP file and the log file, search "\[DHE Secret\]" or "\[PSK\]" in the log file to get the HEX string.
+   Take [SpdmEmu](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmEmu.md) tool as an example, a user may use `SpdmRequesterEmu --pcap SpdmRequester.pcap > SpdmRequester.log` or `SpdmResponderEmu --pcap SpdmResponder.pcap > SpdmResponder.log` to get the PCAP file and the log file, search "\[DHE Secret\]" or "\[PSK\]" in the log file to get the HEX string.
 
    ```
    [DHE Secret]: c7ac17ee29b6a4f84e978223040b7eddff792477a6f7fc0f51faa553fee58175

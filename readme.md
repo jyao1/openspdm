@@ -140,7 +140,7 @@
 ### Build with CMake
 
    We will use CMake to replace makefile in the future, after all features are enabled.
-   Currently, only OsTest and UnitTest are enabled with VS2019 and GCC.
+   Currently, only SpdmEmu and UnitTest are enabled with VS2019 and GCC.
 
 1) Use CMake in Linux (Toolchain=GCC|CLANG)
 
@@ -148,7 +148,7 @@
    cd openspdm
    mkdir build
    cd build
-   cmake -DARCH=<X64|Ia32> -DTOOLCHAIN=<Toolchain> -DTARGET=<Debug|Release> -DCRYPTO=<MbedTls|Openssl> -DTESTTYPE=<OsTest|UnitTest> ..
+   cmake -DARCH=<X64|Ia32> -DTOOLCHAIN=<Toolchain> -DTARGET=<Debug|Release> -DCRYPTO=<MbedTls|Openssl> -DTESTTYPE=<SpdmEmu|UnitTest> ..
    make CopyTestKey
    make
    ```
@@ -160,19 +160,19 @@
    cd openspdm
    mkdir build
    cd build
-   cmake -G"NMake Makefiles" -DARCH=<X64|Ia32> -DTOOLCHAIN=<Toolchain> -DTARGET=<Debug|Release> -DCRYPTO=<MbedTls|Openssl> -DTESTTYPE=<OsTest|UnitTest> ..
+   cmake -G"NMake Makefiles" -DARCH=<X64|Ia32> -DTOOLCHAIN=<Toolchain> -DTARGET=<Debug|Release> -DCRYPTO=<MbedTls|Openssl> -DTESTTYPE=<SpdmEmu|UnitTest> ..
    nmake CopyTestKey
    nmake
    ```
 
 ## Run Test
 
-### Run [OsTest](https://github.com/jyao1/openspdm/tree/master/OsTest)
+### Run [SpdmEmu](https://github.com/jyao1/openspdm/tree/master/SpdmEmu)
 
-   The OsTest output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
+   The SpdmEmu output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>.
    Open one command prompt at output dir to run `SpdmResponderEmu` and another command prompt to run `SpdmRequesterEmu`.
 
-   Please refer to [SpdmOsTest](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmOsTest.md) for detail.
+   Please refer to [SpdmEmu](https://github.com/jyao1/openspdm/blob/master/Doc/SpdmEmu.md) for detail.
 
 ### Run [UnitTest](https://github.com/jyao1/openspdm/tree/master/UnitTest)
 

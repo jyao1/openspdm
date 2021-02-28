@@ -16,7 +16,7 @@
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmRequesterEmu
+MODULE_NAME = SpdmResponderEmu
 BASE_NAME = $(MODULE_NAME)
 
 #
@@ -24,20 +24,18 @@ BASE_NAME = $(MODULE_NAME)
 #
 BUILD_DIR = $(WORKSPACE)\Build
 BIN_DIR = $(BUILD_DIR)\$(TARGET)_$(TOOLCHAIN)\$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)\OsTest\$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)\SpdmEmu\$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)\OsTest\$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)\SpdmEmu\$(MODULE_NAME)
 
 #
 # Build Macro
 #
 
 OBJECT_FILES =  \
-    $(OUTPUT_DIR)\SpdmRequester.obj \
-    $(OUTPUT_DIR)\SpdmRequesterAuthentication.obj \
-    $(OUTPUT_DIR)\SpdmRequesterMeasurement.obj \
-    $(OUTPUT_DIR)\SpdmRequesterSession.obj \
-    $(OUTPUT_DIR)\SpdmRequesterEmu.obj \
+    $(OUTPUT_DIR)\SpdmResponder.obj \
+    $(OUTPUT_DIR)\SpdmResponderSession.obj \
+    $(OUTPUT_DIR)\SpdmResponderEmu.obj \
     $(OUTPUT_DIR)\SpdmEmu.obj \
     $(OUTPUT_DIR)\SpdmEmuCommand.obj \
     $(OUTPUT_DIR)\SpdmEmuKey.obj \
@@ -54,12 +52,12 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\OsStub\RngLib\RngLib.lib \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\MemoryAllocationLib.lib \
     $(BIN_DIR)\Library\SpdmCommonLib\SpdmCommonLib.lib \
-    $(BIN_DIR)\Library\SpdmRequesterLib\SpdmRequesterLib.lib \
+    $(BIN_DIR)\Library\SpdmResponderLib\SpdmResponderLib.lib \
     $(BIN_DIR)\Library\SpdmCryptLib\SpdmCryptLib.lib \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
     $(BIN_DIR)\Library\SpdmTransportMctpLib\SpdmTransportMctpLib.lib \
     $(BIN_DIR)\Library\SpdmTransportPciDoeLib\SpdmTransportPciDoeLib.lib \
-    $(BIN_DIR)\OsTest\SpdmDeviceSecretLib\SpdmDeviceSecretLib.lib \
+    $(BIN_DIR)\SpdmEmu\SpdmDeviceSecretLib\SpdmDeviceSecretLib.lib \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
 
 
@@ -72,18 +70,18 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\OsStub\RngLib\*.obj \
     $(BIN_DIR)\OsStub\MemoryAllocationLib\*.obj \
     $(BIN_DIR)\Library\SpdmCommonLib\*.obj \
-    $(BIN_DIR)\Library\SpdmRequesterLib\*.obj \
+    $(BIN_DIR)\Library\SpdmResponderLib\*.obj \
     $(BIN_DIR)\Library\SpdmCryptLib\*.obj \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\*.obj \
     $(BIN_DIR)\Library\SpdmTransportMctpLib\*.obj \
     $(BIN_DIR)\Library\SpdmTransportPciDoeLib\*.obj \
-    $(BIN_DIR)\OsTest\SpdmDeviceSecretLib\*.obj \
+    $(BIN_DIR)\SpdmEmu\SpdmDeviceSecretLib\*.obj \
 
 
 INC =  \
     -I$(SOURCE_DIR) \
-    -I$(WORKSPACE)\OsTest\SpdmEmuCommon \
-    -I$(WORKSPACE)\OsTest\SpdmDeviceSecretLib \
+    -I$(WORKSPACE)\SpdmEmu\SpdmEmuCommon \
+    -I$(WORKSPACE)\SpdmEmu\SpdmDeviceSecretLib \
     -I$(WORKSPACE)\Include \
     -I$(WORKSPACE)\Include\Hal \
     -I$(WORKSPACE)\Include\Hal\$(ARCH) \
@@ -124,30 +122,24 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\RngLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsStub\MemoryAllocationLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCommonLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmRequesterLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmResponderLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCryptLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmTransportMctpLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmTransportPciDoeLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsTest\SpdmDeviceSecretLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\SpdmEmu\SpdmDeviceSecretLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
 #
-$(OUTPUT_DIR)\SpdmRequester.obj : $(SOURCE_DIR)\SpdmRequester.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequester.c
+$(OUTPUT_DIR)\SpdmResponder.obj : $(SOURCE_DIR)\SpdmResponder.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponder.c
 
-$(OUTPUT_DIR)\SpdmRequesterAuthentication.obj : $(SOURCE_DIR)\SpdmRequesterAuthentication.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterAuthentication.c
+$(OUTPUT_DIR)\SpdmResponderSession.obj : $(SOURCE_DIR)\SpdmResponderSession.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderSession.c
 
-$(OUTPUT_DIR)\SpdmRequesterMeasurement.obj : $(SOURCE_DIR)\SpdmRequesterMeasurement.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterMeasurement.c
-
-$(OUTPUT_DIR)\SpdmRequesterSession.obj : $(SOURCE_DIR)\SpdmRequesterSession.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterSession.c
-
-$(OUTPUT_DIR)\SpdmRequesterEmu.obj : $(SOURCE_DIR)\SpdmRequesterEmu.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmRequesterEmu.c
+$(OUTPUT_DIR)\SpdmResponderEmu.obj : $(SOURCE_DIR)\SpdmResponderEmu.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\SpdmResponderEmu.c
 
 $(OUTPUT_DIR)\SpdmEmu.obj : $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmu.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\..\SpdmEmuCommon\SpdmEmu.c

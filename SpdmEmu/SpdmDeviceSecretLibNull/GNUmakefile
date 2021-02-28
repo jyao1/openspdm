@@ -16,16 +16,16 @@ include $(WORKSPACE)/GNUmakefile.Flags
 #
 # Module Macro Definition
 #
-MODULE_NAME = SpdmDeviceSecretLib
+MODULE_NAME = SpdmDeviceSecretLibNull
 
 #
 # Build Directory Macro Definition
 #
 BUILD_DIR = $(WORKSPACE)/Build
 BIN_DIR = $(BUILD_DIR)/$(TARGET)_$(TOOLCHAIN)/$(ARCH)
-OUTPUT_DIR = $(BIN_DIR)/OsTest/$(MODULE_NAME)
+OUTPUT_DIR = $(BIN_DIR)/SpdmEmu/$(MODULE_NAME)
 
-SOURCE_DIR = $(WORKSPACE)/OsTest/$(MODULE_NAME)
+SOURCE_DIR = $(WORKSPACE)/SpdmEmu/$(MODULE_NAME)
 
 #
 # Build Macro
@@ -33,7 +33,6 @@ SOURCE_DIR = $(WORKSPACE)/OsTest/$(MODULE_NAME)
 
 OBJECT_FILES =  \
     $(OUTPUT_DIR)/SpdmDeviceSecretLib.o \
-    $(OUTPUT_DIR)/SpdmDeviceSecretLibCert.o \
 
 
 INC =  \
@@ -70,9 +69,6 @@ init:
 # Individual Object Build Targets
 #
 $(OUTPUT_DIR)/SpdmDeviceSecretLib.o : $(SOURCE_DIR)/SpdmDeviceSecretLib.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/SpdmDeviceSecretLibCert.o : $(SOURCE_DIR)/SpdmDeviceSecretLibCert.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)

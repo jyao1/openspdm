@@ -63,7 +63,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/Library/SpdmResponderLib/SpdmResponderLib.a \
     $(BIN_DIR)/Library/SpdmCryptLib/SpdmCryptLib.a \
     $(BIN_DIR)/Library/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a \
-    $(BIN_DIR)/OsTest/SpdmDeviceSecretLib/SpdmDeviceSecretLib.a \
+    $(BIN_DIR)/SpdmEmu/SpdmDeviceSecretLib/SpdmDeviceSecretLib.a \
     $(BIN_DIR)/UnitTest/SpdmTransportTestLib/SpdmTransportTestLib.a \
     $(BIN_DIR)/UnitTest/CmockaLib/CmockaLib.a \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
@@ -80,7 +80,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/Library/SpdmResponderLib/*.o \
     $(BIN_DIR)/Library/SpdmCryptLib/*.o \
     $(BIN_DIR)/Library/SpdmSecuredMessageLib/*.o \
-    $(BIN_DIR)/OsTest/SpdmDeviceSecretLib/*.o \
+    $(BIN_DIR)/SpdmEmu/SpdmDeviceSecretLib/*.o \
     $(BIN_DIR)/UnitTest/SpdmTransportTestLib/*.o \
     $(BIN_DIR)/UnitTest/CmockaLib/*.o \
     $(OUTPUT_DIR)/*.o \
@@ -95,7 +95,7 @@ INC =  \
     -I$(WORKSPACE)/Library/SpdmCommonLib \
     -I$(WORKSPACE)/Library/SpdmResponderLib \
     -I$(WORKSPACE)/Library/SpdmSecuredMessageLib \
-    -I$(WORKSPACE)/OsTest/SpdmDeviceSecretLib \
+    -I$(WORKSPACE)/SpdmEmu/SpdmDeviceSecretLib \
     -I$(WORKSPACE)/UnitTest/CmockaLib/cmocka/include \
     -I$(WORKSPACE)/UnitTest/CmockaLib/cmocka/include/cmockery \
     -I$(WORKSPACE)/UnitTest/SpdmUnitTestCommon \
@@ -138,7 +138,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmResponderLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmCryptLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmSecuredMessageLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsTest/SpdmDeviceSecretLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/SpdmEmu/SpdmDeviceSecretLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/UnitTest/SpdmTransportTestLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/UnitTest/CmockaLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
@@ -211,7 +211,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/Library/SpdmResponderLib/SpdmResponderLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmCryptLib/SpdmCryptLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/OsTest/SpdmDeviceSecretLib/SpdmDeviceSecretLib.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/SpdmEmu/SpdmDeviceSecretLib/SpdmDeviceSecretLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/UnitTest/SpdmTransportTestLib/SpdmTransportTestLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/UnitTest/CmockaLib/CmockaLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list

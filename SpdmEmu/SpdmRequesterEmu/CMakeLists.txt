@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/OsTest/SpdmRequesterEmu
-                    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon
-                    ${PROJECT_SOURCE_DIR}/OsTest/SpdmDeviceSecretLib
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmRequesterEmu
+                    ${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmEmuCommon
+                    ${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmDeviceSecretLib
                     ${PROJECT_SOURCE_DIR}/Include
                     ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
@@ -15,12 +15,12 @@ SET(src_SpdmRequesterTest
     SpdmRequesterMeasurement.c
     SpdmRequesterSession.c
     SpdmRequesterEmu.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmu.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuCommand.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuKey.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuNvStorage.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuPcap.c
-    ${PROJECT_SOURCE_DIR}/OsTest/SpdmEmuCommon/SpdmEmuSupport.c
+    ${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmEmuCommon/SpdmEmu.c
+    ${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmEmuCommon/SpdmEmuCommand.c
+    ${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmEmuCommon/SpdmEmuKey.c
+    ${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmEmuCommon/SpdmEmuNvStorage.c
+    ${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmEmuCommon/SpdmEmuPcap.c
+    ${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmEmuCommon/SpdmEmuSupport.c
 )
 
 SET(SpdmRequesterTest_LIBRARY

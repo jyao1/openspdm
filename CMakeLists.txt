@@ -13,7 +13,7 @@ SET(ARCH ${ARCH} CACHE STRING "Choose the arch of build: Ia32 X64 ARM AArch64 Ri
 SET(TOOLCHAIN ${TOOLCHAIN} CACHE STRING "Choose the toolchain of build: Windows: VS2015 VS2019 CLANG LIBFUZZER Linux: GCC ARM_GCC AARCH64_GCC RISCV32_GCC RISCV64_GCC ARC_GCC CLANG CBMC AFL KLEE LIBFUZZER" FORCE)
 SET(CMAKE_BUILD_TYPE ${TARGET} CACHE STRING "Choose the target of build: Debug Release" FORCE)
 SET(CRYPTO ${CRYPTO} CACHE STRING "Choose the crypto of build: MbedTls Openssl" FORCE)
-SET(TESTTYPE ${TESTTYPE} CACHE STRING "Choose the test type for openspdm: OsTest UnitTest UnitFuzzing" FORCE)
+SET(TESTTYPE ${TESTTYPE} CACHE STRING "Choose the test type for openspdm: SpdmEmu UnitTest UnitFuzzing" FORCE)
 
 if(ARCH STREQUAL "X64")
     MESSAGE("ARCH = X64")
@@ -93,8 +93,8 @@ else()
     MESSAGE(FATAL_ERROR "Unkown CRYPTO")
 endif()
 
-if(TESTTYPE STREQUAL "OsTest")
-    MESSAGE("TESTTYPE = OsTest")
+if(TESTTYPE STREQUAL "SpdmEmu")
+    MESSAGE("TESTTYPE = SpdmEmu")
 elseif(TESTTYPE STREQUAL "UnitTest")
     MESSAGE("TESTTYPE = UnitTest")
 elseif(TESTTYPE STREQUAL "UnitFuzzing")
@@ -397,9 +397,9 @@ ADD_CUSTOM_TARGET(CopyTestKey)
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     ADD_CUSTOM_COMMAND(TARGET CopyTestKey
                     PRE_BUILD
-                    COMMAND cp -r -f ${PROJECT_SOURCE_DIR}/OsTest/TestKey/* ${EXECUTABLE_OUTPUT_PATH})
+                    COMMAND cp -r -f ${PROJECT_SOURCE_DIR}/SpdmEmu/TestKey/* ${EXECUTABLE_OUTPUT_PATH})
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    STRING(REPLACE "/" "\\" SRC ${PROJECT_SOURCE_DIR}/OsTest/TestKey/*)
+    STRING(REPLACE "/" "\\" SRC ${PROJECT_SOURCE_DIR}/SpdmEmu/TestKey/*)
     STRING(REPLACE "/" "\\" DEST ${EXECUTABLE_OUTPUT_PATH})
     
     ADD_CUSTOM_COMMAND(TARGET CopyTestKey
@@ -417,7 +417,7 @@ elseif(CRYPTO STREQUAL "Openssl")
     )
 endif()
 
-if(TESTTYPE STREQUAL "OsTest") 
+if(TESTTYPE STREQUAL "SpdmEmu") 
     SUBDIRS(Library/SpdmCommonLib
             Library/SpdmRequesterLib
             Library/SpdmResponderLib
@@ -429,11 +429,11 @@ if(TESTTYPE STREQUAL "OsTest")
             OsStub/DebugLib
             OsStub/RngLib
             OsStub/MemoryAllocationLib
-            OsTest/SpdmDeviceSecretLib
+            SpdmEmu/SpdmDeviceSecretLib
     )
             
-    SUBDIRS(OsTest/SpdmRequesterEmu
-            OsTest/SpdmResponderEmu
+    SUBDIRS(SpdmEmu/SpdmRequesterEmu
+            SpdmEmu/SpdmResponderEmu
             Tool/SpdmDump
     )
        
@@ -449,7 +449,7 @@ elseif(TESTTYPE STREQUAL "UnitTest")
             OsStub/DebugLib
             OsStub/RngLib
             OsStub/MemoryAllocationLib
-            OsTest/SpdmDeviceSecretLib
+            SpdmEmu/SpdmDeviceSecretLib
             UnitTest/SpdmTransportTestLib
             UnitTest/CmockaLib
             UnitTest/TestSize/BaseCryptLibDummy
@@ -476,7 +476,7 @@ elseif(TESTTYPE STREQUAL "UnitFuzzing")
             OsStub/RngLib
             OsStub/MemoryAllocationLib
             UnitTest/SpdmTransportTestLib
-            OsTest/SpdmDeviceSecretLib
+            SpdmEmu/SpdmDeviceSecretLib
     )
     
     SUBDIRS(UnitTest/Fuzzing/TestSpdmRequesterGetVersion

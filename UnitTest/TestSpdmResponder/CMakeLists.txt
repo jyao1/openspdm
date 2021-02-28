@@ -8,7 +8,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/UnitTest/TestSpdmResponder
                     ${PROJECT_SOURCE_DIR}/Library/SpdmCommonLib
                     ${PROJECT_SOURCE_DIR}/Library/SpdmResponderLib
                     ${PROJECT_SOURCE_DIR}/Library/SpdmSecuredMessageLib
-                    ${PROJECT_SOURCE_DIR}/OsTest/SpdmDeviceSecretLib
+                    ${PROJECT_SOURCE_DIR}/SpdmEmu/SpdmDeviceSecretLib
                     ${PROJECT_SOURCE_DIR}/UnitTest/CmockaLib/cmocka/include
                     ${PROJECT_SOURCE_DIR}/UnitTest/CmockaLib/cmocka/include/cmockery
                     ${PROJECT_SOURCE_DIR}/UnitTest/SpdmUnitTestCommon

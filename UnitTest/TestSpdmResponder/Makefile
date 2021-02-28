@@ -63,7 +63,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)\Library\SpdmResponderLib\SpdmResponderLib.lib \
     $(BIN_DIR)\Library\SpdmCryptLib\SpdmCryptLib.lib \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\SpdmSecuredMessageLib.lib \
-    $(BIN_DIR)\OsTest\SpdmDeviceSecretLib\SpdmDeviceSecretLib.lib \
+    $(BIN_DIR)\SpdmEmu\SpdmDeviceSecretLib\SpdmDeviceSecretLib.lib \
     $(BIN_DIR)\UnitTest\SpdmTransportTestLib\SpdmTransportTestLib.lib \
     $(BIN_DIR)\UnitTest\CmockaLib\CmockaLib.lib \
     $(OUTPUT_DIR)\$(MODULE_NAME).lib \
@@ -81,7 +81,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)\Library\SpdmResponderLib\*.obj \
     $(BIN_DIR)\Library\SpdmCryptLib\*.obj \
     $(BIN_DIR)\Library\SpdmSecuredMessageLib\*.obj \
-    $(BIN_DIR)\OsTest\SpdmDeviceSecretLib\*.obj \
+    $(BIN_DIR)\SpdmEmu\SpdmDeviceSecretLib\*.obj \
     $(BIN_DIR)\UnitTest\SpdmTransportTestLib\*.obj \
     $(BIN_DIR)\UnitTest\CmockaLib\*.obj \
 
@@ -95,7 +95,7 @@ INC =  \
     -I$(WORKSPACE)\Library\SpdmCommonLib \
     -I$(WORKSPACE)\Library\SpdmResponderLib \
     -I$(WORKSPACE)\Library\SpdmSecuredMessageLib \
-    -I$(WORKSPACE)\OsTest\SpdmDeviceSecretLib \
+    -I$(WORKSPACE)\SpdmEmu\SpdmDeviceSecretLib \
     -I$(WORKSPACE)\UnitTest\CmockaLib\cmocka\include \
     -I$(WORKSPACE)\UnitTest\CmockaLib\cmocka\include\cmockery \
     -I$(WORKSPACE)\UnitTest\SpdmUnitTestCommon \
@@ -138,7 +138,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmResponderLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmCryptLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\Library\SpdmSecuredMessageLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\OsTest\SpdmDeviceSecretLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\SpdmEmu\SpdmDeviceSecretLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\SpdmTransportTestLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)\UnitTest\CmockaLib\$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
