@@ -59,7 +59,7 @@ ValidateCryptSm2 (
   Sm2_2 = Sm2New ();
   if (Sm2_2 == NULL) {
     Print ("[Fail]");
-    EcFree (Sm2_1);
+    Sm2Free (Sm2_1);
     goto Exit;
   }
 
@@ -70,8 +70,8 @@ ValidateCryptSm2 (
   Status = Sm2GenerateKey (Sm2_1, Public1, &Public1Length);
   if (!Status) {
     Print ("[Fail]");
-    EcFree (Sm2_1);
-    EcFree (Sm2_2);
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
     goto Exit;
   }
 
@@ -79,8 +79,8 @@ ValidateCryptSm2 (
   Status = Sm2GenerateKey (Sm2_2, Public2, &Public2Length);
   if (!Status) {
     Print ("[Fail]");
-    EcFree (Sm2_1);
-    EcFree (Sm2_2);
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
     goto Exit;
   }
 
@@ -88,8 +88,8 @@ ValidateCryptSm2 (
   Status = Sm2ComputeKey (Sm2_1, Public2, Public2Length, Key1, &Key1Length);
   if (!Status) {
     Print ("[Fail]");
-    EcFree (Sm2_1);
-    EcFree (Sm2_2);
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
     goto Exit;
   }
 
@@ -97,23 +97,23 @@ ValidateCryptSm2 (
   Status = Sm2ComputeKey (Sm2_2, Public1, Public1Length, Key2, &Key2Length);
   if (!Status) {
     Print ("[Fail]");
-    EcFree (Sm2_1);
-    EcFree (Sm2_2);
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
     goto Exit;
   }
 
   Print ("Compare Keys ... ");
   if (Key1Length != Key2Length) {
     Print ("[Fail]");
-    EcFree (Sm2_1);
-    EcFree (Sm2_2);
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
     goto Exit;
   }
 
   if (CompareMem (Key1, Key2, Key1Length) != 0) {
     Print ("[Fail]");
-    EcFree (Sm2_1);
-    EcFree (Sm2_2);
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
     goto Exit;
   } else {
     Print ("[Pass]\n");
@@ -163,6 +163,81 @@ ValidateCryptSm2 (
     Print ("[Pass]\n");
   }
   Sm2Free (Sm2_1);
+
+
+  Print ("\nUEFI-OpenSSL Sm2 Signing Verification Testing with SetPubKey:\n");
+
+  Public1Length  = sizeof (Public1);
+  Public2Length  = sizeof (Public2);
+
+  Print ("- Context1 ... ");
+  Sm2_1 = Sm2New ();
+  if (Sm2_1 == NULL) {
+    Print ("[Fail]");
+    goto Exit;
+  }
+
+  Print ("Context2 ... ");
+  Sm2_2 = Sm2New ();
+  if (Sm2_2 == NULL) {
+    Print ("[Fail]");
+    Sm2Free (Sm2_1);
+    goto Exit;
+  }
+
+  Print ("Compute key in Context1 ... ");
+  Status = Sm2GenerateKey (Sm2_1, Public1, &Public1Length);
+  if (!Status) {
+    Print ("[Fail]");
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
+    goto Exit;
+  }
+
+  Print ("Export key in Context1 ... ");
+  Status = Sm2GetPubKey (Sm2_1, Public2, &Public2Length);
+  if (!Status) {
+    Print ("[Fail]");
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
+    goto Exit;
+  }
+
+  Print ("Import key in Context2 ... ");
+  Status = Sm2SetPubKey (Sm2_2, Public2, Public2Length);
+  if (!Status) {
+    Print ("[Fail]");
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
+    goto Exit;
+  }
+
+  //
+  // Verify EC-DSA
+  //
+  SigSize = sizeof(Signature);
+  Print ("\n- Sm2 Signing in Context1 ... ");
+  Status  = Sm2Sign (Sm2_1, CRYPTO_NID_SM3_256, Message, sizeof(Message), Signature, &SigSize);
+  if (!Status) {
+    Print ("[Fail]");
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
+    goto Exit;
+  }
+
+  Print ("Sm2 Verification in Context2 ... ");
+  Status = Sm2Verify (Sm2_2, CRYPTO_NID_SM3_256, Message, sizeof(Message), Signature, SigSize);
+  if (!Status) {
+    Print ("[Fail]");
+    Sm2Free (Sm2_1);
+    Sm2Free (Sm2_2);
+    goto Exit;
+  } else {
+    Print ("[Pass]\n");
+  }
+
+  Sm2Free (Sm2_1);
+  Sm2Free (Sm2_2);
 
 Exit:
   return EFI_SUCCESS;

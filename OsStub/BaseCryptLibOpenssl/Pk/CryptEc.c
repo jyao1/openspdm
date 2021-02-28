@@ -81,6 +81,208 @@ EcFree (
 }
 
 /**
+  Sets the public key component into the established EC context.
+
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+
+  @param[in, out]  EcContext      Pointer to EC context being set.
+  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicSize     The size of Public buffer in bytes.
+
+  @retval  TRUE   EC public key component was set successfully.
+  @retval  FALSE  Invalid EC public key component.
+
+**/
+BOOLEAN
+EFIAPI
+EcSetPubKey (
+  IN OUT  VOID   *EcContext,
+  IN      UINT8  *PublicKey,
+  IN      UINTN  PublicKeySize
+  )
+{
+  EC_KEY         *EcKey;
+  CONST EC_GROUP *Group;
+  BOOLEAN        RetVal;
+  BIGNUM         *BnX;
+  BIGNUM         *BnY;
+  EC_POINT       *Point;
+  INT32          OpenSslNid;
+  UINTN          HalfSize;
+
+  if (EcContext == NULL || PublicKey == NULL) {
+    return FALSE;
+  }
+
+  EcKey = (EC_KEY *)EcContext;
+  OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
+  switch (OpenSslNid) {
+  case NID_X9_62_prime256v1:
+    HalfSize = 32;
+    break;
+  case NID_secp384r1:
+    HalfSize = 48;
+    break;
+  case NID_secp521r1:
+    HalfSize = 66;
+    break;
+  default:
+    return FALSE;
+  }
+  if (PublicKeySize != HalfSize * 2) {
+    return FALSE;
+  }
+
+  Group = EC_KEY_get0_group (EcKey);
+  Point = NULL;
+
+  BnX = BN_bin2bn (PublicKey, (UINT32) HalfSize, NULL);
+  BnY = BN_bin2bn (PublicKey + HalfSize, (UINT32) HalfSize, NULL);
+  if (BnX == NULL || BnY == NULL) {
+    RetVal = FALSE;
+    goto Done;
+  }
+  Point = EC_POINT_new(Group);
+  if (Point == NULL) {
+    goto Done;
+  }
+
+  RetVal = (BOOLEAN) EC_POINT_set_affine_coordinates(Group, Point, BnX, BnY, NULL);
+  if (!RetVal) {
+    goto Done;
+  }
+
+  RetVal = (BOOLEAN) EC_KEY_set_public_key (EcKey, Point);
+  if (!RetVal) {
+    goto Done;
+  }
+
+  RetVal = TRUE;
+
+Done:
+  if (BnX != NULL) {
+    BN_free (BnX);
+  }
+  if (BnY != NULL) {
+    BN_free (BnY);
+  }
+  if (Point != NULL) {
+    EC_POINT_free(Point);
+  }
+  return RetVal;
+}
+
+/**
+  Gets the public key component from the established EC context.
+
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+
+  @param[in, out]  EcContext      Pointer to EC context being set.
+  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval  TRUE   EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPubKey (
+  IN OUT  VOID   *EcContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  EC_KEY         *EcKey;
+  CONST EC_GROUP *Group;
+  BOOLEAN        RetVal;
+  CONST EC_POINT *EcPoint;
+  BIGNUM         *BnX;
+  BIGNUM         *BnY;
+  INT32          OpenSslNid;
+  UINTN          HalfSize;
+  INTN           XSize;
+  INTN           YSize;
+
+  if (EcContext == NULL || PublicKeySize == NULL) {
+    return FALSE;
+  }
+
+  if (PublicKey == NULL && *PublicKeySize != 0) {
+    return FALSE;
+  }
+
+  EcKey = (EC_KEY *)EcContext;
+
+  OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
+  switch (OpenSslNid) {
+  case NID_X9_62_prime256v1:
+    HalfSize = 32;
+    break;
+  case NID_secp384r1:
+    HalfSize = 48;
+    break;
+  case NID_secp521r1:
+    HalfSize = 66;
+    break;
+  default:
+    return FALSE;
+  }
+  if (*PublicKeySize < HalfSize * 2) {
+    *PublicKeySize = HalfSize * 2;
+    return FALSE;
+  }
+  *PublicKeySize = HalfSize * 2;
+
+  Group = EC_KEY_get0_group (EcKey);
+  EcPoint = EC_KEY_get0_public_key (EcKey);
+  if (EcPoint == NULL) {
+    return FALSE;
+  }
+   
+  BnX = BN_new();
+  BnY = BN_new();
+  if (BnX == NULL || BnY == NULL) {
+    RetVal = FALSE;
+    goto Done;
+  }
+
+  RetVal = (BOOLEAN) EC_POINT_get_affine_coordinates(Group, EcPoint, BnX, BnY, NULL);
+  if (!RetVal) {
+    goto Done;
+  }
+
+  XSize = BN_num_bytes (BnX);
+  YSize = BN_num_bytes (BnY);
+  if (XSize <= 0 || YSize <= 0) {
+    RetVal = FALSE;
+    goto Done;
+  }
+  ASSERT ((UINTN)XSize <= HalfSize && (UINTN)YSize <= HalfSize);
+
+  if (PublicKey != NULL) {
+    ZeroMem (PublicKey, *PublicKeySize);
+    BN_bn2bin (BnX, &PublicKey[0 + HalfSize - XSize]);
+    BN_bn2bin (BnY, &PublicKey[HalfSize + HalfSize - YSize]);
+  }
+  RetVal = TRUE;
+
+Done:
+  if (BnX != NULL) {
+    BN_free (BnX);
+  }
+  if (BnY != NULL) {
+    BN_free (BnY);
+  }
+  return RetVal;
+}
+
+/**
   Validates key components of EC context.
   NOTE: This function performs integrity checks on all the EC key material, so
         the EC key structure must contain all the private key data.
@@ -171,7 +373,7 @@ EcGenerateKey (
   if (Public == NULL && *PublicSize != 0) {
     return FALSE;
   }
-  
+
   EcKey = (EC_KEY *)EcContext;
   RetVal = (BOOLEAN) EC_KEY_generate_key (EcKey);
   if (!RetVal) {
@@ -202,14 +404,14 @@ EcGenerateKey (
   if (EcPoint == NULL) {
     return FALSE;
   }
-   
+
   BnX = BN_new();
   BnY = BN_new();
   if (BnX == NULL || BnY == NULL) {
     RetVal = FALSE;
     goto Done;
   }
- 
+
   RetVal = (BOOLEAN) EC_POINT_get_affine_coordinates(Group, EcPoint, BnX, BnY, NULL);
   if (!RetVal) {
     goto Done;
@@ -224,6 +426,7 @@ EcGenerateKey (
   ASSERT ((UINTN)XSize <= HalfSize && (UINTN)YSize <= HalfSize);
 
   if (Public != NULL) {
+    ZeroMem (Public, *PublicSize);
     BN_bn2bin (BnX, &Public[0 + HalfSize - XSize]);
     BN_bn2bin (BnY, &Public[HalfSize + HalfSize - YSize]);
   }
@@ -296,7 +499,7 @@ EcComputeKey (
   if (PeerPublicSize > INT_MAX) {
     return FALSE;
   }
-  
+
   EcKey = (EC_KEY *)EcContext;
   OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
   switch (OpenSslNid) {
@@ -348,7 +551,7 @@ EcComputeKey (
   }
 
   *KeySize = Size;
-  
+
   RetVal = TRUE;
 
 Done:

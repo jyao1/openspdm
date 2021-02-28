@@ -212,6 +212,10 @@ Error:
   If PublicKeySize is NULL, then return FALSE.
   If PublicKeySize is large enough but PublicKey is NULL, then return FALSE.
 
+  For FFDHE2048, the PublicSize is 256.
+  For FFDHE3072, the PublicSize is 384.
+  For FFDHE4096, the PublicSize is 512.
+
   @param[in, out]  DhContext      Pointer to the DH context.
   @param[out]      PublicKey      Pointer to the buffer to receive generated public key.
   @param[in, out]  PublicKeySize  On input, the size of PublicKey buffer in bytes.
@@ -234,6 +238,7 @@ DhGenerateKey (
   DH      *Dh;
   BIGNUM  *DhPubKey;
   INTN    Size;
+  UINTN   FinalPubKeySize;
 
   //
   // Check input parameters.
@@ -247,20 +252,39 @@ DhGenerateKey (
   }
 
   Dh = (DH *) DhContext;
+  switch (DH_size (Dh)) {
+  case 256:
+    FinalPubKeySize = 256;
+    break;
+  case 384:
+    FinalPubKeySize = 384;
+    break;
+  case 512:
+    FinalPubKeySize = 512;
+    break;
+  default:
+    return FALSE;
+  }
+
+  if (*PublicKeySize < FinalPubKeySize) {
+    *PublicKeySize = FinalPubKeySize;
+    return FALSE;
+  }
+  *PublicKeySize = FinalPubKeySize;
 
   RetVal = (BOOLEAN) DH_generate_key (DhContext);
   if (RetVal) {
     DH_get0_key (Dh, (const BIGNUM **)&DhPubKey, NULL);
     Size = BN_num_bytes (DhPubKey);
-    if ((Size > 0) && (*PublicKeySize < (UINTN) Size)) {
-      *PublicKeySize = Size;
+    if (Size <= 0) {
       return FALSE;
     }
+    ASSERT ((UINTN)Size <= FinalPubKeySize);
 
     if (PublicKey != NULL) {
-      BN_bn2bin (DhPubKey, PublicKey);
+      ZeroMem (PublicKey, *PublicKeySize);
+      BN_bn2bin (DhPubKey, &PublicKey[0 + FinalPubKeySize - Size]);
     }
-    *PublicKeySize = Size;
   }
 
   return RetVal;
@@ -277,6 +301,10 @@ DhGenerateKey (
   If KeySize is NULL, then return FALSE.
   If Key is NULL, then return FALSE.
   If KeySize is not large enough, then return FALSE.
+
+  For FFDHE2048, the PeerPublicSize is 256.
+  For FFDHE3072, the PeerPublicSize is 384.
+  For FFDHE4096, the PeerPublicSize is 512.
 
   @param[in, out]  DhContext          Pointer to the DH context.
   @param[in]       PeerPublicKey      Pointer to the peer's public key.

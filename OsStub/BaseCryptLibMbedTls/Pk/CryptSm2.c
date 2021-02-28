@@ -41,6 +41,55 @@ Sm2Free (
 }
 
 /**
+  Sets the public key component into the established Sm2 context.
+
+  The PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+
+  @param[in, out]  EcContext      Pointer to Sm2 context being set.
+  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicSize     The size of Public buffer in bytes.
+
+  @retval  TRUE   Sm2 public key component was set successfully.
+  @retval  FALSE  Invalid Sm2 public key component.
+
+**/
+BOOLEAN
+EFIAPI
+Sm2SetPubKey (
+  IN OUT  VOID   *Sm2Context,
+  IN      UINT8  *PublicKey,
+  IN      UINTN  PublicKeySize
+  )
+{
+  return FALSE;
+}
+
+/**
+  Gets the public key component from the established Sm2 context.
+
+  The PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+
+  @param[in, out]  Sm2Context     Pointer to Sm2 context being set.
+  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval  TRUE   Sm2 key component was retrieved successfully.
+  @retval  FALSE  Invalid Sm2 key component.
+
+**/
+BOOLEAN
+EFIAPI
+Sm2GetPubKey (
+  IN OUT  VOID   *Sm2Context,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  return FALSE;
+}
+
+/**
   Validates key components of Sm2 context.
   NOTE: This function performs integrity checks on all the Sm2 key material, so
         the Sm2 key structure must contain all the private key data.

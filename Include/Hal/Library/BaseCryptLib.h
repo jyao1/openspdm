@@ -4133,6 +4133,10 @@ DhSetParameter (
   If PublicKeySize is large enough but PublicKey is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
+  For FFDHE2048, the PublicSize is 256.
+  For FFDHE3072, the PublicSize is 384.
+  For FFDHE4096, the PublicSize is 512.
+
   @param[in, out]  DhContext      Pointer to the DH context.
   @param[out]      PublicKey      Pointer to the buffer to receive generated public key.
   @param[in, out]  PublicKeySize  On input, the size of PublicKey buffer in bytes.
@@ -4164,6 +4168,10 @@ DhGenerateKey (
   If Key is NULL, then return FALSE.
   If KeySize is not large enough, then return FALSE.
   If this interface is not supported, then return FALSE.
+
+  For FFDHE2048, the PeerPublicSize is 256.
+  For FFDHE3072, the PeerPublicSize is 384.
+  For FFDHE4096, the PeerPublicSize is 512.
 
   @param[in, out]  DhContext          Pointer to the DH context.
   @param[in]       PeerPublicKey      Pointer to the peer's public key.
@@ -4218,6 +4226,53 @@ VOID
 EFIAPI
 EcFree (
   IN  VOID  *EcContext
+  );
+
+/**
+  Sets the public key component into the established EC context.
+
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+
+  @param[in, out]  EcContext      Pointer to EC context being set.
+  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicSize     The size of Public buffer in bytes.
+
+  @retval  TRUE   EC public key component was set successfully.
+  @retval  FALSE  Invalid EC public key component.
+
+**/
+BOOLEAN
+EFIAPI
+EcSetPubKey (
+  IN OUT  VOID   *EcContext,
+  IN      UINT8  *PublicKey,
+  IN      UINTN  PublicKeySize
+  );
+
+/**
+  Gets the public key component from the established EC context.
+
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+
+  @param[in, out]  EcContext      Pointer to EC context being set.
+  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval  TRUE   EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPubKey (
+  IN OUT  VOID   *EcContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
   );
 
 /**
@@ -4425,6 +4480,98 @@ EdFree (
   );
 
 /**
+  Sets the public key component into the established Ed context.
+
+  For Ed25519, the PublicSize is 32.
+  For Ed448, the PublicSize is 57.
+
+  @param[in, out]  EdContext      Pointer to Ed context being set.
+  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicSize     The size of Public buffer in bytes.
+
+  @retval  TRUE   Ed public key component was set successfully.
+  @retval  FALSE  Invalid EC public key component.
+
+**/
+BOOLEAN
+EFIAPI
+EdSetPubKey (
+  IN OUT  VOID   *EdContext,
+  IN      UINT8  *PublicKey,
+  IN      UINTN  PublicKeySize
+  );
+
+/**
+  Gets the public key component from the established Ed context.
+
+  For Ed25519, the PublicSize is 32.
+  For Ed448, the PublicSize is 57.
+
+  @param[in, out]  EdContext      Pointer to Ed context being set.
+  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval  TRUE   Ed key component was retrieved successfully.
+  @retval  FALSE  Invalid EC public key component.
+
+**/
+BOOLEAN
+EFIAPI
+EdGetPubKey (
+  IN OUT  VOID   *EdContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  );
+
+/**
+  Validates key components of Ed context.
+  NOTE: This function performs integrity checks on all the Ed key material, so
+        the Ed key structure must contain all the private key data.
+
+  If EdContext is NULL, then return FALSE.
+
+  @param[in]  EdContext  Pointer to Ed context to check.
+
+  @retval  TRUE   Ed key components are valid.
+  @retval  FALSE  Ed key components are not valid.
+
+**/
+BOOLEAN
+EFIAPI
+EdCheckKey (
+  IN  VOID  *EdContext
+  );
+
+/**
+  Generates Ed key and returns Ed public key.
+
+  For Ed25519, the PublicSize is 32.
+  For Ed448, the PublicSize is 57.
+
+  If EdContext is NULL, then return FALSE.
+  If PublicSize is NULL, then return FALSE.
+  If PublicSize is large enough but Public is NULL, then return FALSE.
+
+  @param[in, out]  EdContext      Pointer to the Ed context.
+  @param[out]      Public         Pointer to the buffer to receive generated public key.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval TRUE   Ed public key generation succeeded.
+  @retval FALSE  Ed public key generation failed.
+  @retval FALSE  PublicSize is not large enough.
+
+**/
+BOOLEAN
+EFIAPI
+EdGenerateKey (
+  IN OUT  VOID   *EdContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  );
+
+/**
   Carries out the Ed-DSA signature.
 
   This function carries out the Ed-DSA signature.
@@ -4525,6 +4672,49 @@ VOID
 EFIAPI
 Sm2Free (
   IN  VOID  *Sm2Context
+  );
+
+/**
+  Sets the public key component into the established Sm2 context.
+
+  The PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+
+  @param[in, out]  EcContext      Pointer to Sm2 context being set.
+  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicSize     The size of Public buffer in bytes.
+
+  @retval  TRUE   Sm2 public key component was set successfully.
+  @retval  FALSE  Invalid Sm2 public key component.
+
+**/
+BOOLEAN
+EFIAPI
+Sm2SetPubKey (
+  IN OUT  VOID   *Sm2Context,
+  IN      UINT8  *PublicKey,
+  IN      UINTN  PublicKeySize
+  );
+
+/**
+  Gets the public key component from the established Sm2 context.
+
+  The PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+
+  @param[in, out]  Sm2Context     Pointer to Sm2 context being set.
+  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval  TRUE   Sm2 key component was retrieved successfully.
+  @retval  FALSE  Invalid Sm2 key component.
+
+**/
+BOOLEAN
+EFIAPI
+Sm2GetPubKey (
+  IN OUT  VOID   *Sm2Context,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
   );
 
 /**

@@ -211,5 +211,80 @@ ValidateCryptEc (
   EcFree (Ec1);
   EcFree (Ec2);
 
+  Print ("\nUEFI-OpenSSL EC-DSA Signing Verification Testing with SetPubKey:\n");
+
+  Public1Length  = sizeof (Public1);
+  Public2Length  = sizeof (Public2);
+
+  Print ("- Context1 ... ");
+  Ec1 = EcNewByNid (CRYPTO_NID_SECP256R1);
+  if (Ec1 == NULL) {
+    Print ("[Fail]");
+    return EFI_ABORTED;
+  }
+
+  Print ("Context2 ... ");
+  Ec2 = EcNewByNid (CRYPTO_NID_SECP256R1);
+  if (Ec2 == NULL) {
+    Print ("[Fail]");
+    EcFree (Ec1);
+    return EFI_ABORTED;
+  }
+
+  Print ("Compute key in Context1 ... ");
+  Status = EcGenerateKey (Ec1, Public1, &Public1Length);
+  if (!Status) {
+    Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
+    return EFI_ABORTED;
+  }
+
+  Print ("Export key in Context1 ... ");
+  Status = EcGetPubKey (Ec1, Public2, &Public2Length);
+  if (!Status) {
+    Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
+    return EFI_ABORTED;
+  }
+
+  Print ("Import key in Context2 ... ");
+  Status = EcSetPubKey (Ec2, Public2, Public2Length);
+  if (!Status) {
+    Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
+    return EFI_ABORTED;
+  }
+
+  //
+  // Verify EC-DSA
+  //
+  HashSize = sizeof(HashValue);
+  SigSize = sizeof(Signature);
+  Print ("\n- EC-DSA Signing in Context1 ... ");
+  Status  = EcDsaSign (Ec1, CRYPTO_NID_SHA256, HashValue, HashSize, Signature, &SigSize);
+  if (!Status) {
+    Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
+    return EFI_ABORTED;
+  }
+
+  Print ("EC-DSA Verification in Context2 ... ");
+  Status = EcDsaVerify (Ec2, CRYPTO_NID_SHA256, HashValue, HashSize, Signature, SigSize);
+  if (!Status) {
+    Print ("[Fail]");
+    EcFree (Ec1);
+    EcFree (Ec2);
+    return EFI_ABORTED;
+  } else {
+    Print ("[Pass]\n");
+  }
+
+  EcFree (Ec1);
+  EcFree (Ec2);
+
   return EFI_SUCCESS;
 }

@@ -49,6 +49,7 @@ Sm2New (
     EVP_PKEY_CTX_free(Pctx);
     return NULL;
   }
+
   Params = NULL;
   Result = EVP_PKEY_paramgen(Pctx, &Params);
   if (Result == 0) {
@@ -99,6 +100,207 @@ Sm2Free (
   )
 {
   EVP_PKEY_free ((EVP_PKEY *) Sm2Context);
+}
+
+/**
+  Sets the public key component into the established Sm2 context.
+
+  The PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+
+  @param[in, out]  EcContext      Pointer to Sm2 context being set.
+  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicSize     The size of Public buffer in bytes.
+
+  @retval  TRUE   Sm2 public key component was set successfully.
+  @retval  FALSE  Invalid Sm2 public key component.
+
+**/
+BOOLEAN
+EFIAPI
+Sm2SetPubKey (
+  IN OUT  VOID   *Sm2Context,
+  IN      UINT8  *PublicKey,
+  IN      UINTN  PublicKeySize
+  )
+{
+  EVP_PKEY       *Pkey;
+  EC_KEY         *EcKey;
+  CONST EC_GROUP *Group;
+  BOOLEAN        RetVal;
+  BIGNUM         *BnX;
+  BIGNUM         *BnY;
+  EC_POINT       *Point;
+  INT32          OpenSslNid;
+  UINTN          HalfSize;
+
+  if (Sm2Context == NULL || PublicKey == NULL) {
+    return FALSE;
+  }
+
+  Pkey = (EVP_PKEY *)Sm2Context;
+  if (EVP_PKEY_id(Pkey) != EVP_PKEY_SM2) {
+    return FALSE;
+  }
+  EVP_PKEY_set_alias_type(Pkey, EVP_PKEY_EC);
+  EcKey = EVP_PKEY_get0_EC_KEY(Pkey);
+  EVP_PKEY_set_alias_type(Pkey, EVP_PKEY_SM2);
+
+  OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
+  switch (OpenSslNid) {
+  case NID_sm2:
+    HalfSize = 32;
+    break;
+  default:
+    return FALSE;
+  }
+  if (PublicKeySize != HalfSize * 2) {
+    return FALSE;
+  }
+
+  Group = EC_KEY_get0_group (EcKey);
+  Point = NULL;
+
+  BnX = BN_bin2bn (PublicKey, (UINT32) HalfSize, NULL);
+  BnY = BN_bin2bn (PublicKey + HalfSize, (UINT32) HalfSize, NULL);
+  if (BnX == NULL || BnY == NULL) {
+    RetVal = FALSE;
+    goto Done;
+  }
+  Point = EC_POINT_new(Group);
+  if (Point == NULL) {
+    goto Done;
+  }
+
+  RetVal = (BOOLEAN) EC_POINT_set_affine_coordinates(Group, Point, BnX, BnY, NULL);
+  if (!RetVal) {
+    goto Done;
+  }
+
+  RetVal = (BOOLEAN) EC_KEY_set_public_key (EcKey, Point);
+  if (!RetVal) {
+    goto Done;
+  }
+
+  RetVal = TRUE;
+
+Done:
+  if (BnX != NULL) {
+    BN_free (BnX);
+  }
+  if (BnY != NULL) {
+    BN_free (BnY);
+  }
+  if (Point != NULL) {
+    EC_POINT_free(Point);
+  }
+  return RetVal;
+}
+
+/**
+  Gets the public key component from the established Sm2 context.
+
+  The PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+
+  @param[in, out]  Sm2Context     Pointer to Sm2 context being set.
+  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval  TRUE   Sm2 key component was retrieved successfully.
+  @retval  FALSE  Invalid Sm2 key component.
+
+**/
+BOOLEAN
+EFIAPI
+Sm2GetPubKey (
+  IN OUT  VOID   *Sm2Context,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  EVP_PKEY       *Pkey;
+  EC_KEY         *EcKey;
+  CONST EC_GROUP *Group;
+  BOOLEAN        RetVal;
+  CONST EC_POINT *EcPoint;
+  BIGNUM         *BnX;
+  BIGNUM         *BnY;
+  INT32          OpenSslNid;
+  UINTN          HalfSize;
+  INTN           XSize;
+  INTN           YSize;
+
+  if (Sm2Context == NULL || PublicKeySize == NULL) {
+    return FALSE;
+  }
+
+  if (PublicKey == NULL && *PublicKeySize != 0) {
+    return FALSE;
+  }
+
+  Pkey = (EVP_PKEY *)Sm2Context;
+  if (EVP_PKEY_id(Pkey) != EVP_PKEY_SM2) {
+    return FALSE;
+  }
+  EVP_PKEY_set_alias_type(Pkey, EVP_PKEY_EC);
+  EcKey = EVP_PKEY_get0_EC_KEY(Pkey);
+  EVP_PKEY_set_alias_type(Pkey, EVP_PKEY_SM2);
+
+  OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
+  switch (OpenSslNid) {
+  case NID_sm2:
+    HalfSize = 32;
+    break;
+  default:
+    return FALSE;
+  }
+  if (*PublicKeySize < HalfSize * 2) {
+    *PublicKeySize = HalfSize * 2;
+    return FALSE;
+  }
+  *PublicKeySize = HalfSize * 2;
+
+  Group = EC_KEY_get0_group (EcKey);
+  EcPoint = EC_KEY_get0_public_key (EcKey);
+  if (EcPoint == NULL) {
+    return FALSE;
+  }
+   
+  BnX = BN_new();
+  BnY = BN_new();
+  if (BnX == NULL || BnY == NULL) {
+    RetVal = FALSE;
+    goto Done;
+  }
+
+  RetVal = (BOOLEAN) EC_POINT_get_affine_coordinates(Group, EcPoint, BnX, BnY, NULL);
+  if (!RetVal) {
+    goto Done;
+  }
+
+  XSize = BN_num_bytes (BnX);
+  YSize = BN_num_bytes (BnY);
+  if (XSize <= 0 || YSize <= 0) {
+    RetVal = FALSE;
+    goto Done;
+  }
+  ASSERT ((UINTN)XSize <= HalfSize && (UINTN)YSize <= HalfSize);
+
+  if (PublicKey != NULL) {
+    ZeroMem (PublicKey, *PublicKeySize);
+    BN_bn2bin (BnX, &PublicKey[0 + HalfSize - XSize]);
+    BN_bn2bin (BnY, &PublicKey[HalfSize + HalfSize - YSize]);
+  }
+  RetVal = TRUE;
+
+Done:
+  if (BnX != NULL) {
+    BN_free (BnX);
+  }
+  if (BnY != NULL) {
+    BN_free (BnY);
+  }
+  return RetVal;
 }
 
 /**
@@ -207,10 +409,10 @@ Sm2GenerateKey (
   EcKey = EVP_PKEY_get0_EC_KEY(Pkey);
   EVP_PKEY_set_alias_type(Pkey, EVP_PKEY_SM2);
 
-  //RetVal = (BOOLEAN) EC_KEY_generate_key (EcKey);
-  //if (!RetVal) {
-  //  return FALSE;
-  //}
+  RetVal = (BOOLEAN) EC_KEY_generate_key (EcKey);
+  if (!RetVal) {
+    return FALSE;
+  }
   OpenSslNid = EC_GROUP_get_curve_name(EC_KEY_get0_group(EcKey));
   switch (OpenSslNid) {
   case NID_sm2:
@@ -230,14 +432,14 @@ Sm2GenerateKey (
   if (EcPoint == NULL) {
     return FALSE;
   }
-   
+
   BnX = BN_new();
   BnY = BN_new();
   if (BnX == NULL || BnY == NULL) {
     RetVal = FALSE;
     goto Done;
   }
- 
+
   RetVal = (BOOLEAN) EC_POINT_get_affine_coordinates(Group, EcPoint, BnX, BnY, NULL);
   if (!RetVal) {
     goto Done;
@@ -252,6 +454,7 @@ Sm2GenerateKey (
   ASSERT ((UINTN)XSize <= HalfSize && (UINTN)YSize <= HalfSize);
 
   if (Public != NULL) {
+    ZeroMem (Public, *PublicSize);
     BN_bn2bin (BnX, &Public[0 + HalfSize - XSize]);
     BN_bn2bin (BnY, &Public[HalfSize + HalfSize - YSize]);
   }
@@ -376,7 +579,7 @@ Sm2ComputeKey (
   }
 
   *KeySize = Size;
-  
+
   RetVal = TRUE;
 
 Done:

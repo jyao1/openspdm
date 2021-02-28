@@ -80,6 +80,169 @@ EcFree (
 }
 
 /**
+  Sets the public key component into the established EC context.
+
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+
+  @param[in, out]  EcContext      Pointer to EC context being set.
+  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicSize     The size of Public buffer in bytes.
+
+  @retval  TRUE   EC public key component was set successfully.
+  @retval  FALSE  Invalid EC public key component.
+
+**/
+BOOLEAN
+EFIAPI
+EcSetPubKey (
+  IN OUT  VOID   *EcContext,
+  IN      UINT8  *PublicKey,
+  IN      UINTN  PublicKeySize
+  )
+{
+  mbedtls_ecdh_context *ctx;
+  INT32                Ret;
+  UINTN                HalfSize;
+
+  if (EcContext == NULL || PublicKey == NULL) {
+    return FALSE;
+  }
+
+  ctx = EcContext;
+  switch (ctx->grp.id) {
+  case MBEDTLS_ECP_DP_SECP256R1:
+    HalfSize = 32;
+    break;
+  case MBEDTLS_ECP_DP_SECP384R1:
+    HalfSize = 48;
+    break;
+  case MBEDTLS_ECP_DP_SECP521R1:
+    HalfSize = 66;
+    break;
+  default:
+    return FALSE;
+  }
+  if (PublicKeySize != HalfSize * 2) {
+    return FALSE;
+  }
+
+  Ret = mbedtls_mpi_read_binary (&ctx->Q.X, PublicKey, HalfSize);
+  if (Ret != 0) {
+    return FALSE;
+  }
+  Ret = mbedtls_mpi_read_binary (&ctx->Q.Y, PublicKey + HalfSize, HalfSize);
+  if (Ret != 0) {
+    return FALSE;
+  }
+  Ret = mbedtls_mpi_lset (&ctx->Q.Z, 1);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Gets the public key component from the established EC context.
+
+  For P-256, the PublicSize is 64. First 32-byte is X, Second 32-byte is Y.
+  For P-384, the PublicSize is 96. First 48-byte is X, Second 48-byte is Y.
+  For P-521, the PublicSize is 132. First 66-byte is X, Second 66-byte is Y.
+
+  @param[in, out]  EcContext      Pointer to EC context being set.
+  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval  TRUE   EC key component was retrieved successfully.
+  @retval  FALSE  Invalid EC key component.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPubKey (
+  IN OUT  VOID   *EcContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  mbedtls_ecdh_context *ctx;
+  INT32                Ret;
+  UINTN                HalfSize;
+  UINTN                XSize;
+  UINTN                YSize;
+
+  if (EcContext == NULL || PublicKeySize == NULL) {
+    return FALSE;
+  }
+
+  if (PublicKey == NULL && *PublicKeySize != 0) {
+    return FALSE;
+  }
+
+  ctx = EcContext;
+  switch (ctx->grp.id) {
+  case MBEDTLS_ECP_DP_SECP256R1:
+    HalfSize = 32;
+    break;
+  case MBEDTLS_ECP_DP_SECP384R1:
+    HalfSize = 48;
+    break;
+  case MBEDTLS_ECP_DP_SECP521R1:
+    HalfSize = 66;
+    break;
+  default:
+    return FALSE;
+  }
+  if (*PublicKeySize < HalfSize * 2) {
+    *PublicKeySize = HalfSize * 2;
+    return FALSE;
+  }
+  *PublicKeySize = HalfSize * 2;
+  ZeroMem (PublicKey, *PublicKeySize);
+
+  XSize = mbedtls_mpi_size (&ctx->Q.X);
+  YSize = mbedtls_mpi_size (&ctx->Q.Y);
+  ASSERT (XSize <= HalfSize && YSize <= HalfSize);
+
+  Ret = mbedtls_mpi_write_binary (&ctx->Q.X, &PublicKey[0 + HalfSize - XSize], XSize);
+  if (Ret != 0) {
+    return FALSE;
+  }
+  Ret = mbedtls_mpi_write_binary (&ctx->Q.Y, &PublicKey[HalfSize + HalfSize - YSize], YSize);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Validates key components of EC context.
+  NOTE: This function performs integrity checks on all the EC key material, so
+        the EC key structure must contain all the private key data.
+
+  If EcContext is NULL, then return FALSE.
+
+  @param[in]  EcContext  Pointer to EC context to check.
+
+  @retval  TRUE   EC key components are valid.
+  @retval  FALSE  EC key components are not valid.
+
+**/
+BOOLEAN
+EFIAPI
+EcCheckKey (
+  IN  VOID  *EcContext
+  )
+{
+  // TBD
+  return TRUE;
+}
+
+/**
   Generates EC key and returns EC public key (X, Y).
 
   This function generates random secret, and computes the public key (X, Y), which is
@@ -129,7 +292,7 @@ EcGenerateKey (
   if (Public == NULL && *PublicSize != 0) {
     return FALSE;
   }
-  
+
   ctx = EcContext;
   Ret = mbedtls_ecdh_gen_public (&ctx->grp, &ctx->d, &ctx->Q, myrand, NULL);
   if (Ret != 0) {
@@ -223,7 +386,7 @@ EcComputeKey (
   if (PeerPublicSize > INT_MAX) {
     return FALSE;
   }
-  
+
   ctx = EcContext;
   switch (ctx->grp.id) {
   case MBEDTLS_ECP_DP_SECP256R1:
@@ -241,7 +404,7 @@ EcComputeKey (
   if (PeerPublicSize != HalfSize * 2) {
     return FALSE;
   }
-  
+
   Ret = mbedtls_mpi_read_binary (&ctx->Qp.X, PeerPublic, HalfSize);
   if (Ret != 0) {
     return FALSE;
@@ -270,7 +433,7 @@ EcComputeKey (
   if (Ret != 0) {
     return FALSE;
   }
-  
+
   return TRUE;
 }
 

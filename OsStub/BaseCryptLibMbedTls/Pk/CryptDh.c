@@ -183,6 +183,10 @@ DhSetParameter (
   If PublicKeySize is NULL, then return FALSE.
   If PublicKeySize is large enough but PublicKey is NULL, then return FALSE.
 
+  For FFDHE2048, the PublicSize is 256.
+  For FFDHE3072, the PublicSize is 384.
+  For FFDHE4096, the PublicSize is 512.
+
   @param[in, out]  DhContext      Pointer to the DH context.
   @param[out]      PublicKey      Pointer to the buffer to receive generated public key.
   @param[in, out]  PublicKeySize  On input, the size of PublicKey buffer in bytes.
@@ -201,7 +205,9 @@ DhGenerateKey (
   IN OUT  UINTN  *PublicKeySize
   )
 {
-  INT32   Ret;
+  INT32               Ret;
+  mbedtls_dhm_context *ctx;
+  UINTN               FinalPubKeySize;
 
   //
   // Check input parameters.
@@ -213,6 +219,27 @@ DhGenerateKey (
   if (PublicKey == NULL && *PublicKeySize != 0) {
     return FALSE;
   }
+
+  ctx = DhContext;
+  switch (mbedtls_mpi_size (&ctx->P)) {
+  case 256:
+    FinalPubKeySize = 256;
+    break;
+  case 384:
+    FinalPubKeySize = 384;
+    break;
+  case 512:
+    FinalPubKeySize = 512;
+    break;
+  default:
+    return FALSE;
+  }
+  if (*PublicKeySize < FinalPubKeySize) {
+    *PublicKeySize = FinalPubKeySize;
+    return FALSE;
+  }
+  *PublicKeySize = FinalPubKeySize;
+  ZeroMem (PublicKey, *PublicKeySize);
 
   Ret = mbedtls_dhm_make_public (DhContext, (UINT32)*PublicKeySize, PublicKey, (UINT32)*PublicKeySize, myrand, NULL);
   if (Ret != 0) {
@@ -233,6 +260,10 @@ DhGenerateKey (
   If KeySize is NULL, then return FALSE.
   If Key is NULL, then return FALSE.
   If KeySize is not large enough, then return FALSE.
+
+  For FFDHE2048, the PeerPublicSize is 256.
+  For FFDHE3072, the PeerPublicSize is 384.
+  For FFDHE4096, the PeerPublicSize is 512.
 
   @param[in, out]  DhContext          Pointer to the DH context.
   @param[in]       PeerPublicKey      Pointer to the peer's public key.

@@ -82,6 +82,143 @@ EdFree (
 }
 
 /**
+  Sets the public key component into the established Ed context.
+
+  For Ed25519, the PublicSize is 32.
+  For Ed448, the PublicSize is 57.
+
+  @param[in, out]  EdContext      Pointer to Ed context being set.
+  @param[in]       Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in]       PublicSize     The size of Public buffer in bytes.
+
+  @retval  TRUE   Ed public key component was set successfully.
+  @retval  FALSE  Invalid EC public key component.
+
+**/
+BOOLEAN
+EFIAPI
+EdSetPubKey (
+  IN OUT  VOID   *EdContext,
+  IN      UINT8  *PublicKey,
+  IN      UINTN  PublicKeySize
+  )
+{
+  // TBD
+  return FALSE;
+}
+
+/**
+  Gets the public key component from the established Ed context.
+
+  For Ed25519, the PublicSize is 32.
+  For Ed448, the PublicSize is 57.
+
+  @param[in, out]  EdContext      Pointer to Ed context being set.
+  @param[out]      Public         Pointer to the buffer to receive generated public X,Y.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval  TRUE   Ed key component was retrieved successfully.
+  @retval  FALSE  Invalid EC public key component.
+
+**/
+BOOLEAN
+EFIAPI
+EdGetPubKey (
+  IN OUT  VOID   *EdContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  EVP_PKEY *Pkey;
+  INT32    Result;
+  UINT32   FinalPubKeySize;
+
+  if (EdContext == NULL || PublicKey == NULL || PublicKeySize == NULL) {
+    return FALSE;
+  }
+
+  Pkey = (EVP_PKEY *) EdContext;
+  switch (EVP_PKEY_id(Pkey)) {
+  case EVP_PKEY_ED25519:
+    FinalPubKeySize = 32;
+    break;
+  case EVP_PKEY_ED448:
+    FinalPubKeySize = 57;
+    break;
+  default:
+    return FALSE;
+  }
+  if (*PublicKeySize < FinalPubKeySize) {
+    *PublicKeySize = FinalPubKeySize;
+    return FALSE;
+  }
+  *PublicKeySize = FinalPubKeySize;
+  ZeroMem (PublicKey, *PublicKeySize);
+  Result = EVP_PKEY_get_raw_public_key (Pkey, PublicKey, PublicKeySize);
+  if (Result == 0) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Validates key components of Ed context.
+  NOTE: This function performs integrity checks on all the Ed key material, so
+        the Ed key structure must contain all the private key data.
+
+  If EdContext is NULL, then return FALSE.
+
+  @param[in]  EdContext  Pointer to Ed context to check.
+
+  @retval  TRUE   Ed key components are valid.
+  @retval  FALSE  Ed key components are not valid.
+
+**/
+BOOLEAN
+EFIAPI
+EdCheckKey (
+  IN  VOID  *EdContext
+  )
+{
+  // TBD
+  return FALSE;
+}
+
+/**
+  Generates Ed key and returns Ed public key.
+
+  For Ed25519, the PublicSize is 32.
+  For Ed448, the PublicSize is 57.
+
+  If EdContext is NULL, then return FALSE.
+  If PublicSize is NULL, then return FALSE.
+  If PublicSize is large enough but Public is NULL, then return FALSE.
+
+  @param[in, out]  EdContext      Pointer to the Ed context.
+  @param[out]      Public         Pointer to the buffer to receive generated public key.
+  @param[in, out]  PublicSize     On input, the size of Public buffer in bytes.
+                                  On output, the size of data returned in Public buffer in bytes.
+
+  @retval TRUE   Ed public key generation succeeded.
+  @retval FALSE  Ed public key generation failed.
+  @retval FALSE  PublicSize is not large enough.
+
+**/
+BOOLEAN
+EFIAPI
+EdGenerateKey (
+  IN OUT  VOID   *EdContext,
+  OUT     UINT8  *PublicKey,
+  IN OUT  UINTN  *PublicKeySize
+  )
+{
+  // TBD
+  return TRUE;
+}
+
+/**
   Carries out the Ed-DSA signature.
 
   This function carries out the Ed-DSA signature.
