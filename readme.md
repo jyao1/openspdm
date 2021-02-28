@@ -191,7 +191,7 @@
       [  PASSED  ] 2 test(s).
    </pre>
 
-### [SpdmDump](https://github.com/jyao1/openspdm/tree/master/Tool/SpdmDump) tool
+### [SpdmDump](https://github.com/jyao1/openspdm/tree/master/SpdmDump) tool
 
    The tool output is at openspdm/Build/\<TARGET>_\<TOOLCHAIN>/\<ARCH>. It can be used to parse the pcap file for offline analysis.
 

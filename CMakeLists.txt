@@ -434,7 +434,7 @@ if(TESTTYPE STREQUAL "SpdmEmu")
             
     SUBDIRS(SpdmEmu/SpdmRequesterEmu
             SpdmEmu/SpdmResponderEmu
-            Tool/SpdmDump
+            SpdmDump
     )
        
 elseif(TESTTYPE STREQUAL "UnitTest")

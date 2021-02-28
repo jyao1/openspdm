@@ -1,4 +1,4 @@
-# SPDM SpdmEmu Tool
+# SpdmEmu Tool
 
 This document describes SpdmRequesterEmu and SpdmResponderEmu tool. It can be used to test the SPDM communication in the OS.
 

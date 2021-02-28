@@ -1,4 +1,4 @@
-# SPDM Dump Tool
+# SpdmDump Tool
 
 This document describes SpdmDump tool. It can be used to parse the SPDM message in a dump file offline.
 
