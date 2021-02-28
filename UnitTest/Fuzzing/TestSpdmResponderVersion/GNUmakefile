@@ -50,7 +50,7 @@ STATIC_LIBRARY_FILES =  \
     $(BIN_DIR)/Library/SpdmCryptLib/SpdmCryptLib.a \
     $(BIN_DIR)/Library/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a \
     $(BIN_DIR)/UnitTest/SpdmTransportTestLib/SpdmTransportTestLib.a \
-    $(BIN_DIR)/SpdmEmu/SpdmDeviceSecretLibNull/SpdmDeviceSecretLibNull.a \
+    $(BIN_DIR)/OsStub/SpdmDeviceSecretLibNull/SpdmDeviceSecretLibNull.a \
     $(OUTPUT_DIR)/$(MODULE_NAME).a \
 
 
@@ -66,7 +66,7 @@ STATIC_LIBRARY_OBJECT_FILES =  \
     $(BIN_DIR)/Library/SpdmCryptLib/*.o \
     $(BIN_DIR)/Library/SpdmSecuredMessageLib/*.o \
     $(BIN_DIR)/UnitTest/SpdmTransportTestLib/*.o \
-    $(BIN_DIR)/SpdmEmu/SpdmDeviceSecretLibNull/*.o \
+    $(BIN_DIR)/OsStub/SpdmDeviceSecretLibNull/*.o \
     $(OUTPUT_DIR)/*.o \
 
 
@@ -123,7 +123,7 @@ gen_libs:
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmCryptLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/Library/SpdmSecuredMessageLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/UnitTest/SpdmTransportTestLib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
-	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/SpdmEmu/SpdmDeviceSecretLibNull/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+	@"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/SpdmDeviceSecretLibNull/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
 
 #
 # Individual Object Build Targets
@@ -153,7 +153,7 @@ $(OUTPUT_DIR)/$(MODULE_NAME) : $(STATIC_LIBRARY_FILES)
 	@echo $(BIN_DIR)/Library/SpdmCryptLib/SpdmCryptLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/Library/SpdmSecuredMessageLib/SpdmSecuredMessageLib.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(BIN_DIR)/UnitTest/SpdmTransportTestLib/SpdmTransportTestLib.a >> $(OUTPUT_DIR)/tmp.list
-	@echo $(BIN_DIR)/SpdmEmu/SpdmDeviceSecretLibNull/SpdmDeviceSecretLibNull.a >> $(OUTPUT_DIR)/tmp.list
+	@echo $(BIN_DIR)/OsStub/SpdmDeviceSecretLibNull/SpdmDeviceSecretLibNull.a >> $(OUTPUT_DIR)/tmp.list
 	@echo $(OUTPUT_DIR)/$(MODULE_NAME).a >> $(OUTPUT_DIR)/tmp.list
 ifeq ("$(TOOLCHAIN)", "KLEE")
 	$(DLINK) $(DLINK_OBJECT_FILES) $(DLINK_FLAGS)
