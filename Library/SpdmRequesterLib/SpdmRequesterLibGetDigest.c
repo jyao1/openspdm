@@ -114,7 +114,7 @@ TrySpdmGetDigest (
   }
   DigestCount = 0;
   for (Index = 0; Index < MAX_SPDM_SLOT_COUNT; Index++) {
-    if (*SlotMask & (1 << Index)) {
+    if (SpdmResponse.Header.Param2 & (1 << Index)) {
       DigestCount++;
     }
   }

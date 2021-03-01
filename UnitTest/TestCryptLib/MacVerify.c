@@ -89,6 +89,10 @@ ValidateCryptMac (
   Print ("- CMAC-AES:    ");
 
   CmacCtx = CmacAesNew ();
+  if (CmacCtx == NULL) {
+    Print ("[Fail]");
+    return EFI_ABORTED;
+  }
 
   Print ("Init... ");
   Status  = CmacAesInit (CmacCtx, CmacKey, sizeof (CmacKey));
@@ -127,6 +131,10 @@ ValidateCryptMac (
   Print ("- GMAC-AES:    ");
 
   GmacCtx = GmacAesNew ();
+  if (GmacCtx == NULL) {
+    Print ("[Fail]");
+    return EFI_ABORTED;
+  }
 
   Print ("Init... ");
   Status  = GmacAesInit (GmacCtx, GmacKey, sizeof (GmacKey));

@@ -114,7 +114,10 @@ SpdmRequesterEndSessionTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);    
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
-	/* WALKAROUND: If just use single context to encode message and then decode message */
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
+    /* WALKAROUND: If just use single context to encode message and then decode message */
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -124,7 +127,7 @@ SpdmRequesterEndSessionTestReceiveMessage (
     SPDM_END_SESSION_RESPONSE     *SpdmResponse; 
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
-    UINT32                        SessionId;	
+    UINT32                        SessionId;    
     SPDM_SESSION_INFO             *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
@@ -137,7 +140,10 @@ SpdmRequesterEndSessionTestReceiveMessage (
     SpdmResponse->Header.Param2 = 0;
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-	SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -145,7 +151,7 @@ SpdmRequesterEndSessionTestReceiveMessage (
   case 0x4:
   {
     SPDM_ERROR_RESPONSE    SpdmResponse;
-	UINT32                 SessionId;
+    UINT32                 SessionId;
     SPDM_SESSION_INFO      *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
@@ -155,7 +161,10 @@ SpdmRequesterEndSessionTestReceiveMessage (
     SpdmResponse.Header.Param2 = 0;
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
-	SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -163,7 +172,7 @@ SpdmRequesterEndSessionTestReceiveMessage (
   case 0x5:
   {
     SPDM_ERROR_RESPONSE  SpdmResponse;
-	UINT32               SessionId;
+    UINT32               SessionId;
     SPDM_SESSION_INFO    *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
@@ -174,6 +183,9 @@ SpdmRequesterEndSessionTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -183,7 +195,7 @@ SpdmRequesterEndSessionTestReceiveMessage (
     STATIC UINTN SubIndex1 = 0;
     if (SubIndex1 == 0) {
       SPDM_ERROR_RESPONSE  SpdmResponse;
-	  UINT32               SessionId; 
+      UINT32               SessionId; 
       SPDM_SESSION_INFO    *SessionInfo;
 
       SessionId = 0xFFFFFFFF;
@@ -194,14 +206,17 @@ SpdmRequesterEndSessionTestReceiveMessage (
 
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
       SubIndex1 ++;
-	  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      if (SessionInfo == NULL) {
+        return RETURN_DEVICE_ERROR;
+      }
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     } else if (SubIndex1 == 1) {
       SPDM_END_SESSION_RESPONSE     *SpdmResponse; 
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
-	  UINT32                        SessionId;
-	  SPDM_SESSION_INFO             *SessionInfo;
+      UINT32                        SessionId;
+      SPDM_SESSION_INFO             *SessionInfo;
 
       SessionId = 0xFFFFFFFF;
       TempBufSize = sizeof(SPDM_END_SESSION_RESPONSE);
@@ -213,7 +228,10 @@ SpdmRequesterEndSessionTestReceiveMessage (
       SpdmResponse->Header.Param2 = 0;
 
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
-	  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      if (SessionInfo == NULL) {
+        return RETURN_DEVICE_ERROR;
+      }
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     }
   }
@@ -222,8 +240,8 @@ SpdmRequesterEndSessionTestReceiveMessage (
   case 0x7:
   {
     SPDM_ERROR_RESPONSE  SpdmResponse;
-	UINT32               SessionId;
-	SPDM_SESSION_INFO    *SessionInfo;
+    UINT32               SessionId;
+    SPDM_SESSION_INFO    *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
     SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
@@ -233,6 +251,9 @@ SpdmRequesterEndSessionTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -240,7 +261,7 @@ SpdmRequesterEndSessionTestReceiveMessage (
   case 0x8:
   {
     SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
-	UINT32                                       SessionId;
+    UINT32                                       SessionId;
     SPDM_SESSION_INFO                            *SessionInfo;
 
     SessionId = 0xFFFFFFFF;
@@ -255,6 +276,9 @@ SpdmRequesterEndSessionTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -264,9 +288,9 @@ SpdmRequesterEndSessionTestReceiveMessage (
     STATIC UINTN SubIndex2 = 0;
     if (SubIndex2 == 0) {
       SPDM_ERROR_RESPONSE_DATA_RESPONSE_NOT_READY  SpdmResponse;
-	  UINT32                                       SessionId;
-	  SPDM_SESSION_INFO                            *SessionInfo;
-	  
+      UINT32                                       SessionId;
+      SPDM_SESSION_INFO                            *SessionInfo;
+      
       SessionId = 0xFFFFFFFF;
       SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
       SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
@@ -279,14 +303,17 @@ SpdmRequesterEndSessionTestReceiveMessage (
 
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
       SubIndex2 ++;
-	  SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      if (SessionInfo == NULL) {
+        return RETURN_DEVICE_ERROR;
+      }
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     } else if (SubIndex2 == 1) {
       SPDM_END_SESSION_RESPONSE     *SpdmResponse; 
       UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
       UINTN                         TempBufSize;
-	  UINT32                        SessionId;
-	  SPDM_SESSION_INFO             *SessionInfo;
+      UINT32                        SessionId;
+      SPDM_SESSION_INFO             *SessionInfo;
 
       SessionId = 0xFFFFFFFF;
       TempBufSize = sizeof(SPDM_END_SESSION_RESPONSE);
@@ -299,8 +326,11 @@ SpdmRequesterEndSessionTestReceiveMessage (
 
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
       SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      if (SessionInfo == NULL) {
+        return RETURN_DEVICE_ERROR;
+      }
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
-	}
+    }
   }
     return RETURN_SUCCESS;
 

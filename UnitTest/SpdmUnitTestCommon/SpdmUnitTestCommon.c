@@ -34,6 +34,9 @@ int SpdmUnitTestGroupSetup(void **state)
 
   SpdmTestContext = mSpdmTestContext;
   SpdmTestContext->SpdmContext = (VOID *)malloc (SpdmGetContextSize());
+  if (SpdmTestContext->SpdmContext == NULL) {
+    return -1;
+  }
   SpdmContext = SpdmTestContext->SpdmContext;
   SpdmTestContext->CaseId = 0xFFFFFFFF;
 

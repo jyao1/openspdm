@@ -269,6 +269,7 @@ ProcessArgs (
 {
   CHAR8   *PcapFileName;
   UINT32  Data32;
+  BOOLEAN Res;
 
   PcapFileName = NULL;
 
@@ -548,7 +549,8 @@ ProcessArgs (
 
     if (strcmp (argv[0], "--req_cert_chain") == 0) {
       if (argc >= 2) {
-        if (!ReadInputFile (argv[1], &mRequesterCertChainBuffer, &mRequesterCertChainBufferSize)) {
+        Res = ReadInputFile (argv[1], &mRequesterCertChainBuffer, &mRequesterCertChainBufferSize); 
+        if (!Res) {
           printf ("invalid --req_cert_chain\n");
           PrintUsage ();
           exit (0);
@@ -569,7 +571,8 @@ ProcessArgs (
 
     if (strcmp (argv[0], "--rsp_cert_chain") == 0) {
       if (argc >= 2) {
-        if (!ReadInputFile (argv[1], &mResponderCertChainBuffer, &mResponderCertChainBufferSize)) {
+        Res = ReadInputFile (argv[1], &mResponderCertChainBuffer, &mResponderCertChainBufferSize);
+        if (!Res) {
           printf ("invalid --rsp_cert_chain\n");
           PrintUsage ();
           exit (0);
@@ -656,5 +659,12 @@ int main (
   DeinitSpdmDump ();
 
   ClosePcapPacketFile ();
+
+  if (mRequesterCertChainBuffer != NULL) {
+    free (mRequesterCertChainBuffer);
+  }
+  if (mResponderCertChainBuffer != NULL) {
+    free (mResponderCertChainBuffer);
+  }
   return 0;
 }

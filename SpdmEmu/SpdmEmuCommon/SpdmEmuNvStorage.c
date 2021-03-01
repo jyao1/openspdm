@@ -44,6 +44,7 @@ SpdmLoadNegotiatedState (
 
   if (FileSize != sizeof(NegotiatedState)) {
     printf ("LoadState fail - size mismatch\n");
+    free (FileData);
     return RETURN_UNSUPPORTED;
   }
 

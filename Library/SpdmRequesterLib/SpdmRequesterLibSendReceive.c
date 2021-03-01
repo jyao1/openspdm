@@ -169,6 +169,9 @@ SpdmSendSpdmRequest (
       SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);
     ASSERT (SessionInfo != NULL);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
     if ((SessionState == SpdmSessionStateHandshaking) && !SessionInfo->UsePsk) {
       SessionId = NULL;
@@ -208,6 +211,9 @@ SpdmReceiveSpdmResponse (
       SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_HANDSHAKE_IN_THE_CLEAR_CAP)) {
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, *SessionId);
     ASSERT (SessionInfo != NULL);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     SessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);
     if ((SessionState == SpdmSessionStateHandshaking) && !SessionInfo->UsePsk) {
       SessionId = NULL;

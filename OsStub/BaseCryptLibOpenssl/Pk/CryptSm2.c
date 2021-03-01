@@ -72,7 +72,7 @@ Sm2New (
   }
   Pkey = NULL;
   Result = EVP_PKEY_keygen(Kctx, &Pkey);
-  if (Result == 0) {
+  if (Result == 0 || Pkey == NULL) {
     EVP_PKEY_CTX_free(Kctx);
     return NULL;
   }
@@ -168,6 +168,7 @@ Sm2SetPubKey (
   }
   Point = EC_POINT_new(Group);
   if (Point == NULL) {
+    RetVal = FALSE;
     goto Done;
   }
 
@@ -558,6 +559,7 @@ Sm2ComputeKey (
   }
   Point = EC_POINT_new(Group);
   if (Point == NULL) {
+    RetVal = FALSE;
     goto Done;
   }
 

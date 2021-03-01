@@ -133,7 +133,13 @@ SpdmProcessEncapsulatedResponse (
   if (SpdmContext->EncapContext.CurrentRequestOpCode != 0) {
     EncapResponseStruct = SpdmGetEncapStructViaOpCode (SpdmContext, SpdmContext->EncapContext.CurrentRequestOpCode);
     ASSERT (EncapResponseStruct != NULL);
+    if (EncapResponseStruct == NULL) {
+      return RETURN_UNSUPPORTED;
+    }
     ASSERT (EncapResponseStruct->ProcessEncapResponse != NULL);
+    if (EncapResponseStruct->ProcessEncapResponse == NULL) {
+      return RETURN_UNSUPPORTED;
+    }
     Status = EncapResponseStruct->ProcessEncapResponse (SpdmContext, EncapResponseSize, EncapResponse, &Continue);
     if (RETURN_ERROR(Status)) {
       return Status;
@@ -157,7 +163,13 @@ SpdmProcessEncapsulatedResponse (
   // Process the next request
   EncapResponseStruct = SpdmGetEncapStructViaOpCode (SpdmContext, SpdmContext->EncapContext.CurrentRequestOpCode);
   ASSERT (EncapResponseStruct != NULL);
+  if (EncapResponseStruct == NULL) {
+    return RETURN_UNSUPPORTED;
+  }
   ASSERT (EncapResponseStruct->GetEncapRequest != NULL);
+  if (EncapResponseStruct->GetEncapRequest == NULL) {
+    return RETURN_UNSUPPORTED;
+  }
   Status = EncapResponseStruct->GetEncapRequest (SpdmContext, EncapRequestSize, EncapRequest);
   return Status;
 }

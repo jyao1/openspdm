@@ -114,6 +114,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);    
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     /* WALKAROUND: If just use single context to encode message and then decode message */
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
@@ -138,6 +141,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -156,6 +162,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -174,6 +183,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -195,6 +207,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
       SubIndex1 ++;
       SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      if (SessionInfo == NULL) {
+        return RETURN_DEVICE_ERROR;
+      }
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     } else if (SubIndex1 == 1) {
       SPDM_HEARTBEAT_RESPONSE      *SpdmResponse; 
@@ -214,6 +229,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
       SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      if (SessionInfo == NULL) {
+        return RETURN_DEVICE_ERROR;
+      }
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     }
   }
@@ -233,6 +251,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -255,6 +276,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
     SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
     SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+    if (SessionInfo == NULL) {
+      return RETURN_DEVICE_ERROR;
+    }
     ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
   }
     return RETURN_SUCCESS;
@@ -280,6 +304,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
       SubIndex2 ++;
       SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      if (SessionInfo == NULL) {
+        return RETURN_DEVICE_ERROR;
+      }
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     } else if (SubIndex2 == 1) {
       SPDM_HEARTBEAT_RESPONSE       *SpdmResponse; 
@@ -299,6 +326,9 @@ SpdmRequesterHeartbeatTestReceiveMessage (
 
       SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
       SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      if (SessionInfo == NULL) {
+        return RETURN_DEVICE_ERROR;
+      }
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->ApplicationSecret.ResponseDataSequenceNumber --;
     }
   }

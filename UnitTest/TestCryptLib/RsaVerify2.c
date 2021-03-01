@@ -546,7 +546,7 @@ ValidateCryptPkcs7 (
              &P7SignedData,
              &P7SignedDataSize
              );
-  if (!Status || P7SignedDataSize == 0) {
+  if (!Status || P7SignedDataSize == 0 || P7SignedData == NULL) {
     Print ("[Fail]");
     goto _Exit;
   } else {

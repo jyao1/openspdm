@@ -95,6 +95,10 @@ OpenPcapPacketFile (
   
   DumpPcapGlobalHeader (&mPcapGlobalHeader);
 
+  if (mPcapGlobalHeader.SnapLen == 0) {
+    return FALSE;
+  }
+
   mPcapPacketDataBuffer = (VOID *)malloc (mPcapGlobalHeader.SnapLen);
   if (mPcapPacketDataBuffer == NULL) {
     printf ("!!!memory out of resources!!!\n");
@@ -156,6 +160,9 @@ DumpPcap (
       return ;
     }
     DumpPcapPacketHeader (Index++, &PcapPacketHeader);
+    if (PcapPacketHeader.InclLen == 0) {
+      return ;
+    }
     if (fread (mPcapPacketDataBuffer, 1, PcapPacketHeader.InclLen, mPcapFile) != PcapPacketHeader.InclLen) {
       return ;
     }

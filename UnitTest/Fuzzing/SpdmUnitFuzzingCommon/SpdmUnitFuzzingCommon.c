@@ -34,6 +34,9 @@ UINTN SpdmUnitTestGroupSetup(VOID **State)
 
   SpdmTestContext = mSpdmTestContext;
   SpdmTestContext->SpdmContext = (VOID *)malloc (SpdmGetContextSize());
+  if (SpdmTestContext->SpdmContext == NULL) {
+    return (UINTN)-1;
+  }
   SpdmContext = SpdmTestContext->SpdmContext;
 
   SpdmInitContext (SpdmContext);

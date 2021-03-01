@@ -146,6 +146,7 @@ EcSetPubKey (
   }
   Point = EC_POINT_new(Group);
   if (Point == NULL) {
+    RetVal = FALSE;
     goto Done;
   }
 
@@ -530,6 +531,7 @@ EcComputeKey (
   }
   Point = EC_POINT_new(Group);
   if (Point == NULL) {
+    RetVal = FALSE;
     goto Done;
   }
 

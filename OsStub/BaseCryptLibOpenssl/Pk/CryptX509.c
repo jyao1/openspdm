@@ -1450,8 +1450,17 @@ X509GetExtensionData (
   //
   for (i = 0; i < sk_X509_EXTENSION_num(Extensions); i++) {
       Ext = sk_X509_EXTENSION_value(Extensions, (int)i);
+      if (Ext == NULL) {
+        continue;
+      }
       Asn1Obj = X509_EXTENSION_get_object(Ext);
+      if (Asn1Obj == NULL) {
+        continue;
+      }
       Asn1Oct = X509_EXTENSION_get_data(Ext);
+      if (Asn1Oct == NULL) {
+        continue;
+      }
 
       if(OidSize == (UINTN)Asn1Obj->length && CompareMem (Asn1Obj->data, Oid, OidSize) == 0) {
         //

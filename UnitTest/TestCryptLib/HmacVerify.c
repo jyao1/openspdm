@@ -58,10 +58,15 @@ ValidateCryptHmac (
   //
   ZeroMem (Digest, MAX_DIGEST_SIZE);
   HmacCtx = HmacSha256New ();
+  if (HmacCtx == NULL) {
+    Print ("[Fail]");
+    return EFI_ABORTED;
+  }
 
   Status = HmacSha256SetKey (HmacCtx, HmacSha256Key, 20);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HmacCtx);
     return EFI_ABORTED;
   }
 
@@ -69,6 +74,7 @@ ValidateCryptHmac (
   Status  = HmacSha256Update (HmacCtx, HmacData, 8);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HmacCtx);
     return EFI_ABORTED;
   }
 
@@ -76,6 +82,7 @@ ValidateCryptHmac (
   Status  = HmacSha256Final (HmacCtx, Digest);
   if (!Status) {
     Print ("[Fail]");
+    FreePool (HmacCtx);
     return EFI_ABORTED;
   }
 

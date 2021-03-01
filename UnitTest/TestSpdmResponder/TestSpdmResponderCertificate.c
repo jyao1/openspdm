@@ -661,6 +661,7 @@ void TestSpdmResponderCertificateCase12(void **state) {
   // reseting an internal buffer to avoid overflow and prevent tests to succeed
   ResetManagedBuffer (&SpdmContext->Transcript.MessageB);
 
+  SpdmResponse = NULL;
   for(UINTN offset=0; offset<DataSize; offset++) {
     TEST_DEBUG_PRINT("offset:%u \n", offset);
     mSpdmGetCertificateRequest3.Offset = (UINT16)offset;
@@ -683,8 +684,10 @@ void TestSpdmResponderCertificateCase12(void **state) {
       break;
     }
   }
-  if (SpdmResponse->Header.RequestResponseCode == SPDM_CERTIFICATE) {
-    assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
+  if (SpdmResponse != NULL) {
+    if (SpdmResponse->Header.RequestResponseCode == SPDM_CERTIFICATE) {
+      assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_CERTIFICATE_REQUEST)*Count + sizeof(SPDM_CERTIFICATE_RESPONSE)*Count + DataSize);
+    }
   }
   free(Data);
 }

@@ -383,6 +383,7 @@ Pkcs7Sign (
   UINT8               *P;
   INT32               Len;
 
+  Buffer = NULL;
   BufferSize = 4096;
 
   SignatureLen = MAX_SIGNATURE_SIZE;
@@ -396,11 +397,18 @@ Pkcs7Sign (
     }
     CopyMem (NewPrivateKey, PrivateKey, PrivateKeySize);
     NewPrivateKey[PrivateKeySize] = 0;
+    PrivateKeySize ++;
+  } else {
+    NewPrivateKey = AllocatePool (PrivateKeySize);
+    if (NewPrivateKey == NULL) {
+      return FALSE;
+    }
+    CopyMem (NewPrivateKey, PrivateKey, PrivateKeySize);
   }
 
   mbedtls_pk_init (&Pkey);
   Ret = mbedtls_pk_parse_key (
-    &Pkey, NewPrivateKey, PrivateKeySize + 1,
+    &Pkey, NewPrivateKey, PrivateKeySize,
     KeyPassword, KeyPassword == NULL ? 0 : AsciiStrLen (KeyPassword)
   );
   if (Ret != 0) {

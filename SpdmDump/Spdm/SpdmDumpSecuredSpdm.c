@@ -204,39 +204,40 @@ DumpSecuredSpdmMessage (
 
   mCurrentSessionInfo = SpdmGetSessionInfoViaSessionId (mSpdmContext, RecordHeader1->SessionId);
   mCurrentSessionId = RecordHeader1->SessionId;
+  Status = RETURN_UNSUPPORTED;
   if (mCurrentSessionInfo != NULL) {
     SecuredMessageContext = SpdmGetSecuredMessageContextViaSessionId (mSpdmContext, RecordHeader1->SessionId);
-    MessageSize = GetMaxPacketLength();
-    Status = SpdmDecodeSecuredMessage (
-              SecuredMessageContext,
-              RecordHeader1->SessionId,
-              IsRequester,
-              BufferSize,
-              Buffer,
-              &MessageSize,
-              mSpdmDecMessageBuffer,
-              &SpdmSecuredMessageCallbacks
-              );
-    if (RETURN_ERROR(Status)) {
-      //
-      // Try other direction, because a responder might initiate a message in Session.
-      //
+    if (SecuredMessageContext != NULL) {
+      MessageSize = GetMaxPacketLength();
       Status = SpdmDecodeSecuredMessage (
                 SecuredMessageContext,
                 RecordHeader1->SessionId,
-                !IsRequester,
+                IsRequester,
                 BufferSize,
                 Buffer,
                 &MessageSize,
                 mSpdmDecMessageBuffer,
                 &SpdmSecuredMessageCallbacks
                 );
-      if (!RETURN_ERROR(Status)) {
-        IsRequester = !IsRequester;
+      if (RETURN_ERROR(Status)) {
+        //
+        // Try other direction, because a responder might initiate a message in Session.
+        //
+        Status = SpdmDecodeSecuredMessage (
+                  SecuredMessageContext,
+                  RecordHeader1->SessionId,
+                  !IsRequester,
+                  BufferSize,
+                  Buffer,
+                  &MessageSize,
+                  mSpdmDecMessageBuffer,
+                  &SpdmSecuredMessageCallbacks
+                  );
+        if (!RETURN_ERROR(Status)) {
+          IsRequester = !IsRequester;
+        }
       }
     }
-  } else {
-    Status = RETURN_UNSUPPORTED;
   }
 
   if (!RETURN_ERROR(Status)) {

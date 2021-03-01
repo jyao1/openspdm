@@ -95,6 +95,7 @@ HkdfMdExtract (
     return FALSE;
   }
 
+  MdSize = 0;
   switch (MdType) {
   case MBEDTLS_MD_SHA256:
     MdSize = SHA256_DIGEST_SIZE;
@@ -105,6 +106,8 @@ HkdfMdExtract (
   case MBEDTLS_MD_SHA512:
     MdSize = SHA512_DIGEST_SIZE;
     break;
+  default:
+    return FALSE;
   }
   if (PrkOutSize != MdSize) {
     return FALSE;

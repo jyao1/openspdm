@@ -199,6 +199,7 @@ SpdmSetSessionState (
   SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
   if (SessionInfo == NULL) {
     ASSERT (FALSE);
+    return ;
   }
 
   OldSessionState = SpdmSecuredMessageGetSessionState (SessionInfo->SecuredMessageContext);

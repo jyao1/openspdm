@@ -102,6 +102,10 @@ ValidateCryptDigest (
   ZeroMem (Digest, MAX_DIGEST_SIZE);
   CtxSize = Sha256GetContextSize ();
   HashCtx = AllocatePool (CtxSize);
+  if (HashCtx == NULL) {
+    Print ("[Fail]");
+    return EFI_ABORTED;
+  }
 
   Print ("Init... ");
   Status  = Sha256Init (HashCtx);
@@ -157,6 +161,10 @@ ValidateCryptDigest (
   ZeroMem (Digest, MAX_DIGEST_SIZE);
   CtxSize = Sha384GetContextSize ();
   HashCtx = AllocatePool (CtxSize);
+  if (HashCtx == NULL) {
+    Print ("[Fail]");
+    return EFI_ABORTED;
+  }
 
   Print ("Init... ");
   Status  = Sha384Init (HashCtx);
@@ -212,6 +220,10 @@ ValidateCryptDigest (
   ZeroMem (Digest, MAX_DIGEST_SIZE);
   CtxSize = Sha512GetContextSize ();
   HashCtx = AllocatePool (CtxSize);
+  if (HashCtx == NULL) {
+    Print ("[Fail]");
+    return EFI_ABORTED;
+  }
 
   Print ("Init... ");
   Status  = Sha512Init (HashCtx);

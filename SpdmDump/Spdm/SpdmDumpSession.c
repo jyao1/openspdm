@@ -46,6 +46,10 @@ SpdmDumpSessionDataProvision (
     return RETURN_UNSUPPORTED;
   }
   SecuredMessageContext = SpdmGetSecuredMessageContextViaSessionId (SpdmContext, SessionId);
+  if (SecuredMessageContext == NULL) {
+    ASSERT (FALSE);
+    return RETURN_UNSUPPORTED;
+  }
 
   ZeroMem (&Parameter, sizeof(Parameter));
   Parameter.Location = SpdmDataLocationSession;

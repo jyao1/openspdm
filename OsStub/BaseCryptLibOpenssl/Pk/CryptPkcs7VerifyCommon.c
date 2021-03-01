@@ -584,7 +584,7 @@ Pkcs7GetCertificatesList (
     //
     Issuer = NULL;
     if (X509_STORE_CTX_get1_issuer (&Issuer, CertCtx, Cert) == 1) {
-      if (X509_cmp (Issuer, Cert) == 0) {
+      if ((Issuer != NULL) && (X509_cmp (Issuer, Cert) == 0)) {
         break;
       }
     }
@@ -595,7 +595,9 @@ Pkcs7GetCertificatesList (
     if (CtxUntrusted != NULL) {
       Issuer = NULL;
       IssuerName = X509_get_issuer_name (Cert);
-      Issuer     = X509_find_by_subject (CtxUntrusted, IssuerName);
+      if (IssuerName != NULL) {
+        Issuer     = X509_find_by_subject (CtxUntrusted, IssuerName);
+      }
       if (Issuer != NULL) {
         if (!sk_X509_push (CtxChain, Issuer)) {
           goto _Error;

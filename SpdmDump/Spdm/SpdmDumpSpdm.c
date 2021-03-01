@@ -1453,6 +1453,9 @@ DumpSpdmKeyExchangeRsp (
   }
   mCurrentSessionInfo = SpdmAssignSessionId (mSpdmContext, mCachedSessionId, FALSE);
   ASSERT (mCurrentSessionInfo != NULL);
+  if (mCurrentSessionInfo == NULL) {
+    return ;
+  }
   mCurrentSessionId = mCachedSessionId;
 
   MutAuthRequested = SpdmResponse->MutAuthRequested;
@@ -1597,6 +1600,9 @@ DumpSpdmFinishRsp (
   printf ("\n");
 
   ASSERT (mCurrentSessionInfo != NULL);
+  if (mCurrentSessionInfo == NULL) {
+    return ;
+  }
   SpdmAppendMessageF (mCurrentSessionInfo, Buffer, MessageSize);
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", mCurrentSessionId));
@@ -1740,6 +1746,9 @@ DumpSpdmPskExchangeRsp (
   }
   mCurrentSessionInfo = SpdmAssignSessionId (mSpdmContext, mCachedSessionId, TRUE);
   ASSERT (mCurrentSessionInfo != NULL);
+  if (mCurrentSessionInfo == NULL) {
+    return ;
+  }
   mCurrentSessionId = mCachedSessionId;
 
   SpdmAppendMessageK (mCurrentSessionInfo, mSpdmLastMessageBuffer, mSpdmLastMessageBufferSize);
@@ -1866,6 +1875,9 @@ DumpSpdmPskFinishRsp (
   printf ("\n");
 
   ASSERT (mCurrentSessionInfo != NULL);
+  if (mCurrentSessionInfo == NULL) {
+    return ;
+  }
   SpdmAppendMessageF (mCurrentSessionInfo, Buffer, MessageSize);
 
   DEBUG ((DEBUG_INFO, "SpdmGenerateSessionDataKey[%x]\n", mCurrentSessionId));

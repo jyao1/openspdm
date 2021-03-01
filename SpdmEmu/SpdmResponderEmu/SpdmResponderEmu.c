@@ -30,8 +30,8 @@ CreateSocket(
 {
   struct               sockaddr_in MyAddress;
   INT32                Res;
-//  
-    // Initialize Winsock
+
+  // Initialize Winsock
 #ifdef _MSC_VER
   WSADATA              Ws;
   Res = WSAStartup(MAKEWORD(2, 2), &Ws);

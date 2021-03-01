@@ -58,7 +58,7 @@ ValidateCryptDh (
 
   Print ("Generate key1 ... ");
   Status = DhGenerateKey (Dh1, FFPublicKey1, &FFPublicKey1Length);
-  if (!Status) {
+  if (!Status || FFPublicKey1Length > sizeof (FFPublicKey1)) {
     Print ("[Fail]");
     DhFree (Dh1);
     DhFree (Dh2);
@@ -67,7 +67,7 @@ ValidateCryptDh (
 
   Print ("Generate key2 ... ");
   Status = DhGenerateKey (Dh2, FFPublicKey2, &FFPublicKey2Length);
-  if (!Status) {
+  if (!Status || FFPublicKey2Length > sizeof (FFPublicKey2)) {
     Print ("[Fail]");
     DhFree (Dh1);
     DhFree (Dh2);
