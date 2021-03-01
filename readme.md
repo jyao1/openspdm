@@ -6,23 +6,23 @@
 
    The SPDM and secured message follow :
 
-   DSP0274	Security Protocol and Data Model (SPDM) Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.0.0.pdf) and version [1.1.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.1.0.pdf))
+   DSP0274  Security Protocol and Data Model (SPDM) Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.0.0.pdf) and version [1.1.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.1.0.pdf))
 
-   DSP0277	Secured Messages using SPDM Specification (version [1.0.0b](https://www.dmtf.org/sites/default/files/standards/documents/DSP0277_1.0.0b.pdf))
+   DSP0277  Secured Messages using SPDM Specification (version [1.0.0b](https://www.dmtf.org/sites/default/files/standards/documents/DSP0277_1.0.0b.pdf))
 
    The MCTP and secured MCTP follow :
 
-   DSP0275	Security Protocol and Data Model (SPDM) over MCTP Binding Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0275_1.0.0.pdf))
+   DSP0275  Security Protocol and Data Model (SPDM) over MCTP Binding Specification (version [1.0.0](https://www.dmtf.org/sites/default/files/standards/documents/DSP0275_1.0.0.pdf))
 
-   DSP0276	Secured MCTP Messages over MCTP Binding Specification (version [1.0.0a](https://www.dmtf.org/sites/default/files/standards/documents/DSP0276_1.0.0a.pdf))
+   DSP0276  Secured MCTP Messages over MCTP Binding Specification (version [1.0.0a](https://www.dmtf.org/sites/default/files/standards/documents/DSP0276_1.0.0a.pdf))
 
    The PCI DOE / IDE follow :
 
-   PCI	Data Object Exchange (DOE) [ECN](https://members.pcisig.com/wg/PCI-SIG/document/14143)
+   PCI  Data Object Exchange (DOE) [ECN](https://members.pcisig.com/wg/PCI-SIG/document/14143)
 
-   PCI	Component Measurement and Authentication (CMA) [ECN](https://members.pcisig.com/wg/PCI-SIG/document/14236)
+   PCI  Component Measurement and Authentication (CMA) [ECN](https://members.pcisig.com/wg/PCI-SIG/document/14236)
 
-   PCI	Integrity and Data Encryption (IDE) [ECN](https://members.pcisig.com/wg/PCI-SIG/document/15149)
+   PCI  Integrity and Data Encryption (IDE) [ECN](https://members.pcisig.com/wg/PCI-SIG/document/15149)
 
 2) Both SPDM requester and SPDM responder.
 

@@ -229,7 +229,7 @@ else ifeq ("$(TOOLCHAIN)","CLANG")
     DLINK_OBJECT_FILES = -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group
     DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib
     DLINK_FLAGS2 = -Wno-error -no-pie
-	
+
 else ifeq ("$(TOOLCHAIN)","KLEE")
     CC = clang
     CC_FLAGS = -c -g -fno-strict-aliasing -Wall  -Wno-array-bounds -ffunction-sections -fdata-sections -fno-common  -mno-red-zone -Wno-address -fpie -fno-asynchronous-unwind-tables -flto -DUSING_LTO -Wno-switch -emit-llvm -DTEST_WITH_KLEE=TRUE -DDEBUG_ASSERT_CHOICE=0
@@ -240,7 +240,7 @@ else ifeq ("$(TOOLCHAIN)","KLEE")
     SLINK = llvm-ar
 
     DLINK = llvm-link
-	DLINK_OBJECT_FILES = $(STATIC_LIBRARY_OBJECT_FILES)
+    DLINK_OBJECT_FILES = $(STATIC_LIBRARY_OBJECT_FILES)
     DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME)
 
 else ifeq ("$(TOOLCHAIN)","LIBFUZZER")
@@ -256,7 +256,7 @@ else ifeq ("$(TOOLCHAIN)","LIBFUZZER")
     DLINK_OBJECT_FILES = -Wl,--start-group,@$(OUTPUT_DIR)/tmp.list,--end-group
     DLINK_FLAGS = -o $(BIN_DIR)/$(BASE_NAME) -flto -L/usr/X11R6/lib 
     DLINK_FLAGS2 = -Wno-error -no-pie -fsanitize=fuzzer,address
-	
+
 endif
 
 ifeq ("$(ARCH)","X64")
