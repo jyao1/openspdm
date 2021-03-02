@@ -1,5 +1,9 @@
 # This openspdm is a sample implementation for the DMTF [SPDM](https://www.dmtf.org/standards/pmci) specification
 
+## NOTE
+We are moving openspdm to a new location. We freeze the master at this moment.
+Once the new location is finalized, we will move development activity there.
+
 ## Feature
 
 1) Specification
