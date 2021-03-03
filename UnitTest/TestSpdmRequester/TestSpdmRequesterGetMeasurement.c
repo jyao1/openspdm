@@ -706,7 +706,6 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
   case 0xE:
   {
     SPDM_MEASUREMENTS_RESPONSE    *SpdmResponse;
-    UINT8                         *Ptr;
     UINTN                         MeasurmentSigSize;
     SPDM_MEASUREMENT_BLOCK_DMTF   *MeasurmentBlock;
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
@@ -729,11 +728,6 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     SetMem (MeasurmentBlock, sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo), 1);
     MeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSpecification = SPDM_MEASUREMENT_BLOCK_HEADER_SPECIFICATION_DMTF;
     MeasurmentBlock->MeasurementBlockCommonHeader.MeasurementSize = (UINT16) (sizeof(SPDM_MEASUREMENT_BLOCK_DMTF_HEADER) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo));
-    Ptr = (VOID *)((UINT8 *)SpdmResponse + TempBufSize - MeasurmentSigSize);
-    SpdmGetRandomNumber (SPDM_NONCE_SIZE, Ptr);
-    Ptr += SPDM_NONCE_SIZE;
-    *(UINT16 *)Ptr = 0;
-    Ptr += sizeof(UINT16);
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
   }
