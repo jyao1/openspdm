@@ -706,7 +706,6 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
   case 0xE:
   {
     SPDM_MEASUREMENTS_RESPONSE    *SpdmResponse;
-    UINTN                         MeasurmentSigSize;
     SPDM_MEASUREMENT_BLOCK_DMTF   *MeasurmentBlock;
     UINT8                         TempBuf[MAX_SPDM_MESSAGE_BUFFER_SIZE];
     UINTN                         TempBufSize;
@@ -714,7 +713,6 @@ SpdmRequesterGetMeasurementTestReceiveMessage (
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
     ((SPDM_DEVICE_CONTEXT*)SpdmContext)->ConnectionInfo.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
-    MeasurmentSigSize = SPDM_NONCE_SIZE + sizeof(UINT16) + 0 + GetSpdmAsymSignatureSize (mUseAsymAlgo);
     TempBufSize = sizeof(SPDM_MEASUREMENTS_RESPONSE) + sizeof(SPDM_MEASUREMENT_BLOCK_DMTF) + GetSpdmMeasurementHashSize (mUseMeasurementHashAlgo);
     SpdmResponse = (VOID *)TempBuf;
 
