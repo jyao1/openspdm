@@ -50,6 +50,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/CryptDh.o \
     $(OUTPUT_DIR)/CryptEc.o \
     $(OUTPUT_DIR)/CryptEd.o \
+    $(OUTPUT_DIR)/CryptEcx.o \
     $(OUTPUT_DIR)/CryptSm2.o \
     $(OUTPUT_DIR)/CryptRsaBasic.o \
     $(OUTPUT_DIR)/CryptRsaExt.o \
@@ -142,6 +143,9 @@ $(OUTPUT_DIR)/CryptEc.o : $(SOURCE_DIR)/Pk/CryptEc.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptEd.o : $(SOURCE_DIR)/Pk/CryptEd.c
+	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
+
+$(OUTPUT_DIR)/CryptEcx.o : $(SOURCE_DIR)/Pk/CryptEcx.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptDh.o : $(SOURCE_DIR)/Pk/CryptDh.c

@@ -260,6 +260,18 @@ ValidateCryptEd2 (
   );
 
 /**
+  Validate UEFI-OpenSSL MontgomeryCurve Interfaces.
+
+  @retval  EFI_SUCCESS  Validation succeeded.
+  @retval  EFI_ABORTED  Validation failed.
+
+**/
+EFI_STATUS
+ValidateCryptEcx (
+  VOID
+  );
+
+/**
   Validate UEFI-OpenSSL Sm2 Interfaces.
 
   @retval  EFI_SUCCESS  Validation succeeded.

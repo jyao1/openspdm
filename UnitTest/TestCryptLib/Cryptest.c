@@ -164,6 +164,11 @@ CryptestMain (
     return Status;
   }
 
+  Status = ValidateCryptEcx ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   Status = ValidateCryptSm2 ();
   if (EFI_ERROR (Status)) {
     return Status;

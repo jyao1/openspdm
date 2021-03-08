@@ -31,6 +31,7 @@ SET(src_BaseCryptLibMbedTls
     Pem/CryptPem.c
     Pk/CryptEc.c
     Pk/CryptEd.c
+    Pk/CryptEcx.c
     Pk/CryptDh.c
     Pk/CryptSm2.c
     Pk/CryptRsaBasic.c

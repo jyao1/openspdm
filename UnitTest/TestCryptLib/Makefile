@@ -45,6 +45,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\EcVerify2.obj \
     $(OUTPUT_DIR)\EdVerify.obj \
     $(OUTPUT_DIR)\EdVerify2.obj \
+    $(OUTPUT_DIR)\EcxVerify.obj \
     $(OUTPUT_DIR)\Sm2Verify.obj \
     $(OUTPUT_DIR)\Sm2Verify2.obj \
     $(OUTPUT_DIR)\RandVerify.obj \
@@ -152,6 +153,9 @@ $(OUTPUT_DIR)\EdVerify.obj : $(SOURCE_DIR)\EdVerify.c
 
 $(OUTPUT_DIR)\EdVerify2.obj : $(SOURCE_DIR)\EdVerify2.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\EdVerify2.c
+
+$(OUTPUT_DIR)\EcxVerify.obj : $(SOURCE_DIR)\EcxVerify.c
+    $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\EcxVerify.c
 
 $(OUTPUT_DIR)\Sm2Verify.obj : $(SOURCE_DIR)\Sm2Verify.c
     $(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Sm2Verify.c

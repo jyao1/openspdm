@@ -48,6 +48,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\CryptDh.obj \
     $(OUTPUT_DIR)\CryptEc.obj \
     $(OUTPUT_DIR)\CryptEd.obj \
+    $(OUTPUT_DIR)\CryptEcx.obj \
     $(OUTPUT_DIR)\CryptSm2.obj \
     $(OUTPUT_DIR)\CryptRsaBasic.obj \
     $(OUTPUT_DIR)\CryptRsaExt.obj \
@@ -141,6 +142,9 @@ $(OUTPUT_DIR)\CryptEc.obj : $(SOURCE_DIR)\Pk\CryptEc.c
 
 $(OUTPUT_DIR)\CryptEd.obj : $(SOURCE_DIR)\Pk\CryptEd.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptEd.c
+
+$(OUTPUT_DIR)\CryptEcx.obj : $(SOURCE_DIR)\Pk\CryptEcx.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptEcx.c
 
 $(OUTPUT_DIR)\CryptDh.obj : $(SOURCE_DIR)\Pk\CryptDh.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Pk\CryptDh.c
