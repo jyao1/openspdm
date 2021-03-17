@@ -47,6 +47,8 @@ SpdmRequesterNegotiateAlgorithmTestSendMessage (
     return RETURN_SUCCESS;
   case 0xC:
     return RETURN_SUCCESS;
+  case 0xD:
+    return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -307,6 +309,35 @@ SpdmRequesterNegotiateAlgorithmTestReceiveMessage (
   }
     return RETURN_SUCCESS;
 
+  case 0xD:
+  {
+    STATIC UINT16 ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+
+    SPDM_ERROR_RESPONSE    SpdmResponse;
+
+    if(ErrorCode <= 0xff) {
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = (UINT8) ErrorCode;
+      SpdmResponse.Header.Param2 = 0;
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    }
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+    return RETURN_SUCCESS;
+
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -552,6 +583,43 @@ void TestSpdmRequesterNegotiateAlgorithmCase12(void **state) {
   assert_int_equal (SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo, 0);
 }
 
+void TestSpdmRequesterNegotiateAlgorithmCase13(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT16                ErrorCode;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xD;
+  SpdmContext->LocalContext.Algorithm.MeasurementHashAlgo = mUseMeasurementHashAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->LocalContext.Algorithm.BaseHashAlgo = mUseHashAlgo;
+
+  ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+  while(ErrorCode <= 0xff) {
+    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterCapabilities;
+    SpdmContext->Transcript.MessageA.BufferSize = 0;
+
+    Status = SpdmNegotiateAlgorithms (SpdmContext);
+    // assert_int_equal (Status, RETURN_DEVICE_ERROR);
+    // assert_int_equal (SpdmContext->Transcript.MessageA.BufferSize, 0);
+    ASSERT_INT_EQUAL_CASE (Status, RETURN_DEVICE_ERROR, ErrorCode);
+    ASSERT_INT_EQUAL_CASE (SpdmContext->Transcript.MessageA.BufferSize, 0, ErrorCode);
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+}
+
 SPDM_TEST_CONTEXT       mSpdmRequesterNegotiateAlgorithmTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
@@ -585,6 +653,8 @@ int SpdmRequesterNegotiateAlgorithmTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterNegotiateAlgorithmCase11),
       // When SpdmResponse.BaseHashSel is 0
       cmocka_unit_test(TestSpdmRequesterNegotiateAlgorithmCase12),
+      // Unexpected errors
+      cmocka_unit_test(TestSpdmRequesterNegotiateAlgorithmCase13),
   };
   
   SetupSpdmTestContext (&mSpdmRequesterNegotiateAlgorithmTestContext);

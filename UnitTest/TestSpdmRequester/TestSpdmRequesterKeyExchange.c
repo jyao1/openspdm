@@ -134,6 +134,12 @@ SpdmRequesterKeyExchangeTestSendMessage (
     }
   }
     return RETURN_SUCCESS;
+  case 0xA:
+    LocalBufferSize = 0;
+    MessageSize = SpdmTestGetKeyExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
+    return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -665,6 +671,35 @@ SpdmRequesterKeyExchangeTestReceiveMessage (
   }
     return RETURN_SUCCESS;
 
+  case 0xA:
+  {
+    STATIC UINT16 ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+
+    SPDM_ERROR_RESPONSE    SpdmResponse;
+
+    if(ErrorCode <= 0xff) {
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = (UINT8) ErrorCode;
+      SpdmResponse.Header.Param2 = 0;
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    }
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+    return RETURN_SUCCESS;
+
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -1000,6 +1035,60 @@ void TestSpdmRequesterKeyExchangeCase9(void **state) {
   free(Data);
 }
 
+void TestSpdmRequesterKeyExchangeCase10(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT32               SessionId;
+  UINT8                HeartbeatPeriod;
+  UINT8                MeasurementHash[MAX_HASH_SIZE];
+  UINT8                SlotIdParam;
+  VOID                 *Data;
+  UINTN                DataSize;
+  VOID                 *Hash;
+  UINTN                HashSize;
+  UINT16               ErrorCode;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xA;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP;
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
+
+  ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+  while(ErrorCode <= 0xff) {
+    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
+    SpdmContext->Transcript.MessageA.BufferSize = 0;
+
+    HeartbeatPeriod = 0;
+    ZeroMem(MeasurementHash, sizeof(MeasurementHash));
+    Status = SpdmSendReceiveKeyExchange (SpdmContext, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH,
+               0, &SessionId, &HeartbeatPeriod, &SlotIdParam, MeasurementHash);
+    // assert_int_equal (Status, RETURN_DEVICE_ERROR);
+    ASSERT_INT_EQUAL_CASE (Status, RETURN_DEVICE_ERROR, ErrorCode);
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+
+  free(Data);
+}
+
 SPDM_TEST_CONTEXT       mSpdmRequesterKeyExchangeTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
@@ -1027,6 +1116,8 @@ int SpdmRequesterKeyExchangeTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterKeyExchangeCase8),
       // SPDM_ERROR_CODE_RESPONSE_NOT_READY + Successful response
       cmocka_unit_test(TestSpdmRequesterKeyExchangeCase9),
+      // Unexpected errors
+      cmocka_unit_test(TestSpdmRequesterKeyExchangeCase10),
   };
   
   SetupSpdmTestContext (&mSpdmRequesterKeyExchangeTestContext);

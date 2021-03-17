@@ -123,6 +123,12 @@ SpdmRequesterPskExchangeTestSendMessage (
     }
   }
     return RETURN_SUCCESS;
+  case 0xA:
+    LocalBufferSize = 0;
+    MessageSize = SpdmTestGetPskExchangeRequestSize (SpdmContext, (UINT8 *)Request + HeaderSize, RequestSize - HeaderSize);
+    CopyMem (LocalBuffer, (UINT8 *)Request + HeaderSize, MessageSize);
+    LocalBufferSize += MessageSize;
+    return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -550,6 +556,35 @@ SpdmRequesterPskExchangeTestReceiveMessage (
   }
     return RETURN_SUCCESS;
 
+  case 0xA:
+  {
+    STATIC UINT16 ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+
+    SPDM_ERROR_RESPONSE    SpdmResponse;
+
+    if(ErrorCode <= 0xff) {
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = (UINT8) ErrorCode;
+      SpdmResponse.Header.Param2 = 0;
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    }
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+    return RETURN_SUCCESS;
+
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -913,6 +948,63 @@ void TestSpdmRequesterPskExchangeCase9(void **state) {
   free(Data);
 }
 
+void TestSpdmRequesterPskExchangeCase10(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT32               SessionId;
+  UINT8                HeartbeatPeriod;
+  UINT8                MeasurementHash[MAX_HASH_SIZE];
+  VOID                 *Data;
+  UINTN                DataSize;
+  VOID                 *Hash;
+  UINTN                HashSize;
+  UINT16               ErrorCode;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xA;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.KeySchedule = mUseKeyScheduleAlgo;
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
+  ZeroMem (LocalPskHint, 32);
+  CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
+  SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
+  SpdmContext->LocalContext.PskHint = LocalPskHint;
+
+  ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+  while(ErrorCode <= 0xff) {
+    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
+    SpdmContext->Transcript.MessageA.BufferSize = 0;
+  
+    HeartbeatPeriod = 0;
+    ZeroMem(MeasurementHash, sizeof(MeasurementHash));
+    Status = SpdmSendReceivePskExchange (SpdmContext, SPDM_CHALLENGE_REQUEST_NO_MEASUREMENT_SUMMARY_HASH,
+             &SessionId, &HeartbeatPeriod, MeasurementHash);
+    // assert_int_equal (Status, RETURN_DEVICE_ERROR);
+    ASSERT_INT_EQUAL_CASE (Status, RETURN_DEVICE_ERROR, ErrorCode);
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+
+  free(Data);
+}
+
 SPDM_TEST_CONTEXT       mSpdmRequesterPskExchangeTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
@@ -940,6 +1032,8 @@ int SpdmRequesterPskExchangeTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterPskExchangeCase8),
       // SPDM_ERROR_CODE_RESPONSE_NOT_READY + Successful response
       cmocka_unit_test(TestSpdmRequesterPskExchangeCase9),
+      // Unexpected errors
+      cmocka_unit_test(TestSpdmRequesterPskExchangeCase10),
   };
   
   SetupSpdmTestContext (&mSpdmRequesterPskExchangeTestContext);

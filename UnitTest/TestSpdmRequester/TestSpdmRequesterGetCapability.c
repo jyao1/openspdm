@@ -83,6 +83,8 @@ SpdmRequesterGetCapabilityTestSendMessage (
     return RETURN_SUCCESS;
   case 0x1c:
     return RETURN_SUCCESS;
+  case 0x1d:
+    return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -567,6 +569,35 @@ SpdmRequesterGetCapabilityTestReceiveMessage (
         SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
       }
         return RETURN_SUCCESS;
+
+  case 0x1d:
+  {
+    STATIC UINT16 ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+
+    SPDM_ERROR_RESPONSE    SpdmResponse;
+
+    if(ErrorCode <= 0xff) {
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = (UINT8) ErrorCode;
+      SpdmResponse.Header.Param2 = 0;
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    }
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+    return RETURN_SUCCESS;
 
   default:
     return RETURN_DEVICE_ERROR;
@@ -1113,6 +1144,43 @@ void TestSpdmRequesterGetCapabilityCase28(void **state) {
   assert_int_equal (Status, RETURN_DEVICE_ERROR);
 }
 
+void TestSpdmRequesterGetCapabilityCase29(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT16               ErrorCode;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x1d;
+  SpdmContext->ConnectionInfo.Version.SpdmVersionCount = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MajorVersion = 1;
+  SpdmContext->ConnectionInfo.Version.SpdmVersion[0].MinorVersion = 1;
+  SpdmContext->LocalContext.Capability.CTExponent = 0;
+  SpdmContext->LocalContext.Capability.Flags = DEFAULT_CAPABILITY_FLAG_VERSION_11;
+
+  ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+  while(ErrorCode <= 0xff) {
+    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterVersion;
+    ResetManagedBuffer(&SpdmContext->Transcript.MessageA);
+
+    Status = SpdmGetCapabilities (SpdmContext);
+    // assert_int_equal (Status, RETURN_DEVICE_ERROR);
+    ASSERT_INT_EQUAL_CASE (Status, RETURN_DEVICE_ERROR, ErrorCode);
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+}
+
 SPDM_TEST_CONTEXT       mSpdmRequesterGetCapabilityTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
@@ -1181,6 +1249,8 @@ int SpdmRequesterGetCapabilityTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterGetCapabilityCase27),
       // Requester sends all flags set and receives response with 0xFF as version code (wrong version code)
       cmocka_unit_test(TestSpdmRequesterGetCapabilityCase28),
+      // Unexpected errors
+      cmocka_unit_test(TestSpdmRequesterGetCapabilityCase29),
   };
 
   SetupSpdmTestContext (&mSpdmRequesterGetCapabilityTestContext);

@@ -67,6 +67,8 @@ SpdmRequesterGetDigestTestSendMessage (
     return RETURN_SUCCESS;
   case 0x15:
     return RETURN_SUCCESS;
+  case 0x16:
+    return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -496,6 +498,35 @@ SpdmRequesterGetDigestTestReceiveMessage (
     SpdmResponse->Header.Param2 |= (1 << 0);
 
     SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, TempBufSize, TempBuf, ResponseSize, Response);
+  }
+    return RETURN_SUCCESS;
+
+  case 0x16:
+  {
+    STATIC UINT16 ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+
+    SPDM_ERROR_RESPONSE    SpdmResponse;
+
+    if(ErrorCode <= 0xff) {
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = (UINT8) ErrorCode;
+      SpdmResponse.Header.Param2 = 0;
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    }
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
   }
     return RETURN_SUCCESS;
 
@@ -1100,6 +1131,56 @@ void TestSpdmRequesterGetDigestCase21(void **state) {
   assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, sizeof(SPDM_GET_DIGESTS_REQUEST));
 }
 
+/**
+  Test 22: receiving an unexpected ERROR message from the responder.
+  There are tests for all named codes, including some reserved ones
+  (namely, 0x00, 0x0b, 0x0c, 0x3f, 0xfd, 0xfe).
+  However, for having specific test cases, it is excluded from this case:
+  Busy (0x03), ResponseNotReady (0x42), and RequestResync (0x43).
+  Expected behavior: client returns a Status of RETURN_DEVICE_ERROR.
+**/
+void TestSpdmRequesterGetDigestCase22(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT8                 SlotMask;
+  UINT8                 TotalDigestBuffer[MAX_HASH_SIZE * MAX_SPDM_SLOT_COUNT];
+  UINT16                ErrorCode;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x16;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->LocalContext.PeerCertChainProvision = LocalCertificateChain;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = MAX_SPDM_MESSAGE_BUFFER_SIZE;
+  SetMem (LocalCertificateChain, MAX_SPDM_MESSAGE_BUFFER_SIZE, (UINT8)(0xFF));
+
+  ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+  while(ErrorCode <= 0xff) {
+    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
+    SpdmContext->Transcript.MessageB.BufferSize = 0;
+    
+    ZeroMem (TotalDigestBuffer, sizeof(TotalDigestBuffer));
+    Status = SpdmGetDigest (SpdmContext, &SlotMask, &TotalDigestBuffer);
+    // assert_int_equal (Status, RETURN_DEVICE_ERROR);
+    // assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, 0);
+    ASSERT_INT_EQUAL_CASE (Status, RETURN_DEVICE_ERROR, ErrorCode);
+    ASSERT_INT_EQUAL_CASE (SpdmContext->Transcript.MessageB.BufferSize, 0, ErrorCode);
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+}
+
 SPDM_TEST_CONTEXT       mSpdmRequesterGetDigestTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
@@ -1151,6 +1232,8 @@ int SpdmRequesterGetDigestTestMain(void) {
       //cmocka_unit_test(TestSpdmRequesterGetDigestCase20),
       // Size of response > Max size of SPDM DIGESTS response
       //cmocka_unit_test(TestSpdmRequesterGetDigestCase21),
+      // Unexpected errors
+      cmocka_unit_test(TestSpdmRequesterGetDigestCase22),
   };
   
   SetupSpdmTestContext (&mSpdmRequesterGetDigestTestContext);

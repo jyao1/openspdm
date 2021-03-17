@@ -56,6 +56,8 @@ SpdmRequesterGetCertificateTestSendMessage (
     return RETURN_SUCCESS;
   case 0xF:
     return RETURN_SUCCESS;
+  case 0x10:
+    return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -633,6 +635,35 @@ SpdmRequesterGetCertificateTestReceiveMessage (
         LocalCertificateChain = NULL;
         LocalCertificateChainSize = 0;
       }
+  }
+    return RETURN_SUCCESS;
+
+  case 0x10:
+  {
+    STATIC UINT16 ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+
+    SPDM_ERROR_RESPONSE    SpdmResponse;
+
+    if(ErrorCode <= 0xff) {
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = (UINT8) ErrorCode;
+      SpdmResponse.Header.Param2 = 0;
+
+      SpdmTransportTestEncodeMessage (SpdmContext, NULL, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+    }
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
   }
     return RETURN_SUCCESS;
 
@@ -1230,6 +1261,65 @@ void TestSpdmRequesterGetCertificateCase15(void **state) {
   free(Data);
 }
 
+/**
+  Test 16: receiving an unexpected ERROR message from the responder.
+  There are tests for all named codes, including some reserved ones
+  (namely, 0x00, 0x0b, 0x0c, 0x3f, 0xfd, 0xfe).
+  However, for having specific test cases, it is excluded from this case:
+  Busy (0x03), ResponseNotReady (0x42), and RequestResync (0x43).
+  Expected behavior: client returns a Status of RETURN_DEVICE_ERROR.
+**/
+void TestSpdmRequesterGetCertificateCase16(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINTN                CertChainSize;
+  UINT8                CertChain[MAX_SPDM_CERT_CHAIN_SIZE];
+  VOID                 *Data;
+  UINTN                DataSize;
+  VOID                 *Hash;
+  UINTN                HashSize;
+  UINT16                ErrorCode;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0x10;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CERT_CAP;
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
+  SpdmContext->LocalContext.PeerRootCertHashProvisionSize = HashSize;
+  SpdmContext->LocalContext.PeerRootCertHashProvision = Hash;
+  SpdmContext->LocalContext.PeerCertChainProvision = NULL;
+  SpdmContext->LocalContext.PeerCertChainProvisionSize = 0;
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+
+  ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+  while(ErrorCode <= 0xff) {
+    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateAfterDigests;
+    SpdmContext->Transcript.MessageB.BufferSize = 0;
+
+    CertChainSize = sizeof(CertChain);
+    ZeroMem (CertChain, sizeof(CertChain));
+    Status = SpdmGetCertificate (SpdmContext, 0, &CertChainSize, CertChain);
+    // assert_int_equal (Status, RETURN_DEVICE_ERROR);
+    // assert_int_equal (SpdmContext->Transcript.MessageB.BufferSize, 0);
+    ASSERT_INT_EQUAL_CASE (Status, RETURN_DEVICE_ERROR, ErrorCode);
+    ASSERT_INT_EQUAL_CASE (SpdmContext->Transcript.MessageB.BufferSize, 0, ErrorCode);
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+  
+  free(Data);
+}
+
 SPDM_TEST_CONTEXT       mSpdmRequesterGetCertificateTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
@@ -1269,6 +1359,8 @@ int SpdmRequesterGetCertificateTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterGetCertificateCase14),
       // Sucessful response: get a long certificate chain
       cmocka_unit_test(TestSpdmRequesterGetCertificateCase15),
+      // Unexpected errors
+      cmocka_unit_test(TestSpdmRequesterGetCertificateCase16),
   };
 
   SetupSpdmTestContext (&mSpdmRequesterGetCertificateTestContext);

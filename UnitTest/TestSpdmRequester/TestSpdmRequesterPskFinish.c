@@ -74,6 +74,8 @@ SpdmRequesterPskFinishTestSendMessage (
     return RETURN_SUCCESS;
   case 0x9:
     return RETURN_SUCCESS;
+  case 0xA:
+    return RETURN_SUCCESS;
   default:
     return RETURN_DEVICE_ERROR;
   }
@@ -330,6 +332,41 @@ SpdmRequesterPskFinishTestReceiveMessage (
         return RETURN_DEVICE_ERROR;
       }
       ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->HandshakeSecret.ResponseHandshakeSequenceNumber --;
+    }
+  }
+    return RETURN_SUCCESS;
+
+  case 0xA:
+  {
+    STATIC UINT16 ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+
+    SPDM_ERROR_RESPONSE    SpdmResponse;
+    UINT32                 SessionId;
+    SPDM_SESSION_INFO      *SessionInfo;
+
+    SessionId = 0xFFFFFFFF;
+
+    if(ErrorCode <= 0xff) {
+      ZeroMem (&SpdmResponse, sizeof(SpdmResponse));
+      SpdmResponse.Header.SPDMVersion = SPDM_MESSAGE_VERSION_11;
+      SpdmResponse.Header.RequestResponseCode = SPDM_ERROR;
+      SpdmResponse.Header.Param1 = (UINT8) ErrorCode;
+      SpdmResponse.Header.Param2 = 0;
+
+      SpdmTransportTestEncodeMessage (SpdmContext, &SessionId, FALSE, FALSE, sizeof(SpdmResponse), &SpdmResponse, ResponseSize, Response);
+      SessionInfo = SpdmGetSessionInfoViaSessionId (SpdmContext, SessionId);
+      ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->HandshakeSecret.ResponseHandshakeSequenceNumber --;
+    }
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
     }
   }
     return RETURN_SUCCESS;
@@ -779,6 +816,73 @@ void TestSpdmRequesterPskFinishCase9(void **state) {
   free(Data);
 }
 
+void TestSpdmRequesterPskFinishCase10(void **state) {
+  RETURN_STATUS        Status;
+  SPDM_TEST_CONTEXT    *SpdmTestContext;
+  SPDM_DEVICE_CONTEXT  *SpdmContext;
+  UINT32               SessionId;
+  VOID                 *Data;
+  UINTN                DataSize;
+  VOID                 *Hash;
+  UINTN                HashSize;
+  SPDM_SESSION_INFO    *SessionInfo;
+  UINT16               ErrorCode;
+
+  SpdmTestContext = *state;
+  SpdmContext = SpdmTestContext->SpdmContext;
+  SpdmTestContext->CaseId = 0xA;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_ENCRYPT_CAP;
+  SpdmContext->ConnectionInfo.Capability.Flags |= SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MAC_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_ENCRYPT_CAP;
+  SpdmContext->LocalContext.Capability.Flags |= SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MAC_CAP;
+  ReadResponderPublicCertificateChain (mUseHashAlgo, mUseAsymAlgo, &Data, &DataSize, &Hash, &HashSize);
+  SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo = mUseHashAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo = mUseAsymAlgo;
+  SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup = mUseDheAlgo; 
+  SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite = mUseAeadAlgo;
+  SpdmContext->ConnectionInfo.PeerUsedCertChainBufferSize = DataSize;
+  CopyMem (SpdmContext->ConnectionInfo.PeerUsedCertChainBuffer, Data, DataSize);
+  ZeroMem (LocalPskHint, 32);
+  CopyMem (&LocalPskHint[0], TEST_PSK_HINT_STRING, sizeof(TEST_PSK_HINT_STRING));
+  SpdmContext->LocalContext.PskHintSize = sizeof(TEST_PSK_HINT_STRING);
+  SpdmContext->LocalContext.PskHint = LocalPskHint;
+
+  ErrorCode = SPDM_ERROR_CODE_RESERVED_00;
+  while(ErrorCode <= 0xff) {
+    SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
+    SpdmContext->Transcript.MessageA.BufferSize = 0;
+
+    SessionId = 0xFFFFFFFF;
+    SessionInfo = &SpdmContext->SessionInfo[0];
+    SpdmSessionInfoInit (SpdmContext, SessionInfo, SessionId, TRUE);
+    SpdmSecuredMessageSetSessionState (SessionInfo->SecuredMessageContext, SpdmSessionStateHandshaking);  
+    SetMem (mDummyKeyBuffer, ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->AeadKeySize, (UINT8)(0xFF));
+    SpdmSecuredMessageSetResponseHandshakeEncryptionKey (SessionInfo->SecuredMessageContext, mDummyKeyBuffer, ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->AeadKeySize);
+    SetMem (mDummySaltBuffer, ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->AeadIvSize, (UINT8)(0xFF));
+    SpdmSecuredMessageSetResponseHandshakeSalt (SessionInfo->SecuredMessageContext, mDummySaltBuffer, ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->AeadIvSize);
+    ((SPDM_SECURED_MESSAGE_CONTEXT*)(SessionInfo->SecuredMessageContext))->HandshakeSecret.ResponseHandshakeSequenceNumber = 0;
+    
+    Status = SpdmSendReceivePskFinish (SpdmContext, SessionId); 
+    // assert_int_equal (Status, RETURN_DEVICE_ERROR);
+    ASSERT_INT_EQUAL_CASE (Status, RETURN_DEVICE_ERROR, ErrorCode);
+
+    ErrorCode++;
+    if(ErrorCode == SPDM_ERROR_CODE_BUSY) { //busy is treated in cases 5 and 6
+      ErrorCode = SPDM_ERROR_CODE_UNEXPECTED_REQUEST;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESERVED_0D) { //skip some reserved error codes (0d to 3e)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_3F;
+    }
+    if(ErrorCode == SPDM_ERROR_CODE_RESPONSE_NOT_READY) { //skip response not ready, request resync, and some reserved codes (44 to fc)
+      ErrorCode = SPDM_ERROR_CODE_RESERVED_FD;
+    }
+  }
+
+  free(Data);
+}
+
 SPDM_TEST_CONTEXT       mSpdmRequesterPskFinishTestContext = {
   SPDM_TEST_CONTEXT_SIGNATURE,
   TRUE,
@@ -806,6 +910,8 @@ int SpdmRequesterPskFinishTestMain(void) {
       cmocka_unit_test(TestSpdmRequesterPskFinishCase8),
       // SPDM_ERROR_CODE_RESPONSE_NOT_READY + Successful response
       cmocka_unit_test(TestSpdmRequesterPskFinishCase9),
+      // Unexpected errors
+      cmocka_unit_test(TestSpdmRequesterPskFinishCase10),
   };
   
   SetupSpdmTestContext (&mSpdmRequesterPskFinishTestContext);
