@@ -34,26 +34,29 @@ SET(SpdmDump_LIBRARY
     SpdmSecuredMessageLib
     SpdmTransportMctpLib
     SpdmTransportPciDoeLib
-    SpdmDeviceSecretLibNull
+    SpdmDeviceSecretLib
 )
-
-if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
-    ADD_EXECUTABLE(SpdmDump
-                   ${src_SpdmDump}
-                   $<TARGET_OBJECTS:BaseMemoryLib>
-                   $<TARGET_OBJECTS:DebugLibNull>
-                   $<TARGET_OBJECTS:SpdmCommonLib>
-                   $<TARGET_OBJECTS:${CRYPTO}Lib>
-                   $<TARGET_OBJECTS:RngLib>
-                   $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
-                   $<TARGET_OBJECTS:MemoryAllocationLib>
-                   $<TARGET_OBJECTS:SpdmCryptLib>
-                   $<TARGET_OBJECTS:SpdmSecuredMessageLib>
-                   $<TARGET_OBJECTS:SpdmTransportMctpLib>
-                   $<TARGET_OBJECTS:SpdmTransportPciDoeLib>
-                   $<TARGET_OBJECTS:SpdmDeviceSecretLibNull>
-    ) 
+if(TESTTYPE STREQUAL "WireShark")
+    ADD_LIBRARY(SpdmDumpLib STATIC ${src_SpdmDump})
 else()
-    ADD_EXECUTABLE(SpdmDump ${src_SpdmDump})
-    TARGET_LINK_LIBRARIES(SpdmDump ${SpdmDump_LIBRARY})
+    if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
+        ADD_EXECUTABLE(SpdmDump
+                       ${src_SpdmDump}
+                       $<TARGET_OBJECTS:BaseMemoryLib>
+                       $<TARGET_OBJECTS:DebugLibNull>
+                       $<TARGET_OBJECTS:SpdmCommonLib>
+                       $<TARGET_OBJECTS:${CRYPTO}Lib>
+                       $<TARGET_OBJECTS:RngLib>
+                       $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
+                       $<TARGET_OBJECTS:MemoryAllocationLib>
+                       $<TARGET_OBJECTS:SpdmCryptLib>
+                       $<TARGET_OBJECTS:SpdmSecuredMessageLib>
+                       $<TARGET_OBJECTS:SpdmTransportMctpLib>
+                       $<TARGET_OBJECTS:SpdmTransportPciDoeLib>
+                       $<TARGET_OBJECTS:SpdmDeviceSecretLib>
+        ) 
+    else()
+        ADD_EXECUTABLE(SpdmDump ${src_SpdmDump})
+        TARGET_LINK_LIBRARIES(SpdmDump ${SpdmDump_LIBRARY})
+    endif()
 endif()
