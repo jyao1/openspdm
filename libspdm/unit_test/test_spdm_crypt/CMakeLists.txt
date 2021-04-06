@@ -1,21 +1,21 @@
 cmake_minimum_required(VERSION 2.6)
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../libspdm/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal/${ARCH}
-                    ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/library/spdm_common_lib
-                    ${PROJECT_SOURCE_DIR}/../libspdm/os_stub/spdm_device_secret_lib
-                    ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/cmockalib/cmocka/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/cmockalib/cmocka/include/cmockery
-                    ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/spdm_unit_test_common
+INCLUDE_DIRECTORIES(${LIBSPDM_DIR}/include
+                    ${LIBSPDM_DIR}/include/hal
+                    ${LIBSPDM_DIR}/include/hal/${ARCH}
+                    ${LIBSPDM_DIR}/unit_test/include
+                    ${LIBSPDM_DIR}/library/spdm_common_lib
+                    ${LIBSPDM_DIR}/os_stub/spdm_device_secret_lib
+                    ${LIBSPDM_DIR}/unit_test/cmockalib/cmocka/include
+                    ${LIBSPDM_DIR}/unit_test/cmockalib/cmocka/include/cmockery
+                    ${LIBSPDM_DIR}/unit_test/spdm_unit_test_common
 )
 
 SET(src_test_spdm_crypt
     test_spdm_crypt.c
-    ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/spdm_unit_test_common/common.c
-    ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/spdm_unit_test_common/algo.c
-    ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/spdm_unit_test_common/support.c
+    ${LIBSPDM_DIR}/unit_test/spdm_unit_test_common/common.c
+    ${LIBSPDM_DIR}/unit_test/spdm_unit_test_common/algo.c
+    ${LIBSPDM_DIR}/unit_test/spdm_unit_test_common/support.c
 )
 
 SET(test_spdm_crypt_LIBRARY

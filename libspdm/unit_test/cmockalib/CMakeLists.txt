@@ -6,12 +6,12 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMOCKA_FLAGS} -DHAVE_VSNPRINTF -DHAVE_SNPRINTF")
 endif()
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../libspdm/unit_test/cmockalib
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal 
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal/${ARCH}
-                    ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/cmockalib/cmocka/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/cmockalib/cmocka/include/cmockery
+INCLUDE_DIRECTORIES(${LIBSPDM_DIR}/unit_test/cmockalib
+                    ${LIBSPDM_DIR}/include
+                    ${LIBSPDM_DIR}/include/hal 
+                    ${LIBSPDM_DIR}/include/hal/${ARCH}
+                    ${LIBSPDM_DIR}/unit_test/cmockalib/cmocka/include
+                    ${LIBSPDM_DIR}/unit_test/cmockalib/cmocka/include/cmockery
 )
 
 SET(src_CmockaLib

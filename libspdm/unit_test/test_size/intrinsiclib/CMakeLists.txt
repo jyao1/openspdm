@@ -4,9 +4,9 @@ if(TOOLCHAIN MATCHES "VS")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /GL-")
 endif()
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../libspdm/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal 
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal/${ARCH}
+INCLUDE_DIRECTORIES(${LIBSPDM_DIR}/include
+                    ${LIBSPDM_DIR}/include/hal 
+                    ${LIBSPDM_DIR}/include/hal/${ARCH}
 )
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")

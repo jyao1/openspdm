@@ -4,15 +4,15 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-incompatible-pointer-types -Wno-pointer-sign")
 endif()
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../libspdm/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal 
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal/${ARCH}
-                    ${PROJECT_SOURCE_DIR}/../libspdm/os_stub/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/os_stub/cryptlib_mbedtls
-                    ${PROJECT_SOURCE_DIR}/../libspdm/os_stub/mbedtlslib/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/os_stub/mbedtlslib/include/mbedtls
-                    ${PROJECT_SOURCE_DIR}/../libspdm/os_stub/mbedtlslib/mbedtls/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/os_stub/mbedtlslib/mbedtls/include/mbedtls
+INCLUDE_DIRECTORIES(${LIBSPDM_DIR}/include
+                    ${LIBSPDM_DIR}/include/hal 
+                    ${LIBSPDM_DIR}/include/hal/${ARCH}
+                    ${LIBSPDM_DIR}/os_stub/include
+                    ${LIBSPDM_DIR}/os_stub/cryptlib_mbedtls
+                    ${LIBSPDM_DIR}/os_stub/mbedtlslib/include
+                    ${LIBSPDM_DIR}/os_stub/mbedtlslib/include/mbedtls
+                    ${LIBSPDM_DIR}/os_stub/mbedtlslib/mbedtls/include
+                    ${LIBSPDM_DIR}/os_stub/mbedtlslib/mbedtls/include/mbedtls
 )
 
 SET(src_cryptlib_mbedtls

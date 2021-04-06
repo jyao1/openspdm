@@ -14,6 +14,8 @@ SET(TOOLCHAIN ${TOOLCHAIN} CACHE STRING "Choose the toolchain of build: Windows:
 SET(CMAKE_BUILD_TYPE ${TARGET} CACHE STRING "Choose the target of build: Debug Release" FORCE)
 SET(CRYPTO ${CRYPTO} CACHE STRING "Choose the crypto of build: mbedtls openssl" FORCE)
 
+SET(LIBSPDM_DIR ${PROJECT_SOURCE_DIR})
+
 if(ARCH STREQUAL "x64")
     MESSAGE("ARCH = x64")
 elseif(ARCH STREQUAL "ia32")
@@ -378,6 +380,10 @@ elseif(TOOLCHAIN STREQUAL "VS2019")
     endif()
 endif()
 
+if(OPENSSL_PATH)
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LIBPATH:${OPENSSL_PATH}") 
+endif()
+
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
@@ -386,9 +392,9 @@ ADD_CUSTOM_TARGET(copy_sample_key)
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     ADD_CUSTOM_COMMAND(TARGET copy_sample_key
                     PRE_BUILD
-                    COMMAND cp -r -f ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/sample_key/* ${EXECUTABLE_OUTPUT_PATH})
+                    COMMAND cp -r -f ${LIBSPDM_DIR}/unit_test/sample_key/* ${EXECUTABLE_OUTPUT_PATH})
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    STRING(REPLACE "/" "\\" SRC ${PROJECT_SOURCE_DIR}/../libspdm/unit_test/sample_key/*)
+    STRING(REPLACE "/" "\\" SRC ${LIBSPDM_DIR}/unit_test/sample_key/*)
     STRING(REPLACE "/" "\\" DEST ${EXECUTABLE_OUTPUT_PATH})
 
     ADD_CUSTOM_COMMAND(TARGET copy_sample_key
@@ -401,7 +407,9 @@ if(CRYPTO STREQUAL "mbedtls")
     ADD_SUBDIRECTORY(os_stub/mbedtlslib)
 elseif(CRYPTO STREQUAL "openssl")
     ADD_SUBDIRECTORY(os_stub/cryptlib_openssl)
-    ADD_SUBDIRECTORY(os_stub/openssllib)
+    if(NOT DEFINED OPENSSL_PATH)
+        ADD_SUBDIRECTORY(os_stub/openssllib)
+    endif()
 endif()
     ADD_SUBDIRECTORY(library/spdm_common_lib)
     ADD_SUBDIRECTORY(library/spdm_requester_lib)

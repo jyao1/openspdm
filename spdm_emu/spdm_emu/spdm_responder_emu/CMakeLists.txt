@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 2.6)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/spdm_emu/spdm_responder_emu
                     ${PROJECT_SOURCE_DIR}/spdm_emu/spdm_emu_common
-                    ${PROJECT_SOURCE_DIR}/../libspdm/os_stub/spdm_device_secret_lib
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal/${ARCH}
-                    ${PROJECT_SOURCE_DIR}/../libspdm/os_stub/include
+                    ${LIBSPDM_DIR}/os_stub/spdm_device_secret_lib
+                    ${LIBSPDM_DIR}/include
+                    ${LIBSPDM_DIR}/include/hal
+                    ${LIBSPDM_DIR}/include/hal/${ARCH}
+                    ${LIBSPDM_DIR}/os_stub/include
 )
 
 SET(src_spdm_responder_emu

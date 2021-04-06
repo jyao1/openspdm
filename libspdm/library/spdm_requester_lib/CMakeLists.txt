@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../libspdm/library/spdm_requester_lib
-                    ${PROJECT_SOURCE_DIR}/../libspdm/library/spdm_common_lib 
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal 
-                    ${PROJECT_SOURCE_DIR}/../libspdm/include/hal/${ARCH}
+INCLUDE_DIRECTORIES(${LIBSPDM_DIR}/library/spdm_requester_lib
+                    ${LIBSPDM_DIR}/library/spdm_common_lib 
+                    ${LIBSPDM_DIR}/include
+                    ${LIBSPDM_DIR}/include/hal 
+                    ${LIBSPDM_DIR}/include/hal/${ARCH}
 )
 
 SET(src_spdm_requester_lib
