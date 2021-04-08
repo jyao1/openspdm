@@ -1573,14 +1573,14 @@ get_spdm_aead_enc_func (
   switch (aead_cipher_suite) {
   case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
 #if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return aead_aes_ccm_encrypt;
+    return aead_aes_gcm_encrypt;
 #else
     ASSERT (FALSE);
     break;
 #endif
   case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
 #if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return aead_aes_ccm_encrypt;
+    return aead_aes_gcm_encrypt;
 #else
     ASSERT (FALSE);
     break;
@@ -1658,14 +1658,14 @@ get_spdm_aead_dec_func (
   switch (aead_cipher_suite) {
   case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_128_GCM:
 #if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return aead_aes_ccm_decrypt;
+    return aead_aes_gcm_decrypt;
 #else
     ASSERT (FALSE);
     break;
 #endif
   case SPDM_ALGORITHMS_AEAD_CIPHER_SUITE_AES_256_GCM:
 #if OPENSPDM_AEAD_GCM_SUPPORT == 1
-    return aead_aes_ccm_decrypt;
+    return aead_aes_gcm_decrypt;
 #else
     ASSERT (FALSE);
     break;

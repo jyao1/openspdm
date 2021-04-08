@@ -38,7 +38,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 boolean
-aead_aes_ccm_encrypt (
+aead_aes_gcm_encrypt (
   IN   const uint8  *key,
   IN   uintn        key_size,
   IN   const uint8  *iv,
@@ -165,7 +165,7 @@ done:
 
 **/
 boolean
-aead_aes_ccm_decrypt (
+aead_aes_gcm_decrypt (
   IN   const uint8  *key,
   IN   uintn        key_size,
   IN   const uint8  *iv,

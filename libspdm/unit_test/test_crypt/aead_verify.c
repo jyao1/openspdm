@@ -144,7 +144,7 @@ validate_crypt_aead_cipher (
   my_print ("\n- AES-GCM Encryption: ");
   OutBufferSize = sizeof(OutBuffer);
   OutTagSize = sizeof(m_gcm_tag);
-  status = aead_aes_ccm_encrypt(
+  status = aead_aes_gcm_encrypt(
              m_gcm_key,
              sizeof(m_gcm_key),
              m_gcm_iv,
@@ -177,7 +177,7 @@ validate_crypt_aead_cipher (
   my_print ("[Pass]");
 
   my_print ("\n- AES-GCM Decryption: ");
-  status = aead_aes_ccm_decrypt(
+  status = aead_aes_gcm_decrypt(
              m_gcm_key,
              sizeof(m_gcm_key),
              m_gcm_iv,
