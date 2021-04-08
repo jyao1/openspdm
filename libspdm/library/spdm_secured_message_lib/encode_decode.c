@@ -41,7 +41,6 @@ spdm_encode_secured_message (
   uintn                              plain_text_size;
   uintn                              cipher_text_size;
   uintn                              aead_pad_size;
-  uintn                              aead_block_size;
   uintn                              aead_tag_size;
   uintn                              aead_key_size;
   uintn                              aead_iv_size;
@@ -71,7 +70,6 @@ spdm_encode_secured_message (
   session_state = secured_message_context->session_state;
   ASSERT ((session_state == SPDM_SESSION_STATE_HANDSHAKING) || (session_state == SPDM_SESSION_STATE_ESTABLISHED));
 
-  aead_block_size = secured_message_context->aead_block_size;
   aead_tag_size = secured_message_context->aead_tag_size;
   aead_key_size = secured_message_context->aead_key_size;
   aead_iv_size = secured_message_context->aead_iv_size;
@@ -147,7 +145,7 @@ spdm_encode_secured_message (
     }
 
     plain_text_size = sizeof(spdm_secured_message_cipher_header_t) + app_message_size + rand_count;
-    cipher_text_size = (plain_text_size + aead_block_size - 1) / aead_block_size * aead_block_size;
+    cipher_text_size = plain_text_size;
     aead_pad_size = cipher_text_size - plain_text_size;
     total_secured_message_size = record_header_size + cipher_text_size + aead_tag_size;
 
@@ -266,7 +264,6 @@ spdm_decode_secured_message (
   spdm_secured_message_context_t       *secured_message_context;
   uintn                              plain_text_size;
   uintn                              cipher_text_size;
-  uintn                              aead_block_size;
   uintn                              aead_tag_size;
   uintn                              aead_key_size;
   uintn                              aead_iv_size;
@@ -303,7 +300,6 @@ spdm_decode_secured_message (
   session_state = secured_message_context->session_state;
   ASSERT ((session_state == SPDM_SESSION_STATE_HANDSHAKING) || (session_state == SPDM_SESSION_STATE_ESTABLISHED));
 
-  aead_block_size = secured_message_context->aead_block_size;
   aead_tag_size = secured_message_context->aead_tag_size;
   aead_key_size = secured_message_context->aead_key_size;
   aead_iv_size = secured_message_context->aead_iv_size;
@@ -369,7 +365,7 @@ spdm_decode_secured_message (
 
   switch (session_type) {
   case SPDM_SESSION_TYPE_ENC_MAC:
-    if (secured_message_size < record_header_size + aead_block_size + aead_tag_size) {
+    if (secured_message_size < record_header_size + aead_tag_size) {
       spdm_secured_message_set_last_spdm_error_struct (spdm_secured_message_context, &spdm_error);
       return RETURN_SECURITY_VIOLATION;
     }
@@ -391,7 +387,7 @@ spdm_decode_secured_message (
       spdm_secured_message_set_last_spdm_error_struct (spdm_secured_message_context, &spdm_error);
       return RETURN_SECURITY_VIOLATION;
     }
-    cipher_text_size = (record_header2->length - aead_tag_size) / aead_block_size * aead_block_size;
+    cipher_text_size = (record_header2->length - aead_tag_size);
     if (cipher_text_size > sizeof(dec_message)) {
       return RETURN_OUT_OF_RESOURCES;
     }
