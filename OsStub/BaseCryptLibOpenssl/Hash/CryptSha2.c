@@ -1,10 +1,9 @@
 /** @file
-  SHA-3 Digest Wrapper Implementations over OpenSSL.
+  SHA-2 Digest Wrapper Implementations over OpenSSL.
 
-  This file includes SHA3-256, SHA3-384, SHA-512, SHAKE-256, all part of
-  SHA-3 family.
+  This file includes SHA256, SHA384, SHA512, all part of SHA-2 family.
 
-Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -12,36 +11,30 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "InternalCryptLib.h"
 
 typedef enum {
-_SHA3_256,
-_SHA3_384,
-_SHA3_512,
-_SHAKE_256
-} INTERNAL_SHA3_TYPE;
-
+  _SHA2_256,
+  _SHA2_384,
+  _SHA2_512
+} INTERNAL_SHA2_TYPE;
 
 STATIC
 CONST
 EVP_MD*
 GetMd(
-  INTERNAL_SHA3_TYPE type
+  INTERNAL_SHA2_TYPE type
   )
 {
   switch (type) {
-    case _SHA3_256:
+    case _SHA2_256:
     {
-      return EVP_sha3_256();
+      return EVP_sha256();
     }
-    case _SHA3_384:
+    case _SHA2_384:
     {
-      return EVP_sha3_384();
+      return EVP_sha384();
     }
-    case _SHA3_512:
+    case _SHA2_512:
     {
-      return EVP_sha3_512();
-    }
-    case _SHAKE_256:
-    {
-      return EVP_shake256();
+      return EVP_sha512();
     }
     default: break;
   }
@@ -64,9 +57,9 @@ GetMd(
 **/
 BOOLEAN
 EFIAPI
-Sha3_InitGeneric (
-  OUT VOID               **ShaCtxPtr,
-  IN  INTERNAL_SHA3_TYPE ShaType
+Sha2_InitGeneric (
+  OUT VOID                **ShaCtxPtr,
+  IN  INTERNAL_SHA2_TYPE  ShaType
 )
 {
   RETURN_STATUS success;
@@ -95,47 +88,38 @@ Sha3_InitGeneric (
 
 BOOLEAN
 EFIAPI
-Sha3_256Init (
+Sha2_256Init (
   OUT VOID **ShaCtxPtr
 )
 {
-  return Sha3_InitGeneric(ShaCtxPtr, _SHA3_256);
+  return Sha2_InitGeneric(ShaCtxPtr, _SHA2_256);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_384Init (
+Sha2_384Init (
   OUT VOID **ShaCtxPtr
 )
 {
-  return Sha3_InitGeneric(ShaCtxPtr, _SHA3_384);
+  return Sha2_InitGeneric(ShaCtxPtr, _SHA2_384);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_512Init (
+Sha2_512Init (
   OUT VOID **ShaCtxPtr
 )
 {
-  return Sha3_InitGeneric(ShaCtxPtr, _SHA3_512);
+  return Sha2_InitGeneric(ShaCtxPtr, _SHA2_512);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_Shake256Init (
-  OUT VOID **ShaCtxPtr
-)
-{
-  return Sha3_InitGeneric(ShaCtxPtr, _SHAKE_256);
-}
-
-BOOLEAN
-EFIAPI
-Sha3_UpdateGeneric (
+Sha2_UpdateGeneric (
   IN OUT VOID               *ShaCtx,
   IN     CONST VOID         *Data,
   IN     UINTN              DataSize,
-  IN     INTERNAL_SHA3_TYPE ShaType
+  IN     INTERNAL_SHA2_TYPE ShaType
 )
 {
   if (ShaCtx == NULL) {
@@ -151,51 +135,40 @@ Sha3_UpdateGeneric (
 
 BOOLEAN
 EFIAPI
-Sha3_256Update (
+Sha2_256Update (
   IN OUT VOID         *ShaCtx,
   IN     CONST VOID   *Data,
   IN     UINTN        DataSize
 )
 {
-  return Sha3_UpdateGeneric(ShaCtx, Data, DataSize, _SHA3_256);
+  return Sha2_UpdateGeneric(ShaCtx, Data, DataSize, _SHA2_256);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_384Update (
+Sha2_384Update (
   IN OUT VOID         *ShaCtx,
   IN     CONST VOID   *Data,
   IN     UINTN        DataSize
 )
 {
-  return Sha3_UpdateGeneric(ShaCtx, Data, DataSize, _SHA3_384);
+  return Sha2_UpdateGeneric(ShaCtx, Data, DataSize, _SHA2_384);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_512Update (
+Sha2_512Update (
   IN OUT VOID         *ShaCtx,
   IN     CONST VOID   *Data,
   IN     UINTN        DataSize
 )
 {
-  return Sha3_UpdateGeneric(ShaCtx, Data, DataSize, _SHA3_512);
+  return Sha2_UpdateGeneric(ShaCtx, Data, DataSize, _SHA2_512);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_Shake256Update (
-  IN OUT VOID         *ShaCtx,
-  IN     CONST VOID   *Data,
-  IN     UINTN        DataSize
-)
-{
-  return Sha3_UpdateGeneric(ShaCtx, Data, DataSize, _SHAKE_256);
-}
-
-BOOLEAN
-EFIAPI
-Sha3_FinalGeneric (
+Sha2_FinalGeneric (
   IN     VOID         *ShaCtx,
   OUT    UINT8        *HashValue
 )
@@ -209,74 +182,63 @@ Sha3_FinalGeneric (
 
 BOOLEAN
 EFIAPI
-Sha3_256Final (
+Sha2_256Final (
   IN  VOID  *ShaCtx,
   OUT UINT8 *HashValue
 )
 {
-  return Sha3_FinalGeneric(ShaCtx, HashValue);
+  return Sha2_FinalGeneric(ShaCtx, HashValue);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_384Final (
+Sha2_384Final (
   IN  VOID  *ShaCtx,
   OUT UINT8 *HashValue
 )
 {
-  return Sha3_FinalGeneric(ShaCtx, HashValue);
+  return Sha2_FinalGeneric(ShaCtx, HashValue);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_512Final (
+Sha2_512Final (
   IN  VOID  *ShaCtx,
   OUT UINT8 *HashValue
 )
 {
-  return Sha3_FinalGeneric(ShaCtx, HashValue);
+  return Sha2_FinalGeneric(ShaCtx, HashValue);
 }
 
-BOOLEAN
-EFIAPI
-Sha3_Shake256Final (
-  IN  VOID  *ShaCtx,
-  OUT UINT8 *HashValue
-)
-{
-  return Sha3_FinalGeneric(ShaCtx, HashValue);
-}
 /**
-  Computes the SHA3 message digest of an input data buffer for a supported SHA3 algorithm.
-  Presently, this function supports {256, 384, 512, SHAKE256}.
+  Computes the SHA2 message digest of an input data buffer for a supported SHA2 algorithm.
+  Presently, this function supports SHA-2{256, 384, 512}.
 
   If this interface is not supported, then return FALSE.
 
   @param[in]   Data        Pointer to the buffer containing the data to be hashed.
   @param[in]   DataSize    Size of data buffer in bytes.
   @param[in]   ShaType     Algorithm requested. Must be supported.
-  @param[out]  HashValue   Pointer to a buffer to which the SHA3-256 digest value will be written.
+  @param[out]  HashValue   Pointer to a buffer to which the SHA2 digest value will be written.
 
-
-  @retval TRUE   SHA3 digest computation succeeded.
-  @retval FALSE  SHA3 digest computation failed.
+  @retval TRUE   SHA2 digest computation succeeded.
+  @retval FALSE  SHA2 digest computation failed.
   @retval FALSE  This interface is not supported.
 
 **/
 BOOLEAN
 EFIAPI
-Sha3_HashAll_Generic(
+Sha2_HashAll_Generic(
   IN   CONST VOID            *Data,
   IN   UINTN                 DataSize,
-  IN   INTERNAL_SHA3_TYPE    ShaType,
+  IN   INTERNAL_SHA2_TYPE    ShaType,
   OUT  UINT8                 *HashValue
 )
 {
-  INTN success;
+  RETURN_STATUS success;
   EVP_MD_CTX* ctx;
 
   // Check input parameters.
-  //
   if (HashValue == NULL) {
     return FALSE;
   }
@@ -294,7 +256,6 @@ Sha3_HashAll_Generic(
   success = EVP_Digest(Data, DataSize, HashValue, NULL /*bytes written*/,
                       GetMd(ShaType), NULL /*impl*/);
 
-
   if (success == 0) {
     return FALSE;
   }
@@ -304,44 +265,33 @@ Sha3_HashAll_Generic(
 
 BOOLEAN
 EFIAPI
-Sha3_256HashAll (
+Sha2_256HashAll (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
   )
 {
-  return Sha3_HashAll_Generic(Data, DataSize, _SHA3_256, HashValue);
+  return Sha2_HashAll_Generic(Data, DataSize, _SHA2_256, HashValue);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_384HashAll (
+Sha2_384HashAll (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
   )
 {
-  return Sha3_HashAll_Generic(Data, DataSize, _SHA3_384, HashValue);
+  return Sha2_HashAll_Generic(Data, DataSize, _SHA2_384, HashValue);
 }
 
 BOOLEAN
 EFIAPI
-Sha3_512HashAll (
+Sha2_512HashAll (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
   )
 {
-  return Sha3_HashAll_Generic(Data, DataSize, _SHA3_512, HashValue);
-}
-
-BOOLEAN
-EFIAPI
-Sha3_Shake256HashAll (
-  IN   CONST VOID  *Data,
-  IN   UINTN       DataSize,
-  OUT  UINT8       *HashValue
-  )
-{
-  return Sha3_HashAll_Generic(Data, DataSize, _SHAKE_256, HashValue);
+  return Sha2_HashAll_Generic(Data, DataSize, _SHA2_512, HashValue);
 }

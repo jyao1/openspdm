@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "CrtLibSupport.h"
 
 #include <openssl/opensslv.h>
+#include <openssl/evp.h>
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 #define OBJ_get0_data(o) ((o)->data)

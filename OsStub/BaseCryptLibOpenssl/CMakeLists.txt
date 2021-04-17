@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Include
-                    ${PROJECT_SOURCE_DIR}/Include/Hal 
+                    ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
                     ${PROJECT_SOURCE_DIR}/OsStub/Include
                     ${PROJECT_SOURCE_DIR}/OsStub/BaseCryptLibOpenssl
@@ -16,8 +16,7 @@ SET(src_BaseCryptLibOpenssl
     Cipher/CryptAeadChaCha20Poly1305.c
     Cipher/CryptAeadSm4Gcm.c
     Cipher/CryptAes.c
-    Hash/CryptSha256.c
-    Hash/CryptSha512.c
+    Hash/CryptSha2.c
     Hash/CryptSha3.c
     Hash/CryptSm3.c
     Hmac/CryptHmacSha256.c

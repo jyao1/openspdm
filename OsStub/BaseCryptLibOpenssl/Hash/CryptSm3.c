@@ -34,7 +34,6 @@ Sm3GetContextSize (
   If Sm3Context is NULL, then return FALSE.
 
   @param[out]  Sm3Context  Pointer to SM3 context being initialized.
-
   @retval TRUE   SM3 context initialization succeeded.
   @retval FALSE  SM3 context initialization failed.
 
@@ -97,9 +96,10 @@ Sm3Duplicate (
   Digests the input data and updates SM3 context.
 
   This function performs SM3 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SM3 context should be already correctly initialized by Sm3Init(), and should not be finalized
-  by Sm3Final(). Behavior with invalid context is undefined.
+  It can be called multiple times to compute the digest of long or
+  discontinuous data streams. SM3 context should be already correctly
+  initialized by Sm3Init(), and should not be finalized by Sm3Final().
+  Behavior with invalid context is undefined.
 
   If Sm3Context is NULL, then return FALSE.
 
@@ -147,6 +147,7 @@ Sm3Update (
   This function completes SM3 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the SM3 context cannot
   be used again.
+
   SM3 context should be already correctly initialized by Sm3Init(), and should not be
   finalized by Sm3Final(). Behavior with invalid SM3 context is undefined.
 
@@ -156,7 +157,6 @@ Sm3Update (
   @param[in, out]  Sm3Context     Pointer to the SM3 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SM3 digest
                                   value (32 bytes).
-
   @retval TRUE   SM3 digest computation succeeded.
   @retval FALSE  SM3 digest computation failed.
 
@@ -184,10 +184,10 @@ Sm3Final (
 }
 
 /**
-  Computes the SM3 message digest of a input data buffer.
+  Computes the SM3 message digest of an input data buffer.
 
   This function performs the SM3 message digest of a given data buffer, and places
-  the digest value into the specified memory.
+  the digest value into the specified memory location.
 
   If this interface is not supported, then return FALSE.
 
@@ -209,7 +209,8 @@ Sm3HashAll (
   OUT  UINT8       *HashValue
   )
 {
-  SM3_CTX Ctx;
+  INTN success;
+  EVP_MD_CTX* ctx;
 
   //
   // Check input parameters.
@@ -217,18 +218,23 @@ Sm3HashAll (
   if (HashValue == NULL) {
     return FALSE;
   }
+
   if (Data == NULL && DataSize != 0) {
     return FALSE;
   }
 
-  //
-  // SM3 Hash Computation.
-  //
-  sm3_init(&Ctx);
+  ctx = EVP_MD_CTX_new();
 
-  sm3_update(&Ctx, Data, DataSize);
+  if (ctx == NULL) {
+    return FALSE;
+  }
 
-  sm3_final(HashValue, &Ctx);
+  success = EVP_Digest(Data, DataSize, HashValue, NULL /*bytes written*/,
+                      EVP_sm3(), NULL /*impl*/);
+
+  if (success == 0) {
+    return FALSE;
+  }
 
   return TRUE;
 }

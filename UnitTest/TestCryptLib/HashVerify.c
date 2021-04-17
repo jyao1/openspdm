@@ -85,7 +85,6 @@ ValidateCryptDigest (
   VOID
   )
 {
-  UINTN    CtxSize;
   VOID     *HashCtx;
   UINTN    DataSize;
   UINT8    Digest[MAX_DIGEST_SIZE];
@@ -94,44 +93,33 @@ ValidateCryptDigest (
   Print (" UEFI-OpenSSL Hash Engine Testing:\n");
   DataSize = AsciiStrLen (HashData);
 
-  Print ("- SHA256: ");
+  Print ("- SHA2_256: ");
 
   //
   // SHA256 Digest Validation
   //
   ZeroMem (Digest, MAX_DIGEST_SIZE);
-  CtxSize = Sha256GetContextSize ();
-  HashCtx = AllocatePool (CtxSize);
-  if (HashCtx == NULL) {
-    Print ("[Fail]");
-    return EFI_ABORTED;
-  }
 
   Print ("Init... ");
-  Status  = Sha256Init (HashCtx);
+  Status  = Sha2_256Init (&HashCtx);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
   Print ("Update... ");
-  Status  = Sha256Update (HashCtx, HashData, DataSize);
+  Status  = Sha2_256Update (HashCtx, HashData, DataSize);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
   Print ("Finalize... ");
-  Status  = Sha256Final (HashCtx, Digest);
+  Status  = Sha2_256Final (HashCtx, Digest);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (HashCtx);
     return EFI_ABORTED;
   }
-
-  FreePool (HashCtx);
 
   Print ("Check Value... ");
   if (CompareMem (Digest, Sha256Digest, SHA256_DIGEST_SIZE) != 0) {
@@ -141,7 +129,7 @@ ValidateCryptDigest (
 
   Print ("HashAll... ");
   ZeroMem (Digest, SHA256_DIGEST_SIZE);
-  Status  = Sha256HashAll (HashData, DataSize, Digest);
+  Status  = Sha2_256HashAll (HashData, DataSize, Digest);
   if (!Status) {
     Print ("[Fail]");
     return EFI_ABORTED;
@@ -153,44 +141,33 @@ ValidateCryptDigest (
 
   Print ("[Pass]\n");
 
-  Print ("- SHA384: ");
+  Print ("- SHA2_384: ");
 
   //
   // SHA384 Digest Validation
   //
   ZeroMem (Digest, MAX_DIGEST_SIZE);
-  CtxSize = Sha384GetContextSize ();
-  HashCtx = AllocatePool (CtxSize);
-  if (HashCtx == NULL) {
-    Print ("[Fail]");
-    return EFI_ABORTED;
-  }
 
   Print ("Init... ");
-  Status  = Sha384Init (HashCtx);
+  Status  = Sha2_384Init (&HashCtx);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
   Print ("Update... ");
-  Status  = Sha384Update (HashCtx, HashData, DataSize);
+  Status  = Sha2_384Update (HashCtx, HashData, DataSize);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
   Print ("Finalize... ");
-  Status  = Sha384Final (HashCtx, Digest);
+  Status  = Sha2_384Final (HashCtx, Digest);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (HashCtx);
     return EFI_ABORTED;
   }
-
-  FreePool (HashCtx);
 
   Print ("Check Value... ");
   if (CompareMem (Digest, Sha384Digest, SHA384_DIGEST_SIZE) != 0) {
@@ -200,7 +177,7 @@ ValidateCryptDigest (
 
   Print ("HashAll... ");
   ZeroMem (Digest, SHA384_DIGEST_SIZE);
-  Status  = Sha384HashAll (HashData, DataSize, Digest);
+  Status  = Sha2_384HashAll (HashData, DataSize, Digest);
   if (!Status) {
     Print ("[Fail]");
     return EFI_ABORTED;
@@ -212,44 +189,33 @@ ValidateCryptDigest (
 
   Print ("[Pass]\n");
 
-  Print ("- SHA512: ");
+  Print ("- SHA2_512: ");
 
   //
   // SHA512 Digest Validation
   //
   ZeroMem (Digest, MAX_DIGEST_SIZE);
-  CtxSize = Sha512GetContextSize ();
-  HashCtx = AllocatePool (CtxSize);
-  if (HashCtx == NULL) {
-    Print ("[Fail]");
-    return EFI_ABORTED;
-  }
 
   Print ("Init... ");
-  Status  = Sha512Init (HashCtx);
+  Status  = Sha2_512Init (&HashCtx);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
   Print ("Update... ");
-  Status  = Sha512Update (HashCtx, HashData, DataSize);
+  Status  = Sha2_512Update (HashCtx, HashData, DataSize);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (HashCtx);
     return EFI_ABORTED;
   }
 
   Print ("Finalize... ");
-  Status  = Sha512Final (HashCtx, Digest);
+  Status  = Sha2_512Final (HashCtx, Digest);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (HashCtx);
     return EFI_ABORTED;
   }
-
-  FreePool (HashCtx);
 
   Print ("Check Value... ");
   if (CompareMem (Digest, Sha512Digest, SHA512_DIGEST_SIZE) != 0) {
@@ -259,7 +225,7 @@ ValidateCryptDigest (
 
   Print ("HashAll... ");
   ZeroMem (Digest, SHA512_DIGEST_SIZE);
-  Status  = Sha512HashAll (HashData, DataSize, Digest);
+  Status  = Sha2_512HashAll (HashData, DataSize, Digest);
   if (!Status) {
     Print ("[Fail]");
     return EFI_ABORTED;
@@ -276,12 +242,7 @@ ValidateCryptDigest (
   // SHA3_256 Digest Validation
   //
   ZeroMem (Digest, MAX_DIGEST_SIZE);
-  CtxSize = Sha3_256GetContextSize ();
-  HashCtx = AllocatePool (CtxSize);
-  if (HashCtx != NULL) {
-    Print ("Init... ");
-    Status  = Sha3_256Init (HashCtx);
-  }
+  Status  = Sha3_256Init (&HashCtx);
 
   if (Status) {
     Print ("Update... ");
@@ -302,10 +263,6 @@ ValidateCryptDigest (
     }
   }
 
-  if (HashCtx != NULL) {
-    FreePool(HashCtx);
-  }
-
   if (Status) {
     Print ("HashAll... ");
     ZeroMem (Digest, SHA3_256_DIGEST_SIZE);
@@ -322,12 +279,7 @@ ValidateCryptDigest (
   // SHA3_384 Digest Validation
   //
   ZeroMem (Digest, MAX_DIGEST_SIZE);
-  CtxSize = Sha3_384GetContextSize ();
-  HashCtx = AllocatePool (CtxSize);
-  if (HashCtx != NULL) {
-    Print ("Init... ");
-    Status  = Sha3_384Init (HashCtx);
-  }
+  Status  = Sha3_384Init (&HashCtx);
 
   if (Status) {
     Print ("Update... ");
@@ -348,10 +300,6 @@ ValidateCryptDigest (
     }
   }
 
-  if (HashCtx != NULL) {
-    FreePool(HashCtx);
-  }
-
   if (Status) {
     Print ("HashAll... ");
     ZeroMem (Digest, SHA3_384_DIGEST_SIZE);
@@ -368,12 +316,7 @@ ValidateCryptDigest (
   // SHA3_512 Digest Validation
   //
   ZeroMem (Digest, MAX_DIGEST_SIZE);
-  CtxSize = Sha3_512GetContextSize ();
-  HashCtx = AllocatePool (CtxSize);
-  if (HashCtx != NULL) {
-    Print ("Init... ");
-    Status  = Sha3_512Init (HashCtx);
-  }
+  Status  = Sha3_512Init (&HashCtx);
 
   if (Status) {
     Print ("Update... ");
@@ -394,10 +337,6 @@ ValidateCryptDigest (
     }
   }
 
-  if (HashCtx != NULL) {
-    FreePool(HashCtx);
-  }
-
   if (Status) {
     Print ("HashAll... ");
     ZeroMem (Digest, SHA3_512_DIGEST_SIZE);
@@ -414,40 +353,31 @@ ValidateCryptDigest (
   // SHAKE256 Digest Validation
   //
   ZeroMem (Digest, MAX_DIGEST_SIZE);
-  CtxSize = Shake256GetContextSize ();
-  HashCtx = AllocatePool (CtxSize);
-  if (HashCtx != NULL) {
-    Print ("Init... ");
-    Status  = Shake256Init (HashCtx);
-  }
+  Status  = Sha3_Shake256Init (&HashCtx);
 
   if (Status) {
     Print ("Update... ");
-    Status  = Shake256Update (HashCtx, HashData, DataSize);
+    Status  = Sha3_Shake256Update (HashCtx, HashData, DataSize);
   }
 
   if (Status) {
     Print ("Finalize... ");
-    Status  = Shake256Final (HashCtx, Digest);
+    Status  = Sha3_Shake256Final (HashCtx, Digest);
   }
 
   if (Status) {
     Print ("Check Value... ");
-    if (CompareMem (Digest, Shake256Digest, SHAKE256_DIGEST_SIZE) == 0) {
+    if (CompareMem (Digest, Sha3_Shake256Digest, SHAKE256_DIGEST_SIZE) == 0) {
       Status = TRUE;
     } else {
       Status = FALSE;
     }
   }
 
-  if (HashCtx != NULL) {
-    FreePool(HashCtx);
-  }
-
   if (Status) {
     Print ("HashAll... ");
     ZeroMem (Digest, SHAKE256_DIGEST_SIZE);
-    Status  = Shake256HashAll (HashData, DataSize, Digest);
+    Status  = Sha3_Shake256HashAll (HashData, DataSize, Digest);
   }
   if (Status) {
     Print ("[Pass]\n");
