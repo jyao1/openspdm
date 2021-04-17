@@ -42,7 +42,6 @@ SpdmEncodeSecuredMessage (
   UINTN                              PlainTextSize;
   UINTN                              CipherTextSize;
   UINTN                              AeadPadSize;
-  UINTN                              AeadBlockSize;
   UINTN                              AeadTagSize;
   UINTN                              AeadKeySize;
   UINTN                              AeadIvSize;
@@ -72,7 +71,6 @@ SpdmEncodeSecuredMessage (
   SessionState = SecuredMessageContext->SessionState;
   ASSERT ((SessionState == SpdmSessionStateHandshaking) || (SessionState == SpdmSessionStateEstablished));
 
-  AeadBlockSize = SecuredMessageContext->AeadBlockSize;
   AeadTagSize = SecuredMessageContext->AeadTagSize;
   AeadKeySize = SecuredMessageContext->AeadKeySize;
   AeadIvSize = SecuredMessageContext->AeadIvSize;
@@ -147,7 +145,7 @@ SpdmEncodeSecuredMessage (
     }
 
     PlainTextSize = sizeof(SPDM_SECURED_MESSAGE_CIPHER_HEADER) + AppMessageSize + RandCount;
-    CipherTextSize = (PlainTextSize + AeadBlockSize - 1) / AeadBlockSize * AeadBlockSize;
+    CipherTextSize = PlainTextSize;
     AeadPadSize = CipherTextSize - PlainTextSize;
     TotalSecuredMessageSize = RecordHeaderSize + CipherTextSize + AeadTagSize;
 
@@ -267,7 +265,6 @@ SpdmDecodeSecuredMessage (
   SPDM_SECURED_MESSAGE_CONTEXT       *SecuredMessageContext;
   UINTN                              PlainTextSize;
   UINTN                              CipherTextSize;
-  UINTN                              AeadBlockSize;
   UINTN                              AeadTagSize;
   UINTN                              AeadKeySize;
   UINTN                              AeadIvSize;
@@ -304,7 +301,6 @@ SpdmDecodeSecuredMessage (
   SessionState = SecuredMessageContext->SessionState;
   ASSERT ((SessionState == SpdmSessionStateHandshaking) || (SessionState == SpdmSessionStateEstablished));
 
-  AeadBlockSize = SecuredMessageContext->AeadBlockSize;
   AeadTagSize = SecuredMessageContext->AeadTagSize;
   AeadKeySize = SecuredMessageContext->AeadKeySize;
   AeadIvSize = SecuredMessageContext->AeadIvSize;
@@ -370,7 +366,7 @@ SpdmDecodeSecuredMessage (
 
   switch (SessionType) {
   case SpdmSessionTypeEncMac:
-    if (SecuredMessageSize < RecordHeaderSize + AeadBlockSize + AeadTagSize) {
+    if (SecuredMessageSize < RecordHeaderSize + AeadTagSize) {
       SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
       return RETURN_SECURITY_VIOLATION;
     }
@@ -392,7 +388,7 @@ SpdmDecodeSecuredMessage (
       SpdmSecuredMessageSetLastSpdmErrorStruct (SpdmSecuredMessageContext, &SpdmError);
       return RETURN_SECURITY_VIOLATION;
     }
-    CipherTextSize = (RecordHeader2->Length - AeadTagSize) / AeadBlockSize * AeadBlockSize;
+    CipherTextSize = RecordHeader2->Length - AeadTagSize;
     if (CipherTextSize > sizeof(DecMessage)) {
       return RETURN_OUT_OF_RESOURCES;
     }
