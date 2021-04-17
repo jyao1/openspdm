@@ -80,21 +80,21 @@ GetSpdmHashFunc (
   switch (BaseHashAlgo) {
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_256:
 #if OPENSPDM_SHA256_SUPPORT == 1
-    return Sha256HashAll;
+    return Sha2_256HashAll;
 #else
     ASSERT (FALSE);
     break;
 #endif
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_384:
 #if OPENSPDM_SHA384_SUPPORT == 1
-    return Sha384HashAll;
+    return Sha2_384HashAll;
 #else
     ASSERT (FALSE);
     break;
 #endif
   case SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512:
 #if OPENSPDM_SHA512_SUPPORT == 1
-    return Sha512HashAll;
+    return Sha2_512HashAll;
 #else
     ASSERT (FALSE);
     break;
@@ -184,21 +184,21 @@ GetSpdmMeasurementHashFunc (
   switch (MeasurementHashAlgo) {
   case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_256:
 #if OPENSPDM_SHA256_SUPPORT == 1
-    return Sha256HashAll;
+    return Sha2_256HashAll;
 #else
     ASSERT (FALSE);
     break;
 #endif
   case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_384:
 #if OPENSPDM_SHA384_SUPPORT == 1
-    return Sha384HashAll;
+    return Sha2_384HashAll;
 #else
     ASSERT (FALSE);
     break;
 #endif
   case SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512:
 #if OPENSPDM_SHA512_SUPPORT == 1
-    return Sha512HashAll;
+    return Sha2_512HashAll;
 #else
     ASSERT (FALSE);
     break;
@@ -1260,7 +1260,7 @@ GetSpdmDheNew (
 /**
   Allocates and Initializes one Diffie-Hellman Ephemeral (DHE) Context for subsequent use,
   based upon negotiated DHE algorithm.
-  
+
   @param  DHENamedGroup                SPDM DHENamedGroup
 
   @return  Pointer to the Diffie-Hellman Context that has been initialized.

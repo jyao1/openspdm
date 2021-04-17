@@ -88,8 +88,7 @@ ValidateCryptRsa (
   VOID     *Rsa;
   UINT8    HashValue[SHA256_DIGEST_SIZE];
   UINTN    HashSize;
-  UINTN    CtxSize;
-  VOID     *Sha1Ctx;
+  VOID     *Sha2Ctx;
   UINT8    *Signature;
   UINTN    SigSize;
   BOOLEAN  Status;
@@ -352,39 +351,27 @@ ValidateCryptRsa (
   Print ("Hash Original Message ... ");
   HashSize = SHA256_DIGEST_SIZE;
   ZeroMem (HashValue, HashSize);
-  CtxSize = Sha256GetContextSize ();
-  Sha1Ctx = AllocatePool (CtxSize);
-  if (Sha1Ctx == NULL) {
-    Print ("[Fail]");
-    RsaFree (Rsa);
-    return EFI_ABORTED;
-  }
 
-  Status  = Sha256Init (Sha1Ctx);
+  Status  = Sha2_256Init (&Sha2Ctx);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (Sha1Ctx);
     RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
-  Status  = Sha256Update (Sha1Ctx, RsaSignData, AsciiStrLen (RsaSignData));
+  Status  = Sha2_256Update (Sha2Ctx, RsaSignData, AsciiStrLen (RsaSignData));
   if (!Status) {
     Print ("[Fail]");
-    FreePool (Sha1Ctx);
     RsaFree (Rsa);
     return EFI_ABORTED;
   }
 
-  Status  = Sha256Final (Sha1Ctx, HashValue);
+  Status  = Sha2_256Final (Sha2Ctx, HashValue);
   if (!Status) {
     Print ("[Fail]");
-    FreePool (Sha1Ctx);
     RsaFree (Rsa);
     return EFI_ABORTED;
   }
-
-  FreePool (Sha1Ctx);
 
   //
   // Sign RSA PKCS#1-encoded Signature

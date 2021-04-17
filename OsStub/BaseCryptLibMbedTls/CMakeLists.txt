@@ -5,7 +5,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Include
-                    ${PROJECT_SOURCE_DIR}/Include/Hal 
+                    ${PROJECT_SOURCE_DIR}/Include/Hal
                     ${PROJECT_SOURCE_DIR}/Include/Hal/${ARCH}
                     ${PROJECT_SOURCE_DIR}/OsStub/Include
                     ${PROJECT_SOURCE_DIR}/OsStub/BaseCryptLibMbedTls
@@ -20,8 +20,7 @@ SET(src_BaseCryptLibMbedTls
     Cipher/CryptAeadAesGcm.c
     Cipher/CryptAeadChaCha20Poly1305.c
     Cipher/CryptAeadSm4Gcm.c
-    Hash/CryptSha256.c
-    Hash/CryptSha512.c
+    Hash/CryptSha2.c
     Hash/CryptSha3.c
     Hash/CryptSm3.c
     Hmac/CryptHmacSha256.c

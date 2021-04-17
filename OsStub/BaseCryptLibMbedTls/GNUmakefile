@@ -38,8 +38,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)/CryptAeadAesGcm.o \
     $(OUTPUT_DIR)/CryptAeadChaCha20Poly1305.o \
     $(OUTPUT_DIR)/CryptAeadSm4Gcm.o \
-    $(OUTPUT_DIR)/CryptSha256.o \
-    $(OUTPUT_DIR)/CryptSha512.o \
+    $(OUTPUT_DIR)/CryptSha2.o \
     $(OUTPUT_DIR)/CryptSha3.o \
     $(OUTPUT_DIR)/CryptSm3.o \
     $(OUTPUT_DIR)/CryptHmacSha256.o \
@@ -112,10 +111,7 @@ $(OUTPUT_DIR)/CryptAeadChaCha20Poly1305.o : $(SOURCE_DIR)/Cipher/CryptAeadChaCha
 $(OUTPUT_DIR)/CryptAeadSm4Gcm.o : $(SOURCE_DIR)/Cipher/CryptAeadSm4Gcm.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
-$(OUTPUT_DIR)/CryptSha256.o : $(SOURCE_DIR)/Hash/CryptSha256.c
-	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
-
-$(OUTPUT_DIR)/CryptSha512.o : $(SOURCE_DIR)/Hash/CryptSha512.c
+$(OUTPUT_DIR)/CryptSha2.o : $(SOURCE_DIR)/Hash/CryptSha2.c
 	$(CC) $(CC_FLAGS) -o $@ $(INC) $^
 
 $(OUTPUT_DIR)/CryptSha3.o : $(SOURCE_DIR)/Hash/CryptSha3.c
@@ -190,5 +186,3 @@ $(OUTPUT_DIR)/$(MODULE_NAME).a : $(OBJECT_FILES)
 #
 clean:
 	$(RD) $(OUTPUT_DIR)
-
-

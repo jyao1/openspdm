@@ -158,24 +158,11 @@ typedef enum {
 //=====================================================================================
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
+  Allocates a new digest context, and returns a reference through the outparam `ShaCtxPtr`.
 
-  @return  The size, in bytes, of the context buffer required for SHA-256 hash operations.
+  If ShaCtxPtr is NULL, then return FALSE.
 
-**/
-UINTN
-EFIAPI
-Sha256GetContextSize (
-  VOID
-  );
-
-/**
-  Initializes user-supplied memory pointed by Sha256Context as SHA-256 hash context for
-  subsequent use.
-
-  If Sha256Context is NULL, then return FALSE.
-
-  @param[out]  Sha256Context  Pointer to SHA-256 context being initialized.
+  @param[out]  ShaCtxPtr  Pointer to the pointer of the newly allocated digest context.
 
   @retval TRUE   SHA-256 context initialization succeeded.
   @retval FALSE  SHA-256 context initialization failed.
@@ -183,43 +170,22 @@ Sha256GetContextSize (
 **/
 BOOLEAN
 EFIAPI
-Sha256Init (
-  OUT  VOID  *Sha256Context
-  );
-
-/**
-  Makes a copy of an existing SHA-256 context.
-
-  If Sha256Context is NULL, then return FALSE.
-  If NewSha256Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Sha256Context     Pointer to SHA-256 context being copied.
-  @param[out] NewSha256Context  Pointer to new SHA-256 context.
-
-  @retval TRUE   SHA-256 context copy succeeded.
-  @retval FALSE  SHA-256 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sha256Duplicate (
-  IN   CONST VOID  *Sha256Context,
-  OUT  VOID        *NewSha256Context
+Sha2_256Init (
+  OUT VOID **ShaCtxPtr
   );
 
 /**
   Digests the input data and updates SHA-256 context.
 
-  This function performs SHA-256 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA-256 context should be already correctly initialized by Sha256Init(), and should not be finalized
-  by Sha256Final(). Behavior with invalid context is undefined.
+  This function performs SHA-256 digest on a data buffer of the specified
+  size. It can be called multiple times to compute the digest of long or
+  discontinuous data streams. SHA-256 context should be already correctly
+  initialized by Sha2_256Init(), and should not have been finalized by
+  Sha2_256Final(). Behavior with invalid context is undefined.
 
-  If Sha256Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
 
-  @param[in, out]  Sha256Context  Pointer to the SHA-256 context.
+  @param[in, out]  ShaCtx         Pointer to the SHA-256 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize       Size of Data buffer in bytes.
 
@@ -229,25 +195,27 @@ Sha256Duplicate (
 **/
 BOOLEAN
 EFIAPI
-Sha256Update (
-  IN OUT  VOID        *Sha256Context,
-  IN      CONST VOID  *Data,
-  IN      UINTN       DataSize
+Sha2_256Update (
+  IN OUT VOID         *ShaCtx,
+  IN     CONST VOID   *Data,
+  IN     UINTN        DataSize
   );
 
 /**
   Completes computation of the SHA-256 digest value.
 
-  This function completes SHA-256 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the SHA-256 context cannot
-  be used again.
-  SHA-256 context should be already correctly initialized by Sha256Init(), and should not be
-  finalized by Sha256Final(). Behavior with invalid SHA-256 context is undefined.
+  This function completes SHA-256 hash computation and retrieves the digest
+  value into the specified memory. SHA-256 context should be already
+  correctly initialized by Sha256Init(), and should not be finalized by
+  Sha256Final(). Behavior with invalid SHA-256 context is undefined.
 
-  If Sha256Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
   If HashValue is NULL, then return FALSE.
 
-  @param[in, out]  Sha256Context  Pointer to the SHA-256 context.
+  After this function returns, ShaCtx is considered invalidated and should
+  not be used again.
+
+  @param[in, out]  ShaCtx         Pointer to the SHA-256 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHA-256 digest
                                   value (32 bytes).
 
@@ -257,9 +225,10 @@ Sha256Update (
 **/
 BOOLEAN
 EFIAPI
-Sha256Final (
-  IN OUT  VOID   *Sha256Context,
-  OUT     UINT8  *HashValue
+Sha2_256Final
+(
+  IN  VOID  *ShaCtx,
+  OUT UINT8 *HashValue
   );
 
 /**
@@ -282,31 +251,18 @@ Sha256Final (
 **/
 BOOLEAN
 EFIAPI
-Sha256HashAll (
+Sha2_256HashAll (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
   );
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for SHA-384 hash operations.
+  Allocates a new digest context, and returns a reference through the outparam `ShaCtxPtr`.
 
-  @return  The size, in bytes, of the context buffer required for SHA-384 hash operations.
+  If ShaCtxPtr is NULL, then return FALSE.
 
-**/
-UINTN
-EFIAPI
-Sha384GetContextSize (
-  VOID
-  );
-
-/**
-  Initializes user-supplied memory pointed by Sha384Context as SHA-384 hash context for
-  subsequent use.
-
-  If Sha384Context is NULL, then return FALSE.
-
-  @param[out]  Sha384Context  Pointer to SHA-384 context being initialized.
+  @param[out]  ShaCtxPtr  Pointer to the pointer of the newly allocated digest context.
 
   @retval TRUE   SHA-384 context initialization succeeded.
   @retval FALSE  SHA-384 context initialization failed.
@@ -314,30 +270,8 @@ Sha384GetContextSize (
 **/
 BOOLEAN
 EFIAPI
-Sha384Init (
-  OUT  VOID  *Sha384Context
-  );
-
-/**
-  Makes a copy of an existing SHA-384 context.
-
-  If Sha384Context is NULL, then return FALSE.
-  If NewSha384Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Sha384Context     Pointer to SHA-384 context being copied.
-  @param[out] NewSha384Context  Pointer to new SHA-384 context.
-
-  @retval TRUE   SHA-384 context copy succeeded.
-  @retval FALSE  SHA-384 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sha384Duplicate (
-  IN   CONST VOID  *Sha384Context,
-  OUT  VOID        *NewSha384Context
+Sha2_384Init (
+  OUT VOID **ShaCtxPtr
   );
 
 /**
@@ -348,9 +282,9 @@ Sha384Duplicate (
   SHA-384 context should be already correctly initialized by Sha384Init(), and should not be finalized
   by Sha384Final(). Behavior with invalid context is undefined.
 
-  If Sha384Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
 
-  @param[in, out]  Sha384Context  Pointer to the SHA-384 context.
+  @param[in, out]  ShaCtx         Pointer to the SHA-384 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize       Size of Data buffer in bytes.
 
@@ -360,8 +294,8 @@ Sha384Duplicate (
 **/
 BOOLEAN
 EFIAPI
-Sha384Update (
-  IN OUT  VOID        *Sha384Context,
+Sha2_384Update (
+  IN OUT  VOID        *ShaCtx,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   );
@@ -369,16 +303,18 @@ Sha384Update (
 /**
   Completes computation of the SHA-384 digest value.
 
-  This function completes SHA-384 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the SHA-384 context cannot
-  be used again.
-  SHA-384 context should be already correctly initialized by Sha384Init(), and should not be
-  finalized by Sha384Final(). Behavior with invalid SHA-384 context is undefined.
+  This function completes SHA-384 hash computation and retrieves the digest
+  value into the specified memory. SHA-384 context should be already
+  correctly initialized by Sha384Init(), and should not be finalized by
+  Sha384Final(). Behavior with invalid SHA-384 context is undefined.
 
-  If Sha384Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
   If HashValue is NULL, then return FALSE.
 
-  @param[in, out]  Sha384Context  Pointer to the SHA-384 context.
+  After this function returns, ShaCtx is considered invalidated and should
+  not be used again.
+
+  @param[in, out]  ShaCtx         Pointer to the SHA-384 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHA-384 digest
                                   value (48 bytes).
 
@@ -388,8 +324,8 @@ Sha384Update (
 **/
 BOOLEAN
 EFIAPI
-Sha384Final (
-  IN OUT  VOID   *Sha384Context,
+Sha2_384Final (
+  IN OUT  VOID   *ShaCtx,
   OUT     UINT8  *HashValue
   );
 
@@ -413,31 +349,18 @@ Sha384Final (
 **/
 BOOLEAN
 EFIAPI
-Sha384HashAll (
+Sha2_384HashAll (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
   );
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for SHA-512 hash operations.
+  Allocates a new digest context, and returns a reference through the outparam `ShaCtxPtr`.
 
-  @return  The size, in bytes, of the context buffer required for SHA-512 hash operations.
+  If ShaCtxPtr is NULL, then return FALSE.
 
-**/
-UINTN
-EFIAPI
-Sha512GetContextSize (
-  VOID
-  );
-
-/**
-  Initializes user-supplied memory pointed by Sha512Context as SHA-512 hash context for
-  subsequent use.
-
-  If Sha512Context is NULL, then return FALSE.
-
-  @param[out]  Sha512Context  Pointer to SHA-512 context being initialized.
+  @param[out]  ShaCtxPtr  Pointer to the pointer of the newly allocated digest context.
 
   @retval TRUE   SHA-512 context initialization succeeded.
   @retval FALSE  SHA-512 context initialization failed.
@@ -445,30 +368,8 @@ Sha512GetContextSize (
 **/
 BOOLEAN
 EFIAPI
-Sha512Init (
-  OUT  VOID  *Sha512Context
-  );
-
-/**
-  Makes a copy of an existing SHA-512 context.
-
-  If Sha512Context is NULL, then return FALSE.
-  If NewSha512Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Sha512Context     Pointer to SHA-512 context being copied.
-  @param[out] NewSha512Context  Pointer to new SHA-512 context.
-
-  @retval TRUE   SHA-512 context copy succeeded.
-  @retval FALSE  SHA-512 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sha512Duplicate (
-  IN   CONST VOID  *Sha512Context,
-  OUT  VOID        *NewSha512Context
+Sha2_512Init (
+  OUT VOID **ShaCtxPtr
   );
 
 /**
@@ -479,9 +380,9 @@ Sha512Duplicate (
   SHA-512 context should be already correctly initialized by Sha512Init(), and should not be finalized
   by Sha512Final(). Behavior with invalid context is undefined.
 
-  If Sha512Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
 
-  @param[in, out]  Sha512Context  Pointer to the SHA-512 context.
+  @param[in, out]  ShaCtx         Pointer to the SHA-512 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize       Size of Data buffer in bytes.
 
@@ -491,8 +392,8 @@ Sha512Duplicate (
 **/
 BOOLEAN
 EFIAPI
-Sha512Update (
-  IN OUT  VOID        *Sha512Context,
+Sha2_512Update (
+  IN OUT  VOID        *ShaCtx,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   );
@@ -500,16 +401,18 @@ Sha512Update (
 /**
   Completes computation of the SHA-512 digest value.
 
-  This function completes SHA-512 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the SHA-512 context cannot
-  be used again.
-  SHA-512 context should be already correctly initialized by Sha512Init(), and should not be
-  finalized by Sha512Final(). Behavior with invalid SHA-512 context is undefined.
+  This function completes SHA-512 hash computation and retrieves the digest
+  value into the specified memory. SHA-512 context should be already
+  correctly initialized by Sha512Init(), and should not be finalized by
+  Sha512Final(). Behavior with invalid SHA-512 context is undefined.
 
-  If Sha512Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
   If HashValue is NULL, then return FALSE.
 
-  @param[in, out]  Sha512Context  Pointer to the SHA-512 context.
+  After this function returns, ShaCtx is considered invalidated and should
+  not be used again.
+
+  @param[in, out]  ShaCtx         Pointer to the SHA-512 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHA-512 digest
                                   value (64 bytes).
 
@@ -519,8 +422,8 @@ Sha512Update (
 **/
 BOOLEAN
 EFIAPI
-Sha512Final (
-  IN OUT  VOID   *Sha512Context,
+Sha2_512Final (
+  IN OUT  VOID   *ShaCtx,
   OUT     UINT8  *HashValue
   );
 
@@ -544,7 +447,7 @@ Sha512Final (
 **/
 BOOLEAN
 EFIAPI
-Sha512HashAll (
+Sha2_512HashAll (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
@@ -555,24 +458,11 @@ Sha512HashAll (
 //=====================================================================================
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
+  Allocates a new digest context, and returns a reference through the outparam `ShaCtxPtr`.
 
-  @return  The size, in bytes, of the context buffer required for SHA-256 hash operations.
+  If ShaCtxPtr is NULL, then return FALSE.
 
-**/
-UINTN
-EFIAPI
-Sha3_256GetContextSize (
-  VOID
-  );
-
-/**
-  Initializes user-supplied memory pointed by Sha3_256Context as SHA3-256 hash context for
-  subsequent use.
-
-  If Sha3_256Context is NULL, then return FALSE.
-
-  @param[out]  Sha3_256Context  Pointer to SHA3-256 context being initialized.
+  @param[out]  ShaCtxPtr  Pointer to the pointer of the newly allocated digest context.
 
   @retval TRUE   SHA3-256 context initialization succeeded.
   @retval FALSE  SHA3-256 context initialization failed.
@@ -581,29 +471,7 @@ Sha3_256GetContextSize (
 BOOLEAN
 EFIAPI
 Sha3_256Init (
-  OUT  VOID  *Sha3_256Context
-  );
-
-/**
-  Makes a copy of an existing SHA3-256 context.
-
-  If Sha3_256Context is NULL, then return FALSE.
-  If NewSha3_256Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Sha3_256Context     Pointer to SHA3-256 context being copied.
-  @param[out] NewSha3_256Context  Pointer to new SHA3-256 context.
-
-  @retval TRUE   SHA3-256 context copy succeeded.
-  @retval FALSE  SHA3-256 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sha3_256Duplicate (
-  IN   CONST VOID  *Sha3_256Context,
-  OUT  VOID        *NewSha3_256Context
+  OUT VOID **ShaCtxPtr
   );
 
 /**
@@ -614,9 +482,9 @@ Sha3_256Duplicate (
   SHA3-256 context should be already correctly initialized by Sha3_256Init(), and should not be finalized
   by Sha3_256Final(). Behavior with invalid context is undefined.
 
-  If Sha3_256Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
 
-  @param[in, out]  Sha3_256Context  Pointer to the SHA3-256 context.
+  @param[in, out]  ShaCtx         Pointer to the SHA3-256 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize       Size of Data buffer in bytes.
 
@@ -627,7 +495,7 @@ Sha3_256Duplicate (
 BOOLEAN
 EFIAPI
 Sha3_256Update (
-  IN OUT  VOID        *Sha3_256Context,
+  IN OUT  VOID        *ShaCtx,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   );
@@ -635,16 +503,18 @@ Sha3_256Update (
 /**
   Completes computation of the SHA3-256 digest value.
 
-  This function completes SHA3-256 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the SHA3-256 context cannot
-  be used again.
-  SHA3-256 context should be already correctly initialized by Sha3_256Init(), and should not be
-  finalized by Sha3_256Final(). Behavior with invalid SHA3-256 context is undefined.
+  This function completes SHA3-256 hash computation and retrieves the digest
+  value into the specified memory. SHA3-256 context should be already
+  correctly initialized by Sha3_256Init(), and should not be finalized by
+  Sha3_256Final(). Behavior with invalid SHA3-256 context is undefined.
 
-  If Sha3_256Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
   If HashValue is NULL, then return FALSE.
 
-  @param[in, out]  Sha3_256Context  Pointer to the SHA3-256 context.
+  After this function returns, ShaCtx is considered invalidated and should
+  not be used again.
+
+  @param[in, out]  ShaCtx         Pointer to the SHA3-256 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHA3-256 digest
                                   value (256 / 8 bytes).
 
@@ -655,7 +525,7 @@ Sha3_256Update (
 BOOLEAN
 EFIAPI
 Sha3_256Final (
-  IN OUT  VOID   *Sha3_256Context,
+  IN OUT  VOID   *ShaCtx,
   OUT     UINT8  *HashValue
   );
 
@@ -685,25 +555,13 @@ Sha3_256HashAll (
   OUT  UINT8       *HashValue
   );
 
-/**
-  Retrieves the size, in bytes, of the context buffer required for SHA-384 hash operations.
-
-  @return  The size, in bytes, of the context buffer required for SHA-384 hash operations.
-
-**/
-UINTN
-EFIAPI
-Sha3_384GetContextSize (
-  VOID
-  );
 
 /**
-  Initializes user-supplied memory pointed by Sha3_384Context as SHA3-384 hash context for
-  subsequent use.
+  Allocates a new digest context, and returns a reference through the outparam `ShaCtxPtr`.
 
-  If Sha3_384Context is NULL, then return FALSE.
+  If ShaCtxPtr is NULL, then return FALSE.
 
-  @param[out]  Sha3_384Context  Pointer to SHA3-384 context being initialized.
+  @param[out]  ShaCtxPtr  Pointer to the pointer of the newly allocated digest context.
 
   @retval TRUE   SHA3-384 context initialization succeeded.
   @retval FALSE  SHA3-384 context initialization failed.
@@ -712,29 +570,7 @@ Sha3_384GetContextSize (
 BOOLEAN
 EFIAPI
 Sha3_384Init (
-  OUT  VOID  *Sha3_384Context
-  );
-
-/**
-  Makes a copy of an existing SHA3-384 context.
-
-  If Sha3_384Context is NULL, then return FALSE.
-  If NewSha3_384Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Sha3_384Context     Pointer to SHA3-384 context being copied.
-  @param[out] NewSha3_384Context  Pointer to new SHA3-384 context.
-
-  @retval TRUE   SHA3-384 context copy succeeded.
-  @retval FALSE  SHA3-384 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sha3_384Duplicate (
-  IN   CONST VOID  *Sha3_384Context,
-  OUT  VOID        *NewSha3_384Context
+  OUT  VOID   **ShaCtxPtr
   );
 
 /**
@@ -745,9 +581,9 @@ Sha3_384Duplicate (
   SHA3-384 context should be already correctly initialized by Sha3_384Init(), and should not be finalized
   by Sha3_384Final(). Behavior with invalid context is undefined.
 
-  If Sha3_384Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
 
-  @param[in, out]  Sha3_384Context  Pointer to the SHA3-384 context.
+  @param[in, out]  ShaCtx         Pointer to the SHA3-384 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize       Size of Data buffer in bytes.
 
@@ -758,7 +594,7 @@ Sha3_384Duplicate (
 BOOLEAN
 EFIAPI
 Sha3_384Update (
-  IN OUT  VOID        *Sha3_384Context,
+  IN OUT  VOID        *ShaCtx,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   );
@@ -766,16 +602,18 @@ Sha3_384Update (
 /**
   Completes computation of the SHA3-384 digest value.
 
-  This function completes SHA3-384 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the SHA3-384 context cannot
-  be used again.
-  SHA3-384 context should be already correctly initialized by Sha3_384Init(), and should not be
-  finalized by Sha3_384Final(). Behavior with invalid SHA3-384 context is undefined.
+  This function completes SHA3-384 hash computation and retrieves the digest
+  value into the specified memory. SHA3-384 context should be already
+  correctly initialized by Sha3_384Init(), and should not be finalized by
+  Sha3_384Final(). Behavior with invalid SHA3-384 context is undefined.
 
-  If Sha3_384Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
   If HashValue is NULL, then return FALSE.
 
-  @param[in, out]  Sha3_384Context  Pointer to the SHA3-384 context.
+  After this function returns, ShaCtx is considered invalidated and should
+  not be used again.
+
+  @param[in, out]  ShaCtx         Pointer to the SHA3-384 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHA3-384 digest
                                   value (384 / 8 bytes).
 
@@ -786,7 +624,7 @@ Sha3_384Update (
 BOOLEAN
 EFIAPI
 Sha3_384Final (
-  IN OUT  VOID   *Sha3_384Context,
+  IN OUT  VOID   *ShaCtx,
   OUT     UINT8  *HashValue
   );
 
@@ -817,24 +655,11 @@ Sha3_384HashAll (
   );
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for SHA3-512 hash operations.
+  Allocates a new digest context, and returns a reference through the outparam `ShaCtxPtr`.
 
-  @return  The size, in bytes, of the context buffer required for SHA3-512 hash operations.
+  If ShaCtxPtr is NULL, then return FALSE.
 
-**/
-UINTN
-EFIAPI
-Sha3_512GetContextSize (
-  VOID
-  );
-
-/**
-  Initializes user-supplied memory pointed by Sha3_512Context as SHA3-512 hash context for
-  subsequent use.
-
-  If Sha3_512Context is NULL, then return FALSE.
-
-  @param[out]  Sha3_512Context  Pointer to SHA3-512 context being initialized.
+  @param[out]  ShaCtxPtr  Pointer to the pointer of the newly allocated digest context.
 
   @retval TRUE   SHA3-512 context initialization succeeded.
   @retval FALSE  SHA3-512 context initialization failed.
@@ -843,29 +668,7 @@ Sha3_512GetContextSize (
 BOOLEAN
 EFIAPI
 Sha3_512Init (
-  OUT  VOID  *Sha3_512Context
-  );
-
-/**
-  Makes a copy of an existing SHA3-512 context.
-
-  If Sha3_512Context is NULL, then return FALSE.
-  If NewSha3_512Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Sha3_512Context     Pointer to SHA3-512 context being copied.
-  @param[out] NewSha3_512Context  Pointer to new SHA3-512 context.
-
-  @retval TRUE   SHA3-512 context copy succeeded.
-  @retval FALSE  SHA3-512 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sha3_512Duplicate (
-  IN   CONST VOID  *Sha3_512Context,
-  OUT  VOID        *NewSha3_512Context
+  OUT  VOID   **ShaCtxPtr
   );
 
 /**
@@ -876,9 +679,9 @@ Sha3_512Duplicate (
   SHA3-512 context should be already correctly initialized by Sha3_512Init(), and should not be finalized
   by Sha3_512Final(). Behavior with invalid context is undefined.
 
-  If Sha3_512Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
 
-  @param[in, out]  Sha3_512Context  Pointer to the SHA3-512 context.
+  @param[in, out]  ShaCtx         Pointer to the SHA3-512 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize       Size of Data buffer in bytes.
 
@@ -889,7 +692,7 @@ Sha3_512Duplicate (
 BOOLEAN
 EFIAPI
 Sha3_512Update (
-  IN OUT  VOID        *Sha3_512Context,
+  IN OUT  VOID        *ShaCtx,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   );
@@ -897,16 +700,18 @@ Sha3_512Update (
 /**
   Completes computation of the SHA3-512 digest value.
 
-  This function completes SHA3-512 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the SHA3-512 context cannot
-  be used again.
-  SHA3-512 context should be already correctly initialized by Sha3_512Init(), and should not be
-  finalized by Sha3_512Final(). Behavior with invalid SHA3-512 context is undefined.
+  This function completes SHA3-512 hash computation and retrieves the digest
+  value into the specified memory. SHA3-512 context should be already
+  correctly initialized by Sha3_512Init(), and should not be finalized by
+  Sha3_512Final(). Behavior with invalid SHA3-512 context is undefined.
 
-  If Sha3_512Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
   If HashValue is NULL, then return FALSE.
 
-  @param[in, out]  Sha3_512Context  Pointer to the SHA3-512 context.
+  After this function returns, ShaCtx is considered invalidated and should
+  not be used again.
+
+  @param[in, out]  ShaCtx         Pointer to the SHA3-512 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHA3-512 digest
                                   value (512 / 8 bytes).
 
@@ -917,7 +722,7 @@ Sha3_512Update (
 BOOLEAN
 EFIAPI
 Sha3_512Final (
-  IN OUT  VOID   *Sha3_512Context,
+  IN OUT  VOID   *ShaCtx,
   OUT     UINT8  *HashValue
   );
 
@@ -948,24 +753,11 @@ Sha3_512HashAll (
   );
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for SHAKE256 hash operations.
+  Allocates a new digest context, and returns a reference through the outparam `ShaCtxPtr`.
 
-  @return  The size, in bytes, of the context buffer required for SHAKE256 hash operations.
+  If ShaCtxPtr is NULL, then return FALSE.
 
-**/
-UINTN
-EFIAPI
-Shake256GetContextSize (
-  VOID
-  );
-
-/**
-  Initializes user-supplied memory pointed by Shake256Context as SHAKE256 hash context for
-  subsequent use.
-
-  If Shake256Context is NULL, then return FALSE.
-
-  @param[out]  Shake256Context  Pointer to SHAKE256 context being initialized.
+  @param[out]  ShaCtxPtr  Pointer to the pointer of the newly allocated digest context.
 
   @retval TRUE   SHAKE256 context initialization succeeded.
   @retval FALSE  SHAKE256 context initialization failed.
@@ -973,30 +765,8 @@ Shake256GetContextSize (
 **/
 BOOLEAN
 EFIAPI
-Shake256Init (
-  OUT  VOID  *Shake256Context
-  );
-
-/**
-  Makes a copy of an existing SHAKE256 context.
-
-  If Shake256Context is NULL, then return FALSE.
-  If NewShake256Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Shake256Context     Pointer to SHAKE256 context being copied.
-  @param[out] NewShake256Context  Pointer to new SHAKE256 context.
-
-  @retval TRUE   SHAKE256 context copy succeeded.
-  @retval FALSE  SHAKE256 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Shake256Duplicate (
-  IN   CONST VOID  *Shake256Context,
-  OUT  VOID        *NewShake256Context
+Sha3_Shake256Init (
+  OUT  VOID  **ShaCtxPtr
   );
 
 /**
@@ -1007,9 +777,9 @@ Shake256Duplicate (
   SHAKE256 context should be already correctly initialized by Shake256Init(), and should not be finalized
   by Shake256Final(). Behavior with invalid context is undefined.
 
-  If Shake256Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
 
-  @param[in, out]  Shake256Context  Pointer to the SHAKE256 context.
+  @param[in, out]  ShaCtx         Pointer to the SHAKE256 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize       Size of Data buffer in bytes.
 
@@ -1019,8 +789,8 @@ Shake256Duplicate (
 **/
 BOOLEAN
 EFIAPI
-Shake256Update (
-  IN OUT  VOID        *Shake256Context,
+Sha3_Shake256Update (
+  IN OUT  VOID        *ShaCtx,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   );
@@ -1028,16 +798,17 @@ Shake256Update (
 /**
   Completes computation of the SHAKE256 digest value.
 
-  This function completes SHAKE256 hash computation and retrieves the digest value into
-  the specified memory. After this function has been called, the SHAKE256 context cannot
-  be used again.
+  This function completes SHAKE256 hash computation and retrieves the digest value into the specified memory.
   SHAKE256 context should be already correctly initialized by Shake256Init(), and should not be
   finalized by Shake256Final(). Behavior with invalid SHAKE256 context is undefined.
 
-  If Shake256Context is NULL, then return FALSE.
+  If ShaCtx is NULL, then return FALSE.
   If HashValue is NULL, then return FALSE.
 
-  @param[in, out]  Shake256Context  Pointer to the SHAKE256 context.
+  After this function returns, ShaCtx is considered invalidated and should
+  not be used again.
+
+  @param[in, out]  ShaCtx         Pointer to the SHAKE256 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SHAKE256 digest
                                   value (256 / 8 bytes).
 
@@ -1047,8 +818,8 @@ Shake256Update (
 **/
 BOOLEAN
 EFIAPI
-Shake256Final (
-  IN OUT  VOID   *Shake256Context,
+Sha3_Shake256Final (
+  IN OUT  VOID   *ShaCtx,
   OUT     UINT8  *HashValue
   );
 
@@ -1072,7 +843,7 @@ Shake256Final (
 **/
 BOOLEAN
 EFIAPI
-Shake256HashAll (
+Sha3_Shake256HashAll (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
@@ -2448,7 +2219,7 @@ AeadSm4GcmEncrypt (
 
 /**
   Performs AEAD SM4-GCM authenticated decryption on a data buffer and additional authenticated data (AAD).
-  
+
   IvSize must be 12, otherwise FALSE is returned.
   KeySize must be 16, otherwise FALSE is returned.
   TagSize must be 16, otherwise FALSE is returned.
@@ -4471,7 +4242,7 @@ EdNewByNid (
 
 /**
   Release the specified Ed context.
-  
+
   @param[in]  EcContext  Pointer to the Ed context to be released.
 
 **/
@@ -4769,7 +4540,7 @@ Sm2New (
 
 /**
   Release the specified Sm2 context.
-  
+
   @param[in]  Sm2Context  Pointer to the Sm2 context to be released.
 
 **/

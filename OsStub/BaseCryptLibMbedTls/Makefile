@@ -36,8 +36,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\CryptAeadAesGcm.obj \
     $(OUTPUT_DIR)\CryptAeadChaCha20Poly1305.obj \
     $(OUTPUT_DIR)\CryptAeadSm4Gcm.obj \
-    $(OUTPUT_DIR)\CryptSha256.obj \
-    $(OUTPUT_DIR)\CryptSha512.obj \
+    $(OUTPUT_DIR)\CryptSha2.obj \
     $(OUTPUT_DIR)\CryptSha3.obj \
     $(OUTPUT_DIR)\CryptSm3.obj \
     $(OUTPUT_DIR)\CryptHmacSha256.obj \
@@ -110,11 +109,8 @@ $(OUTPUT_DIR)\CryptAeadChaCha20Poly1305.obj : $(SOURCE_DIR)\Cipher\CryptAeadChaC
 $(OUTPUT_DIR)\CryptAeadSm4Gcm.obj : $(SOURCE_DIR)\Cipher\CryptAeadSm4Gcm.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Cipher\CryptAeadSm4Gcm.c
 
-$(OUTPUT_DIR)\CryptSha256.obj : $(SOURCE_DIR)\Hash\CryptSha256.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash\CryptSha256.c
-
-$(OUTPUT_DIR)\CryptSha512.obj : $(SOURCE_DIR)\Hash\CryptSha512.c
-	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash\CryptSha512.c
+$(OUTPUT_DIR)\CryptSha2.obj : $(SOURCE_DIR)\Hash\CryptSha2.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash\CryptSha2.c
 
 $(OUTPUT_DIR)\CryptSha3.obj : $(SOURCE_DIR)\Hash\CryptSha3.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\Hash\CryptSha3.c
@@ -188,5 +184,3 @@ $(OUTPUT_DIR)\$(MODULE_NAME).lib : $(OBJECT_FILES)
 clean:
 	-@if exist $(OUTPUT_DIR) $(RD) $(OUTPUT_DIR)
 	$(RM) *.pdb *.idb > NUL 2>&1
-
-

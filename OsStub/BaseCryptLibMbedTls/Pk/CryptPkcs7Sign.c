@@ -418,7 +418,7 @@ Pkcs7Sign (
 
   /// Calculate InData Digest
   ZeroMem (HashValue, SHA256_DIGEST_SIZE);
-  Status = Sha256HashAll (InData, InDataSize, HashValue);
+  Status = Sha2_256HashAll (InData, InDataSize, HashValue);
   if (!Status) {
     goto Cleanup;
   }
