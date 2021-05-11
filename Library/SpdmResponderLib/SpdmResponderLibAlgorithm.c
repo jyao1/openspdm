@@ -27,7 +27,7 @@ typedef struct {
 #pragma pack()
 
 UINT32 mHashPriorityTable[] = {
-#if OPENSPDM_SHA256_SUPPORT == 1
+#if OPENSPDM_SHA512_SUPPORT == 1
   SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512,
 #endif
 #if OPENSPDM_SHA384_SUPPORT == 1
@@ -102,7 +102,7 @@ UINT32 mKeySchedulePriorityTable[] = {
 };
 
 UINT32 mMeasurementHashPriorityTable[] = {
-#if OPENSPDM_SHA256_SUPPORT == 1
+#if OPENSPDM_SHA512_SUPPORT == 1
   SPDM_ALGORITHMS_MEASUREMENT_HASH_ALGO_TPM_ALG_SHA_512,
 #endif
 #if OPENSPDM_SHA384_SUPPORT == 1
@@ -186,9 +186,11 @@ SpdmGetResponseAlgorithm (
   UINT32                                         AlgoSize;
   UINT8                                          FixedAlgSize;
   UINT8                                          ExtAlgCount;
+  UINT16                                         ExtAlgTotalCount;
 
   SpdmContext = Context;
   SpdmRequest = Request;
+  ExtAlgTotalCount = 0;
 
   if (SpdmContext->ResponseState != SpdmResponseStateNormal) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->Header.RequestResponseCode, ResponseSize, Response);
@@ -202,7 +204,7 @@ SpdmGetResponseAlgorithm (
     SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
     return RETURN_SUCCESS;
   }
-  if (RequestSize < sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) + 
+  if (RequestSize < sizeof(SPDM_NEGOTIATE_ALGORITHMS_REQUEST) +
                     sizeof(UINT32) * SpdmRequest->ExtAsymCount +
                     sizeof(UINT32) * SpdmRequest->ExtHashCount +
                     sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) * SpdmRequest->Header.Param1) {
@@ -226,6 +228,7 @@ SpdmGetResponseAlgorithm (
       }
       FixedAlgSize = (StructTable->AlgCount >> 4) & 0xF;
       ExtAlgCount = StructTable->AlgCount & 0xF;
+      ExtAlgTotalCount += ExtAlgCount;
       if (FixedAlgSize != 2) {
         SpdmGenerateErrorResponse (SpdmContext, SPDM_ERROR_CODE_INVALID_REQUEST, 0, ResponseSize, Response);
         return RETURN_SUCCESS;
@@ -235,6 +238,23 @@ SpdmGetResponseAlgorithm (
         return RETURN_SUCCESS;
       }
       StructTable = (VOID *)((UINTN)StructTable + sizeof (SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) + sizeof(UINT32) * ExtAlgCount);
+    }
+  }
+  ExtAlgTotalCount += (SpdmRequest->ExtAsymCount + SpdmRequest->ExtHashCount);
+  // Algorithm count check and message size check
+  if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
+    if (ExtAlgTotalCount>0x14){
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmRequest->Length>0x80){
+      return RETURN_DEVICE_ERROR;
+    }
+  } else {
+    if (ExtAlgTotalCount>0x08){
+      return RETURN_DEVICE_ERROR;
+    }
+    if (SpdmRequest->Length>0x40){
+      return RETURN_DEVICE_ERROR;
     }
   }
   RequestSize = (UINTN)StructTable - (UINTN)SpdmRequest;
@@ -437,4 +457,3 @@ SpdmGetResponseAlgorithm (
 
   return RETURN_SUCCESS;
 }
-

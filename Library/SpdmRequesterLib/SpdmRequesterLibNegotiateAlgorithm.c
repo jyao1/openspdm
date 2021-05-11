@@ -36,8 +36,8 @@ typedef struct {
   UINT8                ExtAsymSelCount;
   UINT8                ExtHashSelCount;
   UINT16               Reserved3;
-  UINT32               ExtAsymSel[8];
-  UINT32               ExtHashSel[8];
+  UINT32               ExtAsymSel;//ExtAsymSel and ExtHashSel are unique
+  UINT32               ExtHashSel;
   SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE  StructTable[4];
 } SPDM_ALGORITHMS_RESPONSE_MAX;
 #pragma pack()
@@ -135,13 +135,16 @@ TrySpdmNegotiateAlgorithms (
   if (SpdmResponseSize > sizeof(SpdmResponse)) {
     return RETURN_DEVICE_ERROR;
   }
+  if (SpdmResponse.Header.SPDMVersion != SpdmRequest.Header.SPDMVersion){
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmResponse.ExtAsymSelCount > 1) {
     return RETURN_DEVICE_ERROR;
   }
   if (SpdmResponse.ExtHashSelCount > 1) {
     return RETURN_DEVICE_ERROR;
   }
-  if (SpdmResponseSize < sizeof(SPDM_ALGORITHMS_RESPONSE) + 
+  if (SpdmResponseSize < sizeof(SPDM_ALGORITHMS_RESPONSE) +
                          sizeof(UINT32) * SpdmResponse.ExtAsymSelCount +
                          sizeof(UINT32) * SpdmResponse.ExtHashSelCount +
                          sizeof(SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) * SpdmResponse.Header.Param1) {
@@ -178,7 +181,6 @@ TrySpdmNegotiateAlgorithms (
   if (SpdmResponseSize != SpdmResponse.Length) {
     return RETURN_DEVICE_ERROR;
   }
-
   //
   // Cache data
   //
@@ -205,13 +207,18 @@ TrySpdmNegotiateAlgorithms (
   if (AlgoSize == 0) {
     return RETURN_SECURITY_VIOLATION;
   }
+  if ((SpdmContext->ConnectionInfo.Algorithm.BaseHashAlgo&SpdmContext->LocalContext.Algorithm.BaseHashAlgo)==0){
+    return RETURN_DEVICE_ERROR;
+  }
   if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, 0, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_CHAL_CAP)) {
     AlgoSize = GetSpdmAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo);
     if (AlgoSize == 0) {
       return RETURN_SECURITY_VIOLATION;
     }
+    if ((SpdmContext->ConnectionInfo.Algorithm.BaseAsymAlgo&SpdmContext->LocalContext.Algorithm.BaseAsymAlgo)==0){
+      return RETURN_DEVICE_ERROR;
+    }
   }
-
   if (SpdmResponse.Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
     StructTable = (VOID *)((UINTN)&SpdmResponse +
                             sizeof(SPDM_ALGORITHMS_RESPONSE) +
@@ -236,10 +243,12 @@ TrySpdmNegotiateAlgorithms (
       ExtAlgCount = StructTable->AlgCount & 0xF;
       StructTable = (VOID *)((UINTN)StructTable + sizeof (SPDM_NEGOTIATE_ALGORITHMS_COMMON_STRUCT_TABLE) + sizeof(UINT32) * ExtAlgCount);
     }
-
     if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP)) {
       AlgoSize = GetSpdmDhePubKeySize (SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup);
       if (AlgoSize == 0) {
+        return RETURN_SECURITY_VIOLATION;
+      }
+      if ((SpdmContext->ConnectionInfo.Algorithm.DHENamedGroup&SpdmContext->LocalContext.Algorithm.DHENamedGroup)==0){
         return RETURN_SECURITY_VIOLATION;
       }
     }
@@ -249,16 +258,25 @@ TrySpdmNegotiateAlgorithms (
       if (AlgoSize == 0) {
         return RETURN_SECURITY_VIOLATION;
       }
+      if ((SpdmContext->ConnectionInfo.Algorithm.AEADCipherSuite&SpdmContext->LocalContext.Algorithm.AEADCipherSuite)==0){
+        return RETURN_SECURITY_VIOLATION;
+      }
     }
     if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_MUT_AUTH_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_MUT_AUTH_CAP)) {
       AlgoSize = GetSpdmReqAsymSignatureSize (SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg);
       if (AlgoSize == 0) {
         return RETURN_SECURITY_VIOLATION;
       }
+      if ((SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg&SpdmContext->LocalContext.Algorithm.ReqBaseAsymAlg)==0){
+        return RETURN_SECURITY_VIOLATION;
+      }
     }
     if (SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_KEY_EX_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_KEY_EX_CAP) ||
         SpdmIsCapabilitiesFlagSupported(SpdmContext, TRUE, SPDM_GET_CAPABILITIES_REQUEST_FLAGS_PSK_CAP, SPDM_GET_CAPABILITIES_RESPONSE_FLAGS_PSK_CAP)) {
       if (SpdmContext->ConnectionInfo.Algorithm.KeySchedule != SPDM_ALGORITHMS_KEY_SCHEDULE_HMAC_HASH) {
+        return RETURN_SECURITY_VIOLATION;
+      }
+      if ((SpdmContext->ConnectionInfo.Algorithm.KeySchedule&SpdmContext->LocalContext.Algorithm.KeySchedule)==0){
         return RETURN_SECURITY_VIOLATION;
       }
     }
@@ -268,7 +286,6 @@ TrySpdmNegotiateAlgorithms (
     SpdmContext->ConnectionInfo.Algorithm.ReqBaseAsymAlg = 0;
     SpdmContext->ConnectionInfo.Algorithm.KeySchedule = 0;
   }
-
   SpdmContext->ConnectionInfo.ConnectionState = SpdmConnectionStateNegotiated;
   return RETURN_SUCCESS;
 }
@@ -300,4 +317,3 @@ SpdmNegotiateAlgorithms (
 
   return Status;
 }
-
