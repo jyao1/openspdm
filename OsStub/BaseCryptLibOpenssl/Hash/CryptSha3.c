@@ -51,7 +51,7 @@ GetMd(
 
 /**
 
-  Given a Sha2Type, allocate, initialize, and return a pointer to an
+  Given a Sha3Type, allocate, initialize, and return a pointer to an
   initialized context struct.
 
   Note that this function will allocate.
