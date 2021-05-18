@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "InternalCryptLib.h"
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
-#include <crypto/asn1.h>
 #include <openssl/asn1.h>
 #include <openssl/rsa.h>
 
@@ -1058,6 +1057,7 @@ X509GetSignatureAlgorithm (
   X509            *X509Cert;
   int             Nid;
   ASN1_OBJECT     *Asn1Obj;
+  UINTN           ObjLength;
 
   //
   // Check input parameters.
@@ -1092,15 +1092,16 @@ X509GetSignatureAlgorithm (
     goto _Exit;
   }
 
-  if (*OidSize < (UINTN)Asn1Obj->length) {
-    *OidSize = Asn1Obj->length;
+  ObjLength = OBJ_length(Asn1Obj);
+  if (*OidSize < ObjLength) {
+    *OidSize = ObjLength;
     ReturnStatus = RETURN_BUFFER_TOO_SMALL;
     goto _Exit;
   }
   if (Oid != NULL) {
-    CopyMem(Oid, Asn1Obj->data, Asn1Obj->length);
+    CopyMem(Oid, OBJ_get0_data(Asn1Obj), ObjLength);
   }
-  *OidSize = Asn1Obj->length;
+  *OidSize = ObjLength;
   ReturnStatus = RETURN_SUCCESS;
 
 _Exit:
@@ -1415,6 +1416,8 @@ X509GetExtensionData (
   ASN1_OBJECT *Asn1Obj;
   ASN1_OCTET_STRING *Asn1Oct;
   X509_EXTENSION *Ext;
+  UINTN ObjLength;
+  UINTN OctLength;
 
   ReturnStatus = RETURN_INVALID_PARAMETER;
 
@@ -1462,7 +1465,10 @@ X509GetExtensionData (
         continue;
       }
 
-      if(OidSize == (UINTN)Asn1Obj->length && CompareMem (Asn1Obj->data, Oid, OidSize) == 0) {
+      ObjLength = OBJ_length(Asn1Obj);
+      OctLength = ASN1_STRING_length(Asn1Oct);
+
+      if(OidSize == ObjLength && CompareMem (OBJ_get0_data(Asn1Obj), Oid, OidSize) == 0) {
         //
         // Extension Found
         //
@@ -1471,15 +1477,15 @@ X509GetExtensionData (
       }
   }
   if (ReturnStatus == RETURN_SUCCESS) {
-    if (*ExtensionDataSize < (UINTN)Asn1Oct->length) {
-      *ExtensionDataSize = Asn1Oct->length;
+    if (*ExtensionDataSize < OctLength) {
+      *ExtensionDataSize = OctLength;
       ReturnStatus = RETURN_BUFFER_TOO_SMALL;
       goto Cleanup;
     }
     if (Oid != NULL) {
-      CopyMem(ExtensionData, Asn1Oct->data, Asn1Oct->length);
+      CopyMem(ExtensionData, ASN1_STRING_get0_data(Asn1Oct), OctLength);
     }
-    *ExtensionDataSize = Asn1Oct->length;
+    *ExtensionDataSize = OctLength;
     ReturnStatus = RETURN_SUCCESS;
   }
 

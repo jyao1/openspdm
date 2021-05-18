@@ -15,13 +15,11 @@
 #include <openssl/asn1.h>
 #include <openssl/x509.h>
 #include <openssl/bio.h>
-#include <crypto/x509.h>
 #include <openssl/pkcs7.h>
 #include <openssl/bn.h>
 #include <openssl/x509_vfy.h>
 #include <openssl/pem.h>
 #include <openssl/evp.h>
-#include <crypto/asn1.h>
 
 /**
   This function will return the leaf signer certificate in a chain.  This is
@@ -215,8 +213,8 @@ IsEkuInCertificate (
       goto Exit;
     }
 
-    if (Asn1InCert->length == Asn1ToFind->length &&
-        CompareMem (Asn1InCert->data, Asn1ToFind->data, Asn1InCert->length) == 0) {
+    if (OBJ_length(Asn1InCert) == OBJ_length(Asn1ToFind) &&
+        CompareMem(OBJ_get0_data(Asn1InCert), OBJ_get0_data(Asn1ToFind), OBJ_length(Asn1ToFind)) == 0) {
       //
       // Found Eku in certificate.
       //
@@ -518,4 +516,3 @@ Exit:
 
   return Status;
 }
-
