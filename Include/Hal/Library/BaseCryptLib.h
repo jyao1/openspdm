@@ -854,24 +854,11 @@ Sha3_Shake256HashAll (
 //=====================================================================================
 
 /**
-  Retrieves the size, in bytes, of the context buffer required for SM3 hash operations.
+  Allocates a new digest context, and then return a reference through the outparam `Sm3CtxPtr`
 
-  @return  The size, in bytes, of the context buffer required for SM3 hash operations.
+  If Sm3CtxPtr is NULL, then return FALSE
 
-**/
-UINTN
-EFIAPI
-Sm3GetContextSize (
-  VOID
-  );
-
-/**
-  Initializes user-supplied memory pointed by Sm3Context as SM3 hash context for
-  subsequent use.
-
-  If Sm3Context is NULL, then return FALSE.
-
-  @param[out]  Sm3Context  Pointer to SM3 context being initialized.
+  @param[out]  Sm3CtxPtr  Pointer to the pointer of the newly allocated digest context.
 
   @retval TRUE   SM3 context initialization succeeded.
   @retval FALSE  SM3 context initialization failed.
@@ -880,42 +867,21 @@ Sm3GetContextSize (
 BOOLEAN
 EFIAPI
 Sm3Init (
-  OUT  VOID  *Sm3Context
-  );
-
-/**
-  Makes a copy of an existing SM3 context.
-
-  If Sm3Context is NULL, then return FALSE.
-  If NewSm3Context is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Sm3Context     Pointer to SM3 context being copied.
-  @param[out] NewSm3Context  Pointer to new SM3 context.
-
-  @retval TRUE   SM3 context copy succeeded.
-  @retval FALSE  SM3 context copy failed.
-  @retval FALSE  This interface is not supported.
-
-**/
-BOOLEAN
-EFIAPI
-Sm3Duplicate (
-  IN   CONST VOID  *Sm3Context,
-  OUT  VOID        *NewSm3Context
+  OUT  VOID  **Sm3CtxPtr
   );
 
 /**
   Digests the input data and updates SM3 context.
 
   This function performs SM3 digest on a data buffer of the specified size.
-  It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SM3 context should be already correctly initialized by Sm3Init(), and should not be finalized
-  by Sm3Final(). Behavior with invalid context is undefined.
+  It can be called multiple times to compute the digest of long or
+  discontinuous data streams. SM3 context should be already correctly
+  initialized by Sm3Init(), and should not be finalized by Sm3Final().
+  Behavior with invalid context is undefined.
 
-  If Sm3Context is NULL, then return FALSE.
+  If Sm3Ctx is NULL, then return FALSE.
 
-  @param[in, out]  Sm3Context     Pointer to the SM3 context.
+  @param[in, out]  Sm3Ctx         Pointer to the SM3 context.
   @param[in]       Data           Pointer to the buffer containing the data to be hashed.
   @param[in]       DataSize       Size of Data buffer in bytes.
 
@@ -926,7 +892,7 @@ Sm3Duplicate (
 BOOLEAN
 EFIAPI
 Sm3Update (
-  IN OUT  VOID        *Sm3Context,
+  IN OUT  VOID        *Sm3Ctx,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
   );
@@ -940,10 +906,10 @@ Sm3Update (
   SM3 context should be already correctly initialized by Sm3Init(), and should not be
   finalized by Sm3Final(). Behavior with invalid SM3 context is undefined.
 
-  If Sm3Context is NULL, then return FALSE.
+  If Sm3Ctx is NULL, then return FALSE.
   If HashValue is NULL, then return FALSE.
 
-  @param[in, out]  Sm3Context     Pointer to the SM3 context.
+  @param[in, out]  Sm3Ctx         Pointer to the SM3 context.
   @param[out]      HashValue      Pointer to a buffer that receives the SM3 digest
                                   value (32 bytes).
 
@@ -954,7 +920,7 @@ Sm3Update (
 BOOLEAN
 EFIAPI
 Sm3Final (
-  IN OUT  VOID   *Sm3Context,
+  IN OUT  VOID   *Sm3Ctx,
   OUT     UINT8  *HashValue
   );
 
@@ -4438,7 +4404,7 @@ EcxNewByNid (
 
 /**
   Release the specified Ecx context.
-  
+
   @param[in]  EcxContext  Pointer to the Ecx context to be released.
 
 **/
