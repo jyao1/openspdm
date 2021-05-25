@@ -1,5 +1,5 @@
 /** @file
-  CMAC-AES Wrapper Implementation over OpenSSL.
+  CMAC-AES Wrapper Implementation over mbedTLS.
 
   RFC 4493 - The AES-CMAC Algorithm
   NIST SP800-38b - Cipher Modes of Operation: The CMAC Mode for Authentication

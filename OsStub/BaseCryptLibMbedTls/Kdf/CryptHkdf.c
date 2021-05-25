@@ -1,5 +1,5 @@
 /** @file
-  HMAC-SHA256 KDF Wrapper Implementation over OpenSSL.
+  HMAC-SHA256 KDF Wrapper Implementation over mbedTLS.
 
   RFC 5869: HMAC-based Extract-and-Expand Key Derivation Function (HKDF)
 

@@ -1,5 +1,5 @@
 /** @file
-  Shang-Mi2 Asymmetric Wrapper Implementation over OpenSSL.
+  Shang-Mi2 Asymmetric Wrapper Implementation over mbedTLS.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent

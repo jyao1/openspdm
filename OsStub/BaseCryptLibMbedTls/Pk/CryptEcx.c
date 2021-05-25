@@ -1,5 +1,5 @@
 /** @file
-  Montgomery-Curve Wrapper Implementation over OpenSSL.
+  Montgomery-Curve Wrapper Implementation over mbedTLS.
 
   RFC 7748 - Elliptic Curves for Security (Curve25519/Curve448)
   NIST SP 800-186 - Recommendations for Discrete Logarithm-Based Cryptography: Elliptic Curve Domain Parameters

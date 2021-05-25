@@ -1,5 +1,5 @@
 /** @file
-  GMAC-AES Wrapper Implementation over OpenSSL.
+  GMAC-AES Wrapper Implementation over mbedTLS.
   
   NIST SP800-38d - Cipher Modes of Operation: Galois / Counter Mode(GCM) and GMAC
 
