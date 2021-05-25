@@ -1,5 +1,5 @@
 /** @file
-  SHA-3 Digest Wrapper Implementations over OpenSSL.
+  SHA-3 Digest Wrapper Implementations over mbedTLS.
 
   This file includes SHA3-256, SHA3-384, SHA-512, SHAKE-256, all part of
   SHA-3 family.

@@ -1,5 +1,5 @@
 /** @file
-  AEAD (AES-CCM) Wrapper Implementation over OpenSSL.
+  AEAD (AES-CCM) Wrapper Implementation over mbedTLS.
 
   RFC 5116 - An Interface and Algorithms for Authenticated Encryption
   NIST SP800-38c - Cipher Modes of Operation: The CCM Mode for Authenticationand Confidentiality

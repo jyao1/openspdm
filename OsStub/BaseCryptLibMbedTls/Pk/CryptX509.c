@@ -1,5 +1,5 @@
 /** @file
-  X.509 Certificate Handler Wrapper Implementation over OpenSSL.
+  X.509 Certificate Handler Wrapper Implementation over mbedTLS.
 
 Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent

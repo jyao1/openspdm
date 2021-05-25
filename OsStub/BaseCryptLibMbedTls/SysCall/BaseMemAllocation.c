@@ -1,5 +1,5 @@
 /** @file
-  Base Memory Allocation Routines Wrapper for Crypto library over OpenSSL
+  Base Memory Allocation Routines Wrapper for Crypto library over mbedTLS
   during PEI & DXE phases.
 
 Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
