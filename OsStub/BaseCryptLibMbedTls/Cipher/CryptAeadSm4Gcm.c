@@ -1,5 +1,5 @@
 /** @file
-  AEAD (SM4-GCM) Wrapper Implementation over OpenSSL.
+  AEAD (SM4-GCM) Wrapper Implementation over mbedTLS.
 
 Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent

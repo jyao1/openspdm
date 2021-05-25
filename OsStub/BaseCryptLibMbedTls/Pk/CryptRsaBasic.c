@@ -1,5 +1,5 @@
 /** @file
-  RSA Asymmetric Cipher Wrapper Implementation over OpenSSL.
+  RSA Asymmetric Cipher Wrapper Implementation over mbedTLS.
 
   This file implements following APIs which provide basic capabilities for RSA:
   1) RsaNew

@@ -1,5 +1,5 @@
 /** @file
-  SHA-2 Digest Wrapper Implementations over OpenSSL.
+  SHA-2 Digest Wrapper Implementations over mbedTLS
 
   This file includes SHA256, SHA384, SHA512, all part of SHA-2 family.
 
