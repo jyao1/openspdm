@@ -14,6 +14,13 @@ ARCH = X64
 TOOLCHAIN = GCC
 TARGET = DEBUG
 CRYPTO = MbedTls
+ENABLE_BINARY_BUILD = 0
+
+#
+# OpenSSL specific compiled libraries.
+#
+COMPILED_LIBCRYPTO_PATH=
+COMPILED_LIBSSL_PATH=
 
 ifeq ("$(ARCH)","X64")
     $(info ARCH=X64)
@@ -74,6 +81,39 @@ else ifeq ("$(CRYPTO)","Openssl")
 else
     $(error unknown CRYPTO)
 endif
+
+ifeq ("$(ENABLE_BINARY_BUILD)", "1")
+    ifneq ("$(CRYPTO)", "Openssl")
+        $(error enabling binary build not supported for non-Openssl)
+    endif
+
+    ifeq ($(COMPILED_LIBSSL_PATH),)
+        $(error enabling binary build for $(CRYPTO) requires path to libssl.)
+    endif
+
+    ifeq ($(COMPILED_LIBCRYPTO_PATH),)
+        $(error enabling binary build for $(CRYPTO) requires path to libcrypto.)
+    endif
+
+    $(info ENABLE_BINARY_BUILD=1)
+    $(info COMPILED_LIBCRYPTO_PATH=$(COMPILED_LIBCRYPTO_PATH))
+    $(info COMPILED_LIBSSL_PATH=$(COMPILED_LIBSSL_PATH))
+
+    CRYPTO_LIB_OBJS = $(COMPILED_LIBCRYPTO_PATH) $(COMPILED_LIBSSL_PATH)
+    CRYPTO_LIBS =
+    GEN_LIB_CRYPTO =
+    CRYPTO_PATHS_TO_ECHO = $(CRYPTO_LIB_OBJS)
+else
+    $(info ENABLE_BINARY_BUILD=0)
+    CRYPTO_LIB_OBJS = $(BIN_DIR)/OsStub/$(CRYPTO)Lib/*.o
+    CRYPTO_LIBS = $(BIN_DIR)/OsStub/$(CRYPTO)Lib/$(CRYPTO)Lib.a
+    GEN_LIB_CRYPTO = @"$(MAKE)" $(MAKE_FLAGS) -f $(WORKSPACE)/OsStub/$(CRYPTO)Lib/$(MAKEFILE) ARCH=$(ARCH) TARGET=$(TARGET) TOOLCHAIN=$(TOOLCHAIN) CRYPTO=$(CRYPTO)
+    CRYPTO_PATHS_TO_ECHO = $(CRYPTO_LIBS)
+endif
+
+ECHO_CRYPTO_PATHS = for lib in $(CRYPTO_PATHS_TO_ECHO); do \
+                        echo $$lib >> $(OUTPUT_DIR)/tmp.list; \
+                    done
 
 #
 # Shell Command Macro
