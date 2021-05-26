@@ -23,6 +23,7 @@ SET(src_TestSpdmResponder
     TestSpdmResponderCertificate.c
     TestSpdmResponderChallengeAuth.c
     TestSpdmResponderMeasurement.c
+    TestSpdmResponderRespondIfReady.c
     TestSpdmResponderKeyExchange.c
     TestSpdmResponderFinish.c
     TestSpdmResponderPskExchange.c

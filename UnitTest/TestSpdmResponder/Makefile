@@ -41,6 +41,7 @@ OBJECT_FILES =  \
     $(OUTPUT_DIR)\TestSpdmResponderCertificate.obj \
     $(OUTPUT_DIR)\TestSpdmResponderChallengeAuth.obj \
     $(OUTPUT_DIR)\TestSpdmResponderMeasurement.obj \
+    $(OUTPUT_DIR)\TestSpdmResponderRespondIfReady.obj \
     $(OUTPUT_DIR)\TestSpdmResponderKeyExchange.obj \
     $(OUTPUT_DIR)\TestSpdmResponderFinish.obj \
     $(OUTPUT_DIR)\TestSpdmResponderPskExchange.obj \
@@ -168,6 +169,9 @@ $(OUTPUT_DIR)\TestSpdmResponderChallengeAuth.obj : $(SOURCE_DIR)\TestSpdmRespond
 
 $(OUTPUT_DIR)\TestSpdmResponderMeasurement.obj : $(SOURCE_DIR)\TestSpdmResponderMeasurement.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderMeasurement.c
+
+$(OUTPUT_DIR)\TestSpdmResponderRespondIfReady.obj : $(SOURCE_DIR)\TestSpdmResponderRespondIfReady.c
+	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderRespondIfReady.c
 
 $(OUTPUT_DIR)\TestSpdmResponderKeyExchange.obj : $(SOURCE_DIR)\TestSpdmResponderKeyExchange.c
 	$(CC) $(CC_FLAGS) $(CC_OBJ_FLAG)$@ $(INC) $(SOURCE_DIR)\TestSpdmResponderKeyExchange.c
