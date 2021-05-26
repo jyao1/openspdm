@@ -48,12 +48,15 @@ SpdmResponderHandleResponseState (
     SpdmSetConnectionState (SpdmContext, SpdmConnectionStateNotStarted);
     return RETURN_SUCCESS;
   case SpdmResponseStateNotReady:
-    SpdmContext->CachSpdmRequestSize = SpdmContext->LastSpdmRequestSize;
-    CopyMem (SpdmContext->CachSpdmRequest, SpdmContext->LastSpdmRequest, SpdmContext->LastSpdmRequestSize);
-    SpdmContext->ErrorData.RDTExponent = 1;
-    SpdmContext->ErrorData.RDTM        = 1;
-    SpdmContext->ErrorData.RequestCode = RequestCode;
-    SpdmContext->ErrorData.Token       = SpdmContext->CurrentToken++;
+    //do not update ErrorData if a previous request has not been completed
+    if(RequestCode != SPDM_RESPOND_IF_READY) {
+      SpdmContext->CachSpdmRequestSize = SpdmContext->LastSpdmRequestSize;
+      CopyMem (SpdmContext->CachSpdmRequest, SpdmContext->LastSpdmRequest, SpdmContext->LastSpdmRequestSize);
+      SpdmContext->ErrorData.RDTExponent = 1;
+      SpdmContext->ErrorData.RDTM        = 1;
+      SpdmContext->ErrorData.RequestCode = RequestCode;
+      SpdmContext->ErrorData.Token       = SpdmContext->CurrentToken++;
+    }
     SpdmGenerateExtendedErrorResponse (SpdmContext, SPDM_ERROR_CODE_RESPONSE_NOT_READY, 0, sizeof(SPDM_ERROR_DATA_RESPONSE_NOT_READY), (UINT8*)(void*)&SpdmContext->ErrorData, ResponseSize, Response);
     // NOTE: Need to reset status to Normal in up level
     return RETURN_SUCCESS;

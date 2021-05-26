@@ -44,7 +44,7 @@ SpdmGetResponseRespondIfReady (
   SpdmContext = Context;
   SpdmRequest = Request;
 
-  if (SpdmContext->ResponseState == SpdmResponseStateNeedResync) {
+  if (SpdmContext->ResponseState == SpdmResponseStateNeedResync || SpdmContext->ResponseState == SpdmResponseStateNotReady) {
     return SpdmResponderHandleResponseState(SpdmContext, SpdmRequest->RequestResponseCode, ResponseSize, Response);
   }
 
