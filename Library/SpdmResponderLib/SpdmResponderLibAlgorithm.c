@@ -243,17 +243,17 @@ SpdmGetResponseAlgorithm (
   ExtAlgTotalCount += (SpdmRequest->ExtAsymCount + SpdmRequest->ExtHashCount);
   // Algorithm count check and message size check
   if (SpdmRequest->Header.SPDMVersion >= SPDM_MESSAGE_VERSION_11) {
-    if (ExtAlgTotalCount>0x14){
+    if (ExtAlgTotalCount>SPDM_NEGOTIATE_ALGORITHMS_REQUEST_MAX_EXT_ALG_COUNT_VERSION_11){
       return RETURN_DEVICE_ERROR;
     }
-    if (SpdmRequest->Length>0x80){
+    if (SpdmRequest->Length>SPDM_NEGOTIATE_ALGORITHMS_REQUEST_MAX_LENGTH_VERSION_11){
       return RETURN_DEVICE_ERROR;
     }
   } else {
-    if (ExtAlgTotalCount>0x08){
+    if (ExtAlgTotalCount>SPDM_NEGOTIATE_ALGORITHMS_REQUEST_MAX_EXT_ALG_COUNT_VERSION_10){
       return RETURN_DEVICE_ERROR;
     }
-    if (SpdmRequest->Length>0x40){
+    if (SpdmRequest->Length>SPDM_NEGOTIATE_ALGORITHMS_REQUEST_MAX_LENGTH_VERSION_10){
       return RETURN_DEVICE_ERROR;
     }
   }

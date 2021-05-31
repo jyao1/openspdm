@@ -182,7 +182,7 @@ typedef struct {
 ///
 typedef struct {
   SPDM_MESSAGE_HEADER  Header;
-  // Param1 == Number of Algorithms Structure Tables 
+  // Param1 == Number of Algorithms Structure Tables
   // Param2 == RSVD
   UINT16               Length;
   UINT8                MeasurementSpecification;
@@ -198,6 +198,11 @@ typedef struct {
   // Below field is added in 1.1.
 //SPDM_NEGOTIATE_ALGORITHMS_STRUCT_TABLE  AlgStruct[Param1];
 } SPDM_NEGOTIATE_ALGORITHMS_REQUEST;
+
+#define SPDM_NEGOTIATE_ALGORITHMS_REQUEST_MAX_LENGTH_VERSION_10          0x40
+#define SPDM_NEGOTIATE_ALGORITHMS_REQUEST_MAX_LENGTH_VERSION_11          0x80
+#define SPDM_NEGOTIATE_ALGORITHMS_REQUEST_MAX_EXT_ALG_COUNT_VERSION_10   0x08
+#define SPDM_NEGOTIATE_ALGORITHMS_REQUEST_MAX_EXT_ALG_COUNT_VERSION_11   0x14
 
 typedef struct {
   UINT8                AlgType;
@@ -844,4 +849,3 @@ typedef struct {
 #pragma pack()
 
 #endif
-
