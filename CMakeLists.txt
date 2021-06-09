@@ -430,6 +430,8 @@ if(TESTTYPE STREQUAL "SpdmEmu")
             OsStub/RngLib
             OsStub/MemoryAllocationLib
             SpdmEmu/SpdmDeviceSecretLib
+            OsStub/SpdmDeviceSecretLibNull
+            OsStub/DebugLibNull
     )
             
     SUBDIRS(SpdmEmu/SpdmRequesterEmu
