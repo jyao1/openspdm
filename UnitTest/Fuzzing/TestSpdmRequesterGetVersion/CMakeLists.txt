@@ -24,7 +24,7 @@ SET(TestSpdmRequesterGetVersion_LIBRARY
     DebugLib
     SpdmRequesterLib
     SpdmCommonLib
-    ${CRYPTO}Lib
+    ${CRYPTO_LIB_PATHS}
     RngLib
     BaseCryptLib${CRYPTO}
     MemoryAllocationLib
@@ -35,13 +35,13 @@ SET(TestSpdmRequesterGetVersion_LIBRARY
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
-    ADD_EXECUTABLE(TestSpdmRequesterGetVersion 
+    ADD_EXECUTABLE(TestSpdmRequesterGetVersion
                    ${src_TestSpdmRequesterGetVersion}
                    $<TARGET_OBJECTS:BaseMemoryLib>
                    $<TARGET_OBJECTS:DebugLib>
                    $<TARGET_OBJECTS:SpdmRequesterLib>
                    $<TARGET_OBJECTS:SpdmCommonLib>
-                   $<TARGET_OBJECTS:${CRYPTO}Lib>
+                   $<TARGET_OBJECTS:${CRYPTO_LIB_PATHS}>
                    $<TARGET_OBJECTS:RngLib>
                    $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
                    $<TARGET_OBJECTS:MemoryAllocationLib>

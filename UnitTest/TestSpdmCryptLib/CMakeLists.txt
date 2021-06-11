@@ -22,7 +22,7 @@ SET(TestSpdmCryptLib_LIBRARY
     BaseMemoryLib
     DebugLib
     SpdmCryptLib
-    ${CRYPTO}Lib
+    ${CRYPTO_LIB_PATHS}
     BaseCryptLib${CRYPTO}
     RngLib
     MemoryAllocationLib
@@ -30,20 +30,18 @@ SET(TestSpdmCryptLib_LIBRARY
 )
 
 if((TOOLCHAIN STREQUAL "KLEE") OR (TOOLCHAIN STREQUAL "CBMC"))
-    ADD_EXECUTABLE(TestSpdmCryptLib 
+    ADD_EXECUTABLE(TestSpdmCryptLib
                    ${src_TestSpdmCryptLib}
                    $<TARGET_OBJECTS:BaseMemoryLib>
                    $<TARGET_OBJECTS:DebugLib>
                    $<TARGET_OBJECTS:SpdmCryptLib>
-                   $<TARGET_OBJECTS:${CRYPTO}Lib>
+                   $<TARGET_OBJECTS:${CRYPTO_LIB_PATHS}>
                    $<TARGET_OBJECTS:RngLib>
                    $<TARGET_OBJECTS:BaseCryptLib${CRYPTO}>
                    $<TARGET_OBJECTS:MemoryAllocationLib>
                    $<TARGET_OBJECTS:CmockaLib>
-    ) 
+    )
 else()
     ADD_EXECUTABLE(TestSpdmCryptLib ${src_TestSpdmCryptLib})
     TARGET_LINK_LIBRARIES(TestSpdmCryptLib ${TestSpdmCryptLib_LIBRARY})
 endif()
-
-
