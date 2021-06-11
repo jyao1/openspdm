@@ -15,6 +15,12 @@ SET(CMAKE_BUILD_TYPE ${TARGET} CACHE STRING "Choose the target of build: Debug R
 SET(CRYPTO ${CRYPTO} CACHE STRING "Choose the crypto of build: MbedTls Openssl" FORCE)
 SET(TESTTYPE ${TESTTYPE} CACHE STRING "Choose the test type for openspdm: SpdmEmu UnitTest UnitFuzzing" FORCE)
 
+#
+# OpenSSL specific compiled libraries.
+#
+SET(COMPILED_LIBCRYPTO_PATH ${COMPILED_LIBCRYPTO_PATH} CACHE STRING "Optionally provide a path to libcrypto" FORCE)
+SET(COMPILED_LIBSSL_PATH ${COMPILED_LIBSSL_PATH} CACHE STRING "Optionally provide a path to libssl" FORCE)
+
 if(ARCH STREQUAL "X64")
     MESSAGE("ARCH = X64")
 elseif(ARCH STREQUAL "Ia32")
@@ -91,6 +97,29 @@ elseif(CRYPTO STREQUAL "Openssl")
     MESSAGE("CRYPTO = Openssl")
 else()
     MESSAGE(FATAL_ERROR "Unkown CRYPTO")
+endif()
+
+if(ENABLE_BINARY_BUILD STREQUAL "1")
+    if(NOT CRYPTO STREQUAL "Openssl")
+        MESSAGE(FATAL_ERROR "enabling binary build not supported for non-Openssl")
+    endif()
+
+    if(NOT COMPILED_LIBCRYPTO_PATH)
+        MESSAGE(FATAL_ERROR "enabling binary build requires path to libcrypto.")
+    endif()
+
+    if(NOT COMPILED_LIBSSL_PATH)
+        MESSAGE(FATAL_ERROR "enabling binary build requires path to libssl.")
+    endif()
+
+    MESSAGE("ENABLE_BINARY_BUILD=1")
+    MESSAGE("COMPILED_LIBCRYPTO_PATH=${COMPILED_LIBCRYPTO_PATH}")
+    MESSAGE("COMPILED_LIBSSL_PATH=${COMPILED_LIBSSL_PATH}")
+
+    SET(CRYPTO_LIB_PATHS ${COMPILED_LIBCRYPTO_PATH} ${COMPILED_LIBSSL_PATH})
+else()
+    SET(CRYPTO_LIB_PATHS ${CRYPTO}Lib)
+    MESSAGE("ENABLE_BINARY_BUILD=0; Building ${CRYPTO} library from source.")
 endif()
 
 if(TESTTYPE STREQUAL "SpdmEmu")
@@ -405,23 +434,27 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
     STRING(REPLACE "/" "\\" SRC ${PROJECT_SOURCE_DIR}/SpdmEmu/TestKey/*)
     STRING(REPLACE "/" "\\" DEST ${EXECUTABLE_OUTPUT_PATH})
-    
+
     ADD_CUSTOM_COMMAND(TARGET CopyTestKey
                        PRE_BUILD
                        COMMAND xcopy /y /s ${SRC} ${DEST})
 endif()
 
 if(CRYPTO STREQUAL "MbedTls")
-    SUBDIRS(OsStub/BaseCryptLibMbedTls
-            OsStub/MbedTlsLib
-    )
+    SUBDIRS(OsStub/BaseCryptLibMbedTls)
 elseif(CRYPTO STREQUAL "Openssl")
-    SUBDIRS(OsStub/BaseCryptLibOpenssl
-            OsStub/OpensslLib
-    )
+    SUBDIRS(OsStub/BaseCryptLibOpenssl)
 endif()
 
-if(TESTTYPE STREQUAL "SpdmEmu") 
+if(NOT ENABLE_BINARY_BUILD STREQUAL "1")
+    if(CRYPTO STREQUAL "MbedTls")
+        SUBDIRS(OsStub/MbedTlsLib)
+    elseif(CRYPTO STREQUAL "Openssl")
+        SUBDIRS(OsStub/OpensslLib)
+    endif()
+endif()
+
+if(TESTTYPE STREQUAL "SpdmEmu")
     SUBDIRS(Library/SpdmCommonLib
             Library/SpdmRequesterLib
             Library/SpdmResponderLib
