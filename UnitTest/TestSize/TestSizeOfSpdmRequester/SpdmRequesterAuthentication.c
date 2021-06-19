@@ -59,6 +59,7 @@ SpdmAuthentication (
   if (RETURN_ERROR(Status)) {
     return Status;
   }
+  return RETURN_SUCCESS;
 }
 
 /**
