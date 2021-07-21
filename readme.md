@@ -1,8 +1,10 @@
 # This openspdm is a sample implementation for the DMTF [SPDM](https://www.dmtf.org/standards/pmci) specification
 
 ## NOTE
-We are moving openspdm to a new location. We freeze the master at this moment.
-Once the new location is finalized, we will move development activity there.
+The [openspdm](https://github.com/jyao1/openspdm) is moved to https://github.com/DMTF/libspdm.
+The [temp_master branch](https://github.com/jyao1/openspdm/tree/temp_master) is synced.
+The [openspdm issue](https://github.com/jyao1/openspdm/issues) is also synced.
+This repo will be achieved as read-only.
 
 ## Feature
 
