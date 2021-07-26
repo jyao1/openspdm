@@ -13,7 +13,7 @@ SET(ARCH ${ARCH} CACHE STRING "Choose the arch of build: Ia32 X64 ARM AArch64 Ri
 SET(TOOLCHAIN ${TOOLCHAIN} CACHE STRING "Choose the toolchain of build: Windows: VS2015 VS2019 CLANG LIBFUZZER Linux: GCC ARM_GCC AARCH64_GCC RISCV32_GCC RISCV64_GCC ARC_GCC CLANG CBMC AFL KLEE LIBFUZZER" FORCE)
 SET(CMAKE_BUILD_TYPE ${TARGET} CACHE STRING "Choose the target of build: Debug Release" FORCE)
 SET(CRYPTO ${CRYPTO} CACHE STRING "Choose the crypto of build: MbedTls Openssl" FORCE)
-SET(TESTTYPE ${TESTTYPE} CACHE STRING "Choose the test type for openspdm: SpdmEmu UnitTest UnitFuzzing" FORCE)
+SET(TESTTYPE ${TESTTYPE} CACHE STRING "Choose the test type for openspdm: SpdmEmu UnitTest UnitFuzzing WireShark" FORCE)
 
 if(ARCH STREQUAL "X64")
     MESSAGE("ARCH = X64")
@@ -99,6 +99,8 @@ elseif(TESTTYPE STREQUAL "UnitTest")
     MESSAGE("TESTTYPE = UnitTest")
 elseif(TESTTYPE STREQUAL "UnitFuzzing")
     MESSAGE("TESTTYPE = UnitFuzzing")
+elseif(TESTTYPE STREQUAL "WireShark")
+    MESSAGE("TESTTYPE = WireShark")
 else()
     MESSAGE(FATAL_ERROR "Unkown TESTTYPE")
 endif()
@@ -351,7 +353,7 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
         SET(CMAKE_C_FLAGS_RELEASE     "/GL /O1b2s")  
         SET(CMAKE_C_FLAGS_DEBUG       "/Od")
     else()
-        SET(CMAKE_C_FLAGS "/nologo /WX /W4 /Gs32768 /D UNICODE /Gy /EHs-c- /GR- /GF /Z7 /Gw /Oy- /wd4063")
+        SET(CMAKE_C_FLAGS "/nologo /WX /W4 /Gs32768 /D UNICODE /Gy /EHs-c- /GR- /GF /Z7 /Gw /Oy- /D _CRT_SECURE_NO_WARNINGS /wd4063")
         SET(MBEDTLS_FLAGS "/wd4244 /wd4132 /wd4245 /wd4310 /wd4701 /wd4127")
         SET(OPENSSL_FLAGS "/FIBase.h /wd4090 /wd4132 /wd4244 /wd4245 /wd4267 /wd4306 /wd4310 /wd4700 /wd4389 /wd4702 /wd4706 /wd4819 /wd4013")
         SET(CMOCKA_FLAGS "/wd4204 /wd4133 /wd4267 /wd4701 /wd4702 /wd4703 /D _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1 /D _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT=1 /D _CRT_NONSTDC_NO_WARNINGS=1")
@@ -427,6 +429,7 @@ if(TESTTYPE STREQUAL "SpdmEmu")
             Library/SpdmTransportPciDoeLib
             OsStub/BaseMemoryLib
             OsStub/DebugLib
+            OsStub/DebugLibNull
             OsStub/RngLib
             OsStub/MemoryAllocationLib
             SpdmEmu/SpdmDeviceSecretLib
@@ -436,7 +439,21 @@ if(TESTTYPE STREQUAL "SpdmEmu")
             SpdmEmu/SpdmResponderEmu
             SpdmDump
     )
-       
+    
+elseif(TESTTYPE STREQUAL "WireShark") 
+    SUBDIRS(Library/SpdmCommonLib
+            Library/SpdmCryptLib
+            Library/SpdmSecuredMessageLib
+            Library/SpdmTransportMctpLib
+            Library/SpdmTransportPciDoeLib
+            OsStub/BaseMemoryLib
+            OsStub/DebugLibNull
+            OsStub/RngLib
+            OsStub/MemoryAllocationLib
+            SpdmEmu/SpdmDeviceSecretLib
+            SpdmDump
+    )
+              
 elseif(TESTTYPE STREQUAL "UnitTest")
     SUBDIRS(Library/SpdmCommonLib
             Library/SpdmRequesterLib

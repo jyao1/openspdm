@@ -238,6 +238,22 @@ OpenOutputFile (
   IN CHAR8   *FileName
   );
 
+BOOLEAN
+GetValueFromName (
+  IN VALUE_STRING_ENTRY  *Table,
+  IN UINTN               EntryCount,
+  IN CHAR8               *Name,
+  OUT UINT32             *Value
+  );
+
+BOOLEAN
+GetFlagsFromName (
+  IN VALUE_STRING_ENTRY  *Table,
+  IN UINTN               EntryCount,
+  IN CHAR8               *Name,
+  OUT UINT32             *Flags
+  );
+
 extern BOOLEAN  mParamQuiteMode;
 extern BOOLEAN  mParamAllMode;
 extern BOOLEAN  mParamDumpVendorApp;

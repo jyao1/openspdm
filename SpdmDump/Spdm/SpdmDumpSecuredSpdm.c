@@ -152,6 +152,25 @@ DISPATCH_TABLE_ENTRY mSecuredSpdmDispatch[] = {
   {LINKTYPE_PCI_DOE, "", DumpSpdmMessage},
 };
 
+VOID 
+DumpDecodedMessageForWireshark (
+  IN VOID    *Buffer,
+  IN UINTN   BufferSize
+  )
+{
+  CHAR8 *FileName = "DecodeMsg.bin";
+
+  FILE *pf = NULL;
+
+  if ((pf = fopen(FileName, "wb")) == NULL) {
+    printf ("!!!Unable to open decode message file %s!!!\n", FileName);
+  }
+
+  fwrite(Buffer, 1, BufferSize, pf);
+ 
+  fclose(pf);
+}
+
 VOID
 DumpSecuredSpdmMessage (
   IN VOID    *Buffer,
@@ -254,6 +273,7 @@ DumpSecuredSpdmMessage (
 
     mDecrypted = TRUE;
     DumpDispatchMessage (mSecuredSpdmDispatch, ARRAY_SIZE(mSecuredSpdmDispatch), GetDataLinkType(), mSpdmDecMessageBuffer, MessageSize);
+    DumpDecodedMessageForWireshark (mSpdmDecMessageBuffer, MessageSize);
     mDecrypted = FALSE;
   } else {
     printf ("(?)->(?) ");
